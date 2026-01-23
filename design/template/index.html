@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Deck Family Farm CSA Store Template</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="state-member">
+    <!-- component: announcement -->
+    <div class="announcement">
+      <div class="container">
+        <div>Winter cycle opens Friday at 9am PT</div>
+        <div>Free pickup at 3 drop sites</div>
+      </div>
+    </div>
+
+    <!-- component: header -->
+    <header class="site-header">
+      <div class="container header-row">
+        <div class="logo">Deck Family Farm CSA</div>
+        <nav class="nav">
+          <a href="#shop">Shop</a>
+          <a href="#csa">CSA Plans</a>
+          <a href="#plan-chooser">Choose a Plan</a>
+          <a href="#recipes">Recipes</a>
+          <a href="#delivery">Delivery</a>
+          <a href="#product-detail">Product</a>
+          <a href="#account">Account</a>
+          <a href="#cart">Cart (3)</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <!-- component: hero -->
+      <section class="section">
+        <div class="container hero">
+          <div class="hero-inner">
+            <div class="hero-card">
+              <div class="eyebrow">Market to table</div>
+              <h1 class="h1">A coastal catalog feel with real farm roots.</h1>
+              <p class="lede">
+                Build your share from pasture-raised meats, dairy, and pantry staples.
+                Use monthly credits, roll them forward, and top up only when you want.
+              </p>
+              <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <a class="button" href="#shop">Shop this cycle</a>
+                <a class="button alt" href="#csa">View CSA plans</a>
+              </div>
+            </div>
+            <div class="hero-visual"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- component: plan chooser (guest visible) -->
+      <section class="section tight show-guest" id="plan-chooser">
+        <div class="container">
+          <div class="eyebrow">New here?</div>
+          <h2 class="h2">Start with a plan, then shop the pantry.</h2>
+          <p class="lede">
+            Plans fund your monthly credits and unlock member-only pricing. Pick a plan to
+            open the store and start building your share.
+          </p>
+          <div class="grid three">
+            <div class="plan featured">
+              <div class="plan-price">$300</div>
+              <div>Most popular</div>
+              <div class="small">Great for weekly staples + a few extras</div>
+              <a class="button" href="#">Start at $300</a>
+            </div>
+            <div class="plan">
+              <div class="plan-price">$200</div>
+              <div>Small household</div>
+              <div class="small">Flexible for lighter weeks</div>
+              <a class="button alt" href="#">Start at $200</a>
+            </div>
+            <div class="plan">
+              <div class="plan-price">$500</div>
+              <div>Big table</div>
+              <div class="small">Best for bulk + freezer stock</div>
+              <a class="button alt" href="#">Start at $500</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- component: pantry categories -->
+      <section class="section tight show-member" id="shop">
+        <div class="container">
+          <div class="eyebrow">Shop by pantry</div>
+          <h2 class="h2">A clear, catalog-driven browse.</h2>
+          <div class="grid four">
+            <div class="category-tile">
+              <div class="icon">M</div>
+              <strong>Meat + Poultry</strong>
+              <span class="small">Pasture raised cuts</span>
+            </div>
+            <div class="category-tile">
+              <div class="icon">D</div>
+              <strong>Dairy</strong>
+              <span class="small">Milk, butter, cheese</span>
+            </div>
+            <div class="category-tile">
+              <div class="icon">E</div>
+              <strong>Eggs</strong>
+              <span class="small">Weekly farm eggs</span>
+            </div>
+            <div class="category-tile">
+              <div class="icon">P</div>
+              <strong>Pantry</strong>
+              <span class="small">Grains, honey, herbs</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- component: CSA plans -->
+      <section class="section" id="csa">
+        <div class="container">
+          <div class="grid two">
+            <div>
+              <div class="eyebrow">Monthly credits</div>
+              <h2 class="h2">CSA plans that roll forward.</h2>
+              <p class="lede">
+                Choose the level that fits your household. Credits never expire, and you can
+                pause or donate leftover balance to Feed-a-Friend.
+              </p>
+            </div>
+            <div class="grid three">
+              <div class="plan">
+                <div class="plan-price">$200</div>
+                <div>Good for small households</div>
+                <div class="small">$5 herdshare + $5 dividend posted monthly</div>
+                <a class="button alt" href="#">Select</a>
+              </div>
+              <div class="plan featured">
+                <div class="plan-price">$300</div>
+                <div>Most popular</div>
+                <div class="small">Ideal for weekly pantry and protein</div>
+                <a class="button" href="#">Select</a>
+              </div>
+              <div class="plan">
+                <div class="plan-price">$500</div>
+                <div>Feeding a crew</div>
+                <div class="small">For large families or bulk orders</div>
+                <a class="button alt" href="#">Select</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- component: seasonal highlight -->
+      <section class="section tight">
+        <div class="container grid two">
+          <div class="card pad">
+            <div class="eyebrow">Seasonal</div>
+            <h2 class="h2">Winter broth and roast bundle.</h2>
+            <p class="lede">
+              Save on grass-fed beef bones, marrow, and stew cuts. Perfect for slow weekends and
+              freezer stocking.
+            </p>
+            <a class="button" href="#">Add bundle</a>
+          </div>
+          <div class="card pad">
+            <div class="eyebrow">From the dairy</div>
+            <h2 class="h2">Farmstead cheese flight.</h2>
+            <p class="lede">
+              Three small batch cheeses with pairing notes and a pantry list for simple boards.
+            </p>
+            <a class="button alt" href="#">View details</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- component: product grid -->
+      <section class="section">
+        <div class="container">
+          <div class="eyebrow">Featured this cycle</div>
+          <h2 class="h2">Fresh cuts and staples ready to ship or pickup.</h2>
+          <div class="grid four">
+            <div class="product-card">
+              <div class="product-image"></div>
+              <strong>Ribeye Steak</strong>
+              <div class="small">1 lb average</div>
+              <div class="price">$24.00</div>
+            </div>
+            <div class="product-card">
+              <div class="product-image"></div>
+              <strong>Raw Milk, 1/2 gal</strong>
+              <div class="small">Jar deposit included</div>
+              <div class="price">$10.00</div>
+            </div>
+            <div class="product-card">
+              <div class="product-image"></div>
+              <strong>Pastured Eggs</strong>
+              <div class="small">Dozen</div>
+              <div class="price">$8.00</div>
+            </div>
+            <div class="product-card">
+              <div class="product-image"></div>
+              <strong>Heirloom Beans</strong>
+              <div class="small">2 lb bag</div>
+              <div class="price">$12.00</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- component: herdshare and credits -->
+      <section class="section tight">
+        <div class="container">
+          <div class="banner">
+            <strong>Herdshare + credits</strong>
+            <div>
+              $5 herdshare fee is paired with a $5 dividend credit each month for audit clarity.
+              Credits roll over forever and can be donated to Feed-a-Friend when you leave.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- component: delivery -->
+      <section class="section" id="delivery">
+        <div class="container">
+          <div class="grid two">
+            <div>
+              <div class="eyebrow">Delivery and pickup</div>
+              <h2 class="h2">Choose a drop site or check zone eligibility.</h2>
+              <p class="lede">
+                We deliver across the valley with order windows based on drop day. Pickups stay
+                free for members, delivery is available for a small fee.
+              </p>
+              <div class="grid two">
+                <div class="card pad">
+                  <strong>Tuesday route</strong>
+                  <div class="small">Order Fri to Sun</div>
+                </div>
+                <div class="card pad">
+                  <strong>Saturday route</strong>
+                  <div class="small">Order Mon to Wed</div>
+                </div>
+              </div>
+            </div>
+            <div class="side-stack">
+              <div class="map-card"></div>
+              <div class="card pad">
+                <strong>Default drop site</strong>
+                <div class="small">Set in account settings</div>
+                <div class="pill">Elm St Church</div>
+                <a class="button alt" href="#account">Update drop site</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- component: product detail with reviews -->
+      <section class="section" id="product-detail">
+        <div class="container">
+          <div class="grid two">
+            <div class="product-gallery">
+              <div class="product-photo photo-a"></div>
+              <div class="grid two">
+                <div class="product-photo photo-b"></div>
+                <div class="product-photo photo-c"></div>
+              </div>
+            </div>
+            <div class="card pad">
+              <div class="eyebrow">Featured cut</div>
+              <h2 class="h2">Grass-fed Ribeye Steak</h2>
+              <p class="lede">
+                Dry-aged in small batches for a deep, buttery finish. Each cut is hand trimmed
+                and vacuum sealed. Jar return credit available at pickup.
+              </p>
+              <div class="price">$24.00</div>
+              <div class="small">1 lb average · Member pricing available</div>
+              <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px;">
+                <a class="button" href="#">Add to cart</a>
+                <a class="button alt" href="#">Save for recurring</a>
+              </div>
+              <div class="review-block">
+                <strong>Reviews</strong>
+                <div class="review">
+                  <div class="small">★★★★★ · “Best sear all winter.”</div>
+                  <div class="small">- Morgan, Dec 14</div>
+                </div>
+                <div class="review">
+                  <div class="small">★★★★☆ · “Great marbling, cooked fast.”</div>
+                  <div class="small">- Jamie, Dec 2</div>
+                </div>
+                <a class="button alt" href="#">Write a review</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- component: recipes and stories -->
+      <section class="section" id="recipes">
+        <div class="container">
+          <div class="eyebrow">From the kitchen</div>
+          <h2 class="h2">Recipes and stories from the farm.</h2>
+          <div class="grid three">
+            <div class="card pad">
+              <strong>Sunday pot roast</strong>
+              <p class="small">How to braise with marrow bones and roots.</p>
+            </div>
+            <div class="card pad">
+              <strong>Weeknight skillet eggs</strong>
+              <p class="small">Pantry staples you already have.</p>
+            </div>
+            <div class="card pad">
+              <strong>Raw milk yogurt</strong>
+              <p class="small">Simple cultures, low heat, big flavor.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- component: footer -->
+    <footer class="site-footer" id="account">
+      <div class="container footer-grid">
+        <div>
+          <div class="logo">Deck Family Farm CSA</div>
+          <p class="small">Pasture-raised, family-run, and built for steady weekly rhythm.</p>
+        </div>
+        <div>
+          <strong>Store</strong>
+          <div class="small">Catalog</div>
+          <div class="small">CSA plans</div>
+          <div class="small">Delivery zones</div>
+        </div>
+        <div>
+          <strong>Members</strong>
+          <div class="small">Wallet and credits</div>
+          <div class="small">Order history</div>
+          <div class="small">Preferences</div>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
