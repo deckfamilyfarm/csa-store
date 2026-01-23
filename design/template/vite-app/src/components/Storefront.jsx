@@ -32,8 +32,9 @@ export function Storefront() {
   const [view, setView] = useState("home");
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useState("meat");
   const productGridRef = useRef(null);
+  const categoryRef = useRef(null);
 
   useEffect(() => {
     function syncView() {
@@ -49,16 +50,19 @@ export function Storefront() {
   const isAccountView = view === "account";
   const activeCategory = categories.find((category) => category.key === selectedCategory);
   const featuredProducts = products.filter((product) => product.featured);
-  const filteredProducts =
-    selectedCategory === "all"
-      ? products
-      : products.filter((product) => product.category === selectedCategory);
+  const filteredProducts = products.filter((product) => product.category === selectedCategory);
 
   useEffect(() => {
     if (isMember && productGridRef.current) {
       productGridRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   }, [selectedCategory, isMember]);
+
+  useEffect(() => {
+    if (isMember && categoryRef.current) {
+      categoryRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [isMember]);
 
   function renderStars(rating) {
     const safeRating = Math.max(0, Math.min(5, rating || 0));
@@ -100,11 +104,13 @@ export function Storefront() {
           <>
             {!isMember && <HeroSection hero={hero} showEyebrow={!isMember} showCard={!isMember} />}
             {isMember ? (
-              <PantryCategories
-                categories={categories}
-                selectedKey={selectedCategory}
-                onSelect={(key) => setSelectedCategory(key)}
-              />
+              <div ref={categoryRef}>
+                <PantryCategories
+                  categories={categories}
+                  selectedKey={selectedCategory}
+                  onSelect={(key) => setSelectedCategory(key)}
+                />
+              </div>
             ) : (
               <PlanChooser plans={plans} />
             )}

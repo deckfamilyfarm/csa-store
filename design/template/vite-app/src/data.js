@@ -24,14 +24,6 @@ export const hero = {
 
 export const categories = [
   {
-    icon: "All",
-    title: "Show all",
-    note: "Every category",
-    key: "all",
-    image:
-      "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=900&q=80",
-  },
-  {
     icon: "M",
     title: "Meat + Poultry",
     note: "Pasture raised cuts",
