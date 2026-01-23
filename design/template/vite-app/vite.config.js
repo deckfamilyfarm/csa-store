@@ -10,5 +10,6 @@ export default defineConfig({
   preview: {
     port: 5176,
     host: true,
+    allowedHosts: ["store.deckfamilyfarm.com"],
   },
 });
