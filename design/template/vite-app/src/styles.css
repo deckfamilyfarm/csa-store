@@ -149,6 +149,17 @@ img {
   box-shadow: none;
 }
 
+.button:hover {
+  filter: brightness(0.92);
+}
+
+.button.alt:hover {
+  background: var(--barn);
+  color: #fff;
+  border-color: var(--barn);
+  box-shadow: none;
+}
+
 .button-row {
   display: flex;
   gap: 12px;
@@ -396,13 +407,20 @@ img {
 
 .category-tile {
   display: grid;
-  gap: 10px;
-  padding: 20px;
+  gap: 12px;
+  padding: 16px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: #fff;
   text-align: left;
   width: 100%;
+  margin: 0;
+}
+
+.category-tile.button-reset {
+  border: 1px solid var(--line);
+  background: #fff;
+  padding: 16px;
 }
 
 .category-image {
@@ -413,6 +431,11 @@ img {
   border-radius: calc(var(--radius) - 6px);
   overflow: hidden;
   border: 1px solid var(--line);
+  margin-bottom: 6px;
+}
+
+.category-tile strong {
+  margin-top: 4px;
 }
 
 .category-image img {
