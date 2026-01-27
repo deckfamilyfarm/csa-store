@@ -255,48 +255,63 @@ export function Storefront() {
             {isMember ? (
               <div ref={categoryRef}>
                 <section className="section tight" id="shop">
-                  <div className="container">
-                    <div className="eyebrow">Shop by pantry</div>
-                    <h2 className="h2">Browse by Category</h2>
-                    <div className="filters">
-                      <label className="filter-field">
-                        <span className="small">Category</span>
-                        <select
-                          className="select"
-                          value={selectedCategory}
-                          onChange={(event) => setSelectedCategory(event.target.value)}
-                        >
-                          <option value="">All categories</option>
-                          {catalog.categories.map((category) => (
-                            <option key={category.id} value={category.id}>
-                              {category.name}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                      <label className="filter-field">
-                        <span className="small">Vendor</span>
-                        <select
-                          className="select"
-                          value={selectedVendor}
-                          onChange={(event) => setSelectedVendor(event.target.value)}
-                        >
-                          <option value="">All vendors</option>
-                          {catalog.vendors.map((vendor) => (
-                            <option key={vendor.id} value={vendor.id}>
-                              {vendor.name}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                      <label className="filter-toggle">
-                        <input
-                          type="checkbox"
-                          checked={onSaleOnly}
-                          onChange={(event) => setOnSaleOnly(event.target.checked)}
-                        />
-                        <span>On sale</span>
-                      </label>
+                  <div className="container shop-layout">
+                    <aside className="shop-filters">
+                      <div className="eyebrow">Shop by pantry</div>
+                      <h2 className="h2">Filters</h2>
+                      <div className="filters vertical">
+                        <label className="filter-field">
+                          <span className="small">Category</span>
+                          <select
+                            className="select"
+                            value={selectedCategory}
+                            onChange={(event) => setSelectedCategory(event.target.value)}
+                          >
+                            <option value="">All categories</option>
+                            {catalog.categories.map((category) => (
+                              <option key={category.id} value={category.id}>
+                                {category.name}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        <label className="filter-field">
+                          <span className="small">Vendor</span>
+                          <select
+                            className="select"
+                            value={selectedVendor}
+                            onChange={(event) => setSelectedVendor(event.target.value)}
+                          >
+                            <option value="">All vendors</option>
+                            {catalog.vendors.map((vendor) => (
+                              <option key={vendor.id} value={vendor.id}>
+                                {vendor.name}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        <label className="filter-toggle">
+                          <input
+                            type="checkbox"
+                            checked={onSaleOnly}
+                            onChange={(event) => setOnSaleOnly(event.target.checked)}
+                          />
+                          <span>On sale</span>
+                        </label>
+                      </div>
+                    </aside>
+                    <div className="shop-main">
+                      {catalogError && <div className="card pad">{catalogError}</div>}
+                      <ProductGrid
+                        products={filteredProducts}
+                        showCartAction
+                        onSelect={(product) => setSelectedProduct(product)}
+                        filterLabel={activeCategory ? activeCategory.name : "All"}
+                        sectionRef={productGridRef}
+                        eyebrow="Catalog"
+                        title="All products in this category."
+                        embedded
+                      />
                     </div>
                   </div>
                 </section>
@@ -306,16 +321,6 @@ export function Storefront() {
             )}
             {isMember ? (
               <>
-                {catalogError && <div className="card pad">{catalogError}</div>}
-                <ProductGrid
-                  products={filteredProducts}
-                  showCartAction
-                  onSelect={(product) => setSelectedProduct(product)}
-                  filterLabel={activeCategory ? activeCategory.name : "All"}
-                  sectionRef={productGridRef}
-                  eyebrow="Catalog"
-                  title="All products in this category."
-                />
                 <ProductGrid
                   products={featuredProducts}
                   showCartAction

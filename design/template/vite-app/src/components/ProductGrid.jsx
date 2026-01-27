@@ -13,19 +13,19 @@ export function ProductGrid({
   sectionRef,
   eyebrow = "Featured this cycle",
   title = "Fresh cuts and staples ready to ship or pickup.",
+  embedded = false,
 }) {
-  return (
-    <section className="section" id="product-grid" ref={sectionRef}>
-      <div className="container">
-        <div className="eyebrow">{eyebrow}</div>
-        <h2 className="h2">{title}</h2>
-        {filterLabel && <div className="small">Showing: {filterLabel}</div>}
-        {products.length === 0 ? (
-          <div className="card pad">
-            <strong>No products in this category yet.</strong>
-            <div className="small">Try another category or check back soon.</div>
-          </div>
-        ) : (
+  const content = (
+    <>
+      <div className="eyebrow">{eyebrow}</div>
+      <h2 className="h2">{title}</h2>
+      {filterLabel && <div className="small">Showing: {filterLabel}</div>}
+      {products.length === 0 ? (
+        <div className="card pad">
+          <strong>No products in this category yet.</strong>
+          <div className="small">Try another category or check back soon.</div>
+        </div>
+      ) : (
         <div className="grid four">
           {products.map((product) => (
             <div key={product.name} className="product-card">
@@ -58,8 +58,21 @@ export function ProductGrid({
             </div>
           ))}
         </div>
-        )}
+      )}
+    </>
+  );
+
+  if (embedded) {
+    return (
+      <div className="product-grid" id="product-grid" ref={sectionRef}>
+        {content}
       </div>
+    );
+  }
+
+  return (
+    <section className="section" id="product-grid" ref={sectionRef}>
+      <div className="container">{content}</div>
     </section>
   );
 }

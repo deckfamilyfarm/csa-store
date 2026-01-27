@@ -31,9 +31,16 @@ export async function ensureSeedUser() {
   });
 }
 
-if (process.env.SEED_USER === "true") {
-  ensureSeedUser().then(() => {
-    console.log("User seeded");
-    process.exit(0);
-  });
+const isDirectRun = process.argv[1] && process.argv[1].endsWith("seedUser.js");
+
+if (isDirectRun) {
+  ensureSeedUser()
+    .then(() => {
+      console.log("User seeded");
+      process.exit(0);
+    })
+    .catch((err) => {
+      console.error("User seed failed:", err.message);
+      process.exit(1);
+    });
 }

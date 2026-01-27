@@ -214,6 +214,14 @@ img {
   .section {
     padding: 40px 0;
   }
+
+  .shop-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .shop-filters {
+    position: static;
+  }
 }
 
 @media (max-width: 600px) {
@@ -611,6 +619,37 @@ img {
 
 .filters .filter-field {
   width: 170px;
+}
+
+.filters.vertical {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.filters.vertical .filter-field {
+  width: 100%;
+}
+
+.shop-layout {
+  display: grid;
+  grid-template-columns: minmax(200px, 240px) minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.shop-filters {
+  position: sticky;
+  top: 120px;
+  align-self: start;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow);
+}
+
+.shop-main .product-grid {
+  padding-top: 0;
 }
 
 .filter-toggle {

@@ -29,9 +29,16 @@ export async function ensureSeedAdmin() {
   });
 }
 
-if (process.env.SEED_ADMIN === "true") {
-  ensureSeedAdmin().then(() => {
-    console.log("Admin seeded");
-    process.exit(0);
-  });
+const isDirectRun = process.argv[1] && process.argv[1].endsWith("seedAdmin.js");
+
+if (isDirectRun) {
+  ensureSeedAdmin()
+    .then(() => {
+      console.log("Admin seeded");
+      process.exit(0);
+    })
+    .catch((err) => {
+      console.error("Admin seed failed:", err.message);
+      process.exit(1);
+    });
 }
