@@ -11,7 +11,7 @@ import {
   productDetail,
   seasonalHighlights,
 } from "../data";
-import { fetchCatalog } from "../api.js";
+import { fetchCatalog, fetchMe, userLogin } from "../api.js";
 import { AccountPanelSection } from "./AccountPanelSection.jsx";
 import { CsaPlansSection } from "./CsaPlansSection.jsx";
 import { DeliverySection } from "./DeliverySection.jsx";
@@ -22,10 +22,15 @@ import { PlanChooser } from "./PlanChooser.jsx";
 import { ProductDetailSection } from "./ProductDetailSection.jsx";
 import { ProductGrid } from "./ProductGrid.jsx";
 import { RecipesSection } from "./RecipesSection.jsx";
+import { AdminPanel } from "./AdminPanel.jsx";
 import { SeasonalHighlights } from "./SeasonalHighlights.jsx";
 
 export function Storefront() {
-  const [isMember, setIsMember] = useState(false);
+  const [userToken, setUserToken] = useState(() => localStorage.getItem("userToken") || "");
+  const [user, setUser] = useState(null);
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [loginState, setLoginState] = useState({ email: "", password: "", error: "" });
+  const [showPassword, setShowPassword] = useState(false);
   const [view, setView] = useState("home");
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
@@ -36,16 +41,22 @@ export function Storefront() {
     categories: [],
     vendors: [],
     products: [],
-    recipes: []
+    recipes: [],
+    dropSites: []
   });
   const [catalogError, setCatalogError] = useState("");
   const productGridRef = useRef(null);
   const categoryRef = useRef(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const isMember = Boolean(userToken);
 
   useEffect(() => {
     function syncView() {
       const hash = window.location.hash.replace("#/", "");
+      if (hash === "admin") {
+        setView("admin");
+        return;
+      }
       setView(hash === "account" ? "account" : "home");
     }
 
@@ -61,7 +72,8 @@ export function Storefront() {
           categories: data.categories || [],
           vendors: data.vendors || [],
           products: data.products || [],
-          recipes: data.recipes || []
+          recipes: data.recipes || [],
+          dropSites: data.dropSites || []
         });
         setSelectedCategory((current) => current || "");
       })
@@ -71,7 +83,24 @@ export function Storefront() {
       });
   }, []);
 
+  useEffect(() => {
+    if (!userToken) {
+      setUser(null);
+      return;
+    }
+    fetchMe(userToken)
+      .then((data) => {
+        setUser(data.user || null);
+      })
+      .catch(() => {
+        localStorage.removeItem("userToken");
+        setUserToken("");
+        setUser(null);
+      });
+  }, [userToken]);
+
   const isAccountView = view === "account";
+  const isAdminView = view === "admin";
   const activeCategory = catalog.categories.find(
     (category) => String(category.id) === String(selectedCategory)
   );
@@ -95,6 +124,14 @@ export function Storefront() {
       }),
     [catalog.products, selectedCategory, selectedVendor, onSaleOnly]
   );
+
+  const dropSiteData = useMemo(() => {
+    const names = (catalog.dropSites || []).map((site) => site.name).filter(Boolean);
+    return {
+      defaultSite: names[0] || dropSite.defaultSite,
+      options: names.length ? names : dropSite.options
+    };
+  }, [catalog.dropSites]);
 
   useEffect(() => {
     if (isMember && productGridRef.current) {
@@ -154,6 +191,27 @@ export function Storefront() {
     return template.innerHTML;
   }
 
+  async function handleLogin(event) {
+    event.preventDefault();
+    setLoginState((prev) => ({ ...prev, error: "" }));
+    try {
+      const result = await userLogin(loginState.email, loginState.password);
+      localStorage.setItem("userToken", result.token);
+      setUserToken(result.token);
+      setUser(result.user || null);
+      setLoginOpen(false);
+      setLoginState({ email: "", password: "", error: "" });
+    } catch (err) {
+      setLoginState((prev) => ({ ...prev, error: "Invalid login" }));
+    }
+  }
+
+  function handleLogout() {
+    localStorage.removeItem("userToken");
+    setUserToken("");
+    setUser(null);
+  }
+
   return (
     <div className="page">
       <main>
@@ -178,12 +236,18 @@ export function Storefront() {
                   </button>
                 </>
               ))}
-            <button className="button" type="button" onClick={() => setIsMember(!isMember)}>
+            <button
+              className="button"
+              type="button"
+              onClick={() => (isMember ? handleLogout() : setLoginOpen(true))}
+            >
               {isMember ? "Log out" : "Log in"}
             </button>
           </div>
         </div>
-        {isAccountView ? (
+        {isAdminView ? (
+          <AdminPanel />
+        ) : isAccountView ? (
           <AccountPanelSection accountPanel={accountPanel} dropSite={dropSite} />
         ) : (
           <>
@@ -273,7 +337,7 @@ export function Storefront() {
                   onSelect={(product) => setSelectedProduct(product)}
                 />
                 <HerdshareBanner herdshare={herdshare} />
-                <DeliverySection delivery={delivery} dropSite={dropSite} />
+                <DeliverySection delivery={delivery} dropSite={dropSiteData} />
                 <ProductDetailSection productDetail={productDetail} />
                 <RecipesSection
                   recipes={catalog.recipes}
@@ -284,6 +348,53 @@ export function Storefront() {
           </>
         )}
       </main>
+
+      {loginOpen && (
+        <div className="modal-backdrop" onClick={() => setLoginOpen(false)}>
+          <div className="modal modal-small" onClick={(event) => event.stopPropagation()}>
+            <button className="modal-close" type="button" onClick={() => setLoginOpen(false)}>
+              Close
+            </button>
+            <div className="modal-body single">
+              <div>
+                <div className="eyebrow">Member access</div>
+                <h2 className="h2">Log in</h2>
+                <form className="admin-form" onSubmit={handleLogin}>
+                  <input
+                    className="input"
+                    placeholder="Email"
+                    value={loginState.email}
+                    onChange={(event) =>
+                      setLoginState((prev) => ({ ...prev, email: event.target.value }))
+                    }
+                  />
+                  <input
+                    className="input"
+                    placeholder="Password"
+                    type={showPassword ? "text" : "password"}
+                    value={loginState.password}
+                    onChange={(event) =>
+                      setLoginState((prev) => ({ ...prev, password: event.target.value }))
+                    }
+                  />
+                  <label className="filter-toggle">
+                    <input
+                      type="checkbox"
+                      checked={showPassword}
+                      onChange={(event) => setShowPassword(event.target.checked)}
+                    />
+                    <span>Show password</span>
+                  </label>
+                  {loginState.error && <div className="small">{loginState.error}</div>}
+                  <button className="button" type="submit">
+                    Sign in
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <FooterSection brand={brand} />
 

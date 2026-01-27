@@ -90,3 +90,35 @@ export const admins = mysqlTable("admins", {
   passwordHash: varchar("password_hash", { length: 255 }).notNull(),
   createdAt: datetime("created_at")
 });
+
+export const users = mysqlTable("users", {
+  id: int("id").autoincrement().primaryKey(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  passwordHash: varchar("password_hash", { length: 255 }).notNull(),
+  role: varchar("role", { length: 32 }).default("member"),
+  createdAt: datetime("created_at"),
+  updatedAt: datetime("updated_at")
+});
+
+export const reviews = mysqlTable("reviews", {
+  id: int("id").autoincrement().primaryKey(),
+  productId: int("product_id").notNull(),
+  rating: int("rating").notNull(),
+  title: varchar("title", { length: 255 }),
+  body: text("body"),
+  status: varchar("status", { length: 32 }).default("pending"),
+  createdAt: datetime("created_at"),
+  updatedAt: datetime("updated_at")
+});
+
+export const dropSites = mysqlTable("drop_sites", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  address: text("address"),
+  dayOfWeek: varchar("day_of_week", { length: 16 }),
+  openTime: varchar("open_time", { length: 16 }),
+  closeTime: varchar("close_time", { length: 16 }),
+  active: tinyint("active").default(1),
+  createdAt: datetime("created_at"),
+  updatedAt: datetime("updated_at")
+});

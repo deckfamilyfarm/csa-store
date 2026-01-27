@@ -591,16 +591,26 @@ img {
 }
 
 .filters {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   gap: 16px;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  align-items: end;
+  align-items: flex-end;
   margin-top: 16px;
 }
 
 .filter-field {
   display: grid;
   gap: 8px;
+  min-width: 0;
+}
+
+.filters .input,
+.filters .select {
+  width: 100%;
+}
+
+.filters .filter-field {
+  width: 170px;
 }
 
 .filter-toggle {
@@ -609,6 +619,229 @@ img {
   gap: 10px;
   font-weight: 600;
   color: var(--navy);
+}
+
+.admin-panel {
+  padding: 32px 0 64px;
+}
+
+.admin-layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.admin-nav {
+  position: sticky;
+  top: 24px;
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+
+.admin-nav-item {
+  border: 1px solid transparent;
+  background: var(--mist);
+  border-radius: 12px;
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--navy);
+  cursor: pointer;
+}
+
+.admin-nav-item.active,
+.admin-nav-item:hover {
+  border-color: var(--barn);
+  color: var(--barn);
+  background: #fff;
+}
+
+.admin-content {
+  display: grid;
+  gap: 24px;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.admin-section {
+  margin: 24px 0;
+}
+
+.admin-section:first-child {
+  margin-top: 0;
+}
+
+.admin-section h3 {
+  margin-top: 0;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  font-size: 14px;
+}
+
+.admin-table th {
+  background: #f7f2e8;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.admin-row-link {
+  cursor: pointer;
+}
+
+.admin-row-link:hover {
+  background: rgba(143, 46, 43, 0.08);
+}
+
+.admin-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.admin-grid .card {
+  box-shadow: none;
+}
+
+.admin-row {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+
+.admin-thumb {
+  width: 140px;
+  height: 140px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid var(--line);
+}
+
+.admin-form {
+  display: grid;
+  gap: 12px;
+  max-width: 360px;
+}
+
+.admin-fields {
+  display: grid;
+  gap: 16px;
+  margin: 16px 0 24px;
+  max-width: none;
+  width: 100%;
+}
+
+.admin-fields .filter-field {
+  width: 100%;
+}
+
+.admin-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-toolbar .button {
+  box-shadow: none;
+  padding: 6px 10px;
+  font-size: 12px;
+  min-width: 44px;
+  justify-content: center;
+}
+
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 36px;
+  padding: 0;
+}
+
+.icon-button svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.admin-fields .textarea {
+  min-height: 180px;
+}
+
+.admin-editor {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px;
+  min-height: 220px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.6;
+  width: 100%;
+}
+
+.admin-price-list {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-editor:focus {
+  outline: 2px solid rgba(143, 46, 43, 0.35);
+  outline-offset: 1px;
+}
+.input,
+.textarea {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-family: var(--sans);
+  font-size: 14px;
+}
+
+.textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+@media (max-width: 900px) {
+  .admin-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-nav {
+    position: static;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-thumb {
+    width: 100%;
+    height: 180px;
+  }
 }
 
 .account-row {
@@ -697,6 +930,10 @@ img {
   overflow: hidden;
 }
 
+.modal.modal-small {
+  width: min(520px, 92vw);
+}
+
 .modal-body {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -704,6 +941,11 @@ img {
   align-items: start;
   max-height: calc(90vh - 80px);
   overflow: auto;
+}
+
+.modal-body.single {
+  grid-template-columns: 1fr;
+  max-height: none;
 }
 
 .modal-image {

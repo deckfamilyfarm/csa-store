@@ -1,7 +1,18 @@
 import express from "express";
 import { getDb } from "../db.js";
 import { and, eq, inArray } from "drizzle-orm";
-import { categories, packages, productImages, products, productTags, recipes, tags, vendors } from "../schema.js";
+import {
+  categories,
+  dropSites,
+  packages,
+  productImages,
+  products,
+  productTags,
+  recipes,
+  reviews,
+  tags,
+  vendors
+} from "../schema.js";
 
 const router = express.Router();
 
@@ -25,6 +36,13 @@ router.get("/catalog", async (_req, res) => {
 
     const packageRows = productIds.length
       ? await db.select().from(packages).where(inArray(packages.productId, productIds))
+      : [];
+
+    const reviewRows = productIds.length
+      ? await db
+          .select()
+          .from(reviews)
+          .where(and(inArray(reviews.productId, productIds), eq(reviews.status, "approved")))
       : [];
 
     const featuredTag = await db.select().from(tags).where(eq(tags.name, "featured"));
@@ -78,6 +96,17 @@ router.get("/catalog", async (_req, res) => {
       return acc;
     }, {});
 
+    const reviewsByProduct = reviewRows.reduce((acc, row) => {
+      if (!acc[row.productId]) acc[row.productId] = [];
+      acc[row.productId].push({
+        rating: row.rating,
+        title: row.title,
+        body: row.body,
+        createdAt: row.createdAt
+      });
+      return acc;
+    }, {});
+
     const vendorMap = new Map(vendorRows.map((row) => [row.id, row.name]));
     const categoryMap = new Map(categoryRows.map((row) => [row.id, row.name]));
 
@@ -87,6 +116,11 @@ router.get("/catalog", async (_req, res) => {
       const priceCandidates = visiblePackages
         .map((pkg) => Number(pkg.price))
         .filter((value) => Number.isFinite(value));
+      const productReviews = reviewsByProduct[row.id] || [];
+      const avgRating = productReviews.length
+        ? productReviews.reduce((sum, review) => sum + Number(review.rating || 0), 0) /
+          productReviews.length
+        : 0;
 
       return {
         id: row.id,
@@ -102,8 +136,8 @@ router.get("/catalog", async (_req, res) => {
         imageUrl: (imagesByProduct[row.id] || [row.thumbnailUrl]).find(Boolean) || null,
         featured: featuredSet.has(row.id),
         onSale: saleSet.has(row.id),
-        rating: 0,
-        reviews: []
+        rating: avgRating ? Math.round(avgRating * 10) / 10 : 0,
+        reviews: productReviews
       };
     });
 
@@ -117,9 +151,12 @@ router.get("/catalog", async (_req, res) => {
       steps: row.stepsJson ? JSON.parse(row.stepsJson) : []
     }));
 
+    const dropSiteRows = await db.select().from(dropSites).where(eq(dropSites.active, 1));
+
     res.json({
       categories: categoryRows,
       vendors: vendorRows,
+      dropSites: dropSiteRows,
       products: productPayload,
       recipes: recipePayload
     });

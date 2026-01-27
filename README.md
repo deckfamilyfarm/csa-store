@@ -12,6 +12,9 @@ Template location
 API location
 - The API lives in `apps/api` (Express + Drizzle + MySQL).
 
+Admin panel
+- Visit `/#/admin` to log in as an admin.
+
 Run locally (dev)
 1) `npm install`
 2) Copy `.env.example` to `.env` and fill in DB creds
