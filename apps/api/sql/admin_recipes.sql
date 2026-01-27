@@ -35,6 +35,13 @@ CREATE TABLE IF NOT EXISTS reviews (
 CREATE UNIQUE INDEX IF NOT EXISTS idx_reviews_unique_user_product
   ON reviews (product_id, user_id);
 
+CREATE TABLE IF NOT EXISTS product_sales (
+  product_id INT PRIMARY KEY,
+  on_sale TINYINT(1) DEFAULT 0,
+  sale_discount DECIMAL(5, 2),
+  updated_at DATETIME
+);
+
 CREATE TABLE IF NOT EXISTS drop_sites (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(255) NOT NULL,

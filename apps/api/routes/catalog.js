@@ -7,6 +7,7 @@ import {
   packages,
   productImages,
   products,
+  productSales,
   productTags,
   recipes,
   reviews,
@@ -37,6 +38,10 @@ router.get("/catalog", async (_req, res) => {
 
     const packageRows = productIds.length
       ? await db.select().from(packages).where(inArray(packages.productId, productIds))
+      : [];
+
+    const saleRows = productIds.length
+      ? await db.select().from(productSales).where(inArray(productSales.productId, productIds))
       : [];
 
     const reviewRows = productIds.length
@@ -97,6 +102,14 @@ router.get("/catalog", async (_req, res) => {
       return acc;
     }, {});
 
+    const salesByProduct = saleRows.reduce((acc, row) => {
+      acc[row.productId] = {
+        onSale: Boolean(row.onSale),
+        saleDiscount: row.saleDiscount !== null ? Number(row.saleDiscount) : null
+      };
+      return acc;
+    }, {});
+
     const reviewsByProduct = reviewRows.reduce((acc, row) => {
       if (!acc[row.productId]) acc[row.productId] = [];
       acc[row.productId].push({
@@ -123,6 +136,7 @@ router.get("/catalog", async (_req, res) => {
         ? productReviews.reduce((sum, review) => sum + Number(review.rating || 0), 0) /
           productReviews.length
         : 0;
+      const saleMeta = salesByProduct[row.id];
 
       return {
         id: row.id,
@@ -137,7 +151,8 @@ router.get("/catalog", async (_req, res) => {
         images: imagesByProduct[row.id] || [],
         imageUrl: (imagesByProduct[row.id] || [row.thumbnailUrl]).find(Boolean) || null,
         featured: featuredSet.has(row.id),
-        onSale: saleSet.has(row.id),
+        onSale: saleMeta ? saleMeta.onSale : saleSet.has(row.id),
+        saleDiscount: saleMeta ? saleMeta.saleDiscount : null,
         rating: avgRating ? Math.round(avgRating * 10) / 10 : 0,
         reviews: productReviews
       };

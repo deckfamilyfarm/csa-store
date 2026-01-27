@@ -72,6 +72,16 @@ export const productTags = mysqlTable(
   })
 );
 
+export const productSales = mysqlTable(
+  "product_sales",
+  {
+    productId: int("product_id").notNull().primaryKey(),
+    onSale: tinyint("on_sale").default(0),
+    saleDiscount: decimal("sale_discount", { precision: 5, scale: 2 }),
+    updatedAt: datetime("updated_at")
+  }
+);
+
 export const recipes = mysqlTable("recipes", {
   id: int("id").autoincrement().primaryKey(),
   title: varchar("title", { length: 255 }).notNull(),

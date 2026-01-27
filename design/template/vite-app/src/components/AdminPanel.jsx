@@ -28,6 +28,9 @@ export function AdminPanel() {
   const [productCategoryFilter, setProductCategoryFilter] = useState("");
   const [productVendorFilter, setProductVendorFilter] = useState("");
   const [productVisibleFilter, setProductVisibleFilter] = useState("visible");
+  const [productEdits, setProductEdits] = useState({});
+  const [applyState, setApplyState] = useState({ open: false, updates: [], results: [], error: "" });
+  const [applyLoading, setApplyLoading] = useState(false);
   const activeProduct = products.find((product) => product.id === selectedProductId);
   const descriptionRef = useRef(null);
 
@@ -48,6 +51,7 @@ export function AdminPanel() {
       setRecipes(recipeData.recipes || []);
       setReviews(reviewData.reviews || []);
       setDropSites(dropSiteData.dropSites || []);
+      setProductEdits({});
     } catch (err) {
       setMessage("Failed to load admin data.");
     } finally {
@@ -240,6 +244,56 @@ export function AdminPanel() {
     loadAll();
   }
 
+  async function handleApplyChanges() {
+    const editEntries = Object.entries(productEdits);
+    if (!editEntries.length) return;
+
+    const updates = editEntries.map(([id, changes]) => {
+      const productId = Number(id);
+      const product = productMap.get(productId);
+      const safeDiscount = Math.min(Math.max(Number(changes.saleDiscount) || 0, 0), 100);
+      return {
+        productId,
+        productName: product?.name || `Product ${productId}`,
+        category: categoryMap.get(product?.categoryId) || "Uncategorized",
+        changes: {
+          visible: changes.visible ? 1 : 0,
+          trackInventory: changes.trackInventory ? 1 : 0,
+          inventory: Number(changes.inventory) || 0,
+          onSale: changes.onSale ? 1 : 0,
+          saleDiscount: safeDiscount / 100
+        },
+        display: {
+          visible: changes.visible ? "On" : "Off",
+          trackInventory: changes.trackInventory ? "On" : "Off",
+          inventory: Number(changes.inventory) || 0,
+          onSale: changes.onSale ? "On" : "Off",
+          saleDiscount: safeDiscount
+        }
+      };
+    });
+
+    setApplyState({ open: true, updates, results: [], error: "" });
+    setApplyLoading(true);
+
+    try {
+      const response = await adminPost("products/bulk-update", token, {
+        updates: updates.map((update) => ({ productId: update.productId, changes: update.changes }))
+      });
+      setApplyState((prev) => ({ ...prev, results: response.results || [] }));
+      setProductEdits({});
+      await loadAll();
+    } catch (err) {
+      setApplyState((prev) => ({ ...prev, error: "Failed to apply changes." }));
+    } finally {
+      setApplyLoading(false);
+    }
+  }
+
+  function closeApplyPanel() {
+    setApplyState({ open: false, updates: [], results: [], error: "" });
+  }
+
   if (!token) {
     return (
       <div className="container admin-panel">
@@ -269,6 +323,7 @@ export function AdminPanel() {
 
   const vendorMap = new Map(vendors.map((vendor) => [vendor.id, vendor.name]));
   const categoryMap = new Map(categories.map((category) => [category.id, category.name]));
+  const productMap = new Map(products.map((product) => [product.id, product]));
 
   function getProductPrice(product) {
     const prices = (product.packages || [])
@@ -276,6 +331,48 @@ export function AdminPanel() {
       .filter((value) => Number.isFinite(value));
     if (!prices.length) return "N/A";
     return `$${Math.min(...prices).toFixed(2)}`;
+  }
+
+  function getProductDefaults(product) {
+    const saleDiscount = Number.isFinite(product.saleDiscount) ? Number(product.saleDiscount) : 0;
+    return {
+      visible: Boolean(product.visible),
+      trackInventory: Boolean(product.trackInventory),
+      inventory: Number.isFinite(product.inventory) ? Number(product.inventory) : 0,
+      onSale: Boolean(product.onSale),
+      saleDiscount: Math.round(saleDiscount * 100)
+    };
+  }
+
+  function editsMatch(a, b) {
+    return (
+      a.visible === b.visible &&
+      a.trackInventory === b.trackInventory &&
+      Number(a.inventory) === Number(b.inventory) &&
+      a.onSale === b.onSale &&
+      Number(a.saleDiscount) === Number(b.saleDiscount)
+    );
+  }
+
+  function updateProductEdit(productId, patch) {
+    const product = productMap.get(productId);
+    if (!product) return;
+    const defaults = getProductDefaults(product);
+    setProductEdits((prev) => {
+      const next = { ...prev };
+      const current = next[productId] ? { ...defaults, ...next[productId] } : { ...defaults };
+      const updated = { ...current, ...patch };
+      if (updated.trackInventory && updated.visible && Number(updated.inventory) === 0) {
+        window.alert("If Track Inventory is on and stock is 0, set Visible to off.");
+        return prev;
+      }
+      if (editsMatch(updated, defaults)) {
+        delete next[productId];
+      } else {
+        next[productId] = updated;
+      }
+      return next;
+    });
   }
 
   const filteredProducts = products.filter((product) => {
@@ -292,9 +389,6 @@ export function AdminPanel() {
     <div className="container admin-panel">
       <div className="admin-header">
         <h2 className="h2">Admin Dashboard</h2>
-        <button className="button alt" type="button" onClick={() => setToken("")}>
-          Log out
-        </button>
       </div>
       {message && <div className="small">{message}</div>}
       {loading && <div className="small">Loading...</div>}
@@ -396,32 +490,107 @@ export function AdminPanel() {
                   </select>
                 </label>
               </div>
+              <div className="admin-actions">
+                <button
+                  className="button"
+                  type="button"
+                  onClick={handleApplyChanges}
+                  disabled={applyLoading || Object.keys(productEdits).length === 0}
+                >
+                  {applyLoading ? "Applying..." : "Apply Changes"}
+                </button>
+              </div>
               <table className="admin-table">
                 <thead>
                   <tr>
+                    <th>Category</th>
                     <th>Name</th>
                     <th>Vendor</th>
                     <th>Price</th>
                     <th>Visible</th>
                     <th>Track Inventory</th>
-                    <th>Inventory</th>
+                    <th>Stock</th>
+                    <th>On Sale</th>
+                    <th>Discount %</th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredProducts.map((product) => (
-                    <tr
-                      key={product.id}
-                      className="admin-row-link"
-                      onClick={() => setSelectedProductId(product.id)}
-                    >
-                      <td>{product.name}</td>
-                      <td>{vendorMap.get(product.vendorId) || "N/A"}</td>
-                      <td>{getProductPrice(product)}</td>
-                      <td>{product.visible ? "Yes" : "No"}</td>
-                      <td>{product.trackInventory ? "Yes" : "No"}</td>
-                      <td>{Number.isFinite(product.inventory) ? product.inventory : "N/A"}</td>
-                    </tr>
-                  ))}
+                  {filteredProducts.map((product) => {
+                    const defaults = getProductDefaults(product);
+                    const edits = productEdits[product.id];
+                    const rowValues = edits ? { ...defaults, ...edits } : defaults;
+                    return (
+                      <tr key={product.id} className={edits ? "edited" : ""}>
+                        <td>{categoryMap.get(product.categoryId) || "Uncategorized"}</td>
+                        <td>{product.name}</td>
+                        <td>{vendorMap.get(product.vendorId) || "N/A"}</td>
+                        <td>{getProductPrice(product)}</td>
+                        <td>
+                          <button
+                            className={`toggle-switch ${rowValues.visible ? "active" : ""}`}
+                            type="button"
+                            onClick={() =>
+                              updateProductEdit(product.id, { visible: !rowValues.visible })
+                            }
+                          />
+                        </td>
+                        <td>
+                          <button
+                            className={`toggle-switch ${rowValues.trackInventory ? "active" : ""}`}
+                            type="button"
+                            onClick={() =>
+                              updateProductEdit(product.id, { trackInventory: !rowValues.trackInventory })
+                            }
+                          />
+                        </td>
+                        <td>
+                          <input
+                            className="stock-input"
+                            type="number"
+                            value={rowValues.inventory}
+                            onChange={(event) =>
+                              updateProductEdit(product.id, { inventory: Number(event.target.value) })
+                            }
+                          />
+                        </td>
+                        <td>
+                          <button
+                            className={`toggle-switch ${rowValues.onSale ? "active" : ""}`}
+                            type="button"
+                            onClick={() =>
+                              updateProductEdit(product.id, { onSale: !rowValues.onSale })
+                            }
+                          />
+                        </td>
+                        <td>
+                          <span className="sale-discount-wrapper">
+                            <input
+                              className="sale-discount-input"
+                              type="number"
+                              min="0"
+                              max="100"
+                              step="1"
+                              value={rowValues.saleDiscount}
+                              onChange={(event) =>
+                                updateProductEdit(product.id, { saleDiscount: Number(event.target.value) })
+                              }
+                            />
+                            <span className="sale-discount-suffix">%</span>
+                          </span>
+                        </td>
+                        <td>
+                          <button
+                            className="button alt"
+                            type="button"
+                            onClick={() => setSelectedProductId(product.id)}
+                          >
+                            Details
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </section>
@@ -679,6 +848,60 @@ export function AdminPanel() {
           )}
         </div>
       </div>
+
+      {applyState.open && (
+        <div className="modal-backdrop" onClick={closeApplyPanel}>
+          <div className="modal response-modal" onClick={(event) => event.stopPropagation()}>
+            <h3>Updates Applied</h3>
+            <div className="response-progress">
+              Updating {applyState.results.length} of {applyState.updates.length} products
+            </div>
+            {applyState.error && <div className="small">{applyState.error}</div>}
+            <div className="response-list">
+              {applyState.updates.map((update) => {
+                const result = (applyState.results || []).find(
+                  (item) => item.productId === update.productId
+                );
+                const databaseOk = result ? result.databaseUpdate : null;
+                const localLineOk = result ? result.localLineUpdate : null;
+                const localLinePriceOk = result ? result.localLinePriceUpdate : null;
+                const dbLabel = databaseOk === null || databaseOk === undefined ? "Pending" : databaseOk ? "Updated" : "Failed";
+                const llLabel = localLineOk === null || localLineOk === undefined ? "Skipped" : localLineOk ? "Updated" : "Failed";
+                const llPriceLabel =
+                  localLinePriceOk === null || localLinePriceOk === undefined
+                    ? "Skipped"
+                    : localLinePriceOk
+                    ? "Updated"
+                    : "Failed";
+                const dbClass = databaseOk ? "ok" : databaseOk === null ? "pending" : "warn";
+                const llClass = localLineOk ? "ok" : localLineOk === null ? "pending" : "warn";
+                const llPriceClass = localLinePriceOk ? "ok" : localLinePriceOk === null ? "pending" : "warn";
+
+                return (
+                  <div className="response-card" key={update.productId}>
+                    <div className="title">{update.productName}</div>
+                    <div className="small">Category: {update.category}</div>
+                    <div className="small">
+                      Visible: {update.display.visible} · Track: {update.display.trackInventory} · Stock: {update.display.inventory}
+                    </div>
+                    <div className="small">
+                      Sale: {update.display.onSale} · Discount: {update.display.saleDiscount}%
+                    </div>
+                    <div>Database: <span className={`status ${dbClass}`}>{dbLabel}</span></div>
+                    <div>LocalLine: <span className={`status ${llClass}`}>{llLabel}</span></div>
+                    <div>LocalLine Pricing: <span className={`status ${llPriceClass}`}>{llPriceLabel}</span></div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="response-actions">
+              <button className="button alt" type="button" onClick={closeApplyPanel}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

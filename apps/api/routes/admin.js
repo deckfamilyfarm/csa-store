@@ -11,6 +11,7 @@ import {
   packages,
   productImages,
   products,
+  productSales,
   recipes,
   reviews,
   tags,
@@ -80,6 +81,10 @@ router.get("/products", requireAdmin, async (_req, res) => {
     ? await db.select().from(packages).where(inArray(packages.productId, productIds))
     : [];
 
+  const saleRows = productIds.length
+    ? await db.select().from(productSales).where(inArray(productSales.productId, productIds))
+    : [];
+
   const imagesByProduct = imageRows.reduce((acc, row) => {
     if (!acc[row.productId]) acc[row.productId] = [];
     acc[row.productId].push(row.url);
@@ -92,11 +97,21 @@ router.get("/products", requireAdmin, async (_req, res) => {
     return acc;
   }, {});
 
+  const salesByProduct = saleRows.reduce((acc, row) => {
+    acc[row.productId] = {
+      onSale: Boolean(row.onSale),
+      saleDiscount: row.saleDiscount !== null ? Number(row.saleDiscount) : null
+    };
+    return acc;
+  }, {});
+
   res.json({
     products: productRows.map((row) => ({
       ...row,
       images: imagesByProduct[row.id] || [],
-      packages: packagesByProduct[row.id] || []
+      packages: packagesByProduct[row.id] || [],
+      onSale: salesByProduct[row.id]?.onSale ?? false,
+      saleDiscount: salesByProduct[row.id]?.saleDiscount ?? null
     }))
   });
 });
@@ -219,6 +234,8 @@ router.put("/products/:id", requireAdmin, async (req, res) => {
       name: updates.name ?? undefined,
       description: updates.description ?? undefined,
       visible: updates.visible ?? undefined,
+      trackInventory: updates.trackInventory ?? undefined,
+      inventory: updates.inventory ?? undefined,
       categoryId: updates.categoryId ?? undefined,
       vendorId: updates.vendorId ?? undefined,
       thumbnailUrl: updates.thumbnailUrl ?? undefined
@@ -226,6 +243,71 @@ router.put("/products/:id", requireAdmin, async (req, res) => {
     .where(eq(products.id, id));
 
   res.json({ ok: true });
+});
+
+router.post("/products/bulk-update", requireAdmin, async (req, res) => {
+  const db = getDb();
+  const updates = Array.isArray(req.body?.updates) ? req.body.updates : [];
+  const results = [];
+
+  for (const update of updates) {
+    const productId = Number(update.productId);
+    const changes = update.changes || {};
+    if (!Number.isFinite(productId)) {
+      results.push({ productId, databaseUpdate: false, localLineUpdate: null, localLinePriceUpdate: null });
+      continue;
+    }
+
+    try {
+      await db
+        .update(products)
+        .set({
+          visible: changes.visible ?? undefined,
+          trackInventory: changes.trackInventory ?? undefined,
+          inventory: changes.inventory ?? undefined,
+          updatedAt: new Date()
+        })
+        .where(eq(products.id, productId));
+
+      const salePayload = {
+        productId,
+        onSale: changes.onSale ?? 0,
+        saleDiscount: typeof changes.saleDiscount === "number" ? changes.saleDiscount : null,
+        updatedAt: new Date()
+      };
+
+      const existingSale = await db
+        .select()
+        .from(productSales)
+        .where(eq(productSales.productId, productId));
+
+      if (existingSale.length) {
+        await db
+          .update(productSales)
+          .set(salePayload)
+          .where(eq(productSales.productId, productId));
+      } else {
+        await db.insert(productSales).values(salePayload);
+      }
+
+      results.push({
+        productId,
+        databaseUpdate: true,
+        localLineUpdate: null,
+        localLinePriceUpdate: null
+      });
+    } catch (err) {
+      console.error("Bulk update error:", err);
+      results.push({
+        productId,
+        databaseUpdate: false,
+        localLineUpdate: null,
+        localLinePriceUpdate: null
+      });
+    }
+  }
+
+  res.json({ results });
 });
 
 router.put("/packages/:id", requireAdmin, async (req, res) => {
