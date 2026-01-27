@@ -34,19 +34,19 @@ export function ProductGrid({
                 type="button"
                 onClick={() => onSelect?.(product)}
               >
-                <img src={product.image} alt={product.name} loading="lazy" />
+                <img src={product.imageUrl || product.image} alt={product.name} loading="lazy" />
               </button>
               <strong>{product.name}</strong>
               <div className="small">{product.note}</div>
-              <div className="price">{product.price}</div>
-              <div className="small">
-                {renderStars(product.rating)} {product.rating || 0}/5
-              </div>
-              <div className="small">
-                {product.reviews && product.reviews.length > 0
-                  ? `${product.reviews.length} review(s)`
-                  : "No reviews yet"}
-              </div>
+              <div className="price">{product.price ? `$${product.price}` : "Price TBD"}</div>
+              {product.reviews && product.reviews.length > 0 ? (
+                <div className="small">
+                  {renderStars(product.rating)} {product.rating || 0}/5 ·{" "}
+                  {product.reviews.length} review(s)
+                </div>
+              ) : (
+                <div className="small">No reviews yet</div>
+              )}
               <button className="button alt" type="button" onClick={() => onSelect?.(product)}>
                 View details
               </button>

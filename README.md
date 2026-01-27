@@ -1,7 +1,7 @@
 # CSA Storefront Template
 
-This repo holds the design and template work for the Full Farm CSA storefront. The current output is a
-front-end template only; it is not wired to a live backend yet.
+This repo holds the design and template work for the Full Farm CSA storefront, plus a small API that
+serves the catalog from the `store` database.
 
 Design source
 - The core plan and requirements live in `design/design.md`.
@@ -9,12 +9,21 @@ Design source
 Template location
 - The Vite-based template is in `design/template/vite-app`.
 
+API location
+- The API lives in `apps/api` (Express + Drizzle + MySQL).
+
 Run locally (dev)
-1) `cd design/template/vite-app`
-2) `npm install`
+1) `npm install`
+2) Copy `.env.example` to `.env` and fill in DB creds
 3) `npm run dev`
 
 The dev server defaults to port 5176.
+
+Run the API (dev)
+1) `cd apps/api`
+2) `npm install`
+3) Copy `.env.example` to `.env` and fill in DB creds
+4) `npm run dev`
 
 Run online (preview/prod)
 1) `cd design/template/vite-app`

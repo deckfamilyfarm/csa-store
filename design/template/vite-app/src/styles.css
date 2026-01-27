@@ -29,6 +29,10 @@ body {
     repeating-linear-gradient(90deg, rgba(143, 46, 43, 0.04) 0 1px, transparent 1px 12px);
 }
 
+body.modal-open {
+  overflow: hidden;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -550,6 +554,21 @@ img {
   gap: 6px;
 }
 
+.product-description p {
+  margin: 0 0 12px;
+}
+
+.product-description {
+  max-height: 200px;
+  overflow: auto;
+  padding-right: 6px;
+}
+
+.product-description a {
+  color: var(--barn);
+  text-decoration: underline;
+}
+
 .pill {
   display: inline-flex;
   align-items: center;
@@ -568,6 +587,27 @@ img {
   border: 1px solid var(--line);
   font-weight: 600;
   background: #fff;
+  color: var(--navy);
+}
+
+.filters {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  align-items: end;
+  margin-top: 16px;
+}
+
+.filter-field {
+  display: grid;
+  gap: 8px;
+}
+
+.filter-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
   color: var(--navy);
 }
 
@@ -653,6 +693,8 @@ img {
   box-shadow: var(--shadow);
   padding: 28px;
   position: relative;
+  max-height: 90vh;
+  overflow: hidden;
 }
 
 .modal-body {
@@ -660,6 +702,8 @@ img {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 24px;
   align-items: start;
+  max-height: calc(90vh - 80px);
+  overflow: auto;
 }
 
 .modal-image {
@@ -667,6 +711,31 @@ img {
   overflow: hidden;
   border: 1px solid var(--line);
   min-height: 320px;
+  position: relative;
+}
+
+.modal-thumbs {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.modal-thumbs .thumb {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0;
+  background: #fff;
+  width: 72px;
+  height: 72px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.modal-thumbs .thumb.active {
+  border-color: var(--barn);
+  box-shadow: var(--shadow);
 }
 
 .modal-close {
