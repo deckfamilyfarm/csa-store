@@ -3,7 +3,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import bcrypt from "bcryptjs";
 import { getDb } from "../db.js";
-import { admins } from "../schema.js";
+import { users } from "../schema.js";
 import { eq } from "drizzle-orm";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -15,17 +15,19 @@ export async function ensureSeedAdmin() {
   const password = process.env.ADMIN_PASS || "admin2004";
 
   const db = getDb();
-  const existing = await db.select().from(admins).where(eq(admins.username, username));
+  const existing = await db.select().from(users).where(eq(users.email, username));
 
   if (existing.length > 0) {
     return;
   }
 
   const hash = await bcrypt.hash(password, 10);
-  await db.insert(admins).values({
-    username,
+  await db.insert(users).values({
+    email: username,
     passwordHash: hash,
-    createdAt: new Date()
+    role: "administrator",
+    createdAt: new Date(),
+    updatedAt: new Date()
   });
 }
 

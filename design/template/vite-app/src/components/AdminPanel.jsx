@@ -247,7 +247,7 @@ export function AdminPanel() {
         <form className="admin-form" onSubmit={handleLogin}>
           <input
             className="input"
-            placeholder="Username"
+            placeholder="Admin email"
             value={loginState.username}
             onChange={(event) => setLoginState((prev) => ({ ...prev, username: event.target.value }))}
           />
@@ -668,6 +668,7 @@ export function AdminPanel() {
                   <div key={review.id} className="card pad">
                     <strong>{review.title || "Review"}</strong>
                     <div className="small">Rating: {review.rating}</div>
+                    {review.userEmail && <div className="small">User: {review.userEmail}</div>}
                     <div className="small">Status: {review.status}</div>
                     <button className="button alt" type="button" onClick={() => handleReviewStatus(review.id, "approved")}>Approve</button>
                     <button className="button alt" type="button" onClick={() => handleReviewStatus(review.id, "rejected")}>Reject</button>

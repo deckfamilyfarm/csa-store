@@ -535,6 +535,38 @@ img {
   gap: 4px;
 }
 
+.review-form {
+  margin-top: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.review-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.review-own {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
+.review-own-item {
+  display: grid;
+  gap: 6px;
+}
+
+.review-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .recipe-image {
   width: 100%;
   height: 180px;

@@ -6,7 +6,6 @@ import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getDb } from "../db.js";
 import { and, eq, inArray } from "drizzle-orm";
 import {
-  admins,
   categories,
   dropSites,
   packages,
@@ -15,6 +14,7 @@ import {
   recipes,
   reviews,
   tags,
+  users,
   vendors
 } from "../schema.js";
 import { requireAdmin } from "../middleware/auth.js";
@@ -44,7 +44,7 @@ router.post("/login", async (req, res) => {
   }
 
   const db = getDb();
-  const rows = await db.select().from(admins).where(eq(admins.username, username));
+  const rows = await db.select().from(users).where(eq(users.email, username));
   if (!rows.length) {
     return res.status(401).json({ error: "Invalid credentials" });
   }
@@ -54,9 +54,15 @@ router.post("/login", async (req, res) => {
     return res.status(401).json({ error: "Invalid credentials" });
   }
 
-  const token = jwt.sign({ adminId: rows[0].id }, process.env.JWT_SECRET || "dev-secret", {
-    expiresIn: "30d"
-  });
+  if (rows[0].role !== "administrator" && rows[0].role !== "admin") {
+    return res.status(403).json({ error: "Admin access required" });
+  }
+
+  const token = jwt.sign(
+    { adminId: rows[0].id, userId: rows[0].id, role: rows[0].role },
+    process.env.JWT_SECRET || "dev-secret",
+    { expiresIn: "30d" }
+  );
 
   res.json({ token });
 });
@@ -116,7 +122,18 @@ router.get("/drop-sites", requireAdmin, async (_req, res) => {
 router.get("/reviews", requireAdmin, async (_req, res) => {
   const db = getDb();
   const rows = await db.select().from(reviews);
-  res.json({ reviews: rows });
+  const userIds = [...new Set(rows.map((row) => row.userId).filter(Boolean))];
+  const userRows = userIds.length
+    ? await db.select().from(users).where(inArray(users.id, userIds))
+    : [];
+  const userMap = new Map(userRows.map((row) => [row.id, row.email]));
+
+  res.json({
+    reviews: rows.map((row) => ({
+      ...row,
+      userEmail: row.userId ? userMap.get(row.userId) || null : null
+    }))
+  });
 });
 
 router.get("/recipes", requireAdmin, async (_req, res) => {

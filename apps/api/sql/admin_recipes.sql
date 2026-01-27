@@ -1,11 +1,4 @@
 -- Add admin/recipe tables if missing (run in `store` database)
-CREATE TABLE IF NOT EXISTS admins (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  username VARCHAR(255) NOT NULL UNIQUE,
-  password_hash VARCHAR(255) NOT NULL,
-  created_at DATETIME
-);
-
 CREATE TABLE IF NOT EXISTS users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   email VARCHAR(255) NOT NULL UNIQUE,
@@ -30,6 +23,7 @@ CREATE TABLE IF NOT EXISTS recipes (
 CREATE TABLE IF NOT EXISTS reviews (
   id INT AUTO_INCREMENT PRIMARY KEY,
   product_id INT NOT NULL,
+  user_id INT,
   rating INT NOT NULL,
   title VARCHAR(255),
   body TEXT,
@@ -37,6 +31,9 @@ CREATE TABLE IF NOT EXISTS reviews (
   created_at DATETIME,
   updated_at DATETIME
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_reviews_unique_user_product
+  ON reviews (product_id, user_id);
 
 CREATE TABLE IF NOT EXISTS drop_sites (
   id INT AUTO_INCREMENT PRIMARY KEY,

@@ -84,13 +84,6 @@ export const recipes = mysqlTable("recipes", {
   updatedAt: datetime("updated_at")
 });
 
-export const admins = mysqlTable("admins", {
-  id: int("id").autoincrement().primaryKey(),
-  username: varchar("username", { length: 255 }).notNull().unique(),
-  passwordHash: varchar("password_hash", { length: 255 }).notNull(),
-  createdAt: datetime("created_at")
-});
-
 export const users = mysqlTable("users", {
   id: int("id").autoincrement().primaryKey(),
   email: varchar("email", { length: 255 }).notNull().unique(),
@@ -103,6 +96,7 @@ export const users = mysqlTable("users", {
 export const reviews = mysqlTable("reviews", {
   id: int("id").autoincrement().primaryKey(),
   productId: int("product_id").notNull(),
+  userId: int("user_id"),
   rating: int("rating").notNull(),
   title: varchar("title", { length: 255 }),
   body: text("body"),

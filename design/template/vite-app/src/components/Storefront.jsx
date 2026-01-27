@@ -11,7 +11,15 @@ import {
   productDetail,
   seasonalHighlights,
 } from "../data";
-import { fetchCatalog, fetchMe, userLogin } from "../api.js";
+import {
+  deleteReview,
+  fetchCatalog,
+  fetchMe,
+  fetchMyReviews,
+  submitReview,
+  updateReview,
+  userLogin
+} from "../api.js";
 import { AccountPanelSection } from "./AccountPanelSection.jsx";
 import { CsaPlansSection } from "./CsaPlansSection.jsx";
 import { DeliverySection } from "./DeliverySection.jsx";
@@ -49,6 +57,11 @@ export function Storefront() {
   const categoryRef = useRef(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const isMember = Boolean(userToken);
+  const isAdmin = user?.role === "administrator" || user?.role === "admin";
+  const [reviewForm, setReviewForm] = useState({ rating: "5", title: "", body: "" });
+  const [reviewStatus, setReviewStatus] = useState({ message: "", error: "" });
+  const [userReviews, setUserReviews] = useState([]);
+  const [editingReviewId, setEditingReviewId] = useState(null);
 
   useEffect(() => {
     function syncView() {
@@ -91,6 +104,12 @@ export function Storefront() {
     fetchMe(userToken)
       .then((data) => {
         setUser(data.user || null);
+        if (data.user?.role === "administrator" || data.user?.role === "admin") {
+          localStorage.setItem("adminToken", userToken);
+          if (window.location.hash !== "#/admin") {
+            window.location.hash = "#/admin";
+          }
+        }
       })
       .catch(() => {
         localStorage.removeItem("userToken");
@@ -157,6 +176,34 @@ export function Storefront() {
     setSelectedImageIndex(0);
   }, [selectedProduct]);
 
+  useEffect(() => {
+    setReviewForm({ rating: "5", title: "", body: "" });
+    setReviewStatus({ message: "", error: "" });
+    setEditingReviewId(null);
+  }, [selectedProduct?.id]);
+
+  useEffect(() => {
+    if (!selectedProduct || !userToken) {
+      setUserReviews([]);
+      return;
+    }
+    fetchMyReviews(selectedProduct.id, userToken)
+      .then((data) => {
+        const reviews = data.reviews || [];
+        setUserReviews(reviews);
+        if (reviews.length && !editingReviewId) {
+          const review = reviews[0];
+          setEditingReviewId(review.id);
+          setReviewForm({
+            rating: String(review.rating || 5),
+            title: review.title || "",
+            body: review.body || ""
+          });
+        }
+      })
+      .catch(() => setUserReviews([]));
+  }, [selectedProduct?.id, userToken]);
+
   function renderStars(rating) {
     const safeRating = Math.max(0, Math.min(5, rating || 0));
     return "*".repeat(safeRating) + "-".repeat(5 - safeRating);
@@ -191,6 +238,62 @@ export function Storefront() {
     return template.innerHTML;
   }
 
+  async function handleReviewSubmit(event) {
+    event.preventDefault();
+    if (!selectedProduct) return;
+    setReviewStatus({ message: "", error: "" });
+    try {
+      if (editingReviewId) {
+        await updateReview(
+          editingReviewId,
+          {
+            rating: Number(reviewForm.rating),
+            title: reviewForm.title,
+            body: reviewForm.body
+          },
+          userToken
+        );
+        setReviewStatus({ message: "Review updated. Pending approval.", error: "" });
+      } else {
+        await submitReview(
+          {
+            productId: selectedProduct.id,
+            rating: Number(reviewForm.rating),
+            title: reviewForm.title,
+            body: reviewForm.body
+          },
+          userToken
+        );
+        setReviewStatus({ message: "Thanks! Your review is pending approval.", error: "" });
+      }
+      setReviewForm({ rating: "5", title: "", body: "" });
+      setEditingReviewId(null);
+      const data = await fetchMyReviews(selectedProduct.id, userToken);
+      setUserReviews(data.reviews || []);
+    } catch (err) {
+      setReviewStatus({ message: "", error: err.message || "Unable to submit review." });
+    }
+  }
+
+  function startEditReview(review) {
+    setEditingReviewId(review.id);
+    setReviewForm({
+      rating: String(review.rating || 5),
+      title: review.title || "",
+      body: review.body || ""
+    });
+  }
+
+  async function handleDeleteReview(reviewId) {
+    try {
+      await deleteReview(reviewId, userToken);
+      const data = await fetchMyReviews(selectedProduct.id, userToken);
+      setUserReviews(data.reviews || []);
+    } catch (err) {
+      setReviewStatus({ message: "", error: err.message || "Unable to delete review." });
+    }
+  }
+
   async function handleLogin(event) {
     event.preventDefault();
     setLoginState((prev) => ({ ...prev, error: "" }));
@@ -208,8 +311,10 @@ export function Storefront() {
 
   function handleLogout() {
     localStorage.removeItem("userToken");
+    localStorage.removeItem("adminToken");
     setUserToken("");
     setUser(null);
+    window.location.hash = "#/home";
   }
 
   return (
@@ -245,7 +350,7 @@ export function Storefront() {
             </button>
           </div>
         </div>
-        {isAdminView ? (
+        {isAdminView || isAdmin ? (
           <AdminPanel />
         ) : isAccountView ? (
           <AccountPanelSection accountPanel={accountPanel} dropSite={dropSite} />
@@ -463,15 +568,112 @@ export function Storefront() {
                   <strong>Reviews</strong>
                   {selectedProduct.reviews && selectedProduct.reviews.length > 0 ? (
                     selectedProduct.reviews.map((review) => (
-                      <div key={review.quote} className="review">
+                      <div key={review.id || review.createdAt || review.title} className="review">
                         <div className="small">
-                          {review.rating} "{review.quote}"
+                          {review.rating} {review.title ? `"${review.title}"` : ""}
                         </div>
-                        <div className="small">- {review.author}</div>
+                        {review.body && <div className="small">{review.body}</div>}
                       </div>
                     ))
                   ) : (
                     <div className="small">No reviews yet.</div>
+                  )}
+                  {isMember ? (
+                    <>
+                      {userReviews.length > 0 && (
+                        <div className="review-own">
+                          <div className="small">Your reviews</div>
+                          {userReviews.map((review) => (
+                            <div key={review.id} className="review-own-item">
+                              <div className="small">
+                                {review.rating}★ {review.title || "Review"} · {review.status}
+                              </div>
+                              {review.body && <div className="small">{review.body}</div>}
+                              <div className="review-actions">
+                                <button
+                                  className="button alt"
+                                  type="button"
+                                  onClick={() => startEditReview(review)}
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  className="button alt"
+                                  type="button"
+                                  onClick={() => handleDeleteReview(review.id)}
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      <form className="review-form" onSubmit={handleReviewSubmit}>
+                        <div className="small">
+                          {editingReviewId ? "Edit your review" : "Add your review"}
+                        </div>
+                        <div className="review-grid">
+                          <label className="filter-field">
+                            <span className="small">Rating</span>
+                            <select
+                              className="select"
+                              value={reviewForm.rating}
+                              onChange={(event) =>
+                                setReviewForm((prev) => ({ ...prev, rating: event.target.value }))
+                              }
+                            >
+                              {[5, 4, 3, 2, 1].map((value) => (
+                                <option key={value} value={value}>
+                                  {value} stars
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                          <label className="filter-field">
+                            <span className="small">Title</span>
+                            <input
+                              className="input"
+                              value={reviewForm.title}
+                              onChange={(event) =>
+                                setReviewForm((prev) => ({ ...prev, title: event.target.value }))
+                              }
+                            />
+                          </label>
+                        </div>
+                        <label className="filter-field">
+                          <span className="small">Review</span>
+                          <textarea
+                            className="textarea"
+                            value={reviewForm.body}
+                            onChange={(event) =>
+                              setReviewForm((prev) => ({ ...prev, body: event.target.value }))
+                            }
+                          />
+                        </label>
+                        {reviewStatus.error && <div className="small">{reviewStatus.error}</div>}
+                        {reviewStatus.message && <div className="small">{reviewStatus.message}</div>}
+                        <div className="button-row">
+                          {editingReviewId && (
+                            <button
+                              className="button alt"
+                              type="button"
+                              onClick={() => {
+                                setEditingReviewId(null);
+                                setReviewForm({ rating: "5", title: "", body: "" });
+                              }}
+                            >
+                              Cancel
+                            </button>
+                          )}
+                          <button className="button alt" type="submit">
+                            {editingReviewId ? "Update review" : "Submit review"}
+                          </button>
+                        </div>
+                      </form>
+                    </>
+                  ) : (
+                    <div className="small">Log in to leave a review.</div>
                   )}
                 </div>
                 <div className="button-row">

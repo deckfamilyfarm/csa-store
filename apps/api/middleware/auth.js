@@ -10,7 +10,8 @@ export function requireAdmin(req, res, next) {
 
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET || "dev-secret");
-    if (!payload || !payload.adminId) {
+    const isAdminRole = payload && (payload.role === "administrator" || payload.role === "admin");
+    if (!payload || (!payload.adminId && !isAdminRole)) {
       return res.status(403).json({ error: "Admin access required" });
     }
     req.admin = payload;

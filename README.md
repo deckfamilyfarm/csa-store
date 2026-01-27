@@ -5,6 +5,7 @@ serves the catalog from the `store` database.
 
 Design source
 - The core plan and requirements live in `design/design.md`.
+- Issues and motivation are in `design/whatswrong.md`.
 
 Template location
 - The Vite-based template is in `design/template/vite-app`.
