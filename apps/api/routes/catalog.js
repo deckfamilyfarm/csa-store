@@ -76,24 +76,47 @@ router.get("/catalog", async (_req, res) => {
     }, {});
 
     const normalizeUrl = (url) => (url ? url.split("?")[0] : url);
-    const imageScore = (url) => {
-      if (!url) return 99;
-      if (/thumbnail/i.test(url)) return 50;
-      if (/_1\\./i.test(url)) return 0;
-      if (/_2\\./i.test(url)) return 1;
-      return 2;
+    const isThumbnailUrl = (url) => /(?:^|\/)[^/]+\.thumbnail\.(jpg|jpeg|png|webp)$/i.test(url || "");
+    const baseKeyForUrl = (url) => {
+      try {
+        const normalized = normalizeUrl(url);
+        if (!normalized) return url;
+        const parsed = new URL(normalized);
+        const file = parsed.pathname.split("/").pop() || normalized;
+        return file
+          .replace(/\.thumbnail\.(jpg|jpeg|png|webp)$/i, "")
+          .replace(/\.(jpg|jpeg|png|webp)$/i, "");
+      } catch (err) {
+        const file = (normalizeUrl(url) || "").split("/").pop() || url;
+        return file
+          .replace(/\.thumbnail\.(jpg|jpeg|png|webp)$/i, "")
+          .replace(/\.(jpg|jpeg|png|webp)$/i, "");
+      }
     };
 
+    const imageObjectsByProduct = {};
     for (const productId of Object.keys(imagesByProduct)) {
-      const unique = [];
-      const seen = new Set();
-      for (const url of imagesByProduct[productId]) {
-        const normalized = normalizeUrl(url);
-        if (!normalized || /thumbnail/i.test(normalized) || seen.has(normalized)) continue;
-        seen.add(normalized);
-        unique.push(url);
-      }
-      imagesByProduct[productId] = unique.sort((a, b) => imageScore(a) - imageScore(b));
+      const groups = new Map();
+      const urls = imagesByProduct[productId];
+      urls.forEach((url) => {
+        const key = baseKeyForUrl(url);
+        if (!groups.has(key)) {
+          groups.set(key, { url: null, thumbnailUrl: null });
+        }
+        const entry = groups.get(key);
+        if (isThumbnailUrl(url)) {
+          entry.thumbnailUrl = entry.thumbnailUrl || url;
+        } else {
+          entry.url = entry.url || url;
+        }
+      });
+
+      imageObjectsByProduct[productId] = [...groups.values()]
+        .map((entry) => ({
+          url: entry.url || entry.thumbnailUrl,
+          thumbnailUrl: entry.thumbnailUrl || entry.url
+        }))
+        .filter((entry) => entry.url);
     }
 
     const packagesByProduct = packageRows.reduce((acc, row) => {
@@ -123,6 +146,15 @@ router.get("/catalog", async (_req, res) => {
     }, {});
 
     const vendorMap = new Map(vendorRows.map((row) => [row.id, row.name]));
+    const vendorMarkupMap = new Map(
+      vendorRows.map((row) => [
+        row.id,
+        {
+          guestMarkup: row.guestMarkup !== null && row.guestMarkup !== undefined ? Number(row.guestMarkup) : 0.55,
+          memberMarkup: row.memberMarkup !== null && row.memberMarkup !== undefined ? Number(row.memberMarkup) : 0.4
+        }
+      ])
+    );
     const categoryMap = new Map(categoryRows.map((row) => [row.id, row.name]));
 
     const productPayload = productRows.map((row) => {
@@ -137,6 +169,12 @@ router.get("/catalog", async (_req, res) => {
           productReviews.length
         : 0;
       const saleMeta = salesByProduct[row.id];
+      const basePrice = priceCandidates.length ? Math.min(...priceCandidates) : null;
+      const markups = vendorMarkupMap.get(row.vendorId) || { guestMarkup: 0.55, memberMarkup: 0.4 };
+      const guestPrice =
+        basePrice !== null ? Number((basePrice * (1 + markups.guestMarkup)).toFixed(2)) : null;
+      const memberPrice =
+        basePrice !== null ? Number((basePrice * (1 + markups.memberMarkup)).toFixed(2)) : null;
 
       return {
         id: row.id,
@@ -146,10 +184,27 @@ router.get("/catalog", async (_req, res) => {
         category: categoryMap.get(row.categoryId) || null,
         vendorId: row.vendorId,
         vendor: vendorMap.get(row.vendorId) || null,
-        price: priceCandidates.length ? Math.min(...priceCandidates).toFixed(2) : null,
+        basePrice: basePrice !== null ? Number(basePrice.toFixed(2)) : null,
+        guestPrice,
+        memberPrice,
+        vendorGuestMarkup: markups.guestMarkup,
+        vendorMemberMarkup: markups.memberMarkup,
         packages: productPackages,
-        images: imagesByProduct[row.id] || [],
-        imageUrl: (imagesByProduct[row.id] || [row.thumbnailUrl]).find(Boolean) || null,
+        images:
+          imageObjectsByProduct[row.id] ||
+          (imagesByProduct[row.id] || []).map((url) => ({ url, thumbnailUrl: url })),
+        imageUrl:
+          (imageObjectsByProduct[row.id] || [])
+            .map((item) => item.url)
+            .find(Boolean) ||
+          row.thumbnailUrl ||
+          null,
+        thumbnailUrl:
+          (imageObjectsByProduct[row.id] || [])
+            .map((item) => item.thumbnailUrl)
+            .find(Boolean) ||
+          row.thumbnailUrl ||
+          null,
         featured: featuredSet.has(row.id),
         onSale: saleMeta ? saleMeta.onSale : saleSet.has(row.id),
         saleDiscount: saleMeta ? saleMeta.saleDiscount : null,

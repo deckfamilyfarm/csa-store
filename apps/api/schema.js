@@ -11,7 +11,9 @@ import {
 
 export const vendors = mysqlTable("vendors", {
   id: int("id").primaryKey(),
-  name: varchar("name", { length: 255 })
+  name: varchar("name", { length: 255 }),
+  guestMarkup: decimal("guest_markup", { precision: 5, scale: 2 }).default("0.55"),
+  memberMarkup: decimal("member_markup", { precision: 5, scale: 2 }).default("0.40")
 });
 
 export const categories = mysqlTable("categories", {

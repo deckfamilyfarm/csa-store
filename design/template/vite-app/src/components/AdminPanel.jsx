@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+﻿import React, { useEffect, useRef, useState } from "react";
 import {
   adminGet,
   adminLogin,
@@ -28,6 +28,7 @@ export function AdminPanel() {
   const [productCategoryFilter, setProductCategoryFilter] = useState("");
   const [productVendorFilter, setProductVendorFilter] = useState("");
   const [productVisibleFilter, setProductVisibleFilter] = useState("visible");
+  const [productSaleFilter, setProductSaleFilter] = useState("all");
   const [productEdits, setProductEdits] = useState({});
   const [applyState, setApplyState] = useState({ open: false, updates: [], results: [], error: "" });
   const [applyLoading, setApplyLoading] = useState(false);
@@ -73,7 +74,9 @@ export function AdminPanel() {
         description: sanitizeHtml(activeProduct.description || ""),
         vendorId: activeProduct.vendorId ? String(activeProduct.vendorId) : "",
         categoryId: activeProduct.categoryId ? String(activeProduct.categoryId) : "",
-        visible: Boolean(activeProduct.visible)
+        visible: Boolean(activeProduct.visible),
+        onSale: Boolean(activeProduct.onSale),
+        saleDiscount: Math.round((Number(activeProduct.saleDiscount) || 0) * 100)
       });
     } else {
       setProductDraft(null);
@@ -166,6 +169,18 @@ export function AdminPanel() {
         vendorId,
         categoryId,
         visible: productDraft.visible ? 1 : 0
+      });
+      const safeDiscount = Math.min(Math.max(Number(productDraft.saleDiscount) || 0, 0), 100);
+      await adminPost("products/bulk-update", token, {
+        updates: [
+          {
+            productId: activeProduct.id,
+            changes: {
+              onSale: productDraft.onSale ? 1 : 0,
+              saleDiscount: safeDiscount / 100
+            }
+          }
+        ]
       });
       setMessage("Product updated.");
       await loadAll();
@@ -382,8 +397,13 @@ export function AdminPanel() {
       productVisibleFilter === "all" ||
       (productVisibleFilter === "visible" && product.visible) ||
       (productVisibleFilter === "hidden" && !product.visible);
-    return categoryMatch && vendorMatch && visibleMatch;
+    const saleMatch =
+      productSaleFilter === "all" ||
+      (productSaleFilter === "onSale" && product.onSale) ||
+      (productSaleFilter === "notOnSale" && !product.onSale);
+    return categoryMatch && vendorMatch && visibleMatch && saleMatch;
   });
+
 
   return (
     <div className="container admin-panel">
@@ -489,6 +509,18 @@ export function AdminPanel() {
                     <option value="all">All</option>
                   </select>
                 </label>
+                <label className="filter-field">
+                  <span className="small">On sale</span>
+                  <select
+                    className="input"
+                    value={productSaleFilter}
+                    onChange={(event) => setProductSaleFilter(event.target.value)}
+                  >
+                    <option value="all">All</option>
+                    <option value="onSale">On sale only</option>
+                    <option value="notOnSale">Not on sale</option>
+                  </select>
+                </label>
               </div>
               <div className="admin-actions">
                 <button
@@ -498,6 +530,20 @@ export function AdminPanel() {
                   disabled={applyLoading || Object.keys(productEdits).length === 0}
                 >
                   {applyLoading ? "Applying..." : "Apply Changes"}
+                </button>
+                <button
+                  className="button alt"
+                  type="button"
+                  disabled={applyLoading || Object.keys(productEdits).length === 0}
+                  onClick={() => {
+                    if (!window.confirm("Discard all pending changes? This cannot be undone.")) {
+                      return;
+                    }
+                    setProductEdits({});
+                    setMessage("Pending changes discarded.");
+                  }}
+                >
+                  Cancel Changes
                 </button>
               </div>
               <table className="admin-table">
@@ -670,6 +716,36 @@ export function AdminPanel() {
                       }
                     />
                     <span>Visible</span>
+                  </label>
+                  <div className="admin-row">
+                    <span className="small">On sale</span>
+                    <button
+                      className={`toggle-switch ${productDraft.onSale ? "active" : ""}`}
+                      type="button"
+                      onClick={() =>
+                        setProductDraft((prev) => ({ ...prev, onSale: !prev.onSale }))
+                      }
+                    />
+                  </div>
+                  <label className="filter-field">
+                    <span className="small">Sale discount</span>
+                    <span className="sale-discount-wrapper">
+                      <input
+                        className="sale-discount-input"
+                        type="number"
+                        min="0"
+                        max="100"
+                        step="1"
+                        value={productDraft.saleDiscount}
+                        onChange={(event) =>
+                          setProductDraft((prev) => ({
+                            ...prev,
+                            saleDiscount: Number(event.target.value)
+                          }))
+                        }
+                      />
+                      <span className="sale-discount-suffix">%</span>
+                    </span>
                   </label>
                   <label className="filter-field">
                     <span className="small">Description</span>

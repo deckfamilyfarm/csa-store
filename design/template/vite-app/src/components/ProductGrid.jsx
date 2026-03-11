@@ -14,7 +14,9 @@ export function ProductGrid({
   eyebrow = "Featured this cycle",
   title = "Fresh cuts and staples ready to ship or pickup.",
   embedded = false,
+  getPrice
 }) {
+  const priceFor = (product) => (getPrice ? getPrice(product) : product.price);
   const content = (
     <>
       <div className="eyebrow">{eyebrow}</div>
@@ -34,11 +36,15 @@ export function ProductGrid({
                 type="button"
                 onClick={() => onSelect?.(product)}
               >
-                <img src={product.imageUrl || product.image} alt={product.name} loading="lazy" />
+                <img
+                  src={product.thumbnailUrl || product.imageUrl || product.image}
+                  alt={product.name}
+                  loading="lazy"
+                />
               </button>
               <strong>{product.name}</strong>
               <div className="small">{product.note}</div>
-              <div className="price">{product.price ? `$${product.price}` : "Price TBD"}</div>
+              <div className="price">{priceFor(product) ? `$${priceFor(product)}` : "Price TBD"}</div>
               {product.reviews && product.reviews.length > 0 ? (
                 <div className="small">
                   {renderStars(product.rating)} {product.rating || 0}/5 ·{" "}

@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "dev": "cross-env DOTENV_CONFIG_PATH=./.env VITE_API_BASE=/api concurrently -n api,web -c cyan,green \"npm --prefix apps/api run dev\" \"npm --prefix design/template/vite-app run dev\""
+    "dev": "cross-env DOTENV_CONFIG_PATH=./.env VITE_API_BASE=/api concurrently --raw -n api,web -c cyan,green \"npm --prefix apps/api run dev\" \"npm --prefix design/template/vite-app run dev\""
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

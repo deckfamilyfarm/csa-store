@@ -58,19 +58,27 @@ export function Storefront() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const isMember = Boolean(userToken);
   const isAdmin = user?.role === "administrator" || user?.role === "admin";
+  const priceTier = isAdmin || user?.role === "member" ? "member" : "guest";
   const [reviewForm, setReviewForm] = useState({ rating: "5", title: "", body: "" });
   const [reviewStatus, setReviewStatus] = useState({ message: "", error: "" });
   const [userReviews, setUserReviews] = useState([]);
   const [editingReviewId, setEditingReviewId] = useState(null);
 
+  function getHashRoute() {
+    const raw = window.location.hash.replace(/^#\/?/, "").trim();
+    if (!raw) return null;
+    if (raw === "admin" || raw === "account" || raw === "home") return raw;
+    return null;
+  }
+
   useEffect(() => {
     function syncView() {
-      const hash = window.location.hash.replace("#/", "");
-      if (hash === "admin") {
+      const route = getHashRoute();
+      if (route === "admin") {
         setView("admin");
         return;
       }
-      setView(hash === "account" ? "account" : "home");
+      setView(route === "account" ? "account" : "home");
     }
 
     syncView();
@@ -104,11 +112,15 @@ export function Storefront() {
     fetchMe(userToken)
       .then((data) => {
         setUser(data.user || null);
-        if (data.user?.role === "administrator" || data.user?.role === "admin") {
+        const role = data.user?.role;
+        const route = getHashRoute();
+        if (role === "administrator" || role === "admin") {
           localStorage.setItem("adminToken", userToken);
-          if (window.location.hash !== "#/admin") {
+          if (!route) {
             window.location.hash = "#/admin";
           }
+        } else if (!route) {
+          window.location.hash = "#/home";
         }
       })
       .catch(() => {
@@ -238,6 +250,17 @@ export function Storefront() {
     return template.innerHTML;
   }
 
+  function getDisplayPrice(product) {
+    if (!product) return null;
+    const memberPrice =
+      product.memberPrice ?? product.guestPrice ?? product.basePrice ?? product.price;
+    const guestPrice = product.guestPrice ?? product.basePrice ?? product.price;
+    const raw = priceTier === "member" ? memberPrice : guestPrice;
+    if (raw === null || raw === undefined) return null;
+    const num = Number(raw);
+    return Number.isFinite(num) ? num.toFixed(2) : null;
+  }
+
   async function handleReviewSubmit(event) {
     event.preventDefault();
     if (!selectedProduct) return;
@@ -304,6 +327,13 @@ export function Storefront() {
       setUser(result.user || null);
       setLoginOpen(false);
       setLoginState({ email: "", password: "", error: "" });
+      const role = result.user?.role;
+      if (role === "administrator" || role === "admin") {
+        localStorage.setItem("adminToken", result.token);
+        window.location.hash = "#/admin";
+      } else {
+        window.location.hash = "#/home";
+      }
     } catch (err) {
       setLoginState((prev) => ({ ...prev, error: "Invalid login" }));
     }
@@ -350,7 +380,7 @@ export function Storefront() {
             </button>
           </div>
         </div>
-        {isAdminView || isAdmin ? (
+        {isAdminView ? (
           <AdminPanel />
         ) : isAccountView ? (
           <AccountPanelSection accountPanel={accountPanel} dropSite={dropSite} />
@@ -416,6 +446,7 @@ export function Storefront() {
                         eyebrow="Catalog"
                         title="All products in this category."
                         embedded
+                        getPrice={getDisplayPrice}
                       />
                     </div>
                   </div>
@@ -430,6 +461,7 @@ export function Storefront() {
                   products={featuredProducts}
                   showCartAction
                   onSelect={(product) => setSelectedProduct(product)}
+                  getPrice={getDisplayPrice}
                 />
                 <ProductDetailSection productDetail={productDetail} />
                 <RecipesSection
@@ -445,6 +477,7 @@ export function Storefront() {
                 <ProductGrid
                   products={featuredProducts}
                   onSelect={(product) => setSelectedProduct(product)}
+                  getPrice={getDisplayPrice}
                 />
                 <HerdshareBanner herdshare={herdshare} />
                 <DeliverySection delivery={delivery} dropSite={dropSiteData} />
@@ -520,34 +553,42 @@ export function Storefront() {
             </button>
             <div className="modal-body">
               <div className="modal-image">
-                <img
-                  src={
-                    (selectedProduct.images && selectedProduct.images[selectedImageIndex]) ||
-                    selectedProduct.imageUrl ||
-                    selectedProduct.image
-                  }
-                  alt={selectedProduct.name}
-                />
-                {selectedProduct.images && selectedProduct.images.length > 1 && (
-                  <div className="modal-thumbs">
-                    {selectedProduct.images.map((image, index) => (
-                      <button
-                        key={image}
-                        className={`thumb ${index === selectedImageIndex ? "active" : ""}`}
-                        type="button"
-                        onClick={() => setSelectedImageIndex(index)}
-                      >
-                        <img src={image} alt={`${selectedProduct.name} ${index + 1}`} />
-                      </button>
-                    ))}
-                  </div>
-                )}
+                {(() => {
+                  const imageItems = (selectedProduct.images || []).map((item) =>
+                    typeof item === "string" ? { url: item, thumbnailUrl: item } : item
+                  );
+                  const activeImage = imageItems[selectedImageIndex] || {};
+                  const mainUrl =
+                    activeImage.url || selectedProduct.imageUrl || selectedProduct.image;
+                  return (
+                    <>
+                      <img src={mainUrl} alt={selectedProduct.name} />
+                      {imageItems.length > 1 && (
+                        <div className="modal-thumbs">
+                          {imageItems.map((image, index) => (
+                            <button
+                              key={image.url || image.thumbnailUrl || index}
+                              className={`thumb ${index === selectedImageIndex ? "active" : ""}`}
+                              type="button"
+                              onClick={() => setSelectedImageIndex(index)}
+                            >
+                              <img
+                                src={image.thumbnailUrl || image.url}
+                                alt={`${selectedProduct.name} ${index + 1}`}
+                              />
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
               <div>
                 <div className="eyebrow">Product detail</div>
                 <h2 className="h2">{selectedProduct.name}</h2>
                 <div className="price">
-                  {selectedProduct.price ? `$${selectedProduct.price}` : "Price TBD"}
+                  {getDisplayPrice(selectedProduct) ? `$${getDisplayPrice(selectedProduct)}` : "Price TBD"}
                 </div>
                 {selectedProduct.reviews && selectedProduct.reviews.length > 0 && (
                   <div className="small">

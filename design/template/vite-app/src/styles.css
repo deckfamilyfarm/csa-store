@@ -696,10 +696,14 @@ img {
   padding: 32px 0 64px;
 }
 
+.container.admin-panel {
+  width: min(1400px, 96vw);
+}
+
 .admin-layout {
   display: grid;
-  grid-template-columns: 220px minmax(0, 1fr);
-  gap: 24px;
+  grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
+  gap: 18px;
   align-items: start;
 }
 
