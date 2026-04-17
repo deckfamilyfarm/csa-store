@@ -12,6 +12,7 @@ Template location
 
 API location
 - The API lives in `apps/api` (Express + Drizzle + MySQL).
+- Local Line schema additions for the store DB are in `apps/api/sql/localline_sync.sql`.
 
 Admin panel
 - Visit `/#/admin` to log in as an admin.
@@ -38,3 +39,34 @@ Run online (preview/prod)
 PM2 helpers
 - `start.sh` runs a preview server under PM2 on port 5176.
 - `restart.sh` restarts that PM2 process.
+
+Killdeer integration
+- Preview the wired export command from this repo with `npm run killdeer:export-master-pricelist:preview`.
+- Run the Killdeer master pricelist export from this repo with `npm run killdeer:export-master-pricelist`.
+- The export wrapper now loads this repo's `.env` by default, falls back from `DFF_DB_*` to the full `STORE_DB_*` config including the database name, and skips Google Sheets sync by default. Pass `-- --google-sync` to enable sheet updates or `-- --env-file=/path/to/.env` to override the env source.
+- Dry-run the store sync with `npm run sync:killdeer-pricelist`.
+- Apply the sync only when ready with `npm run sync:killdeer-pricelist -- --write`.
+
+Local Line sync
+- Dry-run the Local Line catalog and pricelist audit with `npm run audit:localline-sync`.
+- In the admin UI, use the `Local Line Sync` button in the Products section to run the same analysis and review warnings/errors before applying any local-store changes.
+- In the admin UI, use `Local Line Full Sync` to apply the csa-store catalog updates and then populate the Local Line price-list/media/image data in one pass.
+- After the audit finishes, each actionable suggested fix in the admin audit panel gets its own `Apply` button. There is no global apply while the audit is still running.
+- The audit downloads the full Local Line products export, compares it to local `products` and `packages`, then fetches live Local Line details for the current pricelist-mapped products.
+- The audit writes a full JSON report to `tmp/localline-audit-report.json` by default and prints a summary plus sample mismatches.
+- Apply the actionable local-store catalog updates from the CLI with `npm run sync:localline-store`.
+- Apply a specific fix bucket from the CLI with `npm run sync:localline-store -- --fixes=create-store-products` or `--fixes=sync-store-catalog-fields`.
+- Use `--limit=50` to print more sample rows and `--concurrency=8` to raise Local Line fetch parallelism.
+- Use `--include-inactive` if you want to include inactive rows from the Killdeer pricelist in the live comparison.
+- Add `--write` when running `apps/api/scripts/auditLocalLineSync.js` directly.
+- The apply path writes actionable csa-store fixes only: create missing local products, create missing local packages, and update local product/package fields. Pricelist drift, dead Local Line mappings, and price-list override warnings are still reported but not written.
+- The Local Line push logic now preserves the live adjustment type when price-list entries already exist, so dollar (`adjustment_type=1`), percentage (`adjustment_type=2`), and set-price (`adjustment_type=3`) rows can be updated without being coerced into percentage adjustments.
+- The audit still surfaces fixed-adjustment rows explicitly so you can review where Local Line pricing behavior differs from the current pricelist assumptions.
+- Populate the new Local Line cache tables in csa-store with `npm run sync:localline-cache`.
+- The audit/full-sync scripts use this repo's `.env` by default. `DFF_DB_*` is optional; when omitted, the scripts reuse the full `STORE_DB_*` connection, including the database name. Pass `-- --killdeer-env=/path/to/.env` only when you explicitly want a separate override file.
+- Preview the cache sync first with `npm run sync:localline-cache -- --limit=25`.
+- Write the cache tables with `npm run sync:localline-cache -- --write`.
+- Run the combined catalog + Local Line data/image sync with `npm run sync:localline-full`.
+- Cached Local Line product media is stored in csa-store `product_media`.
+- When cache sync runs in write mode and Spaces is configured, Local Line product images are also mirrored into local storage and written into `product_images`.
+- Admin/catalog responses use mirrored `product_images` first and fall back to cached `product_media` URLs when needed.

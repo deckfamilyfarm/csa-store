@@ -3,10 +3,26 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "dev": "cross-env DOTENV_CONFIG_PATH=./.env VITE_API_BASE=/api concurrently --raw -n api,web -c cyan,green \"npm --prefix apps/api run dev\" \"npm --prefix design/template/vite-app run dev\""
+    "dev": "cross-env DOTENV_CONFIG_PATH=./.env VITE_API_BASE=/api concurrently --raw -n api,web -c cyan,green \"npm --prefix apps/api run dev\" \"npm --prefix design/template/vite-app run dev\"",
+    "export:master-pricelist:preview": "node scripts/runStoreExportMasterPricelist.js --dry-run --skip-google",
+    "export:master-pricelist": "node scripts/runStoreExportMasterPricelist.js",
+    "killdeer:export-master-pricelist:preview": "node scripts/runKilldeerExportMasterPricelist.js --dry-run",
+    "killdeer:export-master-pricelist": "node scripts/runKilldeerExportMasterPricelist.js",
+    "verify:localline-sync": "npm --prefix apps/api run verify:localline-sync --",
+    "sync:killdeer-pricelist": "npm --prefix apps/api run sync:killdeer-pricelist --",
+    "audit:localline-sync": "npm --prefix apps/api run audit:localline-sync --",
+    "sync:localline-store": "npm --prefix apps/api run sync:localline-store --",
+    "sync:localline-cache": "npm --prefix apps/api run sync:localline-cache --",
+    "sync:localline-full": "npm --prefix apps/api run sync:localline-full --",
+    "sync:localline-full:checked": "npm run sync:localline-full -- && npm run verify:localline-sync"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
     "cross-env": "^7.0.3"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.0",
+    "express": "^5.2.1",
+    "sharp": "^0.34.5"
   }
 }

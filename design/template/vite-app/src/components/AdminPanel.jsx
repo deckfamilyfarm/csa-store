@@ -1,4 +1,6 @@
 ﻿import React, { useEffect, useRef, useState } from "react";
+import { AdminInventorySection } from "./AdminInventorySection.jsx";
+import { AdminPriceListSection } from "./AdminPriceListSection.jsx";
 import {
   adminGet,
   adminLogin,
@@ -7,7 +9,7 @@ import {
   adminUploadImage
 } from "../adminApi.js";
 
-export function AdminPanel() {
+export function AdminPanel({ onCatalogRefresh }) {
   const [token, setToken] = useState(() => localStorage.getItem("adminToken") || "");
   const [loginState, setLoginState] = useState({ username: "", password: "", error: "" });
   const [loading, setLoading] = useState(false);
@@ -25,6 +27,8 @@ export function AdminPanel() {
   const [newVendor, setNewVendor] = useState("");
   const [newDropSite, setNewDropSite] = useState({ name: "", address: "", dayOfWeek: "", openTime: "", closeTime: "" });
   const [newRecipe, setNewRecipe] = useState({ title: "", note: "", imageUrl: "", ingredients: "", steps: "" });
+  const [productNameSearch, setProductNameSearch] = useState("");
+  const [showProductNameSuggestions, setShowProductNameSuggestions] = useState(false);
   const [productCategoryFilter, setProductCategoryFilter] = useState("");
   const [productVendorFilter, setProductVendorFilter] = useState("");
   const [productVisibleFilter, setProductVisibleFilter] = useState("visible");
@@ -32,8 +36,37 @@ export function AdminPanel() {
   const [productEdits, setProductEdits] = useState({});
   const [applyState, setApplyState] = useState({ open: false, updates: [], results: [], error: "" });
   const [applyLoading, setApplyLoading] = useState(false);
+  const [localLineAuditState, setLocalLineAuditState] = useState({
+    open: false,
+    loading: false,
+    applying: false,
+    applyingFixKey: "",
+    appliedFixes: {},
+    error: "",
+    applyError: "",
+    data: null
+  });
+  const [localLineCacheState, setLocalLineCacheState] = useState({
+    open: false,
+    loading: false,
+    error: "",
+    data: null,
+    jobId: ""
+  });
+  const [localLineProductDetail, setLocalLineProductDetail] = useState(null);
+  const [priceListEntryDrafts, setPriceListEntryDrafts] = useState([]);
+  const [priceListSaveLoading, setPriceListSaveLoading] = useState(false);
   const activeProduct = products.find((product) => product.id === selectedProductId);
   const descriptionRef = useRef(null);
+
+  async function refreshCatalogFromAdmin() {
+    if (typeof onCatalogRefresh !== "function") return;
+    try {
+      await onCatalogRefresh();
+    } catch (_error) {
+      // Keep admin flow successful even if storefront refresh fails.
+    }
+  }
 
   async function loadAll() {
     setLoading(true);
@@ -68,6 +101,50 @@ export function AdminPanel() {
   }, [token]);
 
   useEffect(() => {
+    const jobId = localLineCacheState.jobId;
+    const status = localLineCacheState.data?.status;
+
+    if (!token || !jobId || !status || (status !== "queued" && status !== "running")) {
+      return undefined;
+    }
+
+    let cancelled = false;
+
+    async function pollJob() {
+      try {
+        const response = await adminGet(`localline/full-sync/${jobId}`, token);
+        if (cancelled) return;
+        setLocalLineCacheState((prev) => ({
+          ...prev,
+          error: "",
+          data: response.job || null,
+          jobId: response.job?.jobId || jobId
+        }));
+
+        if (response.job?.status === "completed") {
+          setMessage("Pull/Update LL completed.");
+          await loadAll();
+          await refreshCatalogFromAdmin();
+        }
+      } catch (error) {
+        if (cancelled) return;
+        setLocalLineCacheState((prev) => ({
+          ...prev,
+          error: error?.message || "Failed to refresh Pull/Update LL progress."
+        }));
+      }
+    }
+
+    pollJob();
+    const intervalId = window.setInterval(pollJob, 2000);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(intervalId);
+    };
+  }, [token, localLineCacheState.jobId, localLineCacheState.data?.status]);
+
+  useEffect(() => {
     if (activeProduct) {
       setProductDraft({
         name: activeProduct.name || "",
@@ -82,6 +159,64 @@ export function AdminPanel() {
       setProductDraft(null);
     }
   }, [activeProduct]);
+
+  useEffect(() => {
+    if (!token || !selectedProductId) {
+      setLocalLineProductDetail(null);
+      setPriceListEntryDrafts([]);
+      return;
+    }
+
+    let cancelled = false;
+
+    async function loadLocalLineProductDetail() {
+      try {
+        const response = await adminGet(`localline/products/${selectedProductId}`, token);
+        if (cancelled) return;
+        setLocalLineProductDetail(response || null);
+        setPriceListEntryDrafts(
+          (response?.priceListEntries || []).map((entry) => ({
+            id: entry.id,
+            productId: entry.productId,
+            packageId: entry.packageId,
+            priceListId: entry.priceListId,
+            priceListName: entry.priceListName,
+            packageName: entry.packageName,
+            productName: entry.productName,
+            entryScope: entry.entryScope,
+            visible:
+              entry.visible === null || typeof entry.visible === "undefined"
+                ? true
+                : Boolean(entry.visible),
+            onSale: Boolean(entry.onSale),
+            onSaleToggle: Boolean(entry.onSaleToggle),
+            finalPriceCache:
+              entry.finalPriceCache === null || typeof entry.finalPriceCache === "undefined"
+                ? ""
+                : Number(entry.finalPriceCache),
+            strikethroughDisplayValue:
+              entry.strikethroughDisplayValue === null ||
+              typeof entry.strikethroughDisplayValue === "undefined"
+                ? ""
+                : Number(entry.strikethroughDisplayValue),
+            maxUnitsPerOrder:
+              entry.maxUnitsPerOrder === null || typeof entry.maxUnitsPerOrder === "undefined"
+                ? ""
+                : Number(entry.maxUnitsPerOrder)
+          }))
+        );
+      } catch (_error) {
+        if (cancelled) return;
+        setLocalLineProductDetail(null);
+        setPriceListEntryDrafts([]);
+      }
+    }
+
+    loadLocalLineProductDetail();
+    return () => {
+      cancelled = true;
+    };
+  }, [token, selectedProductId]);
 
   useEffect(() => {
     if (!descriptionRef.current) return;
@@ -140,6 +275,7 @@ export function AdminPanel() {
       await adminPut(`products/${productId}`, token, { [field]: value });
       setMessage("Product updated.");
       await loadAll();
+      await refreshCatalogFromAdmin();
     } catch (err) {
       setMessage("Product update failed.");
     }
@@ -151,6 +287,7 @@ export function AdminPanel() {
       await adminPut(`packages/${packageId}`, token, { price: value });
       setMessage("Package price updated.");
       await loadAll();
+      await refreshCatalogFromAdmin();
     } catch (err) {
       setMessage("Package update failed.");
     }
@@ -184,6 +321,7 @@ export function AdminPanel() {
       });
       setMessage("Product updated.");
       await loadAll();
+      await refreshCatalogFromAdmin();
     } catch (err) {
       setMessage("Product update failed.");
     }
@@ -214,8 +352,82 @@ export function AdminPanel() {
       await adminUploadImage(productId, token, file);
       setMessage("Image uploaded.");
       await loadAll();
+      await refreshCatalogFromAdmin();
     } catch (err) {
       setMessage("Image upload failed.");
+    }
+  }
+
+  function updatePriceListEntryDraft(entryId, patch) {
+    setPriceListEntryDrafts((prev) =>
+      prev.map((entry) => (entry.id === entryId ? { ...entry, ...patch } : entry))
+    );
+  }
+
+  async function handleSavePriceListEntries() {
+    if (!activeProduct || !priceListEntryDrafts.length) return;
+    setPriceListSaveLoading(true);
+    setMessage("");
+
+    try {
+      await adminPut(`localline/products/${activeProduct.id}/price-list-entries`, token, {
+        entries: priceListEntryDrafts.map((entry) => ({
+          id: entry.id,
+          packageId: entry.packageId,
+          priceListId: entry.priceListId,
+          visible: Boolean(entry.visible),
+          onSale: Boolean(entry.onSale),
+          onSaleToggle: Boolean(entry.onSaleToggle),
+          finalPriceCache:
+            entry.finalPriceCache === "" ? null : Number(entry.finalPriceCache),
+          strikethroughDisplayValue:
+            entry.strikethroughDisplayValue === ""
+              ? null
+              : Number(entry.strikethroughDisplayValue),
+          maxUnitsPerOrder:
+            entry.maxUnitsPerOrder === "" ? null : Number(entry.maxUnitsPerOrder)
+        }))
+      });
+      setMessage("Local price-list entries updated.");
+      const response = await adminGet(`localline/products/${activeProduct.id}`, token);
+      setLocalLineProductDetail(response || null);
+      setPriceListEntryDrafts(
+        (response?.priceListEntries || []).map((entry) => ({
+          id: entry.id,
+          productId: entry.productId,
+          packageId: entry.packageId,
+          priceListId: entry.priceListId,
+          priceListName: entry.priceListName,
+          packageName: entry.packageName,
+          productName: entry.productName,
+          entryScope: entry.entryScope,
+          visible:
+            entry.visible === null || typeof entry.visible === "undefined"
+              ? true
+              : Boolean(entry.visible),
+          onSale: Boolean(entry.onSale),
+          onSaleToggle: Boolean(entry.onSaleToggle),
+          finalPriceCache:
+            entry.finalPriceCache === null || typeof entry.finalPriceCache === "undefined"
+              ? ""
+              : Number(entry.finalPriceCache),
+          strikethroughDisplayValue:
+            entry.strikethroughDisplayValue === null ||
+            typeof entry.strikethroughDisplayValue === "undefined"
+              ? ""
+              : Number(entry.strikethroughDisplayValue),
+          maxUnitsPerOrder:
+            entry.maxUnitsPerOrder === null || typeof entry.maxUnitsPerOrder === "undefined"
+              ? ""
+              : Number(entry.maxUnitsPerOrder)
+        }))
+      );
+      await loadAll();
+      await refreshCatalogFromAdmin();
+    } catch (_error) {
+      setMessage("Local price-list update failed.");
+    } finally {
+      setPriceListSaveLoading(false);
     }
   }
 
@@ -260,7 +472,7 @@ export function AdminPanel() {
   }
 
   async function handleApplyChanges() {
-    const editEntries = Object.entries(productEdits);
+    const editEntries = getPendingProductEditEntries();
     if (!editEntries.length) return;
 
     const updates = editEntries.map(([id, changes]) => {
@@ -309,6 +521,177 @@ export function AdminPanel() {
     setApplyState({ open: false, updates: [], results: [], error: "" });
   }
 
+  async function handleLocalLineFullSync() {
+    setLocalLineCacheState({
+      open: true,
+      loading: true,
+      error: "",
+      data: null,
+      jobId: ""
+    });
+
+    try {
+      const response = await adminPost("localline/products-sync", token, {
+        concurrency: 6
+      });
+      setLocalLineCacheState({
+        open: true,
+        loading: false,
+        error: "",
+        data: response.job || null,
+        jobId: response.job?.jobId || ""
+      });
+      setMessage(
+        response.alreadyRunning
+          ? "Attached to the running Pull/Update LL job."
+          : "Pull/Update LL started."
+      );
+    } catch (err) {
+      setLocalLineCacheState({
+        open: true,
+        loading: false,
+        error:
+          err?.status === 404
+            ? "Pull/Update LL is not available on the API server at :5177. Restart the API service so it loads /api/admin/localline/products-sync."
+            : err?.message || "Failed to run Pull/Update LL.",
+        data: null,
+        jobId: ""
+      });
+    }
+  }
+
+  function closeLocalLineCachePanel() {
+    setLocalLineCacheState({
+      open: false,
+      loading: false,
+      error: "",
+      data: null,
+      jobId: ""
+    });
+  }
+
+  async function handleLocalLineAudit() {
+    setLocalLineAuditState({
+      open: true,
+      loading: true,
+      applying: false,
+      applyingFixKey: "",
+      appliedFixes: {},
+      error: "",
+      applyError: "",
+      data: null
+    });
+
+    try {
+      const response = await adminPost("localline/audit", token, {
+        limit: 12,
+        concurrency: 6,
+        includeInactive: false
+      });
+      setLocalLineAuditState({
+        open: true,
+        loading: false,
+        applying: false,
+        applyingFixKey: "",
+        appliedFixes: {},
+        error: "",
+        applyError: "",
+        data: response
+      });
+    } catch (err) {
+      setLocalLineAuditState({
+        open: true,
+        loading: false,
+        applying: false,
+        applyingFixKey: "",
+        appliedFixes: {},
+        error: "Failed to run Local Line sync analysis.",
+        applyError: "",
+        data: null
+      });
+    }
+  }
+
+  async function handleApplyLocalLineSuggestedFix(fix) {
+    if (!auditData || localLineAuditState.loading || localLineAuditState.applying || !fix?.applySupported) {
+      return;
+    }
+    if (!window.confirm(`Apply "${fix.title}"? This only writes csa-store tables in this codebase.`)) {
+      return;
+    }
+
+    setLocalLineAuditState((prev) => ({
+      ...prev,
+      applying: true,
+      applyingFixKey: fix.key,
+      applyError: ""
+    }));
+
+    try {
+      const response = await adminPost("localline/apply", token, {
+        fixKey: fix.key,
+        limit: 12,
+        concurrency: 6,
+        includeInactive: false
+      });
+      const applySummary = response.applySummary || null;
+      const isSuccessful = applySummary && Number(applySummary.errors || 0) === 0;
+      setLocalLineAuditState((prev) => ({
+        ...prev,
+        open: true,
+        loading: false,
+        applying: false,
+        applyingFixKey: "",
+        error: "",
+        applyError: "",
+        appliedFixes: isSuccessful
+          ? {
+              ...prev.appliedFixes,
+              [fix.key]: {
+                title: fix.title,
+                applied: Number(applySummary.applied || 0),
+                skipped: Number(applySummary.skipped || 0),
+                attempted: Number(applySummary.attempted || 0)
+              }
+            }
+          : prev.appliedFixes,
+        data: prev.data
+          ? {
+              ...prev.data,
+              applySummary,
+              sampleApplyResults: response.sampleApplyResults || []
+            }
+          : response
+      }));
+      setMessage(
+        isSuccessful
+          ? `Success: ${fix.title} applied.`
+          : `Apply finished for "${fix.title}" with issues.`
+      );
+      await loadAll();
+    } catch (err) {
+      setLocalLineAuditState((prev) => ({
+        ...prev,
+        applying: false,
+        applyingFixKey: "",
+        applyError: `Failed to apply "${fix.title}".`
+      }));
+    }
+  }
+
+  function closeLocalLineAuditPanel() {
+    setLocalLineAuditState({
+      open: false,
+      loading: false,
+      applying: false,
+      applyingFixKey: "",
+      appliedFixes: {},
+      error: "",
+      applyError: "",
+      data: null
+    });
+  }
+
   if (!token) {
     return (
       <div className="container admin-panel">
@@ -339,6 +722,12 @@ export function AdminPanel() {
   const vendorMap = new Map(vendors.map((vendor) => [vendor.id, vendor.name]));
   const categoryMap = new Map(categories.map((category) => [category.id, category.name]));
   const productMap = new Map(products.map((product) => [product.id, product]));
+  const pendingProductEditEntries = getPendingProductEditEntries();
+  const auditData = localLineAuditState.data;
+  const fullSyncJob = localLineCacheState.data;
+  const fullSyncRunning =
+    fullSyncJob?.status === "queued" || fullSyncJob?.status === "running";
+  const productTableWidth = "1376px";
 
   function getProductPrice(product) {
     const prices = (product.packages || [])
@@ -369,6 +758,35 @@ export function AdminPanel() {
     );
   }
 
+  function normalizeProductEdit(changes, defaults) {
+    return {
+      visible: typeof changes.visible === "boolean" ? changes.visible : defaults.visible,
+      trackInventory:
+        typeof changes.trackInventory === "boolean"
+          ? changes.trackInventory
+          : defaults.trackInventory,
+      inventory:
+        changes.inventory === null || typeof changes.inventory === "undefined"
+          ? defaults.inventory
+          : Number(changes.inventory) || 0,
+      onSale: typeof changes.onSale === "boolean" ? changes.onSale : defaults.onSale,
+      saleDiscount:
+        changes.saleDiscount === null || typeof changes.saleDiscount === "undefined"
+          ? defaults.saleDiscount
+          : Math.min(Math.max(Number(changes.saleDiscount) || 0, 0), 100)
+    };
+  }
+
+  function getPendingProductEditEntries() {
+    return Object.entries(productEdits).filter(([id, changes]) => {
+      const product = productMap.get(Number(id));
+      if (!product) return false;
+      const defaults = getProductDefaults(product);
+      const normalized = normalizeProductEdit(changes || {}, defaults);
+      return !editsMatch(normalized, defaults);
+    });
+  }
+
   function updateProductEdit(productId, patch) {
     const product = productMap.get(productId);
     if (!product) return;
@@ -376,7 +794,7 @@ export function AdminPanel() {
     setProductEdits((prev) => {
       const next = { ...prev };
       const current = next[productId] ? { ...defaults, ...next[productId] } : { ...defaults };
-      const updated = { ...current, ...patch };
+      const updated = normalizeProductEdit({ ...current, ...patch }, defaults);
       if (updated.trackInventory && updated.visible && Number(updated.inventory) === 0) {
         window.alert("If Track Inventory is on and stock is 0, set Visible to off.");
         return prev;
@@ -390,7 +808,9 @@ export function AdminPanel() {
     });
   }
 
-  const filteredProducts = products.filter((product) => {
+  const normalizedProductNameSearch = productNameSearch.trim().toLowerCase();
+
+  const productsMatchingOtherFilters = products.filter((product) => {
     const categoryMatch = !productCategoryFilter || String(product.categoryId) === productCategoryFilter;
     const vendorMatch = !productVendorFilter || String(product.vendorId) === productVendorFilter;
     const visibleMatch =
@@ -403,6 +823,539 @@ export function AdminPanel() {
       (productSaleFilter === "notOnSale" && !product.onSale);
     return categoryMatch && vendorMatch && visibleMatch && saleMatch;
   });
+
+  const productNameMatches = normalizedProductNameSearch
+    ? productsMatchingOtherFilters.filter((product) =>
+        String(product.name || "").toLowerCase().includes(normalizedProductNameSearch)
+      )
+    : [];
+
+  const filteredProducts = normalizedProductNameSearch
+    ? productNameMatches
+    : productsMatchingOtherFilters;
+
+  const visibleProductNameSuggestions = productNameMatches.slice(0, 8);
+
+  function formatValue(value) {
+    if (value === null || typeof value === "undefined" || value === "") return "n/a";
+    if (typeof value === "object") return JSON.stringify(value);
+    return String(value);
+  }
+
+  function formatChanges(changes) {
+    return Object.entries(changes || {})
+      .map(([field, change]) => `${field}: ${formatValue(change.from)} -> ${formatValue(change.to)}`)
+      .join(" | ");
+  }
+
+  function getImageEntry(image, index) {
+    if (typeof image === "string") {
+      return {
+        key: image,
+        src: image,
+        thumbnailUrl: image
+      };
+    }
+
+    const src = image?.url || image?.thumbnailUrl || "";
+    return {
+      key: src || `image-${index}`,
+      src,
+      thumbnailUrl: image?.thumbnailUrl || src
+    };
+  }
+
+  function scrollToAuditSection(sectionId) {
+    const element = document.getElementById(sectionId);
+    if (!element) return;
+    element.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function renderLocalLineAuditContent() {
+    if (localLineAuditState.loading) {
+      return <div className="small">Running Local Line sync...</div>;
+    }
+
+    if (localLineAuditState.error) {
+      return <div className="small">{localLineAuditState.error}</div>;
+    }
+
+    if (!auditData) {
+      return <div className="small">No Local Line sync data loaded yet.</div>;
+    }
+
+    return (
+      <>
+        <div className="small">Report: {auditData.reportFile}</div>
+        <div className="small">Mode: {auditData.mode}</div>
+        <div className="audit-summary-grid">
+          <button
+            className="response-card audit-nav-card"
+            type="button"
+            onClick={() => scrollToAuditSection("audit-proposed-changes")}
+          >
+            <div className="title">Catalog</div>
+            <div className="small">Local Line products: {auditData.exportSummary.localLineProducts}</div>
+            <div className="small">Local store products: {auditData.exportSummary.storeProducts}</div>
+            <div className="small">Missing in store: {auditData.catalogSummary.missingStoreProducts}</div>
+            <div className="small">Missing in Local Line: {auditData.catalogSummary.missingLocalLineProducts}</div>
+          </button>
+          <button
+            className="response-card audit-nav-card"
+            type="button"
+            onClick={() => scrollToAuditSection("audit-proposed-changes")}
+          >
+            <div className="title">Pending Changes</div>
+            <div className="small">Product updates: {auditData.catalogSummary.productUpdates}</div>
+            <div className="small">Package updates: {auditData.catalogSummary.packageUpdates}</div>
+            <div className="small">Package shape mismatches: {auditData.catalogSummary.packageShapeMismatches}</div>
+            <div className="small">
+              Suppressed low-signal warnings: {formatValue(auditData.catalogSummary.suppressedLowSignalWarnings?.packageInventoryNullSkipped)}
+            </div>
+          </button>
+          <button
+            className="response-card audit-nav-card"
+            type="button"
+            onClick={() => scrollToAuditSection("audit-warnings")}
+          >
+            <div className="title">Warnings</div>
+            <div className="small">Fixed adjustments: {auditData.pricelistSummary.fixedAdjustmentEntries}</div>
+            <div className="small">Product mismatches: {auditData.pricelistSummary.productFieldMismatches}</div>
+            <div className="small">Package mismatches: {auditData.pricelistSummary.packageFieldMismatches}</div>
+            <div className="small">Price-list mismatches: {auditData.pricelistSummary.priceListEntryMismatches}</div>
+          </button>
+          <button
+            className="response-card audit-nav-card"
+            type="button"
+            onClick={() => scrollToAuditSection("audit-errors")}
+          >
+            <div className="title">Errors</div>
+            <div className="small">Live fetch errors: {auditData.pricelistSummary.liveFetchErrors}</div>
+            <div className="small">Pricing errors: {auditData.pricelistSummary.pricingErrors}</div>
+            <div className="small">Missing live products: {auditData.pricelistSummary.missingLiveProducts}</div>
+          </button>
+        </div>
+
+        <div className="audit-section" id="audit-suggested-fixes">
+          <h4>Suggested Fixes</h4>
+          <div className="small">Apply is only available after sync analysis finishes. Runnable fixes only write csa-store tables in this codebase.</div>
+          {localLineAuditState.applyError && <div className="small">{localLineAuditState.applyError}</div>}
+          {(auditData.suggestedFixes || []).length ? (
+            <>
+              {(auditData.suggestedFixes || []).some((item) => item.applySupported) ? (
+                <div className="response-list">
+                  {(auditData.suggestedFixes || []).map((item) => (
+                    <div className="response-card" key={`fix-${item.key}`}>
+                      <div className="title">{item.title}</div>
+                      <div className="small">Severity: {item.severity}</div>
+                      <div className="small">Count: {item.count}</div>
+                      <div className="small">{item.detail}</div>
+                      {localLineAuditState.appliedFixes[item.key] ? (
+                        <div className="small status-success">
+                          Success. Applied {localLineAuditState.appliedFixes[item.key].applied}
+                          {localLineAuditState.appliedFixes[item.key].skipped
+                            ? `, skipped ${localLineAuditState.appliedFixes[item.key].skipped}`
+                            : ""}
+                          .
+                        </div>
+                      ) : item.applySupported ? (
+                        <button
+                          className="button"
+                          type="button"
+                          onClick={() => handleApplyLocalLineSuggestedFix(item)}
+                          disabled={localLineAuditState.loading || localLineAuditState.applying}
+                        >
+                          {localLineAuditState.applying && localLineAuditState.applyingFixKey === item.key
+                            ? "Applying..."
+                            : "Apply"}
+                        </button>
+                      ) : (
+                        <div className="small status-note">Manual review only</div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="small">
+                  No runnable fixes remain in this sync result. The remaining items are review-only.
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="small">No suggested fixes generated.</div>
+          )}
+        </div>
+
+        <div className="audit-section" id="audit-apply-results">
+          <h4>Apply Results</h4>
+          {auditData.applySummary ? (
+            <div className="response-list">
+              <div className="response-card">
+                <div className="title">Apply Summary</div>
+                <div className="small">
+                  Fixes: {(auditData.applySummary.selectedFixKeys || []).join(", ") || "all actionable"}
+                </div>
+                <div className="small">Attempted: {auditData.applySummary.attempted}</div>
+                <div className="small">Applied: {auditData.applySummary.applied}</div>
+                <div className="small">Skipped: {auditData.applySummary.skipped}</div>
+                <div className="small">Errors: {auditData.applySummary.errors}</div>
+                <div className="small">Created products: {auditData.applySummary.createdProducts}</div>
+                <div className="small">Updated products: {auditData.applySummary.updatedProducts}</div>
+                <div className="small">Updated packages: {auditData.applySummary.updatedPackages}</div>
+              </div>
+              {(auditData.sampleApplyResults || []).map((item, index) => (
+                <div className="response-card" key={`apply-result-${item.action}-${item.productId || "none"}-${item.packageId || "none"}-${index}`}>
+                  <div className="title">{item.action}</div>
+                  <div className="small">Status: {item.status}</div>
+                  {item.productId ? <div className="small">Product: {item.productId}</div> : null}
+                  {item.packageId ? <div className="small">Package: {item.packageId}</div> : null}
+                  {item.updatedFields?.length ? (
+                    <div className="small">Fields: {item.updatedFields.join(", ")}</div>
+                  ) : null}
+                  {item.reason ? <div className="small">Reason: {item.reason}</div> : null}
+                  {item.error ? <div className="small">{item.error}</div> : null}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="small">No apply run yet.</div>
+          )}
+        </div>
+
+        <div className="audit-section" id="audit-errors">
+          <h4>Errors</h4>
+          {(auditData.sampleLiveFetchErrors?.length || auditData.samplePricingErrors?.length) ? (
+            <div className="response-list">
+              {(auditData.sampleLiveFetchErrors || []).map((item) => (
+                <div className="response-card" key={`fetch-${item.productId}-${item.pricelistId}`}>
+                  <div className="title">Product {item.productId}</div>
+                  <div className="small">Pricelist row: {item.pricelistId}</div>
+                  <div className="small">HTTP status: {item.status}</div>
+                  <div className="small">{item.error}</div>
+                </div>
+              ))}
+              {(auditData.samplePricingErrors || []).map((item) => (
+                <div className="response-card" key={`pricing-${item.productId}-${item.pricelistId}`}>
+                  <div className="title">Product {item.productId}</div>
+                  <div className="small">Pricelist row: {item.pricelistId}</div>
+                  <div className="small">{item.error}</div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="small">No row-level errors in the sampled results.</div>
+          )}
+        </div>
+
+        <div className="audit-section" id="audit-warnings">
+          <h4>Warnings</h4>
+          <div className="response-list">
+            {(auditData.sampleFixedAdjustmentEntries || []).map((item) => (
+              <div className="response-card" key={`fixed-${item.productId}-${item.priceListId}`}>
+                <div className="title">Fixed adjustment on product {item.productId}</div>
+                <div className="small">Price list: {item.priceListName}</div>
+                <div className="small">
+                  Actual final: {formatValue(item.actual.finalPrice)} | Expected final: {formatValue(item.expected.finalPrice)}
+                </div>
+                <div className="small">
+                  Actual adjustment: type {formatValue(item.actual.adjustmentType)} / {formatValue(item.actual.adjustmentValue)}
+                </div>
+              </div>
+            ))}
+            {(auditData.samplePackageShapeMismatches || []).map((item) => (
+              <div className="response-card" key={`shape-${item.productId}`}>
+                <div className="title">Package shape mismatch on product {item.productId}</div>
+                <div className="small">Store packages: {item.storePackageIds.join(", ") || "none"}</div>
+                <div className="small">Local Line packages: {item.localLinePackageIds.join(", ") || "none"}</div>
+              </div>
+            ))}
+            {(auditData.sampleMissingStoreProducts || []).map((item) => (
+              <div className="response-card" key={`missing-store-${item.productId}`}>
+                <div className="title">Missing in local store: {item.productId}</div>
+                <div className="small">{item.localLineName}</div>
+              </div>
+            ))}
+            {(auditData.sampleMissingLocalLineProducts || []).map((item) => (
+              <div className="response-card" key={`missing-ll-${item.productId}`}>
+                <div className="title">Missing in Local Line: {item.productId}</div>
+                <div className="small">{item.storeName}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="audit-section" id="audit-proposed-changes">
+          <h4>Proposed Store Changes</h4>
+          <div className="response-list">
+            {(auditData.sampleProposedStoreProductCreates || []).map((item) => (
+              <div className="response-card" key={`proposed-create-${item.productId}`}>
+                <div className="title">Create store product {item.productId}</div>
+                <div className="small">{item.product.name}</div>
+                <div className="small">Packages: {(item.packages || []).map((pkg) => pkg.packageId).join(", ") || "none"}</div>
+              </div>
+            ))}
+            {(auditData.sampleProposedStoreProductUpdates || []).map((item) => (
+              <div className="response-card" key={`proposed-product-${item.productId}`}>
+                <div className="title">Proposed store product update {item.productId}</div>
+                <div className="small">{formatChanges(item.changes)}</div>
+              </div>
+            ))}
+            {(auditData.sampleProposedStorePackageUpdates || []).map((item) => (
+              <div className="response-card" key={`proposed-package-${item.packageId}`}>
+                <div className="title">Proposed store package update {item.packageId}</div>
+                <div className="small">Product: {item.productId}</div>
+                <div className="small">{formatChanges(item.changes)}</div>
+              </div>
+            ))}
+            {(auditData.sampleProposedStorePackageShapeFixes || []).map((item) => (
+              <div className="response-card" key={`proposed-shape-${item.action}-${item.packageId}`}>
+                <div className="title">{item.action}</div>
+                <div className="small">Product: {item.productId}</div>
+                <div className="small">Package: {item.packageId}</div>
+                <div className="small">{item.package?.name || "n/a"}</div>
+              </div>
+            ))}
+            {!(auditData.sampleProposedStoreProductCreates || []).length &&
+            !(auditData.sampleProposedStoreProductUpdates || []).length &&
+            !(auditData.sampleProposedStorePackageUpdates || []).length &&
+            !(auditData.sampleProposedStorePackageShapeFixes || []).length ? (
+              <div className="small">No sample store changes in this result.</div>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="audit-section" id="audit-review-drift">
+          <h4>Review-Only Drift</h4>
+          <div className="response-list">
+            {(auditData.sampleProposedPricelistRowUpdates || []).map((item) => (
+              <div className="response-card" key={`proposed-pricelist-${item.pricelistId}`}>
+                <div className="title">Proposed pricelist row update {item.pricelistId}</div>
+                <div className="small">Product: {item.productId}</div>
+                <div className="small">
+                  {Object.entries(item.changes || {})
+                    .map(([field, value]) => `${field}: ${formatValue(value)}`)
+                    .join(" | ")}
+                </div>
+              </div>
+            ))}
+            {(auditData.sampleProposedPriceListOverrideCaptures || []).map((item) => (
+              <div className="response-card" key={`proposed-override-${item.productId}-${item.priceListId}`}>
+                <div className="title">{item.action}</div>
+                <div className="small">Product: {item.productId} | List: {item.priceListName || item.priceListId}</div>
+                <div className="small">
+                  Actual final: {formatValue(item.actual?.finalPrice)} | Expected final: {formatValue(item.expected?.finalPrice)}
+                </div>
+              </div>
+            ))}
+            {(auditData.sampleRepairDeadMappings || []).map((item) => (
+              <div className="response-card" key={`repair-${item.productId}-${item.pricelistId}`}>
+                <div className="title">Repair Local Line mapping</div>
+                <div className="small">Product: {item.productId} | Pricelist row: {item.pricelistId}</div>
+                <div className="small">Status: {item.status}</div>
+              </div>
+            ))}
+            {(auditData.sampleCatalogProductUpdates || []).map((item) => (
+              <div className="response-card" key={`catalog-product-${item.productId}`}>
+                <div className="title">Catalog product {item.productId}</div>
+                <div className="small">{formatChanges(item.changes)}</div>
+              </div>
+            ))}
+            {(auditData.sampleCatalogPackageUpdates || []).map((item) => (
+              <div className="response-card" key={`catalog-package-${item.packageId}`}>
+                <div className="title">Catalog package {item.packageId}</div>
+                <div className="small">Product: {item.productId}</div>
+                <div className="small">{formatChanges(item.changes)}</div>
+              </div>
+            ))}
+            {(auditData.samplePricelistProductMismatches || []).map((item) => (
+              <div className="response-card" key={`pricelist-product-${item.productId}`}>
+                <div className="title">Pricelist product {item.productId}</div>
+                <div className="small">Row: {item.pricelistId}</div>
+                <div className="small">{formatChanges(item.changes)}</div>
+              </div>
+            ))}
+            {(auditData.samplePricelistPackageMismatches || []).map((item) => (
+              <div className="response-card" key={`pricelist-package-${item.packageId}`}>
+                <div className="title">Pricelist package {item.packageId}</div>
+                <div className="small">Product: {item.productId} | Row: {item.pricelistId}</div>
+                <div className="small">{formatChanges(item.changes)}</div>
+              </div>
+            ))}
+            {(auditData.samplePricelistEntryMismatches || []).map((item) => (
+              <div className="response-card" key={`entry-${item.productId}-${item.priceListId}`}>
+                <div className="title">Price-list entry mismatch on product {item.productId}</div>
+                <div className="small">List: {item.priceListName || item.priceListId}</div>
+                <div className="small">Reason: {Array.isArray(item.reason) ? item.reason.join(", ") : item.reason}</div>
+                <div className="small">
+                  Actual final: {formatValue(item.actual?.finalPrice)} | Expected final: {formatValue(item.expected?.finalPrice)}
+                </div>
+              </div>
+            ))}
+            {!(auditData.sampleProposedPricelistRowUpdates || []).length &&
+            !(auditData.sampleProposedPriceListOverrideCaptures || []).length &&
+            !(auditData.sampleRepairDeadMappings || []).length &&
+            !(auditData.sampleCatalogProductUpdates || []).length &&
+            !(auditData.sampleCatalogPackageUpdates || []).length &&
+            !(auditData.samplePricelistProductMismatches || []).length &&
+            !(auditData.samplePricelistPackageMismatches || []).length &&
+            !(auditData.samplePricelistEntryMismatches || []).length ? (
+              <div className="small">No review-only drift in this sampled result.</div>
+            ) : null}
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  function renderLocalLineCacheContent() {
+    const job = localLineCacheState.data;
+    const cacheData = job?.result || null;
+
+    if (localLineCacheState.loading && !job) {
+      return <div className="small">Starting Pull/Update LL...</div>;
+    }
+
+    if (localLineCacheState.error) {
+      return <div className="small">{localLineCacheState.error}</div>;
+    }
+
+    if (!job) {
+      return <div className="small">No Pull/Update LL data loaded yet.</div>;
+    }
+
+    return (
+      <>
+        <div className="small">Job: {job.jobId}</div>
+        <div className="small">Status: {job.status}</div>
+        {job.progress?.phaseLabel ? (
+          <div className="small">
+            Current phase: {job.progress.phaseLabel}
+            {job.progress?.message ? ` | ${job.progress.message}` : ""}
+            {typeof job.progress?.current === "number" && typeof job.progress?.total === "number"
+              ? ` (${job.progress.current}/${job.progress.total})`
+              : ""}
+          </div>
+        ) : null}
+        <div className="sync-progress">
+          <div
+            className="sync-progress-bar"
+            style={{ width: `${Math.max(0, Math.min(100, Number(job.progress?.percent) || 0))}%` }}
+          />
+        </div>
+        <div className="response-list">
+          {(job.phases || []).map((phase) => (
+            <div className="response-card" key={`full-sync-phase-${phase.key}`}>
+              <div className="title">{phase.label}</div>
+              <div className="small">Status: {phase.status}</div>
+              <div className="small">Progress: {Math.max(0, Math.min(100, Number(phase.percent) || 0))}%</div>
+              {phase.message ? <div className="small">{phase.message}</div> : null}
+              {typeof phase.current === "number" && typeof phase.total === "number" ? (
+                <div className="small">
+                  {phase.current} / {phase.total}
+                </div>
+              ) : null}
+            </div>
+          ))}
+        </div>
+        {job.error?.message ? <div className="small">{job.error.message}</div> : null}
+
+        {!cacheData ? (
+          <div className="small">Detailed results will appear here when the full sync finishes.</div>
+        ) : (
+          <>
+            <div className="small">Audit report: {cacheData.reportFiles?.audit}</div>
+            <div className="small">Cache report: {cacheData.reportFiles?.cache}</div>
+            <div className="small">Mode: {cacheData.mode}</div>
+        <div className="audit-summary-grid">
+          <div className="response-card">
+            <div className="title">Catalog Updates</div>
+            <div className="small">Applied changes: {cacheData.fullSummary?.appliedCatalogChanges}</div>
+            <div className="small">Created products: {cacheData.fullSummary?.createdProducts}</div>
+            <div className="small">Updated products: {cacheData.fullSummary?.updatedProducts}</div>
+            <div className="small">Updated packages: {cacheData.fullSummary?.updatedPackages}</div>
+          </div>
+          <div className="response-card">
+            <div className="title">Price Lists</div>
+            <div className="small">Price lists: {cacheData.fullSummary?.priceLists}</div>
+            <div className="small">Package memberships: {cacheData.fullSummary?.packagePriceListMemberships}</div>
+            <div className="small">Product memberships: {cacheData.fullSummary?.productPriceListMemberships}</div>
+          </div>
+          <div className="response-card">
+            <div className="title">Images</div>
+            <div className="small">Cached media rows: {cacheData.fullSummary?.cachedMediaRows}</div>
+            <div className="small">Mirrored product image rows: {cacheData.fullSummary?.mirroredProductImageRows}</div>
+            <div className="small">Sync issues: {cacheData.fullSummary?.syncIssueRows}</div>
+          </div>
+        </div>
+
+        <div className="audit-section">
+          <h4>Sample Price Lists</h4>
+          <div className="response-list">
+            {(cacheData.cache?.samplePriceLists || []).map((item) => (
+              <div className="response-card" key={`cache-pricelist-${item.localLinePriceListId}`}>
+                <div className="title">{item.name}</div>
+                <div className="small">Local Line id: {item.localLinePriceListId}</div>
+                <div className="small">Source: {item.source}</div>
+              </div>
+            ))}
+            {!(cacheData.cache?.samplePriceLists || []).length ? (
+              <div className="small">No price lists returned in the sample.</div>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="audit-section">
+          <h4>Sample Product Media</h4>
+          <div className="response-list">
+            {(cacheData.cache?.sampleProductMedia || []).map((item, index) => (
+              <div className="response-card" key={`cache-media-${item.productId}-${index}`}>
+                <div className="title">Product {item.productId}</div>
+                <div className="small">Remote URL: {item.remoteUrl}</div>
+                <div className="small">Primary: {item.isPrimary ? "Yes" : "No"}</div>
+              </div>
+            ))}
+            {!(cacheData.cache?.sampleProductMedia || []).length ? (
+              <div className="small">No product media returned in the sample.</div>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="audit-section">
+          <h4>Sample Mirrored Product Images</h4>
+          <div className="response-list">
+            {(cacheData.cache?.sampleMirroredProductImages || []).map((item, index) => (
+              <div className="response-card" key={`cache-mirrored-image-${item.productId}-${index}`}>
+                <div className="title">Product {item.productId}</div>
+                <div className="small">Local URL: {item.url}</div>
+              </div>
+            ))}
+            {!(cacheData.cache?.sampleMirroredProductImages || []).length ? (
+              <div className="small">No mirrored product images in this run.</div>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="audit-section">
+          <h4>Sync Issues</h4>
+          <div className="response-list">
+            {(cacheData.cache?.sampleSyncIssues || []).map((item, index) => (
+              <div className="response-card" key={`cache-issue-${item.productId || "none"}-${index}`}>
+                <div className="title">{item.issueType}</div>
+                <div className="small">Severity: {item.severity}</div>
+                {item.productId ? <div className="small">Product: {item.productId}</div> : null}
+                <div className="small">{item.detailsJson}</div>
+              </div>
+            ))}
+            {!(cacheData.cache?.sampleSyncIssues || []).length ? (
+              <div className="small">No sync issues in this run.</div>
+            ) : null}
+          </div>
+        </div>
+          </>
+        )}
+      </>
+    );
+  }
 
 
   return (
@@ -424,6 +1377,23 @@ export function AdminPanel() {
             type="button"
           >
             Products
+          </button>
+          <button
+            className={`admin-nav-item ${activeSection === "inventory" ? "active" : ""}`}
+            onClick={() => {
+              setActiveSection("inventory");
+              setSelectedProductId(null);
+            }}
+            type="button"
+          >
+            Inventory
+          </button>
+          <button
+            className={`admin-nav-item ${activeSection === "pricelist" ? "active" : ""}`}
+            onClick={() => setActiveSection("pricelist")}
+            type="button"
+          >
+            Pricelist
           </button>
           <button
             className={`admin-nav-item ${activeSection === "categories" ? "active" : ""}`}
@@ -466,7 +1436,48 @@ export function AdminPanel() {
           {activeSection === "products" && !selectedProductId && (
             <section className="admin-section">
               <h3>Products</h3>
-              <div className="filters">
+              <div className="filters product-admin-filters">
+                <label className="filter-field product-search-filter">
+                  <span className="small">Product name</span>
+                  <input
+                    className="input"
+                    type="search"
+                    value={productNameSearch}
+                    placeholder="Search products"
+                    onChange={(event) => {
+                      setProductNameSearch(event.target.value);
+                      setShowProductNameSuggestions(true);
+                    }}
+                    onFocus={() => setShowProductNameSuggestions(true)}
+                    onBlur={() => setShowProductNameSuggestions(false)}
+                  />
+                  {showProductNameSuggestions && normalizedProductNameSearch ? (
+                    <div className="filter-suggestions" role="listbox" aria-label="Matching products">
+                      {visibleProductNameSuggestions.length ? (
+                        visibleProductNameSuggestions.map((product) => (
+                          <button
+                            key={`product-suggestion-${product.id}`}
+                            className="filter-suggestion"
+                            type="button"
+                            onMouseDown={(event) => {
+                              event.preventDefault();
+                              setProductNameSearch(product.name || "");
+                              setShowProductNameSuggestions(false);
+                            }}
+                          >
+                            <span>{product.name}</span>
+                            <span className="small">
+                              {categoryMap.get(product.categoryId) || "Uncategorized"} ·{" "}
+                              {vendorMap.get(product.vendorId) || "N/A"}
+                            </span>
+                          </button>
+                        ))
+                      ) : (
+                        <div className="filter-suggestion-empty small">No matching products</div>
+                      )}
+                    </div>
+                  ) : null}
+                </label>
                 <label className="filter-field">
                   <span className="small">Category</span>
                   <select
@@ -527,14 +1538,34 @@ export function AdminPanel() {
                   className="button"
                   type="button"
                   onClick={handleApplyChanges}
-                  disabled={applyLoading || Object.keys(productEdits).length === 0}
+                  disabled={applyLoading || pendingProductEditEntries.length === 0}
                 >
                   {applyLoading ? "Applying..." : "Apply Changes"}
                 </button>
                 <button
+                  className="button sync-button"
+                  type="button"
+                  onClick={handleLocalLineAudit}
+                  disabled={localLineAuditState.loading}
+                >
+                  {localLineAuditState.loading ? "Running Audit/Inspect LL..." : "Audit/Inspect LL"}
+                </button>
+                <button
+                  className="button sync-button"
+                  type="button"
+                  onClick={handleLocalLineFullSync}
+                  disabled={localLineCacheState.loading || fullSyncRunning}
+                >
+                  {localLineCacheState.loading
+                    ? "Starting Pull/Update LL..."
+                    : fullSyncRunning
+                    ? "Pull/Update LL Running..."
+                    : "Pull/Update LL"}
+                </button>
+                <button
                   className="button alt"
                   type="button"
-                  disabled={applyLoading || Object.keys(productEdits).length === 0}
+                  disabled={applyLoading || pendingProductEditEntries.length === 0}
                   onClick={() => {
                     if (!window.confirm("Discard all pending changes? This cannot be undone.")) {
                       return;
@@ -546,99 +1577,157 @@ export function AdminPanel() {
                   Cancel Changes
                 </button>
               </div>
-              <table className="admin-table">
-                <thead>
-                  <tr>
-                    <th>Category</th>
-                    <th>Name</th>
-                    <th>Vendor</th>
-                    <th>Price</th>
-                    <th>Visible</th>
-                    <th>Track Inventory</th>
-                    <th>Stock</th>
-                    <th>On Sale</th>
-                    <th>Discount %</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredProducts.map((product) => {
-                    const defaults = getProductDefaults(product);
-                    const edits = productEdits[product.id];
-                    const rowValues = edits ? { ...defaults, ...edits } : defaults;
-                    return (
-                      <tr key={product.id} className={edits ? "edited" : ""}>
-                        <td>{categoryMap.get(product.categoryId) || "Uncategorized"}</td>
-                        <td>{product.name}</td>
-                        <td>{vendorMap.get(product.vendorId) || "N/A"}</td>
-                        <td>{getProductPrice(product)}</td>
-                        <td>
-                          <button
-                            className={`toggle-switch ${rowValues.visible ? "active" : ""}`}
-                            type="button"
-                            onClick={() =>
-                              updateProductEdit(product.id, { visible: !rowValues.visible })
-                            }
-                          />
-                        </td>
-                        <td>
-                          <button
-                            className={`toggle-switch ${rowValues.trackInventory ? "active" : ""}`}
-                            type="button"
-                            onClick={() =>
-                              updateProductEdit(product.id, { trackInventory: !rowValues.trackInventory })
-                            }
-                          />
-                        </td>
-                        <td>
-                          <input
-                            className="stock-input"
-                            type="number"
-                            value={rowValues.inventory}
-                            onChange={(event) =>
-                              updateProductEdit(product.id, { inventory: Number(event.target.value) })
-                            }
-                          />
-                        </td>
-                        <td>
-                          <button
-                            className={`toggle-switch ${rowValues.onSale ? "active" : ""}`}
-                            type="button"
-                            onClick={() =>
-                              updateProductEdit(product.id, { onSale: !rowValues.onSale })
-                            }
-                          />
-                        </td>
-                        <td>
-                          <span className="sale-discount-wrapper">
-                            <input
-                              className="sale-discount-input"
-                              type="number"
-                              min="0"
-                              max="100"
-                              step="1"
-                              value={rowValues.saleDiscount}
-                              onChange={(event) =>
-                                updateProductEdit(product.id, { saleDiscount: Number(event.target.value) })
-                              }
-                            />
-                            <span className="sale-discount-suffix">%</span>
-                          </span>
-                        </td>
-                        <td>
-                          <button
-                            className="button alt"
-                            type="button"
-                            onClick={() => setSelectedProductId(product.id)}
-                          >
-                            Details
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+              {localLineAuditState.open && (
+                <div className="admin-inline-audit">
+                  <div className="admin-inline-audit-header">
+                    <h4>Audit/Inspect LL</h4>
+                    <button className="button alt" type="button" onClick={closeLocalLineAuditPanel}>
+                      Close
+                    </button>
+                  </div>
+                  {renderLocalLineAuditContent()}
+                </div>
+              )}
+              {localLineCacheState.open && (
+                <div className="admin-inline-audit">
+                  <div className="admin-inline-audit-header">
+                    <h4>Pull/Update LL</h4>
+                    <button className="button alt" type="button" onClick={closeLocalLineCachePanel}>
+                      Close
+                    </button>
+                  </div>
+                  {renderLocalLineCacheContent()}
+                </div>
+              )}
+              <div className="admin-table-shell">
+                <table
+                  className="admin-table admin-table-head"
+                  style={{ width: productTableWidth, minWidth: productTableWidth }}
+                >
+                  <colgroup>
+                    <col style={{ width: "160px" }} />
+                    <col style={{ width: "260px" }} />
+                    <col style={{ width: "180px" }} />
+                    <col style={{ width: "110px" }} />
+                    <col style={{ width: "96px" }} />
+                    <col style={{ width: "132px" }} />
+                    <col style={{ width: "110px" }} />
+                    <col style={{ width: "96px" }} />
+                    <col style={{ width: "132px" }} />
+                    <col style={{ width: "100px" }} />
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th>Category</th>
+                      <th>Name</th>
+                      <th>Vendor</th>
+                      <th>Price</th>
+                      <th>Visible</th>
+                      <th>Track Inventory</th>
+                      <th>Stock</th>
+                      <th>On Sale</th>
+                      <th>Discount %</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                </table>
+                <div className="admin-table-body-scroll">
+                  <table
+                    className="admin-table admin-table-body"
+                    style={{ width: productTableWidth, minWidth: productTableWidth }}
+                  >
+                    <colgroup>
+                      <col style={{ width: "160px" }} />
+                      <col style={{ width: "260px" }} />
+                      <col style={{ width: "180px" }} />
+                      <col style={{ width: "110px" }} />
+                      <col style={{ width: "96px" }} />
+                      <col style={{ width: "132px" }} />
+                      <col style={{ width: "110px" }} />
+                      <col style={{ width: "96px" }} />
+                      <col style={{ width: "132px" }} />
+                      <col style={{ width: "100px" }} />
+                    </colgroup>
+                    <tbody>
+                      {filteredProducts.map((product) => {
+                        const defaults = getProductDefaults(product);
+                        const edits = productEdits[product.id];
+                        const rowValues = edits ? { ...defaults, ...edits } : defaults;
+                        return (
+                          <tr key={product.id} className={edits ? "edited" : ""}>
+                            <td>{categoryMap.get(product.categoryId) || "Uncategorized"}</td>
+                            <td>{product.name}</td>
+                            <td>{vendorMap.get(product.vendorId) || "N/A"}</td>
+                            <td>{getProductPrice(product)}</td>
+                            <td>
+                              <button
+                                className={`toggle-switch ${rowValues.visible ? "active" : ""}`}
+                                type="button"
+                                onClick={() =>
+                                  updateProductEdit(product.id, { visible: !rowValues.visible })
+                                }
+                              />
+                            </td>
+                            <td>
+                              <button
+                                className={`toggle-switch ${rowValues.trackInventory ? "active" : ""}`}
+                                type="button"
+                                onClick={() =>
+                                  updateProductEdit(product.id, { trackInventory: !rowValues.trackInventory })
+                                }
+                              />
+                            </td>
+                            <td>
+                              <input
+                                className="stock-input"
+                                type="number"
+                                value={rowValues.inventory}
+                                onChange={(event) =>
+                                  updateProductEdit(product.id, { inventory: Number(event.target.value) })
+                                }
+                              />
+                            </td>
+                            <td>
+                              <button
+                                className={`toggle-switch ${rowValues.onSale ? "active" : ""}`}
+                                type="button"
+                                onClick={() =>
+                                  updateProductEdit(product.id, { onSale: !rowValues.onSale })
+                                }
+                              />
+                            </td>
+                            <td>
+                              <span className="sale-discount-wrapper">
+                                <input
+                                  className="sale-discount-input"
+                                  type="number"
+                                  min="0"
+                                  max="100"
+                                  step="1"
+                                  value={rowValues.saleDiscount}
+                                  onChange={(event) =>
+                                    updateProductEdit(product.id, { saleDiscount: Number(event.target.value) })
+                                  }
+                                />
+                                <span className="sale-discount-suffix">%</span>
+                              </span>
+                            </td>
+                            <td>
+                              <button
+                                className="button alt"
+                                type="button"
+                                onClick={() => setSelectedProductId(product.id)}
+                              >
+                                Details
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </section>
           )}
 
@@ -706,6 +1795,124 @@ export function AdminPanel() {
                         />
                       </label>
                     ))}
+                  </div>
+                  <div className="admin-price-list">
+                    <div className="small">Local Line Price Lists</div>
+                    {localLineProductDetail?.productMeta ? (
+                      <div className="small">
+                        Local Line product {localLineProductDetail.productMeta.localLineProductId} · Last synced{" "}
+                        {localLineProductDetail.productMeta.lastSyncedAt || "n/a"}
+                      </div>
+                    ) : null}
+                    <div className="small">
+                      These edits change the locally cached Local Line rows used by the store. They do not push back to Local Line.
+                    </div>
+                    {priceListEntryDrafts.length ? (
+                      <>
+                        <table className="admin-table">
+                          <thead>
+                            <tr>
+                              <th>List</th>
+                              <th>Package</th>
+                              <th>Scope</th>
+                              <th>Visible</th>
+                              <th>On Sale</th>
+                              <th>Sale Toggle</th>
+                              <th>Final Price</th>
+                              <th>Strike Price</th>
+                              <th>Max Units</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {priceListEntryDrafts.map((entry) => (
+                              <tr key={`price-list-entry-${entry.id}`}>
+                                <td>{entry.priceListName || entry.priceListId}</td>
+                                <td>{entry.packageName || entry.productName || "Product"}</td>
+                                <td>{entry.entryScope || "package"}</td>
+                                <td>
+                                  <button
+                                    className={`toggle-switch ${entry.visible ? "active" : ""}`}
+                                    type="button"
+                                    onClick={() =>
+                                      updatePriceListEntryDraft(entry.id, { visible: !entry.visible })
+                                    }
+                                  />
+                                </td>
+                                <td>
+                                  <button
+                                    className={`toggle-switch ${entry.onSale ? "active" : ""}`}
+                                    type="button"
+                                    onClick={() =>
+                                      updatePriceListEntryDraft(entry.id, { onSale: !entry.onSale })
+                                    }
+                                  />
+                                </td>
+                                <td>
+                                  <button
+                                    className={`toggle-switch ${entry.onSaleToggle ? "active" : ""}`}
+                                    type="button"
+                                    onClick={() =>
+                                      updatePriceListEntryDraft(entry.id, {
+                                        onSaleToggle: !entry.onSaleToggle
+                                      })
+                                    }
+                                  />
+                                </td>
+                                <td>
+                                  <input
+                                    className="input"
+                                    type="number"
+                                    step="0.01"
+                                    value={entry.finalPriceCache}
+                                    onChange={(event) =>
+                                      updatePriceListEntryDraft(entry.id, {
+                                        finalPriceCache: event.target.value
+                                      })
+                                    }
+                                  />
+                                </td>
+                                <td>
+                                  <input
+                                    className="input"
+                                    type="number"
+                                    step="0.01"
+                                    value={entry.strikethroughDisplayValue}
+                                    onChange={(event) =>
+                                      updatePriceListEntryDraft(entry.id, {
+                                        strikethroughDisplayValue: event.target.value
+                                      })
+                                    }
+                                  />
+                                </td>
+                                <td>
+                                  <input
+                                    className="input"
+                                    type="number"
+                                    step="1"
+                                    value={entry.maxUnitsPerOrder}
+                                    onChange={(event) =>
+                                      updatePriceListEntryDraft(entry.id, {
+                                        maxUnitsPerOrder: event.target.value
+                                      })
+                                    }
+                                  />
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                        <button
+                          className="button alt"
+                          type="button"
+                          onClick={handleSavePriceListEntries}
+                          disabled={priceListSaveLoading}
+                        >
+                          {priceListSaveLoading ? "Saving price lists..." : "Save Local Price Lists"}
+                        </button>
+                      </>
+                    ) : (
+                      <div className="small">No cached Local Line price-list entries for this product yet.</div>
+                    )}
                   </div>
                   <label className="filter-toggle">
                     <input
@@ -787,9 +1994,18 @@ export function AdminPanel() {
                 </div>
               )}
               <div className="admin-grid">
-                {(activeProduct.images || []).map((url) => (
-                  <img key={url} src={url} alt={activeProduct.name} className="admin-thumb" />
-                ))}
+                {(activeProduct.images || []).map((image, index) => {
+                  const entry = getImageEntry(image, index);
+                  if (!entry.src) return null;
+                  return (
+                    <img
+                      key={entry.key}
+                      src={entry.thumbnailUrl || entry.src}
+                      alt={activeProduct.name}
+                      className="admin-thumb"
+                    />
+                  );
+                })}
               </div>
               <div className="small">Upload image</div>
               <input type="file" onChange={(event) => event.target.files?.[0] && handleImageUpload(activeProduct.id, event.target.files[0])} />
@@ -819,6 +2035,27 @@ export function AdminPanel() {
                 <button className="button alt" type="button" onClick={handleAddDropSite}>Add drop site</button>
               </div>
             </section>
+          )}
+
+          {activeSection === "pricelist" && (
+            <AdminPriceListSection
+              token={token}
+              categories={categories}
+              vendors={vendors}
+              onDataRefresh={loadAll}
+              onCatalogRefresh={refreshCatalogFromAdmin}
+            />
+          )}
+
+          {activeSection === "inventory" && (
+            <AdminInventorySection
+              token={token}
+              products={products}
+              categories={categories}
+              vendors={vendors}
+              onDataRefresh={loadAll}
+              onCatalogRefresh={refreshCatalogFromAdmin}
+            />
           )}
 
           {activeSection === "categories" && (
@@ -978,6 +2215,7 @@ export function AdminPanel() {
           </div>
         </div>
       )}
+
     </div>
   );
 }

@@ -1,5 +1,23 @@
 const base = import.meta.env.VITE_API_BASE || "/api";
 
+async function throwForError(response, fallbackMessage) {
+  let detail = "";
+  try {
+    const payload = await response.json();
+    detail = payload?.detail || payload?.error || "";
+  } catch (error) {
+    try {
+      detail = (await response.text()) || "";
+    } catch (textError) {
+      detail = "";
+    }
+  }
+
+  const error = new Error(detail || fallbackMessage);
+  error.status = response.status;
+  throw error;
+}
+
 export async function adminLogin(username, password) {
   const response = await fetch(`${base}/admin/login`, {
     method: "POST",
@@ -18,7 +36,7 @@ export async function adminGet(path, token) {
   const response = await fetch(`${base}/admin/${path}`, {
     headers: { Authorization: `Bearer ${token}` }
   });
-  if (!response.ok) throw new Error("Admin request failed");
+  if (!response.ok) await throwForError(response, "Admin request failed");
   return response.json();
 }
 
@@ -31,7 +49,7 @@ export async function adminPut(path, token, body) {
     },
     body: JSON.stringify(body)
   });
-  if (!response.ok) throw new Error("Admin update failed");
+  if (!response.ok) await throwForError(response, "Admin update failed");
   return response.json();
 }
 
@@ -44,7 +62,7 @@ export async function adminPost(path, token, body) {
     },
     body: JSON.stringify(body)
   });
-  if (!response.ok) throw new Error("Admin create failed");
+  if (!response.ok) await throwForError(response, "Admin create failed");
   return response.json();
 }
 
@@ -58,6 +76,6 @@ export async function adminUploadImage(productId, token, file) {
     },
     body: form
   });
-  if (!response.ok) throw new Error("Upload failed");
+  if (!response.ok) await throwForError(response, "Upload failed");
   return response.json();
 }

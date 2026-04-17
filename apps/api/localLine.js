@@ -1,10 +1,22 @@
 import { eq } from "drizzle-orm";
-import { categories, packages, products, productSales } from "./schema.js";
+import {
+  localLinePackageMeta,
+  packages,
+  products,
+  productPricingProfiles,
+  productSales,
+  vendors
+} from "./schema.js";
 import {
   getLocalLineAccessToken,
   getLocalLineBaseUrl,
   isLocalLineAuthConfigured
 } from "./localLineAuth.js";
+import {
+  computePackageBasePrice,
+  getPriceListDefinitions,
+  resolvePricingProfile
+} from "./lib/productPricing.js";
 
 const LL_BASEURL = getLocalLineBaseUrl();
 const isTestMode = process.env.LOCALLINE_TEST === "true";
@@ -13,6 +25,10 @@ const updatePrices = process.env.LOCALLINE_UPDATE_PRICES !== "false";
 function parseNumber(value, fallback = null) {
   const num = Number(value);
   return Number.isFinite(num) ? num : fallback;
+}
+
+function roundCurrency(value) {
+  return Number(Number(value).toFixed(2));
 }
 
 function parseIdList(value) {
@@ -63,7 +79,6 @@ function buildPriceListsFromEnv() {
   return priceLists;
 }
 
-const PRICE_LISTS = buildPriceListsFromEnv();
 const DAIRY_PRICE_LIST_IDS = parseIdList(process.env.LL_DAIRY_PRICE_LIST_IDS);
 const DAIRY_MARKUP = parseNumber(process.env.LL_MARKUP_DAIRY, null);
 const DEBUG_PRODUCT_ID = Number(process.env.LL_DEBUG_PRODUCT_ID || "");
@@ -141,41 +156,63 @@ function buildPriceListEntry(basePrice, entry, markupDecimal, saleEnabled, saleD
   if (!Number.isFinite(safeMarkup)) return null;
   const safeBase = Number(basePrice);
   if (!Number.isFinite(safeBase)) return null;
+  const priceListId = Number(entry.price_list_id ?? entry.price_list);
+  const productPriceListEntryId = Number(entry.product_price_list_entry ?? entry.id);
+  const liveAdjustmentType = Number(entry.adjustment_type);
+  const adjustmentType =
+    liveAdjustmentType === 1 || liveAdjustmentType === 2 || liveAdjustmentType === 3
+      ? liveAdjustmentType
+      : 2;
+  if (!Number.isFinite(priceListId) || !Number.isFinite(productPriceListEntryId)) {
+    return null;
+  }
 
-  let basePriceUsed = safeBase;
-  let adjustmentValue = Number((safeMarkup * 100).toFixed(2));
-  let calculated = Number((safeBase * (1 + safeMarkup)).toFixed(2));
+  let basePriceUsed = roundCurrency(safeBase);
+  const regularFinalPrice = roundCurrency(safeBase * (1 + safeMarkup));
+  let adjustmentValue =
+    adjustmentType === 1
+      ? roundCurrency(regularFinalPrice - basePriceUsed)
+      : adjustmentType === 2
+        ? roundCurrency(safeMarkup * 100)
+        : regularFinalPrice;
+  let calculated = regularFinalPrice;
   let strikethrough = null;
   let onSaleToggle = false;
 
   const salePct = Number(saleDiscount);
   if (saleEnabled && Number.isFinite(salePct) && salePct > 0) {
-    const regularFinal = safeBase * (1 + safeMarkup);
-    const discountedFinal = regularFinal * (1 - salePct);
-    basePriceUsed = discountedFinal / (1 + safeMarkup);
-    const saleMarkup = (discountedFinal - basePriceUsed) / basePriceUsed;
-    adjustmentValue = Number((saleMarkup * 100).toFixed(2));
-    calculated = Number(discountedFinal.toFixed(2));
-    strikethrough = Number(regularFinal.toFixed(2));
+    const discountedFinal = regularFinalPrice * (1 - salePct);
+    calculated = roundCurrency(discountedFinal);
+    strikethrough = regularFinalPrice;
     onSaleToggle = true;
+
+    if (adjustmentType === 1) {
+      adjustmentValue = roundCurrency(calculated - basePriceUsed);
+    } else if (adjustmentType === 2) {
+      basePriceUsed = roundCurrency(discountedFinal / (1 + safeMarkup));
+      const saleMarkup = (discountedFinal - basePriceUsed) / basePriceUsed;
+      adjustmentValue = roundCurrency(saleMarkup * 100);
+    } else {
+      adjustmentValue = calculated;
+    }
   }
 
   return {
     adjustment: true,
-    adjustment_type: 2,
+    adjustment_type: adjustmentType,
     adjustment_value: adjustmentValue,
-    price_list: entry.price_list,
+    price_list: priceListId,
     checked: true,
     notSubmitted: false,
     edited: false,
     dirty: true,
-    product_price_list_entry: entry.id,
+    product_price_list_entry: productPriceListEntryId,
     calculated_value: calculated,
     on_sale: Boolean(saleEnabled),
     on_sale_toggle: onSaleToggle,
     max_units_per_order: null,
     strikethrough_display_value: strikethrough,
-    base_price_used: Number(basePriceUsed.toFixed(2))
+    base_price_used: basePriceUsed
   };
 }
 
@@ -199,7 +236,8 @@ async function updateLocalLinePrices(db, productId, changes) {
 
   const saleFieldsProvided =
     Object.prototype.hasOwnProperty.call(changes, "onSale") ||
-    Object.prototype.hasOwnProperty.call(changes, "saleDiscount");
+    Object.prototype.hasOwnProperty.call(changes, "saleDiscount") ||
+    Boolean(changes.forcePriceSync);
   if (!saleFieldsProvided) {
     return { ok: null };
   }
@@ -210,15 +248,35 @@ async function updateLocalLinePrices(db, productId, changes) {
   }
   const product = productRows[0];
 
-  const categoryRows = product.categoryId
-    ? await db.select().from(categories).where(eq(categories.id, product.categoryId))
+  const vendorRows = product.vendorId
+    ? await db.select().from(vendors).where(eq(vendors.id, product.vendorId))
     : [];
-  const categoryName = categoryRows[0]?.name || "";
-  const useDairyLists =
-    isDairyCategoryName(categoryName) &&
-    DAIRY_PRICE_LIST_IDS.length > 0 &&
-    Number.isFinite(DAIRY_MARKUP);
-  const priceLists = PRICE_LISTS;
+  const profileRows = await db
+    .select()
+    .from(productPricingProfiles)
+    .where(eq(productPricingProfiles.productId, productId));
+
+  const packageRows = await db.select().from(packages).where(eq(packages.productId, productId));
+  const packageMetaRows = packageRows.length
+    ? await db
+        .select()
+        .from(localLinePackageMeta)
+        .where(eq(localLinePackageMeta.productId, productId))
+        .catch(() => [])
+    : [];
+
+  const packageMetaByPackageId = new Map(
+    packageMetaRows.map((row) => [Number(row.packageId), row])
+  );
+
+  const resolvedProfile = resolvePricingProfile({
+    profile: profileRows[0] || null,
+    product,
+    packages: packageRows,
+    packageMetaByPackageId,
+    vendor: vendorRows[0] || null
+  });
+  const priceLists = getPriceListDefinitions(resolvedProfile);
   if (!priceLists || Object.keys(priceLists).length === 0) {
     return { ok: null };
   }
@@ -226,23 +284,28 @@ async function updateLocalLinePrices(db, productId, changes) {
   if (debugEnabled(productId)) {
     console.log("[LocalLine debug] price list config", {
       productId,
-      categoryName,
-      useDairyLists,
-      dairyListIds: DAIRY_PRICE_LIST_IDS,
-      dairyMarkup: DAIRY_MARKUP,
-      priceListIds: Object.values(priceLists).map((entry) => entry.id)
+      priceListIds: priceLists.map((entry) => entry.id),
+      sourceUnitPrice: resolvedProfile.sourceUnitPrice,
+      unitOfMeasure: resolvedProfile.unitOfMeasure
     });
   }
 
   const saleRows = await db.select().from(productSales).where(eq(productSales.productId, productId));
   const saleRow = saleRows[0] || {};
   const saleEnabled =
-    typeof changes.onSale !== "undefined" ? Boolean(changes.onSale) : Boolean(saleRow.onSale);
+    typeof changes.onSale !== "undefined"
+      ? Boolean(changes.onSale)
+      : profileRows.length
+        ? Boolean(resolvedProfile.onSale)
+        : Boolean(saleRow.onSale);
   const saleDiscountRaw =
-    typeof changes.saleDiscount === "number" ? changes.saleDiscount : saleRow.saleDiscount;
+    typeof changes.saleDiscount === "number"
+      ? changes.saleDiscount
+      : profileRows.length
+        ? resolvedProfile.saleDiscount
+        : saleRow.saleDiscount;
   const saleDiscount = Number(saleDiscountRaw || 0);
 
-  const packageRows = await db.select().from(packages).where(eq(packages.productId, productId));
   if (!packageRows.length) {
     if (debugEnabled(productId)) {
       console.log("[LocalLine debug] no packages found for product.");
@@ -255,11 +318,13 @@ async function updateLocalLinePrices(db, productId, changes) {
   const llEntries = Array.isArray(llProduct?.product_price_list_entries)
     ? llProduct.product_price_list_entries
     : [];
-  const entryByListId = new Map(llEntries.map((entry) => [entry.price_list, entry]));
+  const productEntryByListId = new Map(
+    llEntries.map((entry) => [Number(entry.price_list), entry]).filter(([id]) => Number.isFinite(id))
+  );
 
   if (debugEnabled(productId)) {
     console.log("[LocalLine debug] LocalLine entries", {
-      entryListIds: [...entryByListId.keys()],
+      entryListIds: [...productEntryByListId.keys()],
       packageCount: packageRows.length,
       saleEnabled,
       saleDiscount
@@ -268,18 +333,29 @@ async function updateLocalLinePrices(db, productId, changes) {
 
   const packagePayloads = [];
   for (const pkg of packageRows) {
-    const purchasePrice = Number(pkg.price);
+    const purchasePrice =
+      computePackageBasePrice(resolvedProfile, pkg, packageMetaByPackageId.get(Number(pkg.id))) ??
+      Number(pkg.price);
     if (!Number.isFinite(purchasePrice)) {
       continue;
     }
+    const llPackage = Array.isArray(llProduct?.packages)
+      ? llProduct.packages.find((item) => Number(item.id) === Number(pkg.id))
+      : null;
+    const packageEntryByListId = new Map(productEntryByListId);
+    if (Array.isArray(llPackage?.price_list_entries)) {
+      llPackage.price_list_entries.forEach((entry) => {
+        const listId = Number(entry.price_list_id ?? entry.price_list);
+        if (Number.isFinite(listId)) {
+          packageEntryByListId.set(listId, entry);
+        }
+      });
+    }
 
     const entries = [];
-    for (const listName of Object.keys(priceLists)) {
-      const list = priceLists[listName];
-      const markup = useDairyLists && DAIRY_PRICE_LIST_IDS.includes(list.id)
-        ? DAIRY_MARKUP
-        : list.markup;
-      const existingEntry = entryByListId.get(list.id);
+    for (const list of priceLists) {
+      const markup = list.markup;
+      const existingEntry = packageEntryByListId.get(list.id);
       if (!existingEntry) {
         continue;
       }

@@ -3,7 +3,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import express from "express";
 import cors from "cors";
-import { initDb } from "./db.js";
+import { ensureLocalLineSyncSchema, initDb } from "./db.js";
 import catalogRoutes from "./routes/catalog.js";
 import adminRoutes from "./routes/admin.js";
 import { ensureSeedAdmin } from "./scripts/seedAdmin.js";
@@ -21,6 +21,9 @@ app.use(cors());
 app.use(express.json({ limit: "2mb" }));
 
 initDb();
+ensureLocalLineSyncSchema().catch((err) => {
+  console.error("Local Line schema bootstrap failed:", err.message);
+});
 
 if (process.env.AUTO_SEED_ADMIN === "true") {
   ensureSeedAdmin().catch((err) => {

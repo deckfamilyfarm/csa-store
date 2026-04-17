@@ -64,6 +64,19 @@ export function Storefront() {
   const [userReviews, setUserReviews] = useState([]);
   const [editingReviewId, setEditingReviewId] = useState(null);
 
+  async function reloadCatalog() {
+    const data = await fetchCatalog();
+    setCatalog({
+      categories: data.categories || [],
+      vendors: data.vendors || [],
+      products: data.products || [],
+      recipes: data.recipes || [],
+      dropSites: data.dropSites || []
+    });
+    setCatalogError("");
+    setSelectedCategory((current) => current || "");
+  }
+
   function getHashRoute() {
     const raw = window.location.hash.replace(/^#\/?/, "").trim();
     if (!raw) return null;
@@ -87,17 +100,7 @@ export function Storefront() {
   }, []);
 
   useEffect(() => {
-    fetchCatalog()
-      .then((data) => {
-        setCatalog({
-          categories: data.categories || [],
-          vendors: data.vendors || [],
-          products: data.products || [],
-          recipes: data.recipes || [],
-          dropSites: data.dropSites || []
-        });
-        setSelectedCategory((current) => current || "");
-      })
+    reloadCatalog()
       .catch((err) => {
         console.error(err);
         setCatalogError("Unable to load catalog.");
@@ -381,7 +384,7 @@ export function Storefront() {
           </div>
         </div>
         {isAdminView ? (
-          <AdminPanel />
+          <AdminPanel onCatalogRefresh={reloadCatalog} />
         ) : isAccountView ? (
           <AccountPanelSection accountPanel={accountPanel} dropSite={dropSite} />
         ) : (

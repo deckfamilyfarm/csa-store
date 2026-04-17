@@ -1,11 +1,15 @@
 import express from "express";
-import { getDb } from "../db.js";
+import { ensureLocalLineSyncSchema, getDb, isMissingTableError } from "../db.js";
 import { and, eq, inArray } from "drizzle-orm";
 import {
   categories,
+  localLinePriceListEntries,
+  localLinePackageMeta,
   dropSites,
   packages,
+  productMedia,
   productImages,
+  productPricingProfiles,
   products,
   productSales,
   productTags,
@@ -15,30 +19,145 @@ import {
   vendors
 } from "../schema.js";
 import { requireUser } from "../middleware/auth.js";
+import { computeProductPricingSnapshot } from "../lib/productPricing.js";
 
 const router = express.Router();
+
+function parsePriceListId(value) {
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? numeric : null;
+}
+
+function getStorefrontLocalLinePriceListIds() {
+  return [
+    parsePriceListId(process.env.LL_PRICE_LIST_GUEST_ID),
+    parsePriceListId(process.env.LL_PRICE_LIST_CSA_MEMBERS_ID),
+    parsePriceListId(process.env.LL_PRICE_LIST_HERDSHARE_ID),
+    parsePriceListId(process.env.LL_PRICE_LIST_SNAP_ID)
+  ].filter((value, index, values) => Number.isFinite(value) && values.indexOf(value) === index);
+}
+
+function getExcludedStoreCategoryNames() {
+  const configured = String(process.env.STORE_CATALOG_EXCLUDED_CATEGORY_NAMES || "")
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean);
+  if (!configured.length) {
+    configured.push("Membership");
+  }
+  return new Set(configured.map((value) => value.toLowerCase()));
+}
+
+function isVisiblePriceListEntry(row) {
+  return row.visible === null || typeof row.visible === "undefined" ? true : Boolean(row.visible);
+}
+
+function chooseLowerPrice(current, candidate) {
+  if (!Number.isFinite(candidate)) return current;
+  if (!Number.isFinite(current)) return candidate;
+  return candidate < current ? candidate : current;
+}
+
+function toTimestamp(value) {
+  const timestamp = value ? new Date(value).getTime() : NaN;
+  return Number.isFinite(timestamp) ? timestamp : 0;
+}
+
+function computeDerivedSaleDiscount(finalPrice, strikethroughDisplayValue) {
+  const finalValue = Number(finalPrice);
+  const strikeValue = Number(strikethroughDisplayValue);
+  if (!Number.isFinite(finalValue) || !Number.isFinite(strikeValue) || strikeValue <= finalValue || strikeValue <= 0) {
+    return null;
+  }
+  return Number(((strikeValue - finalValue) / strikeValue).toFixed(4));
+}
+
+function isRealLocalLineSale(row) {
+  const derivedDiscount = computeDerivedSaleDiscount(
+    row.finalPriceCache,
+    row.strikethroughDisplayValue
+  );
+  return Boolean(row.onSaleToggle) || (Number.isFinite(derivedDiscount) && derivedDiscount > 0);
+}
 
 router.get("/catalog", async (_req, res) => {
   try {
     const db = getDb();
+    await ensureLocalLineSyncSchema().catch((error) => {
+      console.warn("Local Line schema bootstrap skipped for /catalog:", error.message);
+    });
 
-    const categoryRows = await db.select().from(categories).orderBy(categories.name);
+    const rawCategoryRows = await db.select().from(categories).orderBy(categories.name);
     const vendorRows = await db.select().from(vendors);
+    const excludedCategoryNames = getExcludedStoreCategoryNames();
+    const excludedCategoryIds = new Set(
+      rawCategoryRows
+        .filter((row) => excludedCategoryNames.has(String(row.name || "").trim().toLowerCase()))
+        .map((row) => row.id)
+    );
+    const categoryRows = rawCategoryRows.filter((row) => !excludedCategoryIds.has(row.id));
 
-    const productRows = await db
+    const rawProductRows = await db
       .select()
       .from(products)
       .where(and(eq(products.isDeleted, 0), eq(products.visible, 1)));
+    const productRows = rawProductRows.filter((row) => !excludedCategoryIds.has(row.categoryId));
 
     const productIds = productRows.map((row) => row.id);
 
     const imageRows = productIds.length
       ? await db.select().from(productImages).where(inArray(productImages.productId, productIds))
       : [];
+    let mediaRows = [];
+    if (productIds.length) {
+      try {
+        mediaRows = await db.select().from(productMedia).where(inArray(productMedia.productId, productIds));
+      } catch (error) {
+        if (!isMissingTableError(error, "product_media")) throw error;
+      }
+    }
 
     const packageRows = productIds.length
       ? await db.select().from(packages).where(inArray(packages.productId, productIds))
       : [];
+    const pricingProfileRows = productIds.length
+      ? await db
+          .select()
+          .from(productPricingProfiles)
+          .where(inArray(productPricingProfiles.productId, productIds))
+      : [];
+    let packageMetaRows = [];
+    if (productIds.length) {
+      try {
+        packageMetaRows = await db
+          .select()
+          .from(localLinePackageMeta)
+          .where(inArray(localLinePackageMeta.productId, productIds));
+      } catch (error) {
+        if (!isMissingTableError(error, "local_line_package_meta")) throw error;
+      }
+    }
+
+    const storefrontLocalLinePriceListIds = getStorefrontLocalLinePriceListIds();
+    let localLinePriceListEntryRows = [];
+    if (productIds.length && storefrontLocalLinePriceListIds.length) {
+      try {
+        localLinePriceListEntryRows = await db
+          .select()
+          .from(localLinePriceListEntries)
+          .where(
+            and(
+              inArray(localLinePriceListEntries.productId, productIds),
+              inArray(
+                localLinePriceListEntries.localLinePriceListId,
+                storefrontLocalLinePriceListIds
+              )
+            )
+          );
+      } catch (error) {
+        if (!isMissingTableError(error, "local_line_price_list_entries")) throw error;
+      }
+    }
 
     const saleRows = productIds.length
       ? await db.select().from(productSales).where(inArray(productSales.productId, productIds))
@@ -119,6 +238,24 @@ router.get("/catalog", async (_req, res) => {
         .filter((entry) => entry.url);
     }
 
+    const mediaObjectsByProduct = mediaRows
+      .slice()
+      .sort((left, right) => {
+        const primaryDelta = Number(right.isPrimary || 0) - Number(left.isPrimary || 0);
+        if (primaryDelta !== 0) return primaryDelta;
+        return Number(left.sortOrder || 0) - Number(right.sortOrder || 0);
+      })
+      .reduce((acc, row) => {
+        if (!acc[row.productId]) acc[row.productId] = [];
+        const url = row.publicUrl || row.remoteUrl || row.sourceUrl;
+        if (!url) return acc;
+        acc[row.productId].push({
+          url,
+          thumbnailUrl: row.thumbnailUrl || url
+        });
+        return acc;
+      }, {});
+
     const packagesByProduct = packageRows.reduce((acc, row) => {
       if (!acc[row.productId]) acc[row.productId] = [];
       acc[row.productId].push(row);
@@ -128,8 +265,90 @@ router.get("/catalog", async (_req, res) => {
     const salesByProduct = saleRows.reduce((acc, row) => {
       acc[row.productId] = {
         onSale: Boolean(row.onSale),
-        saleDiscount: row.saleDiscount !== null ? Number(row.saleDiscount) : null
+        saleDiscount: row.saleDiscount !== null ? Number(row.saleDiscount) : null,
+        updatedAt: row.updatedAt || null
       };
+      return acc;
+    }, {});
+
+    const guestPriceListId = parsePriceListId(process.env.LL_PRICE_LIST_GUEST_ID);
+    const memberPriceListIds = [
+      parsePriceListId(process.env.LL_PRICE_LIST_CSA_MEMBERS_ID),
+      parsePriceListId(process.env.LL_PRICE_LIST_HERDSHARE_ID),
+      parsePriceListId(process.env.LL_PRICE_LIST_SNAP_ID)
+    ].filter((value, index, values) => Number.isFinite(value) && values.indexOf(value) === index);
+
+    const localLineSalesByProduct = localLinePriceListEntryRows.reduce((acc, row) => {
+      if (
+        Number.isFinite(guestPriceListId) &&
+        Number(row.localLinePriceListId) !== Number(guestPriceListId)
+      ) {
+        return acc;
+      }
+
+      const productId = row.productId;
+      if (!acc[productId]) {
+        acc[productId] = {
+          hasEntries: false,
+          onSale: false,
+          saleDiscount: null,
+          lastSyncedAt: null
+        };
+      }
+
+      const visible =
+        row.visible === null || typeof row.visible === "undefined" ? true : Boolean(row.visible);
+      if (!visible) {
+        return acc;
+      }
+
+      const entry = acc[productId];
+      entry.hasEntries = true;
+      if (
+        !entry.lastSyncedAt ||
+        toTimestamp(row.lastSyncedAt || row.updatedAt) > toTimestamp(entry.lastSyncedAt)
+      ) {
+        entry.lastSyncedAt = row.lastSyncedAt || row.updatedAt || null;
+      }
+
+      const derivedDiscount = computeDerivedSaleDiscount(
+        row.finalPriceCache,
+        row.strikethroughDisplayValue
+      );
+      const isOnSale = isRealLocalLineSale(row);
+
+      if (isOnSale) {
+        entry.onSale = true;
+      }
+      if (
+        Number.isFinite(derivedDiscount) &&
+        (entry.saleDiscount === null || derivedDiscount > entry.saleDiscount)
+      ) {
+        entry.saleDiscount = derivedDiscount;
+      }
+
+      return acc;
+    }, {});
+
+    const localLinePriceCacheByProduct = localLinePriceListEntryRows.reduce((acc, row) => {
+      if (!isVisiblePriceListEntry(row)) {
+        return acc;
+      }
+      const finalPrice =
+        row.finalPriceCache !== null && typeof row.finalPriceCache !== "undefined"
+          ? Number(row.finalPriceCache)
+          : null;
+      if (!Number.isFinite(finalPrice)) {
+        return acc;
+      }
+
+      if (!acc[row.productId]) {
+        acc[row.productId] = {
+          byPriceListId: {}
+        };
+      }
+      const current = acc[row.productId].byPriceListId[row.localLinePriceListId];
+      acc[row.productId].byPriceListId[row.localLinePriceListId] = chooseLowerPrice(current, finalPrice);
       return acc;
     }, {});
 
@@ -146,6 +365,7 @@ router.get("/catalog", async (_req, res) => {
     }, {});
 
     const vendorMap = new Map(vendorRows.map((row) => [row.id, row.name]));
+    const vendorRowMap = new Map(vendorRows.map((row) => [row.id, row]));
     const vendorMarkupMap = new Map(
       vendorRows.map((row) => [
         row.id,
@@ -156,6 +376,12 @@ router.get("/catalog", async (_req, res) => {
       ])
     );
     const categoryMap = new Map(categoryRows.map((row) => [row.id, row.name]));
+    const pricingProfileByProductId = new Map(
+      pricingProfileRows.map((row) => [Number(row.productId), row])
+    );
+    const packageMetaByPackageId = new Map(
+      packageMetaRows.map((row) => [Number(row.packageId), row])
+    );
 
     const productPayload = productRows.map((row) => {
       const productPackages = packagesByProduct[row.id] || [];
@@ -168,13 +394,57 @@ router.get("/catalog", async (_req, res) => {
         ? productReviews.reduce((sum, review) => sum + Number(review.rating || 0), 0) /
           productReviews.length
         : 0;
-      const saleMeta = salesByProduct[row.id];
-      const basePrice = priceCandidates.length ? Math.min(...priceCandidates) : null;
+      const localLineSaleMeta = localLineSalesByProduct[row.id];
+      const localSaleMeta = salesByProduct[row.id];
+      const shouldUseLocalSaleOverride =
+        Boolean(localSaleMeta) &&
+        (!localLineSaleMeta?.hasEntries ||
+          toTimestamp(localSaleMeta.updatedAt) > toTimestamp(localLineSaleMeta.lastSyncedAt));
+      const saleMeta = shouldUseLocalSaleOverride
+        ? localSaleMeta
+        : (localLineSaleMeta?.hasEntries ? localLineSaleMeta : localSaleMeta);
+      const pricingSnapshot = computeProductPricingSnapshot({
+        product: row,
+        packages: productPackages,
+        packageMetaByPackageId,
+        vendor: vendorRowMap.get(row.vendorId) || null,
+        profile: pricingProfileByProductId.get(row.id) || null
+      });
+      const hasResolvedPricingProfile =
+        Boolean(pricingProfileByProductId.get(row.id)) &&
+        Number.isFinite(Number(pricingSnapshot.profile.sourceUnitPrice));
+      const basePrice = hasResolvedPricingProfile
+        ? pricingSnapshot.basePrice
+        : (priceCandidates.length ? Math.min(...priceCandidates) : null);
       const markups = vendorMarkupMap.get(row.vendorId) || { guestMarkup: 0.55, memberMarkup: 0.4 };
-      const guestPrice =
-        basePrice !== null ? Number((basePrice * (1 + markups.guestMarkup)).toFixed(2)) : null;
-      const memberPrice =
-        basePrice !== null ? Number((basePrice * (1 + markups.memberMarkup)).toFixed(2)) : null;
+      const localLinePricing = localLinePriceCacheByProduct[row.id]?.byPriceListId || {};
+      const guestPriceFromLocalLine =
+        Number.isFinite(guestPriceListId) && Number.isFinite(localLinePricing[guestPriceListId])
+          ? Number(localLinePricing[guestPriceListId].toFixed(2))
+          : null;
+      const memberPriceFromLocalLine = memberPriceListIds
+        .map((id) => localLinePricing[id])
+        .find((value) => Number.isFinite(value));
+      const guestPrice = hasResolvedPricingProfile
+        ? pricingSnapshot.guestPrice
+        : (
+            guestPriceFromLocalLine ??
+            (basePrice !== null ? Number((basePrice * (1 + markups.guestMarkup)).toFixed(2)) : null)
+          );
+      const memberPrice = hasResolvedPricingProfile
+        ? pricingSnapshot.memberPrice
+        : (
+            (Number.isFinite(memberPriceFromLocalLine)
+              ? Number(memberPriceFromLocalLine.toFixed(2))
+              : null) ??
+            (basePrice !== null ? Number((basePrice * (1 + markups.memberMarkup)).toFixed(2)) : null)
+          );
+      const effectiveSaleMeta = hasResolvedPricingProfile
+        ? {
+            onSale: Boolean(pricingSnapshot.profile.onSale),
+            saleDiscount: pricingSnapshot.profile.saleDiscount
+          }
+        : saleMeta;
 
       return {
         id: row.id,
@@ -192,9 +462,13 @@ router.get("/catalog", async (_req, res) => {
         packages: productPackages,
         images:
           imageObjectsByProduct[row.id] ||
+          mediaObjectsByProduct[row.id] ||
           (imagesByProduct[row.id] || []).map((url) => ({ url, thumbnailUrl: url })),
         imageUrl:
           (imageObjectsByProduct[row.id] || [])
+            .map((item) => item.url)
+            .find(Boolean) ||
+          (mediaObjectsByProduct[row.id] || [])
             .map((item) => item.url)
             .find(Boolean) ||
           row.thumbnailUrl ||
@@ -203,11 +477,14 @@ router.get("/catalog", async (_req, res) => {
           (imageObjectsByProduct[row.id] || [])
             .map((item) => item.thumbnailUrl)
             .find(Boolean) ||
+          (mediaObjectsByProduct[row.id] || [])
+            .map((item) => item.thumbnailUrl)
+            .find(Boolean) ||
           row.thumbnailUrl ||
           null,
         featured: featuredSet.has(row.id),
-        onSale: saleMeta ? saleMeta.onSale : saleSet.has(row.id),
-        saleDiscount: saleMeta ? saleMeta.saleDiscount : null,
+        onSale: effectiveSaleMeta ? Boolean(effectiveSaleMeta.onSale) : saleSet.has(row.id),
+        saleDiscount: effectiveSaleMeta ? effectiveSaleMeta.saleDiscount : null,
         rating: avgRating ? Math.round(avgRating * 10) / 10 : 0,
         reviews: productReviews
       };

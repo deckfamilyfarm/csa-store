@@ -4,13 +4,20 @@ import jwt from "jsonwebtoken";
 import multer from "multer";
 import sharp from "sharp";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-import { getDb } from "../db.js";
+import { ensureLocalLineSyncSchema, getDb, isMissingTableError } from "../db.js";
 import { and, eq, inArray } from "drizzle-orm";
 import {
   categories,
   dropSites,
+  localLinePackageMeta,
+  localLinePriceListEntries,
+  localLineProductMeta,
+  localLineSyncIssues,
+  packagePriceListMemberships,
   packages,
+  productMedia,
   productImages,
+  productPricingProfiles,
   products,
   productSales,
   recipes,
@@ -21,6 +28,17 @@ import {
 } from "../schema.js";
 import { requireAdmin } from "../middleware/auth.js";
 import { isLocalLineEnabled, updateLocalLineForProduct } from "../localLine.js";
+import {
+  getLatestLocalLineFullSyncJob,
+  getLocalLineFullSyncJob,
+  startLocalLineFullSyncJob
+} from "../lib/localLineFullSyncJobs.js";
+import { computeProductPricingSnapshot, isSourcePricingVendor } from "../lib/productPricing.js";
+import { runLocalLineAudit } from "../scripts/auditLocalLineSync.js";
+import {
+  exportMasterPricelist,
+  isGooglePricelistVendorName
+} from "../scripts/exportMasterPricelist.js";
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -38,6 +56,21 @@ function buildPublicUrl(key) {
   const base = process.env.DO_SPACES_PUBLIC_BASE_URL;
   if (base) return `${base.replace(/\/$/, "")}/${key}`;
   return `${process.env.DO_SPACES_ENDPOINT}/${process.env.DO_SPACES_BUCKET}/${key}`;
+}
+
+function toNumber(value) {
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? numeric : null;
+}
+
+function toTimestamp(value) {
+  const timestamp = value ? new Date(value).getTime() : NaN;
+  return Number.isFinite(timestamp) ? timestamp : 0;
+}
+
+function toDbDecimal(value) {
+  const numeric = toNumber(value);
+  return numeric === null ? null : numeric;
 }
 
 router.post("/login", async (req, res) => {
@@ -75,9 +108,39 @@ router.get("/products", requireAdmin, async (_req, res) => {
   const productRows = await db.select().from(products);
   const productIds = productRows.map((row) => row.id);
 
+  await ensureLocalLineSyncSchema().catch((error) => {
+    console.warn("Local Line schema bootstrap skipped for /admin/products:", error.message);
+  });
+
   const imageRows = productIds.length
     ? await db.select().from(productImages).where(inArray(productImages.productId, productIds))
     : [];
+  let mediaRows = [];
+  let productMetaRows = [];
+  let syncIssueRows = [];
+  if (productIds.length) {
+    try {
+      mediaRows = await db.select().from(productMedia).where(inArray(productMedia.productId, productIds));
+    } catch (error) {
+      if (!isMissingTableError(error, "product_media")) throw error;
+    }
+    try {
+      productMetaRows = await db
+        .select()
+        .from(localLineProductMeta)
+        .where(inArray(localLineProductMeta.productId, productIds));
+    } catch (error) {
+      if (!isMissingTableError(error, "local_line_product_meta")) throw error;
+    }
+    try {
+      syncIssueRows = await db
+        .select()
+        .from(localLineSyncIssues)
+        .where(inArray(localLineSyncIssues.productId, productIds));
+    } catch (error) {
+      if (!isMissingTableError(error, "local_line_sync_issues")) throw error;
+    }
+  }
 
   const packageRows = productIds.length
     ? await db.select().from(packages).where(inArray(packages.productId, productIds))
@@ -137,9 +200,35 @@ router.get("/products", requireAdmin, async (_req, res) => {
       .filter((entry) => entry.url);
   }
 
+  const mediaObjectsByProduct = mediaRows
+    .slice()
+    .sort((left, right) => {
+      const primaryDelta = Number(right.isPrimary || 0) - Number(left.isPrimary || 0);
+      if (primaryDelta !== 0) return primaryDelta;
+      return Number(left.sortOrder || 0) - Number(right.sortOrder || 0);
+    })
+    .reduce((acc, row) => {
+      if (!acc[row.productId]) acc[row.productId] = [];
+      const url = row.publicUrl || row.remoteUrl || row.sourceUrl;
+      if (!url) return acc;
+      acc[row.productId].push({
+        url,
+        thumbnailUrl: row.thumbnailUrl || url
+      });
+      return acc;
+    }, {});
+
   const packagesByProduct = packageRows.reduce((acc, row) => {
     if (!acc[row.productId]) acc[row.productId] = [];
     acc[row.productId].push(row);
+    return acc;
+  }, {});
+  const productMetaByProduct = productMetaRows.reduce((acc, row) => {
+    acc[row.productId] = row;
+    return acc;
+  }, {});
+  const syncIssueCountsByProduct = syncIssueRows.reduce((acc, row) => {
+    acc[row.productId] = (acc[row.productId] || 0) + 1;
     return acc;
   }, {});
 
@@ -156,12 +245,543 @@ router.get("/products", requireAdmin, async (_req, res) => {
       ...row,
       images:
         imageObjectsByProduct[row.id] ||
+        mediaObjectsByProduct[row.id] ||
         (imagesByProduct[row.id] || []).map((url) => ({ url, thumbnailUrl: url })),
+      localLineMeta: productMetaByProduct[row.id] || null,
+      localLineSyncIssueCount: syncIssueCountsByProduct[row.id] || 0,
       packages: packagesByProduct[row.id] || [],
       onSale: salesByProduct[row.id]?.onSale ?? false,
       saleDiscount: salesByProduct[row.id]?.saleDiscount ?? null
     }))
   });
+});
+
+router.get("/localline/products/:id", requireAdmin, async (req, res) => {
+  const db = getDb();
+  const productId = Number(req.params.id);
+  if (!Number.isFinite(productId)) {
+    return res.status(400).json({ error: "Invalid product id" });
+  }
+
+  await ensureLocalLineSyncSchema().catch((error) => {
+    console.warn("Local Line schema bootstrap skipped for /admin/localline/products/:id:", error.message);
+  });
+
+  try {
+    const [productMetaRows, packageMetaRows, priceListEntryRows, syncIssueRows, mediaRows] =
+      await Promise.all([
+        db.select().from(localLineProductMeta).where(eq(localLineProductMeta.productId, productId)),
+        db
+          .select()
+          .from(localLinePackageMeta)
+          .where(eq(localLinePackageMeta.productId, productId)),
+        db
+          .select()
+          .from(localLinePriceListEntries)
+          .where(eq(localLinePriceListEntries.productId, productId)),
+        db
+          .select()
+          .from(localLineSyncIssues)
+          .where(eq(localLineSyncIssues.productId, productId)),
+        db.select().from(productMedia).where(eq(productMedia.productId, productId))
+      ]);
+
+    res.json({
+      productId,
+      productMeta: productMetaRows[0] || null,
+      packageMeta: packageMetaRows,
+      priceListEntries: priceListEntryRows
+        .slice()
+        .sort((left, right) => {
+          const priceListDelta = Number(left.priceListId || 0) - Number(right.priceListId || 0);
+          if (priceListDelta !== 0) return priceListDelta;
+          return Number(left.packageId || 0) - Number(right.packageId || 0);
+        }),
+      syncIssues: syncIssueRows
+        .slice()
+        .sort((left, right) => new Date(right.createdAt || 0) - new Date(left.createdAt || 0)),
+      media: mediaRows
+        .slice()
+        .sort((left, right) => {
+          const primaryDelta = Number(right.isPrimary || 0) - Number(left.isPrimary || 0);
+          if (primaryDelta !== 0) return primaryDelta;
+          return Number(left.sortOrder || 0) - Number(right.sortOrder || 0);
+        })
+    });
+  } catch (error) {
+    if (
+      isMissingTableError(error, "local_line_product_meta") ||
+      isMissingTableError(error, "local_line_package_meta") ||
+      isMissingTableError(error, "local_line_price_list_entries") ||
+      isMissingTableError(error, "local_line_sync_issues") ||
+      isMissingTableError(error, "product_media")
+    ) {
+      return res.json({
+        productId,
+        productMeta: null,
+        packageMeta: [],
+        priceListEntries: [],
+        syncIssues: [],
+        media: []
+      });
+    }
+    throw error;
+  }
+});
+
+router.put("/localline/products/:id/price-list-entries", requireAdmin, async (req, res) => {
+  const db = getDb();
+  const productId = Number(req.params.id);
+  const entries = Array.isArray(req.body?.entries) ? req.body.entries : [];
+
+  if (!Number.isFinite(productId)) {
+    return res.status(400).json({ error: "Invalid product id" });
+  }
+
+  if (!entries.length) {
+    return res.json({ ok: true, updated: 0 });
+  }
+
+  const updatedAt = new Date();
+  let updated = 0;
+
+  for (const entry of entries) {
+    const entryId = Number(entry.id);
+    if (!Number.isFinite(entryId)) continue;
+
+    const payload = {
+      visible:
+        typeof entry.visible === "boolean" || entry.visible === null
+          ? (entry.visible === null ? null : (entry.visible ? 1 : 0))
+          : undefined,
+      onSale:
+        typeof entry.onSale === "boolean" || entry.onSale === null
+          ? (entry.onSale === null ? null : (entry.onSale ? 1 : 0))
+          : undefined,
+      onSaleToggle:
+        typeof entry.onSaleToggle === "boolean" || entry.onSaleToggle === null
+          ? (entry.onSaleToggle === null ? null : (entry.onSaleToggle ? 1 : 0))
+          : undefined,
+      finalPriceCache:
+        entry.finalPriceCache === null || typeof entry.finalPriceCache === "undefined"
+          ? undefined
+          : entry.finalPriceCache,
+      strikethroughDisplayValue:
+        entry.strikethroughDisplayValue === null ||
+        typeof entry.strikethroughDisplayValue === "undefined"
+          ? undefined
+          : entry.strikethroughDisplayValue,
+      maxUnitsPerOrder:
+        entry.maxUnitsPerOrder === null || typeof entry.maxUnitsPerOrder === "undefined"
+          ? undefined
+          : entry.maxUnitsPerOrder,
+      updatedAt,
+      lastSyncedAt: updatedAt
+    };
+
+    Object.keys(payload).forEach((key) => {
+      if (typeof payload[key] === "undefined") {
+        delete payload[key];
+      }
+    });
+
+    if (!Object.keys(payload).length) continue;
+
+    await db
+      .update(localLinePriceListEntries)
+      .set(payload)
+      .where(and(eq(localLinePriceListEntries.id, entryId), eq(localLinePriceListEntries.productId, productId)));
+
+    const packageId = Number(entry.packageId);
+    const priceListId = Number(entry.priceListId);
+    if (Number.isFinite(packageId) && Number.isFinite(priceListId)) {
+      await db
+        .update(packagePriceListMemberships)
+        .set({
+          onSale: payload.onSale ?? undefined,
+          onSaleToggle: payload.onSaleToggle ?? undefined,
+          finalPriceCache: payload.finalPriceCache ?? undefined,
+          strikethroughDisplayValue: payload.strikethroughDisplayValue ?? undefined,
+          maxUnitsPerOrder: payload.maxUnitsPerOrder ?? undefined,
+          updatedAt,
+          lastSyncedAt: updatedAt
+        })
+        .where(
+          and(
+            eq(packagePriceListMemberships.packageId, packageId),
+            eq(packagePriceListMemberships.priceListId, priceListId)
+          )
+        );
+    }
+
+    updated += 1;
+  }
+
+  return res.json({ ok: true, updated });
+});
+
+router.get("/pricelist", requireAdmin, async (_req, res) => {
+  const db = getDb();
+  await ensureLocalLineSyncSchema().catch((error) => {
+    console.warn("Local Line schema bootstrap skipped for /admin/pricelist:", error.message);
+  });
+
+  const [productRows, categoryRows, vendorRows, packageRows, profileRows, saleRows] =
+    await Promise.all([
+      db.select().from(products),
+      db.select().from(categories),
+      db.select().from(vendors),
+      db.select().from(packages),
+      db.select().from(productPricingProfiles),
+      db.select().from(productSales)
+    ]);
+
+  let packageMetaRows = [];
+  try {
+    packageMetaRows = await db.select().from(localLinePackageMeta);
+  } catch (error) {
+    if (!isMissingTableError(error, "local_line_package_meta")) throw error;
+  }
+
+  const categoryMap = new Map(categoryRows.map((row) => [row.id, row.name]));
+  const vendorMap = new Map(vendorRows.map((row) => [row.id, row]));
+  const packagesByProductId = packageRows.reduce((acc, row) => {
+    const list = acc.get(row.productId) || [];
+    list.push(row);
+    acc.set(row.productId, list);
+    return acc;
+  }, new Map());
+  const packageMetaByPackageId = new Map(
+    packageMetaRows.map((row) => [Number(row.packageId), row])
+  );
+  const profileByProductId = new Map(
+    profileRows.map((row) => [Number(row.productId), row])
+  );
+  const saleByProductId = new Map(
+    saleRows.map((row) => [Number(row.productId), row])
+  );
+
+  const rows = productRows
+    .slice()
+    .sort((left, right) => String(left.name || "").localeCompare(String(right.name || "")))
+    .map((product) => {
+      const pricingProfile = profileByProductId.get(Number(product.id)) || null;
+      const saleRow = saleByProductId.get(Number(product.id)) || null;
+      const vendor = vendorMap.get(product.vendorId) || null;
+      const snapshot = computeProductPricingSnapshot({
+        product,
+        packages: packagesByProductId.get(Number(product.id)) || [],
+        packageMetaByPackageId,
+        vendor,
+        profile: pricingProfile
+          ? pricingProfile
+          : {
+              productId: product.id,
+              onSale: saleRow?.onSale ?? 0,
+              saleDiscount: saleRow?.saleDiscount ?? 0
+            }
+      });
+      const usesSourcePricing = isSourcePricingVendor(vendor);
+      const hasPendingRemoteApply = pricingProfile
+        ? ["pending", "failed"].includes(String(pricingProfile.remoteSyncStatus || "")) ||
+          toTimestamp(pricingProfile.updatedAt) > toTimestamp(pricingProfile.remoteSyncedAt)
+        : false;
+
+      return {
+        productId: product.id,
+        name: product.name,
+        categoryId: product.categoryId,
+        categoryName: categoryMap.get(product.categoryId) || "Uncategorized",
+        vendorId: product.vendorId,
+        vendorName: vendor?.name || "N/A",
+        usesSourcePricing,
+        packageCount: snapshot.packageRows.length,
+        packages: snapshot.packageRows,
+        packageSummary: snapshot.packageRows
+          .map((row) => {
+            const details = [];
+            if (snapshot.profile.unitOfMeasure === "lbs" && row.averageWeight !== null) {
+              details.push(`${row.averageWeight} lb avg`);
+            }
+            if (row.quantity > 1) details.push(`${row.quantity} ea`);
+            return `${row.name || `Package ${row.id}`}${details.length ? ` (${details.join(" · ")})` : ""}`;
+          })
+          .join(", "),
+        unitOfMeasure: usesSourcePricing ? snapshot.profile.unitOfMeasure : null,
+        sourceUnitPrice: usesSourcePricing ? snapshot.profile.sourceUnitPrice : null,
+        minWeight: usesSourcePricing ? snapshot.profile.minWeight : null,
+        maxWeight: usesSourcePricing ? snapshot.profile.maxWeight : null,
+        avgWeightOverride: usesSourcePricing ? snapshot.profile.avgWeightOverride : null,
+        sourceMultiplier: usesSourcePricing ? snapshot.profile.sourceMultiplier : null,
+        guestMarkup: snapshot.profile.guestMarkup,
+        memberMarkup: snapshot.profile.memberMarkup,
+        herdShareMarkup: snapshot.profile.herdShareMarkup,
+        snapMarkup: snapshot.profile.snapMarkup,
+        onSale: Boolean(snapshot.profile.onSale),
+        saleDiscount: snapshot.profile.saleDiscount,
+        basePrice: snapshot.basePrice,
+        guestPrice: snapshot.guestPrice,
+        memberPrice: snapshot.memberPrice,
+        herdSharePrice: snapshot.herdSharePrice,
+        snapPrice: snapshot.snapPrice,
+        remoteSyncStatus: pricingProfile?.remoteSyncStatus || "not-applied",
+        remoteSyncMessage: pricingProfile?.remoteSyncMessage || "",
+        remoteSyncedAt: pricingProfile?.remoteSyncedAt || null,
+        updatedAt: pricingProfile?.updatedAt || null,
+        hasPendingRemoteApply
+      };
+    });
+
+  res.json({ rows });
+});
+
+router.post("/pricelist/bulk-save", requireAdmin, async (req, res) => {
+  const db = getDb();
+  const rows = Array.isArray(req.body?.rows) ? req.body.rows : [];
+  const now = new Date();
+  const savedProductIds = [];
+
+  for (const row of rows) {
+    const productId = Number(row?.productId);
+    if (!Number.isFinite(productId)) {
+      continue;
+    }
+
+    const payload = {
+      unitOfMeasure: String(row.unitOfMeasure || "each").toLowerCase() === "lbs" ? "lbs" : "each",
+      sourceUnitPrice: toDbDecimal(row.sourceUnitPrice),
+      minWeight: toDbDecimal(row.minWeight),
+      maxWeight: toDbDecimal(row.maxWeight),
+      avgWeightOverride: toDbDecimal(row.avgWeightOverride),
+      sourceMultiplier: toDbDecimal(row.sourceMultiplier),
+      guestMarkup: toDbDecimal(row.guestMarkup),
+      memberMarkup: toDbDecimal(row.memberMarkup),
+      herdShareMarkup: toDbDecimal(row.herdShareMarkup),
+      snapMarkup: toDbDecimal(row.snapMarkup),
+      onSale: row.onSale ? 1 : 0,
+      saleDiscount: toDbDecimal(row.saleDiscount),
+      remoteSyncStatus: "pending",
+      remoteSyncMessage: "Local pricing updated. Apply to remote store pending.",
+      updatedAt: now
+    };
+
+    const existing = await db
+      .select()
+      .from(productPricingProfiles)
+      .where(eq(productPricingProfiles.productId, productId));
+
+    if (existing.length) {
+      await db
+        .update(productPricingProfiles)
+        .set(payload)
+        .where(eq(productPricingProfiles.productId, productId));
+    } else {
+      await db.insert(productPricingProfiles).values({
+        productId,
+        ...payload,
+        createdAt: now
+      });
+    }
+
+    savedProductIds.push(productId);
+  }
+
+  res.json({ ok: true, saved: savedProductIds.length, productIds: savedProductIds });
+});
+
+router.post("/pricelist/apply-remote", requireAdmin, async (req, res) => {
+  const db = getDb();
+  const productIds = [...new Set(
+    (Array.isArray(req.body?.productIds) ? req.body.productIds : [])
+      .map((value) => Number(value))
+      .filter((value) => Number.isFinite(value))
+  )];
+
+  const results = [];
+  for (const productId of productIds) {
+    const now = new Date();
+    try {
+      const productRows = await db.select().from(products).where(eq(products.id, productId));
+
+      if (!productRows.length) {
+        results.push({ productId, ok: false, message: "Product not found." });
+        continue;
+      }
+
+      const product = productRows[0];
+      const [packageRows, vendorRows, profileRows, saleRows] = await Promise.all([
+        db.select().from(packages).where(eq(packages.productId, productId)),
+        product.vendorId
+          ? db.select().from(vendors).where(eq(vendors.id, product.vendorId))
+          : Promise.resolve([]),
+        db
+          .select()
+          .from(productPricingProfiles)
+          .where(eq(productPricingProfiles.productId, productId)),
+        db.select().from(productSales).where(eq(productSales.productId, productId))
+      ]);
+
+      let packageMetaRows = [];
+      try {
+        packageMetaRows = await db
+          .select()
+          .from(localLinePackageMeta)
+          .where(eq(localLinePackageMeta.productId, productId));
+      } catch (error) {
+        if (!isMissingTableError(error, "local_line_package_meta")) throw error;
+      }
+
+      const snapshot = computeProductPricingSnapshot({
+        product,
+        packages: packageRows,
+        packageMetaByPackageId: new Map(
+          packageMetaRows.map((row) => [Number(row.packageId), row])
+        ),
+        vendor: vendorRows[0] || null,
+        profile: profileRows[0] || {
+          productId,
+          onSale: saleRows[0]?.onSale ?? 0,
+          saleDiscount: saleRows[0]?.saleDiscount ?? 0
+        }
+      });
+
+      if (!Number.isFinite(Number(snapshot.profile.sourceUnitPrice))) {
+        results.push({
+          productId,
+          ok: false,
+          message: "Source unit price is required before remote apply."
+        });
+        continue;
+      }
+
+      const pricedPackages = snapshot.packageRows.filter((row) => Number.isFinite(Number(row.basePrice)));
+      if (!pricedPackages.length) {
+        results.push({
+          productId,
+          ok: false,
+          message: "No package prices could be derived for this product."
+        });
+        continue;
+      }
+
+      for (const packageRow of pricedPackages) {
+        await db
+          .update(packages)
+          .set({ price: packageRow.basePrice })
+          .where(eq(packages.id, packageRow.id));
+      }
+
+      const salePayload = {
+        productId,
+        onSale: snapshot.profile.onSale ? 1 : 0,
+        saleDiscount: snapshot.profile.saleDiscount,
+        updatedAt: now
+      };
+      if (saleRows.length) {
+        await db
+          .update(productSales)
+          .set(salePayload)
+          .where(eq(productSales.productId, productId));
+      } else {
+        await db.insert(productSales).values(salePayload);
+      }
+
+      const profilePayload = {
+        unitOfMeasure: snapshot.profile.unitOfMeasure,
+        sourceUnitPrice: snapshot.profile.sourceUnitPrice,
+        minWeight: snapshot.profile.minWeight,
+        maxWeight: snapshot.profile.maxWeight,
+        avgWeightOverride: snapshot.profile.avgWeightOverride,
+        sourceMultiplier: snapshot.profile.sourceMultiplier,
+        guestMarkup: snapshot.profile.guestMarkup,
+        memberMarkup: snapshot.profile.memberMarkup,
+        herdShareMarkup: snapshot.profile.herdShareMarkup,
+        snapMarkup: snapshot.profile.snapMarkup,
+        onSale: snapshot.profile.onSale ? 1 : 0,
+        saleDiscount: snapshot.profile.saleDiscount,
+        remoteSyncStatus: "applied",
+        remoteSyncMessage: "Applied to store pricing and remote sync completed.",
+        remoteSyncedAt: now,
+        updatedAt: profileRows[0]?.updatedAt || now
+      };
+      if (profileRows.length) {
+        await db
+          .update(productPricingProfiles)
+          .set(profilePayload)
+          .where(eq(productPricingProfiles.productId, productId));
+      } else {
+        await db.insert(productPricingProfiles).values({
+          productId,
+          ...profilePayload,
+          createdAt: now
+        });
+      }
+
+      const remoteResult = await updateLocalLineForProduct(db, productId, {
+        onSale: snapshot.profile.onSale ? 1 : 0,
+        saleDiscount: snapshot.profile.saleDiscount,
+        forcePriceSync: true
+      });
+      const remoteFailed = isLocalLineEnabled() && remoteResult.priceOk === false;
+      if (remoteFailed) {
+        await db
+          .update(productPricingProfiles)
+          .set({
+            remoteSyncStatus: "failed",
+            remoteSyncMessage: "Local store updated, but Local Line price sync failed.",
+            updatedAt: now
+          })
+          .where(eq(productPricingProfiles.productId, productId));
+      }
+
+      results.push({
+        productId,
+        ok: !remoteFailed,
+        packageUpdates: pricedPackages.length,
+        remotePriceUpdate: remoteResult.priceOk,
+        message: remoteFailed
+          ? "Local store updated, but Local Line price sync failed."
+          : "Pricing applied."
+      });
+    } catch (error) {
+      await db
+        .update(productPricingProfiles)
+        .set({
+          remoteSyncStatus: "failed",
+          remoteSyncMessage: error?.message || "Remote apply failed.",
+          updatedAt: new Date()
+        })
+        .where(eq(productPricingProfiles.productId, productId));
+      results.push({
+        productId,
+        ok: false,
+        message: error?.message || "Remote apply failed."
+      });
+    }
+  }
+
+  res.json({ results });
+});
+
+router.post("/pricelist/export-google", requireAdmin, async (_req, res) => {
+  try {
+    const summary = await exportMasterPricelist({
+      nodeEnv: process.env.NODE_ENV || "production",
+      vendorNameMatcher: isGooglePricelistVendorName
+    });
+
+    res.json({
+      ok: true,
+      rowCount: summary.rowCount,
+      spreadsheetSummary: summary.spreadsheetSummary,
+      vendorNames: summary.vendorNames
+    });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      error: error?.message || "Google pricelist export failed."
+    });
+  }
 });
 
 router.get("/categories", requireAdmin, async (_req, res) => {
@@ -203,6 +823,105 @@ router.get("/recipes", requireAdmin, async (_req, res) => {
   const db = getDb();
   const rows = await db.select().from(recipes);
   res.json({ recipes: rows });
+});
+
+router.post("/localline/audit", requireAdmin, async (req, res) => {
+  try {
+    const limit = Number(req.body?.limit);
+    const concurrency = Number(req.body?.concurrency);
+    const includeInactive = Boolean(req.body?.includeInactive);
+    const includePricelist = Boolean(req.body?.includePricelist);
+
+    const { summary } = await runLocalLineAudit({
+      killdeerEnvPath: includePricelist ? process.env.LOCALLINE_AUDIT_KILLDEER_ENV || undefined : undefined,
+      includeInactive,
+      skipPricelist: !includePricelist,
+      limit: Number.isFinite(limit) ? limit : 20,
+      concurrency: Number.isFinite(concurrency) ? concurrency : 5
+    });
+
+    res.json(summary);
+  } catch (error) {
+    console.error("LocalLine sync failed:", error);
+    res.status(500).json({
+      error: "Local Line sync failed",
+      detail: error?.message || "Unknown error"
+    });
+  }
+});
+
+router.post("/localline/apply", requireAdmin, async (req, res) => {
+  try {
+    const limit = Number(req.body?.limit);
+    const concurrency = Number(req.body?.concurrency);
+    const includeInactive = Boolean(req.body?.includeInactive);
+    const selectedFixKeys = Array.isArray(req.body?.fixKeys)
+      ? req.body.fixKeys
+      : req.body?.fixKey
+        ? [req.body.fixKey]
+        : [];
+
+    const { summary } = await runLocalLineAudit({
+      killdeerEnvPath: process.env.LOCALLINE_AUDIT_KILLDEER_ENV || undefined,
+      includeInactive,
+      write: true,
+      selectedFixKeys,
+      limit: Number.isFinite(limit) ? limit : 20,
+      concurrency: Number.isFinite(concurrency) ? concurrency : 5
+    });
+
+    res.json(summary);
+  } catch (error) {
+    console.error("LocalLine apply failed:", error);
+    res.status(500).json({
+      error: "Local Line apply failed",
+      detail: error?.message || "Unknown error"
+    });
+  }
+});
+
+async function handleLocalLineFullSync(req, res) {
+  try {
+    await ensureLocalLineSyncSchema();
+    const limit = Number(req.body?.limit);
+    const concurrency = Number(req.body?.concurrency);
+    const includePricelist = Boolean(req.body?.includePricelist);
+    const forceFull = Boolean(req.body?.forceFull);
+
+    const result = startLocalLineFullSyncJob({
+      killdeerEnvPath: includePricelist ? process.env.LOCALLINE_AUDIT_KILLDEER_ENV || undefined : undefined,
+      skipPricelist: !includePricelist,
+      forceFull,
+      limit: Number.isFinite(limit) ? limit : null,
+      concurrency: Number.isFinite(concurrency) ? concurrency : 6
+    });
+
+    res.status(result.alreadyRunning ? 200 : 202).json(result);
+  } catch (error) {
+    console.error("LocalLine full sync failed:", error);
+    res.status(500).json({
+      error: "Local Line full sync failed",
+      detail: error?.message || "Unknown error"
+    });
+  }
+}
+
+router.post("/localline/full-sync", requireAdmin, handleLocalLineFullSync);
+router.post("/localline/cache-sync", requireAdmin, handleLocalLineFullSync);
+router.post("/localline/products-sync", requireAdmin, handleLocalLineFullSync);
+router.get("/localline/full-sync", requireAdmin, (_req, res) => {
+  const job = getLatestLocalLineFullSyncJob();
+  if (!job) {
+    return res.status(404).json({ error: "No Local Line full sync job found" });
+  }
+  return res.json({ job });
+});
+router.get("/localline/full-sync/:jobId", requireAdmin, (req, res) => {
+  const job = getLocalLineFullSyncJob(req.params.jobId);
+  if (!job) {
+    return res.status(404).json({ error: "Local Line full sync job not found" });
+  }
+  return res.json({ job });
 });
 
 router.post("/categories", requireAdmin, async (req, res) => {
