@@ -110,6 +110,10 @@ function normalizeVendorName(value) {
   return String(value || "").trim().toLowerCase();
 }
 
+function normalizeSheetTitle(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
 export function isGooglePricelistVendorName(name) {
   const normalized = normalizeVendorName(name);
   return GOOGLE_PRICELIST_VENDOR_KEYWORDS.some((keyword) => normalized.includes(keyword));
@@ -202,12 +206,104 @@ async function googleSheetRequest(url, options) {
   throw new Error(`Google Sheets request failed: ${response.status} ${response.statusText} ${text}`);
 }
 
+async function getGoogleSheetInfo({ accessToken, spreadsheetId, sheetName }) {
+  const response = await googleSheetRequest(
+    `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?fields=sheets.properties`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    }
+  );
+
+  const payload = await response.json();
+  const sheets = payload.sheets || [];
+  const exactMatch = sheets.find(
+    (sheet) => String(sheet?.properties?.title || "") === String(sheetName)
+  );
+  const matchingSheet =
+    exactMatch ||
+    sheets.find(
+      (sheet) =>
+        normalizeSheetTitle(sheet?.properties?.title) === normalizeSheetTitle(sheetName)
+    );
+
+  if (!matchingSheet?.properties?.sheetId && matchingSheet?.properties?.sheetId !== 0) {
+    const availableTabs = sheets
+      .map((sheet) => sheet?.properties?.title)
+      .filter(Boolean)
+      .join(", ");
+    throw new Error(
+      `Google Sheet tab not found: ${sheetName}${availableTabs ? ` (available: ${availableTabs})` : ""}`
+    );
+  }
+
+  return {
+    sheetId: Number(matchingSheet.properties.sheetId),
+    sheetName: String(matchingSheet.properties.title || sheetName)
+  };
+}
+
+async function formatGoogleSheetHeader({
+  accessToken,
+  spreadsheetId,
+  sheetName,
+  columnCount
+}) {
+  const { sheetId } = await getGoogleSheetInfo({ accessToken, spreadsheetId, sheetName });
+  const safeColumnCount = Math.max(Number(columnCount) || 1, 1);
+
+  await googleSheetRequest(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}:batchUpdate`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      requests: [
+        {
+          updateSheetProperties: {
+            properties: {
+              sheetId,
+              gridProperties: {
+                frozenRowCount: 1
+              }
+            },
+            fields: "gridProperties.frozenRowCount"
+          }
+        },
+        {
+          repeatCell: {
+            range: {
+              sheetId,
+              startRowIndex: 0,
+              endRowIndex: 1,
+              startColumnIndex: 0,
+              endColumnIndex: safeColumnCount
+            },
+            cell: {
+              userEnteredFormat: {
+                textFormat: {
+                  bold: true
+                }
+              }
+            },
+            fields: "userEnteredFormat.textFormat.bold"
+          }
+        }
+      ]
+    })
+  });
+}
+
 async function updateGoogleSheet({ accessToken, spreadsheetId, sheetName, values }) {
-  const encodedSheet = encodeURIComponent(sheetName);
+  const sheetInfo = await getGoogleSheetInfo({ accessToken, spreadsheetId, sheetName });
+  const resolvedSheetName = sheetInfo.sheetName;
+  const encodedSheet = encodeURIComponent(resolvedSheetName);
   const columnCount = values.reduce((max, row) => Math.max(max, row?.length || 0), 1);
   const rowCount = values.length || 1;
   const endColumn = columnIndexToLetter(columnCount);
-  const range = `${sheetName}!A1:${endColumn}${rowCount}`;
+  const range = `${resolvedSheetName}!A1:${endColumn}${rowCount}`;
   const baseUrl = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values`;
 
   await googleSheetRequest(`${baseUrl}/${encodedSheet}:clear`, {
@@ -234,6 +330,8 @@ async function updateGoogleSheet({ accessToken, spreadsheetId, sheetName, values
       })
     }
   );
+
+  return { columnCount, rowCount, sheetName: resolvedSheetName };
 }
 
 async function syncPricelistToGoogleSheet(sheetValues, introductionValues) {
@@ -246,11 +344,17 @@ async function syncPricelistToGoogleSheet(sheetValues, introductionValues) {
   }
 
   const accessToken = await getServiceAccountAccessToken(credentialsPath);
-  await updateGoogleSheet({
+  const priceSheetUpdate = await updateGoogleSheet({
     accessToken,
     spreadsheetId,
     sheetName,
     values: sheetValues
+  });
+  await formatGoogleSheetHeader({
+    accessToken,
+    spreadsheetId,
+    sheetName,
+    columnCount: priceSheetUpdate.columnCount
   });
   console.log(`Google Sheet updated: ${spreadsheetId} (${sheetName})`);
 
