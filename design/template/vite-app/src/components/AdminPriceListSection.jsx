@@ -535,6 +535,9 @@ export function AdminPriceListSection({
   const pricelistCategories = categories.filter(
     (category) => !isMembershipCategoryName(category.name)
   );
+  const sortedVendors = vendors
+    .slice()
+    .sort((left, right) => String(left.name || "").localeCompare(String(right.name || "")));
 
   function getColumnCellStyle(column) {
     return {
@@ -781,7 +784,7 @@ export function AdminPriceListSection({
               onChange={(event) => setVendorFilter(event.target.value)}
             >
               <option value="">All vendors</option>
-              {vendors.map((vendor) => (
+              {sortedVendors.map((vendor) => (
                 <option key={vendor.id} value={vendor.id}>
                   {vendor.name}
                 </option>

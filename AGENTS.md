@@ -43,7 +43,7 @@ Do not back-capture Local Line price changes for these vendors as authoritative 
 
 Products whose product name contains `deposit` are deposit products and must use no markup, even when they are Deck Family Farm products. The shared pricing resolver classifies these as `deposit-no-markup`, sets guest/member/herd-share/SNAP markups to `0`, and the admin pricelist exposes the rule so these cases are visible.
 
-Products in the `Membership` category are membership levels, not pricelist items. Keep them out of the admin pricelist/formula-pricing workflow and manage them from the dedicated admin `Membership` section. That section tracks the membership-level product/package records without treating them as normal price-list rows.
+Products in the `Membership` category are membership levels, not pricelist or inventory items. Keep them out of the admin pricelist/formula-pricing workflow and the admin inventory workflow. Manage them from the dedicated admin `Membership` section, which tracks the membership-level product/package records without treating them as normal price-list rows.
 
 The admin pricelist intentionally has two edit paths:
 

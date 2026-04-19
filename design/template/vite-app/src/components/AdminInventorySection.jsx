@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { adminPost } from "../adminApi.js";
 
 function getProductPrice(product) {
@@ -28,6 +28,14 @@ function getProductDefaults(product) {
     onSale: Boolean(product.onSale),
     saleDiscount: Math.round(saleDiscount * 100)
   };
+}
+
+function normalizeCategoryName(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function isMembershipCategoryName(value) {
+  return normalizeCategoryName(value) === "membership";
 }
 
 function editsMatch(a, b) {
@@ -85,7 +93,34 @@ export function AdminInventorySection({
 
   const categoryMap = new Map(categories.map((category) => [category.id, category.name]));
   const vendorMap = new Map(vendors.map((vendor) => [vendor.id, vendor.name]));
-  const productMap = new Map(products.map((product) => [product.id, product]));
+  const inventoryCategories = categories.filter(
+    (category) => !isMembershipCategoryName(category.name)
+  );
+  const inventoryProducts = products.filter(
+    (product) => !isMembershipCategoryName(categoryMap.get(product.categoryId))
+  );
+  const productMap = new Map(inventoryProducts.map((product) => [product.id, product]));
+  const sortedVendors = vendors
+    .slice()
+    .sort((left, right) => String(left.name || "").localeCompare(String(right.name || "")));
+  const productsMatchingVendorFilter = inventoryProducts.filter(
+    (product) => !vendorFilter || String(product.vendorId) === vendorFilter
+  );
+  const categoryIdsForVendor = new Set(
+    productsMatchingVendorFilter.map((product) => String(product.categoryId))
+  );
+  const visibleInventoryCategories = inventoryCategories.filter((category) =>
+    categoryIdsForVendor.has(String(category.id))
+  );
+
+  useEffect(() => {
+    if (
+      categoryFilter &&
+      !visibleInventoryCategories.some((category) => String(category.id) === categoryFilter)
+    ) {
+      setCategoryFilter("");
+    }
+  }, [categoryFilter, visibleInventoryCategories]);
 
   function getPendingInventoryEditEntries() {
     return Object.entries(inventoryEdits).filter(([id, changes]) => {
@@ -123,7 +158,7 @@ export function AdminInventorySection({
 
   const normalizedProductNameSearch = productNameSearch.trim().toLowerCase();
 
-  const productsMatchingOtherFilters = products.filter((product) => {
+  const productsMatchingOtherFilters = inventoryProducts.filter((product) => {
     const categoryMatch = !categoryFilter || String(product.categoryId) === categoryFilter;
     const vendorMatch = !vendorFilter || String(product.vendorId) === vendorFilter;
     const visibleMatch =
@@ -266,7 +301,7 @@ export function AdminInventorySection({
                 onChange={(event) => setVendorFilter(event.target.value)}
               >
                 <option value="">All vendors</option>
-                {vendors.map((vendor) => (
+                {sortedVendors.map((vendor) => (
                   <option key={vendor.id} value={vendor.id}>
                     {vendor.name}
                   </option>
@@ -281,7 +316,7 @@ export function AdminInventorySection({
                 onChange={(event) => setCategoryFilter(event.target.value)}
               >
                 <option value="">All categories</option>
-                {categories.map((category) => (
+                {visibleInventoryCategories.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
                   </option>
@@ -315,34 +350,36 @@ export function AdminInventorySection({
           </div>
 
           <div className="admin-actions inventory-actions">
+            <div className="inventory-button-row">
+              <button
+                className="button"
+                type="button"
+                onClick={handleApplyChanges}
+                disabled={applyLoading || pendingInventoryEditEntries.length === 0}
+              >
+                {applyLoading
+                  ? "Applying inventory..."
+                  : `Apply Inventory Changes (${pendingInventoryEditEntries.length})`}
+              </button>
+              <button
+                className="button alt"
+                type="button"
+                disabled={applyLoading || pendingInventoryEditEntries.length === 0}
+                onClick={() => {
+                  if (!window.confirm("Discard all pending inventory changes? This cannot be undone.")) {
+                    return;
+                  }
+                  setInventoryEdits({});
+                  setMessage("Pending inventory changes discarded.");
+                }}
+              >
+                Cancel Changes
+              </button>
+            </div>
             <div className="small inventory-count">
-              Showing {filteredProducts.length} of {products.length} products · Pending changes:{" "}
+              Showing {filteredProducts.length} of {inventoryProducts.length} products · Pending changes:{" "}
               {pendingInventoryEditEntries.length}
             </div>
-            <button
-              className="button"
-              type="button"
-              onClick={handleApplyChanges}
-              disabled={applyLoading || pendingInventoryEditEntries.length === 0}
-            >
-              {applyLoading
-                ? "Applying inventory..."
-                : `Apply Inventory Changes (${pendingInventoryEditEntries.length})`}
-            </button>
-            <button
-              className="button alt"
-              type="button"
-              disabled={applyLoading || pendingInventoryEditEntries.length === 0}
-              onClick={() => {
-                if (!window.confirm("Discard all pending inventory changes? This cannot be undone.")) {
-                  return;
-                }
-                setInventoryEdits({});
-                setMessage("Pending inventory changes discarded.");
-              }}
-            >
-              Cancel Changes
-            </button>
           </div>
         </div>
 

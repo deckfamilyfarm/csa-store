@@ -1021,16 +1021,27 @@ img {
   width: 180px;
 }
 
-.inventory-actions {
-  align-items: center;
+.admin-actions.inventory-actions {
+  display: grid;
+  justify-content: start;
+  justify-items: start;
+  gap: 6px;
+  margin: 0 0 12px;
 }
 
 .membership-actions {
   align-items: center;
 }
 
+.inventory-button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
 .inventory-count {
-  margin-right: 4px;
+  margin: 0;
   white-space: nowrap;
 }
 

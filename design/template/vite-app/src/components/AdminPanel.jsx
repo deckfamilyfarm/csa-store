@@ -723,6 +723,9 @@ export function AdminPanel({ onCatalogRefresh }) {
   const vendorMap = new Map(vendors.map((vendor) => [vendor.id, vendor.name]));
   const categoryMap = new Map(categories.map((category) => [category.id, category.name]));
   const productMap = new Map(products.map((product) => [product.id, product]));
+  const sortedVendors = vendors
+    .slice()
+    .sort((left, right) => String(left.name || "").localeCompare(String(right.name || "")));
   const pendingProductEditEntries = getPendingProductEditEntries();
   const auditData = localLineAuditState.data;
   const fullSyncJob = localLineCacheState.data;
@@ -1505,7 +1508,7 @@ export function AdminPanel({ onCatalogRefresh }) {
                     onChange={(event) => setProductVendorFilter(event.target.value)}
                   >
                     <option value="">All vendors</option>
-                    {vendors.map((vendor) => (
+                    {sortedVendors.map((vendor) => (
                       <option key={vendor.id} value={vendor.id}>
                         {vendor.name}
                       </option>
@@ -1723,7 +1726,7 @@ export function AdminPanel({ onCatalogRefresh }) {
                       }
                     >
                       <option value="">Select vendor</option>
-                      {vendors.map((vendor) => (
+                      {sortedVendors.map((vendor) => (
                         <option key={vendor.id} value={vendor.id}>
                           {vendor.name}
                         </option>

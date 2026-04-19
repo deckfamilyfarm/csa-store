@@ -158,6 +158,13 @@ export function Storefront() {
       }),
     [catalog.products, selectedCategory, selectedVendor, onSaleOnly]
   );
+  const sortedVendors = useMemo(
+    () =>
+      (catalog.vendors || [])
+        .slice()
+        .sort((left, right) => String(left.name || "").localeCompare(String(right.name || ""))),
+    [catalog.vendors]
+  );
 
   const dropSiteData = useMemo(() => {
     const names = (catalog.dropSites || []).map((site) => site.name).filter(Boolean);
@@ -421,7 +428,7 @@ export function Storefront() {
                             onChange={(event) => setSelectedVendor(event.target.value)}
                           >
                             <option value="">All vendors</option>
-                            {catalog.vendors.map((vendor) => (
+                            {sortedVendors.map((vendor) => (
                               <option key={vendor.id} value={vendor.id}>
                                 {vendor.name}
                               </option>
