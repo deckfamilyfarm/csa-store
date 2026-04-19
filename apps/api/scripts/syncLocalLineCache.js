@@ -3,18 +3,16 @@ import os from "os";
 import path from "path";
 import crypto from "crypto";
 import { fileURLToPath } from "url";
-import { createRequire } from "module";
 import dotenv from "dotenv";
 import mysql from "mysql2/promise";
 import sharp from "sharp";
+import xlsx from "xlsx";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { ensureLocalLineSyncSchema } from "../db.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, "../../../");
-const require = createRequire(import.meta.url);
-const xlsx = require(path.resolve(repoRoot, "../killdeer/node_modules/xlsx"));
 const args = process.argv.slice(2);
 
 function hasFlag(flag) {

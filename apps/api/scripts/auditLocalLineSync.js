@@ -2,15 +2,13 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import { fileURLToPath } from "url";
-import { createRequire } from "module";
 import dotenv from "dotenv";
 import mysql from "mysql2/promise";
+import xlsx from "xlsx";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, "../../../");
-const require = createRequire(import.meta.url);
-const xlsx = require(path.resolve(repoRoot, "../killdeer/node_modules/xlsx"));
 
 const args = process.argv.slice(2);
 
