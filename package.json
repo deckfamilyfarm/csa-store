@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "scripts": {
     "dev": "cross-env DOTENV_CONFIG_PATH=./.env VITE_API_BASE=/api concurrently --raw -n api,web -c cyan,green \"npm --prefix apps/api run dev\" \"npm --prefix design/template/vite-app run dev\"",
-    "start": "node server.js",
+    "start": "STORE_SERVE_FRONTEND=true npm --prefix apps/api start",
     "export:master-pricelist:preview": "node scripts/runStoreExportMasterPricelist.js --dry-run --skip-google",
     "export:master-pricelist": "node scripts/runStoreExportMasterPricelist.js",
     "killdeer:export-master-pricelist:preview": "node scripts/runKilldeerExportMasterPricelist.js --dry-run",
@@ -23,7 +23,6 @@
   },
   "dependencies": {
     "dotenv": "^17.4.0",
-    "express": "^5.2.1",
     "sharp": "^0.34.5"
   }
 }

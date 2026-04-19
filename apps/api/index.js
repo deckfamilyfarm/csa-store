@@ -15,7 +15,8 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 const app = express();
-const port = Number(process.env.PORT || 5177);
+const serveFrontend = process.env.STORE_SERVE_FRONTEND === "true";
+const port = Number(process.env.PORT || (serveFrontend ? 5176 : 5177));
 
 app.use(cors());
 app.use(express.json({ limit: "2mb" }));
@@ -45,6 +46,23 @@ app.use("/api", catalogRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 
+if (serveFrontend) {
+  const distDir = path.resolve(__dirname, "../../design/template/vite-app/dist");
+
+  app.use(express.static(distDir, { index: "index.html" }));
+  app.use((req, res, next) => {
+    if (req.path.startsWith("/api") || (req.method !== "GET" && req.method !== "HEAD")) {
+      next();
+      return;
+    }
+
+    res.sendFile(path.join(distDir, "index.html"));
+  });
+}
+
 app.listen(port, () => {
   console.log(`API listening on :${port}`);
+  if (serveFrontend) {
+    console.log("Serving built frontend from design/template/vite-app/dist");
+  }
 });
