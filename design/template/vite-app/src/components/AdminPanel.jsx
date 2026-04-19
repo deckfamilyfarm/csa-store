@@ -1,5 +1,6 @@
 ﻿import React, { useEffect, useRef, useState } from "react";
 import { AdminInventorySection } from "./AdminInventorySection.jsx";
+import { AdminMembershipSection } from "./AdminMembershipSection.jsx";
 import { AdminPriceListSection } from "./AdminPriceListSection.jsx";
 import {
   adminGet,
@@ -13,7 +14,7 @@ export function AdminPanel({ onCatalogRefresh }) {
   const [token, setToken] = useState(() => localStorage.getItem("adminToken") || "");
   const [loginState, setLoginState] = useState({ username: "", password: "", error: "" });
   const [loading, setLoading] = useState(false);
-  const [activeSection, setActiveSection] = useState("products");
+  const [activeSection, setActiveSection] = useState("pricelist");
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [productDraft, setProductDraft] = useState(null);
   const [products, setProducts] = useState([]);
@@ -122,7 +123,7 @@ export function AdminPanel({ onCatalogRefresh }) {
         }));
 
         if (response.job?.status === "completed") {
-          setMessage("Pull/Update LL completed.");
+          setMessage("Pull From Local Line completed.");
           await loadAll();
           await refreshCatalogFromAdmin();
         }
@@ -130,7 +131,7 @@ export function AdminPanel({ onCatalogRefresh }) {
         if (cancelled) return;
         setLocalLineCacheState((prev) => ({
           ...prev,
-          error: error?.message || "Failed to refresh Pull/Update LL progress."
+          error: error?.message || "Failed to refresh Pull From Local Line progress."
         }));
       }
     }
@@ -543,8 +544,8 @@ export function AdminPanel({ onCatalogRefresh }) {
       });
       setMessage(
         response.alreadyRunning
-          ? "Attached to the running Pull/Update LL job."
-          : "Pull/Update LL started."
+          ? "Attached to the running Pull From Local Line job."
+          : "Pull From Local Line started."
       );
     } catch (err) {
       setLocalLineCacheState({
@@ -552,8 +553,8 @@ export function AdminPanel({ onCatalogRefresh }) {
         loading: false,
         error:
           err?.status === 404
-            ? "Pull/Update LL is not available on the API server at :5177. Restart the API service so it loads /api/admin/localline/products-sync."
-            : err?.message || "Failed to run Pull/Update LL.",
+            ? "Pull From Local Line is not available on the API server at :5177. Restart the API service so it loads /api/admin/localline/products-sync."
+            : err?.message || "Failed to run Pull From Local Line.",
         data: null,
         jobId: ""
       });
@@ -1212,7 +1213,7 @@ export function AdminPanel({ onCatalogRefresh }) {
     const cacheData = job?.result || null;
 
     if (localLineCacheState.loading && !job) {
-      return <div className="small">Starting Pull/Update LL...</div>;
+      return <div className="small">Starting Pull From Local Line...</div>;
     }
 
     if (localLineCacheState.error) {
@@ -1220,7 +1221,7 @@ export function AdminPanel({ onCatalogRefresh }) {
     }
 
     if (!job) {
-      return <div className="small">No Pull/Update LL data loaded yet.</div>;
+      return <div className="small">No Pull From Local Line data loaded yet.</div>;
     }
 
     return (
@@ -1369,14 +1370,14 @@ export function AdminPanel({ onCatalogRefresh }) {
       <div className="admin-layout">
         <aside className="admin-nav">
           <button
-            className={`admin-nav-item ${activeSection === "products" ? "active" : ""}`}
+            className={`admin-nav-item ${activeSection === "pricelist" ? "active" : ""}`}
             onClick={() => {
-              setActiveSection("products");
+              setActiveSection("pricelist");
               setSelectedProductId(null);
             }}
             type="button"
           >
-            Products
+            Pricelist
           </button>
           <button
             className={`admin-nav-item ${activeSection === "inventory" ? "active" : ""}`}
@@ -1389,11 +1390,14 @@ export function AdminPanel({ onCatalogRefresh }) {
             Inventory
           </button>
           <button
-            className={`admin-nav-item ${activeSection === "pricelist" ? "active" : ""}`}
-            onClick={() => setActiveSection("pricelist")}
+            className={`admin-nav-item ${activeSection === "membership" ? "active" : ""}`}
+            onClick={() => {
+              setActiveSection("membership");
+              setSelectedProductId(null);
+            }}
             type="button"
           >
-            Pricelist
+            Membership
           </button>
           <button
             className={`admin-nav-item ${activeSection === "categories" ? "active" : ""}`}
@@ -1543,26 +1547,6 @@ export function AdminPanel({ onCatalogRefresh }) {
                   {applyLoading ? "Applying..." : "Apply Changes"}
                 </button>
                 <button
-                  className="button sync-button"
-                  type="button"
-                  onClick={handleLocalLineAudit}
-                  disabled={localLineAuditState.loading}
-                >
-                  {localLineAuditState.loading ? "Running Audit/Inspect LL..." : "Audit/Inspect LL"}
-                </button>
-                <button
-                  className="button sync-button"
-                  type="button"
-                  onClick={handleLocalLineFullSync}
-                  disabled={localLineCacheState.loading || fullSyncRunning}
-                >
-                  {localLineCacheState.loading
-                    ? "Starting Pull/Update LL..."
-                    : fullSyncRunning
-                    ? "Pull/Update LL Running..."
-                    : "Pull/Update LL"}
-                </button>
-                <button
                   className="button alt"
                   type="button"
                   disabled={applyLoading || pendingProductEditEntries.length === 0}
@@ -1577,28 +1561,6 @@ export function AdminPanel({ onCatalogRefresh }) {
                   Cancel Changes
                 </button>
               </div>
-              {localLineAuditState.open && (
-                <div className="admin-inline-audit">
-                  <div className="admin-inline-audit-header">
-                    <h4>Audit/Inspect LL</h4>
-                    <button className="button alt" type="button" onClick={closeLocalLineAuditPanel}>
-                      Close
-                    </button>
-                  </div>
-                  {renderLocalLineAuditContent()}
-                </div>
-              )}
-              {localLineCacheState.open && (
-                <div className="admin-inline-audit">
-                  <div className="admin-inline-audit-header">
-                    <h4>Pull/Update LL</h4>
-                    <button className="button alt" type="button" onClick={closeLocalLineCachePanel}>
-                      Close
-                    </button>
-                  </div>
-                  {renderLocalLineCacheContent()}
-                </div>
-              )}
               <div className="admin-table-shell">
                 <table
                   className="admin-table admin-table-head"
@@ -1731,10 +1693,12 @@ export function AdminPanel({ onCatalogRefresh }) {
             </section>
           )}
 
-          {activeSection === "products" && selectedProductId && activeProduct && (
+          {(activeSection === "products" || activeSection === "pricelist") &&
+            selectedProductId &&
+            activeProduct && (
             <section className="admin-section">
               <button className="button alt" type="button" onClick={() => setSelectedProductId(null)}>
-                Back to products
+                {activeSection === "pricelist" ? "Back to pricelist" : "Back to products"}
               </button>
               <h3>{activeProduct.name}</h3>
               {productDraft && (
@@ -2037,14 +2001,44 @@ export function AdminPanel({ onCatalogRefresh }) {
             </section>
           )}
 
-          {activeSection === "pricelist" && (
-            <AdminPriceListSection
-              token={token}
-              categories={categories}
-              vendors={vendors}
-              onDataRefresh={loadAll}
-              onCatalogRefresh={refreshCatalogFromAdmin}
-            />
+          {activeSection === "pricelist" && !selectedProductId && (
+            <>
+              <AdminPriceListSection
+                token={token}
+                categories={categories}
+                vendors={vendors}
+                onDataRefresh={loadAll}
+                onCatalogRefresh={refreshCatalogFromAdmin}
+                onReviewLocalLine={handleLocalLineAudit}
+                reviewLocalLineLoading={localLineAuditState.loading}
+                onPullFromLocalLine={handleLocalLineFullSync}
+                pullFromLocalLineLoading={localLineCacheState.loading}
+                pullFromLocalLineRunning={fullSyncRunning}
+                onOpenProductDetails={(productId) => setSelectedProductId(productId)}
+              />
+              {localLineAuditState.open && (
+                <div className="admin-inline-audit">
+                  <div className="admin-inline-audit-header">
+                    <h4>Review Local Line</h4>
+                    <button className="button alt" type="button" onClick={closeLocalLineAuditPanel}>
+                      Close
+                    </button>
+                  </div>
+                  {renderLocalLineAuditContent()}
+                </div>
+              )}
+              {localLineCacheState.open && (
+                <div className="admin-inline-audit">
+                  <div className="admin-inline-audit-header">
+                    <h4>Pull From Local Line</h4>
+                    <button className="button alt" type="button" onClick={closeLocalLineCachePanel}>
+                      Close
+                    </button>
+                  </div>
+                  {renderLocalLineCacheContent()}
+                </div>
+              )}
+            </>
           )}
 
           {activeSection === "inventory" && (
@@ -2053,6 +2047,16 @@ export function AdminPanel({ onCatalogRefresh }) {
               products={products}
               categories={categories}
               vendors={vendors}
+              onDataRefresh={loadAll}
+              onCatalogRefresh={refreshCatalogFromAdmin}
+            />
+          )}
+
+          {activeSection === "membership" && (
+            <AdminMembershipSection
+              token={token}
+              products={products}
+              categories={categories}
               onDataRefresh={loadAll}
               onCatalogRefresh={refreshCatalogFromAdmin}
             />

@@ -411,7 +411,8 @@ router.get("/catalog", async (_req, res) => {
         profile: pricingProfileByProductId.get(row.id) || null
       });
       const hasResolvedPricingProfile =
-        Boolean(pricingProfileByProductId.get(row.id)) &&
+        (Boolean(pricingProfileByProductId.get(row.id)) ||
+          Boolean(pricingSnapshot.profile.usesNoMarkupPricing)) &&
         Number.isFinite(Number(pricingSnapshot.profile.sourceUnitPrice));
       const basePrice = hasResolvedPricingProfile
         ? pricingSnapshot.basePrice

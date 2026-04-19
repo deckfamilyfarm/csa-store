@@ -6,10 +6,13 @@ const COLUMN_DEFAULT_STORAGE_KEY = "adminPricelistColumnDefaultPrefs.v1";
 
 const PRICELIST_COLUMNS = [
   { key: "edit", label: "Edit", width: 88, sticky: true, required: true, defaultVisible: true },
+  { key: "details", label: "Details", width: 104, sticky: true, required: true, defaultVisible: true },
+  { key: "apply", label: "Push", width: 104, sticky: true, required: true, defaultVisible: true },
   { key: "status", label: "Status", width: 150, sticky: true, defaultVisible: true },
   { key: "product", label: "Product", width: 260, sticky: true, required: true, defaultVisible: true },
   { key: "category", label: "Category", width: 160, defaultVisible: true },
   { key: "vendor", label: "Vendor", width: 170, defaultVisible: true },
+  { key: "pricingRule", label: "Rule", width: 150, defaultVisible: true },
   { key: "sourceUnitPrice", label: "DFF Source Price", width: 136, defaultVisible: true },
   { key: "unit", label: "DFF Unit Type", width: 128, defaultVisible: true },
   { key: "minWeight", label: "Min Wt", width: 100, defaultVisible: false },
@@ -28,8 +31,7 @@ const PRICELIST_COLUMNS = [
   { key: "onSale", label: "Sale", width: 82, defaultVisible: true },
   { key: "saleDiscount", label: "Sale %", width: 96, defaultVisible: true },
   { key: "packages", label: "Packages", width: 340, defaultVisible: true },
-  { key: "lastRemote", label: "Last Remote", width: 260, defaultVisible: false },
-  { key: "apply", label: "Apply", width: 104, required: true, defaultVisible: true }
+  { key: "lastRemote", label: "Last Remote", width: 260, defaultVisible: false }
 ];
 
 const PRICELIST_COLUMN_MAP = new Map(PRICELIST_COLUMNS.map((column) => [column.key, column]));
@@ -115,6 +117,14 @@ function loadCurrentColumnPreferences() {
 function toNumber(value) {
   const numeric = Number(value);
   return Number.isFinite(numeric) ? numeric : null;
+}
+
+function normalizeCategoryName(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function isMembershipCategoryName(value) {
+  return normalizeCategoryName(value) === "membership";
 }
 
 function roundCurrency(value) {
@@ -247,7 +257,19 @@ function formatDateTime(value) {
   return date.toLocaleString();
 }
 
-export function AdminPriceListSection({ token, categories, vendors, onDataRefresh, onCatalogRefresh }) {
+export function AdminPriceListSection({
+  token,
+  categories,
+  vendors,
+  onDataRefresh,
+  onCatalogRefresh,
+  onReviewLocalLine,
+  reviewLocalLineLoading = false,
+  onPullFromLocalLine,
+  pullFromLocalLineLoading = false,
+  pullFromLocalLineRunning = false,
+  onOpenProductDetails
+}) {
   const [loading, setLoading] = useState(false);
   const [rows, setRows] = useState([]);
   const [message, setMessage] = useState("");
@@ -510,6 +532,9 @@ export function AdminPriceListSection({ token, categories, vendors, onDataRefres
   const remoteReadyProductIds = rows
     .filter((row) => row.hasPendingRemoteApply && !dirtyProductIds.includes(row.productId))
     .map((row) => row.productId);
+  const pricelistCategories = categories.filter(
+    (category) => !isMembershipCategoryName(category.name)
+  );
 
   function getColumnCellStyle(column) {
     return {
@@ -527,13 +552,27 @@ export function AdminPriceListSection({ token, categories, vendors, onDataRefres
             {editing ? "Lock" : "Edit"}
           </button>
         );
+      case "details":
+        return (
+          <button
+            className="button alt"
+            type="button"
+            onClick={() => {
+              if (typeof onOpenProductDetails === "function") {
+                onOpenProductDetails(row.productId);
+              }
+            }}
+          >
+            Details
+          </button>
+        );
       case "status":
         return (
           <>
             <div className={`small pricelist-status ${row.remoteSyncStatus}`}>
               {dirty ? "Local draft" : row.remoteSyncStatus}
             </div>
-            {row.hasPendingRemoteApply && !dirty ? <div className="small">Needs remote apply</div> : null}
+            {row.hasPendingRemoteApply && !dirty ? <div className="small">Needs push to Local Line</div> : null}
           </>
         );
       case "product":
@@ -542,6 +581,8 @@ export function AdminPriceListSection({ token, categories, vendors, onDataRefres
         return row.categoryName;
       case "vendor":
         return row.vendorName;
+      case "pricingRule":
+        return row.pricingRuleLabel || (row.usesNoMarkupPricing ? "Deposit / no markup" : "Standard");
       case "unit":
         if (!row.usesSourcePricing) return "";
         return (
@@ -618,6 +659,7 @@ export function AdminPriceListSection({ token, categories, vendors, onDataRefres
       case "basePrice":
         return formatMoney(preview.basePrice);
       case "guestMarkup":
+        if (row.usesNoMarkupPricing) return "0.00";
         return (
           <input
             className="input pricelist-input"
@@ -631,6 +673,7 @@ export function AdminPriceListSection({ token, categories, vendors, onDataRefres
       case "guestPrice":
         return formatMoney(preview.guestPrice);
       case "memberMarkup":
+        if (row.usesNoMarkupPricing) return "0.00";
         return (
           <input
             className="input pricelist-input"
@@ -644,6 +687,7 @@ export function AdminPriceListSection({ token, categories, vendors, onDataRefres
       case "memberPrice":
         return formatMoney(preview.memberPrice);
       case "herdShareMarkup":
+        if (row.usesNoMarkupPricing) return "0.00";
         return (
           <input
             className="input pricelist-input"
@@ -657,6 +701,7 @@ export function AdminPriceListSection({ token, categories, vendors, onDataRefres
       case "herdSharePrice":
         return formatMoney(preview.herdSharePrice);
       case "snapMarkup":
+        if (row.usesNoMarkupPricing) return "0.00";
         return (
           <input
             className="input pricelist-input"
@@ -706,7 +751,7 @@ export function AdminPriceListSection({ token, categories, vendors, onDataRefres
             disabled={dirty || isApplying}
             onClick={() => applyRemote([row.productId])}
           >
-            {isApplying ? "Applying..." : "Apply"}
+            {isApplying ? "Pushing..." : "Push"}
           </button>
         );
       default:
@@ -751,7 +796,7 @@ export function AdminPriceListSection({ token, categories, vendors, onDataRefres
               onChange={(event) => setCategoryFilter(event.target.value)}
             >
               <option value="">All categories</option>
-              {categories.map((category) => (
+              {pricelistCategories.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.name}
                 </option>
@@ -766,7 +811,7 @@ export function AdminPriceListSection({ token, categories, vendors, onDataRefres
               onChange={(event) => setStatusFilter(event.target.value)}
             >
               <option value="all">All</option>
-              <option value="needsApply">Needs apply</option>
+              <option value="needsApply">Needs push</option>
               <option value="applied">Applied</option>
               <option value="pending">Pending</option>
               <option value="failed">Failed</option>
@@ -851,12 +896,36 @@ export function AdminPriceListSection({ token, categories, vendors, onDataRefres
           <button
             className="button sync-button"
             type="button"
+            onClick={onReviewLocalLine}
+            disabled={reviewLocalLineLoading || typeof onReviewLocalLine !== "function"}
+          >
+            {reviewLocalLineLoading ? "Reviewing..." : "Review Local Line"}
+          </button>
+          <button
+            className="button sync-button"
+            type="button"
+            onClick={onPullFromLocalLine}
+            disabled={
+              pullFromLocalLineLoading ||
+              pullFromLocalLineRunning ||
+              typeof onPullFromLocalLine !== "function"
+            }
+          >
+            {pullFromLocalLineLoading
+              ? "Starting Pull..."
+              : pullFromLocalLineRunning
+                ? "Pull Running..."
+                : "Pull From Local Line"}
+          </button>
+          <button
+            className="button sync-button"
+            type="button"
             onClick={() => applyRemote(remoteReadyProductIds)}
             disabled={applyingProductIds.length > 0 || remoteReadyProductIds.length === 0}
           >
             {applyingProductIds.length
-              ? "Applying..."
-              : `Apply Pending Remote (${remoteReadyProductIds.length})`}
+              ? "Pushing..."
+              : `Push To Local Line (${remoteReadyProductIds.length})`}
           </button>
           <button
             className="button alt"

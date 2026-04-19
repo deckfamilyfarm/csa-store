@@ -114,6 +114,10 @@ function normalizeSheetTitle(value) {
   return String(value || "").trim().toLowerCase();
 }
 
+function isMembershipCategoryName(value) {
+  return String(value || "").trim().toLowerCase() === "membership";
+}
+
 export function isGooglePricelistVendorName(name) {
   const normalized = normalizeVendorName(name);
   return GOOGLE_PRICELIST_VENDOR_KEYWORDS.some((keyword) => normalized.includes(keyword));
@@ -414,6 +418,7 @@ async function buildSheetValues({ vendorNameMatcher = null } = {}) {
   const filteredProducts = productRows
     .filter((row) => {
       if (row.isDeleted) return false;
+      if (isMembershipCategoryName(categoryMap.get(Number(row.categoryId)))) return false;
       if (typeof vendorNameMatcher !== "function") return true;
       const vendorName = vendorMap.get(Number(row.vendorId))?.name || "";
       const matches = vendorNameMatcher(vendorName, row);

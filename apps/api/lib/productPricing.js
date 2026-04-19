@@ -16,9 +16,21 @@ function normalizeVendorName(value) {
   return String(value || "").trim().toLowerCase();
 }
 
+function normalizeProductName(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
 export function isSourcePricingVendor(vendor = null) {
   const normalized = normalizeVendorName(vendor?.name);
-  return normalized.includes("deck family farm") || normalized.includes("hyland");
+  return (
+    normalized.includes("deck family farm") ||
+    normalized.includes("hyland") ||
+    normalized.includes("creamy cow")
+  );
+}
+
+export function isNoMarkupProduct(product = null) {
+  return normalizeProductName(product?.name).includes("deposit");
 }
 
 function normalizeUnitOfMeasure(value, fallback = "each") {
@@ -147,12 +159,25 @@ export function resolvePricingProfile({
     }
   }
 
-  const memberMarkup = toNumber(profile?.memberMarkup) ?? defaultMemberMarkup ?? 0.4;
-  const guestMarkup = toNumber(profile?.guestMarkup) ?? defaultGuestMarkup ?? 0.55;
+  const usesNoMarkupPricing = isNoMarkupProduct(product);
+  const memberMarkup = usesNoMarkupPricing
+    ? 0
+    : (toNumber(profile?.memberMarkup) ?? defaultMemberMarkup ?? 0.4);
+  const guestMarkup = usesNoMarkupPricing
+    ? 0
+    : (toNumber(profile?.guestMarkup) ?? defaultGuestMarkup ?? 0.55);
+  const herdShareMarkup = usesNoMarkupPricing
+    ? 0
+    : (toNumber(profile?.herdShareMarkup) ?? memberMarkup);
+  const snapMarkup = usesNoMarkupPricing
+    ? 0
+    : (toNumber(profile?.snapMarkup) ?? memberMarkup);
 
   return {
     productId: Number(product?.id ?? profile?.productId),
     usesSourcePricing: isSourcePricingVendor(vendor),
+    usesNoMarkupPricing,
+    pricingRule: usesNoMarkupPricing ? "deposit-no-markup" : "standard",
     unitOfMeasure,
     sourceUnitPrice,
     minWeight,
@@ -161,8 +186,8 @@ export function resolvePricingProfile({
     sourceMultiplier,
     guestMarkup,
     memberMarkup,
-    herdShareMarkup: toNumber(profile?.herdShareMarkup) ?? memberMarkup,
-    snapMarkup: toNumber(profile?.snapMarkup) ?? memberMarkup,
+    herdShareMarkup,
+    snapMarkup,
     onSale:
       typeof profile?.onSale === "boolean"
         ? profile.onSale

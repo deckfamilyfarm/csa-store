@@ -33,6 +33,10 @@ function resolveFromRepoRoot(targetPath) {
     : path.resolve(repoRoot, targetPath);
 }
 
+function normalizeBaseUrl(value) {
+  return String(value || "").replace(/\/?$/, "/");
+}
+
 function normalizeWhitespace(value) {
   return String(value ?? "")
     .replace(/\s+/g, " ")
@@ -269,7 +273,7 @@ function buildConfiguredPriceListsFromEnv() {
 }
 
 async function getLocalLineAccessToken(baseUrl) {
-  const response = await fetchWithRetry(`${baseUrl}token`, {
+  const response = await fetchWithRetry(`${baseUrl}token/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -2017,7 +2021,9 @@ export async function runLocalLineCacheSync(options = {}) {
 
   dotenv.config({ path: storeEnvPath });
 
-  const baseUrl = process.env.LL_BASEURL || "https://localline.ca/api/backoffice/v2/";
+  const baseUrl = normalizeBaseUrl(
+    process.env.LL_BASEURL || "https://localline.ca/api/backoffice/v2/"
+  );
   const storeConfig = {
     host: process.env.STORE_DB_HOST,
     port: Number(process.env.STORE_DB_PORT || 3306),

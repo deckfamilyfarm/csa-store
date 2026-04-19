@@ -986,13 +986,28 @@ img {
   margin-top: 0;
 }
 
+.membership-section {
+  margin-top: 0;
+}
+
 .inventory-toolbar {
   display: grid;
   gap: 8px;
   margin-top: 0;
 }
 
+.membership-toolbar {
+  display: grid;
+  gap: 8px;
+  margin-top: 0;
+}
+
 .inventory-filters .product-search-filter {
+  flex: 0 0 auto;
+  width: 220px;
+}
+
+.membership-filters .product-search-filter {
   flex: 0 0 auto;
   width: 220px;
 }
@@ -1010,7 +1025,16 @@ img {
   align-items: center;
 }
 
+.membership-actions {
+  align-items: center;
+}
+
 .inventory-count {
+  margin-right: 4px;
+  white-space: nowrap;
+}
+
+.membership-count {
   margin-right: 4px;
   white-space: nowrap;
 }
@@ -1023,6 +1047,31 @@ img {
 
 .inventory-package-cell {
   white-space: normal;
+}
+
+.membership-table-shell {
+  overflow-x: auto;
+}
+
+.membership-table {
+  min-width: 980px;
+}
+
+.membership-package-list {
+  display: grid;
+  gap: 8px;
+  min-width: 280px;
+}
+
+.membership-package-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) 120px;
+  gap: 8px;
+  align-items: center;
+}
+
+.membership-price-input {
+  width: 120px;
 }
 
 .pricelist-toolbar {

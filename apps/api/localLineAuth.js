@@ -1,4 +1,10 @@
-const LL_BASEURL = process.env.LL_BASEURL || "https://localline.ca/api/backoffice/v2/";
+function normalizeBaseUrl(value) {
+  return String(value || "").replace(/\/?$/, "/");
+}
+
+const LL_BASEURL = normalizeBaseUrl(
+  process.env.LL_BASEURL || "https://localline.ca/api/backoffice/v2/"
+);
 const SKEW_SECONDS = Number.parseInt(process.env.LOCALLINE_TOKEN_SKEW_SEC || "60", 10);
 const FALLBACK_TTL_SECONDS = Number.parseInt(
   process.env.LOCALLINE_TOKEN_FALLBACK_TTL || "600",
@@ -39,7 +45,7 @@ async function fetchNewToken() {
     throw new Error("LL_USERNAME/LL_PASSWORD are not set");
   }
 
-  const response = await fetch(`${LL_BASEURL}token`, {
+  const response = await fetch(`${LL_BASEURL}token/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, password })

@@ -48,6 +48,8 @@ Killdeer integration
 - Apply the sync only when ready with `npm run sync:killdeer-pricelist -- --write`.
 
 Local Line sync
+- Intended workflow: Local Line can be pulled into this app for review, and locally approved/priced changes can be pushed back to Local Line. Pull and push are explicit admin actions, not silent background source-of-truth swaps.
+- The Local Line API target is Backoffice v2: `LL_BASEURL` defaults to `https://localline.ca/api/backoffice/v2/`, auth posts to `/token/`, product export reads `/products/export/`, product detail reads `/products/{id}/?expand=packages,product_price_list_entries`, and product writes PATCH `/products/{id}/`.
 - Dry-run the Local Line catalog and pricelist audit with `npm run audit:localline-sync`.
 - In the admin UI, use the `Local Line Sync` button in the Products section to run the same analysis and review warnings/errors before applying any local-store changes.
 - In the admin UI, use `Local Line Full Sync` to apply the csa-store catalog updates and then populate the Local Line price-list/media/image data in one pass.
@@ -60,6 +62,9 @@ Local Line sync
 - Use `--include-inactive` if you want to include inactive rows from the Killdeer pricelist in the live comparison.
 - Add `--write` when running `apps/api/scripts/auditLocalLineSync.js` directly.
 - The apply path writes actionable csa-store fixes only: create missing local products, create missing local packages, and update local product/package fields. Pricelist drift, dead Local Line mappings, and price-list override warnings are still reported but not written.
+- Formula-pricing vendors are local-authoritative: vendor names containing `deck family farm`, `hyland`, or `creamy cow` compute pricing from local source price, weight/quantity, multiplier, and markups. Do not back-capture Local Line price changes for those vendors as formula inputs without a separate explicit approval/schema path.
+- Deposit products are no-markup exceptions: product names containing `deposit` are classified as `Deposit / no markup` in the admin pricelist and use `0%` guest/member/herd-share/SNAP markup, even when the vendor is Deck Family Farm.
+- Membership category products are membership levels, not pricelist rows. The admin pricelist excludes the `Membership` category; manage those product/package records from the admin `Membership` section.
 - The Local Line push logic now preserves the live adjustment type when price-list entries already exist, so dollar (`adjustment_type=1`), percentage (`adjustment_type=2`), and set-price (`adjustment_type=3`) rows can be updated without being coerced into percentage adjustments.
 - The audit still surfaces fixed-adjustment rows explicitly so you can review where Local Line pricing behavior differs from the current pricelist assumptions.
 - Populate the new Local Line cache tables in csa-store with `npm run sync:localline-cache`.

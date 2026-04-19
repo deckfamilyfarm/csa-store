@@ -33,7 +33,11 @@ import {
   getLocalLineFullSyncJob,
   startLocalLineFullSyncJob
 } from "../lib/localLineFullSyncJobs.js";
-import { computeProductPricingSnapshot, isSourcePricingVendor } from "../lib/productPricing.js";
+import {
+  computeProductPricingSnapshot,
+  isNoMarkupProduct,
+  isSourcePricingVendor
+} from "../lib/productPricing.js";
 import { runLocalLineAudit } from "../scripts/auditLocalLineSync.js";
 import {
   exportMasterPricelist,
@@ -71,6 +75,14 @@ function toTimestamp(value) {
 function toDbDecimal(value) {
   const numeric = toNumber(value);
   return numeric === null ? null : numeric;
+}
+
+function normalizeCategoryName(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function isMembershipCategoryName(value) {
+  return normalizeCategoryName(value) === "membership";
 }
 
 router.post("/login", async (req, res) => {
@@ -463,6 +475,7 @@ router.get("/pricelist", requireAdmin, async (_req, res) => {
 
   const rows = productRows
     .slice()
+    .filter((product) => !isMembershipCategoryName(categoryMap.get(product.categoryId)))
     .sort((left, right) => String(left.name || "").localeCompare(String(right.name || "")))
     .map((product) => {
       const pricingProfile = profileByProductId.get(Number(product.id)) || null;
@@ -495,6 +508,9 @@ router.get("/pricelist", requireAdmin, async (_req, res) => {
         vendorId: product.vendorId,
         vendorName: vendor?.name || "N/A",
         usesSourcePricing,
+        usesNoMarkupPricing: snapshot.profile.usesNoMarkupPricing,
+        pricingRule: snapshot.profile.pricingRule,
+        pricingRuleLabel: snapshot.profile.usesNoMarkupPricing ? "Deposit / no markup" : "Standard",
         packageCount: snapshot.packageRows.length,
         packages: snapshot.packageRows,
         packageSummary: snapshot.packageRows
@@ -547,6 +563,9 @@ router.post("/pricelist/bulk-save", requireAdmin, async (req, res) => {
       continue;
     }
 
+    const productRows = await db.select().from(products).where(eq(products.id, productId));
+    const forceNoMarkup = isNoMarkupProduct(productRows[0] || { id: productId });
+
     const payload = {
       unitOfMeasure: String(row.unitOfMeasure || "each").toLowerCase() === "lbs" ? "lbs" : "each",
       sourceUnitPrice: toDbDecimal(row.sourceUnitPrice),
@@ -554,10 +573,10 @@ router.post("/pricelist/bulk-save", requireAdmin, async (req, res) => {
       maxWeight: toDbDecimal(row.maxWeight),
       avgWeightOverride: toDbDecimal(row.avgWeightOverride),
       sourceMultiplier: toDbDecimal(row.sourceMultiplier),
-      guestMarkup: toDbDecimal(row.guestMarkup),
-      memberMarkup: toDbDecimal(row.memberMarkup),
-      herdShareMarkup: toDbDecimal(row.herdShareMarkup),
-      snapMarkup: toDbDecimal(row.snapMarkup),
+      guestMarkup: forceNoMarkup ? 0 : toDbDecimal(row.guestMarkup),
+      memberMarkup: forceNoMarkup ? 0 : toDbDecimal(row.memberMarkup),
+      herdShareMarkup: forceNoMarkup ? 0 : toDbDecimal(row.herdShareMarkup),
+      snapMarkup: forceNoMarkup ? 0 : toDbDecimal(row.snapMarkup),
       onSale: row.onSale ? 1 : 0,
       saleDiscount: toDbDecimal(row.saleDiscount),
       remoteSyncStatus: "pending",

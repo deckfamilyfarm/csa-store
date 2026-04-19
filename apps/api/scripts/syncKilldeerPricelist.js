@@ -111,6 +111,10 @@ function groupPackagesByProduct(rows) {
   }, new Map());
 }
 
+function isDepositProductName(name) {
+  return typeof name === "string" && name.toLowerCase().includes("deposit");
+}
+
 function buildPricingSeed(killdeerRow, vendor = null, saleRow = null) {
   const unitOfMeasure = normalizeUnitOfMeasure(killdeerRow.dff_unit_of_measure, "each");
   const sourceUnitPrice = toNullableNumber(killdeerRow.retailSalesPrice);
@@ -119,6 +123,7 @@ function buildPricingSeed(killdeerRow, vendor = null, saleRow = null) {
   const guestMarkup = toNullableNumber(vendor?.guestMarkup);
   const memberMarkup = toNullableNumber(vendor?.memberMarkup);
   const saleDiscount = toNullableNumber(saleRow?.saleDiscount);
+  const noMarkup = isDepositProductName(killdeerRow.productName);
 
   return {
     unitOfMeasure,
@@ -133,10 +138,10 @@ function buildPricingSeed(killdeerRow, vendor = null, saleRow = null) {
         : null,
     avgWeightOverride: null,
     sourceMultiplier: 0.5412,
-    guestMarkup: guestMarkup ?? 0.55,
-    memberMarkup: memberMarkup ?? 0.4,
-    herdShareMarkup: memberMarkup ?? 0.4,
-    snapMarkup: memberMarkup ?? 0.4,
+    guestMarkup: noMarkup ? 0 : (guestMarkup ?? 0.55),
+    memberMarkup: noMarkup ? 0 : (memberMarkup ?? 0.4),
+    herdShareMarkup: noMarkup ? 0 : (memberMarkup ?? 0.4),
+    snapMarkup: noMarkup ? 0 : (memberMarkup ?? 0.4),
     onSale: saleRow?.onSale ? 1 : 0,
     saleDiscount: saleDiscount ?? 0
   };
@@ -164,10 +169,10 @@ function needsPricingSeedRepair(storePricingProfile, pricingSeed) {
   }
 
   if (isMissingOrZero(storePricingProfile.sourceMultiplier)) return true;
-  if (isMissingOrZero(storePricingProfile.guestMarkup)) return true;
-  if (isMissingOrZero(storePricingProfile.memberMarkup)) return true;
-  if (isMissingOrZero(storePricingProfile.herdShareMarkup)) return true;
-  if (isMissingOrZero(storePricingProfile.snapMarkup)) return true;
+  if (pricingSeed.guestMarkup !== 0 && isMissingOrZero(storePricingProfile.guestMarkup)) return true;
+  if (pricingSeed.memberMarkup !== 0 && isMissingOrZero(storePricingProfile.memberMarkup)) return true;
+  if (pricingSeed.herdShareMarkup !== 0 && isMissingOrZero(storePricingProfile.herdShareMarkup)) return true;
+  if (pricingSeed.snapMarkup !== 0 && isMissingOrZero(storePricingProfile.snapMarkup)) return true;
 
   return false;
 }

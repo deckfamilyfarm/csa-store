@@ -39,6 +39,10 @@ function resolveFromRepoRoot(targetPath) {
     : path.resolve(repoRoot, targetPath);
 }
 
+function normalizeBaseUrl(value) {
+  return String(value || "").replace(/\/?$/, "/");
+}
+
 function normalizeWhitespace(value) {
   return String(value ?? "")
     .replace(/\s+/g, " ")
@@ -151,6 +155,10 @@ function isDairyCategoryName(name) {
   return typeof name === "string" && /dairy|milk|cheese|yogurt/i.test(name);
 }
 
+function isDepositProductName(name) {
+  return typeof name === "string" && name.toLowerCase().includes("deposit");
+}
+
 function computePurchasePriceFromPricelist(row) {
   const retailUnit = Number(row.retailSalesPrice);
   const unitOfMeasure = normalizeWhitespace(row.dff_unit_of_measure).toLowerCase();
@@ -186,15 +194,18 @@ function computePurchasePriceFromPricelist(row) {
   throw new Error(`Unknown unit of measure "${row.dff_unit_of_measure}" for pricelist row ${row.id}`);
 }
 
-function expectedPriceListConfig(categoryName) {
+function expectedPriceListConfig(categoryName, productName = "") {
   const dairyMarkup = getDairyMarkup();
   const dairyPriceListIds = getDairyPriceListIds();
+  const useNoMarkup = isDepositProductName(productName);
   const useDairyMarkup = isDairyCategoryName(categoryName) && Number.isFinite(dairyMarkup);
   return buildPriceListsFromEnv().map((entry) => ({
     name: entry.key,
     id: entry.id,
     markup:
-      useDairyMarkup && dairyPriceListIds.includes(entry.id)
+      useNoMarkup
+        ? 0
+        : useDairyMarkup && dairyPriceListIds.includes(entry.id)
         ? dairyMarkup
         : entry.markup
   }));
@@ -302,7 +313,7 @@ function compareNumberField(changes, key, currentValue, nextValue) {
 }
 
 async function getLocalLineAccessToken(baseUrl) {
-  const response = await fetch(`${baseUrl}token`, {
+  const response = await fetch(`${baseUrl}token/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -703,7 +714,7 @@ function buildPricelistComparison(pricelistRows, storeCatalog, liveDetails) {
       const expectedBasePrice = computePurchasePriceFromPricelist(row);
       const actualBasePrice = toNumber(livePackage.package_price ?? livePackage.unit_price);
       const categoryName = storeProduct?.categoryName || "";
-      const expectedLists = expectedPriceListConfig(categoryName);
+      const expectedLists = expectedPriceListConfig(categoryName, row.productName || body.name || "");
       const actualEntries = Array.isArray(livePackage.price_list_entries)
         ? livePackage.price_list_entries
         : [];
@@ -1435,7 +1446,9 @@ export async function runLocalLineAudit(options = {}) {
   const reportProgress = typeof options.onProgress === "function" ? options.onProgress : () => {};
 
   dotenv.config({ path: storeEnvPath });
-  const baseUrl = process.env.LL_BASEURL || "https://localline.ca/api/backoffice/v2/";
+  const baseUrl = normalizeBaseUrl(
+    process.env.LL_BASEURL || "https://localline.ca/api/backoffice/v2/"
+  );
   const storeConfig = {
     host: process.env.STORE_DB_HOST,
     port: Number(process.env.STORE_DB_PORT || 3306),
