@@ -7,8 +7,6 @@
     "start": "STORE_SERVE_FRONTEND=true npm --prefix apps/api start",
     "export:master-pricelist:preview": "node scripts/runStoreExportMasterPricelist.js --dry-run --skip-google",
     "export:master-pricelist": "node scripts/runStoreExportMasterPricelist.js",
-    "killdeer:export-master-pricelist:preview": "node scripts/runKilldeerExportMasterPricelist.js --dry-run",
-    "killdeer:export-master-pricelist": "node scripts/runKilldeerExportMasterPricelist.js",
     "verify:localline-sync": "npm --prefix apps/api run verify:localline-sync --",
     "sync:killdeer-pricelist": "npm --prefix apps/api run sync:killdeer-pricelist --",
     "audit:localline-sync": "npm --prefix apps/api run audit:localline-sync --",

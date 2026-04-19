@@ -12,6 +12,53 @@ import {
 } from "../adminApi.js";
 import { requestPasswordReset } from "../api.js";
 
+function hasRole(roleKeys, roleKey) {
+  return roleKeys.includes("admin") || roleKeys.includes(roleKey);
+}
+
+function canAccessAdminSection(roleKeys, section) {
+  if (roleKeys.includes("admin")) return true;
+  switch (section) {
+    case "pricelist":
+      return (
+        roleKeys.includes("pricing_admin") ||
+        roleKeys.includes("localline_pull") ||
+        roleKeys.includes("localline_push")
+      );
+    case "inventory":
+      return roleKeys.includes("inventory_admin");
+    case "membership":
+      return roleKeys.includes("membership_admin");
+    case "dropSites":
+      return roleKeys.includes("dropsite_admin");
+    case "reviews":
+      return roleKeys.includes("member_admin");
+    case "users":
+      return roleKeys.includes("user_admin");
+    case "categories":
+    case "vendors":
+    case "recipes":
+      return false;
+    default:
+      return false;
+  }
+}
+
+function getDefaultAdminSection(roleKeys = []) {
+  const order = [
+    "pricelist",
+    "inventory",
+    "membership",
+    "dropSites",
+    "reviews",
+    "users",
+    "categories",
+    "vendors",
+    "recipes"
+  ];
+  return order.find((section) => canAccessAdminSection(roleKeys, section)) || "inventory";
+}
+
 export function AdminPanel({ onCatalogRefresh }) {
   const [token, setToken] = useState(() => localStorage.getItem("adminToken") || "");
   const [currentAdmin, setCurrentAdmin] = useState(null);
@@ -108,7 +155,13 @@ export function AdminPanel({ onCatalogRefresh }) {
     if (!token) return;
     try {
       const response = await adminGet("me", token);
-      setCurrentAdmin(response.user || null);
+      const admin = response.user || null;
+      setCurrentAdmin(admin);
+      const roleKeys = admin?.adminRoles || [];
+      if (!canAccessAdminSection(roleKeys, activeSection)) {
+        setActiveSection(getDefaultAdminSection(roleKeys));
+        setSelectedProductId(null);
+      }
     } catch (_error) {
       setCurrentAdmin(null);
     }
@@ -285,7 +338,10 @@ export function AdminPanel({ onCatalogRefresh }) {
     setLoginState((prev) => ({ ...prev, error: "" }));
     try {
       const result = await adminLogin(loginState.username, loginState.password);
-      setCurrentAdmin(result.user || null);
+      const admin = result.user || null;
+      setCurrentAdmin(admin);
+      setActiveSection(getDefaultAdminSection(admin?.adminRoles || []));
+      setSelectedProductId(null);
       setToken(result.token);
     } catch (err) {
       setLoginState((prev) => ({ ...prev, error: "Invalid credentials" }));
@@ -802,7 +858,13 @@ export function AdminPanel({ onCatalogRefresh }) {
     fullSyncJob?.status === "queued" || fullSyncJob?.status === "running";
   const productTableWidth = "1376px";
   const currentAdminRoles = currentAdmin?.adminRoles || [];
-  const canManageUsers = currentAdminRoles.includes("admin") || currentAdminRoles.includes("user_admin");
+  const canManageUsers = hasRole(currentAdminRoles, "user_admin");
+  const canManagePricing = canAccessAdminSection(currentAdminRoles, "pricelist");
+  const canManageInventory = hasRole(currentAdminRoles, "inventory_admin");
+  const canManageMembership = hasRole(currentAdminRoles, "membership_admin");
+  const canManageDropSites = hasRole(currentAdminRoles, "dropsite_admin");
+  const canManageMembers = hasRole(currentAdminRoles, "member_admin");
+  const canManageCoreAdmin = currentAdminRoles.includes("admin");
 
   function getProductPrice(product) {
     const prices = (product.packages || [])
@@ -1443,71 +1505,85 @@ export function AdminPanel({ onCatalogRefresh }) {
 
       <div className="admin-layout">
         <aside className="admin-nav">
-          <button
-            className={`admin-nav-item ${activeSection === "pricelist" ? "active" : ""}`}
-            onClick={() => {
-              setActiveSection("pricelist");
-              setSelectedProductId(null);
-            }}
-            type="button"
-          >
-            Pricelist
-          </button>
-          <button
-            className={`admin-nav-item ${activeSection === "inventory" ? "active" : ""}`}
-            onClick={() => {
-              setActiveSection("inventory");
-              setSelectedProductId(null);
-            }}
-            type="button"
-          >
-            Inventory
-          </button>
-          <button
-            className={`admin-nav-item ${activeSection === "membership" ? "active" : ""}`}
-            onClick={() => {
-              setActiveSection("membership");
-              setSelectedProductId(null);
-            }}
-            type="button"
-          >
-            Membership
-          </button>
-          <button
-            className={`admin-nav-item ${activeSection === "categories" ? "active" : ""}`}
-            onClick={() => setActiveSection("categories")}
-            type="button"
-          >
-            Categories
-          </button>
-          <button
-            className={`admin-nav-item ${activeSection === "vendors" ? "active" : ""}`}
-            onClick={() => setActiveSection("vendors")}
-            type="button"
-          >
-            Vendors
-          </button>
-          <button
-            className={`admin-nav-item ${activeSection === "dropSites" ? "active" : ""}`}
-            onClick={() => setActiveSection("dropSites")}
-            type="button"
-          >
-            Drop Sites
-          </button>
-          <button
-            className={`admin-nav-item ${activeSection === "recipes" ? "active" : ""}`}
-            onClick={() => setActiveSection("recipes")}
-            type="button"
-          >
-            Recipes
-          </button>
-          <button
-            className={`admin-nav-item ${activeSection === "reviews" ? "active" : ""}`}
-            onClick={() => setActiveSection("reviews")}
-            type="button"
-          >
-            Reviews
-          </button>
+          {canManagePricing ? (
+            <button
+              className={`admin-nav-item ${activeSection === "pricelist" ? "active" : ""}`}
+              onClick={() => {
+                setActiveSection("pricelist");
+                setSelectedProductId(null);
+              }}
+              type="button"
+            >
+              Pricelist
+            </button>
+          ) : null}
+          {canManageInventory ? (
+            <button
+              className={`admin-nav-item ${activeSection === "inventory" ? "active" : ""}`}
+              onClick={() => {
+                setActiveSection("inventory");
+                setSelectedProductId(null);
+              }}
+              type="button"
+            >
+              Inventory
+            </button>
+          ) : null}
+          {canManageMembership ? (
+            <button
+              className={`admin-nav-item ${activeSection === "membership" ? "active" : ""}`}
+              onClick={() => {
+                setActiveSection("membership");
+                setSelectedProductId(null);
+              }}
+              type="button"
+            >
+              Membership
+            </button>
+          ) : null}
+          {canManageCoreAdmin ? (
+            <>
+              <button
+                className={`admin-nav-item ${activeSection === "categories" ? "active" : ""}`}
+                onClick={() => setActiveSection("categories")}
+                type="button"
+              >
+                Categories
+              </button>
+              <button
+                className={`admin-nav-item ${activeSection === "vendors" ? "active" : ""}`}
+                onClick={() => setActiveSection("vendors")}
+                type="button"
+              >
+                Vendors
+              </button>
+              <button
+                className={`admin-nav-item ${activeSection === "recipes" ? "active" : ""}`}
+                onClick={() => setActiveSection("recipes")}
+                type="button"
+              >
+                Recipes
+              </button>
+            </>
+          ) : null}
+          {canManageDropSites ? (
+            <button
+              className={`admin-nav-item ${activeSection === "dropSites" ? "active" : ""}`}
+              onClick={() => setActiveSection("dropSites")}
+              type="button"
+            >
+              Drop Sites
+            </button>
+          ) : null}
+          {canManageMembers ? (
+            <button
+              className={`admin-nav-item ${activeSection === "reviews" ? "active" : ""}`}
+              onClick={() => setActiveSection("reviews")}
+              type="button"
+            >
+              Reviews
+            </button>
+          ) : null}
           {canManageUsers ? (
             <button
               className={`admin-nav-item admin-users-nav-item ${activeSection === "users" ? "active" : ""}`}
@@ -1779,7 +1855,7 @@ export function AdminPanel({ onCatalogRefresh }) {
             </section>
           )}
 
-          {(activeSection === "products" || activeSection === "pricelist") &&
+          {(activeSection === "products" || (activeSection === "pricelist" && canManagePricing)) &&
             selectedProductId &&
             activeProduct && (
             <section className="admin-section">
@@ -2065,7 +2141,7 @@ export function AdminPanel({ onCatalogRefresh }) {
             </section>
           )}
 
-          {activeSection === "dropSites" && (
+          {activeSection === "dropSites" && canManageDropSites && (
             <section className="admin-section">
               <h3>Drop Sites</h3>
               <div className="admin-grid">
@@ -2087,7 +2163,7 @@ export function AdminPanel({ onCatalogRefresh }) {
             </section>
           )}
 
-          {activeSection === "pricelist" && !selectedProductId && (
+          {activeSection === "pricelist" && canManagePricing && !selectedProductId && (
             <>
               <AdminPriceListSection
                 token={token}
@@ -2127,7 +2203,7 @@ export function AdminPanel({ onCatalogRefresh }) {
             </>
           )}
 
-          {activeSection === "inventory" && (
+          {activeSection === "inventory" && canManageInventory && (
             <AdminInventorySection
               token={token}
               products={products}
@@ -2138,7 +2214,7 @@ export function AdminPanel({ onCatalogRefresh }) {
             />
           )}
 
-          {activeSection === "membership" && (
+          {activeSection === "membership" && canManageMembership && (
             <AdminMembershipSection
               token={token}
               products={products}
@@ -2152,7 +2228,7 @@ export function AdminPanel({ onCatalogRefresh }) {
             <AdminUsersSection token={token} currentAdmin={currentAdmin} />
           )}
 
-          {activeSection === "categories" && (
+          {activeSection === "categories" && canManageCoreAdmin && (
             <section className="admin-section">
               <h3>Categories</h3>
               <table className="admin-table">
@@ -2183,7 +2259,7 @@ export function AdminPanel({ onCatalogRefresh }) {
             </section>
           )}
 
-          {activeSection === "vendors" && (
+          {activeSection === "vendors" && canManageCoreAdmin && (
             <section className="admin-section">
               <h3>Vendors</h3>
               <table className="admin-table">
@@ -2214,7 +2290,7 @@ export function AdminPanel({ onCatalogRefresh }) {
             </section>
           )}
 
-          {activeSection === "recipes" && (
+          {activeSection === "recipes" && canManageCoreAdmin && (
             <section className="admin-section">
               <h3>Recipes</h3>
               <div className="admin-grid">
@@ -2236,7 +2312,7 @@ export function AdminPanel({ onCatalogRefresh }) {
             </section>
           )}
 
-          {activeSection === "reviews" && (
+          {activeSection === "reviews" && canManageMembers && (
             <section className="admin-section">
               <h3>Reviews</h3>
               <div className="admin-grid">

@@ -35,6 +35,14 @@ import { RecipesSection } from "./RecipesSection.jsx";
 import { AdminPanel } from "./AdminPanel.jsx";
 import { SeasonalHighlights } from "./SeasonalHighlights.jsx";
 
+function hasBackendAccess(user) {
+  return (
+    user?.role === "administrator" ||
+    user?.role === "admin" ||
+    Boolean(user?.adminRoles?.length)
+  );
+}
+
 export function Storefront() {
   const [userToken, setUserToken] = useState(() => localStorage.getItem("userToken") || "");
   const [user, setUser] = useState(null);
@@ -74,7 +82,7 @@ export function Storefront() {
   const categoryRef = useRef(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const isMember = Boolean(userToken);
-  const isAdmin = user?.role === "administrator" || user?.role === "admin";
+  const isAdmin = hasBackendAccess(user);
   const priceTier = isAdmin || user?.role === "member" ? "member" : "guest";
   const [reviewForm, setReviewForm] = useState({ rating: "5", title: "", body: "" });
   const [reviewStatus, setReviewStatus] = useState({ message: "", error: "" });
@@ -142,9 +150,8 @@ export function Storefront() {
     fetchMe(userToken)
       .then((data) => {
         setUser(data.user || null);
-        const role = data.user?.role;
         const route = getHashRoute();
-        if (role === "administrator" || role === "admin") {
+        if (hasBackendAccess(data.user)) {
           localStorage.setItem("adminToken", userToken);
           if (!route) {
             window.location.hash = "#/admin";
@@ -365,8 +372,7 @@ export function Storefront() {
       setUser(result.user || null);
       setLoginOpen(false);
       setLoginState({ username: "", password: "", error: "" });
-      const role = result.user?.role;
-      if (role === "administrator" || role === "admin") {
+      if (hasBackendAccess(result.user)) {
         localStorage.setItem("adminToken", result.token);
         window.location.hash = "#/admin";
       } else {

@@ -9,6 +9,22 @@ import { resetPasswordWithToken, sendPasswordResetForUser } from "../lib/passwor
 
 const router = express.Router();
 
+async function loadAdminRoleKeysForUser(userId) {
+  if (!Number.isFinite(Number(userId))) return [];
+  await ensureAdminAccessSchema();
+  const [rows] = await getPool().query(
+    `
+      SELECT r.role_key AS roleKey
+      FROM admin_user_roles ur
+      JOIN admin_roles r ON r.id = ur.role_id
+      WHERE ur.user_id = ?
+      ORDER BY r.role_key
+    `,
+    [Number(userId)]
+  );
+  return rows.map((row) => row.roleKey).filter(Boolean);
+}
+
 router.post("/login", async (req, res) => {
   const username = String(req.body?.username || req.body?.email || "").trim();
   const { password } = req.body || {};
@@ -33,7 +49,9 @@ router.post("/login", async (req, res) => {
     return res.status(401).json({ error: "Invalid credentials" });
   }
 
-  const token = jwt.sign({ userId: rows[0].id, role: rows[0].role }, process.env.JWT_SECRET || "dev-secret", {
+  const adminRoles = await loadAdminRoleKeysForUser(Number(rows[0].id)).catch(() => []);
+
+  const token = jwt.sign({ userId: rows[0].id, role: rows[0].role, adminRoles }, process.env.JWT_SECRET || "dev-secret", {
     expiresIn: "30d"
   });
 
@@ -43,7 +61,8 @@ router.post("/login", async (req, res) => {
       id: rows[0].id,
       username: rows[0].username,
       email: rows[0].email,
-      role: rows[0].role
+      role: rows[0].role,
+      adminRoles
     }
   });
 });
@@ -137,12 +156,15 @@ router.get("/me", requireUser, async (req, res) => {
     return res.status(404).json({ error: "User not found" });
   }
 
+  const adminRoles = await loadAdminRoleKeysForUser(Number(rows[0].id)).catch(() => []);
+
   res.json({
     user: {
       id: rows[0].id,
       username: rows[0].username,
       email: rows[0].email,
-      role: rows[0].role
+      role: rows[0].role,
+      adminRoles
     }
   });
 });
