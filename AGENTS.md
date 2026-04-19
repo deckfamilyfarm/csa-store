@@ -50,10 +50,16 @@ The admin pricelist intentionally has two edit paths:
 - `Edit Row` edits formula/pricelist fields inline for the row.
 - `Details` opens the same product detail editor used by the Products section for product metadata, descriptions, images, package prices, and cached Local Line price-list entries.
 
+Admin access is local to this application, not delegated to Timesheets. The `users` table stores login identity, while `admin_roles` and `admin_user_roles` store backend permissions. The full `admin` role grants every permission. Granular backend roles are `user_admin`, `inventory_admin`, `pricing_admin`, `localline_pull`, `localline_push`, `dropsite_admin`, `membership_admin`, and `member_admin`. Timesheets linkage fields may exist for future reference, but Timesheets is not the permission authority for CSA Store.
+
+User setup and password recovery are email-link based, following the Timesheets pattern of self-service resets rather than admins typing passwords for other users. Login identity is `users.username`, which must be unique. Password reset/contact delivery is `users.email`, which may be shared by multiple users, such as `deckfamilyfarm@gmail.com`. Admin `Users` creates backend users, assigns roles, and sends a password setup email to the reset email for that username. The same screen can send reset emails for existing users, including the current admin. Signed-in admins can also change their own password directly in `Users` with current password plus new password; this direct in-app change does not send email. Storefront/admin login and forgot-password flows ask for username, not email. Forgot-password emails include the username so shared inboxes can tell which account is being reset. Reset tokens live in `password_reset_tokens`; tokens are one-time use and expire. Mail delivery uses SMTP env vars (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, optional `SMTP_SECURE`), Gmail-style `EMAIL_USER`/`EMAIL_PASS`, or the local `MAIL_USER`/`MAIL_ACCESS` pair. Set `PUBLIC_APP_BASE_URL` or `FRONTEND_BASE_URL` when reset links should point somewhere other than the API host.
+
 Key implementation points:
 
 - Formula-pricing vendor detection lives in `apps/api/lib/productPricing.js`.
 - Deposit/no-markup detection also lives in `apps/api/lib/productPricing.js`.
+- Admin roles and user management live in `apps/api/lib/adminRoles.js`, `apps/api/routes/admin.js`, and `design/template/vite-app/src/components/AdminUsersSection.jsx`.
+- Password reset email and token behavior lives in `apps/api/lib/email.js`, `apps/api/lib/passwordReset.js`, and `apps/api/routes/auth.js`.
 - Admin pricelist reads and remote apply flows live in `apps/api/routes/admin.js`.
 - Local Line push payloads are built in `apps/api/localLine.js`.
 - Local Line pull/audit behavior lives in `apps/api/scripts/auditLocalLineSync.js`.

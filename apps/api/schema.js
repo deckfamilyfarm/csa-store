@@ -100,12 +100,57 @@ export const recipes = mysqlTable("recipes", {
 
 export const users = mysqlTable("users", {
   id: int("id").autoincrement().primaryKey(),
-  email: varchar("email", { length: 255 }).notNull().unique(),
+  username: varchar("username", { length: 255 }).notNull().unique(),
+  email: varchar("email", { length: 255 }),
   passwordHash: varchar("password_hash", { length: 255 }).notNull(),
   role: varchar("role", { length: 32 }).default("member"),
+  name: varchar("name", { length: 255 }),
+  active: tinyint("active").default(1),
+  timesheetsUserId: varchar("timesheets_user_id", { length: 64 }),
+  timesheetsEmployeeId: varchar("timesheets_employee_id", { length: 64 }),
   createdAt: datetime("created_at"),
   updatedAt: datetime("updated_at")
 });
+
+export const adminRoles = mysqlTable("admin_roles", {
+  id: int("id").autoincrement().primaryKey(),
+  roleKey: varchar("role_key", { length: 64 }).notNull().unique(),
+  label: varchar("label", { length: 128 }).notNull(),
+  description: text("description"),
+  createdAt: datetime("created_at"),
+  updatedAt: datetime("updated_at")
+});
+
+export const adminUserRoles = mysqlTable(
+  "admin_user_roles",
+  {
+    userId: int("user_id").notNull(),
+    roleId: int("role_id").notNull(),
+    createdAt: datetime("created_at")
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.userId, table.roleId] })
+  })
+);
+
+export const passwordResetTokens = mysqlTable(
+  "password_reset_tokens",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("user_id").notNull(),
+    tokenHash: varchar("token_hash", { length: 64 }).notNull(),
+    requestedByUserId: int("requested_by_user_id"),
+    requestedByAdmin: tinyint("requested_by_admin").default(0),
+    usedAt: datetime("used_at"),
+    expiresAt: datetime("expires_at").notNull(),
+    createdAt: datetime("created_at")
+  },
+  (table) => ({
+    tokenHashIdx: uniqueIndex("ux_password_reset_tokens_hash").on(table.tokenHash),
+    userIdx: index("idx_password_reset_tokens_user").on(table.userId),
+    expiresIdx: index("idx_password_reset_tokens_expires").on(table.expiresAt)
+  })
+);
 
 export const reviews = mysqlTable("reviews", {
   id: int("id").autoincrement().primaryKey(),

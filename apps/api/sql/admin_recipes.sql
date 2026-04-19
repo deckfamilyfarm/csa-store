@@ -1,12 +1,53 @@
 -- Add admin/recipe tables if missing (run in `store` database)
 CREATE TABLE IF NOT EXISTS users (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  email VARCHAR(255) NOT NULL UNIQUE,
+  username VARCHAR(255) NOT NULL UNIQUE,
+  email VARCHAR(255),
   password_hash VARCHAR(255) NOT NULL,
   role VARCHAR(32) DEFAULT 'member',
+  name VARCHAR(255),
+  active TINYINT(1) DEFAULT 1,
+  timesheets_user_id VARCHAR(64),
+  timesheets_employee_id VARCHAR(64),
   created_at DATETIME,
   updated_at DATETIME
 );
+
+CREATE TABLE IF NOT EXISTS admin_roles (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  role_key VARCHAR(64) NOT NULL UNIQUE,
+  label VARCHAR(128) NOT NULL,
+  description TEXT,
+  created_at DATETIME,
+  updated_at DATETIME
+);
+
+CREATE TABLE IF NOT EXISTS admin_user_roles (
+  user_id INT NOT NULL,
+  role_id INT NOT NULL,
+  created_at DATETIME,
+  PRIMARY KEY (user_id, role_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_admin_user_roles_role
+  ON admin_user_roles (role_id);
+
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  token_hash VARCHAR(64) NOT NULL UNIQUE,
+  requested_by_user_id INT,
+  requested_by_admin TINYINT(1) DEFAULT 0,
+  used_at DATETIME,
+  expires_at DATETIME NOT NULL,
+  created_at DATETIME
+);
+
+CREATE INDEX IF NOT EXISTS idx_password_reset_tokens_user
+  ON password_reset_tokens (user_id);
+
+CREATE INDEX IF NOT EXISTS idx_password_reset_tokens_expires
+  ON password_reset_tokens (expires_at);
 
 ALTER TABLE vendors
   ADD COLUMN guest_markup DECIMAL(5, 2) DEFAULT 0.55,

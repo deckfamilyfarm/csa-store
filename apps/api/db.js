@@ -2,10 +2,12 @@ import mysql from "mysql2/promise";
 import { drizzle } from "drizzle-orm/mysql2";
 import { relations } from "drizzle-orm";
 import * as schema from "./schema.js";
+import { ADMIN_ROLE_DEFINITIONS } from "./lib/adminRoles.js";
 
 let db;
 let pool;
 let localLineSchemaPromise;
+let adminAccessSchemaPromise;
 
 const LOCAL_LINE_TABLE_STATEMENTS = [
   `
@@ -349,6 +351,93 @@ const LOCAL_LINE_COLUMN_STATEMENTS = [
   }
 ];
 
+const ADMIN_ACCESS_TABLE_STATEMENTS = [
+  `
+    CREATE TABLE IF NOT EXISTS admin_roles (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      role_key VARCHAR(64) NOT NULL,
+      label VARCHAR(128) NOT NULL,
+      description TEXT,
+      created_at DATETIME,
+      updated_at DATETIME,
+      UNIQUE KEY ux_admin_roles_key (role_key)
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS admin_user_roles (
+      user_id INT NOT NULL,
+      role_id INT NOT NULL,
+      created_at DATETIME,
+      PRIMARY KEY (user_id, role_id)
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS password_reset_tokens (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL,
+      token_hash VARCHAR(64) NOT NULL,
+      requested_by_user_id INT,
+      requested_by_admin TINYINT(1) DEFAULT 0,
+      used_at DATETIME,
+      expires_at DATETIME NOT NULL,
+      created_at DATETIME,
+      UNIQUE KEY ux_password_reset_tokens_hash (token_hash)
+    )
+  `
+];
+
+const ADMIN_ACCESS_COLUMN_STATEMENTS = [
+  {
+    tableName: "users",
+    columnName: "username",
+    definition: "username VARCHAR(255)"
+  },
+  {
+    tableName: "users",
+    columnName: "name",
+    definition: "name VARCHAR(255)"
+  },
+  {
+    tableName: "users",
+    columnName: "active",
+    definition: "active TINYINT(1) DEFAULT 1"
+  },
+  {
+    tableName: "users",
+    columnName: "timesheets_user_id",
+    definition: "timesheets_user_id VARCHAR(64)"
+  },
+  {
+    tableName: "users",
+    columnName: "timesheets_employee_id",
+    definition: "timesheets_employee_id VARCHAR(64)"
+  }
+];
+
+const ADMIN_ACCESS_INDEX_STATEMENTS = [
+  {
+    tableName: "admin_user_roles",
+    indexName: "idx_admin_user_roles_role",
+    columns: "role_id"
+  },
+  {
+    tableName: "password_reset_tokens",
+    indexName: "idx_password_reset_tokens_user",
+    columns: "user_id"
+  },
+  {
+    tableName: "password_reset_tokens",
+    indexName: "idx_password_reset_tokens_expires",
+    columns: "expires_at"
+  },
+  {
+    tableName: "users",
+    indexName: "ux_users_username",
+    unique: true,
+    columns: "username"
+  }
+];
+
 async function indexExists(connection, tableName, indexName) {
   const [rows] = await connection.query(
     `
@@ -377,6 +466,23 @@ async function columnExists(connection, tableName, columnName) {
     [tableName, columnName]
   );
   return rows.length > 0;
+}
+
+async function singleColumnUniqueIndexes(connection, tableName, columnName) {
+  const [rows] = await connection.query(
+    `
+      SELECT index_name AS indexName
+      FROM information_schema.statistics
+      WHERE table_schema = DATABASE()
+        AND table_name = ?
+        AND non_unique = 0
+      GROUP BY index_name
+      HAVING COUNT(*) = 1
+        AND MAX(column_name = ?) = 1
+    `,
+    [tableName, columnName]
+  );
+  return rows.map((row) => row.indexName).filter((indexName) => indexName !== "PRIMARY");
 }
 
 async function runLocalLineSchemaBootstrap(connection) {
@@ -410,6 +516,99 @@ async function runLocalLineSchemaBootstrap(connection) {
       `CREATE ${uniqueClause}INDEX ${indexDefinition.indexName} ON ${indexDefinition.tableName} (${indexDefinition.columns})`
     );
   }
+}
+
+async function runAdminAccessSchemaBootstrap(connection) {
+  for (const statement of ADMIN_ACCESS_TABLE_STATEMENTS) {
+    await connection.query(statement);
+  }
+
+  for (const columnDefinition of ADMIN_ACCESS_COLUMN_STATEMENTS) {
+    const exists = await columnExists(
+      connection,
+      columnDefinition.tableName,
+      columnDefinition.columnName
+    );
+    if (exists) continue;
+
+    await connection.query(
+      `ALTER TABLE ${columnDefinition.tableName} ADD COLUMN ${columnDefinition.definition}`
+    );
+  }
+
+  await connection.query(
+    `
+      UPDATE users
+      SET username = TRIM(email)
+      WHERE (username IS NULL OR TRIM(username) = '')
+        AND email IS NOT NULL
+        AND TRIM(email) <> ''
+    `
+  );
+  await connection.query(
+    `
+      UPDATE users
+      SET username = CONCAT('user-', id)
+      WHERE username IS NULL
+        OR TRIM(username) = ''
+    `
+  );
+  await connection.query(
+    `
+      UPDATE users
+      SET email = NULL
+      WHERE email IS NOT NULL
+        AND email NOT REGEXP '^[^[:space:]@]+@[^[:space:]@]+\\\\.[^[:space:]@]+$'
+    `
+  );
+
+  await connection.query("ALTER TABLE users MODIFY username VARCHAR(255) NOT NULL");
+  await connection.query("ALTER TABLE users MODIFY email VARCHAR(255)");
+
+  const emailUniqueIndexes = await singleColumnUniqueIndexes(connection, "users", "email");
+  for (const indexName of emailUniqueIndexes) {
+    await connection.query(`ALTER TABLE users DROP INDEX \`${String(indexName).replace(/`/g, "``")}\``);
+  }
+
+  for (const indexDefinition of ADMIN_ACCESS_INDEX_STATEMENTS) {
+    const exists = await indexExists(
+      connection,
+      indexDefinition.tableName,
+      indexDefinition.indexName
+    );
+    if (exists) continue;
+
+    const uniqueClause = indexDefinition.unique ? "UNIQUE " : "";
+    await connection.query(
+      `CREATE ${uniqueClause}INDEX ${indexDefinition.indexName} ON ${indexDefinition.tableName} (${indexDefinition.columns})`
+    );
+  }
+
+  const now = new Date();
+  for (const role of ADMIN_ROLE_DEFINITIONS) {
+    await connection.query(
+      `
+        INSERT INTO admin_roles (role_key, label, description, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE
+          label = VALUES(label),
+          description = VALUES(description),
+          updated_at = VALUES(updated_at)
+      `,
+      [role.key, role.label, role.description, now, now]
+    );
+  }
+
+  await connection.query(
+    `
+      INSERT IGNORE INTO admin_user_roles (user_id, role_id, created_at)
+      SELECT u.id, r.id, ?
+      FROM users u
+      JOIN admin_roles r ON r.role_key = 'admin'
+      WHERE u.role IN ('admin', 'administrator')
+    `,
+    [now]
+  );
 }
 
 export function initDb() {
@@ -451,6 +650,20 @@ export async function ensureLocalLineSyncSchema(connection = getPool()) {
   }
 
   return runLocalLineSchemaBootstrap(connection);
+}
+
+export async function ensureAdminAccessSchema(connection = getPool()) {
+  if (connection === getPool()) {
+    if (!adminAccessSchemaPromise) {
+      adminAccessSchemaPromise = runAdminAccessSchemaBootstrap(connection).catch((error) => {
+        adminAccessSchemaPromise = null;
+        throw error;
+      });
+    }
+    return adminAccessSchemaPromise;
+  }
+
+  return runAdminAccessSchemaBootstrap(connection);
 }
 
 export function isMissingTableError(error, tableName = "") {

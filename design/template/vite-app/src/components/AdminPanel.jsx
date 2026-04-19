@@ -2,6 +2,7 @@
 import { AdminInventorySection } from "./AdminInventorySection.jsx";
 import { AdminMembershipSection } from "./AdminMembershipSection.jsx";
 import { AdminPriceListSection } from "./AdminPriceListSection.jsx";
+import { AdminUsersSection } from "./AdminUsersSection.jsx";
 import {
   adminGet,
   adminLogin,
@@ -9,10 +10,19 @@ import {
   adminPut,
   adminUploadImage
 } from "../adminApi.js";
+import { requestPasswordReset } from "../api.js";
 
 export function AdminPanel({ onCatalogRefresh }) {
   const [token, setToken] = useState(() => localStorage.getItem("adminToken") || "");
+  const [currentAdmin, setCurrentAdmin] = useState(null);
   const [loginState, setLoginState] = useState({ username: "", password: "", error: "" });
+  const [loginMode, setLoginMode] = useState("login");
+  const [forgotState, setForgotState] = useState({
+    username: "",
+    message: "",
+    error: "",
+    submitting: false
+  });
   const [loading, setLoading] = useState(false);
   const [activeSection, setActiveSection] = useState("pricelist");
   const [selectedProductId, setSelectedProductId] = useState(null);
@@ -94,9 +104,20 @@ export function AdminPanel({ onCatalogRefresh }) {
     }
   }
 
+  async function loadCurrentAdmin() {
+    if (!token) return;
+    try {
+      const response = await adminGet("me", token);
+      setCurrentAdmin(response.user || null);
+    } catch (_error) {
+      setCurrentAdmin(null);
+    }
+  }
+
   useEffect(() => {
     if (token) {
       localStorage.setItem("adminToken", token);
+      loadCurrentAdmin();
       loadAll();
     }
   }, [token]);
@@ -264,9 +285,29 @@ export function AdminPanel({ onCatalogRefresh }) {
     setLoginState((prev) => ({ ...prev, error: "" }));
     try {
       const result = await adminLogin(loginState.username, loginState.password);
+      setCurrentAdmin(result.user || null);
       setToken(result.token);
     } catch (err) {
       setLoginState((prev) => ({ ...prev, error: "Invalid credentials" }));
+    }
+  }
+
+  async function handleAdminForgotPassword(event) {
+    event.preventDefault();
+    setForgotState((prev) => ({ ...prev, submitting: true, error: "", message: "" }));
+    try {
+      await requestPasswordReset(forgotState.username);
+      setForgotState((prev) => ({
+        ...prev,
+        submitting: false,
+        message: "If that username matches an active user with a reset email, a reset email has been sent."
+      }));
+    } catch (error) {
+      setForgotState((prev) => ({
+        ...prev,
+        submitting: false,
+        error: error?.message || "Unable to request password reset."
+      }));
     }
   }
 
@@ -697,25 +738,53 @@ export function AdminPanel({ onCatalogRefresh }) {
     return (
       <div className="container admin-panel">
         <h2 className="h2">Admin Login</h2>
-        <form className="admin-form" onSubmit={handleLogin}>
-          <input
-            className="input"
-            placeholder="Admin email"
-            value={loginState.username}
-            onChange={(event) => setLoginState((prev) => ({ ...prev, username: event.target.value }))}
-          />
-          <input
-            className="input"
-            placeholder="Password"
-            type="password"
-            value={loginState.password}
-            onChange={(event) => setLoginState((prev) => ({ ...prev, password: event.target.value }))}
-          />
-          {loginState.error && <div className="small">{loginState.error}</div>}
-          <button className="button" type="submit">
-            Sign in
-          </button>
-        </form>
+        {loginMode === "forgot" ? (
+          <form className="admin-form" onSubmit={handleAdminForgotPassword}>
+            <input
+              className="input"
+              placeholder="Admin username"
+              value={forgotState.username}
+              onChange={(event) =>
+                setForgotState((prev) => ({ ...prev, username: event.target.value }))
+              }
+            />
+            {forgotState.error && <div className="small">{forgotState.error}</div>}
+            {forgotState.message && <div className="small">{forgotState.message}</div>}
+            <button className="button" type="submit" disabled={forgotState.submitting}>
+              {forgotState.submitting ? "Sending..." : "Send reset email"}
+            </button>
+            <button className="button alt" type="button" onClick={() => setLoginMode("login")}>
+              Back to sign in
+            </button>
+          </form>
+        ) : (
+          <form className="admin-form" onSubmit={handleLogin}>
+            <input
+              className="input"
+              placeholder="Admin username"
+              value={loginState.username}
+              onChange={(event) =>
+                setLoginState((prev) => ({ ...prev, username: event.target.value }))
+              }
+            />
+            <input
+              className="input"
+              placeholder="Password"
+              type="password"
+              value={loginState.password}
+              onChange={(event) =>
+                setLoginState((prev) => ({ ...prev, password: event.target.value }))
+              }
+            />
+            {loginState.error && <div className="small">{loginState.error}</div>}
+            <button className="button" type="submit">
+              Sign in
+            </button>
+            <button className="button alt" type="button" onClick={() => setLoginMode("forgot")}>
+              Forgot password
+            </button>
+          </form>
+        )}
       </div>
     );
   }
@@ -732,6 +801,8 @@ export function AdminPanel({ onCatalogRefresh }) {
   const fullSyncRunning =
     fullSyncJob?.status === "queued" || fullSyncJob?.status === "running";
   const productTableWidth = "1376px";
+  const currentAdminRoles = currentAdmin?.adminRoles || [];
+  const canManageUsers = currentAdminRoles.includes("admin") || currentAdminRoles.includes("user_admin");
 
   function getProductPrice(product) {
     const prices = (product.packages || [])
@@ -1437,6 +1508,18 @@ export function AdminPanel({ onCatalogRefresh }) {
           >
             Reviews
           </button>
+          {canManageUsers ? (
+            <button
+              className={`admin-nav-item admin-users-nav-item ${activeSection === "users" ? "active" : ""}`}
+              onClick={() => {
+                setActiveSection("users");
+                setSelectedProductId(null);
+              }}
+              type="button"
+            >
+              Users
+            </button>
+          ) : null}
         </aside>
 
         <div className="admin-content">
@@ -2063,6 +2146,10 @@ export function AdminPanel({ onCatalogRefresh }) {
               onDataRefresh={loadAll}
               onCatalogRefresh={refreshCatalogFromAdmin}
             />
+          )}
+
+          {activeSection === "users" && canManageUsers && (
+            <AdminUsersSection token={token} currentAdmin={currentAdmin} />
           )}
 
           {activeSection === "categories" && (

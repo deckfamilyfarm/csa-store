@@ -798,6 +798,10 @@ img {
   background: #fff;
 }
 
+.admin-users-nav-item {
+  margin-left: auto;
+}
+
 .admin-content {
   display: grid;
   gap: 16px;
@@ -1083,6 +1087,95 @@ img {
 
 .membership-price-input {
   width: 120px;
+}
+
+.admin-users-section {
+  margin-top: 0;
+}
+
+.admin-user-toolbar {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 16px;
+}
+
+.admin-user-active-toggle {
+  align-self: center;
+}
+
+.admin-users-table {
+  min-width: 1040px;
+}
+
+.admin-user-fields {
+  display: grid;
+  gap: 10px;
+  min-width: 260px;
+}
+
+.admin-user-row-heading {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: var(--navy);
+}
+
+.admin-user-you-badge {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--mist);
+  color: var(--barn);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 4px 8px;
+}
+
+.admin-user-field-label {
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-user-warning {
+  color: var(--barn);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.admin-role-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(140px, 1fr));
+  gap: 8px;
+  min-width: 460px;
+}
+
+.admin-role-grid-modal {
+  min-width: 0;
+}
+
+.admin-role-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.admin-user-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 280px;
+}
+
+.reset-password-panel {
+  max-width: 520px;
 }
 
 .pricelist-toolbar {

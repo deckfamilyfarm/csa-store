@@ -1,10 +1,17 @@
 import express from "express";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import multer from "multer";
 import sharp from "sharp";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-import { ensureLocalLineSyncSchema, getDb, isMissingTableError } from "../db.js";
+import {
+  ensureAdminAccessSchema,
+  ensureLocalLineSyncSchema,
+  getDb,
+  getPool,
+  isMissingTableError
+} from "../db.js";
 import { and, eq, inArray } from "drizzle-orm";
 import {
   categories,
@@ -26,7 +33,7 @@ import {
   users,
   vendors
 } from "../schema.js";
-import { requireAdmin } from "../middleware/auth.js";
+import { requireAdmin, requireAdminPermission } from "../middleware/auth.js";
 import { isLocalLineEnabled, updateLocalLineForProduct } from "../localLine.js";
 import {
   getLatestLocalLineFullSyncJob,
@@ -43,6 +50,11 @@ import {
   exportMasterPricelist,
   isGooglePricelistVendorName
 } from "../scripts/exportMasterPricelist.js";
+import {
+  ADMIN_ROLE_DEFINITIONS,
+  normalizeAdminRoleKeys
+} from "../lib/adminRoles.js";
+import { sendPasswordResetForUser } from "../lib/passwordReset.js";
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -85,6 +97,76 @@ function isMembershipCategoryName(value) {
   return normalizeCategoryName(value) === "membership";
 }
 
+function toActiveFlag(value) {
+  return value === false || value === 0 || value === "0" ? 0 : 1;
+}
+
+function isEmailAddress(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim());
+}
+
+async function loadAdminRoleKeysForUser(userId) {
+  if (!Number.isFinite(Number(userId))) return [];
+  await ensureAdminAccessSchema();
+  const [rows] = await getPool().query(
+    `
+      SELECT r.role_key AS roleKey
+      FROM admin_user_roles ur
+      JOIN admin_roles r ON r.id = ur.role_id
+      WHERE ur.user_id = ?
+      ORDER BY r.role_key
+    `,
+    [Number(userId)]
+  );
+  return rows.map((row) => row.roleKey).filter(Boolean);
+}
+
+async function replaceAdminRolesForUser(userId, roleKeys) {
+  const normalized = normalizeAdminRoleKeys(roleKeys);
+  const pool = getPool();
+  await ensureAdminAccessSchema();
+  await pool.query("DELETE FROM admin_user_roles WHERE user_id = ?", [userId]);
+  if (!normalized.length) return normalized;
+  await pool.query(
+    `
+      INSERT INTO admin_user_roles (user_id, role_id, created_at)
+      SELECT ?, id, ?
+      FROM admin_roles
+      WHERE role_key IN (?)
+    `,
+    [userId, new Date(), normalized]
+  );
+  return normalized;
+}
+
+async function countOtherActiveFullAdmins(userId) {
+  await ensureAdminAccessSchema();
+  const [rows] = await getPool().query(
+    `
+      SELECT COUNT(*) AS count
+      FROM users u
+      JOIN admin_user_roles ur ON ur.user_id = u.id
+      JOIN admin_roles r ON r.id = ur.role_id
+      WHERE r.role_key = 'admin'
+        AND COALESCE(u.active, 1) = 1
+        AND u.id <> ?
+    `,
+    [Number(userId) || 0]
+  );
+  return Number(rows[0]?.count || 0);
+}
+
+async function assertAdminRoleChangeSafe(userId, active, roleKeys) {
+  const normalized = normalizeAdminRoleKeys(roleKeys);
+  if (active && normalized.includes("admin")) return;
+  const otherAdmins = await countOtherActiveFullAdmins(userId);
+  if (otherAdmins <= 0) {
+    const error = new Error("At least one active full admin user is required.");
+    error.status = 400;
+    throw error;
+  }
+}
+
 router.post("/login", async (req, res) => {
   const { username, password } = req.body || {};
   if (!username || !password) {
@@ -92,9 +174,15 @@ router.post("/login", async (req, res) => {
   }
 
   const db = getDb();
-  const rows = await db.select().from(users).where(eq(users.email, username));
+  await ensureAdminAccessSchema().catch((error) => {
+    console.warn("Admin access schema bootstrap skipped for /admin/login:", error.message);
+  });
+  const rows = await db.select().from(users).where(eq(users.username, username));
   if (!rows.length) {
     return res.status(401).json({ error: "Invalid credentials" });
+  }
+  if (rows[0].active === 0) {
+    return res.status(403).json({ error: "User is inactive" });
   }
 
   const valid = await bcrypt.compare(password, rows[0].passwordHash);
@@ -102,17 +190,255 @@ router.post("/login", async (req, res) => {
     return res.status(401).json({ error: "Invalid credentials" });
   }
 
-  if (rows[0].role !== "administrator" && rows[0].role !== "admin") {
+  const adminRoles = await loadAdminRoleKeysForUser(Number(rows[0].id));
+  const hasLegacyAdminRole = rows[0].role === "administrator" || rows[0].role === "admin";
+  if (!hasLegacyAdminRole && !adminRoles.length) {
     return res.status(403).json({ error: "Admin access required" });
   }
 
   const token = jwt.sign(
-    { adminId: rows[0].id, userId: rows[0].id, role: rows[0].role },
+    { adminId: rows[0].id, userId: rows[0].id, role: rows[0].role, adminRoles },
     process.env.JWT_SECRET || "dev-secret",
     { expiresIn: "30d" }
   );
 
-  res.json({ token });
+  res.json({
+    token,
+    user: {
+      id: rows[0].id,
+      username: rows[0].username,
+      email: rows[0].email,
+      name: rows[0].name || "",
+      role: rows[0].role,
+      adminRoles
+    }
+  });
+});
+
+router.get("/me", requireAdmin, async (req, res) => {
+  const db = getDb();
+  await ensureAdminAccessSchema();
+  const userId = Number(req.admin?.userId || req.admin?.adminId);
+  const rows = await db.select().from(users).where(eq(users.id, userId));
+  if (!rows.length) {
+    return res.status(404).json({ error: "User not found" });
+  }
+  res.json({
+    user: {
+      id: rows[0].id,
+      username: rows[0].username,
+      email: rows[0].email,
+      name: rows[0].name || "",
+      role: rows[0].role,
+      active: rows[0].active !== 0,
+      adminRoles: await loadAdminRoleKeysForUser(Number(rows[0].id))
+    }
+  });
+});
+
+router.get("/admin-users", requireAdminPermission("user_admin"), async (_req, res) => {
+  await ensureAdminAccessSchema();
+  const [userRows] = await getPool().query(
+    `
+      SELECT
+        u.id,
+        u.username,
+        u.email,
+        u.name,
+        u.role,
+        COALESCE(u.active, 1) AS active,
+        u.timesheets_user_id AS timesheetsUserId,
+        u.timesheets_employee_id AS timesheetsEmployeeId,
+        u.created_at AS createdAt,
+        u.updated_at AS updatedAt,
+        GROUP_CONCAT(r.role_key ORDER BY r.role_key SEPARATOR ',') AS adminRoleKeys
+      FROM users u
+      JOIN admin_user_roles ur ON ur.user_id = u.id
+      JOIN admin_roles r ON r.id = ur.role_id
+      GROUP BY u.id
+      ORDER BY u.username
+    `
+  );
+
+  res.json({
+    roles: ADMIN_ROLE_DEFINITIONS,
+    users: userRows.map((row) => ({
+      id: row.id,
+      username: row.username,
+      email: row.email,
+      name: row.name || "",
+      role: row.role,
+      active: Boolean(row.active),
+      timesheetsUserId: row.timesheetsUserId || "",
+      timesheetsEmployeeId: row.timesheetsEmployeeId || "",
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+      adminRoles: String(row.adminRoleKeys || "")
+        .split(",")
+        .map((value) => value.trim())
+        .filter(Boolean)
+    }))
+  });
+});
+
+router.post("/admin-users", requireAdminPermission("user_admin"), async (req, res) => {
+  const db = getDb();
+  await ensureAdminAccessSchema();
+  const payload = req.body || {};
+  const username = String(payload.username || "").trim();
+  const email = String(payload.email || "").trim().toLowerCase() || null;
+  const adminRoles = normalizeAdminRoleKeys(payload.adminRoles);
+
+  if (!username || !adminRoles.length) {
+    return res.status(400).json({ error: "Username and at least one role are required." });
+  }
+  if (email && !isEmailAddress(email)) {
+    return res.status(400).json({ error: "Password reset email must be a valid email address." });
+  }
+
+  const existing = await db.select().from(users).where(eq(users.username, username));
+  if (existing.length) {
+    return res.status(409).json({ error: "A user with this username already exists." });
+  }
+
+  const now = new Date();
+  const passwordHash = await bcrypt.hash(crypto.randomBytes(32).toString("hex"), 10);
+  const active = toActiveFlag(payload.active);
+  const name = String(payload.name || "").trim() || null;
+  const result = await db.insert(users).values({
+    username,
+    email,
+    passwordHash,
+    name,
+    role: adminRoles.includes("admin") ? "admin" : "member",
+    active,
+    timesheetsUserId: payload.timesheetsUserId || null,
+    timesheetsEmployeeId: payload.timesheetsEmployeeId || null,
+    createdAt: now,
+    updatedAt: now
+  });
+
+  const userId = Number(result[0]?.insertId);
+  await replaceAdminRolesForUser(userId, adminRoles);
+
+  let resetResult = { emailSent: false, emailReason: "User is inactive." };
+  if (active && !isEmailAddress(email)) {
+    resetResult = { emailSent: false, emailReason: "Password reset email is not set." };
+  } else if (active) {
+    resetResult = await sendPasswordResetForUser(
+      { id: userId, username, email, name },
+      {
+        req,
+        requestedByUserId: Number(req.admin?.userId || req.admin?.adminId) || null,
+        requestedByAdmin: true
+      }
+    );
+  }
+
+  res.json({ ok: true, userId, ...resetResult });
+});
+
+router.post(
+  "/admin-users/:id/reset-password",
+  requireAdminPermission("user_admin"),
+  async (req, res) => {
+    await ensureAdminAccessSchema();
+    const userId = Number(req.params.id);
+    if (!Number.isFinite(userId)) {
+      return res.status(400).json({ error: "Invalid user id." });
+    }
+
+    const [rows] = await getPool().query(
+      `
+        SELECT id, username, email, name, COALESCE(active, 1) AS active
+        FROM users
+        WHERE id = ?
+        LIMIT 1
+      `,
+      [userId]
+    );
+    const user = rows[0];
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+    if (!isEmailAddress(user.email)) {
+      return res.status(400).json({
+        error: "This user does not have a deliverable password reset email. Save a real reset email first."
+      });
+    }
+    if (Number(user.active) === 0) {
+      return res.status(400).json({ error: "Inactive users cannot receive password reset email." });
+    }
+
+    const resetResult = await sendPasswordResetForUser(user, {
+      req,
+      requestedByUserId: Number(req.admin?.userId || req.admin?.adminId) || null,
+      requestedByAdmin: true
+    });
+
+    res.json({ ok: true, ...resetResult });
+  }
+);
+
+router.put("/admin-users/:id", requireAdminPermission("user_admin"), async (req, res) => {
+  const db = getDb();
+  await ensureAdminAccessSchema();
+  const userId = Number(req.params.id);
+  if (!Number.isFinite(userId)) {
+    return res.status(400).json({ error: "Invalid user id." });
+  }
+
+  const payload = req.body || {};
+  const active = toActiveFlag(payload.active);
+  const adminRoles = normalizeAdminRoleKeys(payload.adminRoles);
+  if (!adminRoles.length) {
+    return res.status(400).json({ error: "At least one role is required." });
+  }
+
+  try {
+    await assertAdminRoleChangeSafe(userId, Boolean(active), adminRoles);
+  } catch (error) {
+    return res.status(error.status || 500).json({ error: error.message });
+  }
+
+  const updatePayload = {
+    username: payload.username ? String(payload.username).trim() : undefined,
+    email:
+      payload.email === undefined
+        ? undefined
+        : String(payload.email || "").trim().toLowerCase() || null,
+    name: payload.name === undefined ? undefined : String(payload.name || "").trim() || null,
+    role: adminRoles.includes("admin") ? "admin" : "member",
+    active,
+    timesheetsUserId:
+      payload.timesheetsUserId === undefined ? undefined : payload.timesheetsUserId || null,
+    timesheetsEmployeeId:
+      payload.timesheetsEmployeeId === undefined ? undefined : payload.timesheetsEmployeeId || null,
+    updatedAt: new Date()
+  };
+
+  if (!updatePayload.username) {
+    return res.status(400).json({ error: "Username is required." });
+  }
+  if (updatePayload.email && !isEmailAddress(updatePayload.email)) {
+    return res.status(400).json({ error: "Password reset email must be a valid email address." });
+  }
+
+  const duplicateUsername = await db
+    .select()
+    .from(users)
+    .where(eq(users.username, updatePayload.username));
+  if (duplicateUsername.some((row) => Number(row.id) !== userId)) {
+    return res.status(409).json({ error: "A user with this username already exists." });
+  }
+
+  if (payload.password) {
+    updatePayload.passwordHash = await bcrypt.hash(String(payload.password), 10);
+  }
+
+  await db.update(users).set(updatePayload).where(eq(users.id, userId));
+  await replaceAdminRolesForUser(userId, adminRoles);
+  res.json({ ok: true });
 });
 
 router.get("/products", requireAdmin, async (_req, res) => {
@@ -341,7 +667,7 @@ router.get("/localline/products/:id", requireAdmin, async (req, res) => {
   }
 });
 
-router.put("/localline/products/:id/price-list-entries", requireAdmin, async (req, res) => {
+router.put("/localline/products/:id/price-list-entries", requireAdminPermission("pricing_admin"), async (req, res) => {
   const db = getDb();
   const productId = Number(req.params.id);
   const entries = Array.isArray(req.body?.entries) ? req.body.entries : [];
@@ -551,7 +877,7 @@ router.get("/pricelist", requireAdmin, async (_req, res) => {
   res.json({ rows });
 });
 
-router.post("/pricelist/bulk-save", requireAdmin, async (req, res) => {
+router.post("/pricelist/bulk-save", requireAdminPermission("pricing_admin"), async (req, res) => {
   const db = getDb();
   const rows = Array.isArray(req.body?.rows) ? req.body.rows : [];
   const now = new Date();
@@ -608,7 +934,7 @@ router.post("/pricelist/bulk-save", requireAdmin, async (req, res) => {
   res.json({ ok: true, saved: savedProductIds.length, productIds: savedProductIds });
 });
 
-router.post("/pricelist/apply-remote", requireAdmin, async (req, res) => {
+router.post("/pricelist/apply-remote", requireAdminPermission("localline_push"), async (req, res) => {
   const db = getDb();
   const productIds = [...new Set(
     (Array.isArray(req.body?.productIds) ? req.body.productIds : [])
@@ -782,7 +1108,7 @@ router.post("/pricelist/apply-remote", requireAdmin, async (req, res) => {
   res.json({ results });
 });
 
-router.post("/pricelist/export-google", requireAdmin, async (_req, res) => {
+router.post("/pricelist/export-google", requireAdminPermission("pricing_admin"), async (_req, res) => {
   try {
     const summary = await exportMasterPricelist({
       nodeEnv: process.env.NODE_ENV || "production",
@@ -844,7 +1170,7 @@ router.get("/recipes", requireAdmin, async (_req, res) => {
   res.json({ recipes: rows });
 });
 
-router.post("/localline/audit", requireAdmin, async (req, res) => {
+router.post("/localline/audit", requireAdminPermission("localline_pull"), async (req, res) => {
   try {
     const limit = Number(req.body?.limit);
     const concurrency = Number(req.body?.concurrency);
@@ -869,7 +1195,7 @@ router.post("/localline/audit", requireAdmin, async (req, res) => {
   }
 });
 
-router.post("/localline/apply", requireAdmin, async (req, res) => {
+router.post("/localline/apply", requireAdminPermission("localline_pull"), async (req, res) => {
   try {
     const limit = Number(req.body?.limit);
     const concurrency = Number(req.body?.concurrency);
@@ -925,9 +1251,9 @@ async function handleLocalLineFullSync(req, res) {
   }
 }
 
-router.post("/localline/full-sync", requireAdmin, handleLocalLineFullSync);
-router.post("/localline/cache-sync", requireAdmin, handleLocalLineFullSync);
-router.post("/localline/products-sync", requireAdmin, handleLocalLineFullSync);
+router.post("/localline/full-sync", requireAdminPermission("localline_pull"), handleLocalLineFullSync);
+router.post("/localline/cache-sync", requireAdminPermission("localline_pull"), handleLocalLineFullSync);
+router.post("/localline/products-sync", requireAdminPermission("localline_pull"), handleLocalLineFullSync);
 router.get("/localline/full-sync", requireAdmin, (_req, res) => {
   const job = getLatestLocalLineFullSyncJob();
   if (!job) {
@@ -943,14 +1269,14 @@ router.get("/localline/full-sync/:jobId", requireAdmin, (req, res) => {
   return res.json({ job });
 });
 
-router.post("/categories", requireAdmin, async (req, res) => {
+router.post("/categories", requireAdminPermission("admin"), async (req, res) => {
   const db = getDb();
   const payload = req.body || {};
   await db.insert(categories).values({ name: payload.name });
   res.json({ ok: true });
 });
 
-router.post("/vendors", requireAdmin, async (req, res) => {
+router.post("/vendors", requireAdminPermission("admin"), async (req, res) => {
   const db = getDb();
   const payload = req.body || {};
   await db.insert(vendors).values({
@@ -961,7 +1287,7 @@ router.post("/vendors", requireAdmin, async (req, res) => {
   res.json({ ok: true });
 });
 
-router.put("/vendors/:id", requireAdmin, async (req, res) => {
+router.put("/vendors/:id", requireAdminPermission("admin"), async (req, res) => {
   const db = getDb();
   const id = Number(req.params.id);
   const payload = req.body || {};
@@ -978,7 +1304,7 @@ router.put("/vendors/:id", requireAdmin, async (req, res) => {
   res.json({ ok: true });
 });
 
-router.post("/drop-sites", requireAdmin, async (req, res) => {
+router.post("/drop-sites", requireAdminPermission("dropsite_admin"), async (req, res) => {
   const db = getDb();
   const payload = req.body || {};
   await db.insert(dropSites).values({
@@ -994,7 +1320,7 @@ router.post("/drop-sites", requireAdmin, async (req, res) => {
   res.json({ ok: true });
 });
 
-router.put("/drop-sites/:id", requireAdmin, async (req, res) => {
+router.put("/drop-sites/:id", requireAdminPermission("dropsite_admin"), async (req, res) => {
   const db = getDb();
   const id = Number(req.params.id);
   const payload = req.body || {};
@@ -1013,7 +1339,7 @@ router.put("/drop-sites/:id", requireAdmin, async (req, res) => {
   res.json({ ok: true });
 });
 
-router.put("/reviews/:id", requireAdmin, async (req, res) => {
+router.put("/reviews/:id", requireAdminPermission("member_admin"), async (req, res) => {
   const db = getDb();
   const id = Number(req.params.id);
   const payload = req.body || {};
@@ -1030,7 +1356,7 @@ router.put("/reviews/:id", requireAdmin, async (req, res) => {
   res.json({ ok: true });
 });
 
-router.put("/products/:id", requireAdmin, async (req, res) => {
+router.put("/products/:id", requireAdminPermission(["inventory_admin", "pricing_admin", "membership_admin"]), async (req, res) => {
   const db = getDb();
   const id = Number(req.params.id);
   const updates = req.body || {};
@@ -1052,7 +1378,7 @@ router.put("/products/:id", requireAdmin, async (req, res) => {
   res.json({ ok: true });
 });
 
-router.post("/products/bulk-update", requireAdmin, async (req, res) => {
+router.post("/products/bulk-update", requireAdminPermission(["inventory_admin", "membership_admin"]), async (req, res) => {
   const db = getDb();
   const updates = Array.isArray(req.body?.updates) ? req.body.updates : [];
   const results = [];
@@ -1131,7 +1457,7 @@ router.post("/products/bulk-update", requireAdmin, async (req, res) => {
   res.json({ results });
 });
 
-router.put("/packages/:id", requireAdmin, async (req, res) => {
+router.put("/packages/:id", requireAdminPermission(["pricing_admin", "membership_admin"]), async (req, res) => {
   const db = getDb();
   const id = Number(req.params.id);
   const updates = req.body || {};
@@ -1149,7 +1475,7 @@ router.put("/packages/:id", requireAdmin, async (req, res) => {
   res.json({ ok: true });
 });
 
-router.post("/products/:id/images", requireAdmin, upload.single("image"), async (req, res) => {
+router.post("/products/:id/images", requireAdminPermission(["inventory_admin", "pricing_admin"]), upload.single("image"), async (req, res) => {
   const db = getDb();
   const productId = Number(req.params.id);
   if (!req.file) {
@@ -1206,7 +1532,7 @@ router.post("/products/:id/images", requireAdmin, upload.single("image"), async 
   res.json({ ok: true, url, thumbnailUrl });
 });
 
-router.post("/recipes", requireAdmin, async (req, res) => {
+router.post("/recipes", requireAdminPermission("admin"), async (req, res) => {
   const db = getDb();
   const payload = req.body || {};
   await db.insert(recipes).values({
@@ -1223,7 +1549,7 @@ router.post("/recipes", requireAdmin, async (req, res) => {
   res.json({ ok: true });
 });
 
-router.put("/recipes/:id", requireAdmin, async (req, res) => {
+router.put("/recipes/:id", requireAdminPermission("admin"), async (req, res) => {
   const db = getDb();
   const id = Number(req.params.id);
   const payload = req.body || {};

@@ -16,6 +16,12 @@ API location
 
 Admin panel
 - Visit `/#/admin` to log in as an admin.
+- Backend admin access is local to this app. Full admins can use the admin `Users` section to add backend users and assign one or more roles: `admin`, `user_admin`, `inventory_admin`, `pricing_admin`, `localline_pull`, `localline_push`, `dropsite_admin`, `membership_admin`, and `member_admin`.
+- Timesheets identity is not currently the CSA Store permission authority. Optional Timesheets user/employee ids are reserved for future linking only.
+- Admin login uses a unique `username`. Password reset email is stored separately and can be shared by multiple users, for example `deckfamilyfarm@gmail.com`.
+- Admin user setup and recovery use password reset emails. Creating a backend user sends a one-time setup link to that user's reset email instead of requiring an admin-entered password; existing users can be sent reset links from the `Users` screen or from login forgot-password by username.
+- Signed-in admins can also change their own password directly in the `Users` screen with `Change My Password`, which requires their current password and does not send email.
+- Password email delivery uses `SMTP_HOST`/`SMTP_PORT`/`SMTP_USER`/`SMTP_PASS`, Gmail-style `EMAIL_USER`/`EMAIL_PASS`, or the local `MAIL_USER`/`MAIL_ACCESS` pair. Set `PUBLIC_APP_BASE_URL` or `FRONTEND_BASE_URL` so emailed links point to the storefront host.
 
 Run locally (dev)
 1) `npm install`

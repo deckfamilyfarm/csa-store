@@ -16,6 +16,8 @@ import {
   fetchCatalog,
   fetchMe,
   fetchMyReviews,
+  requestPasswordReset,
+  resetPasswordWithToken,
   submitReview,
   updateReview,
   userLogin
@@ -37,7 +39,22 @@ export function Storefront() {
   const [userToken, setUserToken] = useState(() => localStorage.getItem("userToken") || "");
   const [user, setUser] = useState(null);
   const [loginOpen, setLoginOpen] = useState(false);
-  const [loginState, setLoginState] = useState({ email: "", password: "", error: "" });
+  const [loginState, setLoginState] = useState({ username: "", password: "", error: "" });
+  const [loginMode, setLoginMode] = useState("login");
+  const [forgotState, setForgotState] = useState({
+    username: "",
+    message: "",
+    error: "",
+    submitting: false
+  });
+  const [resetToken, setResetToken] = useState("");
+  const [resetState, setResetState] = useState({
+    password: "",
+    confirm: "",
+    message: "",
+    error: "",
+    submitting: false
+  });
   const [showPassword, setShowPassword] = useState(false);
   const [view, setView] = useState("home");
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -80,7 +97,10 @@ export function Storefront() {
   function getHashRoute() {
     const raw = window.location.hash.replace(/^#\/?/, "").trim();
     if (!raw) return null;
-    if (raw === "admin" || raw === "account" || raw === "home") return raw;
+    const route = raw.split("?")[0];
+    if (route === "admin" || route === "account" || route === "home" || route === "reset-password") {
+      return route;
+    }
     return null;
   }
 
@@ -89,6 +109,13 @@ export function Storefront() {
       const route = getHashRoute();
       if (route === "admin") {
         setView("admin");
+        return;
+      }
+      if (route === "reset-password") {
+        const query = window.location.hash.split("?")[1] || "";
+        const params = new URLSearchParams(query);
+        setResetToken(params.get("token") || "");
+        setView("resetPassword");
         return;
       }
       setView(route === "account" ? "account" : "home");
@@ -135,6 +162,7 @@ export function Storefront() {
 
   const isAccountView = view === "account";
   const isAdminView = view === "admin";
+  const isResetPasswordView = view === "resetPassword";
   const activeCategory = catalog.categories.find(
     (category) => String(category.id) === String(selectedCategory)
   );
@@ -331,12 +359,12 @@ export function Storefront() {
     event.preventDefault();
     setLoginState((prev) => ({ ...prev, error: "" }));
     try {
-      const result = await userLogin(loginState.email, loginState.password);
+      const result = await userLogin(loginState.username, loginState.password);
       localStorage.setItem("userToken", result.token);
       setUserToken(result.token);
       setUser(result.user || null);
       setLoginOpen(false);
-      setLoginState({ email: "", password: "", error: "" });
+      setLoginState({ username: "", password: "", error: "" });
       const role = result.user?.role;
       if (role === "administrator" || role === "admin") {
         localStorage.setItem("adminToken", result.token);
@@ -346,6 +374,52 @@ export function Storefront() {
       }
     } catch (err) {
       setLoginState((prev) => ({ ...prev, error: "Invalid login" }));
+    }
+  }
+
+  async function handleForgotPassword(event) {
+    event.preventDefault();
+    setForgotState((prev) => ({ ...prev, submitting: true, error: "", message: "" }));
+    try {
+      await requestPasswordReset(forgotState.username || loginState.username);
+      setForgotState((prev) => ({
+        ...prev,
+        submitting: false,
+        message: "If that username matches an active user with a reset email, a reset email has been sent."
+      }));
+    } catch (err) {
+      setForgotState((prev) => ({
+        ...prev,
+        submitting: false,
+        error: err?.message || "Unable to request password reset."
+      }));
+    }
+  }
+
+  async function handleResetPassword(event) {
+    event.preventDefault();
+    if (resetState.password !== resetState.confirm) {
+      setResetState((prev) => ({ ...prev, error: "Passwords do not match.", message: "" }));
+      return;
+    }
+    setResetState((prev) => ({ ...prev, submitting: true, error: "", message: "" }));
+    try {
+      await resetPasswordWithToken(resetToken, resetState.password);
+      setResetState({
+        password: "",
+        confirm: "",
+        submitting: false,
+        error: "",
+        message: "Password set. You can sign in now."
+      });
+      setLoginMode("login");
+      setLoginOpen(true);
+    } catch (err) {
+      setResetState((prev) => ({
+        ...prev,
+        submitting: false,
+        error: err?.message || "Unable to reset password."
+      }));
     }
   }
 
@@ -392,6 +466,38 @@ export function Storefront() {
         </div>
         {isAdminView ? (
           <AdminPanel onCatalogRefresh={reloadCatalog} />
+        ) : isResetPasswordView ? (
+          <section className="section tight">
+            <div className="container reset-password-panel">
+              <div className="eyebrow">Account access</div>
+              <h2 className="h2">Set Password</h2>
+              <form className="admin-form" onSubmit={handleResetPassword}>
+                <input
+                  className="input"
+                  placeholder="New password"
+                  type="password"
+                  value={resetState.password}
+                  onChange={(event) =>
+                    setResetState((prev) => ({ ...prev, password: event.target.value }))
+                  }
+                />
+                <input
+                  className="input"
+                  placeholder="Confirm password"
+                  type="password"
+                  value={resetState.confirm}
+                  onChange={(event) =>
+                    setResetState((prev) => ({ ...prev, confirm: event.target.value }))
+                  }
+                />
+                {resetState.error ? <div className="small">{resetState.error}</div> : null}
+                {resetState.message ? <div className="small">{resetState.message}</div> : null}
+                <button className="button" type="submit" disabled={resetState.submitting || !resetToken}>
+                  {resetState.submitting ? "Setting..." : "Set password"}
+                </button>
+              </form>
+            </div>
+          </section>
         ) : isAccountView ? (
           <AccountPanelSection accountPanel={accountPanel} dropSite={dropSite} />
         ) : (
@@ -511,38 +617,81 @@ export function Storefront() {
             <div className="modal-body single">
               <div>
                 <div className="eyebrow">Member access</div>
-                <h2 className="h2">Log in</h2>
-                <form className="admin-form" onSubmit={handleLogin}>
-                  <input
-                    className="input"
-                    placeholder="Email"
-                    value={loginState.email}
-                    onChange={(event) =>
-                      setLoginState((prev) => ({ ...prev, email: event.target.value }))
-                    }
-                  />
-                  <input
-                    className="input"
-                    placeholder="Password"
-                    type={showPassword ? "text" : "password"}
-                    value={loginState.password}
-                    onChange={(event) =>
-                      setLoginState((prev) => ({ ...prev, password: event.target.value }))
-                    }
-                  />
-                  <label className="filter-toggle">
-                    <input
-                      type="checkbox"
-                      checked={showPassword}
-                      onChange={(event) => setShowPassword(event.target.checked)}
-                    />
-                    <span>Show password</span>
-                  </label>
-                  {loginState.error && <div className="small">{loginState.error}</div>}
-                  <button className="button" type="submit">
-                    Sign in
-                  </button>
-                </form>
+                {loginMode === "forgot" ? (
+                  <>
+                    <h2 className="h2">Reset password</h2>
+                    <form className="admin-form" onSubmit={handleForgotPassword}>
+                      <input
+                        className="input"
+                        placeholder="Username"
+                        value={forgotState.username}
+                        onChange={(event) =>
+                          setForgotState((prev) => ({ ...prev, username: event.target.value }))
+                        }
+                      />
+                      {forgotState.error && <div className="small">{forgotState.error}</div>}
+                      {forgotState.message && <div className="small">{forgotState.message}</div>}
+                      <button className="button" type="submit" disabled={forgotState.submitting}>
+                        {forgotState.submitting ? "Sending..." : "Send reset email"}
+                      </button>
+                      <button
+                        className="button alt"
+                        type="button"
+                        onClick={() => setLoginMode("login")}
+                      >
+                        Back to sign in
+                      </button>
+                    </form>
+                  </>
+                ) : (
+                  <>
+                    <h2 className="h2">Log in</h2>
+                    <form className="admin-form" onSubmit={handleLogin}>
+                      <input
+                        className="input"
+                        placeholder="Username"
+                        value={loginState.username}
+                        onChange={(event) =>
+                          setLoginState((prev) => ({ ...prev, username: event.target.value }))
+                        }
+                      />
+                      <input
+                        className="input"
+                        placeholder="Password"
+                        type={showPassword ? "text" : "password"}
+                        value={loginState.password}
+                        onChange={(event) =>
+                          setLoginState((prev) => ({ ...prev, password: event.target.value }))
+                        }
+                      />
+                      <label className="filter-toggle">
+                        <input
+                          type="checkbox"
+                          checked={showPassword}
+                          onChange={(event) => setShowPassword(event.target.checked)}
+                        />
+                        <span>Show password</span>
+                      </label>
+                      {loginState.error && <div className="small">{loginState.error}</div>}
+                      <button className="button" type="submit">
+                        Sign in
+                      </button>
+                      <button
+                        className="button alt"
+                        type="button"
+                        onClick={() => {
+                          setForgotState((prev) => ({
+                            ...prev,
+                            username: prev.username || loginState.username
+                          }));
+                          setLoginMode("forgot");
+                        }}
+                      >
+                        Forgot password
+                      </button>
+                    </form>
+                  </>
+                )}
               </div>
             </div>
           </div>
