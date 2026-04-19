@@ -4,6 +4,7 @@ dist/
 coverage/
 .env
 .env.*
+deckfamilyfarm-e5800eeebb36.json
 .DS_Store
 Thumbs.db
 *.log

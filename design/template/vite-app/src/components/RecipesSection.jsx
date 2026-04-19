@@ -14,9 +14,9 @@ export function RecipesSection({ recipes, onSelect }) {
               type="button"
               onClick={() => onSelect?.(recipe)}
             >
-              {recipe.image && (
+              {(recipe.imageUrl || recipe.image) && (
                 <div className="recipe-image">
-                  <img src={recipe.image} alt={recipe.title} loading="lazy" />
+                  <img src={recipe.imageUrl || recipe.image} alt={recipe.title} loading="lazy" />
                 </div>
               )}
               <strong>{recipe.title}</strong>

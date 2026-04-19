@@ -13,19 +13,21 @@ export function ProductGrid({
   sectionRef,
   eyebrow = "Featured this cycle",
   title = "Fresh cuts and staples ready to ship or pickup.",
+  embedded = false,
+  getPrice
 }) {
-  return (
-    <section className="section" id="product-grid" ref={sectionRef}>
-      <div className="container">
-        <div className="eyebrow">{eyebrow}</div>
-        <h2 className="h2">{title}</h2>
-        {filterLabel && <div className="small">Showing: {filterLabel}</div>}
-        {products.length === 0 ? (
-          <div className="card pad">
-            <strong>No products in this category yet.</strong>
-            <div className="small">Try another category or check back soon.</div>
-          </div>
-        ) : (
+  const priceFor = (product) => (getPrice ? getPrice(product) : product.price);
+  const content = (
+    <>
+      <div className="eyebrow">{eyebrow}</div>
+      <h2 className="h2">{title}</h2>
+      {filterLabel && <div className="small">Showing: {filterLabel}</div>}
+      {products.length === 0 ? (
+        <div className="card pad">
+          <strong>No products in this category yet.</strong>
+          <div className="small">Try another category or check back soon.</div>
+        </div>
+      ) : (
         <div className="grid four">
           {products.map((product) => (
             <div key={product.name} className="product-card">
@@ -34,19 +36,23 @@ export function ProductGrid({
                 type="button"
                 onClick={() => onSelect?.(product)}
               >
-                <img src={product.image} alt={product.name} loading="lazy" />
+                <img
+                  src={product.thumbnailUrl || product.imageUrl || product.image}
+                  alt={product.name}
+                  loading="lazy"
+                />
               </button>
               <strong>{product.name}</strong>
               <div className="small">{product.note}</div>
-              <div className="price">{product.price}</div>
-              <div className="small">
-                {renderStars(product.rating)} {product.rating || 0}/5
-              </div>
-              <div className="small">
-                {product.reviews && product.reviews.length > 0
-                  ? `${product.reviews.length} review(s)`
-                  : "No reviews yet"}
-              </div>
+              <div className="price">{priceFor(product) ? `$${priceFor(product)}` : "Price TBD"}</div>
+              {product.reviews && product.reviews.length > 0 ? (
+                <div className="small">
+                  {renderStars(product.rating)} {product.rating || 0}/5 ·{" "}
+                  {product.reviews.length} review(s)
+                </div>
+              ) : (
+                <div className="small">No reviews yet</div>
+              )}
               <button className="button alt" type="button" onClick={() => onSelect?.(product)}>
                 View details
               </button>
@@ -58,8 +64,21 @@ export function ProductGrid({
             </div>
           ))}
         </div>
-        )}
+      )}
+    </>
+  );
+
+  if (embedded) {
+    return (
+      <div className="product-grid" id="product-grid" ref={sectionRef}>
+        {content}
       </div>
+    );
+  }
+
+  return (
+    <section className="section" id="product-grid" ref={sectionRef}>
+      <div className="container">{content}</div>
     </section>
   );
 }

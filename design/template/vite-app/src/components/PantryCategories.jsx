@@ -1,4 +1,5 @@
 import React from "react";
+import { getCategoryMeta } from "../categoryMeta.js";
 
 export function PantryCategories({ categories, selectedKey, onSelect }) {
   return (
@@ -7,25 +8,27 @@ export function PantryCategories({ categories, selectedKey, onSelect }) {
         <div className="eyebrow">Shop by pantry</div>
         <h2 className="h2">Browse by Category</h2>
         <div className="grid four">
-          {categories.map((category) => (
+          {categories.map((category) => {
+            const meta = getCategoryMeta(category.name);
+            return (
             <button
-              key={category.title}
+              key={category.id}
               className={`category-tile button-reset ${
-                selectedKey === category.key ? "selected" : ""
+                selectedKey === category.id ? "selected" : ""
               }`}
               type="button"
-              onClick={() => onSelect?.(category.key)}
+              onClick={() => onSelect?.(category.id)}
             >
-              {category.image && (
+              {meta.image && (
                 <div className="category-image">
-                  <img src={category.image} alt={category.title} loading="lazy" />
+                  <img src={meta.image} alt={category.name} loading="lazy" />
                 </div>
               )}
-              <div className="icon">{category.icon}</div>
-              <strong>{category.title}</strong>
-              <span className="small">{category.note}</span>
+              <div className="icon">{meta.icon}</div>
+              <strong>{category.name}</strong>
+              <span className="small">{meta.note}</span>
             </button>
-          ))}
+          );})}
         </div>
       </div>
     </section>

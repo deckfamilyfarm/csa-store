@@ -6,6 +6,12 @@ export default defineConfig({
   server: {
     port: 5176,
     host: true,
+    proxy: {
+      "/api": {
+        target: "http://127.0.0.1:5177",
+        changeOrigin: true
+      }
+    }
   },
   preview: {
     port: 5176,
