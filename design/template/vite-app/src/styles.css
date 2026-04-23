@@ -181,21 +181,22 @@ img {
 
 .button:disabled,
 .button[disabled] {
-  background: #b8aea1;
+  background: #b1a89b;
   color: rgba(255, 255, 255, 0.82);
-  border-color: #b8aea1;
+  border-color: #b1a89b;
   box-shadow: none;
   cursor: not-allowed;
-  opacity: 0.65;
+  opacity: 0.78;
   filter: none;
 }
 
 .button.alt:disabled,
 .button.alt[disabled] {
-  background: transparent;
-  color: #b8aea1;
-  border-color: #c8beb1;
+  background: #ece5db;
+  color: #8b8174;
+  border-color: #d7cdc0;
   box-shadow: none;
+  opacity: 0.9;
 }
 
 .button:disabled:hover,
@@ -1209,6 +1210,30 @@ img {
   white-space: nowrap;
 }
 
+.admin-help-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fffaf0;
+}
+
+.admin-help-banner-copy {
+  display: grid;
+  gap: 4px;
+  min-width: min(100%, 320px);
+}
+
+.admin-help-banner-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .pricelist-column-picker {
   position: relative;
 }
@@ -1416,6 +1441,10 @@ img {
   background: rgba(80, 104, 59, 0.12);
 }
 
+.pricelist-row-processing {
+  opacity: 0.68;
+}
+
 .admin-thumb {
   width: 140px;
   height: 140px;
@@ -1473,6 +1502,98 @@ img {
 
 .admin-fields .textarea {
   min-height: 180px;
+}
+
+.admin-manual-section {
+  display: grid;
+  gap: 16px;
+}
+
+.admin-manual-hero {
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: linear-gradient(180deg, #fffaf0 0%, #ffffff 100%);
+}
+
+.admin-manual-hero h3,
+.admin-manual-card h4 {
+  margin: 0;
+}
+
+.admin-manual-hero p,
+.admin-manual-card p {
+  margin: 0;
+}
+
+.admin-manual-topic-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-manual-summary-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.admin-manual-summary-card {
+  display: grid;
+  gap: 8px;
+}
+
+.admin-manual-summary-card p {
+  margin: 0;
+}
+
+.admin-manual-card {
+  display: grid;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: #fff;
+}
+
+.admin-manual-list {
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 8px;
+}
+
+.admin-manual-numbered {
+  padding-left: 24px;
+}
+
+.admin-manual-note {
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #f7f2e8;
+}
+
+.admin-manual-callout,
+.admin-source-pricing-callout {
+  display: grid;
+  gap: 10px;
+  padding: 16px 18px;
+  border: 1px solid rgba(143, 46, 43, 0.18);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(143, 46, 43, 0.06) 0%, rgba(247, 242, 232, 0.9) 100%);
+}
+
+.admin-manual-callout p {
+  margin: 0;
+}
+
+.admin-source-pricing-steps {
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 8px;
 }
 
 .admin-editor {

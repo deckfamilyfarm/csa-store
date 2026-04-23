@@ -1,9 +1,11 @@
 ﻿import React, { useEffect, useRef, useState } from "react";
 import { AdminInventorySection } from "./AdminInventorySection.jsx";
+import { AdminManualSection } from "./AdminManualSection.jsx";
 import { AdminMembershipSection } from "./AdminMembershipSection.jsx";
 import { AdminPriceListSection } from "./AdminPriceListSection.jsx";
 import { AdminUsersSection } from "./AdminUsersSection.jsx";
 import {
+  adminDelete,
   adminGet,
   adminLogin,
   adminPost,
@@ -25,6 +27,8 @@ function canAccessAdminSection(roleKeys, section) {
         roleKeys.includes("localline_pull") ||
         roleKeys.includes("localline_push")
       );
+    case "manual":
+      return Array.isArray(roleKeys) && roleKeys.length > 0;
     case "inventory":
       return roleKeys.includes("inventory_admin");
     case "membership":
@@ -59,6 +63,165 @@ function getDefaultAdminSection(roleKeys = []) {
   return order.find((section) => canAccessAdminSection(roleKeys, section)) || "inventory";
 }
 
+function createDraftPackage(overrides = {}) {
+  return {
+    id: overrides.id ?? null,
+    name: overrides.name || "ea",
+    price:
+      overrides.price === null || typeof overrides.price === "undefined"
+        ? ""
+        : String(overrides.price),
+    packageCode: overrides.packageCode || "",
+    unit: overrides.unit || "",
+    numOfItems:
+      overrides.numOfItems === null || typeof overrides.numOfItems === "undefined"
+        ? 1
+        : Number(overrides.numOfItems) || 1,
+    visible: typeof overrides.visible === "boolean" ? overrides.visible : true,
+    trackInventory: typeof overrides.trackInventory === "boolean" ? overrides.trackInventory : false,
+    inventory:
+      overrides.inventory === null || typeof overrides.inventory === "undefined"
+        ? 0
+        : Number(overrides.inventory) || 0,
+    trackType: overrides.trackType || "package",
+    chargeType: overrides.chargeType || "package"
+  };
+}
+
+function toNumber(value) {
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? numeric : null;
+}
+
+function roundCurrency(value) {
+  return Number(Number(value).toFixed(2));
+}
+
+function computeDraftAverageWeight(draft) {
+  const overrideWeight = toNumber(draft?.avgWeightOverride);
+  if (overrideWeight !== null && overrideWeight > 0) return Number(overrideWeight.toFixed(3));
+
+  const minWeight = toNumber(draft?.minWeight);
+  const maxWeight = toNumber(draft?.maxWeight);
+  if (minWeight !== null && maxWeight !== null) {
+    return Number((((minWeight + maxWeight) / 2)).toFixed(3));
+  }
+  if (minWeight !== null) return Number(minWeight.toFixed(3));
+  if (maxWeight !== null) return Number(maxWeight.toFixed(3));
+  return null;
+}
+
+function computeDraftPackagePrice(draft, pkg) {
+  const sourceUnitPrice = toNumber(draft?.sourceUnitPrice);
+  const sourceMultiplier = toNumber(draft?.sourceMultiplier);
+  if (sourceUnitPrice === null || sourceMultiplier === null) return null;
+
+  if (draft?.unitOfMeasure === "lbs") {
+    const averageWeight = computeDraftAverageWeight(draft);
+    if (averageWeight === null || averageWeight <= 0) return null;
+    return roundCurrency(sourceUnitPrice * averageWeight * sourceMultiplier);
+  }
+
+  const quantity = Math.max(toNumber(pkg?.numOfItems) || 1, 1);
+  return roundCurrency(sourceUnitPrice * quantity * sourceMultiplier);
+}
+
+function buildProductDraftFromProduct(product, sanitizeHtml) {
+  return {
+    name: product?.name || "",
+    description: sanitizeHtml(product?.description || ""),
+    vendorId: product?.vendorId ? String(product.vendorId) : "",
+    categoryId: product?.categoryId ? String(product.categoryId) : "",
+    visible: Boolean(product?.visible),
+    trackInventory: Boolean(product?.trackInventory),
+    inventory: Number(product?.inventory) || 0,
+    unitOfMeasure:
+      String(product?.pricingProfile?.unitOfMeasure || "each").toLowerCase() === "lbs"
+        ? "lbs"
+        : "each",
+    sourceUnitPrice:
+      product?.pricingProfile?.sourceUnitPrice === null ||
+      typeof product?.pricingProfile?.sourceUnitPrice === "undefined"
+        ? ""
+        : String(product.pricingProfile.sourceUnitPrice),
+    minWeight:
+      product?.pricingProfile?.minWeight === null ||
+      typeof product?.pricingProfile?.minWeight === "undefined"
+        ? ""
+        : String(product.pricingProfile.minWeight),
+    maxWeight:
+      product?.pricingProfile?.maxWeight === null ||
+      typeof product?.pricingProfile?.maxWeight === "undefined"
+        ? ""
+        : String(product.pricingProfile.maxWeight),
+    avgWeightOverride:
+      product?.pricingProfile?.avgWeightOverride === null ||
+      typeof product?.pricingProfile?.avgWeightOverride === "undefined"
+        ? ""
+        : String(product.pricingProfile.avgWeightOverride),
+    sourceMultiplier:
+      product?.pricingProfile?.sourceMultiplier === null ||
+      typeof product?.pricingProfile?.sourceMultiplier === "undefined"
+        ? "0.5412"
+        : String(product.pricingProfile.sourceMultiplier),
+    onSale: Boolean(product?.onSale),
+    saleDiscount: Math.round((Number(product?.saleDiscount) || 0) * 100),
+    packages: (product?.packages || []).map((pkg) =>
+      createDraftPackage({
+        id: pkg.id,
+        name: pkg.name || "ea",
+        price: pkg.price,
+        packageCode: pkg.packageCode,
+        unit: pkg.unit,
+        numOfItems: pkg.numOfItems,
+        visible: pkg.visible === null || typeof pkg.visible === "undefined" ? true : Boolean(pkg.visible),
+        trackInventory: Boolean(pkg.trackInventory),
+        inventory: pkg.inventory,
+        trackType: pkg.trackType,
+        chargeType: pkg.chargeType
+      })
+    )
+  };
+}
+
+function createEmptyProductDraft() {
+  return {
+    name: "",
+    description: "",
+    vendorId: "",
+    categoryId: "",
+    visible: true,
+    trackInventory: false,
+    inventory: 0,
+    unitOfMeasure: "each",
+    sourceUnitPrice: "",
+    minWeight: "",
+    maxWeight: "",
+    avgWeightOverride: "",
+    sourceMultiplier: "0.5412",
+    onSale: false,
+    saleDiscount: 0,
+    packages: [createDraftPackage()]
+  };
+}
+
+function hasLinkedLocalLineProduct(meta) {
+  return Number(meta?.localLineProductId) > 0;
+}
+
+function normalizeVendorName(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function isSourcePricingVendorName(value) {
+  const normalized = normalizeVendorName(value);
+  return (
+    normalized.includes("deck family farm") ||
+    normalized.includes("hyland") ||
+    normalized.includes("creamy cow")
+  );
+}
+
 export function AdminPanel({ onCatalogRefresh }) {
   const [token, setToken] = useState(() => localStorage.getItem("adminToken") || "");
   const [currentAdmin, setCurrentAdmin] = useState(null);
@@ -72,8 +235,14 @@ export function AdminPanel({ onCatalogRefresh }) {
   });
   const [loading, setLoading] = useState(false);
   const [activeSection, setActiveSection] = useState("pricelist");
+  const [manualFocusTopic, setManualFocusTopic] = useState("overview");
   const [selectedProductId, setSelectedProductId] = useState(null);
+  const [productEditorMode, setProductEditorMode] = useState("existing");
   const [productDraft, setProductDraft] = useState(null);
+  const [productSaveLoading, setProductSaveLoading] = useState(false);
+  const [productDeleteLoading, setProductDeleteLoading] = useState(false);
+  const [pushToLocalLineOnSave, setPushToLocalLineOnSave] = useState(false);
+  const [pushProductLoading, setPushProductLoading] = useState(false);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [vendors, setVendors] = useState([]);
@@ -160,6 +329,7 @@ export function AdminPanel({ onCatalogRefresh }) {
       const roleKeys = admin?.adminRoles || [];
       if (!canAccessAdminSection(roleKeys, activeSection)) {
         setActiveSection(getDefaultAdminSection(roleKeys));
+        setProductEditorMode("existing");
         setSelectedProductId(null);
       }
     } catch (_error) {
@@ -220,20 +390,57 @@ export function AdminPanel({ onCatalogRefresh }) {
   }, [token, localLineCacheState.jobId, localLineCacheState.data?.status]);
 
   useEffect(() => {
+    if (productEditorMode === "new") {
+      return;
+    }
     if (activeProduct) {
-      setProductDraft({
-        name: activeProduct.name || "",
-        description: sanitizeHtml(activeProduct.description || ""),
-        vendorId: activeProduct.vendorId ? String(activeProduct.vendorId) : "",
-        categoryId: activeProduct.categoryId ? String(activeProduct.categoryId) : "",
-        visible: Boolean(activeProduct.visible),
-        onSale: Boolean(activeProduct.onSale),
-        saleDiscount: Math.round((Number(activeProduct.saleDiscount) || 0) * 100)
-      });
+      setProductDraft(buildProductDraftFromProduct(activeProduct, sanitizeHtml));
+      setPushToLocalLineOnSave(false);
     } else {
       setProductDraft(null);
     }
-  }, [activeProduct]);
+  }, [activeProduct, productEditorMode]);
+
+  useEffect(() => {
+    const draftUsesSourcePricing = isSourcePricingVendorName(
+      vendors.find((vendor) => String(vendor.id) === String(productDraft?.vendorId || ""))?.name
+    );
+
+    if (!productDraft || !draftUsesSourcePricing) {
+      return;
+    }
+
+    setProductDraft((prev) => {
+      if (!prev) return prev;
+      let changed = false;
+      const nextPackages = (prev.packages || []).map((pkg) => {
+        const computedPrice = computeDraftPackagePrice(prev, pkg);
+        if (computedPrice === null) return pkg;
+        const nextPrice = computedPrice.toFixed(2);
+        if (String(pkg.price ?? "") === nextPrice) return pkg;
+        changed = true;
+        return {
+          ...pkg,
+          price: nextPrice
+        };
+      });
+
+      if (!changed) return prev;
+      return {
+        ...prev,
+        packages: nextPackages
+      };
+    });
+  }, [
+    productDraft,
+    vendors,
+    productDraft?.unitOfMeasure,
+    productDraft?.sourceUnitPrice,
+    productDraft?.minWeight,
+    productDraft?.maxWeight,
+    productDraft?.avgWeightOverride,
+    productDraft?.sourceMultiplier
+  ]);
 
   useEffect(() => {
     if (!token || !selectedProductId) {
@@ -341,6 +548,7 @@ export function AdminPanel({ onCatalogRefresh }) {
       const admin = result.user || null;
       setCurrentAdmin(admin);
       setActiveSection(getDefaultAdminSection(admin?.adminRoles || []));
+      setProductEditorMode("existing");
       setSelectedProductId(null);
       setToken(result.token);
     } catch (err) {
@@ -379,33 +587,243 @@ export function AdminPanel({ onCatalogRefresh }) {
     }
   }
 
-  async function handlePackageUpdate(packageId, value) {
+  function startNewProductDraft() {
+    setProductEditorMode("new");
+    setSelectedProductId(null);
+    setLocalLineProductDetail(null);
+    setPriceListEntryDrafts([]);
+    setProductDeleteLoading(false);
+    setPushToLocalLineOnSave(false);
+    setProductDraft(createEmptyProductDraft());
+  }
+
+  function closeProductEditor() {
+    setProductEditorMode("existing");
+    setSelectedProductId(null);
+    setLocalLineProductDetail(null);
+    setPriceListEntryDrafts([]);
+    setProductDeleteLoading(false);
+    setPushToLocalLineOnSave(false);
+    setProductDraft(null);
+  }
+
+  function openAdminManual(topic = "overview") {
+    setManualFocusTopic(topic);
+    closeProductEditor();
+    setActiveSection("manual");
+  }
+
+  function updateDraftPackage(index, patch) {
+    setProductDraft((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        packages: prev.packages.map((pkg, pkgIndex) =>
+          pkgIndex === index ? { ...pkg, ...patch } : pkg
+        )
+      };
+    });
+  }
+
+  function addDraftPackage() {
+    setProductDraft((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        packages: [...prev.packages, createDraftPackage({ name: `Package ${prev.packages.length + 1}` })]
+      };
+    });
+  }
+
+  function removeDraftPackage(index) {
+    setProductDraft((prev) => {
+      if (!prev || prev.packages.length <= 1) return prev;
+      return {
+        ...prev,
+        packages: prev.packages.filter((_, pkgIndex) => pkgIndex !== index)
+      };
+    });
+  }
+
+  function normalizeDraftPackagesForSubmit() {
+    return (productDraft?.packages || [])
+      .map((pkg) => ({
+        id: pkg.id,
+        name: String(pkg.name || "").trim() || "ea",
+        price: Number(pkg.price),
+        packageCode: String(pkg.packageCode || "").trim(),
+        unit: String(pkg.unit || "").trim(),
+        numOfItems: Number(pkg.numOfItems) || 1,
+        visible: Boolean(pkg.visible),
+        trackInventory: Boolean(pkg.trackInventory),
+        inventory: Number(pkg.inventory) || 0,
+        trackType: pkg.trackType || "package",
+        chargeType: pkg.chargeType || "package"
+      }))
+      .filter((pkg) => Number.isFinite(pkg.price));
+  }
+
+  function buildSourcePricingPayloadFromDraft() {
+    return {
+      unitOfMeasure: productDraft?.unitOfMeasure === "lbs" ? "lbs" : "each",
+      sourceUnitPrice:
+        productDraft?.sourceUnitPrice === "" ? null : Number(productDraft?.sourceUnitPrice),
+      minWeight:
+        productDraft?.minWeight === "" ? null : Number(productDraft?.minWeight),
+      maxWeight:
+        productDraft?.maxWeight === "" ? null : Number(productDraft?.maxWeight),
+      avgWeightOverride:
+        productDraft?.avgWeightOverride === "" ? null : Number(productDraft?.avgWeightOverride),
+      sourceMultiplier:
+        productDraft?.sourceMultiplier === "" ? null : Number(productDraft?.sourceMultiplier)
+    };
+  }
+
+  async function handlePackageUpdate(packageId, values) {
     setMessage("");
     try {
-      await adminPut(`packages/${packageId}`, token, { price: value });
-      setMessage("Package price updated.");
+      await adminPut(`packages/${packageId}`, token, values);
+      setMessage("Package updated.");
+    } catch (err) {
+      setMessage("Package update failed.");
+      throw err;
+    }
+  }
+
+  async function handlePushProductToLocalLine(productId) {
+    if (!productId) return;
+    setPushProductLoading(true);
+    setMessage("");
+    try {
+      await adminPost(`products/${productId}/push-to-localline`, token, {});
+      setMessage("Product pushed to Local Line.");
       await loadAll();
       await refreshCatalogFromAdmin();
     } catch (err) {
-      setMessage("Package update failed.");
+      setMessage(err?.message || "Local Line push failed.");
+    } finally {
+      setPushProductLoading(false);
+    }
+  }
+
+  async function handleDuplicateProduct(productId) {
+    setMessage("");
+    try {
+      const response = await adminPost(`products/${productId}/duplicate`, token, {});
+      await loadAll();
+      await refreshCatalogFromAdmin();
+      setProductEditorMode("existing");
+      setSelectedProductId(response.productId);
+      setMessage("Product duplicated.");
+    } catch (err) {
+      setMessage(err?.message || "Product duplicate failed.");
+    }
+  }
+
+  async function handleDeleteProduct(productId) {
+    if (!productId) return;
+    const confirmed = window.confirm(
+      "Delete this local-only product? This removes the product, packages, pricing profile, images, and local admin records."
+    );
+    if (!confirmed) return;
+
+    setProductDeleteLoading(true);
+    setMessage("");
+    try {
+      const response = await adminDelete(`products/${productId}`, token);
+      closeProductEditor();
+      await loadAll();
+      await refreshCatalogFromAdmin();
+      setMessage("Product deleted.");
+      return response;
+    } catch (err) {
+      setMessage(err?.message || "Product delete failed.");
+      throw err;
+    } finally {
+      setProductDeleteLoading(false);
     }
   }
 
   async function handleProductSave() {
-    if (!activeProduct || !productDraft) return;
+    if (!productDraft) return;
+    setProductSaveLoading(true);
     setMessage("");
     const vendorId = productDraft.vendorId ? Number(productDraft.vendorId) : null;
     const categoryId = productDraft.categoryId ? Number(productDraft.categoryId) : null;
+    const safeDiscount = Math.min(Math.max(Number(productDraft.saleDiscount) || 0, 0), 100);
+    const safeDescription = sanitizeHtml(productDraft.description);
+    const packagePayloads = normalizeDraftPackagesForSubmit();
+    const sourcePricingPayload = buildSourcePricingPayloadFromDraft();
+
+    if (selectedDraftUsesSourcePricing && !Number.isFinite(Number(sourcePricingPayload.sourceUnitPrice))) {
+      setMessage("DFF source price is required for Deck Family Farm, Hyland, and Creamy Cow products.");
+      setProductSaveLoading(false);
+      return;
+    }
+
     try {
-      const safeDescription = sanitizeHtml(productDraft.description);
+      if (productEditorMode === "new") {
+        const response = await adminPost("products", token, {
+          name: productDraft.name,
+          description: safeDescription,
+          vendorId,
+          categoryId,
+          visible: productDraft.visible,
+          trackInventory: productDraft.trackInventory,
+          inventory: Number(productDraft.inventory) || 0,
+          onSale: productDraft.onSale,
+          saleDiscount: safeDiscount / 100,
+          packages: packagePayloads,
+          pricingProfile: selectedDraftUsesSourcePricing ? sourcePricingPayload : null
+        });
+
+        const newProductId = response.productId;
+        if (pushToLocalLineOnSave) {
+          await adminPost(`products/${newProductId}/push-to-localline`, token, {});
+        }
+
+        await loadAll();
+        await refreshCatalogFromAdmin();
+        setProductEditorMode("existing");
+        setSelectedProductId(newProductId);
+        setPushToLocalLineOnSave(false);
+        setMessage(pushToLocalLineOnSave ? "Product created and pushed to Local Line." : "Product created.");
+        return;
+      }
+
+      if (!activeProduct) {
+        throw new Error("No active product selected");
+      }
+
       await adminPut(`products/${activeProduct.id}`, token, {
         name: productDraft.name,
         description: safeDescription,
         vendorId,
         categoryId,
-        visible: productDraft.visible ? 1 : 0
+        visible: productDraft.visible ? 1 : 0,
+        trackInventory: productDraft.trackInventory ? 1 : 0,
+        inventory: Number(productDraft.inventory) || 0
       });
-      const safeDiscount = Math.min(Math.max(Number(productDraft.saleDiscount) || 0, 0), 100);
+
+      await Promise.all(
+        packagePayloads
+          .filter((pkg) => Number.isFinite(Number(pkg.id)))
+          .map((pkg) =>
+            handlePackageUpdate(pkg.id, {
+              name: pkg.name,
+              price: pkg.price,
+              packageCode: pkg.packageCode || null,
+              unit: pkg.unit || null,
+              numOfItems: pkg.numOfItems,
+              visible: pkg.visible ? 1 : 0,
+              trackInventory: pkg.trackInventory ? 1 : 0,
+              inventory: pkg.inventory,
+              trackType: pkg.trackType,
+              chargeType: pkg.chargeType
+            })
+          )
+      );
+
       await adminPost("products/bulk-update", token, {
         updates: [
           {
@@ -417,11 +835,26 @@ export function AdminPanel({ onCatalogRefresh }) {
           }
         ]
       });
-      setMessage("Product updated.");
+
+      if (selectedDraftUsesSourcePricing) {
+        await adminPut(`products/${activeProduct.id}/pricing-profile`, token, sourcePricingPayload);
+      }
+
+      const linkedLocalLineProductId =
+        Number(activeProduct?.localLineMeta?.localLineProductId) ||
+        Number(localLineProductDetail?.productMeta?.localLineProductId) ||
+        0;
+      if (pushToLocalLineOnSave && linkedLocalLineProductId <= 0) {
+        await adminPost(`products/${activeProduct.id}/push-to-localline`, token, {});
+      }
+
       await loadAll();
       await refreshCatalogFromAdmin();
+      setMessage(pushToLocalLineOnSave ? "Product updated and pushed to Local Line." : "Product updated.");
     } catch (err) {
-      setMessage("Product update failed.");
+      setMessage(err?.message || "Product update failed.");
+    } finally {
+      setProductSaveLoading(false);
     }
   }
 
@@ -856,15 +1289,32 @@ export function AdminPanel({ onCatalogRefresh }) {
   const fullSyncJob = localLineCacheState.data;
   const fullSyncRunning =
     fullSyncJob?.status === "queued" || fullSyncJob?.status === "running";
-  const productTableWidth = "1376px";
+  const productTableWidth = "1464px";
   const currentAdminRoles = currentAdmin?.adminRoles || [];
   const canManageUsers = hasRole(currentAdminRoles, "user_admin");
   const canManagePricing = canAccessAdminSection(currentAdminRoles, "pricelist");
   const canManageInventory = hasRole(currentAdminRoles, "inventory_admin");
   const canManageMembership = hasRole(currentAdminRoles, "membership_admin");
+  const canPushToLocalLine = hasRole(currentAdminRoles, "localline_push");
   const canManageDropSites = hasRole(currentAdminRoles, "dropsite_admin");
   const canManageMembers = hasRole(currentAdminRoles, "member_admin");
   const canManageCoreAdmin = currentAdminRoles.includes("admin");
+  const showProductEditor =
+    activeSection === "pricelist" &&
+    canManagePricing &&
+    (productEditorMode === "new" || (selectedProductId && activeProduct));
+  const selectedDraftVendor = vendors.find(
+    (vendor) => String(vendor.id) === String(productDraft?.vendorId || "")
+  );
+  const selectedDraftUsesSourcePricing = isSourcePricingVendorName(selectedDraftVendor?.name);
+  const linkedLocalLineProductId =
+    (hasLinkedLocalLineProduct(localLineProductDetail?.productMeta)
+      ? Number(localLineProductDetail?.productMeta?.localLineProductId)
+      : 0) ||
+    (hasLinkedLocalLineProduct(activeProduct?.localLineMeta)
+      ? Number(activeProduct?.localLineMeta?.localLineProductId)
+      : 0) ||
+    0;
 
   function getProductPrice(product) {
     const prices = (product.packages || [])
@@ -1510,11 +1960,20 @@ export function AdminPanel({ onCatalogRefresh }) {
               className={`admin-nav-item ${activeSection === "pricelist" ? "active" : ""}`}
               onClick={() => {
                 setActiveSection("pricelist");
-                setSelectedProductId(null);
+                closeProductEditor();
               }}
               type="button"
             >
               Pricelist
+            </button>
+          ) : null}
+          {currentAdmin ? (
+            <button
+              className={`admin-nav-item ${activeSection === "manual" ? "active" : ""}`}
+              onClick={() => openAdminManual("overview")}
+              type="button"
+            >
+              Manual
             </button>
           ) : null}
           {canManageInventory ? (
@@ -1522,7 +1981,7 @@ export function AdminPanel({ onCatalogRefresh }) {
               className={`admin-nav-item ${activeSection === "inventory" ? "active" : ""}`}
               onClick={() => {
                 setActiveSection("inventory");
-                setSelectedProductId(null);
+                closeProductEditor();
               }}
               type="button"
             >
@@ -1534,7 +1993,7 @@ export function AdminPanel({ onCatalogRefresh }) {
               className={`admin-nav-item ${activeSection === "membership" ? "active" : ""}`}
               onClick={() => {
                 setActiveSection("membership");
-                setSelectedProductId(null);
+                closeProductEditor();
               }}
               type="button"
             >
@@ -1545,21 +2004,30 @@ export function AdminPanel({ onCatalogRefresh }) {
             <>
               <button
                 className={`admin-nav-item ${activeSection === "categories" ? "active" : ""}`}
-                onClick={() => setActiveSection("categories")}
+                onClick={() => {
+                  setActiveSection("categories");
+                  closeProductEditor();
+                }}
                 type="button"
               >
                 Categories
               </button>
               <button
                 className={`admin-nav-item ${activeSection === "vendors" ? "active" : ""}`}
-                onClick={() => setActiveSection("vendors")}
+                onClick={() => {
+                  setActiveSection("vendors");
+                  closeProductEditor();
+                }}
                 type="button"
               >
                 Vendors
               </button>
               <button
                 className={`admin-nav-item ${activeSection === "recipes" ? "active" : ""}`}
-                onClick={() => setActiveSection("recipes")}
+                onClick={() => {
+                  setActiveSection("recipes");
+                  closeProductEditor();
+                }}
                 type="button"
               >
                 Recipes
@@ -1569,7 +2037,10 @@ export function AdminPanel({ onCatalogRefresh }) {
           {canManageDropSites ? (
             <button
               className={`admin-nav-item ${activeSection === "dropSites" ? "active" : ""}`}
-              onClick={() => setActiveSection("dropSites")}
+              onClick={() => {
+                setActiveSection("dropSites");
+                closeProductEditor();
+              }}
               type="button"
             >
               Drop Sites
@@ -1578,7 +2049,10 @@ export function AdminPanel({ onCatalogRefresh }) {
           {canManageMembers ? (
             <button
               className={`admin-nav-item ${activeSection === "reviews" ? "active" : ""}`}
-              onClick={() => setActiveSection("reviews")}
+              onClick={() => {
+                setActiveSection("reviews");
+                closeProductEditor();
+              }}
               type="button"
             >
               Reviews
@@ -1589,7 +2063,7 @@ export function AdminPanel({ onCatalogRefresh }) {
               className={`admin-nav-item admin-users-nav-item ${activeSection === "users" ? "active" : ""}`}
               onClick={() => {
                 setActiveSection("users");
-                setSelectedProductId(null);
+                closeProductEditor();
               }}
               type="button"
             >
@@ -1599,7 +2073,7 @@ export function AdminPanel({ onCatalogRefresh }) {
         </aside>
 
         <div className="admin-content">
-          {activeSection === "products" && !selectedProductId && (
+          {activeSection === "products" && !showProductEditor && (
             <section className="admin-section">
               <h3>Products</h3>
               <div className="filters product-admin-filters">
@@ -1700,6 +2174,9 @@ export function AdminPanel({ onCatalogRefresh }) {
                 </label>
               </div>
               <div className="admin-actions">
+                <button className="button" type="button" onClick={startNewProductDraft}>
+                  Add Product
+                </button>
                 <button
                   className="button"
                   type="button"
@@ -1738,7 +2215,7 @@ export function AdminPanel({ onCatalogRefresh }) {
                     <col style={{ width: "110px" }} />
                     <col style={{ width: "96px" }} />
                     <col style={{ width: "132px" }} />
-                    <col style={{ width: "100px" }} />
+                    <col style={{ width: "188px" }} />
                   </colgroup>
                   <thead>
                     <tr>
@@ -1767,11 +2244,11 @@ export function AdminPanel({ onCatalogRefresh }) {
                       <col style={{ width: "110px" }} />
                       <col style={{ width: "96px" }} />
                       <col style={{ width: "132px" }} />
-                      <col style={{ width: "110px" }} />
-                      <col style={{ width: "96px" }} />
-                      <col style={{ width: "132px" }} />
-                      <col style={{ width: "100px" }} />
-                    </colgroup>
+                    <col style={{ width: "110px" }} />
+                    <col style={{ width: "96px" }} />
+                    <col style={{ width: "132px" }} />
+                    <col style={{ width: "188px" }} />
+                  </colgroup>
                     <tbody>
                       {filteredProducts.map((product) => {
                         const defaults = getProductDefaults(product);
@@ -1837,13 +2314,25 @@ export function AdminPanel({ onCatalogRefresh }) {
                               </span>
                             </td>
                             <td>
-                              <button
-                                className="button alt"
-                                type="button"
-                                onClick={() => setSelectedProductId(product.id)}
-                              >
-                                Details
-                              </button>
+                              <div className="admin-actions">
+                                <button
+                                  className="button alt"
+                                  type="button"
+                                  onClick={() => {
+                                    setProductEditorMode("existing");
+                                    setSelectedProductId(product.id);
+                                  }}
+                                >
+                                  Details
+                                </button>
+                                <button
+                                  className="button alt"
+                                  type="button"
+                                  onClick={() => handleDuplicateProduct(product.id)}
+                                >
+                                  Duplicate
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         );
@@ -1855,16 +2344,32 @@ export function AdminPanel({ onCatalogRefresh }) {
             </section>
           )}
 
-          {(activeSection === "products" || (activeSection === "pricelist" && canManagePricing)) &&
-            selectedProductId &&
-            activeProduct && (
+          {showProductEditor && (
             <section className="admin-section">
-              <button className="button alt" type="button" onClick={() => setSelectedProductId(null)}>
-                {activeSection === "pricelist" ? "Back to pricelist" : "Back to products"}
+              <button className="button alt" type="button" onClick={closeProductEditor}>
+                Back to pricelist
               </button>
-              <h3>{activeProduct.name}</h3>
+              <h3>{productEditorMode === "new" ? "New Product" : activeProduct.name}</h3>
               {productDraft && (
                 <div className="admin-fields">
+                  <div className="admin-help-banner">
+                    <div className="admin-help-banner-copy">
+                      <strong>Pricing Help</strong>
+                      <div className="small">
+                        Open the pricing guide for the full explanation of formula pricing, FFCSA
+                        price-list adjustments, and Local Line sync rules.
+                      </div>
+                    </div>
+                    <div className="admin-help-banner-actions">
+                      <button
+                        className="button alt"
+                        type="button"
+                        onClick={() => openAdminManual("pricing")}
+                      >
+                        Open Pricing Guide
+                      </button>
+                    </div>
+                  </div>
                   <label className="filter-field">
                     <span className="small">Name</span>
                     <input
@@ -1909,137 +2414,353 @@ export function AdminPanel({ onCatalogRefresh }) {
                       ))}
                     </select>
                   </label>
-                  <div className="admin-price-list">
-                    <div className="small">Prices</div>
-                    {(activeProduct.packages || []).map((pkg) => (
-                      <label key={pkg.id} className="admin-row">
-                        <span className="small">{pkg.name}</span>
+                  {selectedDraftUsesSourcePricing ? (
+                    <>
+                      <div className="admin-source-pricing-callout">
+                        <strong>Deck / Hyland / Creamy pricing</strong>
+                        <div className="small">
+                          The package Price field below is the CSA base price for these vendors and
+                          is auto-calculated as you enter source pricing.
+                        </div>
+                        <ol className="admin-source-pricing-steps">
+                          <li>
+                            Start with the retail/source unit price in <strong>DFF Source Price</strong>.
+                          </li>
+                          <li>
+                            For weight-based items, use <strong>Avg Weight Override</strong> or the
+                            average of min and max weight.
+                          </li>
+                          <li>
+                            Apply the FFCSA factor to get the CSA store base price shown in
+                            <strong> Price</strong>.
+                          </li>
+                          <li>
+                            Apply Guest, Member, Herd Share, and SNAP margins from that base.
+                          </li>
+                        </ol>
+                      </div>
+                      <label className="filter-field">
+                        <span className="small">DFF Unit Type</span>
+                        <select
+                          className="input"
+                          value={productDraft.unitOfMeasure}
+                          onChange={(event) =>
+                            setProductDraft((prev) => ({
+                              ...prev,
+                              unitOfMeasure: event.target.value
+                            }))
+                          }
+                        >
+                          <option value="each">Each</option>
+                          <option value="lbs">Lbs</option>
+                        </select>
+                      </label>
+                      <label className="filter-field">
+                        <span className="small">DFF Source Price</span>
                         <input
                           className="input"
-                          defaultValue={pkg.price || ""}
-                          onBlur={(event) => handlePackageUpdate(pkg.id, event.target.value)}
+                          type="number"
+                          step="0.01"
+                          value={productDraft.sourceUnitPrice}
+                          onChange={(event) =>
+                            setProductDraft((prev) => ({
+                              ...prev,
+                              sourceUnitPrice: event.target.value
+                            }))
+                          }
                         />
                       </label>
+                      {productDraft.unitOfMeasure === "lbs" ? (
+                        <>
+                          <label className="filter-field">
+                            <span className="small">Min Weight</span>
+                            <input
+                              className="input"
+                              type="number"
+                              step="0.001"
+                              value={productDraft.minWeight}
+                              onChange={(event) =>
+                                setProductDraft((prev) => ({
+                                  ...prev,
+                                  minWeight: event.target.value
+                                }))
+                              }
+                            />
+                          </label>
+                          <label className="filter-field">
+                            <span className="small">Max Weight</span>
+                            <input
+                              className="input"
+                              type="number"
+                              step="0.001"
+                              value={productDraft.maxWeight}
+                              onChange={(event) =>
+                                setProductDraft((prev) => ({
+                                  ...prev,
+                                  maxWeight: event.target.value
+                                }))
+                              }
+                            />
+                          </label>
+                        </>
+                      ) : null}
+                      {productDraft.unitOfMeasure === "lbs" ? (
+                        <label className="filter-field">
+                          <span className="small">Avg Weight Override</span>
+                          <input
+                            className="input"
+                            type="number"
+                            step="0.001"
+                            value={productDraft.avgWeightOverride}
+                            onChange={(event) =>
+                              setProductDraft((prev) => ({
+                                ...prev,
+                                avgWeightOverride: event.target.value
+                              }))
+                            }
+                          />
+                        </label>
+                      ) : null}
+                      <label className="filter-field">
+                        <span className="small">FFCSA Factor</span>
+                        <input
+                          className="input"
+                          type="number"
+                          step="0.0001"
+                          value={productDraft.sourceMultiplier}
+                          onChange={(event) =>
+                            setProductDraft((prev) => ({
+                              ...prev,
+                              sourceMultiplier: event.target.value
+                            }))
+                          }
+                        />
+                      </label>
+                      <div className="small">
+                        These local-only fields drive formula pricing, the remote FFCSA base price,
+                        and the downstream price-list calculations.
+                      </div>
+                    </>
+                  ) : null}
+                  <div className="admin-price-list">
+                    <div className="admin-actions">
+                      <div className="small">Packages</div>
+                      {productEditorMode === "new" ? (
+                        <button className="button alt" type="button" onClick={addDraftPackage}>
+                          Add Package
+                        </button>
+                      ) : null}
+                    </div>
+                    {(productDraft.packages || []).map((pkg, index) => (
+                      <div key={pkg.id || `draft-package-${index}`} className="admin-grid">
+                        <label className="filter-field">
+                          <span className="small">Package name</span>
+                          <input
+                            className="input"
+                            value={pkg.name}
+                            onChange={(event) =>
+                              updateDraftPackage(index, { name: event.target.value })
+                            }
+                          />
+                        </label>
+                        <label className="filter-field">
+                          <span className="small">
+                            {selectedDraftUsesSourcePricing ? "CSA Price" : "Price"}
+                          </span>
+                          <input
+                            className="input"
+                            type="number"
+                            step="0.01"
+                            value={pkg.price}
+                            onChange={(event) =>
+                              updateDraftPackage(index, { price: event.target.value })
+                            }
+                          />
+                          {selectedDraftUsesSourcePricing ? (
+                            <div className="small">
+                              Auto-calculated CSA/base price used for the local store and Local
+                              Line push.
+                            </div>
+                          ) : null}
+                        </label>
+                        {productEditorMode === "new" ? (
+                          <>
+                            <label className="filter-field">
+                              <span className="small">Unit</span>
+                              <input
+                                className="input"
+                                value={pkg.unit}
+                                onChange={(event) =>
+                                  updateDraftPackage(index, { unit: event.target.value })
+                                }
+                              />
+                            </label>
+                            <div className="admin-actions">
+                              <button
+                                className="button alt"
+                                type="button"
+                                onClick={() => removeDraftPackage(index)}
+                                disabled={productDraft.packages.length <= 1}
+                              >
+                                Remove
+                              </button>
+                            </div>
+                          </>
+                        ) : null}
+                      </div>
                     ))}
                   </div>
-                  <div className="admin-price-list">
-                    <div className="small">Local Line Price Lists</div>
-                    {localLineProductDetail?.productMeta ? (
-                      <div className="small">
-                        Local Line product {localLineProductDetail.productMeta.localLineProductId} · Last synced{" "}
-                        {localLineProductDetail.productMeta.lastSyncedAt || "n/a"}
+                  {productEditorMode === "existing" ? (
+                    <div className="admin-price-list">
+                      <div className="admin-actions">
+                        <div className="small">Local Line</div>
+                        {canPushToLocalLine && linkedLocalLineProductId <= 0 ? (
+                          <button
+                            className="button alt"
+                            type="button"
+                            onClick={() => handlePushProductToLocalLine(activeProduct.id)}
+                            disabled={pushProductLoading}
+                          >
+                            {pushProductLoading ? "Pushing..." : "Push Product To Local Line"}
+                          </button>
+                        ) : null}
+                        {linkedLocalLineProductId <= 0 ? (
+                          <button
+                            className="button alt"
+                            type="button"
+                            onClick={() => handleDeleteProduct(activeProduct.id)}
+                            disabled={productDeleteLoading}
+                          >
+                            {productDeleteLoading ? "Deleting..." : "Delete Product"}
+                          </button>
+                        ) : null}
                       </div>
-                    ) : null}
-                    <div className="small">
-                      These edits change the locally cached Local Line rows used by the store. They do not push back to Local Line.
+                      {linkedLocalLineProductId > 0 ? (
+                        <div className="small">
+                          Local Line product {linkedLocalLineProductId} · Last synced{" "}
+                          {localLineProductDetail?.productMeta?.lastSyncedAt || "n/a"}
+                        </div>
+                      ) : (
+                        <div className="small">
+                          This product only exists locally right now. It can be deleted because it
+                          is not linked to a Local Line product.
+                        </div>
+                      )}
+                      {linkedLocalLineProductId > 0 ? (
+                        <>
+                          <div className="small">
+                            These edits change the locally cached Local Line rows used by the store. They do not push back to Local Line.
+                          </div>
+                          {priceListEntryDrafts.length ? (
+                            <>
+                              <table className="admin-table">
+                                <thead>
+                                  <tr>
+                                    <th>List</th>
+                                    <th>Package</th>
+                                    <th>Scope</th>
+                                    <th>Visible</th>
+                                    <th>On Sale</th>
+                                    <th>Sale Toggle</th>
+                                    <th>Final Price</th>
+                                    <th>Strike Price</th>
+                                    <th>Max Units</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {priceListEntryDrafts.map((entry) => (
+                                    <tr key={`price-list-entry-${entry.id}`}>
+                                      <td>{entry.priceListName || entry.priceListId}</td>
+                                      <td>{entry.packageName || entry.productName || "Product"}</td>
+                                      <td>{entry.entryScope || "package"}</td>
+                                      <td>
+                                        <button
+                                          className={`toggle-switch ${entry.visible ? "active" : ""}`}
+                                          type="button"
+                                          onClick={() =>
+                                            updatePriceListEntryDraft(entry.id, { visible: !entry.visible })
+                                          }
+                                        />
+                                      </td>
+                                      <td>
+                                        <button
+                                          className={`toggle-switch ${entry.onSale ? "active" : ""}`}
+                                          type="button"
+                                          onClick={() =>
+                                            updatePriceListEntryDraft(entry.id, { onSale: !entry.onSale })
+                                          }
+                                        />
+                                      </td>
+                                      <td>
+                                        <button
+                                          className={`toggle-switch ${entry.onSaleToggle ? "active" : ""}`}
+                                          type="button"
+                                          onClick={() =>
+                                            updatePriceListEntryDraft(entry.id, {
+                                              onSaleToggle: !entry.onSaleToggle
+                                            })
+                                          }
+                                        />
+                                      </td>
+                                      <td>
+                                        <input
+                                          className="input"
+                                          type="number"
+                                          step="0.01"
+                                          value={entry.finalPriceCache}
+                                          onChange={(event) =>
+                                            updatePriceListEntryDraft(entry.id, {
+                                              finalPriceCache: event.target.value
+                                            })
+                                          }
+                                        />
+                                      </td>
+                                      <td>
+                                        <input
+                                          className="input"
+                                          type="number"
+                                          step="0.01"
+                                          value={entry.strikethroughDisplayValue}
+                                          onChange={(event) =>
+                                            updatePriceListEntryDraft(entry.id, {
+                                              strikethroughDisplayValue: event.target.value
+                                            })
+                                          }
+                                        />
+                                      </td>
+                                      <td>
+                                        <input
+                                          className="input"
+                                          type="number"
+                                          step="1"
+                                          value={entry.maxUnitsPerOrder}
+                                          onChange={(event) =>
+                                            updatePriceListEntryDraft(entry.id, {
+                                              maxUnitsPerOrder: event.target.value
+                                            })
+                                          }
+                                        />
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                              <button
+                                className="button alt"
+                                type="button"
+                                onClick={handleSavePriceListEntries}
+                                disabled={priceListSaveLoading}
+                              >
+                                {priceListSaveLoading ? "Saving price lists..." : "Save Local Price Lists"}
+                              </button>
+                            </>
+                          ) : (
+                            <div className="small">No cached Local Line price-list entries for this product yet.</div>
+                          )}
+                        </>
+                      ) : null}
                     </div>
-                    {priceListEntryDrafts.length ? (
-                      <>
-                        <table className="admin-table">
-                          <thead>
-                            <tr>
-                              <th>List</th>
-                              <th>Package</th>
-                              <th>Scope</th>
-                              <th>Visible</th>
-                              <th>On Sale</th>
-                              <th>Sale Toggle</th>
-                              <th>Final Price</th>
-                              <th>Strike Price</th>
-                              <th>Max Units</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {priceListEntryDrafts.map((entry) => (
-                              <tr key={`price-list-entry-${entry.id}`}>
-                                <td>{entry.priceListName || entry.priceListId}</td>
-                                <td>{entry.packageName || entry.productName || "Product"}</td>
-                                <td>{entry.entryScope || "package"}</td>
-                                <td>
-                                  <button
-                                    className={`toggle-switch ${entry.visible ? "active" : ""}`}
-                                    type="button"
-                                    onClick={() =>
-                                      updatePriceListEntryDraft(entry.id, { visible: !entry.visible })
-                                    }
-                                  />
-                                </td>
-                                <td>
-                                  <button
-                                    className={`toggle-switch ${entry.onSale ? "active" : ""}`}
-                                    type="button"
-                                    onClick={() =>
-                                      updatePriceListEntryDraft(entry.id, { onSale: !entry.onSale })
-                                    }
-                                  />
-                                </td>
-                                <td>
-                                  <button
-                                    className={`toggle-switch ${entry.onSaleToggle ? "active" : ""}`}
-                                    type="button"
-                                    onClick={() =>
-                                      updatePriceListEntryDraft(entry.id, {
-                                        onSaleToggle: !entry.onSaleToggle
-                                      })
-                                    }
-                                  />
-                                </td>
-                                <td>
-                                  <input
-                                    className="input"
-                                    type="number"
-                                    step="0.01"
-                                    value={entry.finalPriceCache}
-                                    onChange={(event) =>
-                                      updatePriceListEntryDraft(entry.id, {
-                                        finalPriceCache: event.target.value
-                                      })
-                                    }
-                                  />
-                                </td>
-                                <td>
-                                  <input
-                                    className="input"
-                                    type="number"
-                                    step="0.01"
-                                    value={entry.strikethroughDisplayValue}
-                                    onChange={(event) =>
-                                      updatePriceListEntryDraft(entry.id, {
-                                        strikethroughDisplayValue: event.target.value
-                                      })
-                                    }
-                                  />
-                                </td>
-                                <td>
-                                  <input
-                                    className="input"
-                                    type="number"
-                                    step="1"
-                                    value={entry.maxUnitsPerOrder}
-                                    onChange={(event) =>
-                                      updatePriceListEntryDraft(entry.id, {
-                                        maxUnitsPerOrder: event.target.value
-                                      })
-                                    }
-                                  />
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                        <button
-                          className="button alt"
-                          type="button"
-                          onClick={handleSavePriceListEntries}
-                          disabled={priceListSaveLoading}
-                        >
-                          {priceListSaveLoading ? "Saving price lists..." : "Save Local Price Lists"}
-                        </button>
-                      </>
-                    ) : (
-                      <div className="small">No cached Local Line price-list entries for this product yet.</div>
-                    )}
-                  </div>
+                  ) : null}
                   <label className="filter-toggle">
                     <input
                       type="checkbox"
@@ -2049,6 +2770,30 @@ export function AdminPanel({ onCatalogRefresh }) {
                       }
                     />
                     <span>Visible</span>
+                  </label>
+                  <label className="filter-toggle">
+                    <input
+                      type="checkbox"
+                      checked={productDraft.trackInventory}
+                      onChange={(event) =>
+                        setProductDraft((prev) => ({ ...prev, trackInventory: event.target.checked }))
+                      }
+                    />
+                    <span>Track inventory</span>
+                  </label>
+                  <label className="filter-field">
+                    <span className="small">Inventory</span>
+                    <input
+                      className="input"
+                      type="number"
+                      value={productDraft.inventory}
+                      onChange={(event) =>
+                        setProductDraft((prev) => ({
+                          ...prev,
+                          inventory: Number(event.target.value) || 0
+                        }))
+                      }
+                    />
                   </label>
                   <div className="admin-row">
                     <span className="small">On sale</span>
@@ -2119,24 +2864,50 @@ export function AdminPanel({ onCatalogRefresh }) {
                   </label>
                 </div>
               )}
-              <div className="admin-grid">
-                {(activeProduct.images || []).map((image, index) => {
-                  const entry = getImageEntry(image, index);
-                  if (!entry.src) return null;
-                  return (
-                    <img
-                      key={entry.key}
-                      src={entry.thumbnailUrl || entry.src}
-                      alt={activeProduct.name}
-                      className="admin-thumb"
-                    />
-                  );
-                })}
-              </div>
-              <div className="small">Upload image</div>
-              <input type="file" onChange={(event) => event.target.files?.[0] && handleImageUpload(activeProduct.id, event.target.files[0])} />
-              <button className="button" type="button" onClick={handleProductSave}>
-                Save product
+              {productEditorMode === "existing" && activeProduct ? (
+                <>
+                  <div className="admin-grid">
+                    {(activeProduct.images || []).map((image, index) => {
+                      const entry = getImageEntry(image, index);
+                      if (!entry.src) return null;
+                      return (
+                        <img
+                          key={entry.key}
+                          src={entry.thumbnailUrl || entry.src}
+                          alt={activeProduct.name}
+                          className="admin-thumb"
+                        />
+                      );
+                    })}
+                  </div>
+                  <div className="small">Upload image</div>
+                  <input
+                    type="file"
+                    onChange={(event) =>
+                      event.target.files?.[0] && handleImageUpload(activeProduct.id, event.target.files[0])
+                    }
+                  />
+                </>
+              ) : null}
+              {canPushToLocalLine && (productEditorMode === "new" || linkedLocalLineProductId <= 0) ? (
+                <label className="filter-toggle">
+                  <input
+                    type="checkbox"
+                    checked={pushToLocalLineOnSave}
+                    onChange={(event) => setPushToLocalLineOnSave(event.target.checked)}
+                  />
+                  <span>Push to Local Line when saving</span>
+                </label>
+              ) : null}
+              <button
+                className="button"
+                type="button"
+                onClick={handleProductSave}
+                disabled={productSaveLoading}
+              >
+                {productSaveLoading
+                  ? (productEditorMode === "new" ? "Creating..." : "Saving...")
+                  : (productEditorMode === "new" ? "Create product" : "Save product")}
               </button>
             </section>
           )}
@@ -2163,7 +2934,7 @@ export function AdminPanel({ onCatalogRefresh }) {
             </section>
           )}
 
-          {activeSection === "pricelist" && canManagePricing && !selectedProductId && (
+          {activeSection === "pricelist" && canManagePricing && !showProductEditor && (
             <>
               <AdminPriceListSection
                 token={token}
@@ -2176,7 +2947,14 @@ export function AdminPanel({ onCatalogRefresh }) {
                 onPullFromLocalLine={handleLocalLineFullSync}
                 pullFromLocalLineLoading={localLineCacheState.loading}
                 pullFromLocalLineRunning={fullSyncRunning}
-                onOpenProductDetails={(productId) => setSelectedProductId(productId)}
+                onAddProduct={startNewProductDraft}
+                onDuplicateProduct={handleDuplicateProduct}
+                onDeleteProduct={handleDeleteProduct}
+                onOpenPricingGuide={() => openAdminManual("pricing")}
+                onOpenProductDetails={(productId) => {
+                  setProductEditorMode("existing");
+                  setSelectedProductId(productId);
+                }}
               />
               {localLineAuditState.open && (
                 <div className="admin-inline-audit">
@@ -2201,6 +2979,10 @@ export function AdminPanel({ onCatalogRefresh }) {
                 </div>
               )}
             </>
+          )}
+
+          {activeSection === "manual" && currentAdmin && (
+            <AdminManualSection focusTopic={manualFocusTopic} />
           )}
 
           {activeSection === "inventory" && canManageInventory && (

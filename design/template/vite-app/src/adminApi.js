@@ -66,6 +66,15 @@ export async function adminPost(path, token, body) {
   return response.json();
 }
 
+export async function adminDelete(path, token) {
+  const response = await fetch(`${base}/admin/${path}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!response.ok) await throwForError(response, "Admin delete failed");
+  return response.json();
+}
+
 export async function adminUploadImage(productId, token, file) {
   const form = new FormData();
   form.append("image", file);

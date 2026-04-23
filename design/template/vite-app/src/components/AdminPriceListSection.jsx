@@ -6,6 +6,8 @@ const COLUMN_DEFAULT_STORAGE_KEY = "adminPricelistColumnDefaultPrefs.v1";
 
 const PRICELIST_COLUMNS = [
   { key: "edit", label: "Edit", width: 88, sticky: true, required: true, defaultVisible: true },
+  { key: "duplicate", label: "Duplicate", width: 112, sticky: true, required: true, defaultVisible: true },
+  { key: "delete", label: "Delete", width: 104, sticky: true, required: true, defaultVisible: true },
   { key: "details", label: "Details", width: 104, sticky: true, required: true, defaultVisible: true },
   { key: "apply", label: "Push", width: 104, sticky: true, required: true, defaultVisible: true },
   { key: "status", label: "Status", width: 150, sticky: true, defaultVisible: true },
@@ -268,7 +270,11 @@ export function AdminPriceListSection({
   onPullFromLocalLine,
   pullFromLocalLineLoading = false,
   pullFromLocalLineRunning = false,
-  onOpenProductDetails
+  onOpenProductDetails,
+  onAddProduct,
+  onDuplicateProduct,
+  onOpenPricingGuide,
+  onDeleteProduct
 }) {
   const [loading, setLoading] = useState(false);
   const [rows, setRows] = useState([]);
@@ -281,6 +287,7 @@ export function AdminPriceListSection({
   const [editingRows, setEditingRows] = useState({});
   const [saving, setSaving] = useState(false);
   const [applyingProductIds, setApplyingProductIds] = useState([]);
+  const [deletingProductIds, setDeletingProductIds] = useState([]);
   const [exportingGoogle, setExportingGoogle] = useState(false);
   const [columnPickerOpen, setColumnPickerOpen] = useState(false);
   const [visibleColumns, setVisibleColumns] = useState(() => loadCurrentColumnPreferences().visibleColumns);
@@ -529,6 +536,33 @@ export function AdminPriceListSection({
     }
   }
 
+  async function handleDeleteRow(productId) {
+    if (typeof onDeleteProduct !== "function") return;
+    setDeletingProductIds((prev) => (prev.includes(productId) ? prev : [...prev, productId]));
+    setMessage("");
+    try {
+      await onDeleteProduct(productId);
+      setRows((prev) => prev.filter((row) => row.productId !== productId));
+      setDrafts((prev) => {
+        if (!Object.prototype.hasOwnProperty.call(prev, productId)) return prev;
+        const next = { ...prev };
+        delete next[productId];
+        return next;
+      });
+      setEditingRows((prev) => {
+        if (!Object.prototype.hasOwnProperty.call(prev, productId)) return prev;
+        const next = { ...prev };
+        delete next[productId];
+        return next;
+      });
+      setMessage("Product deleted.");
+    } catch (_error) {
+      // Parent handler sets the detailed error message.
+    } finally {
+      setDeletingProductIds((prev) => prev.filter((id) => id !== productId));
+    }
+  }
+
   const remoteReadyProductIds = rows
     .filter((row) => row.hasPendingRemoteApply && !dirtyProductIds.includes(row.productId))
     .map((row) => row.productId);
@@ -547,12 +581,33 @@ export function AdminPriceListSection({
     };
   }
 
-  function renderCell(column, row, draft, preview, editing, dirty, isApplying) {
+  function renderCell(column, row, draft, preview, editing, dirty, isApplying, isDeleting) {
+    const rowBusy = isApplying || isDeleting;
     switch (column.key) {
       case "edit":
         return (
-          <button className="button alt" type="button" onClick={() => toggleEditing(row.productId)}>
+          <button
+            className="button alt"
+            type="button"
+            onClick={() => toggleEditing(row.productId)}
+            disabled={rowBusy}
+          >
             {editing ? "Lock" : "Edit"}
+          </button>
+        );
+      case "duplicate":
+        return (
+          <button
+            className="button alt"
+            type="button"
+            disabled={rowBusy}
+            onClick={() => {
+              if (typeof onDuplicateProduct === "function") {
+                onDuplicateProduct(row.productId);
+              }
+            }}
+          >
+            Duplicate
           </button>
         );
       case "details":
@@ -560,6 +615,7 @@ export function AdminPriceListSection({
           <button
             className="button alt"
             type="button"
+            disabled={rowBusy}
             onClick={() => {
               if (typeof onOpenProductDetails === "function") {
                 onOpenProductDetails(row.productId);
@@ -569,6 +625,17 @@ export function AdminPriceListSection({
             Details
           </button>
         );
+      case "delete":
+        return (
+          <button
+            className="button alt"
+            type="button"
+            disabled={Number(row.localLineProductId || 0) > 0 || rowBusy}
+            onClick={() => handleDeleteRow(row.productId)}
+          >
+            {isDeleting ? "Deleting..." : "Delete"}
+          </button>
+        );
       case "status":
         return (
           <>
@@ -576,6 +643,7 @@ export function AdminPriceListSection({
               {dirty ? "Local draft" : row.remoteSyncStatus}
             </div>
             {row.hasPendingRemoteApply && !dirty ? <div className="small">Needs push to Local Line</div> : null}
+            {Number(row.localLineProductId || 0) <= 0 ? <div className="small">Local-only</div> : null}
           </>
         );
       case "product":
@@ -751,7 +819,7 @@ export function AdminPriceListSection({
           <button
             className="button alt"
             type="button"
-            disabled={dirty || isApplying}
+            disabled={dirty || rowBusy}
             onClick={() => applyRemote([row.productId])}
           >
             {isApplying ? "Pushing..." : "Push"}
@@ -827,6 +895,30 @@ export function AdminPriceListSection({
           <div className="small pricelist-count">
             {filteredRows.length} / {rows.length} products
           </div>
+          <button
+            className="button"
+            type="button"
+            onClick={() => {
+              if (typeof onAddProduct === "function") {
+                onAddProduct();
+              }
+            }}
+            disabled={typeof onAddProduct !== "function"}
+          >
+            Add Product
+          </button>
+          <button
+            className="button alt"
+            type="button"
+            onClick={() => {
+              if (typeof onOpenPricingGuide === "function") {
+                onOpenPricingGuide();
+              }
+            }}
+            disabled={typeof onOpenPricingGuide !== "function"}
+          >
+            Pricing Guide
+          </button>
           <div className="pricelist-column-picker" ref={columnPickerRef}>
             <button
               className="button alt"
@@ -988,11 +1080,12 @@ export function AdminPriceListSection({
                 const dirty = !draftsMatchRow(drafts[row.productId], row);
                 const preview = computePreview(row, draft);
                 const isApplying = applyingProductIds.includes(row.productId);
+                const isDeleting = deletingProductIds.includes(row.productId);
 
                 return (
                   <tr
                     key={`pricelist-row-${row.productId}`}
-                    className={dirty ? "edited pricelist-row-dirty" : ""}
+                    className={`${dirty ? "edited pricelist-row-dirty" : ""}${isDeleting ? " pricelist-row-processing" : ""}`}
                   >
                     {visibleColumnDefs.map((column) => (
                       <td
@@ -1000,7 +1093,7 @@ export function AdminPriceListSection({
                         className={column.sticky ? "pricelist-sticky-col" : ""}
                         style={getColumnCellStyle(column)}
                       >
-                        {renderCell(column, row, draft, preview, editing, dirty, isApplying)}
+                        {renderCell(column, row, draft, preview, editing, dirty, isApplying, isDeleting)}
                       </td>
                     ))}
                   </tr>

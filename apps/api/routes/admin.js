@@ -34,7 +34,11 @@ import {
   vendors
 } from "../schema.js";
 import { requireAdmin, requireAdminPermission } from "../middleware/auth.js";
-import { isLocalLineEnabled, updateLocalLineForProduct } from "../localLine.js";
+import {
+  createLocalLineProductFromStoreProduct,
+  isLocalLineEnabled,
+  updateLocalLineForProduct
+} from "../localLine.js";
 import {
   getLatestLocalLineFullSyncJob,
   getLocalLineFullSyncJob,
@@ -103,6 +107,580 @@ function toActiveFlag(value) {
 
 function isEmailAddress(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim());
+}
+
+function toOptionalInteger(value, fallback = null) {
+  if (value === null || value === "" || typeof value === "undefined") {
+    return fallback;
+  }
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? numeric : fallback;
+}
+
+function toNullableString(value) {
+  if (value === null || typeof value === "undefined") return null;
+  const trimmed = String(value).trim();
+  return trimmed ? trimmed : null;
+}
+
+function normalizeDraftPackage(payload = {}, fallbackName = "ea") {
+  const price = Number(payload.price);
+  return {
+    name: String(payload.name || fallbackName).trim() || fallbackName,
+    price: Number.isFinite(price) ? Number(price.toFixed(2)) : NaN,
+    packageCode: toNullableString(payload.packageCode),
+    unit: toNullableString(payload.unit),
+    numOfItems: toOptionalInteger(payload.numOfItems, 1) || 1,
+    visible: payload.visible === false || payload.visible === 0 || payload.visible === "0" ? 0 : 1,
+    trackInventory:
+      payload.trackInventory === true || payload.trackInventory === 1 || payload.trackInventory === "1"
+        ? 1
+        : 0,
+    inventory: toOptionalInteger(payload.inventory, 0) || 0,
+    trackType: toNullableString(payload.trackType) || "package",
+    chargeType: toNullableString(payload.chargeType) || "package"
+  };
+}
+
+async function getNextManualId(connection, tableName) {
+  const [rows] = await connection.query(
+    `SELECT COALESCE(MAX(id), 0) + 1 AS nextId FROM ${tableName}`
+  );
+  return Number(rows?.[0]?.nextId || 1);
+}
+
+async function upsertLocalOnlyProductMeta(db, productId, productRow = {}) {
+  const now = new Date();
+  const existingRows = await db
+    .select()
+    .from(localLineProductMeta)
+    .where(eq(localLineProductMeta.productId, productId))
+    .catch(() => []);
+
+  const payload = {
+    localLineProductId: 0,
+    status: "local-only",
+    visible: typeof productRow.visible === "undefined" ? null : Number(productRow.visible) ? 1 : 0,
+    trackInventory:
+      typeof productRow.trackInventory === "undefined"
+        ? null
+        : Number(productRow.trackInventory)
+          ? 1
+          : 0,
+    inventoryType: "package",
+    productInventory: toOptionalInteger(productRow.inventory, 0),
+    packageCodesEnabled: 0,
+    rawJson: null,
+    updatedAt: now,
+    lastSyncedAt: null
+  };
+
+  if (existingRows.length) {
+    await db
+      .update(localLineProductMeta)
+      .set(payload)
+      .where(eq(localLineProductMeta.productId, productId));
+    return;
+  }
+
+  await db.insert(localLineProductMeta).values({
+    productId,
+    createdAt: now,
+    ...payload
+  });
+}
+
+async function createLocalProductRecord(connection, payload) {
+  const now = new Date();
+  const productId = await getNextManualId(connection, "products");
+  const normalizedPackages = (Array.isArray(payload.packages) ? payload.packages : [])
+    .map((pkg, index) => normalizeDraftPackage(pkg, index === 0 ? "ea" : `Package ${index + 1}`))
+    .filter((pkg) => Number.isFinite(pkg.price));
+
+  if (!normalizedPackages.length) {
+    throw new Error("At least one package with a valid price is required");
+  }
+
+  const productRecord = {
+    id: productId,
+    name: String(payload.name || "").trim(),
+    description: payload.description || "",
+    visible: payload.visible ? 1 : 0,
+    trackInventory: payload.trackInventory ? 1 : 0,
+    inventory: toOptionalInteger(payload.inventory, 0) || 0,
+    categoryId: toOptionalInteger(payload.categoryId, null),
+    vendorId: toOptionalInteger(payload.vendorId, null),
+    thumbnailUrl: toNullableString(payload.thumbnailUrl),
+    createdAt: now,
+    updatedAt: now,
+    isDeleted: 0
+  };
+
+  if (!productRecord.name) {
+    throw new Error("Product name is required");
+  }
+
+  await connection.query(
+    `
+      INSERT INTO products (
+        id, name, description, visible, track_inventory, inventory,
+        category_id, vendor_id, thumbnail_url, created_at, updated_at, is_deleted
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `,
+    [
+      productRecord.id,
+      productRecord.name,
+      productRecord.description,
+      productRecord.visible,
+      productRecord.trackInventory,
+      productRecord.inventory,
+      productRecord.categoryId,
+      productRecord.vendorId,
+      productRecord.thumbnailUrl,
+      productRecord.createdAt,
+      productRecord.updatedAt,
+      productRecord.isDeleted
+    ]
+  );
+
+  let nextPackageId = await getNextManualId(connection, "packages");
+  const createdPackages = [];
+  for (const draftPackage of normalizedPackages) {
+    const packageRecord = {
+      id: nextPackageId,
+      productId,
+      name: draftPackage.name,
+      price: draftPackage.price,
+      packageCode: draftPackage.packageCode,
+      unit: draftPackage.unit,
+      numOfItems: draftPackage.numOfItems,
+      trackType: draftPackage.trackType,
+      chargeType: draftPackage.chargeType,
+      visible: draftPackage.visible,
+      trackInventory: draftPackage.trackInventory,
+      inventory: draftPackage.inventory
+    };
+    createdPackages.push(packageRecord);
+    nextPackageId += 1;
+  }
+
+  for (const pkg of createdPackages) {
+    await connection.query(
+      `
+        INSERT INTO packages (
+          id, product_id, name, price, package_code, unit, num_of_items,
+          track_type, charge_type, visible, track_inventory, inventory
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `,
+      [
+        pkg.id,
+        pkg.productId,
+        pkg.name,
+        pkg.price,
+        pkg.packageCode,
+        pkg.unit,
+        pkg.numOfItems,
+        pkg.trackType,
+        pkg.chargeType,
+        pkg.visible,
+        pkg.trackInventory,
+        pkg.inventory
+      ]
+    );
+  }
+
+  await connection.query(
+    `
+      INSERT INTO product_sales (product_id, on_sale, sale_discount, updated_at)
+      VALUES (?, ?, ?, ?)
+    `,
+    [
+      productId,
+      payload.onSale ? 1 : 0,
+      typeof payload.saleDiscount === "number" ? payload.saleDiscount : 0,
+      now
+    ]
+  );
+
+  return {
+    productId,
+    productRecord,
+    packages: createdPackages
+  };
+}
+
+function normalizePricingUnitOfMeasure(value) {
+  return String(value || "each").trim().toLowerCase() === "lbs" ? "lbs" : "each";
+}
+
+function normalizePricingProfileInput(payload = {}) {
+  return {
+    unitOfMeasure:
+      typeof payload.unitOfMeasure === "undefined"
+        ? undefined
+        : normalizePricingUnitOfMeasure(payload.unitOfMeasure),
+    sourceUnitPrice:
+      typeof payload.sourceUnitPrice === "undefined"
+        ? undefined
+        : (payload.sourceUnitPrice === null ? null : Number(payload.sourceUnitPrice)),
+    minWeight:
+      typeof payload.minWeight === "undefined"
+        ? undefined
+        : (payload.minWeight === null ? null : Number(payload.minWeight)),
+    maxWeight:
+      typeof payload.maxWeight === "undefined"
+        ? undefined
+        : (payload.maxWeight === null ? null : Number(payload.maxWeight)),
+    avgWeightOverride:
+      typeof payload.avgWeightOverride === "undefined"
+        ? undefined
+        : (payload.avgWeightOverride === null ? null : Number(payload.avgWeightOverride)),
+    sourceMultiplier:
+      typeof payload.sourceMultiplier === "undefined"
+        ? undefined
+        : (payload.sourceMultiplier === null ? null : Number(payload.sourceMultiplier))
+  };
+}
+
+function validateSourcePricingProfile(pricingProfile) {
+  if (!Number.isFinite(Number(pricingProfile.sourceUnitPrice))) {
+    throw new Error("DFF source price is required for source-pricing vendors.");
+  }
+}
+
+async function upsertProductPricingProfileRecord(connection, productId, payload = {}) {
+  const now = new Date();
+  const normalized = normalizePricingProfileInput(payload);
+  const [existingRows] = await connection.query(
+    "SELECT * FROM product_pricing_profiles WHERE product_id = ? LIMIT 1",
+    [productId]
+  );
+  const existing = existingRows[0] || null;
+
+  const record = {
+    unit_of_measure: normalized.unitOfMeasure ?? existing?.unit_of_measure ?? "each",
+    source_unit_price:
+      typeof normalized.sourceUnitPrice === "undefined"
+        ? (existing?.source_unit_price ?? null)
+        : normalized.sourceUnitPrice,
+    min_weight:
+      typeof normalized.minWeight === "undefined"
+        ? (existing?.min_weight ?? null)
+        : normalized.minWeight,
+    max_weight:
+      typeof normalized.maxWeight === "undefined"
+        ? (existing?.max_weight ?? null)
+        : normalized.maxWeight,
+    avg_weight_override:
+      typeof normalized.avgWeightOverride === "undefined"
+        ? (existing?.avg_weight_override ?? null)
+        : normalized.avgWeightOverride,
+    source_multiplier:
+      typeof normalized.sourceMultiplier === "undefined" ||
+      normalized.sourceMultiplier === null ||
+      !Number.isFinite(Number(normalized.sourceMultiplier))
+        ? (existing?.source_multiplier ?? 0.5412)
+        : normalized.sourceMultiplier,
+    remote_sync_status: "pending",
+    remote_sync_message: "Local source pricing updated. Apply to remote store pending.",
+    remote_synced_at: null,
+    updated_at: now
+  };
+
+  if (existing) {
+    await connection.query(
+      `
+        UPDATE product_pricing_profiles
+        SET unit_of_measure = ?, source_unit_price = ?, min_weight = ?, max_weight = ?,
+            avg_weight_override = ?, source_multiplier = ?, remote_sync_status = ?,
+            remote_sync_message = ?, remote_synced_at = ?, updated_at = ?
+        WHERE product_id = ?
+      `,
+      [
+        record.unit_of_measure,
+        record.source_unit_price,
+        record.min_weight,
+        record.max_weight,
+        record.avg_weight_override,
+        record.source_multiplier,
+        record.remote_sync_status,
+        record.remote_sync_message,
+        record.remote_synced_at,
+        record.updated_at,
+        productId
+      ]
+    );
+    return;
+  }
+
+  await connection.query(
+    `
+      INSERT INTO product_pricing_profiles (
+        product_id, unit_of_measure, source_unit_price, min_weight, max_weight,
+        avg_weight_override, source_multiplier, on_sale, sale_discount,
+        remote_sync_status, remote_sync_message, remote_synced_at, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `,
+    [
+      productId,
+      record.unit_of_measure,
+      record.source_unit_price,
+      record.min_weight,
+      record.max_weight,
+      record.avg_weight_override,
+      record.source_multiplier,
+      0,
+      0,
+      record.remote_sync_status,
+      record.remote_sync_message,
+      record.remote_synced_at,
+      now,
+      now
+    ]
+  );
+}
+
+async function duplicateLocalProductRecord(connection, sourceProductId) {
+  const [productRows] = await connection.query(
+    "SELECT * FROM products WHERE id = ? LIMIT 1",
+    [sourceProductId]
+  );
+  const sourceProduct = productRows[0];
+  if (!sourceProduct) {
+    throw new Error("Product not found");
+  }
+
+  const [packageRows] = await connection.query(
+    "SELECT * FROM packages WHERE product_id = ? ORDER BY id",
+    [sourceProductId]
+  );
+  const [saleRows] = await connection.query(
+    "SELECT * FROM product_sales WHERE product_id = ? LIMIT 1",
+    [sourceProductId]
+  );
+  const [profileRows] = await connection.query(
+    "SELECT * FROM product_pricing_profiles WHERE product_id = ? LIMIT 1",
+    [sourceProductId]
+  );
+  const [vendorRows] = sourceProduct.vendor_id
+    ? await connection.query(
+        "SELECT member_markup AS memberMarkup FROM vendors WHERE id = ? LIMIT 1",
+        [sourceProduct.vendor_id]
+      )
+    : [[]];
+  const [imageRows] = await connection.query(
+    "SELECT url, url_hash FROM product_images WHERE product_id = ? ORDER BY id",
+    [sourceProductId]
+  );
+  const [mediaRows] = await connection.query(
+    `
+      SELECT source_url, remote_url, storage_key, public_url, thumbnail_url, sort_order,
+             is_primary, alt_text, content_hash, width, height, mime_type
+      FROM product_media
+      WHERE product_id = ?
+      ORDER BY sort_order, id
+    `,
+    [sourceProductId]
+  );
+  const [tagRows] = await connection.query(
+    "SELECT tag_id AS tagId FROM product_tags WHERE product_id = ?",
+    [sourceProductId]
+  );
+  const created = await createLocalProductRecord(connection, {
+    name: `${sourceProduct.name} Copy`,
+    description: sourceProduct.description || "",
+    visible: Boolean(sourceProduct.visible),
+    trackInventory: Boolean(sourceProduct.track_inventory),
+    inventory: Number(sourceProduct.inventory || 0),
+    categoryId: sourceProduct.category_id,
+    vendorId: sourceProduct.vendor_id,
+    thumbnailUrl: sourceProduct.thumbnail_url,
+    onSale: Boolean(saleRows[0]?.on_sale),
+    saleDiscount:
+      saleRows[0]?.sale_discount === null || typeof saleRows[0]?.sale_discount === "undefined"
+        ? 0
+        : Number(saleRows[0].sale_discount),
+    packages: packageRows.map((pkg) => ({
+      name: pkg.name,
+      price: Number(pkg.price),
+      packageCode: pkg.package_code,
+      unit: pkg.unit,
+      numOfItems: pkg.num_of_items,
+      visible: pkg.visible,
+      trackInventory: pkg.track_inventory,
+      inventory: pkg.inventory,
+      trackType: pkg.track_type,
+      chargeType: pkg.charge_type
+    }))
+  });
+
+  const now = new Date();
+  const profile = profileRows[0] || null;
+  const vendor = vendorRows[0] || null;
+  const forceNoMarkup = isNoMarkupProduct({ name: created.productRecord.name });
+  const defaultCsaMarkup = forceNoMarkup
+    ? 0
+    : (
+        Number.isFinite(Number(vendor?.memberMarkup))
+          ? Number(vendor.memberMarkup)
+          : (Number.isFinite(Number(profile?.member_markup)) ? Number(profile.member_markup) : 0.4)
+      );
+  const defaultSaleDiscount =
+    profile?.sale_discount === null || typeof profile?.sale_discount === "undefined"
+      ? (
+          saleRows[0]?.sale_discount === null || typeof saleRows[0]?.sale_discount === "undefined"
+            ? 0
+            : Number(saleRows[0].sale_discount)
+        )
+      : Number(profile.sale_discount);
+
+  await connection.query(
+    `
+      INSERT INTO product_pricing_profiles (
+        product_id, unit_of_measure, source_unit_price, min_weight, max_weight,
+        avg_weight_override, source_multiplier, guest_markup, member_markup,
+        herd_share_markup, snap_markup, on_sale, sale_discount,
+        remote_sync_status, remote_sync_message, remote_synced_at, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `,
+    [
+      created.productId,
+      profile?.unit_of_measure || "each",
+      profile?.source_unit_price ?? null,
+      profile?.min_weight ?? null,
+      profile?.max_weight ?? null,
+      profile?.avg_weight_override ?? null,
+      Number.isFinite(Number(profile?.source_multiplier)) ? Number(profile.source_multiplier) : 0.5412,
+      defaultCsaMarkup,
+      defaultCsaMarkup,
+      defaultCsaMarkup,
+      defaultCsaMarkup,
+      profile ? profile.on_sale : (saleRows[0]?.on_sale ? 1 : 0),
+      defaultSaleDiscount,
+      "pending",
+      "Duplicate created with default CSA markup applied to all price lists. Apply to remote store pending.",
+      null,
+      now,
+      now
+    ]
+  );
+
+  for (const row of imageRows) {
+    await connection.query(
+      "INSERT INTO product_images (product_id, url, url_hash) VALUES (?, ?, ?)",
+      [created.productId, row.url, row.url_hash]
+    );
+  }
+
+  for (const row of mediaRows) {
+    await connection.query(
+      `
+        INSERT INTO product_media (
+          product_id, source, source_media_id, source_url, remote_url, storage_key,
+          public_url, thumbnail_url, sort_order, is_primary, alt_text, content_hash,
+          width, height, mime_type, created_at, updated_at, last_synced_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `,
+      [
+        created.productId,
+        "local-copy",
+        null,
+        row.source_url,
+        row.remote_url,
+        row.storage_key,
+        row.public_url,
+        row.thumbnail_url,
+        row.sort_order,
+        row.is_primary,
+        row.alt_text,
+        row.content_hash,
+        row.width,
+        row.height,
+        row.mime_type,
+        now,
+        now,
+        null
+      ]
+    );
+  }
+
+  for (const row of tagRows) {
+    await connection.query(
+      "INSERT INTO product_tags (product_id, tag_id) VALUES (?, ?)",
+      [created.productId, row.tagId]
+    );
+  }
+
+  return created;
+}
+
+async function deleteLocalOnlyProductRecord(connection, productId) {
+  const [productRows] = await connection.query(
+    "SELECT id FROM products WHERE id = ? LIMIT 1",
+    [productId]
+  );
+  if (!productRows[0]) {
+    throw new Error("Product not found");
+  }
+
+  const [productMetaRows] = await connection.query(
+    "SELECT local_line_product_id AS localLineProductId FROM local_line_product_meta WHERE product_id = ? LIMIT 1",
+    [productId]
+  ).catch((error) => {
+    if (isMissingTableError(error, "local_line_product_meta")) return [[]];
+    throw error;
+  });
+  if (Number(productMetaRows?.[0]?.localLineProductId || 0) > 0) {
+    throw new Error("Only local-only products can be deleted. This product is linked to Local Line.");
+  }
+
+  const [packageRows] = await connection.query(
+    "SELECT id FROM packages WHERE product_id = ?",
+    [productId]
+  );
+  const packageIds = packageRows
+    .map((row) => Number(row.id))
+    .filter((value) => Number.isFinite(value));
+
+  if (packageIds.length) {
+    const placeholders = packageIds.map(() => "?").join(", ");
+    await connection.query(
+      `DELETE FROM package_price_list_memberships WHERE package_id IN (${placeholders})`,
+      packageIds
+    );
+  }
+
+  await connection.query("DELETE FROM product_price_list_memberships WHERE product_id = ?", [productId]);
+  await connection.query("DELETE FROM product_pricing_profiles WHERE product_id = ?", [productId]);
+  await connection.query("DELETE FROM product_sales WHERE product_id = ?", [productId]);
+  await connection.query("DELETE FROM product_images WHERE product_id = ?", [productId]);
+  await connection.query("DELETE FROM product_tags WHERE product_id = ?", [productId]);
+  await connection.query("DELETE FROM reviews WHERE product_id = ?", [productId]);
+  await connection.query("DELETE FROM packages WHERE product_id = ?", [productId]);
+
+  await connection.query("DELETE FROM local_line_price_list_entries WHERE product_id = ?", [productId]).catch((error) => {
+    if (isMissingTableError(error, "local_line_price_list_entries")) return;
+    throw error;
+  });
+  await connection.query("DELETE FROM local_line_package_meta WHERE product_id = ?", [productId]).catch((error) => {
+    if (isMissingTableError(error, "local_line_package_meta")) return;
+    throw error;
+  });
+  await connection.query("DELETE FROM local_line_sync_issues WHERE product_id = ?", [productId]).catch((error) => {
+    if (isMissingTableError(error, "local_line_sync_issues")) return;
+    throw error;
+  });
+  await connection.query("DELETE FROM product_media WHERE product_id = ?", [productId]).catch((error) => {
+    if (isMissingTableError(error, "product_media")) return;
+    throw error;
+  });
+  await connection.query("DELETE FROM local_line_product_meta WHERE product_id = ?", [productId]).catch((error) => {
+    if (isMissingTableError(error, "local_line_product_meta")) return;
+    throw error;
+  });
+  await connection.query("DELETE FROM products WHERE id = ?", [productId]);
+
+  return { productId };
 }
 
 async function loadAdminRoleKeysForUser(userId) {
@@ -483,6 +1061,12 @@ router.get("/products", requireAdmin, async (_req, res) => {
   const packageRows = productIds.length
     ? await db.select().from(packages).where(inArray(packages.productId, productIds))
     : [];
+  const pricingProfileRows = productIds.length
+    ? await db
+        .select()
+        .from(productPricingProfiles)
+        .where(inArray(productPricingProfiles.productId, productIds))
+    : [];
 
   const saleRows = productIds.length
     ? await db.select().from(productSales).where(inArray(productSales.productId, productIds))
@@ -565,6 +1149,10 @@ router.get("/products", requireAdmin, async (_req, res) => {
     acc[row.productId] = row;
     return acc;
   }, {});
+  const pricingProfileByProduct = pricingProfileRows.reduce((acc, row) => {
+    acc[row.productId] = row;
+    return acc;
+  }, {});
   const syncIssueCountsByProduct = syncIssueRows.reduce((acc, row) => {
     acc[row.productId] = (acc[row.productId] || 0) + 1;
     return acc;
@@ -586,6 +1174,7 @@ router.get("/products", requireAdmin, async (_req, res) => {
         mediaObjectsByProduct[row.id] ||
         (imagesByProduct[row.id] || []).map((url) => ({ url, thumbnailUrl: url })),
       localLineMeta: productMetaByProduct[row.id] || null,
+      pricingProfile: pricingProfileByProduct[row.id] || null,
       localLineSyncIssueCount: syncIssueCountsByProduct[row.id] || 0,
       packages: packagesByProduct[row.id] || [],
       onSale: salesByProduct[row.id]?.onSale ?? false,
@@ -775,10 +1364,16 @@ router.get("/pricelist", requireAdmin, async (_req, res) => {
     ]);
 
   let packageMetaRows = [];
+  let productMetaRows = [];
   try {
     packageMetaRows = await db.select().from(localLinePackageMeta);
   } catch (error) {
     if (!isMissingTableError(error, "local_line_package_meta")) throw error;
+  }
+  try {
+    productMetaRows = await db.select().from(localLineProductMeta);
+  } catch (error) {
+    if (!isMissingTableError(error, "local_line_product_meta")) throw error;
   }
 
   const categoryMap = new Map(categoryRows.map((row) => [row.id, row.name]));
@@ -791,6 +1386,9 @@ router.get("/pricelist", requireAdmin, async (_req, res) => {
   }, new Map());
   const packageMetaByPackageId = new Map(
     packageMetaRows.map((row) => [Number(row.packageId), row])
+  );
+  const productMetaByProductId = new Map(
+    productMetaRows.map((row) => [Number(row.productId), row])
   );
   const profileByProductId = new Map(
     profileRows.map((row) => [Number(row.productId), row])
@@ -807,6 +1405,7 @@ router.get("/pricelist", requireAdmin, async (_req, res) => {
       const pricingProfile = profileByProductId.get(Number(product.id)) || null;
       const saleRow = saleByProductId.get(Number(product.id)) || null;
       const vendor = vendorMap.get(product.vendorId) || null;
+      const productMeta = productMetaByProductId.get(Number(product.id)) || null;
       const snapshot = computeProductPricingSnapshot({
         product,
         packages: packagesByProductId.get(Number(product.id)) || [],
@@ -855,6 +1454,7 @@ router.get("/pricelist", requireAdmin, async (_req, res) => {
         maxWeight: usesSourcePricing ? snapshot.profile.maxWeight : null,
         avgWeightOverride: usesSourcePricing ? snapshot.profile.avgWeightOverride : null,
         sourceMultiplier: usesSourcePricing ? snapshot.profile.sourceMultiplier : null,
+        localLineProductId: Number(productMeta?.localLineProductId || 0),
         guestMarkup: snapshot.profile.guestMarkup,
         memberMarkup: snapshot.profile.memberMarkup,
         herdShareMarkup: snapshot.profile.herdShareMarkup,
@@ -1065,7 +1665,8 @@ router.post("/pricelist/apply-remote", requireAdminPermission("localline_push"),
       const remoteResult = await updateLocalLineForProduct(db, productId, {
         onSale: snapshot.profile.onSale ? 1 : 0,
         saleDiscount: snapshot.profile.saleDiscount,
-        forcePriceSync: true
+        forcePriceSync: true,
+        forceImageSync: true
       });
       const remoteFailed = isLocalLineEnabled() && remoteResult.priceOk === false;
       if (remoteFailed) {
@@ -1356,6 +1957,107 @@ router.put("/reviews/:id", requireAdminPermission("member_admin"), async (req, r
   res.json({ ok: true });
 });
 
+router.post("/products", requireAdminPermission(["inventory_admin", "pricing_admin", "membership_admin"]), async (req, res) => {
+  const pool = getPool();
+  const payload = req.body || {};
+  const connection = await pool.getConnection();
+
+  try {
+    await ensureLocalLineSyncSchema().catch((error) => {
+      console.warn("Local Line schema bootstrap skipped for /admin/products POST:", error.message);
+    });
+
+    await connection.beginTransaction();
+    const created = await createLocalProductRecord(connection, payload);
+    if (Number.isFinite(Number(created.productRecord.vendorId))) {
+      const [vendorRows] = await connection.query(
+        "SELECT name FROM vendors WHERE id = ? LIMIT 1",
+        [created.productRecord.vendorId]
+      );
+      const vendor = vendorRows[0] || null;
+      if (isSourcePricingVendor(vendor)) {
+        const pricingProfile = normalizePricingProfileInput(payload.pricingProfile || payload);
+        validateSourcePricingProfile(pricingProfile);
+        await upsertProductPricingProfileRecord(connection, created.productId, pricingProfile);
+      }
+    }
+    await connection.commit();
+
+    const db = getDb();
+    await upsertLocalOnlyProductMeta(db, created.productId, created.productRecord);
+
+    res.json({
+      ok: true,
+      productId: created.productId
+    });
+  } catch (error) {
+    await connection.rollback();
+    res.status(400).json({ error: error?.message || "Unable to create product" });
+  } finally {
+    connection.release();
+  }
+});
+
+router.post("/products/:id/duplicate", requireAdminPermission(["inventory_admin", "pricing_admin", "membership_admin"]), async (req, res) => {
+  const pool = getPool();
+  const db = getDb();
+  const sourceProductId = Number(req.params.id);
+  if (!Number.isFinite(sourceProductId)) {
+    return res.status(400).json({ error: "Invalid product id" });
+  }
+
+  const connection = await pool.getConnection();
+
+  try {
+    await ensureLocalLineSyncSchema().catch((error) => {
+      console.warn("Local Line schema bootstrap skipped for /admin/products/:id/duplicate:", error.message);
+    });
+
+    await connection.beginTransaction();
+    const created = await duplicateLocalProductRecord(connection, sourceProductId);
+    await connection.commit();
+
+    await upsertLocalOnlyProductMeta(db, created.productId, created.productRecord);
+
+    res.json({
+      ok: true,
+      productId: created.productId
+    });
+  } catch (error) {
+    await connection.rollback();
+    const status = error?.message === "Product not found" ? 404 : 400;
+    res.status(status).json({ error: error?.message || "Unable to duplicate product" });
+  } finally {
+    connection.release();
+  }
+});
+
+router.delete("/products/:id", requireAdminPermission(["inventory_admin", "pricing_admin", "membership_admin"]), async (req, res) => {
+  const pool = getPool();
+  const productId = Number(req.params.id);
+  if (!Number.isFinite(productId)) {
+    return res.status(400).json({ error: "Invalid product id" });
+  }
+
+  const connection = await pool.getConnection();
+  try {
+    await ensureLocalLineSyncSchema().catch((error) => {
+      console.warn("Local Line schema bootstrap skipped for /admin/products/:id DELETE:", error.message);
+    });
+
+    await connection.beginTransaction();
+    const deleted = await deleteLocalOnlyProductRecord(connection, productId);
+    await connection.commit();
+    return res.json({ ok: true, productId: deleted.productId });
+  } catch (error) {
+    await connection.rollback();
+    const status = error?.message === "Product not found" ? 404 : 400;
+    return res.status(status).json({ error: error?.message || "Unable to delete product" });
+  } finally {
+    connection.release();
+  }
+});
+
 router.put("/products/:id", requireAdminPermission(["inventory_admin", "pricing_admin", "membership_admin"]), async (req, res) => {
   const db = getDb();
   const id = Number(req.params.id);
@@ -1376,6 +2078,67 @@ router.put("/products/:id", requireAdminPermission(["inventory_admin", "pricing_
     .where(eq(products.id, id));
 
   res.json({ ok: true });
+});
+
+router.put("/products/:id/pricing-profile", requireAdminPermission("pricing_admin"), async (req, res) => {
+  const pool = getPool();
+  const productId = Number(req.params.id);
+  if (!Number.isFinite(productId)) {
+    return res.status(400).json({ error: "Invalid product id" });
+  }
+
+  const connection = await pool.getConnection();
+  try {
+    const [productRows] = await connection.query(
+      "SELECT vendor_id AS vendorId FROM products WHERE id = ? LIMIT 1",
+      [productId]
+    );
+    const product = productRows[0];
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    const [vendorRows] = await connection.query(
+      "SELECT name FROM vendors WHERE id = ? LIMIT 1",
+      [product.vendorId]
+    );
+    const vendor = vendorRows[0] || null;
+    if (!isSourcePricingVendor(vendor)) {
+      return res.json({ ok: true, skipped: true });
+    }
+
+    const pricingProfile = normalizePricingProfileInput(req.body || {});
+    validateSourcePricingProfile(pricingProfile);
+    await upsertProductPricingProfileRecord(connection, productId, pricingProfile);
+    return res.json({ ok: true });
+  } catch (error) {
+    return res.status(400).json({ error: error?.message || "Unable to update pricing profile" });
+  } finally {
+    connection.release();
+  }
+});
+
+router.post("/products/:id/push-to-localline", requireAdminPermission("localline_push"), async (req, res) => {
+  const db = getDb();
+  const productId = Number(req.params.id);
+  if (!Number.isFinite(productId)) {
+    return res.status(400).json({ error: "Invalid product id" });
+  }
+
+  await ensureLocalLineSyncSchema().catch((error) => {
+    console.warn("Local Line schema bootstrap skipped for /admin/products/:id/push-to-localline:", error.message);
+  });
+
+  try {
+    const result = await createLocalLineProductFromStoreProduct(db, productId);
+    return res.json({
+      ok: true,
+      alreadyLinked: Boolean(result.alreadyLinked),
+      localLineProductId: result.localLineProductId || null
+    });
+  } catch (error) {
+    return res.status(400).json({ error: error?.message || "Unable to push product to Local Line" });
+  }
 });
 
 router.post("/products/bulk-update", requireAdminPermission(["inventory_admin", "membership_admin"]), async (req, res) => {
@@ -1465,7 +2228,13 @@ router.put("/packages/:id", requireAdminPermission(["pricing_admin", "membership
   await db
     .update(packages)
     .set({
+      name: updates.name ?? undefined,
       price: updates.price ?? undefined,
+      packageCode: updates.packageCode ?? undefined,
+      unit: updates.unit ?? undefined,
+      numOfItems: updates.numOfItems ?? undefined,
+      trackType: updates.trackType ?? undefined,
+      chargeType: updates.chargeType ?? undefined,
       inventory: updates.inventory ?? undefined,
       visible: updates.visible ?? undefined,
       trackInventory: updates.trackInventory ?? undefined
