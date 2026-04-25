@@ -1957,7 +1957,7 @@ router.put("/reviews/:id", requireAdminPermission("member_admin"), async (req, r
   res.json({ ok: true });
 });
 
-router.post("/products", requireAdminPermission(["inventory_admin", "pricing_admin", "membership_admin"]), async (req, res) => {
+router.post("/products", requireAdminPermission(["inventory_admin", "pricing_admin", "membership_admin", "local_pricelist_admin"]), async (req, res) => {
   const pool = getPool();
   const payload = req.body || {};
   const connection = await pool.getConnection();
@@ -1998,7 +1998,7 @@ router.post("/products", requireAdminPermission(["inventory_admin", "pricing_adm
   }
 });
 
-router.post("/products/:id/duplicate", requireAdminPermission(["inventory_admin", "pricing_admin", "membership_admin"]), async (req, res) => {
+router.post("/products/:id/duplicate", requireAdminPermission(["inventory_admin", "pricing_admin", "membership_admin", "local_pricelist_admin"]), async (req, res) => {
   const pool = getPool();
   const db = getDb();
   const sourceProductId = Number(req.params.id);
@@ -2032,7 +2032,7 @@ router.post("/products/:id/duplicate", requireAdminPermission(["inventory_admin"
   }
 });
 
-router.delete("/products/:id", requireAdminPermission(["inventory_admin", "pricing_admin", "membership_admin"]), async (req, res) => {
+router.delete("/products/:id", requireAdminPermission(["inventory_admin", "pricing_admin", "membership_admin", "local_pricelist_admin"]), async (req, res) => {
   const pool = getPool();
   const productId = Number(req.params.id);
   if (!Number.isFinite(productId)) {
@@ -2058,7 +2058,7 @@ router.delete("/products/:id", requireAdminPermission(["inventory_admin", "prici
   }
 });
 
-router.put("/products/:id", requireAdminPermission(["inventory_admin", "pricing_admin", "membership_admin"]), async (req, res) => {
+router.put("/products/:id", requireAdminPermission(["inventory_admin", "pricing_admin", "membership_admin", "local_pricelist_admin"]), async (req, res) => {
   const db = getDb();
   const id = Number(req.params.id);
   const updates = req.body || {};
@@ -2080,7 +2080,7 @@ router.put("/products/:id", requireAdminPermission(["inventory_admin", "pricing_
   res.json({ ok: true });
 });
 
-router.put("/products/:id/pricing-profile", requireAdminPermission("pricing_admin"), async (req, res) => {
+router.put("/products/:id/pricing-profile", requireAdminPermission(["pricing_admin", "local_pricelist_admin"]), async (req, res) => {
   const pool = getPool();
   const productId = Number(req.params.id);
   if (!Number.isFinite(productId)) {
@@ -2141,7 +2141,7 @@ router.post("/products/:id/push-to-localline", requireAdminPermission("localline
   }
 });
 
-router.post("/products/bulk-update", requireAdminPermission(["inventory_admin", "membership_admin"]), async (req, res) => {
+router.post("/products/bulk-update", requireAdminPermission(["inventory_admin", "membership_admin", "local_pricelist_admin"]), async (req, res) => {
   const db = getDb();
   const updates = Array.isArray(req.body?.updates) ? req.body.updates : [];
   const results = [];
@@ -2220,7 +2220,7 @@ router.post("/products/bulk-update", requireAdminPermission(["inventory_admin", 
   res.json({ results });
 });
 
-router.put("/packages/:id", requireAdminPermission(["pricing_admin", "membership_admin"]), async (req, res) => {
+router.put("/packages/:id", requireAdminPermission(["pricing_admin", "membership_admin", "local_pricelist_admin"]), async (req, res) => {
   const db = getDb();
   const id = Number(req.params.id);
   const updates = req.body || {};
@@ -2244,7 +2244,7 @@ router.put("/packages/:id", requireAdminPermission(["pricing_admin", "membership
   res.json({ ok: true });
 });
 
-router.post("/products/:id/images", requireAdminPermission(["inventory_admin", "pricing_admin"]), upload.single("image"), async (req, res) => {
+router.post("/products/:id/images", requireAdminPermission(["inventory_admin", "pricing_admin", "local_pricelist_admin"]), upload.single("image"), async (req, res) => {
   const db = getDb();
   const productId = Number(req.params.id);
   if (!req.file) {

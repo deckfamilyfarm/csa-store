@@ -27,6 +27,8 @@ function canAccessAdminSection(roleKeys, section) {
         roleKeys.includes("localline_pull") ||
         roleKeys.includes("localline_push")
       );
+    case "localPricelist":
+      return roleKeys.includes("local_pricelist_admin");
     case "manual":
       return Array.isArray(roleKeys) && roleKeys.length > 0;
     case "inventory":
@@ -51,6 +53,7 @@ function canAccessAdminSection(roleKeys, section) {
 function getDefaultAdminSection(roleKeys = []) {
   const order = [
     "pricelist",
+    "localPricelist",
     "inventory",
     "membership",
     "dropSites",
@@ -220,6 +223,13 @@ function isSourcePricingVendorName(value) {
     normalized.includes("hyland") ||
     normalized.includes("creamy cow")
   );
+}
+
+function stripHtmlPreview(value) {
+  return String(value || "")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 export function AdminPanel({ onCatalogRefresh }) {
@@ -756,7 +766,7 @@ export function AdminPanel({ onCatalogRefresh }) {
     const sourcePricingPayload = buildSourcePricingPayloadFromDraft();
 
     if (selectedDraftUsesSourcePricing && !Number.isFinite(Number(sourcePricingPayload.sourceUnitPrice))) {
-      setMessage("DFF source price is required for Deck Family Farm, Hyland, and Creamy Cow products.");
+      setMessage("Vendor retail price is required for Deck Family Farm, Hyland, and Creamy Cow products.");
       setProductSaveLoading(false);
       return;
     }
@@ -1293,6 +1303,7 @@ export function AdminPanel({ onCatalogRefresh }) {
   const currentAdminRoles = currentAdmin?.adminRoles || [];
   const canManageUsers = hasRole(currentAdminRoles, "user_admin");
   const canManagePricing = canAccessAdminSection(currentAdminRoles, "pricelist");
+  const canManageLocalPricelist = canAccessAdminSection(currentAdminRoles, "localPricelist");
   const canManageInventory = hasRole(currentAdminRoles, "inventory_admin");
   const canManageMembership = hasRole(currentAdminRoles, "membership_admin");
   const canPushToLocalLine = hasRole(currentAdminRoles, "localline_push");
@@ -1300,13 +1311,18 @@ export function AdminPanel({ onCatalogRefresh }) {
   const canManageMembers = hasRole(currentAdminRoles, "member_admin");
   const canManageCoreAdmin = currentAdminRoles.includes("admin");
   const showProductEditor =
-    activeSection === "pricelist" &&
-    canManagePricing &&
+    (activeSection === "pricelist" || activeSection === "localPricelist") &&
+    (canManagePricing || canManageLocalPricelist) &&
     (productEditorMode === "new" || (selectedProductId && activeProduct));
   const selectedDraftVendor = vendors.find(
     (vendor) => String(vendor.id) === String(productDraft?.vendorId || "")
   );
   const selectedDraftUsesSourcePricing = isSourcePricingVendorName(selectedDraftVendor?.name);
+  const localPricelistVendors = sortedVendors.filter((vendor) => isSourcePricingVendorName(vendor?.name));
+  const editorVendorOptions = activeSection === "localPricelist" ? localPricelistVendors : sortedVendors;
+  const localPricelistProducts = products.filter((product) =>
+    isSourcePricingVendorName(vendorMap.get(product.vendorId))
+  );
   const linkedLocalLineProductId =
     (hasLinkedLocalLineProduct(localLineProductDetail?.productMeta)
       ? Number(localLineProductDetail?.productMeta?.localLineProductId)
@@ -1397,7 +1413,9 @@ export function AdminPanel({ onCatalogRefresh }) {
 
   const normalizedProductNameSearch = productNameSearch.trim().toLowerCase();
 
-  const productsMatchingOtherFilters = products.filter((product) => {
+  const productSourceSet = activeSection === "localPricelist" ? localPricelistProducts : products;
+
+  const productsMatchingOtherFilters = productSourceSet.filter((product) => {
     const categoryMatch = !productCategoryFilter || String(product.categoryId) === productCategoryFilter;
     const vendorMatch = !productVendorFilter || String(product.vendorId) === productVendorFilter;
     const visibleMatch =
@@ -1967,13 +1985,16 @@ export function AdminPanel({ onCatalogRefresh }) {
               Pricelist
             </button>
           ) : null}
-          {currentAdmin ? (
+          {canManageLocalPricelist ? (
             <button
-              className={`admin-nav-item ${activeSection === "manual" ? "active" : ""}`}
-              onClick={() => openAdminManual("overview")}
+              className={`admin-nav-item ${activeSection === "localPricelist" ? "active" : ""}`}
+              onClick={() => {
+                setActiveSection("localPricelist");
+                closeProductEditor();
+              }}
               type="button"
             >
-              Manual
+              Local Pricelist
             </button>
           ) : null}
           {canManageInventory ? (
@@ -2070,12 +2091,26 @@ export function AdminPanel({ onCatalogRefresh }) {
               Users
             </button>
           ) : null}
+          {currentAdmin ? (
+            <button
+              className={`admin-nav-item ${activeSection === "manual" ? "active" : ""}`}
+              onClick={() => openAdminManual("overview")}
+              type="button"
+            >
+              Manual
+            </button>
+          ) : null}
         </aside>
 
         <div className="admin-content">
-          {activeSection === "products" && !showProductEditor && (
+          {activeSection === "localPricelist" && canManageLocalPricelist && !showProductEditor && (
             <section className="admin-section">
-              <h3>Products</h3>
+              <h3>Local Pricelist</h3>
+              <div className="small">
+                Manage local Deck, Hyland, and Creamy Cow products. Use <strong>Details</strong>
+                to edit vendor retail price, unit type, min/max weight, description, and package
+                pricing.
+              </div>
               <div className="filters product-admin-filters">
                 <label className="filter-field product-search-filter">
                   <span className="small">Product name</span>
@@ -2141,7 +2176,7 @@ export function AdminPanel({ onCatalogRefresh }) {
                     onChange={(event) => setProductVendorFilter(event.target.value)}
                   >
                     <option value="">All vendors</option>
-                    {sortedVendors.map((vendor) => (
+                    {localPricelistVendors.map((vendor) => (
                       <option key={vendor.id} value={vendor.id}>
                         {vendor.name}
                       </option>
@@ -2177,162 +2212,118 @@ export function AdminPanel({ onCatalogRefresh }) {
                 <button className="button" type="button" onClick={startNewProductDraft}>
                   Add Product
                 </button>
-                <button
-                  className="button"
-                  type="button"
-                  onClick={handleApplyChanges}
-                  disabled={applyLoading || pendingProductEditEntries.length === 0}
-                >
-                  {applyLoading ? "Applying..." : "Apply Changes"}
-                </button>
-                <button
-                  className="button alt"
-                  type="button"
-                  disabled={applyLoading || pendingProductEditEntries.length === 0}
-                  onClick={() => {
-                    if (!window.confirm("Discard all pending changes? This cannot be undone.")) {
-                      return;
-                    }
-                    setProductEdits({});
-                    setMessage("Pending changes discarded.");
-                  }}
-                >
-                  Cancel Changes
-                </button>
               </div>
               <div className="admin-table-shell">
                 <table
-                  className="admin-table admin-table-head"
-                  style={{ width: productTableWidth, minWidth: productTableWidth }}
+                  className="admin-table admin-table-head local-pricelist-table"
                 >
                   <colgroup>
-                    <col style={{ width: "160px" }} />
-                    <col style={{ width: "260px" }} />
-                    <col style={{ width: "180px" }} />
-                    <col style={{ width: "110px" }} />
-                    <col style={{ width: "96px" }} />
-                    <col style={{ width: "132px" }} />
-                    <col style={{ width: "110px" }} />
-                    <col style={{ width: "96px" }} />
-                    <col style={{ width: "132px" }} />
-                    <col style={{ width: "188px" }} />
+                    <col style={{ width: "13%" }} />
+                    <col style={{ width: "22%" }} />
+                    <col style={{ width: "8%" }} />
+                    <col style={{ width: "8%" }} />
+                    <col style={{ width: "8%" }} />
+                    <col style={{ width: "12%" }} />
+                    <col style={{ width: "17%" }} />
+                    <col style={{ width: "6%" }} />
+                    <col style={{ width: "6%" }} />
                   </colgroup>
                   <thead>
                     <tr>
                       <th>Category</th>
-                      <th>Name</th>
-                      <th>Vendor</th>
-                      <th>Price</th>
-                      <th>Visible</th>
-                      <th>Track Inventory</th>
-                      <th>Stock</th>
-                      <th>On Sale</th>
-                      <th>Discount %</th>
-                      <th></th>
+                      <th>Product Name</th>
+                      <th>Min</th>
+                      <th>Max</th>
+                      <th>Unit</th>
+                      <th>Retail Price</th>
+                      <th>Description</th>
+                      <th>Edit</th>
+                      <th>Duplicate</th>
                     </tr>
                   </thead>
                 </table>
                 <div className="admin-table-body-scroll">
                   <table
-                    className="admin-table admin-table-body"
-                    style={{ width: productTableWidth, minWidth: productTableWidth }}
+                    className="admin-table admin-table-body local-pricelist-table"
                   >
                     <colgroup>
-                      <col style={{ width: "160px" }} />
-                      <col style={{ width: "260px" }} />
-                      <col style={{ width: "180px" }} />
-                      <col style={{ width: "110px" }} />
-                      <col style={{ width: "96px" }} />
-                      <col style={{ width: "132px" }} />
-                    <col style={{ width: "110px" }} />
-                    <col style={{ width: "96px" }} />
-                    <col style={{ width: "132px" }} />
-                    <col style={{ width: "188px" }} />
+                      <col style={{ width: "13%" }} />
+                      <col style={{ width: "22%" }} />
+                      <col style={{ width: "8%" }} />
+                      <col style={{ width: "8%" }} />
+                      <col style={{ width: "8%" }} />
+                      <col style={{ width: "12%" }} />
+                      <col style={{ width: "17%" }} />
+                      <col style={{ width: "6%" }} />
+                      <col style={{ width: "6%" }} />
                   </colgroup>
                     <tbody>
                       {filteredProducts.map((product) => {
-                        const defaults = getProductDefaults(product);
-                        const edits = productEdits[product.id];
-                        const rowValues = edits ? { ...defaults, ...edits } : defaults;
+                        const pricingProfile = product.pricingProfile || {};
+                        const unitDisplay =
+                          String(pricingProfile.unitOfMeasure || "each").toLowerCase() === "lbs"
+                            ? "lbs"
+                            : "each";
+                        const retailPrice = Number(pricingProfile.sourceUnitPrice);
+                        const descriptionPreview = stripHtmlPreview(product.description);
+                        const descriptionSummary =
+                          !descriptionPreview
+                            ? "No description"
+                            : descriptionPreview.length > 40
+                              ? `${descriptionPreview.slice(0, 40)}...`
+                              : descriptionPreview;
+                        const minWeight =
+                          pricingProfile.minWeight === null || typeof pricingProfile.minWeight === "undefined"
+                            ? "n/a"
+                            : String(pricingProfile.minWeight);
+                        const maxWeight =
+                          pricingProfile.maxWeight === null || typeof pricingProfile.maxWeight === "undefined"
+                            ? "n/a"
+                            : String(pricingProfile.maxWeight);
                         return (
-                          <tr key={product.id} className={edits ? "edited" : ""}>
-                            <td>{categoryMap.get(product.categoryId) || "Uncategorized"}</td>
-                            <td>{product.name}</td>
-                            <td>{vendorMap.get(product.vendorId) || "N/A"}</td>
-                            <td>{getProductPrice(product)}</td>
+                          <tr key={product.id}>
                             <td>
-                              <button
-                                className={`toggle-switch ${rowValues.visible ? "active" : ""}`}
-                                type="button"
-                                onClick={() =>
-                                  updateProductEdit(product.id, { visible: !rowValues.visible })
-                                }
-                              />
+                              <span className="local-pricelist-cell">
+                                {categoryMap.get(product.categoryId) || "Uncategorized"}
+                              </span>
                             </td>
+                            <td><span className="local-pricelist-cell">{product.name}</span></td>
+                            <td><span className="local-pricelist-cell">{minWeight}</span></td>
+                            <td><span className="local-pricelist-cell">{maxWeight}</span></td>
+                            <td><span className="local-pricelist-cell">{unitDisplay}</span></td>
                             <td>
-                              <button
-                                className={`toggle-switch ${rowValues.trackInventory ? "active" : ""}`}
-                                type="button"
-                                onClick={() =>
-                                  updateProductEdit(product.id, { trackInventory: !rowValues.trackInventory })
-                                }
-                              />
-                            </td>
-                            <td>
-                              <input
-                                className="stock-input"
-                                type="number"
-                                value={rowValues.inventory}
-                                onChange={(event) =>
-                                  updateProductEdit(product.id, { inventory: Number(event.target.value) })
-                                }
-                              />
-                            </td>
-                            <td>
-                              <button
-                                className={`toggle-switch ${rowValues.onSale ? "active" : ""}`}
-                                type="button"
-                                onClick={() =>
-                                  updateProductEdit(product.id, { onSale: !rowValues.onSale })
-                                }
-                              />
-                            </td>
-                            <td>
-                              <span className="sale-discount-wrapper">
-                                <input
-                                  className="sale-discount-input"
-                                  type="number"
-                                  min="0"
-                                  max="100"
-                                  step="1"
-                                  value={rowValues.saleDiscount}
-                                  onChange={(event) =>
-                                    updateProductEdit(product.id, { saleDiscount: Number(event.target.value) })
-                                  }
-                                />
-                                <span className="sale-discount-suffix">%</span>
+                              <span className="local-pricelist-cell">
+                                {Number.isFinite(retailPrice) ? `$${retailPrice.toFixed(2)}` : "n/a"}
                               </span>
                             </td>
                             <td>
-                              <div className="admin-actions">
-                                <button
-                                  className="button alt"
-                                  type="button"
-                                  onClick={() => {
-                                    setProductEditorMode("existing");
-                                    setSelectedProductId(product.id);
-                                  }}
-                                >
-                                  Details
-                                </button>
-                                <button
-                                  className="button alt"
-                                  type="button"
-                                  onClick={() => handleDuplicateProduct(product.id)}
-                                >
-                                  Duplicate
-                                </button>
-                              </div>
+                              <span
+                                className="local-pricelist-cell local-pricelist-description"
+                                title={descriptionPreview || "No description"}
+                              >
+                                {descriptionSummary}
+                              </span>
+                            </td>
+                            <td>
+                              <button
+                                className="button alt"
+                                type="button"
+                                onClick={() => {
+                                  setProductEditorMode("existing");
+                                  setSelectedProductId(product.id);
+                                }}
+                              >
+                                Edit
+                              </button>
+                            </td>
+                            <td>
+                              <button
+                                className="button alt"
+                                type="button"
+                                onClick={() => handleDuplicateProduct(product.id)}
+                              >
+                                Duplicate
+                              </button>
                             </td>
                           </tr>
                         );
@@ -2347,7 +2338,7 @@ export function AdminPanel({ onCatalogRefresh }) {
           {showProductEditor && (
             <section className="admin-section">
               <button className="button alt" type="button" onClick={closeProductEditor}>
-                Back to pricelist
+                {activeSection === "localPricelist" ? "Back to local pricelist" : "Back to pricelist"}
               </button>
               <h3>{productEditorMode === "new" ? "New Product" : activeProduct.name}</h3>
               {productDraft && (
@@ -2390,7 +2381,7 @@ export function AdminPanel({ onCatalogRefresh }) {
                       }
                     >
                       <option value="">Select vendor</option>
-                      {sortedVendors.map((vendor) => (
+                      {editorVendorOptions.map((vendor) => (
                         <option key={vendor.id} value={vendor.id}>
                           {vendor.name}
                         </option>
@@ -2419,28 +2410,29 @@ export function AdminPanel({ onCatalogRefresh }) {
                       <div className="admin-source-pricing-callout">
                         <strong>Deck / Hyland / Creamy pricing</strong>
                         <div className="small">
-                          The package Price field below is the CSA base price for these vendors and
-                          is auto-calculated as you enter source pricing.
+                          The package price field below is the CSA Package Price for these vendors
+                          and is auto-calculated as you enter retail pricing.
                         </div>
                         <ol className="admin-source-pricing-steps">
                           <li>
-                            Start with the retail/source unit price in <strong>DFF Source Price</strong>.
+                            Start with the vendor unit price in <strong>Vendor Retail Price</strong>.
                           </li>
                           <li>
                             For weight-based items, use <strong>Avg Weight Override</strong> or the
                             average of min and max weight.
                           </li>
                           <li>
-                            Apply the FFCSA factor to get the CSA store base price shown in
-                            <strong> Price</strong>.
+                            Apply the FFCSA factor to get the <strong>CSA Package Price</strong>
+                            shown in <strong> Price</strong>.
                           </li>
                           <li>
-                            Apply Guest, Member, Herd Share, and SNAP margins from that base.
+                            Apply Guest, Member, Herd Share, and SNAP adjustments from that package
+                            price.
                           </li>
                         </ol>
                       </div>
                       <label className="filter-field">
-                        <span className="small">DFF Unit Type</span>
+                        <span className="small">Unit Type</span>
                         <select
                           className="input"
                           value={productDraft.unitOfMeasure}
@@ -2456,7 +2448,7 @@ export function AdminPanel({ onCatalogRefresh }) {
                         </select>
                       </label>
                       <label className="filter-field">
-                        <span className="small">DFF Source Price</span>
+                        <span className="small">Vendor Retail Price</span>
                         <input
                           className="input"
                           type="number"
@@ -2537,8 +2529,8 @@ export function AdminPanel({ onCatalogRefresh }) {
                         />
                       </label>
                       <div className="small">
-                        These local-only fields drive formula pricing, the remote FFCSA base price,
-                        and the downstream price-list calculations.
+                        These local-only fields drive formula pricing, the CSA Package Price, and
+                        the downstream adjusted prices for each price list.
                       </div>
                     </>
                   ) : null}
@@ -2565,7 +2557,7 @@ export function AdminPanel({ onCatalogRefresh }) {
                         </label>
                         <label className="filter-field">
                           <span className="small">
-                            {selectedDraftUsesSourcePricing ? "CSA Price" : "Price"}
+                            {selectedDraftUsesSourcePricing ? "CSA Package Price" : "Price"}
                           </span>
                           <input
                             className="input"
@@ -2578,8 +2570,8 @@ export function AdminPanel({ onCatalogRefresh }) {
                           />
                           {selectedDraftUsesSourcePricing ? (
                             <div className="small">
-                              Auto-calculated CSA/base price used for the local store and Local
-                              Line push.
+                              Auto-calculated CSA Package Price used for the local store and Local
+                              Line package price push.
                             </div>
                           ) : null}
                         </label>

@@ -927,6 +927,23 @@ img {
   color: var(--navy);
 }
 
+.local-pricelist-table {
+  width: 100%;
+  min-width: 100%;
+}
+
+.local-pricelist-cell {
+  display: block;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.local-pricelist-description {
+  max-width: 100%;
+}
+
 .pricelist-table-shell {
   position: relative;
   width: 100%;

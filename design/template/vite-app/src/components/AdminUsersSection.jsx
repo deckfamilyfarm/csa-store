@@ -7,7 +7,7 @@ const EMPTY_NEW_USER = {
   email: "",
   name: "",
   active: true,
-  adminRoles: ["inventory_admin"]
+  adminRoles: ["local_pricelist_admin"]
 };
 
 function normalizeUserDraft(user) {

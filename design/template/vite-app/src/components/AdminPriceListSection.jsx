@@ -12,24 +12,24 @@ const PRICELIST_COLUMNS = [
   { key: "apply", label: "Push", width: 104, sticky: true, required: true, defaultVisible: true },
   { key: "status", label: "Status", width: 150, sticky: true, defaultVisible: true },
   { key: "product", label: "Product", width: 260, sticky: true, required: true, defaultVisible: true },
+  { key: "sourceUnitPrice", label: "Vendor Retail Price", width: 156, defaultVisible: true },
+  { key: "unit", label: "Unit Type", width: 128, defaultVisible: true },
   { key: "category", label: "Category", width: 160, defaultVisible: true },
   { key: "vendor", label: "Vendor", width: 170, defaultVisible: true },
   { key: "pricingRule", label: "Rule", width: 150, defaultVisible: true },
-  { key: "sourceUnitPrice", label: "DFF Source Price", width: 136, defaultVisible: true },
-  { key: "unit", label: "DFF Unit Type", width: 128, defaultVisible: true },
   { key: "minWeight", label: "Min Wt", width: 100, defaultVisible: false },
   { key: "maxWeight", label: "Max Wt", width: 100, defaultVisible: false },
   { key: "avgWeightOverride", label: "Avg Wt", width: 100, defaultVisible: false },
-  { key: "sourceMultiplier", label: "Factor", width: 100, defaultVisible: false },
-  { key: "basePrice", label: "Base Price", width: 120, defaultVisible: false },
-  { key: "guestMarkup", label: "Guest %", width: 106, defaultVisible: false },
-  { key: "guestPrice", label: "Guest $", width: 106, defaultVisible: false },
-  { key: "memberMarkup", label: "Member %", width: 110, defaultVisible: false },
-  { key: "memberPrice", label: "Member $", width: 110, defaultVisible: false },
-  { key: "herdShareMarkup", label: "Herd %", width: 100, defaultVisible: false },
-  { key: "herdSharePrice", label: "Herd $", width: 100, defaultVisible: false },
-  { key: "snapMarkup", label: "SNAP %", width: 100, defaultVisible: false },
-  { key: "snapPrice", label: "SNAP $", width: 100, defaultVisible: false },
+  { key: "sourceMultiplier", label: "FFCSA Factor", width: 116, defaultVisible: false },
+  { key: "basePrice", label: "CSA Package Price", width: 146, defaultVisible: false },
+  { key: "guestMarkup", label: "Guest Adj %", width: 112, defaultVisible: false },
+  { key: "guestPrice", label: "Guest Adjusted $", width: 142, defaultVisible: false },
+  { key: "memberMarkup", label: "Member Adj %", width: 118, defaultVisible: false },
+  { key: "memberPrice", label: "Member Adjusted $", width: 152, defaultVisible: false },
+  { key: "herdShareMarkup", label: "Herd Adj %", width: 110, defaultVisible: false },
+  { key: "herdSharePrice", label: "Herd Adjusted $", width: 144, defaultVisible: false },
+  { key: "snapMarkup", label: "SNAP Adj %", width: 110, defaultVisible: false },
+  { key: "snapPrice", label: "SNAP Adjusted $", width: 144, defaultVisible: false },
   { key: "onSale", label: "Sale", width: 82, defaultVisible: true },
   { key: "saleDiscount", label: "Sale %", width: 96, defaultVisible: true },
   { key: "packages", label: "Packages", width: 340, defaultVisible: true },
@@ -38,6 +38,23 @@ const PRICELIST_COLUMNS = [
 
 const PRICELIST_COLUMN_MAP = new Map(PRICELIST_COLUMNS.map((column) => [column.key, column]));
 const BUILT_IN_COLUMN_ORDER = PRICELIST_COLUMNS.map((column) => column.key);
+
+function enforcePreferredColumnOrder(columnOrder = []) {
+  const nextOrder = [...columnOrder];
+  const productIndex = nextOrder.indexOf("product");
+  if (productIndex < 0) return nextOrder;
+
+  const preferredKeys = ["sourceUnitPrice", "unit"];
+  preferredKeys.forEach((key) => {
+    const index = nextOrder.indexOf(key);
+    if (index >= 0) {
+      nextOrder.splice(index, 1);
+    }
+  });
+
+  nextOrder.splice(productIndex + 1, 0, ...preferredKeys);
+  return nextOrder;
+}
 
 function getDefaultVisibleColumns() {
   return PRICELIST_COLUMNS.reduce((acc, column) => {
@@ -71,7 +88,7 @@ function normalizeColumnOrder(columnOrder) {
     }
   }
 
-  return normalized;
+  return enforcePreferredColumnOrder(normalized);
 }
 
 function normalizeVisibleColumns(visibleColumns) {
@@ -892,147 +909,137 @@ export function AdminPriceListSection({
         </div>
 
         <div className="pricelist-toolbar-actions">
-          <div className="small pricelist-count">
-            {filteredRows.length} / {rows.length} products
-          </div>
-          <button
-            className="button"
-            type="button"
-            onClick={() => {
-              if (typeof onAddProduct === "function") {
-                onAddProduct();
+          <div className="pricelist-toolbar-buttons">
+            <button
+              className="button"
+              type="button"
+              onClick={() => {
+                if (typeof onAddProduct === "function") {
+                  onAddProduct();
+                }
+              }}
+              disabled={typeof onAddProduct !== "function"}
+            >
+              Add Product
+            </button>
+            <div className="pricelist-column-picker" ref={columnPickerRef}>
+              <button
+                className="button alt"
+                type="button"
+                onClick={() => setColumnPickerOpen((prev) => !prev)}
+              >
+                Columns
+              </button>
+              {columnPickerOpen ? (
+                <div className="pricelist-column-panel">
+                  <div className="pricelist-column-panel-actions">
+                    <button className="button alt" type="button" onClick={saveCurrentColumnsAsDefault}>
+                      Save Default
+                    </button>
+                    <button className="button alt" type="button" onClick={resetColumnsToDefaults}>
+                      Reset Defaults
+                    </button>
+                    <button className="button alt" type="button" onClick={resetColumnsToBuiltInDefaults}>
+                      App Default
+                    </button>
+                    <button className="button alt" type="button" onClick={showAllColumns}>
+                      Show All
+                    </button>
+                  </div>
+                  <div className="pricelist-column-list">
+                    {orderedColumnDefs.map((column, index) => (
+                      <div key={column.key} className="pricelist-column-option">
+                        <label className="pricelist-column-option-main">
+                          <input
+                            type="checkbox"
+                            checked={column.required || visibleColumns[column.key] !== false}
+                            disabled={column.required}
+                            onChange={(event) => setColumnVisibility(column.key, event.target.checked)}
+                          />
+                          <span>{column.label}</span>
+                          {column.required ? <span className="small">Required</span> : null}
+                        </label>
+                        <div className="pricelist-column-order-actions">
+                          <button
+                            className="button alt"
+                            type="button"
+                            disabled={index === 0}
+                            onClick={() => moveColumn(column.key, -1)}
+                          >
+                            Up
+                          </button>
+                          <button
+                            className="button alt"
+                            type="button"
+                            disabled={index === orderedColumnDefs.length - 1}
+                            onClick={() => moveColumn(column.key, 1)}
+                          >
+                            Down
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+            <button
+              className="button"
+              type="button"
+              onClick={handleSaveChanges}
+              disabled={saving || dirtyProductIds.length === 0}
+            >
+              {saving ? "Saving..." : "Save Local Changes"}
+            </button>
+            <button
+              className="button sync-button"
+              type="button"
+              onClick={onReviewLocalLine}
+              disabled={reviewLocalLineLoading || typeof onReviewLocalLine !== "function"}
+            >
+              {reviewLocalLineLoading ? "Reviewing..." : "Review Local Line"}
+            </button>
+            <button
+              className="button sync-button"
+              type="button"
+              onClick={onPullFromLocalLine}
+              disabled={
+                pullFromLocalLineLoading ||
+                pullFromLocalLineRunning ||
+                typeof onPullFromLocalLine !== "function"
               }
-            }}
-            disabled={typeof onAddProduct !== "function"}
-          >
-            Add Product
-          </button>
-          <button
-            className="button alt"
-            type="button"
-            onClick={() => {
-              if (typeof onOpenPricingGuide === "function") {
-                onOpenPricingGuide();
-              }
-            }}
-            disabled={typeof onOpenPricingGuide !== "function"}
-          >
-            Pricing Guide
-          </button>
-          <div className="pricelist-column-picker" ref={columnPickerRef}>
+            >
+              {pullFromLocalLineLoading
+                ? "Starting Pull..."
+                : pullFromLocalLineRunning
+                  ? "Pull Running..."
+                  : "Pull From Local Line"}
+            </button>
+            <button
+              className="button sync-button"
+              type="button"
+              onClick={() => applyRemote(remoteReadyProductIds)}
+              disabled={applyingProductIds.length > 0 || remoteReadyProductIds.length === 0}
+            >
+              {applyingProductIds.length
+                ? "Pushing..."
+                : `Push To Local Line (${remoteReadyProductIds.length})`}
+            </button>
             <button
               className="button alt"
               type="button"
-              onClick={() => setColumnPickerOpen((prev) => !prev)}
+              onClick={exportGooglePricelist}
+              disabled={exportingGoogle}
             >
-              Columns
+              {exportingGoogle ? "Exporting..." : "Push Google Pricelist"}
             </button>
-            {columnPickerOpen ? (
-              <div className="pricelist-column-panel">
-                <div className="pricelist-column-panel-actions">
-                  <button className="button alt" type="button" onClick={saveCurrentColumnsAsDefault}>
-                    Save Default
-                  </button>
-                  <button className="button alt" type="button" onClick={resetColumnsToDefaults}>
-                    Reset Defaults
-                  </button>
-                  <button className="button alt" type="button" onClick={resetColumnsToBuiltInDefaults}>
-                    App Default
-                  </button>
-                  <button className="button alt" type="button" onClick={showAllColumns}>
-                    Show All
-                  </button>
-                </div>
-                <div className="pricelist-column-list">
-                  {orderedColumnDefs.map((column, index) => (
-                    <div key={column.key} className="pricelist-column-option">
-                      <label className="pricelist-column-option-main">
-                        <input
-                          type="checkbox"
-                          checked={column.required || visibleColumns[column.key] !== false}
-                          disabled={column.required}
-                          onChange={(event) => setColumnVisibility(column.key, event.target.checked)}
-                        />
-                        <span>{column.label}</span>
-                        {column.required ? <span className="small">Required</span> : null}
-                      </label>
-                      <div className="pricelist-column-order-actions">
-                        <button
-                          className="button alt"
-                          type="button"
-                          disabled={index === 0}
-                          onClick={() => moveColumn(column.key, -1)}
-                        >
-                          Up
-                        </button>
-                        <button
-                          className="button alt"
-                          type="button"
-                          disabled={index === orderedColumnDefs.length - 1}
-                          onClick={() => moveColumn(column.key, 1)}
-                        >
-                          Down
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : null}
+            <button className="button alt" type="button" onClick={loadPriceList} disabled={loading}>
+              {loading ? "Refreshing..." : "Refresh"}
+            </button>
           </div>
-          <button
-            className="button"
-            type="button"
-            onClick={handleSaveChanges}
-            disabled={saving || dirtyProductIds.length === 0}
-          >
-            {saving ? "Saving..." : "Save Local Changes"}
-          </button>
-          <button
-            className="button sync-button"
-            type="button"
-            onClick={onReviewLocalLine}
-            disabled={reviewLocalLineLoading || typeof onReviewLocalLine !== "function"}
-          >
-            {reviewLocalLineLoading ? "Reviewing..." : "Review Local Line"}
-          </button>
-          <button
-            className="button sync-button"
-            type="button"
-            onClick={onPullFromLocalLine}
-            disabled={
-              pullFromLocalLineLoading ||
-              pullFromLocalLineRunning ||
-              typeof onPullFromLocalLine !== "function"
-            }
-          >
-            {pullFromLocalLineLoading
-              ? "Starting Pull..."
-              : pullFromLocalLineRunning
-                ? "Pull Running..."
-                : "Pull From Local Line"}
-          </button>
-          <button
-            className="button sync-button"
-            type="button"
-            onClick={() => applyRemote(remoteReadyProductIds)}
-            disabled={applyingProductIds.length > 0 || remoteReadyProductIds.length === 0}
-          >
-            {applyingProductIds.length
-              ? "Pushing..."
-              : `Push To Local Line (${remoteReadyProductIds.length})`}
-          </button>
-          <button
-            className="button alt"
-            type="button"
-            onClick={exportGooglePricelist}
-            disabled={exportingGoogle}
-          >
-            {exportingGoogle ? "Exporting..." : "Push Google Pricelist"}
-          </button>
-          <button className="button alt" type="button" onClick={loadPriceList} disabled={loading}>
-            {loading ? "Refreshing..." : "Refresh"}
-          </button>
+          <div className="small pricelist-count">
+            {filteredRows.length} / {rows.length} products
+          </div>
         </div>
       </div>
 

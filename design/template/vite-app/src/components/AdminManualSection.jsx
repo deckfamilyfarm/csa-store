@@ -97,19 +97,19 @@ export function AdminManualSection({ focusTopic = "overview" }) {
       <article className="admin-manual-card" ref={setSectionRef("pricing")}>
         <h4>How Pricing Works</h4>
         <p>
-          Every product has a local pricing profile. The app starts with a base price and then
-          applies adjustments for each customer price list: Guest Basket, CSA Members, Herd Share
-          Members, and SNAP.
+          Every product has a local pricing profile. The app starts with a CSA Package Price and
+          then applies price-list adjustments for each customer price list: Guest Basket, CSA
+          Members, Herd Share Members, and SNAP.
         </p>
         <ul className="admin-manual-list">
-          <li>For standard products, the base price comes from the local package price.</li>
+          <li>For standard products, the CSA Package Price comes from the local package price.</li>
           <li>
-            For formula-priced vendors, the base price is calculated from the local source price,
-            the unit type, package quantity or weight, and the source multiplier.
+            For formula-priced vendors, the CSA Package Price is calculated from the local Vendor
+            Retail Price, the unit type, package quantity or weight, and the FFCSA Factor.
           </li>
           <li>
-            After the base price is known, the app applies the markup for each price list to
-            calculate the customer-facing prices.
+            After the CSA Package Price is known, the app applies the adjustment for each price
+            list to calculate the customer-facing Adjusted Price.
           </li>
           <li>
             If a sale is active, the sale discount is applied after the markup so the app can show
@@ -117,9 +117,9 @@ export function AdminManualSection({ focusTopic = "overview" }) {
           </li>
         </ul>
         <p className="admin-manual-note">
-          The app also keeps a single base price for remote sync. When you push to Local Line, that
-          computed base price becomes the starting point for the remote FFCSA store pricing, and the
-          price-list adjustments are built from there.
+          The app also keeps a single CSA Package Price for remote sync. When you push to Local
+          Line, that computed package price becomes the starting point for the remote FFCSA store
+          pricing, and the price-list adjusted prices are built from there.
         </p>
       </article>
 
@@ -132,35 +132,35 @@ export function AdminManualSection({ focusTopic = "overview" }) {
         </p>
         <ul className="admin-manual-list">
           <li>
-            <strong>DFF Source Price</strong> is the local source cost used for calculation.
+            <strong>Vendor Retail Price</strong> is the local retail price used for calculation.
           </li>
           <li>
-            <strong>DFF Unit Type</strong> tells the app whether the source price is per item or
-            per pound.
+            <strong>Unit Type</strong> tells the app whether the retail price is per item or per
+            pound.
           </li>
           <li>
             <strong>Avg Weight Override</strong> is used when the product is priced by weight and
             you want the app to use a specific average weight.
           </li>
           <li>
-            <strong>Source multiplier</strong> converts the source price into the store base price.
+            <strong>FFCSA Factor</strong> converts the retail price into the CSA Package Price.
           </li>
           <li>
             <strong>Guest, Member, Herd Share, and SNAP adjustments</strong> then create the final
-            sell price for each price list.
+            Adjusted Price for each price list.
           </li>
         </ul>
         <div className="admin-manual-callout">
           <strong>Deck / Hyland / Creamy pricing box</strong>
           <p>
-            The product template&apos;s package <strong>Price</strong> field is the CSA base price
-            for these vendors, and it is automatically calculated. Admins do not type a separate
-            CSA member price for them.
+            The product template&apos;s package <strong>Price</strong> field is the
+            <strong> CSA Package Price</strong> for these vendors, and it is automatically
+            calculated. Admins do not type a separate member sell price for them.
           </p>
           <ol className="admin-manual-list admin-manual-numbered">
             <li>
-              Start with the local retail or source unit price entered in <strong>DFF Source
-              Price</strong>.
+              Start with the local vendor unit price entered in
+              <strong> Vendor Retail Price</strong>.
             </li>
             <li>
               If the item is weight-based, the app uses <strong>Avg Weight Override</strong> when
@@ -173,12 +173,12 @@ export function AdminManualSection({ focusTopic = "overview" }) {
               package retail amount.
             </li>
             <li>
-              The app then applies the <strong>FFCSA discount factor</strong>, stored locally as the
-              source multiplier, to get the CSA store base price.
+              The app then applies the <strong>FFCSA Factor</strong> to get the
+              <strong> CSA Package Price</strong>.
             </li>
             <li>
-              From that base price, the app applies the Guest, CSA Member, Herd Share, and SNAP
-              margins automatically.
+              From that package price, the app applies the Guest, CSA Member, Herd Share, and SNAP
+              adjustments automatically to get each price list&apos;s <strong>Adjusted Price</strong>.
             </li>
             <li>
               If a sale is active, the sale discount is applied after the margin so the final sell
@@ -187,13 +187,13 @@ export function AdminManualSection({ focusTopic = "overview" }) {
           </ol>
         </div>
         <p>
-          If a package is priced by weight, the app uses the average weight to calculate its base
-          price. If a package is priced by count, the app uses the package quantity instead.
+          If a package is priced by weight, the app uses the average weight to calculate its CSA
+          Package Price. If a package is priced by count, the app uses the package quantity instead.
         </p>
         <p>
           Products with <strong>deposit</strong> in the product name are special no-markup items.
           Even if they are Deck Family Farm products, their markups are forced to zero so the sell
-          price stays equal to the calculated base amount.
+          price stays equal to the calculated CSA Package Price.
         </p>
       </article>
 
@@ -243,8 +243,9 @@ export function AdminManualSection({ focusTopic = "overview" }) {
             copy an existing item and adjust it.
           </li>
           <li>
-            For Deck Family Farm, Hyland, and Creamy Cow items, fill in the DFF source fields before
-            saving so the base price and price-list prices can calculate correctly.
+            For Deck Family Farm, Hyland, and Creamy Cow items, fill in the Vendor Retail Price
+            fields before saving so the CSA Package Price and price-list adjusted prices can
+            calculate correctly.
           </li>
           <li>Review the calculated prices and any sale settings.</li>
           <li>Save local changes first.</li>

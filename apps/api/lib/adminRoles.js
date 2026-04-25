@@ -16,8 +16,13 @@ export const ADMIN_ROLE_DEFINITIONS = [
   },
   {
     key: "pricing_admin",
-    label: "Pricing Admin",
-    description: "Manage pricelist formulas and local price adjustments."
+    label: "Remote Pricing Admin",
+    description: "Manage the remote pricelist workflow, formulas, and Local Line pricing adjustments."
+  },
+  {
+    key: "local_pricelist_admin",
+    label: "Local Pricelist",
+    description: "Manage local products, package pricing, and local pricing inputs."
   },
   {
     key: "localline_pull",
