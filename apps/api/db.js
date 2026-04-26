@@ -8,6 +8,7 @@ let db;
 let pool;
 let localLineSchemaPromise;
 let adminAccessSchemaPromise;
+let adminPricelistIndexesPromise;
 
 const LOCAL_LINE_TABLE_STATEMENTS = [
   `
@@ -438,6 +439,29 @@ const ADMIN_ACCESS_INDEX_STATEMENTS = [
   }
 ];
 
+const ADMIN_PRICELIST_INDEX_STATEMENTS = [
+  {
+    tableName: "products",
+    indexName: "idx_products_category",
+    columns: "category_id"
+  },
+  {
+    tableName: "products",
+    indexName: "idx_products_vendor",
+    columns: "vendor_id"
+  },
+  {
+    tableName: "products",
+    indexName: "idx_products_name",
+    columns: "name"
+  },
+  {
+    tableName: "packages",
+    indexName: "idx_packages_product",
+    columns: "product_id"
+  }
+];
+
 async function indexExists(connection, tableName, indexName) {
   const [rows] = await connection.query(
     `
@@ -611,6 +635,21 @@ async function runAdminAccessSchemaBootstrap(connection) {
   );
 }
 
+async function runAdminPricelistIndexBootstrap(connection) {
+  for (const indexDefinition of ADMIN_PRICELIST_INDEX_STATEMENTS) {
+    const exists = await indexExists(
+      connection,
+      indexDefinition.tableName,
+      indexDefinition.indexName
+    );
+    if (exists) continue;
+
+    await connection.query(
+      `CREATE INDEX ${indexDefinition.indexName} ON ${indexDefinition.tableName} (${indexDefinition.columns})`
+    );
+  }
+}
+
 export function initDb() {
   if (db) return db;
 
@@ -664,6 +703,20 @@ export async function ensureAdminAccessSchema(connection = getPool()) {
   }
 
   return runAdminAccessSchemaBootstrap(connection);
+}
+
+export async function ensureAdminPricelistIndexes(connection = getPool()) {
+  if (connection === getPool()) {
+    if (!adminPricelistIndexesPromise) {
+      adminPricelistIndexesPromise = runAdminPricelistIndexBootstrap(connection).catch((error) => {
+        adminPricelistIndexesPromise = null;
+        throw error;
+      });
+    }
+    return adminPricelistIndexesPromise;
+  }
+
+  return runAdminPricelistIndexBootstrap(connection);
 }
 
 export function isMissingTableError(error, tableName = "") {

@@ -5,6 +5,7 @@ import { AdminMembershipSection } from "./AdminMembershipSection.jsx";
 import { AdminPriceListSection } from "./AdminPriceListSection.jsx";
 import { AdminUsersSection } from "./AdminUsersSection.jsx";
 import {
+  adminDeleteImage,
   adminDelete,
   adminGet,
   adminLogin,
@@ -232,6 +233,9 @@ function stripHtmlPreview(value) {
     .trim();
 }
 
+const LOCAL_PRICELIST_PAGE_SIZE = 50;
+const LOCAL_PRICELIST_SEARCH_DEBOUNCE_MS = 250;
+
 export function AdminPanel({ onCatalogRefresh }) {
   const [token, setToken] = useState(() => localStorage.getItem("adminToken") || "");
   const [currentAdmin, setCurrentAdmin] = useState(null);
@@ -247,6 +251,7 @@ export function AdminPanel({ onCatalogRefresh }) {
   const [activeSection, setActiveSection] = useState("pricelist");
   const [manualFocusTopic, setManualFocusTopic] = useState("overview");
   const [selectedProductId, setSelectedProductId] = useState(null);
+  const [selectedProductDetail, setSelectedProductDetail] = useState(null);
   const [productEditorMode, setProductEditorMode] = useState("existing");
   const [productDraft, setProductDraft] = useState(null);
   const [productSaveLoading, setProductSaveLoading] = useState(false);
@@ -254,22 +259,33 @@ export function AdminPanel({ onCatalogRefresh }) {
   const [pushToLocalLineOnSave, setPushToLocalLineOnSave] = useState(false);
   const [pushProductLoading, setPushProductLoading] = useState(false);
   const [products, setProducts] = useState([]);
+  const [productsLoaded, setProductsLoaded] = useState(false);
   const [categories, setCategories] = useState([]);
   const [vendors, setVendors] = useState([]);
   const [recipes, setRecipes] = useState([]);
+  const [recipesLoaded, setRecipesLoaded] = useState(false);
   const [reviews, setReviews] = useState([]);
+  const [reviewsLoaded, setReviewsLoaded] = useState(false);
   const [dropSites, setDropSites] = useState([]);
+  const [dropSitesLoaded, setDropSitesLoaded] = useState(false);
   const [message, setMessage] = useState("");
   const [newCategory, setNewCategory] = useState("");
   const [newVendor, setNewVendor] = useState("");
   const [newDropSite, setNewDropSite] = useState({ name: "", address: "", dayOfWeek: "", openTime: "", closeTime: "" });
   const [newRecipe, setNewRecipe] = useState({ title: "", note: "", imageUrl: "", ingredients: "", steps: "" });
   const [productNameSearch, setProductNameSearch] = useState("");
-  const [showProductNameSuggestions, setShowProductNameSuggestions] = useState(false);
   const [productCategoryFilter, setProductCategoryFilter] = useState("");
   const [productVendorFilter, setProductVendorFilter] = useState("");
   const [productVisibleFilter, setProductVisibleFilter] = useState("visible");
   const [productSaleFilter, setProductSaleFilter] = useState("all");
+  const [debouncedProductNameSearch, setDebouncedProductNameSearch] = useState("");
+  const [localPricelistProducts, setLocalPricelistProducts] = useState([]);
+  const [localPricelistCategories, setLocalPricelistCategories] = useState([]);
+  const [localPricelistLoading, setLocalPricelistLoading] = useState(false);
+  const [localPricelistPage, setLocalPricelistPage] = useState(1);
+  const [localPricelistTotalRows, setLocalPricelistTotalRows] = useState(0);
+  const [localPricelistTotalPages, setLocalPricelistTotalPages] = useState(1);
+  const [openLocalPricelistMenuProductId, setOpenLocalPricelistMenuProductId] = useState(null);
   const [productEdits, setProductEdits] = useState({});
   const [applyState, setApplyState] = useState({ open: false, updates: [], results: [], error: "" });
   const [applyLoading, setApplyLoading] = useState(false);
@@ -293,8 +309,17 @@ export function AdminPanel({ onCatalogRefresh }) {
   const [localLineProductDetail, setLocalLineProductDetail] = useState(null);
   const [priceListEntryDrafts, setPriceListEntryDrafts] = useState([]);
   const [priceListSaveLoading, setPriceListSaveLoading] = useState(false);
-  const activeProduct = products.find((product) => product.id === selectedProductId);
+  const [imageUploadLoading, setImageUploadLoading] = useState(false);
+  const [imageDeleteLoadingKey, setImageDeleteLoadingKey] = useState("");
+  const isLocalPricelistView = activeSection === "localPricelist";
+  const activeProductSource = isLocalPricelistView ? localPricelistProducts : products;
+  const activeProduct =
+    (selectedProductDetail && selectedProductDetail.id === selectedProductId ? selectedProductDetail : null) ||
+    activeProductSource.find((product) => product.id === selectedProductId) ||
+    products.find((product) => product.id === selectedProductId) ||
+    null;
   const descriptionRef = useRef(null);
+  const localPricelistMenuRef = useRef(null);
 
   async function refreshCatalogFromAdmin() {
     if (typeof onCatalogRefresh !== "function") return;
@@ -305,24 +330,107 @@ export function AdminPanel({ onCatalogRefresh }) {
     }
   }
 
+  async function refreshLocalPricelistIfNeeded() {
+    if (activeSection !== "localPricelist") return;
+    await loadLocalPricelistData();
+  }
+
+  async function refreshSelectedProductDetail(productId = selectedProductId) {
+    if (!token || !productId || activeSection === "localPricelist") {
+      setSelectedProductDetail(null);
+      return;
+    }
+
+    try {
+      const response = await adminGet(`products/${productId}`, token);
+      setSelectedProductDetail(response.product || null);
+    } catch (_error) {
+      setSelectedProductDetail(null);
+    }
+  }
+
+  function needsProductsData() {
+    return (
+      activeSection === "inventory" ||
+      activeSection === "membership" ||
+      (productEditorMode === "new" && activeSection !== "localPricelist")
+    );
+  }
+
+  async function loadCoreAdminData() {
+    const [categoryData, vendorData] = await Promise.all([
+      adminGet("categories", token),
+      adminGet("vendors", token)
+    ]);
+    setCategories(categoryData.categories || []);
+    setVendors(vendorData.vendors || []);
+  }
+
+  async function loadProductsData() {
+    const productData = await adminGet("products", token);
+    setProducts(productData.products || []);
+    setProductsLoaded(true);
+    setProductEdits({});
+  }
+
+  async function loadLocalPricelistData() {
+    if (!token) return;
+    const params = new URLSearchParams({
+      page: String(localPricelistPage),
+      pageSize: String(LOCAL_PRICELIST_PAGE_SIZE),
+      visibility: productVisibleFilter,
+      sale: productSaleFilter
+    });
+    if (debouncedProductNameSearch) params.set("search", debouncedProductNameSearch);
+    if (productCategoryFilter) params.set("categoryId", productCategoryFilter);
+    if (productVendorFilter) params.set("vendorId", productVendorFilter);
+
+    setLocalPricelistLoading(true);
+    try {
+      const response = await adminGet(`local-pricelist-products?${params.toString()}`, token);
+      setLocalPricelistCategories(response.categories || []);
+      setLocalPricelistProducts(response.products || []);
+      setLocalPricelistTotalRows(Number(response.pagination?.totalRows || 0));
+      setLocalPricelistTotalPages(Number(response.pagination?.totalPages || 1));
+      const nextPage = Number(response.pagination?.page || localPricelistPage);
+      if (nextPage !== localPricelistPage) {
+        setLocalPricelistPage(nextPage);
+      }
+    } finally {
+      setLocalPricelistLoading(false);
+    }
+  }
+
+  async function loadRecipesData() {
+    const recipeData = await adminGet("recipes", token);
+    setRecipes(recipeData.recipes || []);
+    setRecipesLoaded(true);
+  }
+
+  async function loadReviewsData() {
+    const reviewData = await adminGet("reviews", token);
+    setReviews(reviewData.reviews || []);
+    setReviewsLoaded(true);
+  }
+
+  async function loadDropSitesData() {
+    const dropSiteData = await adminGet("drop-sites", token);
+    setDropSites(dropSiteData.dropSites || []);
+    setDropSitesLoaded(true);
+  }
+
   async function loadAll() {
+    if (!token) return;
     setLoading(true);
     try {
-      const [productData, categoryData, vendorData, recipeData, reviewData, dropSiteData] = await Promise.all([
-        adminGet("products", token),
-        adminGet("categories", token),
-        adminGet("vendors", token),
-        adminGet("recipes", token),
-        adminGet("reviews", token),
-        adminGet("drop-sites", token)
-      ]);
-      setProducts(productData.products || []);
-      setCategories(categoryData.categories || []);
-      setVendors(vendorData.vendors || []);
-      setRecipes(recipeData.recipes || []);
-      setReviews(reviewData.reviews || []);
-      setDropSites(dropSiteData.dropSites || []);
-      setProductEdits({});
+      await loadCoreAdminData();
+
+      const loaders = [];
+      if (productsLoaded || needsProductsData()) loaders.push(loadProductsData());
+      if (recipesLoaded || activeSection === "recipes") loaders.push(loadRecipesData());
+      if (reviewsLoaded || activeSection === "reviews") loaders.push(loadReviewsData());
+      if (dropSitesLoaded || activeSection === "dropSites") loaders.push(loadDropSitesData());
+      await Promise.all(loaders);
     } catch (err) {
       setMessage("Failed to load admin data.");
     } finally {
@@ -341,6 +449,7 @@ export function AdminPanel({ onCatalogRefresh }) {
         setActiveSection(getDefaultAdminSection(roleKeys));
         setProductEditorMode("existing");
         setSelectedProductId(null);
+        setSelectedProductDetail(null);
       }
     } catch (_error) {
       setCurrentAdmin(null);
@@ -350,10 +459,177 @@ export function AdminPanel({ onCatalogRefresh }) {
   useEffect(() => {
     if (token) {
       localStorage.setItem("adminToken", token);
-      loadCurrentAdmin();
-      loadAll();
+      setProducts([]);
+      setProductsLoaded(false);
+      setSelectedProductDetail(null);
+      setLocalPricelistProducts([]);
+      setLocalPricelistPage(1);
+      setLocalPricelistTotalRows(0);
+      setLocalPricelistTotalPages(1);
+      setRecipes([]);
+      setRecipesLoaded(false);
+      setReviews([]);
+      setReviewsLoaded(false);
+      setDropSites([]);
+      setDropSitesLoaded(false);
+      setLoading(true);
+      loadCoreAdminData()
+        .catch(() => {
+          setMessage("Failed to load admin data.");
+        })
+        .finally(() => {
+          setLoading(false);
+      });
     }
   }, [token]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedProductNameSearch(productNameSearch.trim());
+    }, LOCAL_PRICELIST_SEARCH_DEBOUNCE_MS);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [productNameSearch]);
+
+  useEffect(() => {
+    if (!token) return undefined;
+
+    const timer = window.setTimeout(() => {
+      loadCurrentAdmin();
+    }, 300);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [token]);
+
+  useEffect(() => {
+    if (!token || productsLoaded || !needsProductsData()) {
+      return;
+    }
+
+    let cancelled = false;
+    setLoading(true);
+    loadProductsData()
+      .catch(() => {
+        if (!cancelled) {
+          setMessage("Failed to load products.");
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [token, activeSection, productEditorMode, selectedProductId, productsLoaded]);
+
+  useEffect(() => {
+    if (!token || !selectedProductId || productEditorMode === "new" || activeSection === "localPricelist") {
+      setSelectedProductDetail(null);
+      return;
+    }
+
+    refreshSelectedProductDetail(selectedProductId).catch(() => {
+      setSelectedProductDetail(null);
+    });
+  }, [token, selectedProductId, productEditorMode, activeSection]);
+
+  useEffect(() => {
+    if (!token || activeSection !== "localPricelist") {
+      return;
+    }
+
+    loadLocalPricelistData().catch(() => {
+      setMessage("Failed to load local pricelist.");
+    });
+  }, [
+    token,
+    activeSection,
+    localPricelistPage,
+    debouncedProductNameSearch,
+    productCategoryFilter,
+    productVendorFilter,
+    productVisibleFilter,
+    productSaleFilter
+  ]);
+
+  useEffect(() => {
+    if (!token || recipesLoaded || activeSection !== "recipes") {
+      return;
+    }
+
+    let cancelled = false;
+    setLoading(true);
+    loadRecipesData()
+      .catch(() => {
+        if (!cancelled) {
+          setMessage("Failed to load recipes.");
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [token, activeSection, recipesLoaded]);
+
+  useEffect(() => {
+    if (!token || reviewsLoaded || activeSection !== "reviews") {
+      return;
+    }
+
+    let cancelled = false;
+    setLoading(true);
+    loadReviewsData()
+      .catch(() => {
+        if (!cancelled) {
+          setMessage("Failed to load reviews.");
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [token, activeSection, reviewsLoaded]);
+
+  useEffect(() => {
+    if (!token || dropSitesLoaded || activeSection !== "dropSites") {
+      return;
+    }
+
+    let cancelled = false;
+    setLoading(true);
+    loadDropSitesData()
+      .catch(() => {
+        if (!cancelled) {
+          setMessage("Failed to load drop sites.");
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [token, activeSection, dropSitesLoaded]);
 
   useEffect(() => {
     const jobId = localLineCacheState.jobId;
@@ -453,7 +729,7 @@ export function AdminPanel({ onCatalogRefresh }) {
   ]);
 
   useEffect(() => {
-    if (!token || !selectedProductId) {
+    if (!token || !selectedProductId || isLocalPricelistView) {
       setLocalLineProductDetail(null);
       setPriceListEntryDrafts([]);
       return;
@@ -508,7 +784,7 @@ export function AdminPanel({ onCatalogRefresh }) {
     return () => {
       cancelled = true;
     };
-  }, [token, selectedProductId]);
+  }, [token, selectedProductId, isLocalPricelistView]);
 
   useEffect(() => {
     if (!descriptionRef.current) return;
@@ -560,6 +836,7 @@ export function AdminPanel({ onCatalogRefresh }) {
       setActiveSection(getDefaultAdminSection(admin?.adminRoles || []));
       setProductEditorMode("existing");
       setSelectedProductId(null);
+      setSelectedProductDetail(null);
       setToken(result.token);
     } catch (err) {
       setLoginState((prev) => ({ ...prev, error: "Invalid credentials" }));
@@ -600,6 +877,7 @@ export function AdminPanel({ onCatalogRefresh }) {
   function startNewProductDraft() {
     setProductEditorMode("new");
     setSelectedProductId(null);
+    setSelectedProductDetail(null);
     setLocalLineProductDetail(null);
     setPriceListEntryDrafts([]);
     setProductDeleteLoading(false);
@@ -610,6 +888,7 @@ export function AdminPanel({ onCatalogRefresh }) {
   function closeProductEditor() {
     setProductEditorMode("existing");
     setSelectedProductId(null);
+    setSelectedProductDetail(null);
     setLocalLineProductDetail(null);
     setPriceListEntryDrafts([]);
     setProductDeleteLoading(false);
@@ -708,6 +987,7 @@ export function AdminPanel({ onCatalogRefresh }) {
       await adminPost(`products/${productId}/push-to-localline`, token, {});
       setMessage("Product pushed to Local Line.");
       await loadAll();
+      await refreshLocalPricelistIfNeeded();
       await refreshCatalogFromAdmin();
     } catch (err) {
       setMessage(err?.message || "Local Line push failed.");
@@ -721,9 +1001,13 @@ export function AdminPanel({ onCatalogRefresh }) {
     try {
       const response = await adminPost(`products/${productId}/duplicate`, token, {});
       await loadAll();
+      await refreshLocalPricelistIfNeeded();
       await refreshCatalogFromAdmin();
-      setProductEditorMode("existing");
-      setSelectedProductId(response.productId);
+      if (activeSection !== "localPricelist") {
+        setProductEditorMode("existing");
+        setSelectedProductDetail(null);
+        setSelectedProductId(response.productId);
+      }
       setMessage("Product duplicated.");
     } catch (err) {
       setMessage(err?.message || "Product duplicate failed.");
@@ -743,6 +1027,7 @@ export function AdminPanel({ onCatalogRefresh }) {
       const response = await adminDelete(`products/${productId}`, token);
       closeProductEditor();
       await loadAll();
+      await refreshLocalPricelistIfNeeded();
       await refreshCatalogFromAdmin();
       setMessage("Product deleted.");
       return response;
@@ -793,9 +1078,15 @@ export function AdminPanel({ onCatalogRefresh }) {
         }
 
         await loadAll();
+        await refreshLocalPricelistIfNeeded();
         await refreshCatalogFromAdmin();
-        setProductEditorMode("existing");
-        setSelectedProductId(newProductId);
+        if (activeSection !== "localPricelist") {
+          setProductEditorMode("existing");
+          setSelectedProductDetail(null);
+          setSelectedProductId(newProductId);
+        } else {
+          closeProductEditor();
+        }
         setPushToLocalLineOnSave(false);
         setMessage(pushToLocalLineOnSave ? "Product created and pushed to Local Line." : "Product created.");
         return;
@@ -859,7 +1150,9 @@ export function AdminPanel({ onCatalogRefresh }) {
       }
 
       await loadAll();
+      await refreshLocalPricelistIfNeeded();
       await refreshCatalogFromAdmin();
+      await refreshSelectedProductDetail(activeProduct.id);
       setMessage(pushToLocalLineOnSave ? "Product updated and pushed to Local Line." : "Product updated.");
     } catch (err) {
       setMessage(err?.message || "Product update failed.");
@@ -887,15 +1180,65 @@ export function AdminPanel({ onCatalogRefresh }) {
     applyEditorCommand("createLink", url);
   }
 
-  async function handleImageUpload(productId, file) {
+  async function handleImageUpload(productId, files) {
+    const fileList = Array.isArray(files)
+      ? files
+      : files instanceof FileList
+        ? Array.from(files)
+        : files
+          ? [files]
+          : [];
+    if (!fileList.length) return;
+
     setMessage("");
+    setImageUploadLoading(true);
     try {
-      await adminUploadImage(productId, token, file);
-      setMessage("Image uploaded.");
-      await loadAll();
+      for (const file of fileList) {
+        await adminUploadImage(productId, token, file);
+      }
+      setMessage(
+        fileList.length === 1
+          ? "Image uploaded. Local Line push pending."
+          : `${fileList.length} images uploaded. Local Line push pending.`
+      );
+      if (isLocalPricelistView) {
+        await loadLocalPricelistData();
+      } else {
+        await loadAll();
+      }
       await refreshCatalogFromAdmin();
+      await refreshSelectedProductDetail(productId);
     } catch (err) {
       setMessage("Image upload failed.");
+    } finally {
+      setImageUploadLoading(false);
+    }
+  }
+
+  async function handleImageDelete(productId, image, index) {
+    const entry = getImageEntry(image, index);
+    if (!entry.src) return;
+    if (!window.confirm("Delete this image?")) return;
+
+    setMessage("");
+    setImageDeleteLoadingKey(entry.key);
+    try {
+      await adminDeleteImage(productId, token, {
+        url: entry.src,
+        thumbnailUrl: entry.thumbnailUrl || entry.src
+      });
+      setMessage("Image deleted. Local Line push pending.");
+      if (isLocalPricelistView) {
+        await loadLocalPricelistData();
+      } else {
+        await loadAll();
+      }
+      await refreshCatalogFromAdmin();
+      await refreshSelectedProductDetail(productId);
+    } catch (err) {
+      setMessage(err?.message || "Image delete failed.");
+    } finally {
+      setImageDeleteLoadingKey("");
     }
   }
 
@@ -1320,9 +1663,6 @@ export function AdminPanel({ onCatalogRefresh }) {
   const selectedDraftUsesSourcePricing = isSourcePricingVendorName(selectedDraftVendor?.name);
   const localPricelistVendors = sortedVendors.filter((vendor) => isSourcePricingVendorName(vendor?.name));
   const editorVendorOptions = activeSection === "localPricelist" ? localPricelistVendors : sortedVendors;
-  const localPricelistProducts = products.filter((product) =>
-    isSourcePricingVendorName(vendorMap.get(product.vendorId))
-  );
   const linkedLocalLineProductId =
     (hasLinkedLocalLineProduct(localLineProductDetail?.productMeta)
       ? Number(localLineProductDetail?.productMeta?.localLineProductId)
@@ -1332,12 +1672,62 @@ export function AdminPanel({ onCatalogRefresh }) {
       : 0) ||
     0;
 
+  useEffect(() => {
+    if (typeof document === "undefined") return undefined;
+    document.body.classList.toggle("modal-open", showProductEditor);
+    return () => {
+      document.body.classList.remove("modal-open");
+    };
+  }, [showProductEditor]);
+
+  useEffect(() => {
+    if (!openLocalPricelistMenuProductId) return undefined;
+
+    function handlePointerDown(event) {
+      if (!localPricelistMenuRef.current?.contains(event.target)) {
+        setOpenLocalPricelistMenuProductId(null);
+      }
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === "Escape") {
+        setOpenLocalPricelistMenuProductId(null);
+      }
+    }
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [openLocalPricelistMenuProductId]);
+
   function getProductPrice(product) {
     const prices = (product.packages || [])
       .map((pkg) => Number(pkg.price))
       .filter((value) => Number.isFinite(value));
     if (!prices.length) return "N/A";
     return `$${Math.min(...prices).toFixed(2)}`;
+  }
+
+  function toComparableTimestamp(value) {
+    const timestamp = value ? new Date(value).getTime() : 0;
+    return Number.isFinite(timestamp) ? timestamp : 0;
+  }
+
+  function getProductRemoteSyncStatus(product) {
+    return String(product?.pricingProfile?.remoteSyncStatus || "not-applied");
+  }
+
+  function hasPendingProductRemoteApply(product) {
+    const pricingProfile = product?.pricingProfile;
+    if (!pricingProfile) return false;
+    return (
+      ["pending", "failed"].includes(getProductRemoteSyncStatus(product)) ||
+      toComparableTimestamp(pricingProfile.updatedAt) > toComparableTimestamp(pricingProfile.remoteSyncedAt)
+    );
   }
 
   function getProductDefaults(product) {
@@ -1411,35 +1801,17 @@ export function AdminPanel({ onCatalogRefresh }) {
     });
   }
 
-  const normalizedProductNameSearch = productNameSearch.trim().toLowerCase();
+  function getLocalPricelistMetaLine(product) {
+    const packageName =
+      Array.isArray(product?.packages) && product.packages.length
+        ? product.packages[0]?.name || `Package ${product.packages[0]?.id || ""}`.trim()
+        : "No package";
+    return `${packageName} - ${vendorMap.get(product?.vendorId) || "N/A"}`;
+  }
 
-  const productSourceSet = activeSection === "localPricelist" ? localPricelistProducts : products;
-
-  const productsMatchingOtherFilters = productSourceSet.filter((product) => {
-    const categoryMatch = !productCategoryFilter || String(product.categoryId) === productCategoryFilter;
-    const vendorMatch = !productVendorFilter || String(product.vendorId) === productVendorFilter;
-    const visibleMatch =
-      productVisibleFilter === "all" ||
-      (productVisibleFilter === "visible" && product.visible) ||
-      (productVisibleFilter === "hidden" && !product.visible);
-    const saleMatch =
-      productSaleFilter === "all" ||
-      (productSaleFilter === "onSale" && product.onSale) ||
-      (productSaleFilter === "notOnSale" && !product.onSale);
-    return categoryMatch && vendorMatch && visibleMatch && saleMatch;
-  });
-
-  const productNameMatches = normalizedProductNameSearch
-    ? productsMatchingOtherFilters.filter((product) =>
-        String(product.name || "").toLowerCase().includes(normalizedProductNameSearch)
-      )
-    : [];
-
-  const filteredProducts = normalizedProductNameSearch
-    ? productNameMatches
-    : productsMatchingOtherFilters;
-
-  const visibleProductNameSuggestions = productNameMatches.slice(0, 8);
+  function toggleLocalPricelistActionMenu(productId) {
+    setOpenLocalPricelistMenuProductId((prev) => (prev === productId ? null : productId));
+  }
 
   function formatValue(value) {
     if (value === null || typeof value === "undefined" || value === "") return "n/a";
@@ -2107,7 +2479,7 @@ export function AdminPanel({ onCatalogRefresh }) {
             <section className="admin-section">
               <h3>Local Pricelist</h3>
               <div className="small">
-                Manage local Deck, Hyland, and Creamy Cow products. Use <strong>Details</strong>
+                Manage local Deck, Hyland, and Creamy Cow products. Use <strong>Edit</strong>
                 to edit vendor retail price, unit type, min/max weight, description, and package
                 pricing.
               </div>
@@ -2121,47 +2493,22 @@ export function AdminPanel({ onCatalogRefresh }) {
                     placeholder="Search products"
                     onChange={(event) => {
                       setProductNameSearch(event.target.value);
-                      setShowProductNameSuggestions(true);
+                      setLocalPricelistPage(1);
                     }}
-                    onFocus={() => setShowProductNameSuggestions(true)}
-                    onBlur={() => setShowProductNameSuggestions(false)}
                   />
-                  {showProductNameSuggestions && normalizedProductNameSearch ? (
-                    <div className="filter-suggestions" role="listbox" aria-label="Matching products">
-                      {visibleProductNameSuggestions.length ? (
-                        visibleProductNameSuggestions.map((product) => (
-                          <button
-                            key={`product-suggestion-${product.id}`}
-                            className="filter-suggestion"
-                            type="button"
-                            onMouseDown={(event) => {
-                              event.preventDefault();
-                              setProductNameSearch(product.name || "");
-                              setShowProductNameSuggestions(false);
-                            }}
-                          >
-                            <span>{product.name}</span>
-                            <span className="small">
-                              {categoryMap.get(product.categoryId) || "Uncategorized"} ·{" "}
-                              {vendorMap.get(product.vendorId) || "N/A"}
-                            </span>
-                          </button>
-                        ))
-                      ) : (
-                        <div className="filter-suggestion-empty small">No matching products</div>
-                      )}
-                    </div>
-                  ) : null}
                 </label>
                 <label className="filter-field">
                   <span className="small">Category</span>
                   <select
                     className="input"
                     value={productCategoryFilter}
-                    onChange={(event) => setProductCategoryFilter(event.target.value)}
+                    onChange={(event) => {
+                      setProductCategoryFilter(event.target.value);
+                      setLocalPricelistPage(1);
+                    }}
                   >
                     <option value="">All categories</option>
-                    {categories.map((category) => (
+                    {localPricelistCategories.map((category) => (
                       <option key={category.id} value={category.id}>
                         {category.name}
                       </option>
@@ -2173,7 +2520,10 @@ export function AdminPanel({ onCatalogRefresh }) {
                   <select
                     className="input"
                     value={productVendorFilter}
-                    onChange={(event) => setProductVendorFilter(event.target.value)}
+                    onChange={(event) => {
+                      setProductVendorFilter(event.target.value);
+                      setLocalPricelistPage(1);
+                    }}
                   >
                     <option value="">All vendors</option>
                     {localPricelistVendors.map((vendor) => (
@@ -2188,7 +2538,10 @@ export function AdminPanel({ onCatalogRefresh }) {
                   <select
                     className="input"
                     value={productVisibleFilter}
-                    onChange={(event) => setProductVisibleFilter(event.target.value)}
+                    onChange={(event) => {
+                      setProductVisibleFilter(event.target.value);
+                      setLocalPricelistPage(1);
+                    }}
                   >
                     <option value="visible">Visible only</option>
                     <option value="hidden">Hidden only</option>
@@ -2200,7 +2553,10 @@ export function AdminPanel({ onCatalogRefresh }) {
                   <select
                     className="input"
                     value={productSaleFilter}
-                    onChange={(event) => setProductSaleFilter(event.target.value)}
+                    onChange={(event) => {
+                      setProductSaleFilter(event.target.value);
+                      setLocalPricelistPage(1);
+                    }}
                   >
                     <option value="all">All</option>
                     <option value="onSale">On sale only</option>
@@ -2213,32 +2569,79 @@ export function AdminPanel({ onCatalogRefresh }) {
                   Add Product
                 </button>
               </div>
-              <div className="admin-table-shell">
+              <div className="pricelist-pagination">
+                <div className="small pricelist-page-meta">
+                  {localPricelistProducts.length
+                    ? `${(localPricelistPage - 1) * LOCAL_PRICELIST_PAGE_SIZE + 1}-${(localPricelistPage - 1) * LOCAL_PRICELIST_PAGE_SIZE + localPricelistProducts.length}`
+                    : "0"} / {localPricelistTotalRows} products
+                </div>
+                <div className="small pricelist-page-meta">
+                  Page {localPricelistPage} of {localPricelistTotalPages}
+                </div>
+                <div className="pricelist-page-buttons">
+                  <button
+                    className="button alt"
+                    type="button"
+                    onClick={() => setLocalPricelistPage(1)}
+                    disabled={localPricelistLoading || localPricelistPage <= 1}
+                  >
+                    First
+                  </button>
+                  <button
+                    className="button alt"
+                    type="button"
+                    onClick={() => setLocalPricelistPage((prev) => Math.max(1, prev - 1))}
+                    disabled={localPricelistLoading || localPricelistPage <= 1}
+                  >
+                    Prev
+                  </button>
+                  <button
+                    className="button alt"
+                    type="button"
+                    onClick={() => setLocalPricelistPage((prev) => Math.min(localPricelistTotalPages, prev + 1))}
+                    disabled={localPricelistLoading || localPricelistPage >= localPricelistTotalPages}
+                  >
+                    Next
+                  </button>
+                  <button
+                    className="button alt"
+                    type="button"
+                    onClick={() => setLocalPricelistPage(localPricelistTotalPages)}
+                    disabled={localPricelistLoading || localPricelistPage >= localPricelistTotalPages}
+                  >
+                    Last
+                  </button>
+                </div>
+              </div>
+              {localPricelistLoading ? <div className="small">Loading local pricelist...</div> : null}
+              <div className="admin-table-shell local-pricelist-table-shell">
                 <table
                   className="admin-table admin-table-head local-pricelist-table"
                 >
                   <colgroup>
-                    <col style={{ width: "13%" }} />
-                    <col style={{ width: "22%" }} />
+                    <col style={{ width: "11%" }} />
+                    <col style={{ width: "24%" }} />
+                    <col style={{ width: "8%" }} />
+                    <col style={{ width: "7%" }} />
                     <col style={{ width: "8%" }} />
                     <col style={{ width: "8%" }} />
                     <col style={{ width: "8%" }} />
-                    <col style={{ width: "12%" }} />
-                    <col style={{ width: "17%" }} />
-                    <col style={{ width: "6%" }} />
-                    <col style={{ width: "6%" }} />
+                    <col style={{ width: "8%" }} />
+                    <col style={{ width: "14%" }} />
+                    <col style={{ width: "154px" }} />
                   </colgroup>
                   <thead>
                     <tr>
                       <th>Category</th>
                       <th>Product Name</th>
+                      <th>Vendor's Retail Price</th>
+                      <th>Vendor's Unit</th>
                       <th>Min</th>
                       <th>Max</th>
-                      <th>Unit</th>
-                      <th>Retail Price</th>
+                      <th>On Sale</th>
+                      <th>Discount %</th>
                       <th>Description</th>
-                      <th>Edit</th>
-                      <th>Duplicate</th>
+                      <th className="local-pricelist-actions-col">Actions</th>
                     </tr>
                   </thead>
                 </table>
@@ -2247,19 +2650,22 @@ export function AdminPanel({ onCatalogRefresh }) {
                     className="admin-table admin-table-body local-pricelist-table"
                   >
                     <colgroup>
-                      <col style={{ width: "13%" }} />
-                      <col style={{ width: "22%" }} />
+                      <col style={{ width: "11%" }} />
+                      <col style={{ width: "24%" }} />
+                      <col style={{ width: "8%" }} />
+                      <col style={{ width: "7%" }} />
                       <col style={{ width: "8%" }} />
                       <col style={{ width: "8%" }} />
                       <col style={{ width: "8%" }} />
-                      <col style={{ width: "12%" }} />
-                      <col style={{ width: "17%" }} />
-                      <col style={{ width: "6%" }} />
-                      <col style={{ width: "6%" }} />
-                  </colgroup>
+                      <col style={{ width: "8%" }} />
+                      <col style={{ width: "14%" }} />
+                      <col style={{ width: "154px" }} />
+                    </colgroup>
                     <tbody>
-                      {filteredProducts.map((product) => {
+                      {localPricelistProducts.map((product) => {
                         const pricingProfile = product.pricingProfile || {};
+                        const remoteSyncStatus = getProductRemoteSyncStatus(product);
+                        const needsRemotePush = hasPendingProductRemoteApply(product);
                         const unitDisplay =
                           String(pricingProfile.unitOfMeasure || "each").toLowerCase() === "lbs"
                             ? "lbs"
@@ -2287,13 +2693,32 @@ export function AdminPanel({ onCatalogRefresh }) {
                                 {categoryMap.get(product.categoryId) || "Uncategorized"}
                               </span>
                             </td>
-                            <td><span className="local-pricelist-cell">{product.name}</span></td>
-                            <td><span className="local-pricelist-cell">{minWeight}</span></td>
-                            <td><span className="local-pricelist-cell">{maxWeight}</span></td>
-                            <td><span className="local-pricelist-cell">{unitDisplay}</span></td>
+                            <td>
+                              <div className="admin-product-cell">
+                                <div className="admin-product-cell-title">{product.name}</div>
+                                <div className="admin-product-cell-meta">{getLocalPricelistMetaLine(product)}</div>
+                                <div className={`small pricelist-status ${remoteSyncStatus}`}>{remoteSyncStatus}</div>
+                                {needsRemotePush ? <div className="small">Needs push to Local Line</div> : null}
+                              </div>
+                            </td>
                             <td>
                               <span className="local-pricelist-cell">
                                 {Number.isFinite(retailPrice) ? `$${retailPrice.toFixed(2)}` : "n/a"}
+                              </span>
+                            </td>
+                            <td><span className="local-pricelist-cell">{unitDisplay}</span></td>
+                            <td><span className="local-pricelist-cell">{minWeight}</span></td>
+                            <td><span className="local-pricelist-cell">{maxWeight}</span></td>
+                            <td>
+                              <span className="local-pricelist-cell">
+                                {product.onSale ? "Yes" : "No"}
+                              </span>
+                            </td>
+                            <td>
+                              <span className="local-pricelist-cell">
+                                {Number.isFinite(Number(product.saleDiscount))
+                                  ? `${Math.round(Number(product.saleDiscount) * 100)}%`
+                                  : "0%"}
                               </span>
                             </td>
                             <td>
@@ -2304,26 +2729,67 @@ export function AdminPanel({ onCatalogRefresh }) {
                                 {descriptionSummary}
                               </span>
                             </td>
-                            <td>
-                              <button
-                                className="button alt"
-                                type="button"
-                                onClick={() => {
-                                  setProductEditorMode("existing");
-                                  setSelectedProductId(product.id);
-                                }}
+                            <td className="local-pricelist-actions-col">
+                              <div
+                                className="admin-row-actions"
+                                ref={openLocalPricelistMenuProductId === product.id ? localPricelistMenuRef : null}
                               >
-                                Edit
-                              </button>
-                            </td>
-                            <td>
-                              <button
-                                className="button alt"
-                                type="button"
-                                onClick={() => handleDuplicateProduct(product.id)}
-                              >
-                                Duplicate
-                              </button>
+                                <button
+                                  className="button alt"
+                                  type="button"
+                                  onClick={() => {
+                                    setOpenLocalPricelistMenuProductId(null);
+                                    setProductEditorMode("existing");
+                                    setSelectedProductId(product.id);
+                                  }}
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  className="button alt admin-row-menu-trigger"
+                                  type="button"
+                                  onClick={() => toggleLocalPricelistActionMenu(product.id)}
+                                  aria-haspopup="menu"
+                                  aria-expanded={openLocalPricelistMenuProductId === product.id}
+                                >
+                                  ...
+                                </button>
+                                {openLocalPricelistMenuProductId === product.id ? (
+                                  <div className="admin-row-menu" role="menu">
+                                    <button
+                                      className="admin-row-menu-item"
+                                      type="button"
+                                      onClick={() => {
+                                        setOpenLocalPricelistMenuProductId(null);
+                                        handlePushProductToLocalLine(product.id);
+                                      }}
+                                    >
+                                      Push Product
+                                    </button>
+                                    <button
+                                      className="admin-row-menu-item"
+                                      type="button"
+                                      onClick={() => {
+                                        setOpenLocalPricelistMenuProductId(null);
+                                        handleDuplicateProduct(product.id);
+                                      }}
+                                    >
+                                      Duplicate Product
+                                    </button>
+                                    <button
+                                      className="admin-row-menu-item"
+                                      type="button"
+                                      disabled={Number(product?.localLineMeta?.localLineProductId || 0) > 0}
+                                      onClick={() => {
+                                        setOpenLocalPricelistMenuProductId(null);
+                                        handleDeleteProduct(product.id);
+                                      }}
+                                    >
+                                      Delete Product
+                                    </button>
+                                  </div>
+                                ) : null}
+                              </div>
                             </td>
                           </tr>
                         );
@@ -2336,14 +2802,21 @@ export function AdminPanel({ onCatalogRefresh }) {
           )}
 
           {showProductEditor && (
-            <section className="admin-section">
-              <button className="button alt" type="button" onClick={closeProductEditor}>
-                {activeSection === "localPricelist" ? "Back to local pricelist" : "Back to pricelist"}
-              </button>
-              <h3>{productEditorMode === "new" ? "New Product" : activeProduct.name}</h3>
-              {productDraft && (
-                <div className="admin-fields">
-                  <div className="admin-help-banner">
+            <div className="modal-backdrop" onClick={closeProductEditor}>
+              <div
+                className={`modal admin-product-modal ${isLocalPricelistView ? "local-pricelist-modal" : ""}`}
+                onClick={(event) => event.stopPropagation()}
+              >
+                <button className="modal-close" type="button" onClick={closeProductEditor}>
+                  Close
+                </button>
+                <div className="modal-body single">
+                  <section className="admin-product-modal-body">
+                    <h3>{productEditorMode === "new" ? "New Product" : activeProduct.name}</h3>
+                    {productDraft && (
+                      <div className="admin-fields">
+                  {!isLocalPricelistView ? (
+                    <div className="admin-help-banner">
                     <div className="admin-help-banner-copy">
                       <strong>Pricing Help</strong>
                       <div className="small">
@@ -2361,6 +2834,7 @@ export function AdminPanel({ onCatalogRefresh }) {
                       </button>
                     </div>
                   </div>
+                  ) : null}
                   <label className="filter-field">
                     <span className="small">Name</span>
                     <input
@@ -2403,10 +2877,11 @@ export function AdminPanel({ onCatalogRefresh }) {
                           {category.name}
                         </option>
                       ))}
-                    </select>
+                      </select>
                   </label>
                   {selectedDraftUsesSourcePricing ? (
                     <>
+                      {!isLocalPricelistView ? (
                       <div className="admin-source-pricing-callout">
                         <strong>Deck / Hyland / Creamy pricing</strong>
                         <div className="small">
@@ -2415,7 +2890,7 @@ export function AdminPanel({ onCatalogRefresh }) {
                         </div>
                         <ol className="admin-source-pricing-steps">
                           <li>
-                            Start with the vendor unit price in <strong>Vendor Retail Price</strong>.
+                            Start with the vendor unit price in <strong>Vendor's Retail Price</strong>.
                           </li>
                           <li>
                             For weight-based items, use <strong>Avg Weight Override</strong> or the
@@ -2431,8 +2906,9 @@ export function AdminPanel({ onCatalogRefresh }) {
                           </li>
                         </ol>
                       </div>
+                      ) : null}
                       <label className="filter-field">
-                        <span className="small">Unit Type</span>
+                        <span className="small">{isLocalPricelistView ? "Vendor's Unit" : "Vendor's Unit Type"}</span>
                         <select
                           className="input"
                           value={productDraft.unitOfMeasure}
@@ -2448,7 +2924,7 @@ export function AdminPanel({ onCatalogRefresh }) {
                         </select>
                       </label>
                       <label className="filter-field">
-                        <span className="small">Vendor Retail Price</span>
+                        <span className="small">Vendor's Retail Price</span>
                         <input
                           className="input"
                           type="number"
@@ -2513,27 +2989,26 @@ export function AdminPanel({ onCatalogRefresh }) {
                           />
                         </label>
                       ) : null}
-                      <label className="filter-field">
-                        <span className="small">FFCSA Factor</span>
-                        <input
-                          className="input"
-                          type="number"
-                          step="0.0001"
-                          value={productDraft.sourceMultiplier}
-                          onChange={(event) =>
-                            setProductDraft((prev) => ({
-                              ...prev,
-                              sourceMultiplier: event.target.value
-                            }))
-                          }
-                        />
-                      </label>
-                      <div className="small">
-                        These local-only fields drive formula pricing, the CSA Package Price, and
-                        the downstream adjusted prices for each price list.
-                      </div>
+                      {!isLocalPricelistView ? (
+                        <label className="filter-field">
+                          <span className="small">FFCSA Factor</span>
+                          <input
+                            className="input"
+                            type="number"
+                            step="0.0001"
+                            value={productDraft.sourceMultiplier}
+                            onChange={(event) =>
+                              setProductDraft((prev) => ({
+                                ...prev,
+                                sourceMultiplier: event.target.value
+                              }))
+                            }
+                          />
+                        </label>
+                      ) : null}
                     </>
                   ) : null}
+                  {!isLocalPricelistView ? (
                   <div className="admin-price-list">
                     <div className="admin-actions">
                       <div className="small">Packages</div>
@@ -2602,7 +3077,8 @@ export function AdminPanel({ onCatalogRefresh }) {
                       </div>
                     ))}
                   </div>
-                  {productEditorMode === "existing" ? (
+                  ) : null}
+                  {productEditorMode === "existing" && !isLocalPricelistView ? (
                     <div className="admin-price-list">
                       <div className="admin-actions">
                         <div className="small">Local Line</div>
@@ -2753,6 +3229,20 @@ export function AdminPanel({ onCatalogRefresh }) {
                       ) : null}
                     </div>
                   ) : null}
+                  {productEditorMode === "existing" && isLocalPricelistView && linkedLocalLineProductId <= 0 ? (
+                    <div className="admin-product-actions">
+                      <button
+                        className="button alt"
+                        type="button"
+                        onClick={() => handleDeleteProduct(activeProduct.id)}
+                        disabled={productDeleteLoading}
+                      >
+                        {productDeleteLoading ? "Deleting..." : "Delete Product"}
+                      </button>
+                    </div>
+                  ) : null}
+                  {!isLocalPricelistView ? (
+                  <>
                   <label className="filter-toggle">
                     <input
                       type="checkbox"
@@ -2760,7 +3250,7 @@ export function AdminPanel({ onCatalogRefresh }) {
                       onChange={(event) =>
                         setProductDraft((prev) => ({ ...prev, visible: event.target.checked }))
                       }
-                    />
+                      />
                     <span>Visible</span>
                   </label>
                   <label className="filter-toggle">
@@ -2787,36 +3277,40 @@ export function AdminPanel({ onCatalogRefresh }) {
                       }
                     />
                   </label>
-                  <div className="admin-row">
-                    <span className="small">On sale</span>
-                    <button
-                      className={`toggle-switch ${productDraft.onSale ? "active" : ""}`}
-                      type="button"
-                      onClick={() =>
-                        setProductDraft((prev) => ({ ...prev, onSale: !prev.onSale }))
-                      }
-                    />
-                  </div>
-                  <label className="filter-field">
-                    <span className="small">Sale discount</span>
-                    <span className="sale-discount-wrapper">
-                      <input
-                        className="sale-discount-input"
-                        type="number"
-                        min="0"
-                        max="100"
-                        step="1"
-                        value={productDraft.saleDiscount}
-                        onChange={(event) =>
-                          setProductDraft((prev) => ({
-                            ...prev,
-                            saleDiscount: Number(event.target.value)
-                          }))
+                  </>
+                  ) : null}
+                  <div className="admin-sale-fields">
+                    <label className="admin-inline-toggle-field">
+                      <span className="small">On sale</span>
+                      <button
+                        className={`toggle-switch ${productDraft.onSale ? "active" : ""}`}
+                        type="button"
+                        onClick={() =>
+                          setProductDraft((prev) => ({ ...prev, onSale: !prev.onSale }))
                         }
                       />
-                      <span className="sale-discount-suffix">%</span>
-                    </span>
-                  </label>
+                    </label>
+                    <label className="filter-field admin-sale-discount-field">
+                      <span className="small">Sale discount</span>
+                      <span className="sale-discount-wrapper">
+                        <input
+                          className="sale-discount-input"
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="1"
+                          value={productDraft.saleDiscount}
+                          onChange={(event) =>
+                            setProductDraft((prev) => ({
+                              ...prev,
+                              saleDiscount: Number(event.target.value)
+                            }))
+                          }
+                        />
+                        <span className="sale-discount-suffix">%</span>
+                      </span>
+                    </label>
+                  </div>
                   <label className="filter-field">
                     <span className="small">Description</span>
                     <div className="admin-toolbar">
@@ -2857,31 +3351,73 @@ export function AdminPanel({ onCatalogRefresh }) {
                 </div>
               )}
               {productEditorMode === "existing" && activeProduct ? (
-                <>
-                  <div className="admin-grid">
-                    {(activeProduct.images || []).map((image, index) => {
-                      const entry = getImageEntry(image, index);
-                      if (!entry.src) return null;
-                      return (
-                        <img
-                          key={entry.key}
-                          src={entry.thumbnailUrl || entry.src}
-                          alt={activeProduct.name}
-                          className="admin-thumb"
-                        />
-                      );
-                    })}
-                  </div>
-                  <div className="small">Upload image</div>
+                <div className="admin-price-list">
+                  {isLocalPricelistView ? (
+                    <>
+                      <div className={`small pricelist-status ${getProductRemoteSyncStatus(activeProduct)}`}>
+                        {getProductRemoteSyncStatus(activeProduct)}
+                      </div>
+                      {hasPendingProductRemoteApply(activeProduct) ? (
+                        <div className="small">Needs push to Local Line</div>
+                      ) : null}
+                      {activeProduct?.pricingProfile?.remoteSyncMessage ? (
+                        <div className="small">{activeProduct.pricingProfile.remoteSyncMessage}</div>
+                      ) : null}
+                    </>
+                  ) : null}
+                  {activeProduct.images?.length ? (
+                    <div className="admin-grid">
+                      {(activeProduct.images || []).map((image, index) => {
+                        const entry = getImageEntry(image, index);
+                        if (!entry.src) return null;
+                        return (
+                          <div key={entry.key} className="admin-image-tile">
+                            <img
+                              src={entry.thumbnailUrl || entry.src}
+                              alt={activeProduct.name}
+                              className="admin-thumb"
+                            />
+                            {isLocalPricelistView ? (
+                              <button
+                                className="button alt icon-button admin-image-delete-button"
+                                type="button"
+                                aria-label="Delete image"
+                                title="Delete image"
+                                disabled={imageDeleteLoadingKey === entry.key}
+                                onClick={() => handleImageDelete(activeProduct.id, image, index)}
+                              >
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                  <path d="M9 3h6l1 2h4v2H4V5h4zm1 6h2v8h-2zm4 0h2v8h-2zM7 9h2v8H7zm1 12a2 2 0 0 1-2-2V8h12v11a2 2 0 0 1-2 2z" />
+                                </svg>
+                              </button>
+                            ) : null}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="small">
+                      {isLocalPricelistView ? "No local images uploaded yet." : "No images uploaded yet."}
+                    </div>
+                  )}
+                  <div className="small">Upload image{isLocalPricelistView ? "s" : ""}</div>
                   <input
                     type="file"
-                    onChange={(event) =>
-                      event.target.files?.[0] && handleImageUpload(activeProduct.id, event.target.files[0])
-                    }
+                    accept="image/*"
+                    multiple={isLocalPricelistView}
+                    disabled={imageUploadLoading}
+                    onChange={(event) => {
+                      if (!event.target.files?.length) return;
+                      handleImageUpload(activeProduct.id, event.target.files);
+                      event.target.value = "";
+                    }}
                   />
-                </>
+                </div>
               ) : null}
-              {canPushToLocalLine && (productEditorMode === "new" || linkedLocalLineProductId <= 0) ? (
+              {productEditorMode === "new" && isLocalPricelistView ? (
+                <div className="small">Save the product first, then upload images.</div>
+              ) : null}
+              {!isLocalPricelistView && canPushToLocalLine && (productEditorMode === "new" || linkedLocalLineProductId <= 0) ? (
                 <label className="filter-toggle">
                   <input
                     type="checkbox"
@@ -2891,17 +3427,26 @@ export function AdminPanel({ onCatalogRefresh }) {
                   <span>Push to Local Line when saving</span>
                 </label>
               ) : null}
-              <button
-                className="button"
-                type="button"
-                onClick={handleProductSave}
-                disabled={productSaveLoading}
-              >
-                {productSaveLoading
-                  ? (productEditorMode === "new" ? "Creating..." : "Saving...")
-                  : (productEditorMode === "new" ? "Create product" : "Save product")}
-              </button>
-            </section>
+              <div className="admin-product-actions">
+                <button
+                  className="button"
+                  type="button"
+                  onClick={handleProductSave}
+                  disabled={productSaveLoading}
+                >
+                  {productSaveLoading
+                    ? (productEditorMode === "new" ? "Creating..." : "Saving...")
+                    : (
+                      productEditorMode === "new"
+                        ? "Create product"
+                        : (isLocalPricelistView ? "Save Local Changes" : "Save product")
+                    )}
+                </button>
+              </div>
+                  </section>
+                </div>
+              </div>
+            </div>
           )}
 
           {activeSection === "dropSites" && canManageDropSites && (

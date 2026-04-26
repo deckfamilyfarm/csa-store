@@ -19,6 +19,12 @@
   box-sizing: border-box;
 }
 
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
 body {
   margin: 0;
   color: var(--ink);
@@ -27,6 +33,16 @@ body {
   background-image:
     linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0)),
     repeating-linear-gradient(90deg, rgba(143, 46, 43, 0.04) 0 1px, transparent 1px 12px);
+}
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.page > main {
+  flex: 1 0 auto;
 }
 
 body.modal-open {
@@ -170,6 +186,14 @@ img {
   color: #fff;
   border-color: var(--barn);
   box-shadow: none;
+}
+
+.button.alt.selected,
+.button.alt.selected:hover {
+  background: var(--barn);
+  color: #fff;
+  border-color: var(--barn);
+  box-shadow: var(--shadow);
 }
 
 .button.sync-button:hover {
@@ -780,13 +804,13 @@ img {
 
 .admin-nav-item {
   flex: 0 0 auto;
-  border: 1px solid transparent;
-  background: var(--mist);
+  border: 1px solid #cfdacb;
+  background: #e2ebe0;
   border-radius: 12px;
   padding: 8px 10px;
   text-align: center;
   font-weight: 600;
-  color: var(--navy);
+  color: #223545;
   cursor: pointer;
   white-space: nowrap;
   line-height: 1.1;
@@ -929,7 +953,31 @@ img {
 
 .local-pricelist-table {
   width: 100%;
-  min-width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+}
+
+.admin-product-cell {
+  display: grid;
+  gap: 2px;
+  line-height: 1.15;
+  min-width: 0;
+}
+
+.admin-product-cell-title {
+  font-weight: 700;
+  color: var(--navy);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-product-cell-meta {
+  font-size: 12px;
+  color: rgba(31, 27, 23, 0.64);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .local-pricelist-cell {
@@ -948,16 +996,52 @@ img {
   position: relative;
   width: 100%;
   overscroll-behavior: contain;
+  overflow-x: hidden;
 }
 
 .pricelist-table {
-  min-width: 100%;
-  width: max-content;
+  width: 100%;
+  min-width: 0;
+  table-layout: fixed;
 }
 
 .pricelist-table td,
 .pricelist-table th {
   overflow: hidden;
+  max-width: 0;
+}
+
+.pricelist-table td,
+.pricelist-table th,
+.local-pricelist-table td,
+.local-pricelist-table th {
+  padding: 10px 12px;
+}
+
+.pricelist-actions-col {
+  overflow: visible !important;
+}
+
+.pricelist-sort-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.pricelist-sort-indicator {
+  flex: 0 0 auto;
+  color: rgba(28, 43, 58, 0.7);
+  font-size: 11px;
 }
 
 .pricelist-table-body-scroll {
@@ -974,8 +1058,10 @@ img {
 }
 
 .pricelist-package-cell {
-  min-width: 280px;
-  white-space: normal;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .pricelist-row-dirty {
@@ -1222,9 +1308,75 @@ img {
   align-items: center;
 }
 
+.pricelist-toolbar-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.pricelist-toolbar-buttons > .button,
+.pricelist-toolbar-buttons > .pricelist-column-picker > .button {
+  flex: 0 0 auto;
+  min-height: 0;
+  padding: 8px 10px;
+  border: 1px solid #d9e1d6;
+  border-radius: 12px;
+  background: #f0f4ee;
+  color: var(--navy);
+  box-shadow: none;
+  letter-spacing: 0;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.pricelist-toolbar-buttons > .button:hover,
+.pricelist-toolbar-buttons > .pricelist-column-picker > .button:hover {
+  border-color: var(--barn);
+  background: #fff;
+  color: var(--barn);
+  box-shadow: none;
+  filter: none;
+}
+
+.pricelist-toolbar-buttons > .button:disabled,
+.pricelist-toolbar-buttons > .button[disabled],
+.pricelist-toolbar-buttons > .pricelist-column-picker > .button:disabled,
+.pricelist-toolbar-buttons > .pricelist-column-picker > .button[disabled] {
+  border-color: transparent;
+  background: #ece5db;
+  color: #8b8174;
+  box-shadow: none;
+  opacity: 0.9;
+  filter: none;
+}
+
 .pricelist-count {
   margin-right: 4px;
   white-space: nowrap;
+}
+
+.pricelist-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 10px;
+  margin: 8px 0 12px;
+}
+
+.pricelist-page-size {
+  width: 90px;
+}
+
+.pricelist-page-meta {
+  margin-right: 4px;
+  white-space: nowrap;
+}
+
+.pricelist-page-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .admin-help-banner {
@@ -1319,12 +1471,89 @@ img {
   position: sticky;
   background: #fff;
   z-index: 1;
+}
+
+.pricelist-table td.pricelist-sticky-col[style*="left"],
+.pricelist-table th.pricelist-sticky-col[style*="left"] {
   box-shadow: 1px 0 0 var(--line);
+}
+
+.pricelist-table td.pricelist-sticky-col[style*="right"],
+.pricelist-table th.pricelist-sticky-col[style*="right"] {
+  box-shadow: -1px 0 0 var(--line);
 }
 
 .pricelist-table thead .pricelist-sticky-col {
   background: #f7f2e8;
   z-index: 6;
+}
+
+.local-pricelist-actions-col {
+  position: sticky;
+  right: 0;
+  background: #fff;
+  z-index: 2;
+  box-shadow: -1px 0 0 var(--line);
+  overflow: visible !important;
+}
+
+.local-pricelist-table-shell {
+  overflow-x: hidden;
+}
+
+.local-pricelist-table thead .local-pricelist-actions-col {
+  background: #f7f2e8;
+  z-index: 6;
+}
+
+.admin-row-actions {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  min-width: 0;
+}
+
+.admin-row-menu-trigger {
+  min-width: 40px;
+  padding-inline: 10px;
+}
+
+.admin-row-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 12;
+  display: grid;
+  min-width: 176px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+
+.admin-row-menu-item {
+  border: 0;
+  background: transparent;
+  padding: 9px 10px;
+  border-radius: 8px;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.admin-row-menu-item:hover:not(:disabled),
+.admin-row-menu-item:focus-visible:not(:disabled) {
+  background: #f4efe6;
+  outline: none;
+}
+
+.admin-row-menu-item:disabled {
+  opacity: 0.45;
+  cursor: default;
 }
 
 .admin-row-link {
@@ -1359,6 +1588,29 @@ img {
   gap: 12px;
   grid-template-columns: 1fr auto;
   align-items: center;
+}
+
+.admin-sale-fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+  max-width: 420px;
+}
+
+.admin-inline-toggle-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #faf7f1;
+}
+
+.admin-sale-discount-field {
+  width: 120px;
 }
 
 .admin-actions {
@@ -1468,6 +1720,30 @@ img {
   border-radius: 12px;
   object-fit: cover;
   border: 1px solid var(--line);
+}
+
+.admin-image-tile {
+  position: relative;
+  width: 140px;
+}
+
+.admin-image-delete-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(143, 46, 43, 0.72);
+  box-shadow: 0 6px 16px rgba(31, 27, 23, 0.16);
+}
+
+.admin-image-delete-button:hover {
+  background: var(--barn);
+  color: #fff;
+  border-color: var(--barn);
 }
 
 .admin-form {
@@ -1769,6 +2045,15 @@ img {
   width: min(520px, 92vw);
 }
 
+.admin-product-modal {
+  width: min(920px, 94vw);
+  padding: 20px 22px;
+}
+
+.admin-product-modal.local-pricelist-modal {
+  width: min(640px, 92vw);
+}
+
 .modal-body {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1781,6 +2066,44 @@ img {
 .modal-body.single {
   grid-template-columns: 1fr;
   max-height: none;
+}
+
+.admin-product-modal .modal-body.single {
+  max-height: calc(90vh - 64px);
+  overflow: auto;
+}
+
+.admin-product-modal-body {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-product-modal.local-pricelist-modal .admin-product-modal-body {
+  max-width: 460px;
+}
+
+.admin-product-modal .admin-fields {
+  gap: 12px;
+  margin: 8px 0 16px;
+}
+
+.admin-product-modal .admin-fields .filter-field,
+.admin-product-modal .admin-fields .input,
+.admin-product-modal .admin-fields .sale-discount-wrapper,
+.admin-product-modal .admin-fields .admin-editor {
+  max-width: 420px;
+}
+
+.admin-product-modal .admin-grid {
+  gap: 12px;
+}
+
+.admin-product-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-start;
+  margin-top: 6px;
 }
 
 .response-modal {
@@ -1848,6 +2171,31 @@ img {
 .response-card .title {
   font-weight: 700;
   margin-bottom: 6px;
+}
+
+.pricelist-push-review-modal {
+  width: min(880px, 96vw);
+}
+
+.pricelist-push-note {
+  background: #fff7e8;
+}
+
+.pricelist-push-review-table-shell {
+  max-height: 50vh;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.pricelist-push-review-table {
+  min-width: 100%;
+  border: 0;
+}
+
+.pricelist-push-review-table th,
+.pricelist-push-review-table td {
+  white-space: nowrap;
 }
 
 .audit-nav-card {

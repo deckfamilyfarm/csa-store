@@ -132,10 +132,10 @@ export function AdminManualSection({ focusTopic = "overview" }) {
         </p>
         <ul className="admin-manual-list">
           <li>
-            <strong>Vendor Retail Price</strong> is the local retail price used for calculation.
+            <strong>Vendor's Retail Price</strong> is the local retail price used for calculation.
           </li>
           <li>
-            <strong>Unit Type</strong> tells the app whether the retail price is per item or per
+            <strong>Vendor's Unit Type</strong> tells the app whether the retail price is per item or per
             pound.
           </li>
           <li>
@@ -160,7 +160,7 @@ export function AdminManualSection({ focusTopic = "overview" }) {
           <ol className="admin-manual-list admin-manual-numbered">
             <li>
               Start with the local vendor unit price entered in
-              <strong> Vendor Retail Price</strong>.
+              <strong> Vendor's Retail Price</strong>.
             </li>
             <li>
               If the item is weight-based, the app uses <strong>Avg Weight Override</strong> when
@@ -243,7 +243,7 @@ export function AdminManualSection({ focusTopic = "overview" }) {
             copy an existing item and adjust it.
           </li>
           <li>
-            For Deck Family Farm, Hyland, and Creamy Cow items, fill in the Vendor Retail Price
+            For Deck Family Farm, Hyland, and Creamy Cow items, fill in the Vendor's Retail Price
             fields before saving so the CSA Package Price and price-list adjusted prices can
             calculate correctly.
           </li>

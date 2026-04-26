@@ -170,6 +170,7 @@ export function Storefront() {
   const isAccountView = view === "account";
   const isAdminView = view === "admin";
   const isResetPasswordView = view === "resetPassword";
+  const showMemberCart = isMember && !isAdminView && !isResetPasswordView;
   const activeCategory = catalog.categories.find(
     (category) => String(category.id) === String(selectedCategory)
   );
@@ -446,21 +447,23 @@ export function Storefront() {
             <span className="brand-title">Full Farm CSA</span>
           </div>
           <div className="utility-actions">
-            {isMember &&
-              (isAccountView ? (
-                <a className="button alt" href="#/home">
-                  Back to shop
+            {isMember ? (
+              <>
+                <a className={`button alt${isAccountView ? " selected" : ""}`} href="#/account">
+                  Member Settings
                 </a>
-              ) : (
-                <>
-                  <a className="button alt" href="#/account">
-                    Member settings
+                {isAdmin ? (
+                  <a className={`button alt${isAdminView ? " selected" : ""}`} href="#/admin">
+                    Administrator Settings
                   </a>
+                ) : null}
+                {showMemberCart ? (
                   <button className="button alt" type="button">
                     Cart (2)
                   </button>
-                </>
-              ))}
+                ) : null}
+              </>
+            ) : null}
             <button
               className="button"
               type="button"

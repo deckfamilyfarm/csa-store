@@ -1,4 +1,9 @@
 const base = import.meta.env.VITE_API_BASE || "/api";
+const inflightGetRequests = new Map();
+
+function getRequestKey(url, token = "") {
+  return `${url}::${token}`;
+}
 
 async function throwForError(response, fallbackMessage) {
   let detail = "";
@@ -18,6 +23,30 @@ async function throwForError(response, fallbackMessage) {
   throw error;
 }
 
+async function fetchJsonGet(url, token, fallbackMessage) {
+  const requestKey = getRequestKey(url, token);
+  if (inflightGetRequests.has(requestKey)) {
+    return inflightGetRequests.get(requestKey);
+  }
+
+  const requestPromise = (async () => {
+    const response = await fetch(url, {
+      cache: "no-store",
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined
+    });
+    if (!response.ok) await throwForError(response, fallbackMessage);
+    return response.json();
+  })();
+
+  inflightGetRequests.set(requestKey, requestPromise);
+
+  try {
+    return await requestPromise;
+  } finally {
+    inflightGetRequests.delete(requestKey);
+  }
+}
+
 export async function adminLogin(username, password) {
   const response = await fetch(`${base}/admin/login`, {
     method: "POST",
@@ -33,11 +62,7 @@ export async function adminLogin(username, password) {
 }
 
 export async function adminGet(path, token) {
-  const response = await fetch(`${base}/admin/${path}`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!response.ok) await throwForError(response, "Admin request failed");
-  return response.json();
+  return fetchJsonGet(`${base}/admin/${path}`, token, "Admin request failed");
 }
 
 export async function adminPut(path, token, body) {
@@ -86,5 +111,18 @@ export async function adminUploadImage(productId, token, file) {
     body: form
   });
   if (!response.ok) await throwForError(response, "Upload failed");
+  return response.json();
+}
+
+export async function adminDeleteImage(productId, token, payload) {
+  const response = await fetch(`${base}/admin/products/${productId}/images/delete`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  });
+  if (!response.ok) await throwForError(response, "Image delete failed");
   return response.json();
 }

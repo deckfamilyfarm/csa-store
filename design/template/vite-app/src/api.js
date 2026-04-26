@@ -1,10 +1,38 @@
-export async function fetchCatalog() {
-  const base = import.meta.env.VITE_API_BASE || "/api";
-  const response = await fetch(`${base}/catalog`);
-  if (!response.ok) {
-    throw new Error("Failed to load catalog");
+const base = import.meta.env.VITE_API_BASE || "/api";
+const inflightGetRequests = new Map();
+
+function getRequestKey(url, token = "") {
+  return `${url}::${token}`;
+}
+
+async function fetchJsonGet(url, token, fallbackMessage) {
+  const requestKey = getRequestKey(url, token);
+  if (inflightGetRequests.has(requestKey)) {
+    return inflightGetRequests.get(requestKey);
   }
-  return response.json();
+
+  const requestPromise = (async () => {
+    const response = await fetch(url, {
+      cache: "no-store",
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined
+    });
+    if (!response.ok) {
+      throw new Error(fallbackMessage);
+    }
+    return response.json();
+  })();
+
+  inflightGetRequests.set(requestKey, requestPromise);
+
+  try {
+    return await requestPromise;
+  } finally {
+    inflightGetRequests.delete(requestKey);
+  }
+}
+
+export async function fetchCatalog() {
+  return fetchJsonGet(`${base}/catalog`, "", "Failed to load catalog");
 }
 
 export async function submitReview({ productId, rating, title, body }, token) {
@@ -27,18 +55,11 @@ export async function submitReview({ productId, rating, title, body }, token) {
 }
 
 export async function fetchMyReviews(productId, token) {
-  const base = import.meta.env.VITE_API_BASE || "/api";
   const url = new URL(`${base}/reviews/mine`, window.location.origin);
   if (productId) {
     url.searchParams.set("productId", String(productId));
   }
-  const response = await fetch(url, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!response.ok) {
-    throw new Error("Unable to load reviews");
-  }
-  return response.json();
+  return fetchJsonGet(url.toString(), token, "Unable to load reviews");
 }
 
 export async function updateReview(reviewId, payload, token) {
@@ -155,12 +176,5 @@ export async function changePassword(token, currentPassword, password) {
 }
 
 export async function fetchMe(token) {
-  const base = import.meta.env.VITE_API_BASE || "/api";
-  const response = await fetch(`${base}/auth/me`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!response.ok) {
-    throw new Error("Unauthorized");
-  }
-  return response.json();
+  return fetchJsonGet(`${base}/auth/me`, token, "Unauthorized");
 }

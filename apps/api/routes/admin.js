@@ -4,9 +4,10 @@ import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import multer from "multer";
 import sharp from "sharp";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import {
   ensureAdminAccessSchema,
+  ensureAdminPricelistIndexes,
   ensureLocalLineSyncSchema,
   getDb,
   getPool,
@@ -63,19 +64,72 @@ import { sendPasswordResetForUser } from "../lib/passwordReset.js";
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
-const spacesClient = new S3Client({
-  region: process.env.DO_SPACES_REGION || "sfo3",
-  endpoint: process.env.DO_SPACES_ENDPOINT,
-  credentials: {
-    accessKeyId: process.env.DO_SPACES_KEY,
-    secretAccessKey: process.env.DO_SPACES_SECRET
+let spacesClient = null;
+
+function getSpacesClient() {
+  if (!spacesClient) {
+    spacesClient = new S3Client({
+      region: process.env.DO_SPACES_REGION || "sfo3",
+      endpoint: process.env.DO_SPACES_ENDPOINT,
+      credentials: {
+        accessKeyId: process.env.DO_SPACES_KEY,
+        secretAccessKey: process.env.DO_SPACES_SECRET
+      }
+    });
   }
-});
+  return spacesClient;
+}
 
 function buildPublicUrl(key) {
   const base = process.env.DO_SPACES_PUBLIC_BASE_URL;
   if (base) return `${base.replace(/\/$/, "")}/${key}`;
   return `${process.env.DO_SPACES_ENDPOINT}/${process.env.DO_SPACES_BUCKET}/${key}`;
+}
+
+function extractSpacesKeyFromPublicUrl(url) {
+  if (!url) return null;
+
+  try {
+    const parsed = new URL(String(url));
+    const configuredPublicBase = process.env.DO_SPACES_PUBLIC_BASE_URL;
+    if (configuredPublicBase) {
+      const baseUrl = new URL(configuredPublicBase);
+      const basePath = baseUrl.pathname.replace(/\/$/, "");
+      const urlPath = parsed.pathname || "";
+      if (parsed.origin === baseUrl.origin && urlPath.startsWith(`${basePath}/`)) {
+        return decodeURIComponent(urlPath.slice(basePath.length + 1));
+      }
+    }
+
+    const endpoint = process.env.DO_SPACES_ENDPOINT;
+    const bucket = process.env.DO_SPACES_BUCKET;
+    if (endpoint && bucket) {
+      const endpointUrl = new URL(endpoint);
+      const bucketPath = `/${bucket}/`;
+      if (parsed.origin === endpointUrl.origin && parsed.pathname.startsWith(bucketPath)) {
+        return decodeURIComponent(parsed.pathname.slice(bucketPath.length));
+      }
+      if (
+        parsed.protocol === endpointUrl.protocol &&
+        parsed.hostname === `${bucket}.${endpointUrl.hostname}`
+      ) {
+        return decodeURIComponent(parsed.pathname.replace(/^\/+/, ""));
+      }
+    }
+  } catch (_error) {
+    return null;
+  }
+
+  return null;
+}
+
+function hasSpacesUploadConfig() {
+  return Boolean(
+    process.env.DO_SPACES_BUCKET &&
+    process.env.DO_SPACES_ENDPOINT &&
+    process.env.DO_SPACES_KEY &&
+    process.env.DO_SPACES_SECRET
+  );
 }
 
 function toNumber(value) {
@@ -434,6 +488,54 @@ async function upsertProductPricingProfileRecord(connection, productId, payload 
       record.remote_sync_status,
       record.remote_sync_message,
       record.remote_synced_at,
+      now,
+      now
+    ]
+  );
+}
+
+async function markProductRemoteSyncPending(connection, productId, message) {
+  const now = new Date();
+  const remoteSyncMessage =
+    String(message || "").trim() || "Local changes updated. Apply to remote store pending.";
+  const [existingRows] = await connection.query(
+    "SELECT product_id FROM product_pricing_profiles WHERE product_id = ? LIMIT 1",
+    [productId]
+  );
+
+  if (existingRows[0]) {
+    await connection.query(
+      `
+        UPDATE product_pricing_profiles
+        SET remote_sync_status = ?, remote_sync_message = ?, remote_synced_at = ?, updated_at = ?
+        WHERE product_id = ?
+      `,
+      ["pending", remoteSyncMessage, null, now, productId]
+    );
+    return;
+  }
+
+  await connection.query(
+    `
+      INSERT INTO product_pricing_profiles (
+        product_id, unit_of_measure, source_unit_price, min_weight, max_weight,
+        avg_weight_override, source_multiplier, on_sale, sale_discount,
+        remote_sync_status, remote_sync_message, remote_synced_at, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `,
+    [
+      productId,
+      "each",
+      null,
+      null,
+      null,
+      null,
+      0.5412,
+      0,
+      0,
+      "pending",
+      remoteSyncMessage,
+      null,
       now,
       now
     ]
@@ -1183,6 +1285,420 @@ router.get("/products", requireAdmin, async (_req, res) => {
   });
 });
 
+router.get("/products/:id", requireAdmin, async (req, res) => {
+  const db = getDb();
+  const productId = Number(req.params.id);
+  if (!Number.isFinite(productId)) {
+    return res.status(400).json({ error: "Invalid product id" });
+  }
+
+  const productRows = await db.select().from(products).where(eq(products.id, productId));
+  const product = productRows[0] || null;
+  if (!product) {
+    return res.status(404).json({ error: "Product not found" });
+  }
+
+  await ensureLocalLineSyncSchema().catch((error) => {
+    console.warn("Local Line schema bootstrap skipped for /admin/products/:id GET:", error.message);
+  });
+
+  const imageRows = await db.select().from(productImages).where(eq(productImages.productId, productId));
+  let mediaRows = [];
+  let productMetaRows = [];
+  let syncIssueRows = [];
+  try {
+    mediaRows = await db.select().from(productMedia).where(eq(productMedia.productId, productId));
+  } catch (error) {
+    if (!isMissingTableError(error, "product_media")) throw error;
+  }
+  try {
+    productMetaRows = await db
+      .select()
+      .from(localLineProductMeta)
+      .where(eq(localLineProductMeta.productId, productId));
+  } catch (error) {
+    if (!isMissingTableError(error, "local_line_product_meta")) throw error;
+  }
+  try {
+    syncIssueRows = await db
+      .select()
+      .from(localLineSyncIssues)
+      .where(eq(localLineSyncIssues.productId, productId));
+  } catch (error) {
+    if (!isMissingTableError(error, "local_line_sync_issues")) throw error;
+  }
+
+  const [packageRows, pricingProfileRows, saleRows] = await Promise.all([
+    db.select().from(packages).where(eq(packages.productId, productId)),
+    db.select().from(productPricingProfiles).where(eq(productPricingProfiles.productId, productId)),
+    db.select().from(productSales).where(eq(productSales.productId, productId))
+  ]);
+
+  const imagesByProduct = imageRows.reduce((acc, row) => {
+    if (!acc[row.productId]) acc[row.productId] = [];
+    acc[row.productId].push(row.url);
+    return acc;
+  }, {});
+
+  const normalizeUrl = (url) => (url ? url.split("?")[0] : url);
+  const isThumbnailUrl = (url) => /(?:^|\/)[^/]+\.thumbnail\.(jpg|jpeg|png|webp)$/i.test(url || "");
+  const baseKeyForUrl = (url) => {
+    try {
+      const normalized = normalizeUrl(url);
+      if (!normalized) return url;
+      const parsed = new URL(normalized);
+      const file = parsed.pathname.split("/").pop() || normalized;
+      return file
+        .replace(/\.thumbnail\.(jpg|jpeg|png|webp)$/i, "")
+        .replace(/\.(jpg|jpeg|png|webp)$/i, "");
+    } catch (err) {
+      const file = (normalizeUrl(url) || "").split("/").pop() || url;
+      return file
+        .replace(/\.thumbnail\.(jpg|jpeg|png|webp)$/i, "")
+        .replace(/\.(jpg|jpeg|png|webp)$/i, "");
+    }
+  };
+
+  const imageObjectsByProduct = {};
+  for (const groupedProductId of Object.keys(imagesByProduct)) {
+    const groups = new Map();
+    const urls = imagesByProduct[groupedProductId];
+    urls.forEach((url) => {
+      const key = baseKeyForUrl(url);
+      if (!groups.has(key)) {
+        groups.set(key, { url: null, thumbnailUrl: null });
+      }
+      const entry = groups.get(key);
+      if (isThumbnailUrl(url)) {
+        entry.thumbnailUrl = entry.thumbnailUrl || url;
+      } else {
+        entry.url = entry.url || url;
+      }
+    });
+
+    imageObjectsByProduct[groupedProductId] = [...groups.values()]
+      .map((entry) => ({
+        url: entry.url || entry.thumbnailUrl,
+        thumbnailUrl: entry.thumbnailUrl || entry.url
+      }))
+      .filter((entry) => entry.url);
+  }
+
+  const mediaObjectsByProduct = mediaRows
+    .slice()
+    .sort((left, right) => {
+      const primaryDelta = Number(right.isPrimary || 0) - Number(left.isPrimary || 0);
+      if (primaryDelta !== 0) return primaryDelta;
+      return Number(left.sortOrder || 0) - Number(right.sortOrder || 0);
+    })
+    .reduce((acc, row) => {
+      if (!acc[row.productId]) acc[row.productId] = [];
+      const url = row.publicUrl || row.remoteUrl || row.sourceUrl;
+      if (!url) return acc;
+      acc[row.productId].push({
+        url,
+        thumbnailUrl: row.thumbnailUrl || url
+      });
+      return acc;
+    }, {});
+
+  const packagesByProduct = packageRows.reduce((acc, row) => {
+    if (!acc[row.productId]) acc[row.productId] = [];
+    acc[row.productId].push(row);
+    return acc;
+  }, {});
+  const productMetaByProduct = productMetaRows.reduce((acc, row) => {
+    acc[row.productId] = row;
+    return acc;
+  }, {});
+  const pricingProfileByProduct = pricingProfileRows.reduce((acc, row) => {
+    acc[row.productId] = row;
+    return acc;
+  }, {});
+  const syncIssueCountsByProduct = syncIssueRows.reduce((acc, row) => {
+    acc[row.productId] = (acc[row.productId] || 0) + 1;
+    return acc;
+  }, {});
+  const salesByProduct = saleRows.reduce((acc, row) => {
+    acc[row.productId] = {
+      onSale: Boolean(row.onSale),
+      saleDiscount: row.saleDiscount !== null ? Number(row.saleDiscount) : null
+    };
+    return acc;
+  }, {});
+
+  return res.json({
+    product: {
+      ...product,
+      images:
+        imageObjectsByProduct[product.id] ||
+        mediaObjectsByProduct[product.id] ||
+        (imagesByProduct[product.id] || []).map((url) => ({ url, thumbnailUrl: url })),
+      localLineMeta: productMetaByProduct[product.id] || null,
+      pricingProfile: pricingProfileByProduct[product.id] || null,
+      localLineSyncIssueCount: syncIssueCountsByProduct[product.id] || 0,
+      packages: packagesByProduct[product.id] || [],
+      onSale: salesByProduct[product.id]?.onSale ?? false,
+      saleDiscount: salesByProduct[product.id]?.saleDiscount ?? null
+    }
+  });
+});
+
+router.get("/local-pricelist-products", requireAdmin, async (req, res) => {
+  const db = getDb();
+  const pool = getPool();
+  await ensureLocalLineSyncSchema().catch((error) => {
+    console.warn("Local Line schema bootstrap skipped for /admin/local-pricelist-products:", error.message);
+  });
+
+  const [vendorRows, categoryRows] = await Promise.all([
+    db.select().from(vendors),
+    db.select().from(categories)
+  ]);
+
+  const localVendorIds = vendorRows
+    .filter((vendor) => isSourcePricingVendor(vendor))
+    .map((vendor) => Number(vendor.id))
+    .filter((value) => Number.isFinite(value));
+
+  if (!localVendorIds.length) {
+    return res.json({
+      categories: [],
+      products: [],
+      pagination: {
+        page: 1,
+        pageSize: PRICELIST_DEFAULT_PAGE_SIZE,
+        totalRows: 0,
+        totalPages: 1
+      }
+    });
+  }
+
+  const search = String(req.query?.search || "").trim().toLowerCase();
+  const categoryId = toOptionalInteger(req.query?.categoryId, null);
+  const vendorId = toOptionalInteger(req.query?.vendorId, null);
+  const visibility = String(req.query?.visibility || "visible").trim();
+  const saleFilter = String(req.query?.sale || "all").trim();
+  const requestedPageSize = parsePositiveInteger(req.query?.pageSize, PRICELIST_DEFAULT_PAGE_SIZE);
+  const pageSize = Math.min(PRICELIST_MAX_PAGE_SIZE, Math.max(1, requestedPageSize));
+  const requestedPage = parsePositiveInteger(req.query?.page, 1);
+  const whereClauses = ["p.vendor_id IN (?)"];
+  const whereParams = [localVendorIds];
+
+  if (search) {
+    whereClauses.push("LOWER(TRIM(p.name)) LIKE ?");
+    whereParams.push(`%${search}%`);
+  }
+  if (Number.isFinite(categoryId)) {
+    whereClauses.push("p.category_id = ?");
+    whereParams.push(categoryId);
+  }
+  if (Number.isFinite(vendorId)) {
+    whereClauses.push("p.vendor_id = ?");
+    whereParams.push(vendorId);
+  }
+  if (visibility === "visible") {
+    whereClauses.push("COALESCE(p.visible, 0) = 1");
+  } else if (visibility === "hidden") {
+    whereClauses.push("COALESCE(p.visible, 0) = 0");
+  }
+  if (saleFilter === "onSale") {
+    whereClauses.push("COALESCE(ps.on_sale, 0) = 1");
+  } else if (saleFilter === "notOnSale") {
+    whereClauses.push("COALESCE(ps.on_sale, 0) = 0");
+  }
+
+  const whereSql = `WHERE ${whereClauses.join(" AND ")}`;
+  const [categoryOptionRows] = await pool.query(
+    `
+      SELECT DISTINCT c.id, c.name
+      FROM categories c
+      JOIN products p ON p.category_id = c.id
+      WHERE p.vendor_id IN (?)
+      ORDER BY c.name ASC
+    `,
+    [localVendorIds]
+  );
+
+  const [[countRow]] = await pool.query(
+    `
+      SELECT COUNT(*) AS total
+      FROM products p
+      LEFT JOIN product_sales ps ON ps.product_id = p.id
+      ${whereSql}
+    `,
+    whereParams
+  );
+  const totalRows = Number(countRow?.total || 0);
+  const totalPages = Math.max(1, Math.ceil(totalRows / pageSize));
+  const page = Math.min(requestedPage, totalPages);
+  const offset = (page - 1) * pageSize;
+  const [pagedProductRows] = await pool.query(
+    `
+      SELECT
+        p.*,
+        COALESCE(ps.on_sale, 0) AS onSale,
+        ps.sale_discount AS saleDiscount,
+        c.name AS categoryName
+      FROM products p
+      LEFT JOIN product_sales ps ON ps.product_id = p.id
+      LEFT JOIN categories c ON c.id = p.category_id
+      ${whereSql}
+      ORDER BY p.name ASC
+      LIMIT ? OFFSET ?
+    `,
+    [...whereParams, pageSize, offset]
+  );
+  const pagedProductIds = pagedProductRows
+    .map((row) => Number(row.id))
+    .filter((value) => Number.isFinite(value));
+
+  const [packageRows, pricingProfileRows] = pagedProductIds.length
+    ? await Promise.all([
+        db.select().from(packages).where(inArray(packages.productId, pagedProductIds)),
+        db.select().from(productPricingProfiles).where(inArray(productPricingProfiles.productId, pagedProductIds))
+      ])
+    : [[], []];
+
+  let productMetaRows = [];
+  if (pagedProductIds.length) {
+    try {
+      productMetaRows = await db
+        .select()
+        .from(localLineProductMeta)
+        .where(inArray(localLineProductMeta.productId, pagedProductIds));
+    } catch (error) {
+      if (!isMissingTableError(error, "local_line_product_meta")) throw error;
+    }
+  }
+
+  const categoryMap = new Map(categoryRows.map((row) => [Number(row.id), row.name]));
+  const availableCategories = categoryOptionRows.map((row) => ({
+    id: Number(row.id),
+    name: row.name
+  }));
+  const packagesByProduct = packageRows.reduce((acc, row) => {
+    const productId = Number(row.productId);
+    if (!acc[productId]) acc[productId] = [];
+    acc[productId].push(row);
+    return acc;
+  }, {});
+  const pricingProfileByProduct = pricingProfileRows.reduce((acc, row) => {
+    acc[Number(row.productId)] = row;
+    return acc;
+  }, {});
+  const productMetaByProduct = productMetaRows.reduce((acc, row) => {
+    acc[Number(row.productId)] = row;
+    return acc;
+  }, {});
+
+  const imageRows = pagedProductIds.length
+    ? await db.select().from(productImages).where(inArray(productImages.productId, pagedProductIds))
+    : [];
+  let mediaRows = [];
+  if (pagedProductIds.length) {
+    try {
+      mediaRows = await db.select().from(productMedia).where(inArray(productMedia.productId, pagedProductIds));
+    } catch (error) {
+      if (!isMissingTableError(error, "product_media")) throw error;
+    }
+  }
+
+  const imagesByProduct = imageRows.reduce((acc, row) => {
+    if (!acc[row.productId]) acc[row.productId] = [];
+    acc[row.productId].push(row.url);
+    return acc;
+  }, {});
+
+  const normalizeUrl = (url) => (url ? url.split("?")[0] : url);
+  const isThumbnailUrl = (url) => /(?:^|\/)[^/]+\.thumbnail\.(jpg|jpeg|png|webp)$/i.test(url || "");
+  const baseKeyForUrl = (url) => {
+    try {
+      const normalized = normalizeUrl(url);
+      if (!normalized) return url;
+      const parsed = new URL(normalized);
+      const file = parsed.pathname.split("/").pop() || normalized;
+      return file
+        .replace(/\.thumbnail\.(jpg|jpeg|png|webp)$/i, "")
+        .replace(/\.(jpg|jpeg|png|webp)$/i, "");
+    } catch (_error) {
+      const file = (normalizeUrl(url) || "").split("/").pop() || url;
+      return file
+        .replace(/\.thumbnail\.(jpg|jpeg|png|webp)$/i, "")
+        .replace(/\.(jpg|jpeg|png|webp)$/i, "");
+    }
+  };
+
+  const imageObjectsByProduct = {};
+  for (const productId of Object.keys(imagesByProduct)) {
+    const groups = new Map();
+    const urls = imagesByProduct[productId];
+    urls.forEach((url) => {
+      const key = baseKeyForUrl(url);
+      if (!groups.has(key)) {
+        groups.set(key, { url: null, thumbnailUrl: null });
+      }
+      const entry = groups.get(key);
+      if (isThumbnailUrl(url)) {
+        entry.thumbnailUrl = entry.thumbnailUrl || url;
+      } else {
+        entry.url = entry.url || url;
+      }
+    });
+
+    imageObjectsByProduct[productId] = [...groups.values()]
+      .map((entry) => ({
+        url: entry.url || entry.thumbnailUrl,
+        thumbnailUrl: entry.thumbnailUrl || entry.url
+      }))
+      .filter((entry) => entry.url);
+  }
+
+  const mediaObjectsByProduct = mediaRows
+    .slice()
+    .sort((left, right) => {
+      const primaryDelta = Number(right.isPrimary || 0) - Number(left.isPrimary || 0);
+      if (primaryDelta !== 0) return primaryDelta;
+      return Number(left.sortOrder || 0) - Number(right.sortOrder || 0);
+    })
+    .reduce((acc, row) => {
+      if (!acc[row.productId]) acc[row.productId] = [];
+      const url = row.publicUrl || row.remoteUrl || row.sourceUrl;
+      if (!url) return acc;
+      acc[row.productId].push({
+        url,
+        thumbnailUrl: row.thumbnailUrl || url
+      });
+      return acc;
+    }, {});
+
+  return res.json({
+    categories: availableCategories,
+    products: pagedProductRows.map((product) => ({
+      ...product,
+      categoryName: product.categoryName || categoryMap.get(Number(product.categoryId)) || "Uncategorized",
+      packages: packagesByProduct[Number(product.id)] || [],
+      pricingProfile: pricingProfileByProduct[Number(product.id)] || null,
+      localLineMeta: productMetaByProduct[Number(product.id)] || null,
+      onSale: Boolean(product.onSale),
+      saleDiscount:
+        product.saleDiscount === null || typeof product.saleDiscount === "undefined"
+          ? null
+          : Number(product.saleDiscount),
+      images:
+        imageObjectsByProduct[product.id] ||
+        mediaObjectsByProduct[product.id] ||
+        (imagesByProduct[product.id] || []).map((url) => ({ url, thumbnailUrl: url }))
+    })),
+    pagination: {
+      page,
+      pageSize,
+      totalRows,
+      totalPages
+    }
+  });
+});
+
 router.get("/localline/products/:id", requireAdmin, async (req, res) => {
   const db = getDb();
   const productId = Number(req.params.id);
@@ -1347,134 +1863,600 @@ router.put("/localline/products/:id/price-list-entries", requireAdminPermission(
   return res.json({ ok: true, updated });
 });
 
-router.get("/pricelist", requireAdmin, async (_req, res) => {
-  const db = getDb();
-  await ensureLocalLineSyncSchema().catch((error) => {
-    console.warn("Local Line schema bootstrap skipped for /admin/pricelist:", error.message);
-  });
+const PRICELIST_DEFAULT_PAGE_SIZE = 50;
+const PRICELIST_MAX_PAGE_SIZE = 200;
+const PRICELIST_SQL_SORT_MAP = Object.freeze({
+  product: "p.name",
+  sourceUnitPrice: "pp.source_unit_price",
+  unit: "pp.unit_of_measure",
+  category: "c.name",
+  vendor: "v.name",
+  minWeight: "pp.min_weight",
+  maxWeight: "pp.max_weight",
+  avgWeightOverride: "pp.avg_weight_override",
+  sourceMultiplier: "pp.source_multiplier",
+  guestMarkup: "pp.guest_markup",
+  memberMarkup: "pp.member_markup",
+  herdShareMarkup: "pp.herd_share_markup",
+  snapMarkup: "pp.snap_markup",
+  onSale: "pp.on_sale",
+  saleDiscount: "pp.sale_discount",
+  status: "COALESCE(pp.remote_sync_status, 'not-applied')",
+  lastRemote: "pp.remote_synced_at"
+});
+const PRICELIST_PENDING_REMOTE_APPLY_SQL =
+  "(" +
+    "pp.product_id IS NOT NULL AND (" +
+    "pp.remote_sync_status IN ('pending', 'failed') " +
+    "OR COALESCE(pp.updated_at, '1970-01-01 00:00:00') > COALESCE(pp.remote_synced_at, '1970-01-01 00:00:00')" +
+    ")" +
+  ")";
+const PRICELIST_COMPUTED_SORT_KEYS = new Set([
+  "pricingRule",
+  "basePrice",
+  "guestPrice",
+  "memberPrice",
+  "herdSharePrice",
+  "snapPrice",
+  "packages"
+]);
 
-  const [productRows, categoryRows, vendorRows, packageRows, profileRows, saleRows] =
-    await Promise.all([
-      db.select().from(products),
-      db.select().from(categories),
-      db.select().from(vendors),
-      db.select().from(packages),
-      db.select().from(productPricingProfiles),
-      db.select().from(productSales)
-    ]);
+function parsePositiveInteger(value, fallback) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric) || numeric <= 0) return fallback;
+  return Math.floor(numeric);
+}
+
+function normalizePricelistSortKey(value) {
+  const key = String(value || "product").trim();
+  if (Object.prototype.hasOwnProperty.call(PRICELIST_SQL_SORT_MAP, key)) {
+    return key;
+  }
+  return PRICELIST_COMPUTED_SORT_KEYS.has(key) ? key : "product";
+}
+
+function normalizePricelistSortDirection(value) {
+  return String(value || "").trim().toLowerCase() === "desc" ? "desc" : "asc";
+}
+
+function buildPricelistWhereClause({
+  search,
+  categoryId,
+  vendorId,
+  statusFilter,
+  membershipCategoryIds = []
+}) {
+  const clauses = [];
+  const params = [];
+
+  if (membershipCategoryIds.length) {
+    clauses.push("(p.category_id IS NULL OR p.category_id NOT IN (?))");
+    params.push(membershipCategoryIds);
+  }
+
+  if (search) {
+    clauses.push("LOWER(TRIM(p.name)) LIKE ?");
+    params.push(`%${String(search).trim().toLowerCase()}%`);
+  }
+
+  if (Number.isFinite(categoryId)) {
+    clauses.push("p.category_id = ?");
+    params.push(categoryId);
+  }
+
+  if (Number.isFinite(vendorId)) {
+    clauses.push("p.vendor_id = ?");
+    params.push(vendorId);
+  }
+
+  switch (statusFilter) {
+    case "needsApply":
+      clauses.push(PRICELIST_PENDING_REMOTE_APPLY_SQL);
+      break;
+    case "applied":
+    case "pending":
+    case "failed":
+      clauses.push("COALESCE(pp.remote_sync_status, 'not-applied') = ?");
+      params.push(statusFilter);
+      break;
+    case "not-applied":
+      clauses.push(
+        "(" +
+          "pp.product_id IS NULL " +
+          "OR pp.remote_sync_status IS NULL " +
+          "OR TRIM(pp.remote_sync_status) = '' " +
+          "OR pp.remote_sync_status = 'not-applied'" +
+        ")"
+      );
+      break;
+    default:
+      break;
+  }
+
+  return {
+    clauses,
+    whereSql: clauses.length ? `WHERE ${clauses.join(" AND ")}` : "",
+    params
+  };
+}
+
+function buildPendingPricelistClauses(clauses = [], statusFilter = "all") {
+  return statusFilter === "needsApply"
+    ? [...clauses]
+    : [...clauses, PRICELIST_PENDING_REMOTE_APPLY_SQL];
+}
+
+function compareNullableNumbers(left, right) {
+  if (left === null && right === null) return 0;
+  if (left === null) return 1;
+  if (right === null) return -1;
+  return left - right;
+}
+
+function compareNullableStrings(left, right) {
+  const leftValue = String(left || "").trim();
+  const rightValue = String(right || "").trim();
+  if (!leftValue && !rightValue) return 0;
+  if (!leftValue) return 1;
+  if (!rightValue) return -1;
+  return leftValue.localeCompare(rightValue, undefined, { sensitivity: "base", numeric: true });
+}
+
+function getPricelistSortValue(row, columnKey) {
+  switch (columnKey) {
+    case "product":
+      return row.name || "";
+    case "sourceUnitPrice":
+      return toNumber(row.sourceUnitPrice);
+    case "unit":
+      return row.unitOfMeasure || "";
+    case "category":
+      return row.categoryName || "";
+    case "vendor":
+      return row.vendorName || "";
+    case "pricingRule":
+      return row.pricingRuleLabel || "";
+    case "minWeight":
+      return toNumber(row.minWeight);
+    case "maxWeight":
+      return toNumber(row.maxWeight);
+    case "avgWeightOverride":
+      return toNumber(row.avgWeightOverride);
+    case "sourceMultiplier":
+      return toNumber(row.sourceMultiplier);
+    case "basePrice":
+      return toNumber(row.basePrice);
+    case "guestMarkup":
+      return toNumber(row.guestMarkup);
+    case "guestPrice":
+      return toNumber(row.guestPrice);
+    case "memberMarkup":
+      return toNumber(row.memberMarkup);
+    case "memberPrice":
+      return toNumber(row.memberPrice);
+    case "herdShareMarkup":
+      return toNumber(row.herdShareMarkup);
+    case "herdSharePrice":
+      return toNumber(row.herdSharePrice);
+    case "snapMarkup":
+      return toNumber(row.snapMarkup);
+    case "snapPrice":
+      return toNumber(row.snapPrice);
+    case "saleDiscount":
+      return toNumber(row.saleDiscount);
+    case "onSale":
+      return row.onSale ? 1 : 0;
+    case "packages":
+      return row.packageSummary || "";
+    case "status":
+      return row.remoteSyncStatus || "";
+    case "lastRemote":
+      return row.remoteSyncedAt ? new Date(row.remoteSyncedAt).getTime() : null;
+    default:
+      return null;
+  }
+}
+
+function comparePricelistRows(left, right, columnKey, direction) {
+  const leftValue = getPricelistSortValue(left, columnKey);
+  const rightValue = getPricelistSortValue(right, columnKey);
+  const multiplier = direction === "desc" ? -1 : 1;
+
+  if (
+    typeof leftValue === "number" ||
+    typeof rightValue === "number" ||
+    leftValue === null ||
+    rightValue === null
+  ) {
+    return compareNullableNumbers(
+      typeof leftValue === "number" ? leftValue : null,
+      typeof rightValue === "number" ? rightValue : null
+    ) * multiplier;
+  }
+
+  return compareNullableStrings(leftValue, rightValue) * multiplier;
+}
+
+function hasPendingRemoteApply(pricingProfile) {
+  if (!pricingProfile) return false;
+  return (
+    ["pending", "failed"].includes(String(pricingProfile.remoteSyncStatus || "")) ||
+    toTimestamp(pricingProfile.updatedAt) > toTimestamp(pricingProfile.remoteSyncedAt)
+  );
+}
+
+async function fetchPricelistSupportingRows(db, productRows) {
+  const productIds = [...new Set(
+    productRows
+      .map((row) => Number(row.id))
+      .filter((value) => Number.isFinite(value))
+  )];
+  const vendorIds = [...new Set(
+    productRows
+      .map((row) => Number(row.vendorId))
+      .filter((value) => Number.isFinite(value))
+  )];
+
+  if (!productIds.length) {
+    return {
+      packageRows: [],
+      profileRows: [],
+      saleRows: [],
+      packageMetaRows: [],
+      productMetaRows: [],
+      vendorRows: []
+    };
+  }
+
+  const [packageRows, profileRows, saleRows, vendorRows] = await Promise.all([
+    db.select().from(packages).where(inArray(packages.productId, productIds)),
+    db.select().from(productPricingProfiles).where(inArray(productPricingProfiles.productId, productIds)),
+    db.select().from(productSales).where(inArray(productSales.productId, productIds)),
+    vendorIds.length
+      ? db.select().from(vendors).where(inArray(vendors.id, vendorIds))
+      : Promise.resolve([])
+  ]);
 
   let packageMetaRows = [];
   let productMetaRows = [];
   try {
-    packageMetaRows = await db.select().from(localLinePackageMeta);
+    packageMetaRows = await db
+      .select()
+      .from(localLinePackageMeta)
+      .where(inArray(localLinePackageMeta.productId, productIds));
   } catch (error) {
     if (!isMissingTableError(error, "local_line_package_meta")) throw error;
   }
   try {
-    productMetaRows = await db.select().from(localLineProductMeta);
+    productMetaRows = await db
+      .select()
+      .from(localLineProductMeta)
+      .where(inArray(localLineProductMeta.productId, productIds));
   } catch (error) {
     if (!isMissingTableError(error, "local_line_product_meta")) throw error;
   }
 
-  const categoryMap = new Map(categoryRows.map((row) => [row.id, row.name]));
-  const vendorMap = new Map(vendorRows.map((row) => [row.id, row]));
-  const packagesByProductId = packageRows.reduce((acc, row) => {
-    const list = acc.get(row.productId) || [];
+  return {
+    packageRows,
+    profileRows,
+    saleRows,
+    packageMetaRows,
+    productMetaRows,
+    vendorRows
+  };
+}
+
+function buildPricelistRows(productRows, supportingRows) {
+  const vendorMap = new Map(
+    (supportingRows.vendorRows || []).map((row) => [Number(row.id), row])
+  );
+  const packagesByProductId = (supportingRows.packageRows || []).reduce((acc, row) => {
+    const list = acc.get(Number(row.productId)) || [];
     list.push(row);
-    acc.set(row.productId, list);
+    acc.set(Number(row.productId), list);
     return acc;
   }, new Map());
   const packageMetaByPackageId = new Map(
-    packageMetaRows.map((row) => [Number(row.packageId), row])
+    (supportingRows.packageMetaRows || []).map((row) => [Number(row.packageId), row])
   );
   const productMetaByProductId = new Map(
-    productMetaRows.map((row) => [Number(row.productId), row])
+    (supportingRows.productMetaRows || []).map((row) => [Number(row.productId), row])
   );
   const profileByProductId = new Map(
-    profileRows.map((row) => [Number(row.productId), row])
+    (supportingRows.profileRows || []).map((row) => [Number(row.productId), row])
   );
   const saleByProductId = new Map(
-    saleRows.map((row) => [Number(row.productId), row])
+    (supportingRows.saleRows || []).map((row) => [Number(row.productId), row])
   );
 
-  const rows = productRows
-    .slice()
-    .filter((product) => !isMembershipCategoryName(categoryMap.get(product.categoryId)))
-    .sort((left, right) => String(left.name || "").localeCompare(String(right.name || "")))
-    .map((product) => {
-      const pricingProfile = profileByProductId.get(Number(product.id)) || null;
-      const saleRow = saleByProductId.get(Number(product.id)) || null;
-      const vendor = vendorMap.get(product.vendorId) || null;
-      const productMeta = productMetaByProductId.get(Number(product.id)) || null;
-      const snapshot = computeProductPricingSnapshot({
-        product,
-        packages: packagesByProductId.get(Number(product.id)) || [],
-        packageMetaByPackageId,
-        vendor,
-        profile: pricingProfile
-          ? pricingProfile
-          : {
-              productId: product.id,
-              onSale: saleRow?.onSale ?? 0,
-              saleDiscount: saleRow?.saleDiscount ?? 0
-            }
-      });
-      const usesSourcePricing = isSourcePricingVendor(vendor);
-      const hasPendingRemoteApply = pricingProfile
-        ? ["pending", "failed"].includes(String(pricingProfile.remoteSyncStatus || "")) ||
-          toTimestamp(pricingProfile.updatedAt) > toTimestamp(pricingProfile.remoteSyncedAt)
-        : false;
-
-      return {
-        productId: product.id,
-        name: product.name,
-        categoryId: product.categoryId,
-        categoryName: categoryMap.get(product.categoryId) || "Uncategorized",
-        vendorId: product.vendorId,
-        vendorName: vendor?.name || "N/A",
-        usesSourcePricing,
-        usesNoMarkupPricing: snapshot.profile.usesNoMarkupPricing,
-        pricingRule: snapshot.profile.pricingRule,
-        pricingRuleLabel: snapshot.profile.usesNoMarkupPricing ? "Deposit / no markup" : "Standard",
-        packageCount: snapshot.packageRows.length,
-        packages: snapshot.packageRows,
-        packageSummary: snapshot.packageRows
-          .map((row) => {
-            const details = [];
-            if (snapshot.profile.unitOfMeasure === "lbs" && row.averageWeight !== null) {
-              details.push(`${row.averageWeight} lb avg`);
-            }
-            if (row.quantity > 1) details.push(`${row.quantity} ea`);
-            return `${row.name || `Package ${row.id}`}${details.length ? ` (${details.join(" · ")})` : ""}`;
-          })
-          .join(", "),
-        unitOfMeasure: usesSourcePricing ? snapshot.profile.unitOfMeasure : null,
-        sourceUnitPrice: usesSourcePricing ? snapshot.profile.sourceUnitPrice : null,
-        minWeight: usesSourcePricing ? snapshot.profile.minWeight : null,
-        maxWeight: usesSourcePricing ? snapshot.profile.maxWeight : null,
-        avgWeightOverride: usesSourcePricing ? snapshot.profile.avgWeightOverride : null,
-        sourceMultiplier: usesSourcePricing ? snapshot.profile.sourceMultiplier : null,
-        localLineProductId: Number(productMeta?.localLineProductId || 0),
-        guestMarkup: snapshot.profile.guestMarkup,
-        memberMarkup: snapshot.profile.memberMarkup,
-        herdShareMarkup: snapshot.profile.herdShareMarkup,
-        snapMarkup: snapshot.profile.snapMarkup,
-        onSale: Boolean(snapshot.profile.onSale),
-        saleDiscount: snapshot.profile.saleDiscount,
-        basePrice: snapshot.basePrice,
-        guestPrice: snapshot.guestPrice,
-        memberPrice: snapshot.memberPrice,
-        herdSharePrice: snapshot.herdSharePrice,
-        snapPrice: snapshot.snapPrice,
-        remoteSyncStatus: pricingProfile?.remoteSyncStatus || "not-applied",
-        remoteSyncMessage: pricingProfile?.remoteSyncMessage || "",
-        remoteSyncedAt: pricingProfile?.remoteSyncedAt || null,
-        updatedAt: pricingProfile?.updatedAt || null,
-        hasPendingRemoteApply
-      };
+  return productRows.map((product) => {
+    const productId = Number(product.id);
+    const pricingProfile = profileByProductId.get(productId) || null;
+    const saleRow = saleByProductId.get(productId) || null;
+    const vendor = vendorMap.get(Number(product.vendorId)) || null;
+    const productMeta = productMetaByProductId.get(productId) || null;
+    const snapshot = computeProductPricingSnapshot({
+      product,
+      packages: packagesByProductId.get(productId) || [],
+      packageMetaByPackageId,
+      vendor,
+      profile: pricingProfile
+        ? pricingProfile
+        : {
+            productId,
+            onSale: saleRow?.onSale ?? 0,
+            saleDiscount: saleRow?.saleDiscount ?? 0
+          }
     });
+    const usesSourcePricing = isSourcePricingVendor(vendor);
 
-  res.json({ rows });
+    return {
+      productId,
+      name: product.name,
+      categoryId: product.categoryId,
+      categoryName: product.categoryName || "Uncategorized",
+      vendorId: product.vendorId,
+      vendorName: product.vendorName || vendor?.name || "N/A",
+      usesSourcePricing,
+      usesNoMarkupPricing: snapshot.profile.usesNoMarkupPricing,
+      pricingRule: snapshot.profile.pricingRule,
+      pricingRuleLabel: snapshot.profile.usesNoMarkupPricing ? "Deposit / no markup" : "Standard",
+      packageCount: snapshot.packageRows.length,
+      packages: snapshot.packageRows,
+      packageSummary: snapshot.packageRows
+        .map((row) => {
+          const details = [];
+          if (snapshot.profile.unitOfMeasure === "lbs" && row.averageWeight !== null) {
+            details.push(`${row.averageWeight} lb avg`);
+          }
+          if (row.quantity > 1) details.push(`${row.quantity} ea`);
+          return `${row.name || `Package ${row.id}`}${details.length ? ` (${details.join(" · ")})` : ""}`;
+        })
+        .join(", "),
+      unitOfMeasure: usesSourcePricing ? snapshot.profile.unitOfMeasure : null,
+      sourceUnitPrice: usesSourcePricing ? snapshot.profile.sourceUnitPrice : null,
+      minWeight: usesSourcePricing ? snapshot.profile.minWeight : null,
+      maxWeight: usesSourcePricing ? snapshot.profile.maxWeight : null,
+      avgWeightOverride: usesSourcePricing ? snapshot.profile.avgWeightOverride : null,
+      sourceMultiplier: usesSourcePricing ? snapshot.profile.sourceMultiplier : null,
+      localLineProductId: Number(productMeta?.localLineProductId || 0),
+      guestMarkup: snapshot.profile.guestMarkup,
+      memberMarkup: snapshot.profile.memberMarkup,
+      herdShareMarkup: snapshot.profile.herdShareMarkup,
+      snapMarkup: snapshot.profile.snapMarkup,
+      onSale: Boolean(snapshot.profile.onSale),
+      saleDiscount: snapshot.profile.saleDiscount,
+      basePrice: snapshot.basePrice,
+      guestPrice: snapshot.guestPrice,
+      memberPrice: snapshot.memberPrice,
+      herdSharePrice: snapshot.herdSharePrice,
+      snapPrice: snapshot.snapPrice,
+      remoteSyncStatus: pricingProfile?.remoteSyncStatus || "not-applied",
+      remoteSyncMessage: pricingProfile?.remoteSyncMessage || "",
+      remoteSyncedAt: pricingProfile?.remoteSyncedAt || null,
+      updatedAt: pricingProfile?.updatedAt || product.pricingUpdatedAt || null,
+      hasPendingRemoteApply: hasPendingRemoteApply(pricingProfile)
+    };
+  });
+}
+
+router.get("/pricelist", requireAdmin, async (req, res) => {
+  const db = getDb();
+  const pool = getPool();
+  await ensureLocalLineSyncSchema().catch((error) => {
+    console.warn("Local Line schema bootstrap skipped for /admin/pricelist:", error.message);
+  });
+  await ensureAdminPricelistIndexes().catch((error) => {
+    console.warn("Pricelist index bootstrap skipped for /admin/pricelist:", error.message);
+  });
+
+  const search = String(req.query?.search || "").trim();
+  const categoryId = toOptionalInteger(req.query?.categoryId, null);
+  const vendorId = toOptionalInteger(req.query?.vendorId, null);
+  const statusFilter = String(req.query?.status || "all").trim();
+  const requestedPageSize = parsePositiveInteger(req.query?.pageSize, PRICELIST_DEFAULT_PAGE_SIZE);
+  const pageSize = Math.min(PRICELIST_MAX_PAGE_SIZE, Math.max(1, requestedPageSize));
+  const requestedPage = parsePositiveInteger(req.query?.page, 1);
+  const sortKey = normalizePricelistSortKey(req.query?.sortKey);
+  const sortDirection = normalizePricelistSortDirection(req.query?.sortDirection);
+  const sqlSortExpression = PRICELIST_SQL_SORT_MAP[sortKey] || null;
+
+  const categoryRows = await db.select().from(categories);
+  const membershipCategoryIds = categoryRows
+    .filter((row) => isMembershipCategoryName(row.name))
+    .map((row) => Number(row.id))
+    .filter((value) => Number.isFinite(value));
+
+  const { clauses, whereSql, params } = buildPricelistWhereClause({
+    search,
+    categoryId,
+    vendorId,
+    statusFilter,
+    membershipCategoryIds
+  });
+
+  const baseFromSql = `
+    FROM products p
+    LEFT JOIN categories c ON c.id = p.category_id
+    LEFT JOIN vendors v ON v.id = p.vendor_id
+    LEFT JOIN product_pricing_profiles pp ON pp.product_id = p.id
+  `;
+  const selectSql = `
+    SELECT
+      p.id,
+      p.name,
+      p.description,
+      p.visible,
+      p.track_inventory AS trackInventory,
+      p.inventory,
+      p.category_id AS categoryId,
+      p.vendor_id AS vendorId,
+      p.thumbnail_url AS thumbnailUrl,
+      p.created_at AS createdAt,
+      p.updated_at AS updatedAt,
+      p.is_deleted AS isDeleted,
+      c.name AS categoryName,
+      v.name AS vendorName,
+      pp.remote_sync_status AS remoteSyncStatus,
+      pp.remote_sync_message AS remoteSyncMessage,
+      pp.remote_synced_at AS remoteSyncedAt,
+      pp.updated_at AS pricingUpdatedAt
+    ${baseFromSql}
+    ${whereSql}
+  `;
+
+  const countSql = `
+    SELECT COUNT(*) AS total
+    ${baseFromSql}
+    ${whereSql}
+  `;
+  const [[countRow]] = await pool.query(countSql, params);
+  const totalRows = Number(countRow?.total || 0);
+  const pendingCountClauses = buildPendingPricelistClauses(clauses, statusFilter);
+  const pendingCountWhereSql = pendingCountClauses.length
+    ? `WHERE ${pendingCountClauses.join(" AND ")}`
+    : "";
+  const pendingCountParams = [...params];
+  const pendingCountSql = `
+    SELECT COUNT(*) AS total
+    ${baseFromSql}
+    ${pendingCountWhereSql}
+  `;
+  const [[pendingCountRow]] = await pool.query(pendingCountSql, pendingCountParams);
+  const pendingRemoteApplyRows = Number(pendingCountRow?.total || 0);
+  const totalPages = Math.max(1, Math.ceil(totalRows / pageSize));
+  const page = Math.min(requestedPage, totalPages);
+
+  let rows = [];
+  let sortMode = "server";
+
+  if (sqlSortExpression) {
+    const directionSql = sortDirection === "desc" ? "DESC" : "ASC";
+    const offset = (page - 1) * pageSize;
+    const [pageProductRows] = await pool.query(
+      `
+        ${selectSql}
+        ORDER BY ${sqlSortExpression} ${directionSql}, p.name ASC
+        LIMIT ? OFFSET ?
+      `,
+      [...params, pageSize, offset]
+    );
+    const supportingRows = await fetchPricelistSupportingRows(db, pageProductRows);
+    rows = buildPricelistRows(pageProductRows, supportingRows);
+  } else {
+    sortMode = "computed";
+    const [matchingProductRows] = await pool.query(
+      `
+        ${selectSql}
+        ORDER BY p.name ASC
+      `,
+      params
+    );
+    const supportingRows = await fetchPricelistSupportingRows(db, matchingProductRows);
+    const computedRows = buildPricelistRows(matchingProductRows, supportingRows);
+    computedRows.sort((left, right) => {
+      const sortDelta = comparePricelistRows(left, right, sortKey, sortDirection);
+      if (sortDelta !== 0) return sortDelta;
+      return String(left.name || "").localeCompare(String(right.name || ""), undefined, {
+        sensitivity: "base",
+        numeric: true
+      });
+    });
+    const offset = (page - 1) * pageSize;
+    rows = computedRows.slice(offset, offset + pageSize);
+  }
+
+  res.json({
+    rows,
+    pagination: {
+      page,
+      pageSize,
+      totalRows,
+      totalPages
+    },
+    summary: {
+      pendingRemoteApplyRows
+    },
+    sort: {
+      key: sortKey,
+      direction: sortDirection,
+      mode: sortMode
+    }
+  });
+});
+
+router.get("/pricelist/pending-remote", requireAdmin, async (req, res) => {
+  const db = getDb();
+  const pool = getPool();
+  await ensureLocalLineSyncSchema().catch((error) => {
+    console.warn("Local Line schema bootstrap skipped for /admin/pricelist/pending-remote:", error.message);
+  });
+  await ensureAdminPricelistIndexes().catch((error) => {
+    console.warn("Pricelist index bootstrap skipped for /admin/pricelist/pending-remote:", error.message);
+  });
+
+  const search = String(req.query?.search || "").trim();
+  const categoryId = toOptionalInteger(req.query?.categoryId, null);
+  const vendorId = toOptionalInteger(req.query?.vendorId, null);
+  const statusFilter = String(req.query?.status || "all").trim();
+
+  const categoryRows = await db.select().from(categories);
+  const membershipCategoryIds = categoryRows
+    .filter((row) => isMembershipCategoryName(row.name))
+    .map((row) => Number(row.id))
+    .filter((value) => Number.isFinite(value));
+
+  const { clauses, params } = buildPricelistWhereClause({
+    search,
+    categoryId,
+    vendorId,
+    statusFilter,
+    membershipCategoryIds
+  });
+  const pendingClauses = buildPendingPricelistClauses(clauses, statusFilter);
+  const pendingWhereSql = pendingClauses.length
+    ? `WHERE ${pendingClauses.join(" AND ")}`
+    : "";
+
+  const [matchingProductRows] = await pool.query(
+    `
+      SELECT
+        p.id,
+        p.name,
+        p.description,
+        p.visible,
+        p.track_inventory AS trackInventory,
+        p.inventory,
+        p.category_id AS categoryId,
+        p.vendor_id AS vendorId,
+        p.thumbnail_url AS thumbnailUrl,
+        p.created_at AS createdAt,
+        p.updated_at AS updatedAt,
+        p.is_deleted AS isDeleted,
+        c.name AS categoryName,
+        v.name AS vendorName,
+        pp.remote_sync_status AS remoteSyncStatus,
+        pp.remote_sync_message AS remoteSyncMessage,
+        pp.remote_synced_at AS remoteSyncedAt,
+        pp.updated_at AS pricingUpdatedAt
+      FROM products p
+      LEFT JOIN categories c ON c.id = p.category_id
+      LEFT JOIN vendors v ON v.id = p.vendor_id
+      LEFT JOIN product_pricing_profiles pp ON pp.product_id = p.id
+      ${pendingWhereSql}
+      ORDER BY p.name ASC
+    `,
+    params
+  );
+
+  const supportingRows = await fetchPricelistSupportingRows(db, matchingProductRows);
+  const rows = buildPricelistRows(matchingProductRows, supportingRows);
+
+  res.json({
+    productIds: rows.map((row) => row.productId),
+    rows,
+    totalRows: rows.length
+  });
 });
 
 router.post("/pricelist/bulk-save", requireAdminPermission("pricing_admin"), async (req, res) => {
@@ -2251,54 +3233,290 @@ router.post("/products/:id/images", requireAdminPermission(["inventory_admin", "
     return res.status(400).json({ error: "Missing image file" });
   }
 
-  if (!process.env.DO_SPACES_BUCKET || !process.env.DO_SPACES_ENDPOINT) {
-    return res.status(500).json({ error: "Spaces not configured" });
+  if (!hasSpacesUploadConfig()) {
+    return res.status(500).json({
+      error: "Spaces not configured",
+      detail: "Set DO_SPACES_BUCKET, DO_SPACES_ENDPOINT, DO_SPACES_KEY, and DO_SPACES_SECRET."
+    });
   }
 
-  const ext = req.file.originalname.split(".").pop() || "jpg";
-  const safeExt = ext.toLowerCase();
-  const baseName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-  const key = `products/${productId}/${baseName}.${safeExt}`;
-  const thumbKey = `products/${productId}/${baseName}.thumbnail.jpg`;
+  try {
+    await ensureLocalLineSyncSchema().catch((error) => {
+      console.warn("Local Line schema bootstrap skipped for /admin/products/:id/images:", error.message);
+    });
 
-  await spacesClient.send(
-    new PutObjectCommand({
-      Bucket: process.env.DO_SPACES_BUCKET,
-      Key: key,
-      Body: req.file.buffer,
-      ACL: "public-read",
-      ContentType: req.file.mimetype,
-      CacheControl: "public, max-age=31536000, immutable"
-    })
-  );
+    const ext = req.file.originalname.split(".").pop() || "jpg";
+    const safeExt = ext.toLowerCase();
+    const baseName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const key = `products/${productId}/${baseName}.${safeExt}`;
+    const thumbKey = `products/${productId}/${baseName}.thumbnail.jpg`;
+    const metadata = await sharp(req.file.buffer).metadata();
+    const contentHash = crypto.createHash("sha256").update(req.file.buffer).digest("hex");
 
-  const thumbnailBuffer = await sharp(req.file.buffer)
-    .resize({ width: 480, height: 480, fit: "cover" })
-    .jpeg({ quality: 80 })
-    .toBuffer();
+    await getSpacesClient().send(
+      new PutObjectCommand({
+        Bucket: process.env.DO_SPACES_BUCKET,
+        Key: key,
+        Body: req.file.buffer,
+        ACL: "public-read",
+        ContentType: req.file.mimetype,
+        CacheControl: "public, max-age=31536000, immutable"
+      })
+    );
 
-  await spacesClient.send(
-    new PutObjectCommand({
-      Bucket: process.env.DO_SPACES_BUCKET,
-      Key: thumbKey,
-      Body: thumbnailBuffer,
-      ACL: "public-read",
-      ContentType: "image/jpeg",
-      CacheControl: "public, max-age=31536000, immutable"
-    })
-  );
+    const thumbnailBuffer = await sharp(req.file.buffer)
+      .resize({ width: 1200, height: 1200, fit: "inside", withoutEnlargement: true })
+      .jpeg({ quality: 85 })
+      .toBuffer();
 
-  const url = buildPublicUrl(key);
-  const thumbnailUrl = buildPublicUrl(thumbKey);
-  const urlHash = url.length ? String(url).slice(-64) : String(Date.now());
-  const thumbHash = thumbnailUrl.length ? String(thumbnailUrl).slice(-64) : String(Date.now() + 1);
+    await getSpacesClient().send(
+      new PutObjectCommand({
+        Bucket: process.env.DO_SPACES_BUCKET,
+        Key: thumbKey,
+        Body: thumbnailBuffer,
+        ACL: "public-read",
+        ContentType: "image/jpeg",
+        CacheControl: "public, max-age=31536000, immutable"
+      })
+    );
 
-  await db.insert(productImages).values([
-    { productId, url, urlHash },
-    { productId, url: thumbnailUrl, urlHash: thumbHash }
-  ]);
+    const url = buildPublicUrl(key);
+    const thumbnailUrl = buildPublicUrl(thumbKey);
+    const urlHash = url.length ? String(url).slice(-64) : String(Date.now());
+    const thumbHash = thumbnailUrl.length ? String(thumbnailUrl).slice(-64) : String(Date.now() + 1);
+    const existingMediaRows = await db
+      .select()
+      .from(productMedia)
+      .where(eq(productMedia.productId, productId))
+      .catch((error) => {
+        if (isMissingTableError(error, "product_media")) return [];
+        throw error;
+      });
+    const nextSortOrder = existingMediaRows.length
+      ? Math.max(...existingMediaRows.map((row) => Number(row.sortOrder) || 0)) + 1
+      : 0;
+    const now = new Date();
+    const isPrimaryImage = nextSortOrder === 0;
 
-  res.json({ ok: true, url, thumbnailUrl });
+    await db.insert(productImages).values([
+      { productId, url, urlHash },
+      { productId, url: thumbnailUrl, urlHash: thumbHash }
+    ]);
+    await db.insert(productMedia).values({
+      productId,
+      source: "local-upload",
+      sourceMediaId: null,
+      sourceUrl: url,
+      remoteUrl: url,
+      storageKey: key,
+      publicUrl: url,
+      thumbnailUrl,
+      sortOrder: nextSortOrder,
+      isPrimary: isPrimaryImage ? 1 : 0,
+      altText: null,
+      contentHash,
+      width: metadata.width || null,
+      height: metadata.height || null,
+      mimeType: req.file.mimetype || "image/jpeg",
+      fetchedAt: now,
+      createdAt: now,
+      updatedAt: now,
+      lastSyncedAt: null
+    }).catch((error) => {
+      if (isMissingTableError(error, "product_media")) return null;
+      throw error;
+    });
+
+    if (isPrimaryImage) {
+      await db
+        .update(products)
+        .set({
+          thumbnailUrl,
+          updatedAt: now
+        })
+        .where(eq(products.id, productId));
+    }
+
+    await markProductRemoteSyncPending(
+      getPool(),
+      productId,
+      "Local images updated. Apply to remote store pending."
+    );
+
+    res.json({ ok: true, url, thumbnailUrl });
+  } catch (error) {
+    console.error("Product image upload failed:", error);
+    res.status(500).json({
+      error: "Image upload failed",
+      detail: error?.message || "Unable to upload image to Spaces."
+    });
+  }
+});
+
+router.post("/products/:id/images/delete", requireAdminPermission(["inventory_admin", "pricing_admin", "local_pricelist_admin"]), async (req, res) => {
+  const db = getDb();
+  const productId = Number(req.params.id);
+  const url = toNullableString(req.body?.url);
+  const thumbnailUrl = toNullableString(req.body?.thumbnailUrl);
+
+  if (!Number.isFinite(productId)) {
+    return res.status(400).json({ error: "Invalid product id" });
+  }
+
+  if (!url && !thumbnailUrl) {
+    return res.status(400).json({ error: "Image URL is required" });
+  }
+
+  await ensureLocalLineSyncSchema().catch((error) => {
+    console.warn("Local Line schema bootstrap skipped for /admin/products/:id/images/delete:", error.message);
+  });
+
+  try {
+    const candidateUrls = [...new Set([url, thumbnailUrl].filter(Boolean))];
+    const existingImageRows = await db
+      .select()
+      .from(productImages)
+      .where(eq(productImages.productId, productId));
+    const existingMediaRows = await db
+      .select()
+      .from(productMedia)
+      .where(eq(productMedia.productId, productId))
+      .catch((error) => {
+        if (isMissingTableError(error, "product_media")) return [];
+        throw error;
+      });
+
+    const matchingMediaRows = existingMediaRows.filter((row) =>
+      candidateUrls.some((candidateUrl) =>
+        [
+          row.publicUrl,
+          row.thumbnailUrl,
+          row.remoteUrl,
+          row.sourceUrl
+        ].includes(candidateUrl)
+      )
+    );
+    const matchingMediaIds = matchingMediaRows
+      .map((row) => Number(row.id))
+      .filter((value) => Number.isFinite(value));
+    const urlsToDelete = new Set(candidateUrls);
+    matchingMediaRows.forEach((row) => {
+      [row.publicUrl, row.thumbnailUrl].filter(Boolean).forEach((value) => urlsToDelete.add(value));
+    });
+
+    const matchingImageUrls = existingImageRows
+      .map((row) => row.url)
+      .filter((rowUrl) => urlsToDelete.has(rowUrl));
+
+    if (matchingMediaIds.length) {
+      await db.delete(productMedia).where(inArray(productMedia.id, matchingMediaIds));
+    }
+
+    if (matchingImageUrls.length) {
+      await db
+        .delete(productImages)
+        .where(and(eq(productImages.productId, productId), inArray(productImages.url, matchingImageUrls)));
+    }
+
+    if (!matchingMediaIds.length && !matchingImageUrls.length) {
+      return res.status(404).json({ error: "Image not found" });
+    }
+
+    if (hasSpacesUploadConfig()) {
+      const keysToDelete = new Set();
+      matchingMediaRows.forEach((row) => {
+        if (row.storageKey) keysToDelete.add(row.storageKey);
+        const thumbKey = extractSpacesKeyFromPublicUrl(row.thumbnailUrl);
+        if (thumbKey) keysToDelete.add(thumbKey);
+      });
+      candidateUrls.forEach((candidateUrl) => {
+        const derivedKey = extractSpacesKeyFromPublicUrl(candidateUrl);
+        if (derivedKey) keysToDelete.add(derivedKey);
+      });
+
+      await Promise.all(
+        [...keysToDelete].map((key) =>
+          getSpacesClient()
+            .send(
+              new DeleteObjectCommand({
+                Bucket: process.env.DO_SPACES_BUCKET,
+                Key: key
+              })
+            )
+            .catch((error) => {
+              console.warn(`Image asset delete skipped for ${key}:`, error.message);
+            })
+        )
+      );
+    }
+
+    const remainingMediaRows = await db
+      .select()
+      .from(productMedia)
+      .where(eq(productMedia.productId, productId))
+      .catch((error) => {
+        if (isMissingTableError(error, "product_media")) return [];
+        throw error;
+      });
+    const now = new Date();
+    let nextThumbnailUrl = null;
+
+    if (remainingMediaRows.length) {
+      const sortedMediaRows = remainingMediaRows
+        .slice()
+        .sort((left, right) => {
+          const primaryDelta = Number(right.isPrimary || 0) - Number(left.isPrimary || 0);
+          if (primaryDelta !== 0) return primaryDelta;
+          return Number(left.sortOrder || 0) - Number(right.sortOrder || 0);
+        });
+      const primaryRow = sortedMediaRows[0];
+      await db
+        .update(productMedia)
+        .set({ isPrimary: 0 })
+        .where(eq(productMedia.productId, productId));
+      await db
+        .update(productMedia)
+        .set({ isPrimary: 1, updatedAt: now })
+        .where(eq(productMedia.id, primaryRow.id));
+      nextThumbnailUrl =
+        primaryRow.thumbnailUrl ||
+        primaryRow.publicUrl ||
+        primaryRow.remoteUrl ||
+        primaryRow.sourceUrl ||
+        null;
+    } else {
+      const remainingImageRows = await db
+        .select()
+        .from(productImages)
+        .where(eq(productImages.productId, productId));
+      nextThumbnailUrl =
+        remainingImageRows.find((row) => /(?:^|\/)[^/]+\.thumbnail\.(jpg|jpeg|png|webp)$/i.test(row.url || ""))?.url ||
+        remainingImageRows[0]?.url ||
+        null;
+    }
+
+    await db
+      .update(products)
+      .set({
+        thumbnailUrl: nextThumbnailUrl,
+        updatedAt: now
+      })
+      .where(eq(products.id, productId));
+
+    await markProductRemoteSyncPending(
+      getPool(),
+      productId,
+      "Local images updated. Apply to remote store pending."
+    );
+
+    return res.json({ ok: true });
+  } catch (error) {
+    console.error("Product image delete failed:", error);
+    return res.status(500).json({
+      error: "Image delete failed",
+      detail: error?.message || "Unable to delete product image."
+    });
+  }
 });
 
 router.post("/recipes", requireAdminPermission("admin"), async (req, res) => {
