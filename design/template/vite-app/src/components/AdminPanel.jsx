@@ -2,6 +2,7 @@
 import { AdminInventorySection } from "./AdminInventorySection.jsx";
 import { AdminManualSection } from "./AdminManualSection.jsx";
 import { AdminMembershipSection } from "./AdminMembershipSection.jsx";
+import { AdminOrdersSection } from "./AdminOrdersSection.jsx";
 import { AdminPriceListSection } from "./AdminPriceListSection.jsx";
 import { AdminUsersSection } from "./AdminUsersSection.jsx";
 import {
@@ -22,6 +23,10 @@ function hasRole(roleKeys, roleKey) {
 function canAccessAdminSection(roleKeys, section) {
   if (roleKeys.includes("admin")) return true;
   switch (section) {
+    case "localLine":
+      return roleKeys.includes("localline_pull") || roleKeys.includes("dropsite_admin");
+    case "orders":
+      return Array.isArray(roleKeys) && roleKeys.length > 0;
     case "pricelist":
       return (
         roleKeys.includes("pricing_admin") ||
@@ -53,6 +58,8 @@ function canAccessAdminSection(roleKeys, section) {
 
 function getDefaultAdminSection(roleKeys = []) {
   const order = [
+    "localLine",
+    "orders",
     "pricelist",
     "localPricelist",
     "inventory",
@@ -99,6 +106,101 @@ function toNumber(value) {
 
 function roundCurrency(value) {
   return Number(Number(value).toFixed(2));
+}
+
+function stripHtml(value) {
+  return String(value || "")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/p>/gi, "\n")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/\s+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .replace(/[ \t]{2,}/g, " ")
+    .trim();
+}
+
+function parseJsonArray(value) {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (_error) {
+    return [];
+  }
+}
+
+function formatMonthLabel(value) {
+  const match = String(value || "").match(/^(\d{4})-(\d{2})$/);
+  if (!match) return value || "Unknown month";
+  const date = new Date(Number(match[1]), Number(match[2]) - 1, 1);
+  if (Number.isNaN(date.getTime())) return value || "Unknown month";
+  return date.toLocaleDateString(undefined, { month: "long", year: "numeric" });
+}
+
+function formatShortMonthLabel(value) {
+  const match = String(value || "").match(/^(\d{4})-(\d{2})$/);
+  if (!match) return value || "Unknown";
+  const date = new Date(Number(match[1]), Number(match[2]) - 1, 1);
+  if (Number.isNaN(date.getTime())) return value || "Unknown";
+  return date.toLocaleDateString(undefined, { month: "short" });
+}
+
+function formatWeekOfLabel(value) {
+  if (!value) return "Unknown week";
+  const match = String(value).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  const date = match
+    ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]))
+    : new Date(value);
+  if (Number.isNaN(date.getTime())) return "Unknown week";
+  return `Week of ${date.toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric"
+  })}`;
+}
+
+function formatDeliveryCount(count) {
+  const numeric = Number(count) || 0;
+  return `${numeric} ${numeric === 1 ? "delivery" : "deliveries"}`;
+}
+
+function buildTrendSvgLayout(series = [], maxValue = 1) {
+  const width = 280;
+  const height = 56;
+  const paddingX = 12;
+  const paddingTop = 8;
+  const paddingBottom = 10;
+  const usableWidth = width - paddingX * 2;
+  const usableHeight = height - paddingTop - paddingBottom;
+  const safeMax = Math.max(1, Number(maxValue) || 1);
+
+  const pointCount = Math.max(series.length, 1);
+  const points = series.map((entry, index) => {
+    const x =
+      pointCount <= 1
+        ? width / 2
+        : paddingX + (usableWidth * index) / (pointCount - 1);
+    const value = Number(entry.averageWeeklyOrders || 0);
+    const y = paddingTop + usableHeight - (usableHeight * value) / safeMax;
+    return {
+      x,
+      y,
+      value,
+      month: entry.month,
+      weekStart: entry.weekStart,
+      performanceTier: entry.performanceTier || "bad",
+      orderCount: Number(entry.orderCount) || 0
+    };
+  });
+
+  return {
+    width,
+    height,
+    polylinePoints: points.map((point) => `${point.x},${point.y}`).join(" "),
+    points
+  };
 }
 
 function computeDraftAverageWeight(draft) {
@@ -268,6 +370,18 @@ export function AdminPanel({ onCatalogRefresh }) {
   const [reviewsLoaded, setReviewsLoaded] = useState(false);
   const [dropSites, setDropSites] = useState([]);
   const [dropSitesLoaded, setDropSitesLoaded] = useState(false);
+  const [dropSitesSectionLoading, setDropSitesSectionLoading] = useState(false);
+  const [dropSitePerformance, setDropSitePerformance] = useState({
+    selectedMonth: "",
+    months: [],
+    thresholdAverage: 4,
+    strongAverage: 5,
+    rankedSites: []
+  });
+  const [dropSitePerformanceMonth, setDropSitePerformanceMonth] = useState("");
+  const [showZeroDeliverySites, setShowZeroDeliverySites] = useState(false);
+  const [showHomeDeliverySites, setShowHomeDeliverySites] = useState(false);
+  const [showDropSiteOrderCounts, setShowDropSiteOrderCounts] = useState(false);
   const [message, setMessage] = useState("");
   const [newCategory, setNewCategory] = useState("");
   const [newVendor, setNewVendor] = useState("");
@@ -300,6 +414,25 @@ export function AdminPanel({ onCatalogRefresh }) {
     data: null
   });
   const [localLineCacheState, setLocalLineCacheState] = useState({
+    open: false,
+    loading: false,
+    error: "",
+    data: null,
+    jobId: ""
+  });
+  const [localLineStatusState, setLocalLineStatusState] = useState({
+    loading: false,
+    error: "",
+    data: null
+  });
+  const [localLineFulfillmentState, setLocalLineFulfillmentState] = useState({
+    open: false,
+    loading: false,
+    error: "",
+    data: null,
+    jobId: ""
+  });
+  const [localLineOrdersState, setLocalLineOrdersState] = useState({
     open: false,
     loading: false,
     error: "",
@@ -414,9 +547,61 @@ export function AdminPanel({ onCatalogRefresh }) {
   }
 
   async function loadDropSitesData() {
-    const dropSiteData = await adminGet("drop-sites", token);
-    setDropSites(dropSiteData.dropSites || []);
-    setDropSitesLoaded(true);
+    setDropSitesSectionLoading(true);
+    const query = dropSitePerformanceMonth
+      ? `?month=${encodeURIComponent(dropSitePerformanceMonth)}`
+      : "";
+    try {
+      const dropSiteData = await adminGet(`drop-sites${query}`, token);
+      setDropSites(dropSiteData.dropSites || []);
+      setDropSitePerformance(
+        dropSiteData.performance || {
+          selectedMonth: "",
+          months: [],
+          thresholdAverage: 4,
+          strongAverage: 5,
+          rankedSites: []
+        }
+      );
+      if (!dropSitePerformanceMonth && dropSiteData.performance?.selectedMonth) {
+        setDropSitePerformanceMonth(dropSiteData.performance.selectedMonth);
+      }
+      setDropSitesLoaded(true);
+    } finally {
+      setDropSitesSectionLoading(false);
+    }
+  }
+
+  async function loadLocalLineStatusData() {
+    setLocalLineStatusState((prev) => ({ ...prev, loading: true, error: "" }));
+    try {
+      const response = await adminGet("localline/status", token);
+      setLocalLineStatusState({
+        loading: false,
+        error: "",
+        data: response
+      });
+      if (response?.fulfillments?.latestJob?.jobId) {
+        setLocalLineFulfillmentState((prev) => ({
+          ...prev,
+          data: response.fulfillments.latestJob,
+          jobId: response.fulfillments.latestJob.jobId
+        }));
+      }
+      if (response?.orders?.latestJob?.jobId) {
+        setLocalLineOrdersState((prev) => ({
+          ...prev,
+          data: response.orders.latestJob,
+          jobId: response.orders.latestJob.jobId
+        }));
+      }
+    } catch (error) {
+      setLocalLineStatusState({
+        loading: false,
+        error: error?.message || "Failed to load Local Line status.",
+        data: null
+      });
+    }
   }
 
   async function loadAll() {
@@ -430,6 +615,7 @@ export function AdminPanel({ onCatalogRefresh }) {
       if (recipesLoaded || activeSection === "recipes") loaders.push(loadRecipesData());
       if (reviewsLoaded || activeSection === "reviews") loaders.push(loadReviewsData());
       if (dropSitesLoaded || activeSection === "dropSites") loaders.push(loadDropSitesData());
+      if (activeSection === "localLine") loaders.push(loadLocalLineStatusData());
       await Promise.all(loaders);
     } catch (err) {
       setMessage("Failed to load admin data.");
@@ -472,6 +658,15 @@ export function AdminPanel({ onCatalogRefresh }) {
       setReviewsLoaded(false);
       setDropSites([]);
       setDropSitesLoaded(false);
+      setDropSitesSectionLoading(false);
+      setDropSitePerformance({
+        selectedMonth: "",
+        months: [],
+        thresholdAverage: 4,
+        strongAverage: 5,
+        rankedSites: []
+      });
+      setDropSitePerformanceMonth("");
       setLoading(true);
       loadCoreAdminData()
         .catch(() => {
@@ -560,6 +755,20 @@ export function AdminPanel({ onCatalogRefresh }) {
   ]);
 
   useEffect(() => {
+    if (!token || activeSection !== "localLine") {
+      return;
+    }
+
+    loadLocalLineStatusData().catch(() => {
+      setLocalLineStatusState({
+        loading: false,
+        error: "Failed to load Local Line status.",
+        data: null
+      });
+    });
+  }, [token, activeSection]);
+
+  useEffect(() => {
     if (!token || recipesLoaded || activeSection !== "recipes") {
       return;
     }
@@ -632,6 +841,16 @@ export function AdminPanel({ onCatalogRefresh }) {
   }, [token, activeSection, dropSitesLoaded]);
 
   useEffect(() => {
+    if (!token || activeSection !== "dropSites" || !dropSitesLoaded) {
+      return;
+    }
+
+    loadDropSitesData().catch(() => {
+      setMessage("Failed to load drop sites.");
+    });
+  }, [token, activeSection, dropSitePerformanceMonth]);
+
+  useEffect(() => {
     const jobId = localLineCacheState.jobId;
     const status = localLineCacheState.data?.status;
 
@@ -674,6 +893,93 @@ export function AdminPanel({ onCatalogRefresh }) {
       window.clearInterval(intervalId);
     };
   }, [token, localLineCacheState.jobId, localLineCacheState.data?.status]);
+
+  useEffect(() => {
+    const jobId = localLineFulfillmentState.jobId;
+    const status = localLineFulfillmentState.data?.status;
+
+    if (!token || !jobId || !status || (status !== "queued" && status !== "running")) {
+      return undefined;
+    }
+
+    let cancelled = false;
+
+    async function pollJob() {
+      try {
+        const response = await adminGet(`localline/pull-jobs/${jobId}`, token);
+        if (cancelled) return;
+        setLocalLineFulfillmentState((prev) => ({
+          ...prev,
+          error: "",
+          data: response.job || null,
+          jobId: response.job?.jobId || jobId
+        }));
+
+        if (response.job?.status === "completed") {
+          setMessage("Local Line fulfillment pull completed.");
+          await loadDropSitesData();
+          await loadLocalLineStatusData();
+        }
+      } catch (error) {
+        if (cancelled) return;
+        setLocalLineFulfillmentState((prev) => ({
+          ...prev,
+          error: error?.message || "Failed to refresh Local Line fulfillment progress."
+        }));
+      }
+    }
+
+    pollJob();
+    const intervalId = window.setInterval(pollJob, 2000);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(intervalId);
+    };
+  }, [token, localLineFulfillmentState.jobId, localLineFulfillmentState.data?.status]);
+
+  useEffect(() => {
+    const jobId = localLineOrdersState.jobId;
+    const status = localLineOrdersState.data?.status;
+
+    if (!token || !jobId || !status || (status !== "queued" && status !== "running")) {
+      return undefined;
+    }
+
+    let cancelled = false;
+
+    async function pollJob() {
+      try {
+        const response = await adminGet(`localline/pull-jobs/${jobId}`, token);
+        if (cancelled) return;
+        setLocalLineOrdersState((prev) => ({
+          ...prev,
+          error: "",
+          data: response.job || null,
+          jobId: response.job?.jobId || jobId
+        }));
+
+        if (response.job?.status === "completed") {
+          setMessage("Local Line order pull completed.");
+          await loadLocalLineStatusData();
+        }
+      } catch (error) {
+        if (cancelled) return;
+        setLocalLineOrdersState((prev) => ({
+          ...prev,
+          error: error?.message || "Failed to refresh Local Line order progress."
+        }));
+      }
+    }
+
+    pollJob();
+    const intervalId = window.setInterval(pollJob, 2000);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(intervalId);
+    };
+  }, [token, localLineOrdersState.jobId, localLineOrdersState.data?.status]);
 
   useEffect(() => {
     if (productEditorMode === "new") {
@@ -1336,6 +1642,63 @@ export function AdminPanel({ onCatalogRefresh }) {
     loadAll();
   }
 
+  async function handleLocalLineFulfillmentSync() {
+    setMessage("");
+    try {
+      const response = await adminPost("localline/fulfillment-sync", token, {});
+      setLocalLineFulfillmentState({
+        open: true,
+        loading: false,
+        error: "",
+        data: response.job || null,
+        jobId: response.job?.jobId || ""
+      });
+      setMessage(
+        response.alreadyRunning
+          ? "Attached to the running Local Line fulfillment pull."
+          : "Local Line fulfillment pull started."
+      );
+    } catch (error) {
+      setMessage(error?.message || "Failed to sync Local Line fulfillments.");
+    }
+  }
+
+  async function handleLocalLineOrderSync() {
+    setMessage("");
+    setLocalLineOrdersState({
+      open: true,
+      loading: true,
+      error: "",
+      data: null,
+      jobId: ""
+    });
+    try {
+      const response = await adminPost("localline/orders-sync", token, {
+        cutoffDate: "2026-01-01T00:00:00.000Z"
+      });
+      setLocalLineOrdersState({
+        open: true,
+        loading: false,
+        error: "",
+        data: response.job || null,
+        jobId: response.job?.jobId || ""
+      });
+      setMessage(
+        response.alreadyRunning
+          ? "Attached to the running Local Line order pull."
+          : "Local Line order pull started."
+      );
+    } catch (error) {
+      setLocalLineOrdersState({
+        open: true,
+        loading: false,
+        error: error?.message || "Failed to start Local Line order pull.",
+        data: null,
+        jobId: ""
+      });
+    }
+  }
+
   async function handleAddRecipe() {
     if (!newRecipe.title) return;
     await adminPost("recipes", token, {
@@ -1442,16 +1805,6 @@ export function AdminPanel({ onCatalogRefresh }) {
         jobId: ""
       });
     }
-  }
-
-  function closeLocalLineCachePanel() {
-    setLocalLineCacheState({
-      open: false,
-      loading: false,
-      error: "",
-      data: null,
-      jobId: ""
-    });
   }
 
   async function handleLocalLineAudit() {
@@ -1563,19 +1916,6 @@ export function AdminPanel({ onCatalogRefresh }) {
     }
   }
 
-  function closeLocalLineAuditPanel() {
-    setLocalLineAuditState({
-      open: false,
-      loading: false,
-      applying: false,
-      applyingFixKey: "",
-      appliedFixes: {},
-      error: "",
-      applyError: "",
-      data: null
-    });
-  }
-
   if (!token) {
     return (
       <div className="container admin-panel">
@@ -1642,13 +1982,59 @@ export function AdminPanel({ onCatalogRefresh }) {
   const fullSyncJob = localLineCacheState.data;
   const fullSyncRunning =
     fullSyncJob?.status === "queued" || fullSyncJob?.status === "running";
+  const localLineStatus = localLineStatusState.data;
+  const fulfillmentJob = localLineFulfillmentState.data || localLineStatus?.fulfillments?.latestJob || null;
+  const ordersJob = localLineOrdersState.data || localLineStatus?.orders?.latestJob || null;
+  const fulfillmentPullRunning =
+    fulfillmentJob?.status === "queued" || fulfillmentJob?.status === "running";
+  const ordersPullRunning =
+    ordersJob?.status === "queued" || ordersJob?.status === "running";
+  const dropSitePerformanceRows = dropSitePerformance?.rankedSites || [];
+  const dropSiteTrendMode = dropSitePerformance?.mode === "trend6";
+  const dropSitePerformanceByStrategyId = new Map(
+    dropSitePerformanceRows
+      .filter((row) => Number(row.localLineFulfillmentStrategyId || 0) > 0)
+      .map((row) => [Number(row.localLineFulfillmentStrategyId), row])
+  );
+  const dropSitePerformanceByName = new Map(
+    dropSitePerformanceRows.map((row) => [String(row.name || "").trim(), row])
+  );
+  const filteredDropSitePerformanceRows = dropSitePerformanceRows.filter((site) => {
+    const isHomeDelivery = String(site.name || "").toLowerCase().includes("home delivery");
+    if (!showHomeDeliverySites && isHomeDelivery) return false;
+    if (!showZeroDeliverySites && Number(site.orderCount || 0) <= 0) return false;
+    return true;
+  });
+  const filteredDropSites = dropSites.filter((site) => {
+    const siteName = String(site.name || "").trim();
+    const isHomeDelivery = siteName.toLowerCase().includes("home delivery");
+    if (!showHomeDeliverySites && isHomeDelivery) return false;
+    const performanceRow =
+      dropSitePerformanceByStrategyId.get(Number(site.localLineFulfillmentStrategyId || 0)) ||
+      dropSitePerformanceByName.get(siteName) ||
+      null;
+    if (!showZeroDeliverySites && Number(performanceRow?.orderCount || 0) <= 0) return false;
+    return true;
+  });
+  const maxDropSiteAverage = Math.max(
+    1,
+    Number(dropSitePerformance?.strongAverage || 5),
+    ...filteredDropSitePerformanceRows.flatMap((row) =>
+      dropSiteTrendMode
+        ? (row.trendSeries || []).map((entry) => Number(entry.averageWeeklyOrders) || 0)
+        : [Number(row.averageWeeklyOrders) || 0]
+    )
+  );
   const productTableWidth = "1464px";
   const currentAdminRoles = currentAdmin?.adminRoles || [];
   const canManageUsers = hasRole(currentAdminRoles, "user_admin");
   const canManagePricing = canAccessAdminSection(currentAdminRoles, "pricelist");
   const canManageLocalPricelist = canAccessAdminSection(currentAdminRoles, "localPricelist");
+  const canManageLocalLine = canAccessAdminSection(currentAdminRoles, "localLine");
+  const canManageOrders = canAccessAdminSection(currentAdminRoles, "orders");
   const canManageInventory = hasRole(currentAdminRoles, "inventory_admin");
   const canManageMembership = hasRole(currentAdminRoles, "membership_admin");
+  const canPullFromLocalLine = hasRole(currentAdminRoles, "localline_pull");
   const canPushToLocalLine = hasRole(currentAdminRoles, "localline_push");
   const canManageDropSites = hasRole(currentAdminRoles, "dropsite_admin");
   const canManageMembers = hasRole(currentAdminRoles, "member_admin");
@@ -2334,6 +2720,54 @@ export function AdminPanel({ onCatalogRefresh }) {
     );
   }
 
+  function renderLocalLinePullJobContent(jobState, emptyLabel) {
+    const job = jobState?.data;
+
+    if (jobState?.loading && !job) {
+      return <div className="small">Starting...</div>;
+    }
+    if (jobState?.error) {
+      return <div className="small">{jobState.error}</div>;
+    }
+    if (!job) {
+      return <div className="small">{emptyLabel}</div>;
+    }
+
+    return (
+      <>
+        <div className="small">Job: {job.jobId}</div>
+        <div className="small">Status: {job.status}</div>
+        {job.progress?.phaseLabel ? (
+          <div className="small">
+            Current phase: {job.progress.phaseLabel}
+            {job.progress?.message ? ` | ${job.progress.message}` : ""}
+            {typeof job.progress?.current === "number" && typeof job.progress?.total === "number"
+              ? ` (${job.progress.current}/${job.progress.total})`
+              : ""}
+          </div>
+        ) : null}
+        <div className="sync-progress">
+          <div
+            className="sync-progress-bar"
+            style={{ width: `${Math.max(0, Math.min(100, Number(job.progress?.percent) || 0))}%` }}
+          />
+        </div>
+        <div className="response-list">
+          {(job.phases || []).map((phase) => (
+            <div className="response-card" key={`${job.datasetKey || "localline"}-phase-${phase.key}`}>
+              <div className="title">{phase.label}</div>
+              <div className="small">Status: {phase.status}</div>
+              <div className="small">Progress: {Math.max(0, Math.min(100, Number(phase.percent) || 0))}%</div>
+              {phase.message ? <div className="small">{phase.message}</div> : null}
+            </div>
+          ))}
+        </div>
+        {job.result ? <div className="small">{JSON.stringify(job.result)}</div> : null}
+        {job.error?.message ? <div className="small">{job.error.message}</div> : null}
+      </>
+    );
+  }
+
 
   return (
     <div className="container admin-panel">
@@ -2345,6 +2779,30 @@ export function AdminPanel({ onCatalogRefresh }) {
 
       <div className="admin-layout">
         <aside className="admin-nav">
+          {canManageLocalLine ? (
+            <button
+              className={`admin-nav-item ${activeSection === "localLine" ? "active" : ""}`}
+              onClick={() => {
+                setActiveSection("localLine");
+                closeProductEditor();
+              }}
+              type="button"
+            >
+              Local Line
+            </button>
+          ) : null}
+          {canManageOrders ? (
+            <button
+              className={`admin-nav-item ${activeSection === "orders" ? "active" : ""}`}
+              onClick={() => {
+                setActiveSection("orders");
+                closeProductEditor();
+              }}
+              type="button"
+            >
+              Orders
+            </button>
+          ) : null}
           {canManagePricing ? (
             <button
               className={`admin-nav-item ${activeSection === "pricelist" ? "active" : ""}`}
@@ -3452,11 +3910,174 @@ export function AdminPanel({ onCatalogRefresh }) {
           {activeSection === "dropSites" && canManageDropSites && (
             <section className="admin-section">
               <h3>Drop Sites</h3>
+              <div className="small">
+                Local Line fulfillment pulls now live in the <strong>Local Line</strong> section.
+                This view shows the local drop-site records, including locally cached Local Line
+                fulfillments.
+              </div>
+              <div className="response-card drop-site-performance-card">
+                <div className="title">Host Credit Performance</div>
+                <div className="small">
+                  Hosts should average at least {Number(dropSitePerformance?.thresholdAverage || 4).toFixed(0)} orders per
+                  scheduled drop week. Green is over {Number(dropSitePerformance?.strongAverage || 5).toFixed(0)},
+                  orange is {Number(dropSitePerformance?.thresholdAverage || 4).toFixed(0)} to {Number(dropSitePerformance?.strongAverage || 5).toFixed(0)},
+                  and red is under {Number(dropSitePerformance?.thresholdAverage || 4).toFixed(0)}.
+                </div>
+                <div className="pricelist-toolbar-actions drop-site-performance-controls">
+                  <label className="filter-field pricelist-page-size">
+                    <span className="small">Month</span>
+                    <select
+                      className="select"
+                      value={dropSitePerformanceMonth || dropSitePerformance?.selectedMonth || ""}
+                      onChange={(event) => {
+                        setDropSitePerformanceMonth(event.target.value);
+                      }}
+                    >
+                      {!(dropSitePerformance?.months || []).length ? (
+                        <option value="">No order months yet</option>
+                      ) : null}
+                      {(dropSitePerformance?.months || []).length ? (
+                        <option value="__trend6__">Last 6 month trend</option>
+                      ) : null}
+                      {(dropSitePerformance?.months || []).map((value) => (
+                        <option key={`drop-site-month-${value}`} value={value}>
+                          {formatMonthLabel(value)}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="checkbox drop-site-filter-toggle">
+                    <input
+                      type="checkbox"
+                      checked={showZeroDeliverySites}
+                      onChange={(event) => setShowZeroDeliverySites(event.target.checked)}
+                    />
+                    <span>show 0 delivery sites</span>
+                  </label>
+                  <label className="checkbox drop-site-filter-toggle">
+                    <input
+                      type="checkbox"
+                      checked={showHomeDeliverySites}
+                      onChange={(event) => setShowHomeDeliverySites(event.target.checked)}
+                    />
+                    <span>show home deliveries</span>
+                  </label>
+                  <label className="checkbox drop-site-filter-toggle">
+                    <input
+                      type="checkbox"
+                      checked={showDropSiteOrderCounts}
+                      onChange={(event) => setShowDropSiteOrderCounts(event.target.checked)}
+                    />
+                    <span>show # orders and scheduled drops</span>
+                  </label>
+                </div>
+                {dropSitesSectionLoading ? (
+                  <div className="drop-site-loading">
+                    <span className="loading-spinner" aria-hidden="true" />
+                    <span className="small">Loading drop sites...</span>
+                  </div>
+                ) : null}
+                <div className="drop-site-performance-chart">
+                  {filteredDropSitePerformanceRows.map((site) => {
+                    const averageWeeklyOrders = Number(site.averageWeeklyOrders) || 0;
+                    const displayAverage = dropSiteTrendMode
+                      ? averageWeeklyOrders
+                      : averageWeeklyOrders;
+                    const widthPercent = Math.max(
+                      0,
+                      Math.min(100, Math.round((averageWeeklyOrders / maxDropSiteAverage) * 100))
+                    );
+                    const trendLayout = buildTrendSvgLayout(site.trendSeries || [], maxDropSiteAverage);
+                    return (
+                      <div className="drop-site-performance-row" key={`drop-site-performance-${site.id}`}>
+                        <div className="drop-site-performance-meta">
+                          <strong>{site.name}</strong>
+                          <div className="small">
+                            {displayAverage.toFixed(2)} avg/week
+                            {dropSiteTrendMode ? " (6 mo avg)" : ""}
+                          </div>
+                          {showDropSiteOrderCounts ? (
+                            <div className="small">
+                              {Number(site.orderCount || 0)} orders · {Number(site.scheduledDrops || 0)} scheduled drops
+                            </div>
+                          ) : null}
+                        </div>
+                        <div className="drop-site-performance-bar-row">
+                          {dropSiteTrendMode ? (
+                            <div className="drop-site-trend-shell">
+                              <svg
+                                className="drop-site-trend-svg"
+                                viewBox={`0 0 ${trendLayout.width} ${trendLayout.height}`}
+                                aria-label={`${site.name} last 6 month trend`}
+                                role="img"
+                              >
+                                <polyline
+                                  className="drop-site-trend-line"
+                                  fill="none"
+                                  points={trendLayout.polylinePoints}
+                                />
+                                {trendLayout.points.map((point) => (
+                                  <circle
+                                    key={`${site.id}-${point.weekStart || point.month}`}
+                                    className={`drop-site-trend-dot ${point.performanceTier || "bad"}`}
+                                    cx={point.x}
+                                    cy={point.y}
+                                    r="3.5"
+                                  >
+                                    <title>
+                                      {`${formatWeekOfLabel(point.weekStart)} \u00b7 ${formatDeliveryCount(point.orderCount)}`}
+                                    </title>
+                                  </circle>
+                                ))}
+                              </svg>
+                            </div>
+                          ) : (
+                            <div className="drop-site-performance-bar-shell">
+                              <div
+                                className={`drop-site-performance-bar ${site.performanceTier || "bad"}`}
+                                style={{ width: `${widthPercent}%` }}
+                              />
+                              {site.performanceTier === "bad" ? (
+                                <span className="drop-site-performance-warning">
+                                  does not qualify for drop site host credit this month
+                                </span>
+                              ) : null}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {!filteredDropSitePerformanceRows.length ? (
+                    <div className="small">No drop-site performance data is available for this month yet.</div>
+                  ) : null}
+                </div>
+              </div>
               <div className="admin-grid">
-                {dropSites.map((site) => (
+                {filteredDropSites.map((site) => (
                   <div key={site.id} className="card pad">
                     <strong>{site.name}</strong>
-                    <div className="small">{site.dayOfWeek} {site.openTime} - {site.closeTime}</div>
+                    <div className="small">
+                      {site.source === "localline" ? "Local Line fulfillment" : "Local drop site"}
+                      {site.type ? ` · ${site.type}` : ""}
+                      {site.active ? "" : " · inactive"}
+                    </div>
+                    {site.address ? <div className="small">{site.address}</div> : null}
+                    {site.dayOfWeek || site.openTime || site.closeTime ? (
+                      <div className="small">
+                        {[site.dayOfWeek, site.openTime && site.closeTime ? `${site.openTime} - ${site.closeTime}` : site.openTime || site.closeTime]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </div>
+                    ) : null}
+                    {site.instructions ? (
+                      <div className="small">{stripHtml(site.instructions)}</div>
+                    ) : null}
+                    {site.priceListsJson ? (
+                      <div className="small">
+                        Price lists: {parseJsonArray(site.priceListsJson).map((entry) => entry.name).filter(Boolean).join(", ") || "None"}
+                      </div>
+                    ) : null}
                   </div>
                 ))}
               </div>
@@ -3479,11 +4100,6 @@ export function AdminPanel({ onCatalogRefresh }) {
                 vendors={vendors}
                 onDataRefresh={loadAll}
                 onCatalogRefresh={refreshCatalogFromAdmin}
-                onReviewLocalLine={handleLocalLineAudit}
-                reviewLocalLineLoading={localLineAuditState.loading}
-                onPullFromLocalLine={handleLocalLineFullSync}
-                pullFromLocalLineLoading={localLineCacheState.loading}
-                pullFromLocalLineRunning={fullSyncRunning}
                 onAddProduct={startNewProductDraft}
                 onDuplicateProduct={handleDuplicateProduct}
                 onDeleteProduct={handleDeleteProduct}
@@ -3493,33 +4109,139 @@ export function AdminPanel({ onCatalogRefresh }) {
                   setSelectedProductId(productId);
                 }}
               />
-              {localLineAuditState.open && (
-                <div className="admin-inline-audit">
-                  <div className="admin-inline-audit-header">
-                    <h4>Review Local Line</h4>
-                    <button className="button alt" type="button" onClick={closeLocalLineAuditPanel}>
-                      Close
-                    </button>
-                  </div>
-                  {renderLocalLineAuditContent()}
-                </div>
-              )}
-              {localLineCacheState.open && (
-                <div className="admin-inline-audit">
-                  <div className="admin-inline-audit-header">
-                    <h4>Pull From Local Line</h4>
-                    <button className="button alt" type="button" onClick={closeLocalLineCachePanel}>
-                      Close
-                    </button>
-                  </div>
-                  {renderLocalLineCacheContent()}
-                </div>
-              )}
             </>
           )}
 
           {activeSection === "manual" && currentAdmin && (
             <AdminManualSection focusTopic={manualFocusTopic} />
+          )}
+
+          {activeSection === "localLine" && canManageLocalLine && (
+            <section className="admin-section">
+              <h3>Local Line</h3>
+              <div className="small">
+                Review incoming Local Line catalog changes and run dataset pulls for products,
+                fulfillments, and orders from one place.
+              </div>
+              {localLineStatusState.loading && !localLineStatus ? (
+                <div className="small">Loading Local Line status...</div>
+              ) : null}
+              {localLineStatusState.error ? (
+                <div className="small">{localLineStatusState.error}</div>
+              ) : null}
+              <div className="audit-summary-grid">
+                <div className="response-card">
+                  <div className="title">Product Review</div>
+                  <div className="small">Cached products: {Number(localLineStatus?.products?.cachedProducts || 0)}</div>
+                  <div className="small">Sync issues: {Number(localLineStatus?.products?.syncIssues || 0)}</div>
+                  <div className="small">Last product sync: {localLineStatus?.products?.lastSyncedAt || "Never"}</div>
+                  <div className="small">Latest pull job: {localLineStatus?.products?.latestJob?.status || "Never run"}</div>
+                  <div className="admin-actions">
+                    <button
+                      className="button"
+                      type="button"
+                      onClick={handleLocalLineAudit}
+                      disabled={localLineAuditState.loading || !canPullFromLocalLine}
+                    >
+                      {localLineAuditState.loading ? "Reviewing..." : "Review Local Line"}
+                    </button>
+                    <button
+                      className="button"
+                      type="button"
+                      onClick={handleLocalLineFullSync}
+                      disabled={!canPullFromLocalLine || localLineCacheState.loading || fullSyncRunning}
+                    >
+                      {localLineCacheState.loading
+                        ? "Starting Pull..."
+                        : fullSyncRunning
+                          ? "Pull Running..."
+                          : "Pull Products"}
+                    </button>
+                  </div>
+                </div>
+                <div className="response-card">
+                  <div className="title">Fulfillments</div>
+                  <div className="small">Stored locally: {Number(localLineStatus?.fulfillments?.totalRows || 0)}</div>
+                  <div className="small">Active: {Number(localLineStatus?.fulfillments?.activeRows || 0)}</div>
+                  <div className="small">Last fulfillment sync: {localLineStatus?.fulfillments?.lastSyncedAt || "Never"}</div>
+                  <div className="small">Cursor status: {localLineStatus?.fulfillments?.cursor?.lastStatus || "Never run"}</div>
+                  <div className="admin-actions">
+                    <button
+                      className="button"
+                      type="button"
+                      onClick={handleLocalLineFulfillmentSync}
+                      disabled={fulfillmentPullRunning}
+                    >
+                      {fulfillmentPullRunning ? "Pull Running..." : "Pull Fulfillments"}
+                    </button>
+                  </div>
+                </div>
+                <div className="response-card">
+                  <div className="title">Orders</div>
+                  <div className="small">Stored locally: {Number(localLineStatus?.orders?.totalRows || 0)}</div>
+                  <div className="small">Latest remote order: {localLineStatus?.orders?.latestCreatedAt || "Never"}</div>
+                  <div className="small">Cursor: {localLineStatus?.orders?.cursor?.cursorValue || "Not set"}</div>
+                  <div className="small">Cursor status: {localLineStatus?.orders?.cursor?.lastStatus || "Never run"}</div>
+                  <div className="small">
+                    Sync window start: January 1, 2026
+                  </div>
+                  <div className="admin-actions">
+                    <button
+                      className="button"
+                      type="button"
+                      onClick={handleLocalLineOrderSync}
+                      disabled={!canPullFromLocalLine || ordersPullRunning || localLineOrdersState.loading}
+                    >
+                      {ordersPullRunning || localLineOrdersState.loading ? "Pull Running..." : "Pull Orders"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="audit-section">
+                <h4>Recent Orders</h4>
+                <div className="response-list">
+                  {(localLineStatus?.orders?.recentOrders || []).map((order) => (
+                    <div className="response-card" key={`recent-localline-order-${order.localLineOrderId}`}>
+                      <div className="title">Order {order.localLineOrderId}</div>
+                      <div className="small">Created: {order.createdAtRemote || "n/a"}</div>
+                      <div className="small">Status: {order.status || "n/a"}</div>
+                      <div className="small">Customer: {order.customerName || "n/a"}</div>
+                      <div className="small">Price list: {order.priceListName || "n/a"}</div>
+                      <div className="small">Total: {order.total || "0.00"}</div>
+                    </div>
+                  ))}
+                  {!(localLineStatus?.orders?.recentOrders || []).length ? (
+                    <div className="small">No Local Line orders cached yet.</div>
+                  ) : null}
+                </div>
+              </div>
+              <div className="audit-section">
+                <h4>Review Local Line</h4>
+                {renderLocalLineAuditContent()}
+              </div>
+              <div className="audit-section">
+                <h4>Pull Products</h4>
+                {renderLocalLineCacheContent()}
+              </div>
+              <div className="audit-section">
+                <h4>Pull Fulfillments</h4>
+                {renderLocalLinePullJobContent(
+                  localLineFulfillmentState,
+                  "No Local Line fulfillment pull has run yet."
+                )}
+              </div>
+              <div className="audit-section">
+                <h4>Pull Orders</h4>
+                {renderLocalLinePullJobContent(
+                  localLineOrdersState,
+                  "No Local Line order pull has run yet."
+                )}
+              </div>
+            </section>
+          )}
+
+          {activeSection === "orders" && canManageOrders && (
+            <AdminOrdersSection token={token} />
           )}
 
           {activeSection === "inventory" && canManageInventory && (

@@ -975,30 +975,30 @@ export function AdminPriceListSection({
                 </div>
               ) : null}
             </div>
-            <button
-              className="button sync-button"
-              type="button"
-              onClick={onReviewLocalLine}
-              disabled={reviewLocalLineLoading || typeof onReviewLocalLine !== "function"}
-            >
-              {reviewLocalLineLoading ? "Reviewing..." : "Review Local Line"}
-            </button>
-            <button
-              className="button sync-button"
-              type="button"
-              onClick={onPullFromLocalLine}
-              disabled={
-                pullFromLocalLineLoading ||
-                pullFromLocalLineRunning ||
-                typeof onPullFromLocalLine !== "function"
-              }
-            >
-              {pullFromLocalLineLoading
-                ? "Starting Pull..."
-                : pullFromLocalLineRunning
-                  ? "Pull Running..."
-                  : "Pull From Local Line"}
-            </button>
+            {typeof onReviewLocalLine === "function" ? (
+              <button
+                className="button sync-button"
+                type="button"
+                onClick={onReviewLocalLine}
+                disabled={reviewLocalLineLoading}
+              >
+                {reviewLocalLineLoading ? "Reviewing..." : "Review Local Line"}
+              </button>
+            ) : null}
+            {typeof onPullFromLocalLine === "function" ? (
+              <button
+                className="button sync-button"
+                type="button"
+                onClick={onPullFromLocalLine}
+                disabled={pullFromLocalLineLoading || pullFromLocalLineRunning}
+              >
+                {pullFromLocalLineLoading
+                  ? "Starting Pull..."
+                  : pullFromLocalLineRunning
+                    ? "Pull Running..."
+                    : "Pull From Local Line"}
+              </button>
+            ) : null}
             <button
               className="button sync-button"
               type="button"

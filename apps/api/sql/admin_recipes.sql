@@ -95,6 +95,20 @@ CREATE TABLE IF NOT EXISTS drop_sites (
   open_time VARCHAR(16),
   close_time VARCHAR(16),
   active TINYINT(1) DEFAULT 1,
+  source VARCHAR(32) DEFAULT 'local',
+  local_line_fulfillment_strategy_id INT,
+  type VARCHAR(32),
+  fulfillment_type VARCHAR(32),
+  timezone VARCHAR(64),
+  latitude DECIMAL(10, 7),
+  longitude DECIMAL(10, 7),
+  instructions TEXT,
+  address_json TEXT,
+  availability_json TEXT,
+  price_lists_json TEXT,
+  raw_json TEXT,
   created_at DATETIME,
-  updated_at DATETIME
+  updated_at DATETIME,
+  last_synced_at DATETIME,
+  UNIQUE KEY ux_drop_sites_local_line_fulfillment (local_line_fulfillment_strategy_id)
 );

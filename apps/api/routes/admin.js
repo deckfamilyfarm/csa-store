@@ -20,6 +20,7 @@ import {
   localLinePackageMeta,
   localLinePriceListEntries,
   localLineProductMeta,
+  localLineSyncCursors,
   localLineSyncIssues,
   packagePriceListMemberships,
   packages,
@@ -37,9 +38,17 @@ import {
 import { requireAdmin, requireAdminPermission } from "../middleware/auth.js";
 import {
   createLocalLineProductFromStoreProduct,
+  fetchAllLocalLineFulfillmentStrategies,
+  fetchLocalLineOrdersPage,
   isLocalLineEnabled,
   updateLocalLineForProduct
 } from "../localLine.js";
+import {
+  getLatestLocalLinePullJob,
+  getLatestLocalLinePullJobs,
+  getLocalLinePullJob,
+  startLocalLinePullJob
+} from "../lib/localLinePullJobs.js";
 import {
   getLatestLocalLineFullSyncJob,
   getLocalLineFullSyncJob,
@@ -175,6 +184,590 @@ function toNullableString(value) {
   if (value === null || typeof value === "undefined") return null;
   const trimmed = String(value).trim();
   return trimmed ? trimmed : null;
+}
+
+function abbreviateRepeatDays(availability = {}) {
+  const flags = [
+    ["repeat_on_monday", "Mon"],
+    ["repeat_on_tuesday", "Tue"],
+    ["repeat_on_wednesday", "Wed"],
+    ["repeat_on_thursday", "Thu"],
+    ["repeat_on_friday", "Fri"],
+    ["repeat_on_saturday", "Sat"],
+    ["repeat_on_sunday", "Sun"]
+  ];
+  return flags
+    .filter(([key]) => Boolean(availability?.[key]))
+    .map(([, label]) => label);
+}
+
+function deriveDropSiteDayLabel(availability = {}) {
+  if (!availability || typeof availability !== "object") return null;
+  if (availability.type === "repeat") {
+    const repeatDays = abbreviateRepeatDays(availability);
+    if (repeatDays.length === 7) return "Daily";
+    if (repeatDays.join(",") === "Mon,Tue,Wed,Thu,Fri") return "Weekdays";
+    if (repeatDays.join(",") === "Sat,Sun") return "Weekends";
+    if (repeatDays.length > 3) return "Multi-day";
+    if (repeatDays.length) return repeatDays.join("/");
+    if (Array.isArray(availability.repeat_on_dates) && availability.repeat_on_dates.length) {
+      return "Dates";
+    }
+    if (availability.repeat_frequency_unit === "monthly_by_weekday_occurrence") {
+      return "Monthly";
+    }
+    return "Repeat";
+  }
+  if (availability.type === "custom") return "Custom";
+  if (availability.type === "flexible") return "Flexible";
+  return null;
+}
+
+function deriveDropSiteTimeRange(availability = {}) {
+  const timeSlots = Array.isArray(availability?.time_slots) ? availability.time_slots : [];
+  if (!timeSlots.length) {
+    return { openTime: null, closeTime: null };
+  }
+
+  const starts = timeSlots.map((slot) => String(slot?.start || "").trim()).filter(Boolean).sort();
+  const ends = timeSlots.map((slot) => String(slot?.end || "").trim()).filter(Boolean).sort();
+
+  return {
+    openTime: starts[0] || null,
+    closeTime: ends[ends.length - 1] || null
+  };
+}
+
+function stringifyJson(value) {
+  if (value === null || typeof value === "undefined") return null;
+  try {
+    return JSON.stringify(value);
+  } catch (_error) {
+    return null;
+  }
+}
+
+function toDateOrNull(value) {
+  if (!value) return null;
+  if (typeof value === "string") {
+    const dateOnlyMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (dateOnlyMatch) {
+      const year = Number(dateOnlyMatch[1]);
+      const monthIndex = Number(dateOnlyMatch[2]) - 1;
+      const day = Number(dateOnlyMatch[3]);
+      const localDate = new Date(year, monthIndex, day);
+      return Number.isNaN(localDate.getTime()) ? null : localDate;
+    }
+  }
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function formatOrderCustomerName(customer = {}) {
+  const fullName = [customer?.first_name, customer?.last_name]
+    .map((value) => String(value || "").trim())
+    .filter(Boolean)
+    .join(" ");
+  return (
+    fullName ||
+    toNullableString(customer?.name) ||
+    toNullableString(customer?.business_name) ||
+    toNullableString(customer?.email) ||
+    null
+  );
+}
+
+async function getLocalLineSyncCursorRow(connection, syncKey) {
+  const [rows] = await connection.query(
+    `
+      SELECT
+        sync_key AS syncKey,
+        cursor_value AS cursorValue,
+        synced_through_at AS syncedThroughAt,
+        last_started_at AS lastStartedAt,
+        last_finished_at AS lastFinishedAt,
+        last_status AS lastStatus,
+        last_message AS lastMessage,
+        summary_json AS summaryJson,
+        created_at AS createdAt,
+        updated_at AS updatedAt
+      FROM local_line_sync_cursors
+      WHERE sync_key = ?
+      LIMIT 1
+    `,
+    [syncKey]
+  );
+  return rows[0] || null;
+}
+
+async function upsertLocalLineSyncCursor(connection, syncKey, values = {}) {
+  const now = new Date();
+  await connection.query(
+    `
+      INSERT INTO local_line_sync_cursors (
+        sync_key,
+        cursor_value,
+        synced_through_at,
+        last_started_at,
+        last_finished_at,
+        last_status,
+        last_message,
+        summary_json,
+        created_at,
+        updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE
+        cursor_value = VALUES(cursor_value),
+        synced_through_at = VALUES(synced_through_at),
+        last_started_at = VALUES(last_started_at),
+        last_finished_at = VALUES(last_finished_at),
+        last_status = VALUES(last_status),
+        last_message = VALUES(last_message),
+        summary_json = VALUES(summary_json),
+        updated_at = VALUES(updated_at)
+    `,
+    [
+      syncKey,
+      values.cursorValue ?? null,
+      values.syncedThroughAt ?? null,
+      values.lastStartedAt ?? null,
+      values.lastFinishedAt ?? null,
+      values.lastStatus ?? null,
+      values.lastMessage ?? null,
+      values.summaryJson ?? null,
+      values.createdAt ?? now,
+      values.updatedAt ?? now
+    ]
+  );
+}
+
+async function backfillLocalLineOrderFulfillmentFields(connection) {
+  const [result] = await connection.query(
+    `
+      UPDATE local_line_orders
+      SET
+        fulfillment_strategy_id = COALESCE(
+          fulfillment_strategy_id,
+          CAST(NULLIF(NULLIF(TRIM(JSON_UNQUOTE(JSON_EXTRACT(raw_json, '$.fulfillment.fulfillment_strategy'))), ''), 'null') AS UNSIGNED)
+        ),
+        fulfillment_strategy_name = COALESCE(
+          NULLIF(TRIM(fulfillment_strategy_name), ''),
+          NULLIF(NULLIF(TRIM(JSON_UNQUOTE(JSON_EXTRACT(raw_json, '$.fulfillment.fulfillment_strategy_name'))), ''), 'null')
+        ),
+        fulfillment_type = COALESCE(
+          NULLIF(TRIM(fulfillment_type), ''),
+          NULLIF(NULLIF(TRIM(JSON_UNQUOTE(JSON_EXTRACT(raw_json, '$.fulfillment.type_display'))), ''), 'null'),
+          NULLIF(NULLIF(TRIM(JSON_UNQUOTE(JSON_EXTRACT(raw_json, '$.fulfillment.fulfillment_strategy_type'))), ''), 'null')
+        ),
+        fulfillment_status = COALESCE(
+          NULLIF(TRIM(fulfillment_status), ''),
+          NULLIF(NULLIF(TRIM(JSON_UNQUOTE(JSON_EXTRACT(raw_json, '$.fulfillment.status'))), ''), 'null')
+        ),
+        fulfillment_date = COALESCE(
+          fulfillment_date,
+          STR_TO_DATE(NULLIF(NULLIF(TRIM(JSON_UNQUOTE(JSON_EXTRACT(raw_json, '$.fulfillment.fulfillment_date'))), ''), 'null'), '%Y-%m-%d')
+        ),
+        pickup_start_time = COALESCE(
+          NULLIF(TRIM(pickup_start_time), ''),
+          NULLIF(NULLIF(TRIM(JSON_UNQUOTE(JSON_EXTRACT(raw_json, '$.fulfillment.pickup_start_time'))), ''), 'null')
+        ),
+        pickup_end_time = COALESCE(
+          NULLIF(TRIM(pickup_end_time), ''),
+          NULLIF(NULLIF(TRIM(JSON_UNQUOTE(JSON_EXTRACT(raw_json, '$.fulfillment.pickup_end_time'))), ''), 'null')
+        ),
+        updated_at = ?
+      WHERE raw_json IS NOT NULL
+        AND (
+          fulfillment_strategy_id IS NULL OR
+          fulfillment_strategy_name IS NULL OR TRIM(fulfillment_strategy_name) = '' OR
+          fulfillment_type IS NULL OR TRIM(fulfillment_type) = '' OR
+          fulfillment_status IS NULL OR TRIM(fulfillment_status) = '' OR
+          fulfillment_date IS NULL OR
+          pickup_start_time IS NULL OR
+          pickup_end_time IS NULL
+        )
+    `,
+    [new Date()]
+  );
+  return Number(result?.affectedRows || 0);
+}
+
+function getOrderCycleSql(alias = "o") {
+  return {
+    cycleType: `CASE WHEN DAYOFWEEK(${alias}.created_at_remote) IN (1, 6, 7) THEN 'tuesday' ELSE 'fridaySaturday' END`,
+    cycleLabel: `CASE WHEN DAYOFWEEK(${alias}.created_at_remote) IN (1, 6, 7) THEN 'Tuesday Drops' ELSE 'Friday/Saturday Drops' END`,
+    cycleStartDate: `CASE
+      WHEN DAYOFWEEK(${alias}.created_at_remote) = 6 THEN DATE(${alias}.created_at_remote)
+      WHEN DAYOFWEEK(${alias}.created_at_remote) = 7 THEN DATE_SUB(DATE(${alias}.created_at_remote), INTERVAL 1 DAY)
+      WHEN DAYOFWEEK(${alias}.created_at_remote) = 1 THEN DATE_SUB(DATE(${alias}.created_at_remote), INTERVAL 2 DAY)
+      ELSE DATE_SUB(DATE(${alias}.created_at_remote), INTERVAL DAYOFWEEK(${alias}.created_at_remote) - 2 DAY)
+    END`
+  };
+}
+
+function startOfDay(date) {
+  const copy = new Date(date);
+  copy.setHours(0, 0, 0, 0);
+  return copy;
+}
+
+function addDays(date, days) {
+  const copy = new Date(date);
+  copy.setDate(copy.getDate() + days);
+  return copy;
+}
+
+function startOfWeek(date) {
+  const current = startOfDay(date);
+  const day = current.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  return addDays(current, diff);
+}
+
+function getCurrentAndLastOrderCycle(referenceDate = new Date()) {
+  const current = startOfDay(referenceDate);
+  const day = current.getDay();
+  const mondayOffset = day === 0 ? -6 : 1 - day;
+  const monday = addDays(current, mondayOffset);
+  const friday = addDays(monday, 4);
+  const weekendCycle = day === 5 || day === 6 || day === 0;
+
+  if (weekendCycle) {
+    return {
+      current: {
+        type: "tuesday",
+        label: "Tuesday Drops",
+        startDate: friday
+      },
+      last: {
+        type: "fridaySaturday",
+        label: "Friday/Saturday Drops",
+        startDate: monday
+      }
+    };
+  }
+
+  return {
+    current: {
+      type: "fridaySaturday",
+      label: "Friday/Saturday Drops",
+      startDate: monday
+    },
+    last: {
+      type: "tuesday",
+      label: "Tuesday Drops",
+      startDate: addDays(monday, -3)
+    }
+  };
+}
+
+function formatMonthKey(value) {
+  const date = toDateOrNull(value);
+  if (!date) return "";
+  const year = date.getFullYear();
+  const month = `${date.getMonth() + 1}`.padStart(2, "0");
+  return `${year}-${month}`;
+}
+
+function formatDateKey(value) {
+  const date = toDateOrNull(value);
+  if (!date) return "";
+  const year = date.getFullYear();
+  const month = `${date.getMonth() + 1}`.padStart(2, "0");
+  const day = `${date.getDate()}`.padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function parseJsonValue(value, fallback = null) {
+  if (!value) return fallback;
+  try {
+    return JSON.parse(value);
+  } catch (_error) {
+    return fallback;
+  }
+}
+
+function getJsonTrimmedStringSql(orderAlias = "o", jsonPath = "$") {
+  return `NULLIF(NULLIF(TRIM(JSON_UNQUOTE(JSON_EXTRACT(${orderAlias}.raw_json, '${jsonPath}'))), ''), 'null')`;
+}
+
+function getFulfillmentStrategyIdSql(orderAlias = "o") {
+  return `COALESCE(${orderAlias}.fulfillment_strategy_id, CAST(${getJsonTrimmedStringSql(orderAlias, "$.fulfillment.fulfillment_strategy")} AS UNSIGNED))`;
+}
+
+function getFulfillmentTypeSql(orderAlias = "o") {
+  return `COALESCE(NULLIF(TRIM(${orderAlias}.fulfillment_type), ''), ${getJsonTrimmedStringSql(orderAlias, "$.fulfillment.type_display")}, ${getJsonTrimmedStringSql(orderAlias, "$.fulfillment.fulfillment_strategy_type")}, 'Unknown')`;
+}
+
+function getFulfillmentStatusSql(orderAlias = "o") {
+  return `COALESCE(NULLIF(TRIM(${orderAlias}.fulfillment_status), ''), ${getJsonTrimmedStringSql(orderAlias, "$.fulfillment.status")}, 'Unknown')`;
+}
+
+function getFulfillmentDateSql(orderAlias = "o") {
+  return `COALESCE(${orderAlias}.fulfillment_date, STR_TO_DATE(${getJsonTrimmedStringSql(orderAlias, "$.fulfillment.fulfillment_date")}, '%Y-%m-%d'))`;
+}
+
+function getPickupTimeSql(orderAlias = "o", fieldName) {
+  return `COALESCE(NULLIF(TRIM(${orderAlias}.${fieldName}), ''), ${getJsonTrimmedStringSql(orderAlias, `$.fulfillment.${fieldName}`)})`;
+}
+
+function getFulfillmentSiteNameSql(orderAlias = "o", dropSiteAlias = "ds") {
+  return `COALESCE(NULLIF(TRIM(${orderAlias}.fulfillment_strategy_name), ''), ${getJsonTrimmedStringSql(orderAlias, "$.fulfillment.fulfillment_strategy_name")}, NULLIF(TRIM(${dropSiteAlias}.name), ''), 'Unassigned')`;
+}
+
+function isMembershipPurchaseDropSite(site = {}) {
+  const name = String(site?.name || "").trim().toLowerCase();
+  if (name.includes("membership purchase")) return true;
+
+  const raw = parseJsonValue(site?.rawJson || site?.raw_json, {});
+  const formattedAddress = String(
+    raw?.address?.formatted_address ||
+    raw?.address?.street_address ||
+    site?.address ||
+    ""
+  ).trim().toLowerCase();
+  const instructions = String(
+    raw?.availability?.instructions ||
+    site?.instructions ||
+    ""
+  ).trim().toLowerCase();
+
+  return (
+    formattedAddress.includes("online delivery") &&
+    instructions.includes("subscribing to a full farm csa membership")
+  );
+}
+
+function parseMonthKey(value) {
+  const match = String(value || "").match(/^(\d{4})-(\d{2})$/);
+  if (!match) return null;
+  const year = Number(match[1]);
+  const monthIndex = Number(match[2]) - 1;
+  if (!Number.isFinite(year) || !Number.isFinite(monthIndex) || monthIndex < 0 || monthIndex > 11) {
+    return null;
+  }
+  return {
+    year,
+    monthIndex,
+    key: `${year}-${String(monthIndex + 1).padStart(2, "0")}`,
+    start: new Date(year, monthIndex, 1),
+    end: new Date(year, monthIndex + 1, 1)
+  };
+}
+
+function isDateInMonth(date, monthInfo) {
+  if (!(date instanceof Date) || Number.isNaN(date.getTime()) || !monthInfo) return false;
+  return date >= monthInfo.start && date < monthInfo.end;
+}
+
+function isDateInRange(date, rangeStart, rangeEnd) {
+  if (!(date instanceof Date) || Number.isNaN(date.getTime())) return false;
+  return date >= rangeStart && date < rangeEnd;
+}
+
+function countAvailableDatesInMonth(availability = {}, monthInfo) {
+  const dates = Array.isArray(availability?.available_dates) ? availability.available_dates : [];
+  const matchingDates = new Set();
+  for (const item of dates) {
+    const parsed = toDateOrNull(item?.available_date);
+    if (isDateInMonth(parsed, monthInfo)) {
+      matchingDates.add(formatDateKey(parsed));
+    }
+  }
+  return matchingDates.size;
+}
+
+function countCustomDatesInMonth(availability = {}, monthInfo) {
+  const dates = Array.isArray(availability?.custom_dates) ? availability.custom_dates : [];
+  const matchingDates = new Set();
+  for (const item of dates) {
+    const parsed = toDateOrNull(item?.available_date || item?.date || item);
+    if (isDateInMonth(parsed, monthInfo)) {
+      matchingDates.add(formatDateKey(parsed));
+    }
+  }
+  return matchingDates.size;
+}
+
+function getAvailabilityWeekdayNumbers(availability = {}) {
+  const pairs = [
+    ["repeat_on_sunday", 0],
+    ["repeat_on_monday", 1],
+    ["repeat_on_tuesday", 2],
+    ["repeat_on_wednesday", 3],
+    ["repeat_on_thursday", 4],
+    ["repeat_on_friday", 5],
+    ["repeat_on_saturday", 6]
+  ];
+  return pairs.filter(([key]) => Boolean(availability?.[key])).map(([, value]) => value);
+}
+
+function getWeekdayNumbersFromDayLabel(value) {
+  const normalized = String(value || "").toLowerCase();
+  const matches = [];
+  const pairs = [
+    ["sun", 0],
+    ["mon", 1],
+    ["tue", 2],
+    ["wed", 3],
+    ["thu", 4],
+    ["fri", 5],
+    ["sat", 6]
+  ];
+  for (const [token, weekday] of pairs) {
+    if (normalized.includes(token)) {
+      matches.push(weekday);
+    }
+  }
+  return [...new Set(matches)];
+}
+
+function countWeekdayOccurrencesInMonth(monthInfo, weekdayNumbers = [], repeatStartDate = null) {
+  if (!monthInfo || !weekdayNumbers.length) return 0;
+  const allowedWeekdays = new Set(weekdayNumbers);
+  const startDate = toDateOrNull(repeatStartDate);
+  let count = 0;
+
+  for (let day = 1; day <= 31; day += 1) {
+    const current = new Date(monthInfo.year, monthInfo.monthIndex, day);
+    if (current.getMonth() !== monthInfo.monthIndex) break;
+    if (startDate && current < startDate) continue;
+    if (allowedWeekdays.has(current.getDay())) {
+      count += 1;
+    }
+  }
+
+  return count;
+}
+
+function countMonthlyDateOccurrences(monthInfo, repeatOnDates = [], repeatStartDate = null) {
+  if (!monthInfo || !Array.isArray(repeatOnDates) || !repeatOnDates.length) return 0;
+  const startDate = toDateOrNull(repeatStartDate);
+  let count = 0;
+
+  for (const dateValue of repeatOnDates) {
+    const day = Number(dateValue);
+    if (!Number.isFinite(day) || day < 1 || day > 31) continue;
+    const current = new Date(monthInfo.year, monthInfo.monthIndex, day);
+    if (current.getMonth() !== monthInfo.monthIndex) continue;
+    if (startDate && current < startDate) continue;
+    count += 1;
+  }
+
+  return count;
+}
+
+function countAvailableDatesInRange(availability = {}, rangeStart, rangeEnd) {
+  const dates = Array.isArray(availability?.available_dates) ? availability.available_dates : [];
+  const matchingDates = new Set();
+  for (const item of dates) {
+    const parsed = toDateOrNull(item?.available_date);
+    if (isDateInRange(parsed, rangeStart, rangeEnd)) {
+      matchingDates.add(formatDateKey(parsed));
+    }
+  }
+  return matchingDates.size;
+}
+
+function countCustomDatesInRange(availability = {}, rangeStart, rangeEnd) {
+  const dates = Array.isArray(availability?.custom_dates) ? availability.custom_dates : [];
+  const matchingDates = new Set();
+  for (const item of dates) {
+    const parsed = toDateOrNull(item?.available_date || item?.date || item);
+    if (isDateInRange(parsed, rangeStart, rangeEnd)) {
+      matchingDates.add(formatDateKey(parsed));
+    }
+  }
+  return matchingDates.size;
+}
+
+function countWeekdayOccurrencesInRange(rangeStart, rangeEnd, weekdayNumbers = [], repeatStartDate = null) {
+  if (!weekdayNumbers.length) return 0;
+  const allowedWeekdays = new Set(weekdayNumbers);
+  const startDate = toDateOrNull(repeatStartDate);
+  let count = 0;
+  for (let current = new Date(rangeStart); current < rangeEnd; current = addDays(current, 1)) {
+    if (startDate && current < startDate) continue;
+    if (allowedWeekdays.has(current.getDay())) {
+      count += 1;
+    }
+  }
+  return count;
+}
+
+function countMonthlyDateOccurrencesInRange(rangeStart, rangeEnd, repeatOnDates = [], repeatStartDate = null) {
+  if (!Array.isArray(repeatOnDates) || !repeatOnDates.length) return 0;
+  const validDays = new Set(
+    repeatOnDates
+      .map((value) => Number(value))
+      .filter((value) => Number.isFinite(value) && value >= 1 && value <= 31)
+  );
+  if (!validDays.size) return 0;
+  const startDate = toDateOrNull(repeatStartDate);
+  let count = 0;
+  for (let current = new Date(rangeStart); current < rangeEnd; current = addDays(current, 1)) {
+    if (startDate && current < startDate) continue;
+    if (validDays.has(current.getDate())) {
+      count += 1;
+    }
+  }
+  return count;
+}
+
+function getDropSiteScheduledDropCountForRange(site = {}, rangeStart, rangeEnd, fallbackOrderDates = []) {
+  const availability =
+    parseJsonValue(site?.availabilityJson || site?.availability_json, null) ||
+    parseJsonValue(site?.rawJson || site?.raw_json, {})?.availability ||
+    {};
+
+  const customDateCount = countCustomDatesInRange(availability, rangeStart, rangeEnd);
+  if (customDateCount > 0) return customDateCount;
+
+  const repeatOnDates = Array.isArray(availability?.repeat_on_dates) ? availability.repeat_on_dates : [];
+  const repeatStartDate = availability?.repeat_start_date || null;
+  const monthlyDateCount = countMonthlyDateOccurrencesInRange(
+    rangeStart,
+    rangeEnd,
+    repeatOnDates,
+    repeatStartDate
+  );
+  if (monthlyDateCount > 0) return monthlyDateCount;
+
+  const weekdayNumbers = getAvailabilityWeekdayNumbers(availability);
+  const weeklyCount = countWeekdayOccurrencesInRange(rangeStart, rangeEnd, weekdayNumbers, repeatStartDate);
+  if (weeklyCount > 0) return weeklyCount;
+
+  const availableDateCount = countAvailableDatesInRange(availability, rangeStart, rangeEnd);
+  if (availableDateCount > 0) return availableDateCount;
+
+  const labelWeekdays = getWeekdayNumbersFromDayLabel(site?.dayOfWeek);
+  const labelWeekdayCount = countWeekdayOccurrencesInRange(rangeStart, rangeEnd, labelWeekdays);
+  if (labelWeekdayCount > 0) return labelWeekdayCount;
+
+  return new Set(
+    (fallbackOrderDates || [])
+      .filter((value) => isDateInRange(value, rangeStart, rangeEnd))
+      .map((value) => formatDateKey(value))
+      .filter(Boolean)
+  ).size;
+}
+
+function getDropSiteScheduledDropCount(site = {}, monthKey, fallbackOrderDates = []) {
+  const monthInfo = parseMonthKey(monthKey);
+  if (!monthInfo) return 0;
+  return getDropSiteScheduledDropCountForRange(
+    site,
+    monthInfo.start,
+    monthInfo.end,
+    fallbackOrderDates
+  );
+}
+
+function getDropSitePerformanceTier(averageWeeklyOrders) {
+  const numeric = Number(averageWeeklyOrders) || 0;
+  if (numeric > 5) return "good";
+  if (numeric >= 4) return "warn";
+  return "bad";
 }
 
 function normalizeDraftPackage(payload = {}, fallbackName = "ea") {
@@ -2724,10 +3317,1343 @@ router.get("/vendors", requireAdmin, async (_req, res) => {
   res.json({ vendors: rows });
 });
 
+const LOCAL_LINE_FULFILLMENT_JOB_PHASES = [
+  { key: "fetch", label: "Fetch Fulfillments" },
+  { key: "store", label: "Store Fulfillments" },
+  { key: "finalize", label: "Finalize" }
+];
+
+const LOCAL_LINE_ORDER_JOB_PHASES = [
+  { key: "fetch", label: "Fetch Orders" },
+  { key: "store", label: "Store Orders" },
+  { key: "finalize", label: "Finalize" }
+];
+
+async function syncLocalLineFulfillmentStrategiesToStore({ reportProgress = () => {} } = {}) {
+  const strategies = await fetchAllLocalLineFulfillmentStrategies();
+  const now = new Date();
+  const pool = getPool();
+  const connection = await pool.getConnection();
+
+  try {
+    reportProgress({
+      phaseKey: "fetch",
+      phaseLabel: "Fetch Fulfillments",
+      status: "completed",
+      percent: 100,
+      current: strategies.length,
+      total: strategies.length,
+      message: `Fetched ${strategies.length} fulfillment strategies`
+    });
+    reportProgress({
+      phaseKey: "store",
+      phaseLabel: "Store Fulfillments",
+      status: "running",
+      percent: 0,
+      current: 0,
+      total: strategies.length,
+      message: "Writing Local Line fulfillments to store"
+    });
+
+    await connection.beginTransaction();
+    await upsertLocalLineSyncCursor(connection, "fulfillments", {
+      lastStartedAt: now,
+      lastStatus: "running",
+      lastMessage: "Syncing fulfillment strategies",
+      updatedAt: now
+    });
+
+    let stored = 0;
+    const syncedIds = [];
+
+    for (const strategy of strategies) {
+      const strategyId = Number(strategy?.id);
+      if (!Number.isFinite(strategyId)) continue;
+
+      const availability = strategy?.availability || {};
+      const address = strategy?.address || {};
+      const timeRange = deriveDropSiteTimeRange(availability);
+      const name = toNullableString(strategy?.name) || `Fulfillment ${strategyId}`;
+      const addressText =
+        toNullableString(address?.formatted_address) ||
+        toNullableString(address?.street_address) ||
+        null;
+
+      await connection.query(
+        `
+          INSERT INTO drop_sites (
+            name,
+            address,
+            day_of_week,
+            open_time,
+            close_time,
+            active,
+            source,
+            local_line_fulfillment_strategy_id,
+            type,
+            fulfillment_type,
+            timezone,
+            latitude,
+            longitude,
+            instructions,
+            address_json,
+            availability_json,
+            price_lists_json,
+            raw_json,
+            created_at,
+            updated_at,
+            last_synced_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          ON DUPLICATE KEY UPDATE
+            name = VALUES(name),
+            address = VALUES(address),
+            day_of_week = VALUES(day_of_week),
+            open_time = VALUES(open_time),
+            close_time = VALUES(close_time),
+            active = VALUES(active),
+            source = VALUES(source),
+            type = VALUES(type),
+            fulfillment_type = VALUES(fulfillment_type),
+            timezone = VALUES(timezone),
+            latitude = VALUES(latitude),
+            longitude = VALUES(longitude),
+            instructions = VALUES(instructions),
+            address_json = VALUES(address_json),
+            availability_json = VALUES(availability_json),
+            price_lists_json = VALUES(price_lists_json),
+            raw_json = VALUES(raw_json),
+            updated_at = VALUES(updated_at),
+            last_synced_at = VALUES(last_synced_at)
+        `,
+        [
+          name,
+          addressText,
+          deriveDropSiteDayLabel(availability),
+          timeRange.openTime,
+          timeRange.closeTime,
+          strategy?.active ? 1 : 0,
+          "localline",
+          strategyId,
+          toNullableString(strategy?.type),
+          toNullableString(strategy?.fulfillment_type),
+          toNullableString(availability?.timezone),
+          toDbDecimal(address?.latitude),
+          toDbDecimal(address?.longitude),
+          toNullableString(availability?.instructions),
+          stringifyJson(address),
+          stringifyJson(availability),
+          stringifyJson(strategy?.price_lists || []),
+          stringifyJson(strategy),
+          now,
+          now,
+          now
+        ]
+      );
+
+      syncedIds.push(strategyId);
+      stored += 1;
+      reportProgress({
+        phaseKey: "store",
+        phaseLabel: "Store Fulfillments",
+        status: "running",
+        percent: strategies.length ? Math.round((stored / strategies.length) * 100) : 100,
+        current: stored,
+        total: strategies.length,
+        message: `Stored ${stored} of ${strategies.length} fulfillment strategies`
+      });
+    }
+
+    let deactivated = 0;
+    if (syncedIds.length) {
+      const [result] = await connection.query(
+        `
+          UPDATE drop_sites
+          SET active = 0, updated_at = ?, last_synced_at = ?
+          WHERE source = 'localline'
+            AND local_line_fulfillment_strategy_id IS NOT NULL
+            AND local_line_fulfillment_strategy_id NOT IN (?)
+        `,
+        [now, now, syncedIds]
+      );
+      deactivated = Number(result?.affectedRows || 0);
+    } else {
+      const [result] = await connection.query(
+        `
+          UPDATE drop_sites
+          SET active = 0, updated_at = ?, last_synced_at = ?
+          WHERE source = 'localline'
+            AND local_line_fulfillment_strategy_id IS NOT NULL
+        `,
+        [now, now]
+      );
+      deactivated = Number(result?.affectedRows || 0);
+    }
+
+    const summary = {
+      fetched: strategies.length,
+      stored,
+      deactivated
+    };
+
+    await upsertLocalLineSyncCursor(connection, "fulfillments", {
+      cursorValue: syncedIds.length ? String(Math.max(...syncedIds)) : null,
+      syncedThroughAt: now,
+      lastStartedAt: now,
+      lastFinishedAt: now,
+      lastStatus: "completed",
+      lastMessage: `Stored ${stored} fulfillment strategies`,
+      summaryJson: stringifyJson(summary),
+      updatedAt: now
+    });
+
+    await connection.commit();
+    reportProgress({
+      phaseKey: "store",
+      phaseLabel: "Store Fulfillments",
+      status: "completed",
+      percent: 100,
+      current: stored,
+      total: strategies.length,
+      message: `Stored ${stored} fulfillment strategies`
+    });
+    reportProgress({
+      phaseKey: "finalize",
+      phaseLabel: "Finalize",
+      status: "completed",
+      percent: 100,
+      message: "Fulfillment sync complete"
+    });
+    return summary;
+  } catch (error) {
+    await connection.rollback();
+    await upsertLocalLineSyncCursor(connection, "fulfillments", {
+      lastStartedAt: now,
+      lastFinishedAt: new Date(),
+      lastStatus: "failed",
+      lastMessage: error?.message || "Fulfillment sync failed",
+      updatedAt: new Date()
+    }).catch(() => {});
+    throw error;
+  } finally {
+    connection.release();
+  }
+}
+
+async function syncLocalLineOrdersToStore({ reportProgress = () => {}, cutoffDate } = {}) {
+  const effectiveCutoffDate = toDateOrNull(cutoffDate) || new Date("2026-01-01T00:00:00.000Z");
+  const pool = getPool();
+  const connection = await pool.getConnection();
+  const startedAt = new Date();
+
+  try {
+    await connection.beginTransaction();
+    const existingCursor = await getLocalLineSyncCursorRow(connection, "orders");
+    await upsertLocalLineSyncCursor(connection, "orders", {
+      cursorValue: existingCursor?.cursorValue || null,
+      syncedThroughAt: existingCursor?.syncedThroughAt || null,
+      lastStartedAt: startedAt,
+      lastFinishedAt: existingCursor?.lastFinishedAt || null,
+      lastStatus: "running",
+      lastMessage: "Syncing orders",
+      summaryJson: existingCursor?.summaryJson || null,
+      createdAt: existingCursor?.createdAt || startedAt,
+      updatedAt: startedAt
+    });
+    const backfilledOrderRows = await backfillLocalLineOrderFulfillmentFields(connection);
+    await connection.commit();
+
+    let page = 1;
+    let totalFetched = 0;
+    let stored = 0;
+    let newestOrderId = Number(existingCursor?.cursorValue || 0);
+    let newestCreatedAt = toDateOrNull(existingCursor?.syncedThroughAt);
+    let reachedCursor = false;
+    let reachedCutoff = false;
+    let totalAvailable = null;
+
+    reportProgress({
+      phaseKey: "fetch",
+      phaseLabel: "Fetch Orders",
+      status: "running",
+      percent: 0,
+      current: 0,
+      total: null,
+      message: `Fetching orders since ${effectiveCutoffDate.toISOString().slice(0, 10)}`
+    });
+
+    while (!reachedCursor && !reachedCutoff) {
+      const payload = await fetchLocalLineOrdersPage({ page, pageSize: 100, ordering: "-id" });
+      const orders = Array.isArray(payload?.results) ? payload.results : [];
+      totalAvailable = Number(payload?.count || totalAvailable || 0);
+
+      if (!orders.length) {
+        break;
+      }
+
+      reportProgress({
+        phaseKey: "fetch",
+        phaseLabel: "Fetch Orders",
+        status: "running",
+        percent: totalAvailable ? Math.min(95, Math.round((totalFetched / totalAvailable) * 100)) : 0,
+        current: totalFetched,
+        total: totalAvailable,
+        message: `Fetched page ${page}`
+      });
+
+      await connection.beginTransaction();
+
+      for (const order of orders) {
+        const remoteOrderId = Number(order?.id);
+        if (!Number.isFinite(remoteOrderId)) continue;
+
+        const createdAtRemote = toDateOrNull(order?.created_at);
+        if (createdAtRemote && createdAtRemote < effectiveCutoffDate) {
+          reachedCutoff = true;
+          break;
+        }
+        if (Number(existingCursor?.cursorValue || 0) > 0 && remoteOrderId <= Number(existingCursor.cursorValue)) {
+          reachedCursor = true;
+          break;
+        }
+
+        totalFetched += 1;
+        const customer = order?.customer || {};
+        const fulfillment = order?.fulfillment || {};
+        const payment = order?.payment || {};
+        const orderEntries = Array.isArray(order?.order_entries) ? order.order_entries : [];
+        const now = new Date();
+
+        await connection.query(
+          `
+            INSERT INTO local_line_orders (
+              local_line_order_id,
+              status,
+              price_list_id,
+              price_list_name,
+              customer_id,
+              customer_name,
+              created_at_remote,
+              updated_at_remote,
+              opened_at_remote,
+              fulfillment_strategy_id,
+              fulfillment_strategy_name,
+              fulfillment_type,
+              fulfillment_status,
+              fulfillment_date,
+              pickup_start_time,
+              pickup_end_time,
+              payment_status,
+              subtotal,
+              tax,
+              total,
+              discount,
+              product_count,
+              raw_json,
+              created_at,
+              updated_at,
+              last_synced_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE
+              status = VALUES(status),
+              price_list_id = VALUES(price_list_id),
+              price_list_name = VALUES(price_list_name),
+              customer_id = VALUES(customer_id),
+              customer_name = VALUES(customer_name),
+              created_at_remote = VALUES(created_at_remote),
+              updated_at_remote = VALUES(updated_at_remote),
+              opened_at_remote = VALUES(opened_at_remote),
+              fulfillment_strategy_id = VALUES(fulfillment_strategy_id),
+              fulfillment_strategy_name = VALUES(fulfillment_strategy_name),
+              fulfillment_type = VALUES(fulfillment_type),
+              fulfillment_status = VALUES(fulfillment_status),
+              fulfillment_date = VALUES(fulfillment_date),
+              pickup_start_time = VALUES(pickup_start_time),
+              pickup_end_time = VALUES(pickup_end_time),
+              payment_status = VALUES(payment_status),
+              subtotal = VALUES(subtotal),
+              tax = VALUES(tax),
+              total = VALUES(total),
+              discount = VALUES(discount),
+              product_count = VALUES(product_count),
+              raw_json = VALUES(raw_json),
+              updated_at = VALUES(updated_at),
+              last_synced_at = VALUES(last_synced_at)
+          `,
+          [
+            remoteOrderId,
+            toNullableString(order?.status),
+            toOptionalInteger(order?.price_list, null),
+            toNullableString(order?.price_list_name),
+            toOptionalInteger(order?.customer_id, null),
+            formatOrderCustomerName(customer),
+            createdAtRemote,
+            toDateOrNull(order?.updated_at),
+            toDateOrNull(order?.opened_at),
+            toOptionalInteger(fulfillment?.fulfillment_strategy, null),
+            toNullableString(fulfillment?.fulfillment_strategy_name),
+            toNullableString(
+              fulfillment?.type_display ||
+              fulfillment?.fulfillment_strategy_type ||
+              fulfillment?.type ||
+              fulfillment?.fulfillment_type
+            ),
+            toNullableString(fulfillment?.status),
+            toDateOrNull(fulfillment?.fulfillment_date),
+            toNullableString(fulfillment?.pickup_start_time),
+            toNullableString(fulfillment?.pickup_end_time),
+            toNullableString(payment?.status),
+            toDbDecimal(order?.subtotal),
+            toDbDecimal(order?.tax),
+            toDbDecimal(order?.total),
+            toDbDecimal(order?.discount),
+            toOptionalInteger(order?.product_count, null),
+            stringifyJson(order),
+            now,
+            now,
+            now
+          ]
+        );
+
+        await connection.query(
+          "DELETE FROM local_line_order_entries WHERE local_line_order_id = ?",
+          [remoteOrderId]
+        );
+
+        for (const entry of orderEntries) {
+          const remoteEntryId = Number(entry?.id);
+          if (!Number.isFinite(remoteEntryId)) continue;
+
+          await connection.query(
+            `
+              INSERT INTO local_line_order_entries (
+                local_line_order_entry_id,
+                local_line_order_id,
+                product_id,
+                product_name,
+                package_name,
+                vendor_id,
+                vendor_name,
+                category_name,
+                unit_quantity,
+                inventory_quantity,
+                price,
+                total_price,
+                price_per_unit,
+                charge_type,
+                track_type,
+                pack_weight,
+                raw_json,
+                created_at,
+                updated_at,
+                last_synced_at
+              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+              ON DUPLICATE KEY UPDATE
+                local_line_order_id = VALUES(local_line_order_id),
+                product_id = VALUES(product_id),
+                product_name = VALUES(product_name),
+                package_name = VALUES(package_name),
+                vendor_id = VALUES(vendor_id),
+                vendor_name = VALUES(vendor_name),
+                category_name = VALUES(category_name),
+                unit_quantity = VALUES(unit_quantity),
+                inventory_quantity = VALUES(inventory_quantity),
+                price = VALUES(price),
+                total_price = VALUES(total_price),
+                price_per_unit = VALUES(price_per_unit),
+                charge_type = VALUES(charge_type),
+                track_type = VALUES(track_type),
+                pack_weight = VALUES(pack_weight),
+                raw_json = VALUES(raw_json),
+                updated_at = VALUES(updated_at),
+                last_synced_at = VALUES(last_synced_at)
+            `,
+            [
+              remoteEntryId,
+              remoteOrderId,
+              toOptionalInteger(entry?.product, null),
+              toNullableString(entry?.product_name || entry?.custom_entry_product_name),
+              toNullableString(entry?.package_name),
+              toOptionalInteger(entry?.vendor_id, null),
+              toNullableString(entry?.vendor_name),
+              toNullableString(entry?.category),
+              toDbDecimal(entry?.unit_quantity),
+              toDbDecimal(entry?.inventory_quantity),
+              toDbDecimal(entry?.price),
+              toDbDecimal(entry?.total_price),
+              toNullableString(entry?.price_per_unit),
+              toNullableString(entry?.charge_type),
+              toNullableString(entry?.track_type),
+              toDbDecimal(entry?.pack_weight),
+              stringifyJson(entry),
+              now,
+              now,
+              now
+            ]
+          );
+        }
+
+        stored += 1;
+        if (remoteOrderId > newestOrderId) {
+          newestOrderId = remoteOrderId;
+        }
+        if (createdAtRemote && (!newestCreatedAt || createdAtRemote > newestCreatedAt)) {
+          newestCreatedAt = createdAtRemote;
+        }
+      }
+
+      await connection.commit();
+
+      reportProgress({
+        phaseKey: "store",
+        phaseLabel: "Store Orders",
+        status: "running",
+        percent: totalAvailable ? Math.min(95, Math.round((totalFetched / totalAvailable) * 100)) : 0,
+        current: stored,
+        total: totalAvailable,
+        message: `Stored ${stored} orders`
+      });
+
+      if (reachedCursor || reachedCutoff || !payload?.next) {
+        break;
+      }
+
+      page += 1;
+    }
+
+    await connection.beginTransaction();
+    const finishedAt = new Date();
+    const summary = {
+      cutoffDate: effectiveCutoffDate.toISOString(),
+      fetched: totalFetched,
+      stored,
+      backfilledOrderRows,
+      newestOrderId: newestOrderId || null,
+      newestCreatedAt: newestCreatedAt ? newestCreatedAt.toISOString() : null,
+      reachedCursor,
+      reachedCutoff
+    };
+    await upsertLocalLineSyncCursor(connection, "orders", {
+      cursorValue: newestOrderId ? String(newestOrderId) : existingCursor?.cursorValue || null,
+      syncedThroughAt: newestCreatedAt || existingCursor?.syncedThroughAt || null,
+      lastStartedAt: startedAt,
+      lastFinishedAt: finishedAt,
+      lastStatus: "completed",
+      lastMessage: `Stored ${stored} orders`,
+      summaryJson: stringifyJson(summary),
+      createdAt: existingCursor?.createdAt || startedAt,
+      updatedAt: finishedAt
+    });
+    await connection.commit();
+
+    reportProgress({
+      phaseKey: "fetch",
+      phaseLabel: "Fetch Orders",
+      status: "completed",
+      percent: 100,
+      current: totalFetched,
+      total: totalAvailable,
+      message: `Fetched ${totalFetched} new orders`
+    });
+    reportProgress({
+      phaseKey: "store",
+      phaseLabel: "Store Orders",
+      status: "completed",
+      percent: 100,
+      current: stored,
+      total: totalAvailable,
+      message: `Stored ${stored} orders`
+    });
+    reportProgress({
+      phaseKey: "finalize",
+      phaseLabel: "Finalize",
+      status: "completed",
+      percent: 100,
+      message: "Order sync complete"
+    });
+    return summary;
+  } catch (error) {
+    await connection.rollback().catch(() => {});
+    await upsertLocalLineSyncCursor(connection, "orders", {
+      lastStartedAt: startedAt,
+      lastFinishedAt: new Date(),
+      lastStatus: "failed",
+      lastMessage: error?.message || "Order sync failed",
+      updatedAt: new Date()
+    }).catch(() => {});
+    throw error;
+  } finally {
+    connection.release();
+  }
+}
+
 router.get("/drop-sites", requireAdmin, async (_req, res) => {
+  await ensureLocalLineSyncSchema().catch((error) => {
+    console.warn("Local Line schema bootstrap skipped for /admin/drop-sites:", error.message);
+  });
+  const pool = getPool();
+  const requestedMonth = String(_req.query?.month || "").trim();
+  const completedFulfillmentCutoff = startOfDay(new Date());
+  const completedWeekCutoff = startOfWeek(completedFulfillmentCutoff);
+  const latestCompletedWeekStart = addDays(completedWeekCutoff, -7);
+  const fulfillmentDateSql = getFulfillmentDateSql("o");
+  const fulfillmentStrategyIdSql = getFulfillmentStrategyIdSql("o");
+  const fulfillmentSiteSql = getFulfillmentSiteNameSql("o", "ds");
+
+  const [siteRows] = await pool.query(
+    `
+      SELECT
+        id,
+        name,
+        address,
+        day_of_week AS dayOfWeek,
+        open_time AS openTime,
+        close_time AS closeTime,
+        active,
+        source,
+        local_line_fulfillment_strategy_id AS localLineFulfillmentStrategyId,
+        type,
+        fulfillment_type AS fulfillmentType,
+        timezone,
+        latitude,
+        longitude,
+        instructions,
+        address_json AS addressJson,
+        availability_json AS availabilityJson,
+        price_lists_json AS priceListsJson,
+        raw_json AS rawJson,
+        created_at AS createdAt,
+        updated_at AS updatedAt,
+        last_synced_at AS lastSyncedAt
+      FROM drop_sites
+      ORDER BY active DESC, name ASC
+    `
+  );
+
+  const normalizedSites = siteRows.map((row) => ({
+    ...row,
+    active: Boolean(row.active),
+    isOnlineOnlyMembership: isMembershipPurchaseDropSite(row)
+  }));
+
+  const visibleDropSites = normalizedSites.filter((site) => !site.isOnlineOnlyMembership);
+
+  const [monthRows] = await pool.query(
+    `
+      SELECT DISTINCT DATE_FORMAT(${fulfillmentDateSql}, '%Y-%m') AS value
+      FROM local_line_orders o
+      WHERE ${fulfillmentDateSql} IS NOT NULL
+        AND ${fulfillmentDateSql} < ?
+      ORDER BY value DESC
+    `,
+    [completedFulfillmentCutoff]
+  );
+  const performanceMonths = monthRows.map((row) => row.value).filter(Boolean);
+  const trendModeKey = "__trend6__";
+  const isTrendMode = requestedMonth === trendModeKey && performanceMonths.length > 0;
+  const selectedMonth =
+    !isTrendMode && performanceMonths.includes(requestedMonth)
+      ? requestedMonth
+      : (performanceMonths[0] || "");
+  const trendMonths = isTrendMode ? performanceMonths.slice(0, 6).reverse() : [];
+  const trendWeeks = [];
+  if (isTrendMode && trendMonths.length) {
+    const earliestMonth = parseMonthKey(trendMonths[0]);
+    const latestMonth = parseMonthKey(trendMonths[trendMonths.length - 1]);
+    if (earliestMonth && latestMonth) {
+      let currentWeekStart = startOfWeek(earliestMonth.start);
+      while (currentWeekStart < latestMonth.end) {
+        if (currentWeekStart <= latestCompletedWeekStart) {
+          trendWeeks.push({
+            weekStart: formatDateKey(currentWeekStart),
+            month: formatMonthKey(currentWeekStart)
+          });
+        }
+        currentWeekStart = addDays(currentWeekStart, 7);
+      }
+    }
+  }
+  const monthsForData = isTrendMode
+    ? performanceMonths.slice(0, 6)
+    : [selectedMonth].filter(Boolean);
+
+  let rankedSites = [];
+  if (monthsForData.length) {
+    const monthPlaceholders = monthsForData.map(() => "?").join(", ");
+    const [orderRows] = await pool.query(
+      `
+        SELECT
+          ${fulfillmentStrategyIdSql} AS fulfillmentStrategyId,
+          ${fulfillmentSiteSql} AS fulfillmentSiteName,
+          ${fulfillmentDateSql} AS fulfillmentDate
+        FROM local_line_orders o
+        LEFT JOIN drop_sites ds
+          ON ds.local_line_fulfillment_strategy_id = ${fulfillmentStrategyIdSql}
+        WHERE ${fulfillmentDateSql} IS NOT NULL
+          AND ${fulfillmentDateSql} < ?
+          AND DATE_FORMAT(${fulfillmentDateSql}, '%Y-%m') IN (${monthPlaceholders})
+      `,
+      [completedFulfillmentCutoff, ...monthsForData]
+    );
+
+    const orderGroupsByKeyMonth = new Map();
+
+    for (const row of orderRows) {
+      const siteName = String(row.fulfillmentSiteName || "Unassigned").trim();
+      const fulfillmentDate = toDateOrNull(row.fulfillmentDate);
+      const strategyId = Number(row.fulfillmentStrategyId || 0);
+      const monthKey = formatMonthKey(fulfillmentDate);
+      const siteKey = strategyId > 0 ? `id:${strategyId}` : `name:${siteName}`;
+      const bucketKey = `${siteKey}|${monthKey}`;
+      const existing = orderGroupsByKeyMonth.get(bucketKey) || [];
+      existing.push({ fulfillmentDate });
+      orderGroupsByKeyMonth.set(bucketKey, existing);
+    }
+
+    rankedSites = visibleDropSites
+      .map((site) => {
+        const strategyId = Number(site.localLineFulfillmentStrategyId || 0);
+        const siteKey = strategyId > 0 ? `id:${strategyId}` : `name:${site.name}`;
+        const trendSeries = isTrendMode
+          ? trendWeeks
+              .map((week) => {
+              const weekStart = toDateOrNull(week.weekStart);
+              const weekEnd = addDays(weekStart, 7);
+              const monthKey = formatMonthKey(weekStart);
+              const groupedRows = orderGroupsByKeyMonth.get(`${siteKey}|${monthKey}`) || [];
+              const fulfillmentDates = groupedRows
+                .map((row) => row.fulfillmentDate)
+                .filter((value) => isDateInRange(value, weekStart, weekEnd));
+              const orderCount = fulfillmentDates.length;
+              const scheduledDrops = getDropSiteScheduledDropCountForRange(
+                site,
+                weekStart,
+                weekEnd,
+                fulfillmentDates
+              );
+              const averageWeeklyOrders =
+                scheduledDrops > 0 ? Number((orderCount / scheduledDrops).toFixed(2)) : 0;
+              return {
+                weekStart: week.weekStart,
+                month: week.month,
+                orderCount,
+                scheduledDrops,
+                averageWeeklyOrders,
+                performanceTier: getDropSitePerformanceTier(averageWeeklyOrders)
+              };
+            })
+              .filter((entry) => {
+                const weekStart = toDateOrNull(entry.weekStart);
+                return weekStart instanceof Date && weekStart <= latestCompletedWeekStart;
+              })
+          : monthsForData.map((monthKey) => {
+              const groupedRows = orderGroupsByKeyMonth.get(`${siteKey}|${monthKey}`) || [];
+              const fulfillmentDates = groupedRows.map((row) => row.fulfillmentDate).filter(Boolean);
+              const orderCount = groupedRows.length;
+              const monthInfo = parseMonthKey(monthKey);
+              const rangeEnd =
+                monthInfo && monthInfo.end > completedFulfillmentCutoff
+                  ? completedFulfillmentCutoff
+                  : monthInfo?.end || null;
+              const scheduledDrops =
+                monthInfo && rangeEnd && rangeEnd > monthInfo.start
+                  ? getDropSiteScheduledDropCountForRange(
+                      site,
+                      monthInfo.start,
+                      rangeEnd,
+                      fulfillmentDates
+                    )
+                  : 0;
+              const averageWeeklyOrders =
+                scheduledDrops > 0 ? Number((orderCount / scheduledDrops).toFixed(2)) : 0;
+              return {
+                month: monthKey,
+                orderCount,
+                scheduledDrops,
+                averageWeeklyOrders,
+                performanceTier: getDropSitePerformanceTier(averageWeeklyOrders)
+              };
+            });
+
+        const totalOrderCount = trendSeries.reduce((sum, entry) => sum + Number(entry.orderCount || 0), 0);
+        const totalScheduledDrops = trendSeries.reduce((sum, entry) => sum + Number(entry.scheduledDrops || 0), 0);
+        const averageWeeklyOrders =
+          totalScheduledDrops > 0
+            ? Number((totalOrderCount / totalScheduledDrops).toFixed(2))
+            : 0;
+        const latestAverageWeeklyOrders = Number(
+          trendSeries[trendSeries.length - 1]?.averageWeeklyOrders || 0
+        );
+
+        return {
+          id: site.id,
+          name: site.name,
+          source: site.source,
+          active: site.active,
+          localLineFulfillmentStrategyId: site.localLineFulfillmentStrategyId,
+          orderCount: totalOrderCount,
+          scheduledDrops: totalScheduledDrops,
+          averageWeeklyOrders,
+          latestAverageWeeklyOrders,
+          thresholdMet: (isTrendMode ? latestAverageWeeklyOrders : averageWeeklyOrders) >= 4,
+          performanceTier: getDropSitePerformanceTier(
+            isTrendMode ? latestAverageWeeklyOrders : averageWeeklyOrders
+          ),
+          trendSeries
+        };
+      })
+      .sort((left, right) => {
+        const leftSortValue = isTrendMode
+          ? Number(left.latestAverageWeeklyOrders || 0)
+          : Number(left.averageWeeklyOrders || 0);
+        const rightSortValue = isTrendMode
+          ? Number(right.latestAverageWeeklyOrders || 0)
+          : Number(right.averageWeeklyOrders || 0);
+        if (rightSortValue !== leftSortValue) {
+          return rightSortValue - leftSortValue;
+        }
+        if (right.averageWeeklyOrders !== left.averageWeeklyOrders) {
+          return right.averageWeeklyOrders - left.averageWeeklyOrders;
+        }
+        if (right.orderCount !== left.orderCount) {
+          return right.orderCount - left.orderCount;
+        }
+        return String(left.name || "").localeCompare(String(right.name || ""));
+      });
+  }
+
+  res.json({
+    dropSites: visibleDropSites,
+    performance: {
+      mode: isTrendMode ? "trend6" : "month",
+      selectedMonth: isTrendMode ? trendModeKey : selectedMonth,
+      months: performanceMonths,
+      trendMonths,
+      trendWeeks,
+      thresholdAverage: 4,
+      strongAverage: 5,
+      rankedSites
+    }
+  });
+});
+
+router.get("/localline/pull-jobs", requireAdmin, (_req, res) => {
+  return res.json({ jobs: getLatestLocalLinePullJobs() });
+});
+
+router.get("/localline/pull-jobs/:jobId", requireAdmin, (req, res) => {
+  const job = getLocalLinePullJob(req.params.jobId);
+  if (!job) {
+    return res.status(404).json({ error: "Local Line pull job not found" });
+  }
+  return res.json({ job });
+});
+
+router.get("/localline/pull-jobs/latest/:datasetKey", requireAdmin, (req, res) => {
+  const job = getLatestLocalLinePullJob(req.params.datasetKey);
+  if (!job) {
+    return res.status(404).json({ error: "No Local Line pull job found for this dataset" });
+  }
+  return res.json({ job });
+});
+
+router.get("/localline/status", requireAdmin, async (_req, res) => {
+  await ensureLocalLineSyncSchema().catch((error) => {
+    console.warn("Local Line schema bootstrap skipped for /admin/localline/status:", error.message);
+  });
+
   const db = getDb();
-  const rows = await db.select().from(dropSites);
-  res.json({ dropSites: rows });
+  const pool = getPool();
+  const [productSummaryRows] = await pool.query(
+    `
+      SELECT
+        COUNT(*) AS cachedProducts,
+        MAX(last_synced_at) AS lastSyncedAt
+      FROM local_line_product_meta
+    `
+  );
+  const [syncIssueRows] = await pool.query(
+    `
+      SELECT COUNT(*) AS syncIssues
+      FROM local_line_sync_issues
+      WHERE resolved_at IS NULL
+    `
+  );
+  const [dropSiteSummaryRows] = await pool.query(
+    `
+      SELECT
+        COUNT(*) AS totalRows,
+        SUM(CASE WHEN active = 1 THEN 1 ELSE 0 END) AS activeRows,
+        MAX(last_synced_at) AS lastSyncedAt
+      FROM drop_sites
+      WHERE source = 'localline'
+    `
+  );
+  const [orderSummaryRows] = await pool.query(
+    `
+      SELECT
+        COUNT(*) AS totalRows,
+        MAX(created_at_remote) AS latestCreatedAt,
+        MAX(updated_at_remote) AS latestUpdatedAt,
+        MAX(last_synced_at) AS lastSyncedAt
+      FROM local_line_orders
+    `
+  );
+  const [recentOrders] = await pool.query(
+    `
+      SELECT
+        local_line_order_id AS localLineOrderId,
+        created_at_remote AS createdAtRemote,
+        updated_at_remote AS updatedAtRemote,
+        status,
+        price_list_name AS priceListName,
+        customer_name AS customerName,
+        total,
+        product_count AS productCount
+      FROM local_line_orders
+      ORDER BY created_at_remote DESC, local_line_order_id DESC
+      LIMIT 10
+    `
+  );
+  const cursorRows = await db.select().from(localLineSyncCursors);
+  const cursorByKey = Object.fromEntries(
+    cursorRows.map((row) => [
+      row.syncKey,
+      {
+        cursorValue: row.cursorValue,
+        syncedThroughAt: row.syncedThroughAt,
+        lastStartedAt: row.lastStartedAt,
+        lastFinishedAt: row.lastFinishedAt,
+        lastStatus: row.lastStatus,
+        lastMessage: row.lastMessage,
+        summaryJson: row.summaryJson
+      }
+    ])
+  );
+
+  return res.json({
+    products: {
+      cachedProducts: Number(productSummaryRows?.[0]?.cachedProducts || 0),
+      lastSyncedAt: productSummaryRows?.[0]?.lastSyncedAt || null,
+      syncIssues: Number(syncIssueRows?.[0]?.syncIssues || 0),
+      latestJob: getLatestLocalLineFullSyncJob()
+    },
+    fulfillments: {
+      totalRows: Number(dropSiteSummaryRows?.[0]?.totalRows || 0),
+      activeRows: Number(dropSiteSummaryRows?.[0]?.activeRows || 0),
+      lastSyncedAt: dropSiteSummaryRows?.[0]?.lastSyncedAt || null,
+      cursor: cursorByKey.fulfillments || null,
+      latestJob: getLatestLocalLinePullJob("fulfillments")
+    },
+    orders: {
+      totalRows: Number(orderSummaryRows?.[0]?.totalRows || 0),
+      latestCreatedAt: orderSummaryRows?.[0]?.latestCreatedAt || null,
+      latestUpdatedAt: orderSummaryRows?.[0]?.latestUpdatedAt || null,
+      lastSyncedAt: orderSummaryRows?.[0]?.lastSyncedAt || null,
+      cursor: cursorByKey.orders || null,
+      latestJob: getLatestLocalLinePullJob("orders"),
+      recentOrders
+    }
+  });
+});
+
+router.get("/orders", requireAdmin, async (req, res) => {
+  await ensureLocalLineSyncSchema().catch((error) => {
+    console.warn("Local Line schema bootstrap skipped for /admin/orders:", error.message);
+  });
+
+  const pool = getPool();
+  const search = String(req.query?.search || "").trim();
+  const fulfillmentSite = String(req.query?.fulfillmentSite || "").trim();
+  const vendor = String(req.query?.vendor || "").trim();
+  const category = String(req.query?.category || "").trim();
+  const status = String(req.query?.status || "").trim();
+  const paymentStatus = String(req.query?.paymentStatus || "").trim();
+  const month = String(req.query?.month || "").trim();
+  const cycle = String(req.query?.cycle || "").trim();
+  const requestedPageSize = parsePositiveInteger(req.query?.pageSize, PRICELIST_DEFAULT_PAGE_SIZE);
+  const pageSize = Math.min(PRICELIST_MAX_PAGE_SIZE, Math.max(1, requestedPageSize));
+  const requestedPage = parsePositiveInteger(req.query?.page, 1);
+  const cycleSql = getOrderCycleSql("o");
+  const fulfillmentStrategyIdSql = getFulfillmentStrategyIdSql("o");
+  const fulfillmentTypeSql = getFulfillmentTypeSql("o");
+  const fulfillmentStatusSql = getFulfillmentStatusSql("o");
+  const fulfillmentDateSql = getFulfillmentDateSql("o");
+  const pickupStartTimeSql = getPickupTimeSql("o", "pickup_start_time");
+  const pickupEndTimeSql = getPickupTimeSql("o", "pickup_end_time");
+  const fulfillmentSiteSql = getFulfillmentSiteNameSql("o", "ds");
+  const whereClauses = [];
+  const whereParams = [];
+
+  if (search) {
+    whereClauses.push(
+      "(" +
+        "CAST(o.local_line_order_id AS CHAR) LIKE ? " +
+        "OR COALESCE(o.customer_name, '') LIKE ? " +
+        `OR ${fulfillmentSiteSql} LIKE ? ` +
+        "OR COALESCE(o.price_list_name, '') LIKE ?" +
+      ")"
+    );
+    const searchLike = `%${search}%`;
+    whereParams.push(searchLike, searchLike, searchLike, searchLike);
+  }
+  if (fulfillmentSite) {
+    whereClauses.push(`${fulfillmentSiteSql} = ?`);
+    whereParams.push(fulfillmentSite);
+  }
+  if (vendor) {
+    whereClauses.push(
+      `EXISTS (
+        SELECT 1
+        FROM local_line_order_entries e
+        WHERE e.local_line_order_id = o.local_line_order_id
+          AND COALESCE(e.vendor_name, '') = ?
+      )`
+    );
+    whereParams.push(vendor);
+  }
+  if (category) {
+    whereClauses.push(
+      `EXISTS (
+        SELECT 1
+        FROM local_line_order_entries e
+        WHERE e.local_line_order_id = o.local_line_order_id
+          AND COALESCE(e.category_name, '') = ?
+      )`
+    );
+    whereParams.push(category);
+  }
+  if (status) {
+    whereClauses.push("COALESCE(o.status, '') = ?");
+    whereParams.push(status);
+  }
+  if (paymentStatus) {
+    whereClauses.push("COALESCE(o.payment_status, '') = ?");
+    whereParams.push(paymentStatus);
+  }
+  if (month) {
+    whereClauses.push("DATE_FORMAT(o.created_at_remote, '%Y-%m') = ?");
+    whereParams.push(month);
+  }
+  if (cycle === "tuesday" || cycle === "fridaySaturday") {
+    whereClauses.push(`${cycleSql.cycleType} = ?`);
+    whereParams.push(cycle);
+  }
+
+  const whereSql = whereClauses.length ? `WHERE ${whereClauses.join(" AND ")}` : "";
+  const [[countRow]] = await pool.query(
+    `
+      SELECT COUNT(*) AS totalRows
+      FROM local_line_orders o
+      LEFT JOIN drop_sites ds
+        ON ds.local_line_fulfillment_strategy_id = ${fulfillmentStrategyIdSql}
+      ${whereSql}
+    `,
+    whereParams
+  );
+  const totalRows = Number(countRow?.totalRows || 0);
+  const totalPages = Math.max(1, Math.ceil(totalRows / pageSize));
+  const page = Math.min(requestedPage, totalPages);
+  const offset = (page - 1) * pageSize;
+
+  const [orderRows] = await pool.query(
+    `
+      SELECT
+        o.local_line_order_id AS localLineOrderId,
+        o.created_at_remote AS createdAtRemote,
+        o.updated_at_remote AS updatedAtRemote,
+        o.opened_at_remote AS openedAtRemote,
+        ${fulfillmentStrategyIdSql} AS fulfillmentStrategyId,
+        ${fulfillmentSiteSql} AS fulfillmentStrategyName,
+        ${fulfillmentTypeSql} AS fulfillmentType,
+        ${fulfillmentStatusSql} AS fulfillmentStatus,
+        ${fulfillmentDateSql} AS fulfillmentDate,
+        ${pickupStartTimeSql} AS pickupStartTime,
+        ${pickupEndTimeSql} AS pickupEndTime,
+        o.customer_name AS customerName,
+        o.status,
+        o.payment_status AS paymentStatus,
+        o.price_list_name AS priceListName,
+        o.total,
+        o.subtotal,
+        o.tax,
+        o.discount,
+        o.product_count AS productCount,
+        ${cycleSql.cycleType} AS cycleType,
+        ${cycleSql.cycleLabel} AS cycleLabel,
+        ${cycleSql.cycleStartDate} AS cycleStartDate
+      FROM local_line_orders o
+      LEFT JOIN drop_sites ds
+        ON ds.local_line_fulfillment_strategy_id = ${fulfillmentStrategyIdSql}
+      ${whereSql}
+      ORDER BY o.created_at_remote DESC, o.local_line_order_id DESC
+      LIMIT ? OFFSET ?
+    `,
+    [...whereParams, pageSize, offset]
+  );
+
+  const [siteRows] = await pool.query(
+    `
+      SELECT
+        ${fulfillmentSiteSql} AS value,
+        COUNT(*) AS orderCount
+      FROM local_line_orders o
+      LEFT JOIN drop_sites ds
+        ON ds.local_line_fulfillment_strategy_id = ${fulfillmentStrategyIdSql}
+      WHERE ${fulfillmentSiteSql} <> 'Unassigned'
+      GROUP BY ${fulfillmentSiteSql}
+      ORDER BY orderCount DESC, value ASC
+    `
+  );
+  const [statusRows] = await pool.query(
+    `
+      SELECT DISTINCT status AS value
+      FROM local_line_orders
+      WHERE status IS NOT NULL
+        AND TRIM(status) <> ''
+      ORDER BY status ASC
+    `
+  );
+  const [paymentStatusRows] = await pool.query(
+    `
+      SELECT DISTINCT payment_status AS value
+      FROM local_line_orders
+      WHERE payment_status IS NOT NULL
+        AND TRIM(payment_status) <> ''
+      ORDER BY payment_status ASC
+    `
+  );
+  const [monthRows] = await pool.query(
+    `
+      SELECT DISTINCT DATE_FORMAT(created_at_remote, '%Y-%m') AS value
+      FROM local_line_orders
+      WHERE created_at_remote IS NOT NULL
+      ORDER BY value DESC
+    `
+  );
+  const [vendorRows] = await pool.query(
+    `
+      SELECT DISTINCT vendor_name AS value
+      FROM local_line_order_entries
+      WHERE vendor_name IS NOT NULL
+        AND TRIM(vendor_name) <> ''
+      ORDER BY vendor_name ASC
+    `
+  );
+  const [categoryRows] = await pool.query(
+    `
+      SELECT DISTINCT category_name AS value
+      FROM local_line_order_entries
+      WHERE category_name IS NOT NULL
+        AND TRIM(category_name) <> ''
+      ORDER BY category_name ASC
+    `
+  );
+
+  const [[summaryRow]] = await pool.query(
+    `
+      SELECT
+        COUNT(*) AS orderCount,
+        COUNT(DISTINCT COALESCE(customer_id, 0), COALESCE(customer_name, '')) AS customerCount,
+        COALESCE(SUM(total), 0) AS revenue,
+        COALESCE(AVG(total), 0) AS averageOrderValue
+      FROM local_line_orders o
+      LEFT JOIN drop_sites ds
+        ON ds.local_line_fulfillment_strategy_id = ${fulfillmentStrategyIdSql}
+      ${whereSql}
+    `,
+    whereParams
+  );
+
+  const metricsMonth =
+    month ||
+    monthRows.map((row) => row.value).find(Boolean) ||
+    "";
+
+  const [monthlyTrendRows] = await pool.query(
+    `
+      SELECT
+        DATE_FORMAT(o.created_at_remote, '%Y-%m') AS month,
+        COUNT(*) AS orderCount,
+        COALESCE(SUM(o.total), 0) AS revenue,
+        COUNT(DISTINCT ${fulfillmentSiteSql}) AS siteCount
+      FROM local_line_orders o
+      LEFT JOIN drop_sites ds
+        ON ds.local_line_fulfillment_strategy_id = ${fulfillmentStrategyIdSql}
+      GROUP BY DATE_FORMAT(o.created_at_remote, '%Y-%m')
+      ORDER BY month DESC
+      LIMIT 6
+    `
+  );
+
+  return res.json({
+    orders: orderRows,
+    pagination: {
+      page,
+      pageSize,
+      totalRows,
+      totalPages
+    },
+    filters: {
+      fulfillmentSites: siteRows.map((row) => row.value).filter(Boolean),
+      vendors: vendorRows.map((row) => row.value).filter(Boolean),
+      categories: categoryRows.map((row) => row.value).filter(Boolean),
+      statuses: statusRows.map((row) => row.value).filter(Boolean),
+      paymentStatuses: paymentStatusRows.map((row) => row.value).filter(Boolean),
+      months: monthRows.map((row) => row.value).filter(Boolean)
+    },
+    metrics: {
+      overview: {
+        orderCount: Number(summaryRow?.orderCount || 0),
+        customerCount: Number(summaryRow?.customerCount || 0),
+        revenue: Number(summaryRow?.revenue || 0),
+        averageOrderValue: Number(summaryRow?.averageOrderValue || 0)
+      },
+      metricsMonth,
+      monthlyTrend: monthlyTrendRows.map((row) => ({
+        month: row.month,
+        orderCount: Number(row.orderCount || 0),
+        revenue: Number(row.revenue || 0),
+        siteCount: Number(row.siteCount || 0)
+      }))
+    }
+  });
+});
+
+router.get("/orders/:id", requireAdmin, async (req, res) => {
+  await ensureLocalLineSyncSchema().catch((error) => {
+    console.warn("Local Line schema bootstrap skipped for /admin/orders/:id:", error.message);
+  });
+
+  const orderId = Number(req.params.id);
+  if (!Number.isFinite(orderId)) {
+    return res.status(400).json({ error: "Invalid order id" });
+  }
+
+  const pool = getPool();
+  const [orderRows] = await pool.query(
+    `
+      SELECT
+        o.*,
+        ${getFulfillmentStrategyIdSql("o")} AS normalized_fulfillment_strategy_id,
+        ${getFulfillmentTypeSql("o")} AS normalized_fulfillment_type,
+        ${getFulfillmentStatusSql("o")} AS normalized_fulfillment_status,
+        ${getFulfillmentDateSql("o")} AS normalized_fulfillment_date,
+        ${getPickupTimeSql("o", "pickup_start_time")} AS normalized_pickup_start_time,
+        ${getPickupTimeSql("o", "pickup_end_time")} AS normalized_pickup_end_time,
+        ${getFulfillmentSiteNameSql("o", "ds")} AS normalized_fulfillment_strategy_name
+      FROM local_line_orders
+      o LEFT JOIN drop_sites ds
+        ON ds.local_line_fulfillment_strategy_id = ${getFulfillmentStrategyIdSql("o")}
+      WHERE local_line_order_id = ?
+      LIMIT 1
+    `,
+    [orderId]
+  );
+  const order = orderRows[0] || null;
+  if (!order) {
+    return res.status(404).json({ error: "Order not found" });
+  }
+
+  const [entryRows] = await pool.query(
+    `
+      SELECT
+        local_line_order_entry_id AS localLineOrderEntryId,
+        product_id AS productId,
+        product_name AS productName,
+        package_name AS packageName,
+        vendor_id AS vendorId,
+        vendor_name AS vendorName,
+        category_name AS categoryName,
+        unit_quantity AS unitQuantity,
+        inventory_quantity AS inventoryQuantity,
+        price,
+        total_price AS totalPrice,
+        price_per_unit AS pricePerUnit,
+        charge_type AS chargeType,
+        track_type AS trackType,
+        pack_weight AS packWeight,
+        raw_json AS rawJson
+      FROM local_line_order_entries
+      WHERE local_line_order_id = ?
+      ORDER BY vendor_name ASC, product_name ASC, local_line_order_entry_id ASC
+    `,
+    [orderId]
+  );
+
+  return res.json({
+    order: {
+      localLineOrderId: order.local_line_order_id,
+      status: order.status,
+      priceListId: order.price_list_id,
+      priceListName: order.price_list_name,
+      customerId: order.customer_id,
+      customerName: order.customer_name,
+      createdAtRemote: order.created_at_remote,
+      updatedAtRemote: order.updated_at_remote,
+      openedAtRemote: order.opened_at_remote,
+      fulfillmentStrategyId: order.normalized_fulfillment_strategy_id,
+      fulfillmentStrategyName: order.normalized_fulfillment_strategy_name,
+      fulfillmentType: order.normalized_fulfillment_type,
+      fulfillmentStatus: order.normalized_fulfillment_status,
+      fulfillmentDate: order.normalized_fulfillment_date,
+      pickupStartTime: order.normalized_pickup_start_time,
+      pickupEndTime: order.normalized_pickup_end_time,
+      paymentStatus: order.payment_status,
+      subtotal: order.subtotal,
+      tax: order.tax,
+      total: order.total,
+      discount: order.discount,
+      productCount: order.product_count,
+      rawJson: order.raw_json || null,
+      lastSyncedAt: order.last_synced_at || null
+    },
+    entries: entryRows
+  });
+});
+
+router.post("/localline/fulfillment-sync", requireAdminPermission(["dropsite_admin", "localline_pull"]), async (_req, res) => {
+  if (!isLocalLineEnabled()) {
+    return res.status(400).json({ error: "Local Line is not configured" });
+  }
+
+  await ensureLocalLineSyncSchema().catch((error) => {
+    console.warn("Local Line schema bootstrap skipped for /admin/localline/fulfillment-sync:", error.message);
+  });
+
+  const result = startLocalLinePullJob({
+    datasetKey: "fulfillments",
+    datasetLabel: "Local Line fulfillment sync",
+    phases: LOCAL_LINE_FULFILLMENT_JOB_PHASES,
+    run: ({ reportProgress }) => syncLocalLineFulfillmentStrategiesToStore({ reportProgress })
+  });
+
+  return res.status(result.alreadyRunning ? 200 : 202).json(result);
+});
+
+router.post("/localline/orders-sync", requireAdminPermission("localline_pull"), async (req, res) => {
+  if (!isLocalLineEnabled()) {
+    return res.status(400).json({ error: "Local Line is not configured" });
+  }
+
+  await ensureLocalLineSyncSchema().catch((error) => {
+    console.warn("Local Line schema bootstrap skipped for /admin/localline/orders-sync:", error.message);
+  });
+
+  const cutoffDate =
+    toDateOrNull(req.body?.cutoffDate) || new Date("2026-01-01T00:00:00.000Z");
+
+  const result = startLocalLinePullJob({
+    datasetKey: "orders",
+    datasetLabel: "Local Line order sync",
+    phases: LOCAL_LINE_ORDER_JOB_PHASES,
+    run: ({ reportProgress }) =>
+      syncLocalLineOrdersToStore({
+        reportProgress,
+        cutoffDate
+      })
+  });
+
+  return res.status(result.alreadyRunning ? 200 : 202).json(result);
 });
 
 router.get("/reviews", requireAdmin, async (_req, res) => {

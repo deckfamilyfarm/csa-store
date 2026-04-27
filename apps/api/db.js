@@ -197,6 +197,76 @@ const LOCAL_LINE_TABLE_STATEMENTS = [
       created_at DATETIME,
       updated_at DATETIME
     )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS local_line_orders (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      local_line_order_id INT NOT NULL,
+      status VARCHAR(64),
+      price_list_id INT,
+      price_list_name VARCHAR(255),
+      customer_id INT,
+      customer_name VARCHAR(255),
+      created_at_remote DATETIME,
+      updated_at_remote DATETIME,
+      opened_at_remote DATETIME,
+      fulfillment_strategy_id INT,
+      fulfillment_strategy_name VARCHAR(255),
+      fulfillment_type VARCHAR(64),
+      fulfillment_status VARCHAR(64),
+      fulfillment_date DATETIME,
+      pickup_start_time VARCHAR(32),
+      pickup_end_time VARCHAR(32),
+      payment_status VARCHAR(64),
+      subtotal DECIMAL(10, 2),
+      tax DECIMAL(10, 2),
+      total DECIMAL(10, 2),
+      discount DECIMAL(10, 2),
+      product_count INT,
+      raw_json TEXT,
+      created_at DATETIME,
+      updated_at DATETIME,
+      last_synced_at DATETIME
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS local_line_order_entries (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      local_line_order_entry_id INT NOT NULL,
+      local_line_order_id INT NOT NULL,
+      product_id INT,
+      product_name VARCHAR(255),
+      package_name VARCHAR(255),
+      vendor_id INT,
+      vendor_name VARCHAR(255),
+      category_name VARCHAR(255),
+      unit_quantity DECIMAL(10, 3),
+      inventory_quantity DECIMAL(10, 3),
+      price DECIMAL(10, 2),
+      total_price DECIMAL(10, 2),
+      price_per_unit VARCHAR(64),
+      charge_type VARCHAR(64),
+      track_type VARCHAR(64),
+      pack_weight DECIMAL(10, 3),
+      raw_json TEXT,
+      created_at DATETIME,
+      updated_at DATETIME,
+      last_synced_at DATETIME
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS local_line_sync_cursors (
+      sync_key VARCHAR(64) PRIMARY KEY,
+      cursor_value VARCHAR(255),
+      synced_through_at DATETIME,
+      last_started_at DATETIME,
+      last_finished_at DATETIME,
+      last_status VARCHAR(32),
+      last_message TEXT,
+      summary_json TEXT,
+      created_at DATETIME,
+      updated_at DATETIME
+    )
   `
 ];
 
@@ -276,6 +346,54 @@ const LOCAL_LINE_INDEX_STATEMENTS = [
     tableName: "local_line_sync_issues",
     indexName: "idx_local_line_sync_issues_price_list",
     columns: "price_list_id"
+  },
+  {
+    tableName: "drop_sites",
+    indexName: "ux_drop_sites_local_line_fulfillment",
+    unique: true,
+    columns: "local_line_fulfillment_strategy_id"
+  },
+  {
+    tableName: "local_line_orders",
+    indexName: "ux_local_line_orders_remote_id",
+    unique: true,
+    columns: "local_line_order_id"
+  },
+  {
+    tableName: "local_line_orders",
+    indexName: "idx_local_line_orders_created_remote",
+    columns: "created_at_remote"
+  },
+  {
+    tableName: "local_line_orders",
+    indexName: "idx_local_line_orders_updated_remote",
+    columns: "updated_at_remote"
+  },
+  {
+    tableName: "local_line_orders",
+    indexName: "idx_local_line_orders_fulfillment_site",
+    columns: "fulfillment_strategy_name"
+  },
+  {
+    tableName: "local_line_order_entries",
+    indexName: "ux_local_line_order_entries_remote_id",
+    unique: true,
+    columns: "local_line_order_entry_id"
+  },
+  {
+    tableName: "local_line_order_entries",
+    indexName: "idx_local_line_order_entries_order",
+    columns: "local_line_order_id"
+  },
+  {
+    tableName: "local_line_order_entries",
+    indexName: "idx_local_line_order_entries_vendor",
+    columns: "vendor_name"
+  },
+  {
+    tableName: "local_line_order_entries",
+    indexName: "idx_local_line_order_entries_product",
+    columns: "product_name"
   }
 ];
 
@@ -349,6 +467,96 @@ const LOCAL_LINE_COLUMN_STATEMENTS = [
     tableName: "local_line_package_meta",
     columnName: "live_track_inventory",
     definition: "live_track_inventory TINYINT(1)"
+  },
+  {
+    tableName: "drop_sites",
+    columnName: "source",
+    definition: "source VARCHAR(32) DEFAULT 'local'"
+  },
+  {
+    tableName: "drop_sites",
+    columnName: "local_line_fulfillment_strategy_id",
+    definition: "local_line_fulfillment_strategy_id INT"
+  },
+  {
+    tableName: "drop_sites",
+    columnName: "type",
+    definition: "type VARCHAR(32)"
+  },
+  {
+    tableName: "drop_sites",
+    columnName: "fulfillment_type",
+    definition: "fulfillment_type VARCHAR(32)"
+  },
+  {
+    tableName: "drop_sites",
+    columnName: "timezone",
+    definition: "timezone VARCHAR(64)"
+  },
+  {
+    tableName: "drop_sites",
+    columnName: "latitude",
+    definition: "latitude DECIMAL(10, 7)"
+  },
+  {
+    tableName: "drop_sites",
+    columnName: "longitude",
+    definition: "longitude DECIMAL(10, 7)"
+  },
+  {
+    tableName: "drop_sites",
+    columnName: "instructions",
+    definition: "instructions TEXT"
+  },
+  {
+    tableName: "drop_sites",
+    columnName: "address_json",
+    definition: "address_json TEXT"
+  },
+  {
+    tableName: "drop_sites",
+    columnName: "availability_json",
+    definition: "availability_json TEXT"
+  },
+  {
+    tableName: "drop_sites",
+    columnName: "price_lists_json",
+    definition: "price_lists_json TEXT"
+  },
+  {
+    tableName: "drop_sites",
+    columnName: "raw_json",
+    definition: "raw_json TEXT"
+  },
+  {
+    tableName: "drop_sites",
+    columnName: "last_synced_at",
+    definition: "last_synced_at DATETIME"
+  },
+  {
+    tableName: "local_line_orders",
+    columnName: "fulfillment_strategy_id",
+    definition: "fulfillment_strategy_id INT"
+  },
+  {
+    tableName: "local_line_orders",
+    columnName: "fulfillment_strategy_name",
+    definition: "fulfillment_strategy_name VARCHAR(255)"
+  },
+  {
+    tableName: "local_line_orders",
+    columnName: "fulfillment_date",
+    definition: "fulfillment_date DATETIME"
+  },
+  {
+    tableName: "local_line_orders",
+    columnName: "pickup_start_time",
+    definition: "pickup_start_time VARCHAR(32)"
+  },
+  {
+    tableName: "local_line_orders",
+    columnName: "pickup_end_time",
+    definition: "pickup_end_time VARCHAR(32)"
   }
 ];
 

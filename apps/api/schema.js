@@ -164,14 +164,116 @@ export const reviews = mysqlTable("reviews", {
   updatedAt: datetime("updated_at")
 });
 
-export const dropSites = mysqlTable("drop_sites", {
-  id: int("id").autoincrement().primaryKey(),
-  name: varchar("name", { length: 255 }).notNull(),
-  address: text("address"),
-  dayOfWeek: varchar("day_of_week", { length: 16 }),
-  openTime: varchar("open_time", { length: 16 }),
-  closeTime: varchar("close_time", { length: 16 }),
-  active: tinyint("active").default(1),
+export const dropSites = mysqlTable(
+  "drop_sites",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    name: varchar("name", { length: 255 }).notNull(),
+    address: text("address"),
+    dayOfWeek: varchar("day_of_week", { length: 16 }),
+    openTime: varchar("open_time", { length: 16 }),
+    closeTime: varchar("close_time", { length: 16 }),
+    active: tinyint("active").default(1),
+    source: varchar("source", { length: 32 }).default("local"),
+    localLineFulfillmentStrategyId: int("local_line_fulfillment_strategy_id"),
+    type: varchar("type", { length: 32 }),
+    fulfillmentType: varchar("fulfillment_type", { length: 32 }),
+    timezone: varchar("timezone", { length: 64 }),
+    latitude: decimal("latitude", { precision: 10, scale: 7 }),
+    longitude: decimal("longitude", { precision: 10, scale: 7 }),
+    instructions: text("instructions"),
+    addressJson: text("address_json"),
+    availabilityJson: text("availability_json"),
+    priceListsJson: text("price_lists_json"),
+    rawJson: text("raw_json"),
+    createdAt: datetime("created_at"),
+    updatedAt: datetime("updated_at"),
+    lastSyncedAt: datetime("last_synced_at")
+  },
+  (table) => ({
+    localLineFulfillmentIdx: uniqueIndex("ux_drop_sites_local_line_fulfillment").on(
+      table.localLineFulfillmentStrategyId
+    )
+  })
+);
+
+export const localLineOrders = mysqlTable(
+  "local_line_orders",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    localLineOrderId: int("local_line_order_id").notNull(),
+    status: varchar("status", { length: 64 }),
+    priceListId: int("price_list_id"),
+    priceListName: varchar("price_list_name", { length: 255 }),
+    customerId: int("customer_id"),
+    customerName: varchar("customer_name", { length: 255 }),
+    createdAtRemote: datetime("created_at_remote"),
+    updatedAtRemote: datetime("updated_at_remote"),
+    openedAtRemote: datetime("opened_at_remote"),
+    fulfillmentStrategyId: int("fulfillment_strategy_id"),
+    fulfillmentStrategyName: varchar("fulfillment_strategy_name", { length: 255 }),
+    fulfillmentType: varchar("fulfillment_type", { length: 64 }),
+    fulfillmentStatus: varchar("fulfillment_status", { length: 64 }),
+    fulfillmentDate: datetime("fulfillment_date"),
+    pickupStartTime: varchar("pickup_start_time", { length: 32 }),
+    pickupEndTime: varchar("pickup_end_time", { length: 32 }),
+    paymentStatus: varchar("payment_status", { length: 64 }),
+    subtotal: decimal("subtotal", { precision: 10, scale: 2 }),
+    tax: decimal("tax", { precision: 10, scale: 2 }),
+    total: decimal("total", { precision: 10, scale: 2 }),
+    discount: decimal("discount", { precision: 10, scale: 2 }),
+    productCount: int("product_count"),
+    rawJson: text("raw_json"),
+    createdAt: datetime("created_at"),
+    updatedAt: datetime("updated_at"),
+    lastSyncedAt: datetime("last_synced_at")
+  },
+  (table) => ({
+    localLineOrderIdx: uniqueIndex("ux_local_line_orders_remote_id").on(table.localLineOrderId)
+  })
+);
+
+export const localLineOrderEntries = mysqlTable(
+  "local_line_order_entries",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    localLineOrderEntryId: int("local_line_order_entry_id").notNull(),
+    localLineOrderId: int("local_line_order_id").notNull(),
+    productId: int("product_id"),
+    productName: varchar("product_name", { length: 255 }),
+    packageName: varchar("package_name", { length: 255 }),
+    vendorId: int("vendor_id"),
+    vendorName: varchar("vendor_name", { length: 255 }),
+    categoryName: varchar("category_name", { length: 255 }),
+    unitQuantity: decimal("unit_quantity", { precision: 10, scale: 3 }),
+    inventoryQuantity: decimal("inventory_quantity", { precision: 10, scale: 3 }),
+    price: decimal("price", { precision: 10, scale: 2 }),
+    totalPrice: decimal("total_price", { precision: 10, scale: 2 }),
+    pricePerUnit: varchar("price_per_unit", { length: 64 }),
+    chargeType: varchar("charge_type", { length: 64 }),
+    trackType: varchar("track_type", { length: 64 }),
+    packWeight: decimal("pack_weight", { precision: 10, scale: 3 }),
+    rawJson: text("raw_json"),
+    createdAt: datetime("created_at"),
+    updatedAt: datetime("updated_at"),
+    lastSyncedAt: datetime("last_synced_at")
+  },
+  (table) => ({
+    localLineOrderEntryIdx: uniqueIndex("ux_local_line_order_entries_remote_id").on(
+      table.localLineOrderEntryId
+    )
+  })
+);
+
+export const localLineSyncCursors = mysqlTable("local_line_sync_cursors", {
+  syncKey: varchar("sync_key", { length: 64 }).primaryKey(),
+  cursorValue: varchar("cursor_value", { length: 255 }),
+  syncedThroughAt: datetime("synced_through_at"),
+  lastStartedAt: datetime("last_started_at"),
+  lastFinishedAt: datetime("last_finished_at"),
+  lastStatus: varchar("last_status", { length: 32 }),
+  lastMessage: text("last_message"),
+  summaryJson: text("summary_json"),
   createdAt: datetime("created_at"),
   updatedAt: datetime("updated_at")
 });

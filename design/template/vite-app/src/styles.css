@@ -1288,6 +1288,10 @@ img {
   margin-top: 0;
 }
 
+.orders-toolbar {
+  margin-top: 12px;
+}
+
 .pricelist-filters {
   margin-top: 0;
 }
@@ -1299,6 +1303,10 @@ img {
 
 .pricelist-filters .filter-field:not(.product-search-filter) {
   width: 180px;
+}
+
+.orders-filters .product-search-filter {
+  width: min(100%, 320px);
 }
 
 .pricelist-toolbar-actions {
@@ -1371,6 +1379,208 @@ img {
 .pricelist-page-meta {
   margin-right: 4px;
   white-space: nowrap;
+}
+
+.orders-summary-grid {
+  margin-top: 14px;
+}
+
+.orders-performance-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.orders-performance-card {
+  display: grid;
+  gap: 10px;
+}
+
+.orders-performance-list {
+  max-height: 360px;
+}
+
+.orders-trend-card {
+  margin-bottom: 16px;
+}
+
+.orders-table-shell {
+  margin-bottom: 16px;
+}
+
+.orders-row-selected td {
+  background: rgba(122, 155, 85, 0.1);
+}
+
+.orders-detail-card {
+  display: grid;
+  gap: 14px;
+}
+
+.orders-detail-meta {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.orders-entry-table-shell .admin-table-body-scroll {
+  max-height: min(44vh, 420px);
+}
+
+.drop-site-performance-card {
+  display: grid;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.drop-site-performance-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px 16px;
+}
+
+.drop-site-performance-controls .pricelist-page-size {
+  flex: 0 0 180px;
+}
+
+.drop-site-performance-chart {
+  display: grid;
+  gap: 10px;
+}
+
+.drop-site-performance-row {
+  display: grid;
+  grid-template-columns: 200px minmax(280px, 360px);
+  gap: 8px;
+  align-items: center;
+  justify-content: start;
+}
+
+.drop-site-performance-meta {
+  display: grid;
+  gap: 4px;
+  max-width: 200px;
+}
+
+.drop-site-filter-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  min-height: 40px;
+  white-space: nowrap;
+}
+
+.drop-site-filter-toggle input {
+  flex: 0 0 auto;
+}
+
+.drop-site-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.loading-spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  border: 2px solid rgba(31, 27, 23, 0.16);
+  border-top-color: var(--barn);
+  animation: admin-spin 0.8s linear infinite;
+}
+
+@keyframes admin-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.drop-site-performance-bar-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  width: min(360px, 100%);
+  justify-self: start;
+}
+
+.drop-site-performance-bar-shell {
+  position: relative;
+  width: 100%;
+  height: 16px;
+  border-radius: 999px;
+  background: rgba(31, 27, 23, 0.08);
+  overflow: hidden;
+}
+
+.drop-site-performance-bar {
+  height: 100%;
+  border-radius: inherit;
+}
+
+.drop-site-performance-bar.good {
+  background: linear-gradient(90deg, #5b8f3a 0%, #7db74e 100%);
+}
+
+.drop-site-performance-bar.warn {
+  background: linear-gradient(90deg, #c97c28 0%, #e7a445 100%);
+}
+
+.drop-site-performance-bar.bad {
+  background: linear-gradient(90deg, #b43b33 0%, #dc5b52 100%);
+}
+
+.drop-site-performance-warning {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  color: rgba(31, 27, 23, 0.62);
+  font-style: italic;
+  font-size: 12px;
+  line-height: 1;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.drop-site-trend-shell {
+  display: grid;
+  gap: 6px;
+  width: min(360px, 100%);
+  margin-left: 0;
+}
+
+.drop-site-trend-svg {
+  width: 100%;
+  height: 56px;
+  display: block;
+}
+
+.drop-site-trend-line {
+  stroke: #314c5b;
+  stroke-width: 2.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.drop-site-trend-dot.good {
+  fill: #6ca644;
+}
+
+.drop-site-trend-dot.warn {
+  fill: #d68b33;
+}
+
+.drop-site-trend-dot.bad {
+  fill: #cf4c45;
+  cursor: pointer;
 }
 
 .pricelist-page-buttons {
@@ -2290,5 +2500,23 @@ img {
 
   .audit-summary-grid {
     grid-template-columns: 1fr;
+  }
+
+  .orders-performance-grid,
+  .orders-detail-meta,
+  .drop-site-performance-row {
+    grid-template-columns: 1fr;
+  }
+
+  .drop-site-performance-controls {
+    align-items: stretch;
+  }
+
+  .drop-site-performance-controls .pricelist-page-size {
+    flex-basis: 100%;
+  }
+
+  .drop-site-filter-toggle {
+    white-space: normal;
   }
 }

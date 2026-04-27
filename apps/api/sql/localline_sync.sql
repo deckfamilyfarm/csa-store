@@ -212,3 +212,116 @@ CREATE INDEX IF NOT EXISTS idx_local_line_sync_issues_package
 
 CREATE INDEX IF NOT EXISTS idx_local_line_sync_issues_price_list
   ON local_line_sync_issues (price_list_id);
+
+CREATE TABLE IF NOT EXISTS local_line_orders (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  local_line_order_id INT NOT NULL,
+  status VARCHAR(64),
+  price_list_id INT,
+  price_list_name VARCHAR(255),
+  customer_id INT,
+  customer_name VARCHAR(255),
+  created_at_remote DATETIME,
+  updated_at_remote DATETIME,
+  opened_at_remote DATETIME,
+  fulfillment_strategy_id INT,
+  fulfillment_strategy_name VARCHAR(255),
+  fulfillment_type VARCHAR(64),
+  fulfillment_status VARCHAR(64),
+  fulfillment_date DATETIME,
+  pickup_start_time VARCHAR(32),
+  pickup_end_time VARCHAR(32),
+  payment_status VARCHAR(64),
+  subtotal DECIMAL(10, 2),
+  tax DECIMAL(10, 2),
+  total DECIMAL(10, 2),
+  discount DECIMAL(10, 2),
+  product_count INT,
+  raw_json TEXT,
+  created_at DATETIME,
+  updated_at DATETIME,
+  last_synced_at DATETIME
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_local_line_orders_remote_id
+  ON local_line_orders (local_line_order_id);
+
+CREATE INDEX IF NOT EXISTS idx_local_line_orders_created_remote
+  ON local_line_orders (created_at_remote);
+
+CREATE INDEX IF NOT EXISTS idx_local_line_orders_updated_remote
+  ON local_line_orders (updated_at_remote);
+
+CREATE INDEX IF NOT EXISTS idx_local_line_orders_fulfillment_site
+  ON local_line_orders (fulfillment_strategy_name);
+
+CREATE TABLE IF NOT EXISTS local_line_order_entries (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  local_line_order_entry_id INT NOT NULL,
+  local_line_order_id INT NOT NULL,
+  product_id INT,
+  product_name VARCHAR(255),
+  package_name VARCHAR(255),
+  vendor_id INT,
+  vendor_name VARCHAR(255),
+  category_name VARCHAR(255),
+  unit_quantity DECIMAL(10, 3),
+  inventory_quantity DECIMAL(10, 3),
+  price DECIMAL(10, 2),
+  total_price DECIMAL(10, 2),
+  price_per_unit VARCHAR(64),
+  charge_type VARCHAR(64),
+  track_type VARCHAR(64),
+  pack_weight DECIMAL(10, 3),
+  raw_json TEXT,
+  created_at DATETIME,
+  updated_at DATETIME,
+  last_synced_at DATETIME
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_local_line_order_entries_remote_id
+  ON local_line_order_entries (local_line_order_entry_id);
+
+CREATE INDEX IF NOT EXISTS idx_local_line_order_entries_order
+  ON local_line_order_entries (local_line_order_id);
+
+CREATE INDEX IF NOT EXISTS idx_local_line_order_entries_vendor
+  ON local_line_order_entries (vendor_name);
+
+CREATE INDEX IF NOT EXISTS idx_local_line_order_entries_product
+  ON local_line_order_entries (product_name);
+
+CREATE TABLE IF NOT EXISTS local_line_sync_cursors (
+  sync_key VARCHAR(64) PRIMARY KEY,
+  cursor_value VARCHAR(255),
+  synced_through_at DATETIME,
+  last_started_at DATETIME,
+  last_finished_at DATETIME,
+  last_status VARCHAR(32),
+  last_message TEXT,
+  summary_json TEXT,
+  created_at DATETIME,
+  updated_at DATETIME
+);
+
+ALTER TABLE drop_sites ADD COLUMN IF NOT EXISTS source VARCHAR(32) DEFAULT 'local';
+ALTER TABLE drop_sites ADD COLUMN IF NOT EXISTS local_line_fulfillment_strategy_id INT;
+ALTER TABLE drop_sites ADD COLUMN IF NOT EXISTS type VARCHAR(32);
+ALTER TABLE drop_sites ADD COLUMN IF NOT EXISTS fulfillment_type VARCHAR(32);
+ALTER TABLE drop_sites ADD COLUMN IF NOT EXISTS timezone VARCHAR(64);
+ALTER TABLE drop_sites ADD COLUMN IF NOT EXISTS latitude DECIMAL(10, 7);
+ALTER TABLE drop_sites ADD COLUMN IF NOT EXISTS longitude DECIMAL(10, 7);
+ALTER TABLE drop_sites ADD COLUMN IF NOT EXISTS instructions TEXT;
+ALTER TABLE drop_sites ADD COLUMN IF NOT EXISTS address_json TEXT;
+ALTER TABLE drop_sites ADD COLUMN IF NOT EXISTS availability_json TEXT;
+ALTER TABLE drop_sites ADD COLUMN IF NOT EXISTS price_lists_json TEXT;
+ALTER TABLE drop_sites ADD COLUMN IF NOT EXISTS raw_json TEXT;
+ALTER TABLE drop_sites ADD COLUMN IF NOT EXISTS last_synced_at DATETIME;
+ALTER TABLE local_line_orders ADD COLUMN IF NOT EXISTS fulfillment_strategy_id INT;
+ALTER TABLE local_line_orders ADD COLUMN IF NOT EXISTS fulfillment_strategy_name VARCHAR(255);
+ALTER TABLE local_line_orders ADD COLUMN IF NOT EXISTS fulfillment_date DATETIME;
+ALTER TABLE local_line_orders ADD COLUMN IF NOT EXISTS pickup_start_time VARCHAR(32);
+ALTER TABLE local_line_orders ADD COLUMN IF NOT EXISTS pickup_end_time VARCHAR(32);
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_drop_sites_local_line_fulfillment
+  ON drop_sites (local_line_fulfillment_strategy_id);

@@ -99,6 +99,37 @@ export function isLocalLineEnabled() {
   return isLocalLineAuthConfigured();
 }
 
+async function fetchLocalLineCollection(path, accessToken) {
+  const results = [];
+  let nextUrl = path.startsWith("http") ? path : `${LL_BASEURL}${path}`;
+
+  while (nextUrl) {
+    const response = await fetch(nextUrl, {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+    if (!response.ok) {
+      const body = await response.text();
+      throw new Error(`LocalLine collection fetch failed: ${response.status} ${body}`);
+    }
+
+    const payload = await response.json();
+    if (Array.isArray(payload?.results)) {
+      results.push(...payload.results);
+      nextUrl = payload.next || null;
+      continue;
+    }
+
+    if (Array.isArray(payload)) {
+      results.push(...payload);
+      break;
+    }
+
+    break;
+  }
+
+  return results;
+}
+
 async function fetchLocalLineProduct(productId, accessToken) {
   const url = `${LL_BASEURL}products/${productId}/?expand=packages,product_price_list_entries`;
   const response = await fetch(url, {
@@ -201,6 +232,32 @@ async function fetchLocalLineProductUnits(accessToken) {
   const payload = await response.json();
   cachedProductUnits = Array.isArray(payload?.results) ? payload.results : [];
   return cachedProductUnits;
+}
+
+export async function fetchAllLocalLineFulfillmentStrategies() {
+  const accessToken = await getLocalLineAccessToken();
+  return fetchLocalLineCollection("fulfillment-strategies/?page_size=100", accessToken);
+}
+
+export async function fetchLocalLineOrdersPage(options = {}) {
+  const accessToken = await getLocalLineAccessToken();
+  const page = Number.isFinite(options.page) ? options.page : 1;
+  const pageSize = Number.isFinite(options.pageSize) ? options.pageSize : 100;
+  const ordering = String(options.ordering || "-id").trim() || "-id";
+  const params = new URLSearchParams({
+    page: String(Math.max(1, page)),
+    page_size: String(Math.max(1, pageSize)),
+    ordering
+  });
+  const url = `${LL_BASEURL}orders/?${params.toString()}`;
+  const response = await fetch(url, {
+    headers: { Authorization: `Bearer ${accessToken}` }
+  });
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`LocalLine orders fetch failed: ${response.status} ${body}`);
+  }
+  return response.json();
 }
 
 function normalizeUnitLabel(value) {
