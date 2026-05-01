@@ -9,6 +9,7 @@ import {
   ensureAdminAccessSchema,
   ensureAdminPricelistIndexes,
   ensureLocalLineSyncSchema,
+  ensureProductPricingSchema,
   ensureVendorPricingSchema,
   getDb,
   getPool,
@@ -75,6 +76,9 @@ const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
 router.use(async (_req, _res, next) => {
+  await ensureProductPricingSchema().catch((error) => {
+    console.warn("Product pricing schema bootstrap skipped:", error.message);
+  });
   await ensureVendorPricingSchema().catch((error) => {
     console.warn("Vendor pricing schema bootstrap skipped:", error.message);
   });
@@ -212,6 +216,7 @@ async function syncVendorPricingDefaultsForProducts(connection, vendorRecord, de
   updates.push(
     "pp.remote_sync_status = 'pending'",
     "pp.remote_sync_message = 'Vendor pricing defaults updated. Apply to remote store pending.'",
+    "pp.price_changed_at = NOW()",
     "pp.updated_at = NOW()"
   );
   params.push(vendorId);
@@ -1197,6 +1202,7 @@ async function upsertProductPricingProfileRecord(connection, productId, payload 
               ? (existing?.source_multiplier ?? 0.5412)
               : normalized.sourceMultiplier
           ),
+    price_changed_at: now,
     remote_sync_status: "pending",
     remote_sync_message: "Local source pricing updated. Apply to remote store pending.",
     remote_synced_at: null,
@@ -1208,8 +1214,8 @@ async function upsertProductPricingProfileRecord(connection, productId, payload 
       `
         UPDATE product_pricing_profiles
         SET unit_of_measure = ?, source_unit_price = ?, min_weight = ?, max_weight = ?,
-            avg_weight_override = ?, source_multiplier = ?, remote_sync_status = ?,
-            remote_sync_message = ?, remote_synced_at = ?, updated_at = ?
+            avg_weight_override = ?, source_multiplier = ?, price_changed_at = ?,
+            remote_sync_status = ?, remote_sync_message = ?, remote_synced_at = ?, updated_at = ?
         WHERE product_id = ?
       `,
       [
@@ -1219,6 +1225,7 @@ async function upsertProductPricingProfileRecord(connection, productId, payload 
         record.max_weight,
         record.avg_weight_override,
         record.source_multiplier,
+        record.price_changed_at,
         record.remote_sync_status,
         record.remote_sync_message,
         record.remote_synced_at,
@@ -1233,9 +1240,9 @@ async function upsertProductPricingProfileRecord(connection, productId, payload 
     `
       INSERT INTO product_pricing_profiles (
         product_id, unit_of_measure, source_unit_price, min_weight, max_weight,
-        avg_weight_override, source_multiplier, on_sale, sale_discount,
+        avg_weight_override, source_multiplier, on_sale, sale_discount, price_changed_at,
         remote_sync_status, remote_sync_message, remote_synced_at, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `,
     [
       productId,
@@ -1247,6 +1254,7 @@ async function upsertProductPricingProfileRecord(connection, productId, payload 
       record.source_multiplier,
       0,
       0,
+      record.price_changed_at,
       record.remote_sync_status,
       record.remote_sync_message,
       record.remote_synced_at,
@@ -1413,8 +1421,8 @@ async function duplicateLocalProductRecord(connection, sourceProductId) {
         product_id, unit_of_measure, source_unit_price, min_weight, max_weight,
         avg_weight_override, source_multiplier, guest_markup, member_markup,
         herd_share_markup, snap_markup, on_sale, sale_discount,
-        remote_sync_status, remote_sync_message, remote_synced_at, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        price_changed_at, remote_sync_status, remote_sync_message, remote_synced_at, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `,
     [
       created.productId,
@@ -1432,6 +1440,7 @@ async function duplicateLocalProductRecord(connection, sourceProductId) {
       defaultCsaMarkup,
       profile ? profile.on_sale : (saleRows[0]?.on_sale ? 1 : 0),
       defaultSaleDiscount,
+      now,
       "pending",
       "Duplicate created with default CSA markup applied to all price lists. Apply to remote store pending.",
       null,
@@ -3336,6 +3345,7 @@ router.post("/pricelist/bulk-save", requireAdminPermission("pricing_admin"), asy
       snapMarkup: forceNoMarkup ? 0 : (vendorPriceListMarkup ?? toDbDecimal(row.snapMarkup)),
       onSale: row.onSale ? 1 : 0,
       saleDiscount: toDbDecimal(row.saleDiscount),
+      priceChangedAt: now,
       remoteSyncStatus: "pending",
       remoteSyncMessage: "Local pricing updated. Apply to remote store pending.",
       updatedAt: now
@@ -3482,6 +3492,7 @@ router.post("/pricelist/apply-remote", requireAdminPermission("localline_push"),
         snapMarkup: snapshot.profile.snapMarkup,
         onSale: snapshot.profile.onSale ? 1 : 0,
         saleDiscount: snapshot.profile.saleDiscount,
+        priceChangedAt: profileRows[0]?.priceChangedAt || profileRows[0]?.updatedAt || now,
         remoteSyncStatus: "applied",
         remoteSyncMessage: "Applied to store pricing and remote sync completed.",
         remoteSyncedAt: now,
@@ -5538,6 +5549,7 @@ router.post("/products/bulk-update", requireAdminPermission(["inventory_admin", 
         if (syncPricingProfileSale && saleChanged) {
           profileUpdatePayload.onSale = nextOnSale;
           profileUpdatePayload.saleDiscount = nextSaleDiscount;
+          profileUpdatePayload.priceChangedAt = new Date();
           if (!shouldQueueRemoteSync) {
             profileUpdatePayload.remoteSyncStatus = "pending";
             profileUpdatePayload.remoteSyncMessage = "Local sale updated. Apply to remote store pending.";

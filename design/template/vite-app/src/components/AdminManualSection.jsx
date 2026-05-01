@@ -108,12 +108,18 @@ export function AdminManualSection({ focusTopic = "overview" }) {
             Retail Price, the unit type, package quantity or weight, and the FFCSA Factor.
           </li>
           <li>
-            After the CSA Package Price is known, the app applies the adjustment for each price
-            list to calculate the customer-facing Adjusted Price.
+            The default markup for the price lists is now controlled from the <strong>Vendors</strong>
+            section. Each vendor can have a single default Pricelist Markup %, and that markup is
+            used across the customer price lists for that vendor&apos;s products.
           </li>
           <li>
-            If a sale is active, the sale discount is applied after the markup so the app can show
-            both the sale price and the regular price.
+            After the CSA Package Price is known, the app applies the vendor markup to calculate
+            the customer-facing Adjusted Price.
+          </li>
+          <li>
+            If a sale is active, the regular price is the current CSA Package Price plus markup,
+            and the sale discount is then applied to that regular price to get the final sell
+            price.
           </li>
         </ul>
         <p className="admin-manual-note">
@@ -132,6 +138,11 @@ export function AdminManualSection({ focusTopic = "overview" }) {
         </p>
         <ul className="admin-manual-list">
           <li>
+            <strong>Vendor defaults live in the Vendors tab.</strong> Set the vendor&apos;s default
+            Pricelist Markup % there, and for Deck Family Farm, Hyland, and Creamy Cow also set the
+            vendor&apos;s FFCSA Factor there.
+          </li>
+          <li>
             <strong>Vendor's Retail Price</strong> is the local retail price used for calculation.
           </li>
           <li>
@@ -143,11 +154,12 @@ export function AdminManualSection({ focusTopic = "overview" }) {
             you want the app to use a specific average weight.
           </li>
           <li>
-            <strong>FFCSA Factor</strong> converts the retail price into the CSA Package Price.
+            <strong>FFCSA Factor</strong> is the portion of the vendor retail price that becomes the
+            CSA base package price before markup.
           </li>
           <li>
-            <strong>Guest, Member, Herd Share, and SNAP adjustments</strong> then create the final
-            Adjusted Price for each price list.
+            <strong>Vendor markup</strong> then creates the final customer-facing price from that
+            CSA base package price.
           </li>
         </ul>
         <div className="admin-manual-callout">
@@ -177,18 +189,26 @@ export function AdminManualSection({ focusTopic = "overview" }) {
               <strong> CSA Package Price</strong>.
             </li>
             <li>
-              From that package price, the app applies the Guest, CSA Member, Herd Share, and SNAP
-              adjustments automatically to get each price list&apos;s <strong>Adjusted Price</strong>.
+              From that package price, the app applies the vendor&apos;s default
+              <strong> Pricelist Markup %</strong> to get each price list&apos;s
+              <strong> Adjusted Price</strong>.
             </li>
             <li>
-              If a sale is active, the sale discount is applied after the margin so the final sell
-              price and regular price both stay consistent.
+              If a sale is active for a vendor that uses an FFCSA Factor, the app shares the sale
+              cost with the vendor internally by lowering the CSA Package Price first, then applies
+              the full sale discount to the regular marked-up price to get the customer-facing sale
+              price.
             </li>
           </ol>
         </div>
         <p>
           If a package is priced by weight, the app uses the average weight to calculate its CSA
           Package Price. If a package is priced by count, the app uses the package quantity instead.
+        </p>
+        <p>
+          In Local Line, the strikethrough price represents the regular non-sale sell price for the
+          current CSA Package Price, and the live sale price reflects the reduced effective markup
+          needed to reach the true final sale price.
         </p>
         <p>
           Products with <strong>deposit</strong> in the product name are special no-markup items.
@@ -214,8 +234,8 @@ export function AdminManualSection({ focusTopic = "overview" }) {
             actions before local writes are approved.
           </li>
           <li>
-            <strong>Save Local Changes</strong> stores local pricing and product changes in this
-            application.
+            <strong>Apply Local Changes</strong> stores local pricing and product changes in this
+            application only.
           </li>
           <li>
             <strong>Push To Local Line</strong> sends approved local product and pricing changes to
@@ -244,7 +264,8 @@ export function AdminManualSection({ focusTopic = "overview" }) {
           </li>
           <li>
             For Deck Family Farm, Hyland, and Creamy Cow items, fill in the Vendor's Retail Price
-            fields before saving so the CSA Package Price and price-list adjusted prices can
+            fields and make sure the vendor&apos;s FFCSA Factor and Pricelist Markup % are correct in
+            the <strong>Vendors</strong> section before saving so the CSA Package Price and adjusted prices can
             calculate correctly.
           </li>
           <li>Review the calculated prices and any sale settings.</li>

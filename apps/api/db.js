@@ -10,6 +10,7 @@ let localLineSchemaPromise;
 let adminAccessSchemaPromise;
 let adminPricelistIndexesPromise;
 let vendorPricingSchemaPromise;
+let productPricingSchemaPromise;
 
 const SOURCE_PRICING_VENDOR_FACTOR_DEFAULT = 0.5412;
 
@@ -23,6 +24,14 @@ const VENDOR_PRICING_COLUMN_STATEMENTS = [
     tableName: "vendors",
     columnName: "source_multiplier",
     definition: "source_multiplier DECIMAL(10, 4)"
+  }
+];
+
+const PRODUCT_PRICING_COLUMN_STATEMENTS = [
+  {
+    tableName: "product_pricing_profiles",
+    columnName: "price_changed_at",
+    definition: "price_changed_at DATETIME"
   }
 ];
 
@@ -87,6 +96,7 @@ const LOCAL_LINE_TABLE_STATEMENTS = [
       snap_markup DECIMAL(10, 4),
       on_sale TINYINT(1) DEFAULT 0,
       sale_discount DECIMAL(5, 4),
+      price_changed_at DATETIME,
       remote_sync_status VARCHAR(32) DEFAULT 'pending',
       remote_sync_message TEXT,
       remote_synced_at DATETIME,
@@ -975,6 +985,46 @@ async function runVendorPricingSchemaBootstrap(connection) {
   }
 }
 
+async function runProductPricingSchemaBootstrap(connection) {
+  let addedColumn = false;
+  for (const columnDefinition of PRODUCT_PRICING_COLUMN_STATEMENTS) {
+    const exists = await columnExists(
+      connection,
+      columnDefinition.tableName,
+      columnDefinition.columnName
+    );
+    if (exists) continue;
+
+    await connection.query(
+      `ALTER TABLE ${columnDefinition.tableName} ADD COLUMN ${columnDefinition.definition}`
+    );
+    addedColumn = true;
+  }
+
+  if (addedColumn) {
+    await connection.query(
+      `
+        UPDATE product_pricing_profiles
+        SET price_changed_at = CASE
+          WHEN updated_at IS NOT NULL
+            AND updated_at >= (UTC_TIMESTAMP() - INTERVAL 14 DAY)
+            AND (
+              remote_sync_message = 'Local source pricing updated. Apply to remote store pending.'
+              OR remote_sync_message = 'Local pricing updated. Apply to remote store pending.'
+              OR remote_sync_message = 'Local sale updated. Apply to remote store pending.'
+              OR remote_sync_message = 'Duplicate created with default CSA markup applied to all price lists. Apply to remote store pending.'
+              OR remote_sync_message = 'Vendor pricing defaults updated. Apply to remote store pending.'
+              OR remote_sync_message = 'Applied to store pricing and remote sync completed.'
+            )
+            THEN updated_at
+          ELSE (UTC_TIMESTAMP() - INTERVAL 21 DAY)
+        END
+        WHERE price_changed_at IS NULL
+      `
+    );
+  }
+}
+
 export function initDb() {
   if (db) return db;
 
@@ -1056,6 +1106,20 @@ export async function ensureVendorPricingSchema(connection = getPool()) {
   }
 
   return runVendorPricingSchemaBootstrap(connection);
+}
+
+export async function ensureProductPricingSchema(connection = getPool()) {
+  if (connection === getPool()) {
+    if (!productPricingSchemaPromise) {
+      productPricingSchemaPromise = runProductPricingSchemaBootstrap(connection).catch((error) => {
+        productPricingSchemaPromise = null;
+        throw error;
+      });
+    }
+    return productPricingSchemaPromise;
+  }
+
+  return runProductPricingSchemaBootstrap(connection);
 }
 
 export function isMissingTableError(error, tableName = "") {

@@ -354,6 +354,7 @@ export const productPricingProfiles = mysqlTable("product_pricing_profiles", {
   snapMarkup: decimal("snap_markup", { precision: 10, scale: 4 }),
   onSale: tinyint("on_sale").default(0),
   saleDiscount: decimal("sale_discount", { precision: 5, scale: 4 }),
+  priceChangedAt: datetime("price_changed_at"),
   remoteSyncStatus: varchar("remote_sync_status", { length: 32 }).default("pending"),
   remoteSyncMessage: text("remote_sync_message"),
   remoteSyncedAt: datetime("remote_synced_at"),

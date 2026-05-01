@@ -16,7 +16,7 @@ import {
   computeProductPricingSnapshot,
   isSourcePricingVendor
 } from "../lib/productPricing.js";
-import { ensureLocalLineSyncSchema, getDb, isMissingTableError } from "../db.js";
+import { ensureLocalLineSyncSchema, ensureProductPricingSchema, getDb, isMissingTableError } from "../db.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,12 +30,12 @@ const ORDERED_COLUMN_NAMES = [
   "category",
   "vendor",
   "productName",
-  "packageName",
   "retailSalesPrice",
+  "dff_unit_of_measure",
+  "packageName",
   "lowest_weight",
   "highest_weight",
-  "dff_unit_of_measure",
-  "sourceMultiplier",
+  "FFCSAFactor",
   "avgWeightUsed",
   "packageQuantityUsed",
   "ffcsaPurchasePrice",
@@ -138,6 +138,17 @@ function toSheetValue(value) {
   return value === null || typeof value === "undefined" ? "" : value;
 }
 
+function flattenSheetText(value) {
+  return String(value || "")
+    .replace(/<br\s*\/?>/gi, " ")
+    .replace(/<\/p>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function normalizeVendorName(value) {
   return String(value || "").trim().toLowerCase();
 }
@@ -184,9 +195,9 @@ function buildIntroductionValues(metadata) {
     ["Vendor filter", metadata.vendorSummary],
     [],
     ["Notes"],
-    ["Highlight note", "Rows highlighted in yellow show products with price changes in the last 1 day."],
+    ["Highlight note", "Rows highlighted in yellow show products with price changes in the last 2 weeks."],
     ["retailSalesPrice", "DFF source price from the store pricing profile"],
-    ["sourceMultiplier", "Multiplier used in the in-sheet purchase price formula"],
+    ["FFCSAFactor", "FFCSA factor used in the in-sheet purchase price formula"],
     ["avgWeightUsed", "For weight-based products, the sheet uses the average of lowest_weight and highest_weight"],
     ["packageQuantityUsed", "For each-based products, the sheet uses this package quantity in the purchase price formula"],
     ["packageName", "Combined package summary for the product"],
@@ -203,9 +214,9 @@ function toTimestamp(value) {
   return Number.isFinite(timestamp) ? timestamp : 0;
 }
 
-function hasRecentPriceOrSaleChange(profile, saleRow, windowDays = 1) {
+function hasRecentPriceOrSaleChange(profile, saleRow, windowDays = 14) {
   const cutoff = Date.now() - windowDays * 24 * 60 * 60 * 1000;
-  return toTimestamp(profile?.updatedAt) >= cutoff || toTimestamp(saleRow?.updatedAt) >= cutoff;
+  return toTimestamp(profile?.priceChangedAt) >= cutoff;
 }
 
 async function getServiceAccountAccessToken(credentialsPath) {
@@ -662,6 +673,7 @@ async function syncPricelistToGoogleSheet(sheetValues, introductionValues) {
 async function buildSheetValues({ vendorNameMatcher = null } = {}) {
   const db = getDb();
   await ensureLocalLineSyncSchema();
+  await ensureProductPricingSchema();
 
   const [
     productRows,
@@ -751,7 +763,7 @@ async function buildSheetValues({ vendorNameMatcher = null } = {}) {
     const rowNumber = sheetValues.length + 1;
     const retailSalesPriceCol = getColumnLetterByName("retailSalesPrice");
     const unitOfMeasureCol = getColumnLetterByName("dff_unit_of_measure");
-    const sourceMultiplierCol = getColumnLetterByName("sourceMultiplier");
+    const sourceMultiplierCol = getColumnLetterByName("FFCSAFactor");
     const avgWeightUsedCol = getColumnLetterByName("avgWeightUsed");
     const packageQuantityUsedCol = getColumnLetterByName("packageQuantityUsed");
     const purchasePriceCol = getColumnLetterByName("ffcsaPurchasePrice");
@@ -773,7 +785,7 @@ async function buildSheetValues({ vendorNameMatcher = null } = {}) {
       lowest_weight: usesSourcePricing ? snapshot.profile.minWeight : "",
       highest_weight: usesSourcePricing ? snapshot.profile.maxWeight : "",
       dff_unit_of_measure: usesSourcePricing ? snapshot.profile.unitOfMeasure : "",
-      sourceMultiplier: usesSourcePricing ? snapshot.profile.sourceMultiplier : "",
+      FFCSAFactor: usesSourcePricing ? snapshot.profile.sourceMultiplier : "",
       avgWeightUsed:
         usesSourcePricing && String(snapshot.profile.unitOfMeasure || "").toLowerCase() === "lbs"
           ? `=IF(AND(H${rowNumber}<>"",I${rowNumber}<>""),AVERAGE(H${rowNumber},I${rowNumber}),IF(H${rowNumber}<>"",H${rowNumber},IF(I${rowNumber}<>"",I${rowNumber},"")))`
@@ -792,7 +804,7 @@ async function buildSheetValues({ vendorNameMatcher = null } = {}) {
       sale: Boolean(snapshot.profile.onSale),
       saleDiscount: snapshot.profile.saleDiscount,
       packageCount: snapshot.packageRows.length,
-      description: product.description || "",
+      description: flattenSheetText(product.description),
       track_inventory: toBooleanLabel(Boolean(product.trackInventory)),
       visible: toBooleanLabel(Boolean(product.visible)),
       remoteSyncStatus: snapshot.profile.remoteSyncStatus || "",
