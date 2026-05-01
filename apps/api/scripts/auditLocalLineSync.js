@@ -222,7 +222,8 @@ function buildExpectedPriceListEntry(
     preferredAdjustmentType === 3
       ? preferredAdjustmentType
       : 2;
-  const regularFinalPrice = roundCurrency(basePrice * (1 + markupDecimal));
+  const unroundedRegularFinalPrice = basePrice * (1 + markupDecimal);
+  const regularFinalPrice = roundCurrency(unroundedRegularFinalPrice);
   let adjustmentValue =
     adjustmentType === 1
       ? roundCurrency(regularFinalPrice - basePrice)
@@ -235,7 +236,7 @@ function buildExpectedPriceListEntry(
   let strikethroughDisplayValue = null;
 
   if (saleEnabled && Number.isFinite(saleDiscount) && saleDiscount > 0) {
-    const discountedFinal = regularFinalPrice * (1 - saleDiscount);
+    const discountedFinal = unroundedRegularFinalPrice * (1 - saleDiscount);
     finalPrice = roundCurrency(discountedFinal);
     onSaleToggle = true;
     strikethroughDisplayValue = regularFinalPrice;
@@ -243,8 +244,8 @@ function buildExpectedPriceListEntry(
     if (adjustmentType === 1) {
       adjustmentValue = roundCurrency(finalPrice - basePriceUsed);
     } else if (adjustmentType === 2) {
-      basePriceUsed = roundCurrency(discountedFinal / (1 + markupDecimal));
-      const saleMarkup = (discountedFinal - basePriceUsed) / basePriceUsed;
+      basePriceUsed = roundCurrency(basePrice);
+      const saleMarkup = basePriceUsed > 0 ? (finalPrice - basePriceUsed) / basePriceUsed : 0;
       adjustmentValue = roundCurrency(saleMarkup * 100);
     } else {
       adjustmentValue = finalPrice;
@@ -407,6 +408,7 @@ async function fetchStoreCatalog(connection) {
       p.visible,
       p.track_inventory AS trackInventory,
       p.inventory,
+      p.vendor_id AS vendorId,
       p.category_id AS categoryId,
       c.name AS categoryName
     FROM products p
@@ -427,7 +429,91 @@ async function fetchStoreCatalog(connection) {
     FROM packages
   `);
 
-  return { products, packages };
+  let productMetaRows = [];
+  let packageMetaRows = [];
+  try {
+    [productMetaRows] = await connection.query(`
+      SELECT
+        product_id AS productId,
+        local_line_product_id AS localLineProductId
+      FROM local_line_product_meta
+    `);
+  } catch (error) {
+    if (!isMissingTableError(error, "local_line_product_meta")) {
+      throw error;
+    }
+  }
+
+  try {
+    [packageMetaRows] = await connection.query(`
+      SELECT
+        package_id AS packageId,
+        product_id AS productId,
+        local_line_package_id AS localLinePackageId
+      FROM local_line_package_meta
+    `);
+  } catch (error) {
+    if (!isMissingTableError(error, "local_line_package_meta")) {
+      throw error;
+    }
+  }
+
+  return { products, packages, productMetaRows, packageMetaRows };
+}
+
+function scoreMappedProductCandidate(product = null) {
+  if (!product) return -1;
+  let score = 0;
+  if (Number.isFinite(Number(product.vendorId))) score += 4;
+  if (Number.isFinite(Number(product.categoryId))) score += 3;
+  if (normalizeWhitespace(product.description)) score += 2;
+  if (Number.isFinite(Number(product.id)) && Number.isFinite(Number(product.localLineProductId)) && Number(product.id) !== Number(product.localLineProductId)) {
+    score += 1;
+  }
+  return score;
+}
+
+function buildStoreLocalLineMappings(storeCatalog) {
+  const storeProductsById = mapBy(storeCatalog.products, "id");
+  const storePackagesByProductId = groupBy(storeCatalog.packages, "productId");
+  const productMetaRows = Array.isArray(storeCatalog.productMetaRows) ? storeCatalog.productMetaRows : [];
+  const packageMetaRows = Array.isArray(storeCatalog.packageMetaRows) ? storeCatalog.packageMetaRows : [];
+
+  const storeProductsByLocalLineProductId = new Map();
+  for (const row of productMetaRows) {
+    const localLineProductId = Number(row.localLineProductId);
+    const storeProduct = storeProductsById.get(Number(row.productId));
+    if (!Number.isFinite(localLineProductId) || !storeProduct) continue;
+    const current = storeProductsByLocalLineProductId.get(localLineProductId) || null;
+    const candidate = { ...storeProduct, localLineProductId };
+    if (!current || scoreMappedProductCandidate(candidate) > scoreMappedProductCandidate(current)) {
+      storeProductsByLocalLineProductId.set(localLineProductId, candidate);
+    }
+  }
+
+  const packageMetaRowsByProductId = groupBy(packageMetaRows, "productId");
+  const storePackagesByLocalLineProductId = new Map();
+  for (const [localLineProductId, storeProduct] of storeProductsByLocalLineProductId.entries()) {
+    const storeProductId = Number(storeProduct.id);
+    const storePackages = storePackagesByProductId.get(storeProductId) || [];
+    const packageMetaByPackageId = new Map(
+      (packageMetaRowsByProductId.get(storeProductId) || []).map((row) => [Number(row.packageId), row])
+    );
+    const packagesByLocalLinePackageId = new Map();
+    for (const pkg of storePackages) {
+      const localLinePackageId = Number(packageMetaByPackageId.get(Number(pkg.id))?.localLinePackageId);
+      const key = Number.isFinite(localLinePackageId) ? localLinePackageId : Number(pkg.id);
+      packagesByLocalLinePackageId.set(key, pkg);
+    }
+    storePackagesByLocalLineProductId.set(localLineProductId, packagesByLocalLinePackageId);
+  }
+
+  return {
+    storeProductsById,
+    storePackagesByProductId,
+    storeProductsByLocalLineProductId,
+    storePackagesByLocalLineProductId
+  };
 }
 
 async function fetchCurrentPricelist(connection, { includeInactive }) {
@@ -525,8 +611,12 @@ async function mapWithConcurrency(values, concurrency, mapper, onProgress) {
 }
 
 function buildCatalogComparison(exportCatalog, storeCatalog) {
-  const storeProductsById = mapBy(storeCatalog.products, "id");
-  const storePackagesByProductId = groupBy(storeCatalog.packages, "productId");
+  const {
+    storeProductsById,
+    storePackagesByProductId,
+    storeProductsByLocalLineProductId,
+    storePackagesByLocalLineProductId
+  } = buildStoreLocalLineMappings(storeCatalog);
 
   const missingStoreProducts = [];
   const missingLocalLineProducts = [];
@@ -538,7 +628,7 @@ function buildCatalogComparison(exportCatalog, storeCatalog) {
   };
 
   for (const [productId, llProduct] of exportCatalog.productsById.entries()) {
-    const storeProduct = storeProductsById.get(productId);
+    const storeProduct = storeProductsByLocalLineProductId.get(productId) || storeProductsById.get(productId);
     const llPackages = exportCatalog.packagesByProductId.get(productId) || [];
 
     if (!storeProduct) {
@@ -564,6 +654,7 @@ function buildCatalogComparison(exportCatalog, storeCatalog) {
       continue;
     }
 
+    const storeProductId = Number(storeProduct.id);
     const productChanges = {};
     compareTextField(productChanges, "name", storeProduct.name, llProduct.name);
     compareTextField(
@@ -582,31 +673,38 @@ function buildCatalogComparison(exportCatalog, storeCatalog) {
     compareNumberField(productChanges, "inventory", storeProduct.inventory, llProduct.productInventory);
 
     if (Object.keys(productChanges).length) {
-      productUpdates.push({ productId, changes: productChanges });
+      productUpdates.push({
+        productId: storeProductId,
+        localLineProductId: productId,
+        changes: productChanges
+      });
     }
 
-    const storePackages = storePackagesByProductId.get(productId) || [];
+    const storePackages = storePackagesByProductId.get(storeProductId) || [];
     const llPackageIds = llPackages.map((pkg) => pkg.packageId).sort((a, b) => a - b);
-    const storePackageIds = storePackages.map((pkg) => pkg.id).sort((a, b) => a - b);
+    const storePackagesByMappedId =
+      storePackagesByLocalLineProductId.get(productId) ||
+      new Map(storePackages.map((pkg) => [Number(pkg.id), pkg]));
+    const storePackageIds = [...storePackagesByMappedId.keys()].sort((a, b) => a - b);
     const llPackagesById = mapBy(llPackages, "packageId");
-    const storePackagesById = mapBy(storePackages, "id");
 
     if (!arraysEqual(storePackageIds, llPackageIds)) {
       packageShapeMismatches.push({
-        productId,
+        productId: storeProductId,
+        localLineProductId: productId,
         storePackageIds,
         localLinePackageIds: llPackageIds,
         missingInStorePackages: llPackages
-          .filter((pkg) => !storePackagesById.has(pkg.packageId))
+          .filter((pkg) => !storePackagesByMappedId.has(pkg.packageId))
           .map((pkg) => ({
             packageId: pkg.packageId,
             name: pkg.name,
             price: pkg.price,
             packageCode: pkg.packageCode
           })),
-        missingInLocalLinePackages: storePackages
-          .filter((pkg) => !llPackagesById.has(pkg.id))
-          .map((pkg) => ({
+        missingInLocalLinePackages: [...storePackagesByMappedId.entries()]
+          .filter(([mappedPackageId]) => !llPackagesById.has(Number(mappedPackageId)))
+          .map(([, pkg]) => ({
             packageId: pkg.id,
             name: pkg.name,
             price: pkg.price,
@@ -616,7 +714,7 @@ function buildCatalogComparison(exportCatalog, storeCatalog) {
     }
 
     for (const llPackage of llPackages) {
-      const storePackage = storePackagesById.get(llPackage.packageId);
+      const storePackage = storePackagesByMappedId.get(llPackage.packageId);
       if (!storePackage) continue;
 
       const packageChanges = {};
@@ -639,8 +737,10 @@ function buildCatalogComparison(exportCatalog, storeCatalog) {
 
       if (Object.keys(packageChanges).length) {
         packageUpdates.push({
-          productId,
-          packageId: llPackage.packageId,
+          productId: storeProductId,
+          localLineProductId: productId,
+          packageId: storePackage.id,
+          localLinePackageId: llPackage.packageId,
           changes: packageChanges
         });
       }
@@ -648,10 +748,11 @@ function buildCatalogComparison(exportCatalog, storeCatalog) {
   }
 
   const localLineProductIds = new Set(exportCatalog.productsById.keys());
-  for (const storeProduct of storeCatalog.products) {
-    if (!localLineProductIds.has(storeProduct.id)) {
+  for (const [localLineProductId, storeProduct] of storeProductsByLocalLineProductId.entries()) {
+    if (!localLineProductIds.has(localLineProductId)) {
       missingLocalLineProducts.push({
         productId: storeProduct.id,
+        localLineProductId,
         storeName: storeProduct.name
       });
     }
@@ -668,8 +769,12 @@ function buildCatalogComparison(exportCatalog, storeCatalog) {
 }
 
 function buildPricelistComparison(pricelistRows, storeCatalog, liveDetails) {
-  const storeProductsById = mapBy(storeCatalog.products, "id");
-  const storePackagesByProductId = groupBy(storeCatalog.packages, "productId");
+  const {
+    storeProductsById,
+    storePackagesByProductId,
+    storeProductsByLocalLineProductId,
+    storePackagesByLocalLineProductId
+  } = buildStoreLocalLineMappings(storeCatalog);
   const liveByProductId = new Map(liveDetails.map((item) => [item.productId, item]));
 
   const liveFetchErrors = [];
@@ -683,8 +788,10 @@ function buildPricelistComparison(pricelistRows, storeCatalog, liveDetails) {
 
   for (const row of pricelistRows) {
     const productId = Number(row.localLineProductID);
-    const storeProduct = storeProductsById.get(productId);
-    const storePackage = (storePackagesByProductId.get(productId) || [])[0];
+    const storeProduct = storeProductsByLocalLineProductId.get(productId) || storeProductsById.get(productId);
+    const storePackage =
+      storePackagesByLocalLineProductId.get(productId)?.values().next().value ||
+      (storeProduct ? (storePackagesByProductId.get(Number(storeProduct.id)) || [])[0] : null);
     const live = liveByProductId.get(productId);
 
     if (!live?.ok) {

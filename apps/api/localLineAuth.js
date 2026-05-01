@@ -14,6 +14,10 @@ const FALLBACK_TTL_SECONDS = Number.parseInt(
 let cachedToken = null;
 let tokenExpiryMs = 0;
 let refreshingPromise = null;
+const LOCAL_LINE_RETRY_ATTEMPTS = Math.max(
+  1,
+  Number.parseInt(process.env.LOCALLINE_FETCH_RETRY_ATTEMPTS || "2", 10) || 2
+);
 
 function decodeJwtPayload(token) {
   try {
@@ -38,6 +42,21 @@ export function getLocalLineBaseUrl() {
   return LL_BASEURL;
 }
 
+async function fetchLocalLineWithRetry(url, options, label) {
+  let lastError = null;
+  for (let attempt = 1; attempt <= LOCAL_LINE_RETRY_ATTEMPTS; attempt += 1) {
+    try {
+      return await fetch(url, options);
+    } catch (error) {
+      lastError = error;
+      if (attempt >= LOCAL_LINE_RETRY_ATTEMPTS) {
+        break;
+      }
+    }
+  }
+  throw new Error(`${label} request failed: ${lastError?.message || "fetch failed"}`);
+}
+
 async function fetchNewToken() {
   const username = process.env.LL_USERNAME;
   const password = process.env.LL_PASSWORD;
@@ -45,11 +64,11 @@ async function fetchNewToken() {
     throw new Error("LL_USERNAME/LL_PASSWORD are not set");
   }
 
-  const response = await fetch(`${LL_BASEURL}token/`, {
+  const response = await fetchLocalLineWithRetry(`${LL_BASEURL}token/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, password })
-  });
+  }, "LocalLine token");
 
   if (!response.ok) {
     const body = await response.text();

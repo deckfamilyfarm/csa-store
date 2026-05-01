@@ -33,6 +33,9 @@ export function isNoMarkupProduct(product = null) {
   return normalizeProductName(product?.name).includes("deposit");
 }
 
+const SOURCE_PRICING_DEFAULT_MARKUP = 0.6574;
+const VENDOR_SALE_SHARE_RATIO = 0.5;
+
 function normalizeUnitOfMeasure(value, fallback = "each") {
   const normalized = String(value || "").trim().toLowerCase();
   if (normalized === "lbs" || normalized === "lb" || normalized === "pounds") {
@@ -92,18 +95,42 @@ function getPackageQuantity(pkg, packageMeta) {
   return quantity;
 }
 
+function resolveSourcePricingMarkup(value, fallback = SOURCE_PRICING_DEFAULT_MARKUP) {
+  const numeric = toNumber(value);
+  if (numeric !== null && numeric > 0) return numeric;
+  return fallback;
+}
+
+export function shouldSplitSaleWithVendor(profile = null) {
+  return (
+    Boolean(profile?.usesSourcePricing) &&
+    Number(toNumber(profile?.sourceMultiplier) || 0) > 0 &&
+    Boolean(profile?.onSale) &&
+    Number(toNumber(profile?.saleDiscount) || 0) > 0
+  );
+}
+
+export function getVendorFundedSaleDiscount(profile = null) {
+  if (!shouldSplitSaleWithVendor(profile)) return 0;
+  return Number((Number(profile.saleDiscount) * VENDOR_SALE_SHARE_RATIO).toFixed(4));
+}
+
+export function getCustomerFacingSaleDiscount(profile = null) {
+  const rawSaleDiscount = Math.max(0, Math.min(toNumber(profile?.saleDiscount) ?? 0, 1));
+  return rawSaleDiscount;
+}
+
 export function computeAverageWeight(profile, packageMeta = null) {
   const overrideWeight = toNumber(profile?.avgWeightOverride);
   if (overrideWeight !== null && overrideWeight > 0) return Number(overrideWeight.toFixed(3));
-
-  const packageWeight = toNumber(packageMeta?.avgPackageWeight);
-  if (packageWeight !== null && packageWeight > 0) return Number(packageWeight.toFixed(3));
 
   const minWeight = toNumber(profile?.minWeight);
   const maxWeight = toNumber(profile?.maxWeight);
   if (minWeight !== null && maxWeight !== null) {
     return Number((((minWeight + maxWeight) / 2)).toFixed(3));
   }
+  const packageWeight = toNumber(packageMeta?.avgPackageWeight);
+  if (packageWeight !== null && packageWeight > 0) return Number(packageWeight.toFixed(3));
   if (minWeight !== null) return Number(minWeight.toFixed(3));
   if (maxWeight !== null) return Number(maxWeight.toFixed(3));
   return null;
@@ -116,10 +143,13 @@ export function resolvePricingProfile({
   packageMetaByPackageId = new Map(),
   vendor = null
 }) {
-  const defaultGuestMarkup = toNumber(vendor?.guestMarkup);
-  const defaultMemberMarkup = toNumber(vendor?.memberMarkup);
+  const sourcePricingVendor = isSourcePricingVendor(vendor);
+  const vendorPriceListMarkup = toNumber(vendor?.priceListMarkup);
+  const vendorSourceMultiplier = toNumber(vendor?.sourceMultiplier);
   const sourceMultiplier =
-    toNumber(profile?.sourceMultiplier) ?? getDefaultSourceMultiplier();
+    sourcePricingVendor && vendorSourceMultiplier !== null && vendorSourceMultiplier > 0
+      ? vendorSourceMultiplier
+      : (toNumber(profile?.sourceMultiplier) ?? getDefaultSourceMultiplier());
   const unitOfMeasure = normalizeUnitOfMeasure(
     profile?.unitOfMeasure,
     inferUnitOfMeasure(packages, packageMetaByPackageId)
@@ -162,16 +192,32 @@ export function resolvePricingProfile({
   const usesNoMarkupPricing = isNoMarkupProduct(product);
   const memberMarkup = usesNoMarkupPricing
     ? 0
-    : (toNumber(profile?.memberMarkup) ?? defaultMemberMarkup ?? 0.4);
+    : vendorPriceListMarkup !== null && vendorPriceListMarkup > 0
+      ? vendorPriceListMarkup
+    : sourcePricingVendor
+      ? resolveSourcePricingMarkup(profile?.memberMarkup)
+      : (toNumber(profile?.memberMarkup) ?? toNumber(vendor?.memberMarkup) ?? 0.4);
   const guestMarkup = usesNoMarkupPricing
     ? 0
-    : (toNumber(profile?.guestMarkup) ?? defaultGuestMarkup ?? 0.55);
+    : vendorPriceListMarkup !== null && vendorPriceListMarkup > 0
+      ? vendorPriceListMarkup
+    : sourcePricingVendor
+      ? resolveSourcePricingMarkup(profile?.guestMarkup, memberMarkup)
+      : (toNumber(profile?.guestMarkup) ?? toNumber(vendor?.guestMarkup) ?? 0.55);
   const herdShareMarkup = usesNoMarkupPricing
     ? 0
-    : (toNumber(profile?.herdShareMarkup) ?? memberMarkup);
+    : vendorPriceListMarkup !== null && vendorPriceListMarkup > 0
+      ? vendorPriceListMarkup
+    : sourcePricingVendor
+      ? resolveSourcePricingMarkup(profile?.herdShareMarkup, memberMarkup)
+      : (toNumber(profile?.herdShareMarkup) ?? memberMarkup);
   const snapMarkup = usesNoMarkupPricing
     ? 0
-    : (toNumber(profile?.snapMarkup) ?? memberMarkup);
+    : vendorPriceListMarkup !== null && vendorPriceListMarkup > 0
+      ? vendorPriceListMarkup
+    : sourcePricingVendor
+      ? resolveSourcePricingMarkup(profile?.snapMarkup, memberMarkup)
+      : (toNumber(profile?.snapMarkup) ?? memberMarkup);
 
   return {
     productId: Number(product?.id ?? profile?.productId),
@@ -205,15 +251,19 @@ export function computePackageBasePrice(profile, pkg, packageMeta = null) {
   const sourceUnitPrice = toNumber(profile?.sourceUnitPrice);
   const sourceMultiplier = toNumber(profile?.sourceMultiplier);
   if (sourceUnitPrice === null || sourceMultiplier === null) return null;
+  const vendorFundedSaleDiscount = getVendorFundedSaleDiscount(profile);
+  const effectiveSourceMultiplier = Number(
+    (sourceMultiplier * (1 - vendorFundedSaleDiscount)).toFixed(6)
+  );
 
   if (profile?.unitOfMeasure === "lbs") {
     const averageWeight = computeAverageWeight(profile, packageMeta);
     if (averageWeight === null || averageWeight <= 0) return null;
-    return roundCurrency(sourceUnitPrice * averageWeight * sourceMultiplier);
+    return roundCurrency(sourceUnitPrice * averageWeight * effectiveSourceMultiplier);
   }
 
   const quantity = getPackageQuantity(pkg, packageMeta);
-  return roundCurrency(sourceUnitPrice * quantity * sourceMultiplier);
+  return roundCurrency(sourceUnitPrice * quantity * effectiveSourceMultiplier);
 }
 
 export function computeFinalPrice(basePrice, markup, onSale, saleDiscount) {
@@ -223,14 +273,15 @@ export function computeFinalPrice(basePrice, markup, onSale, saleDiscount) {
     return { regular: null, final: null, strikethrough: null };
   }
 
-  const regular = roundCurrency(safeBasePrice * (1 + safeMarkup));
+  const unroundedRegular = safeBasePrice * (1 + safeMarkup);
+  const regular = roundCurrency(unroundedRegular);
   if (!onSale || !Number.isFinite(Number(saleDiscount)) || Number(saleDiscount) <= 0) {
     return { regular, final: regular, strikethrough: null };
   }
 
   return {
     regular,
-    final: roundCurrency(regular * (1 - Number(saleDiscount))),
+    final: roundCurrency(unroundedRegular * (1 - Number(saleDiscount))),
     strikethrough: regular
   };
 }
@@ -299,25 +350,25 @@ export function computeProductPricingSnapshot({
     basePrice,
     resolvedProfile.guestMarkup,
     resolvedProfile.onSale,
-    resolvedProfile.saleDiscount
+    getCustomerFacingSaleDiscount(resolvedProfile)
   );
   const member = computeFinalPrice(
     basePrice,
     resolvedProfile.memberMarkup,
     resolvedProfile.onSale,
-    resolvedProfile.saleDiscount
+    getCustomerFacingSaleDiscount(resolvedProfile)
   );
   const herdShare = computeFinalPrice(
     basePrice,
     resolvedProfile.herdShareMarkup,
     resolvedProfile.onSale,
-    resolvedProfile.saleDiscount
+    getCustomerFacingSaleDiscount(resolvedProfile)
   );
   const snap = computeFinalPrice(
     basePrice,
     resolvedProfile.snapMarkup,
     resolvedProfile.onSale,
-    resolvedProfile.saleDiscount
+    getCustomerFacingSaleDiscount(resolvedProfile)
   );
 
   return {

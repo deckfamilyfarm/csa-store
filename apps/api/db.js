@@ -9,6 +9,22 @@ let pool;
 let localLineSchemaPromise;
 let adminAccessSchemaPromise;
 let adminPricelistIndexesPromise;
+let vendorPricingSchemaPromise;
+
+const SOURCE_PRICING_VENDOR_FACTOR_DEFAULT = 0.5412;
+
+const VENDOR_PRICING_COLUMN_STATEMENTS = [
+  {
+    tableName: "vendors",
+    columnName: "price_list_markup",
+    definition: "price_list_markup DECIMAL(10, 4)"
+  },
+  {
+    tableName: "vendors",
+    columnName: "source_multiplier",
+    definition: "source_multiplier DECIMAL(10, 4)"
+  }
+];
 
 const LOCAL_LINE_TABLE_STATEMENTS = [
   `
@@ -858,6 +874,107 @@ async function runAdminPricelistIndexBootstrap(connection) {
   }
 }
 
+async function runVendorPricingSchemaBootstrap(connection) {
+  for (const columnDefinition of VENDOR_PRICING_COLUMN_STATEMENTS) {
+    const exists = await columnExists(
+      connection,
+      columnDefinition.tableName,
+      columnDefinition.columnName
+    );
+    if (exists) continue;
+
+    await connection.query(
+      `ALTER TABLE ${columnDefinition.tableName} ADD COLUMN ${columnDefinition.definition}`
+    );
+  }
+
+  const [vendorRows] = await connection.query(
+    `
+      SELECT
+        id,
+        name,
+        guest_markup AS guestMarkup,
+        member_markup AS memberMarkup,
+        price_list_markup AS priceListMarkup,
+        source_multiplier AS sourceMultiplier
+      FROM vendors
+    `
+  );
+
+  for (const vendor of vendorRows) {
+    const vendorId = Number(vendor.id);
+    if (!Number.isFinite(vendorId)) continue;
+
+    let nextPriceListMarkup = vendor.priceListMarkup;
+    let nextSourceMultiplier = vendor.sourceMultiplier;
+    const normalizedVendorName = String(vendor.name || "").trim().toLowerCase();
+    const isSourcePricingVendor =
+      normalizedVendorName.includes("deck family farm") ||
+      normalizedVendorName.includes("hyland") ||
+      normalizedVendorName.includes("creamy cow");
+
+    if (nextPriceListMarkup === null || typeof nextPriceListMarkup === "undefined") {
+      const [markupRows] = await connection.query(
+        `
+          SELECT
+            member_markup AS memberMarkup,
+            guest_markup AS guestMarkup,
+            COUNT(*) AS totalRows
+          FROM product_pricing_profiles pp
+          JOIN products p ON p.id = pp.product_id
+          WHERE p.vendor_id = ?
+            AND COALESCE(pp.member_markup, 0) > 0
+          GROUP BY pp.member_markup, pp.guest_markup
+          ORDER BY totalRows DESC, pp.member_markup DESC
+          LIMIT 1
+        `,
+        [vendorId]
+      );
+
+      nextPriceListMarkup =
+        markupRows[0]?.memberMarkup ??
+        vendor.memberMarkup ??
+        vendor.guestMarkup ??
+        null;
+    }
+
+    if (
+      isSourcePricingVendor &&
+      (nextSourceMultiplier === null || typeof nextSourceMultiplier === "undefined")
+    ) {
+      const [factorRows] = await connection.query(
+        `
+          SELECT
+            source_multiplier AS sourceMultiplier,
+            COUNT(*) AS totalRows
+          FROM product_pricing_profiles pp
+          JOIN products p ON p.id = pp.product_id
+          WHERE p.vendor_id = ?
+            AND COALESCE(pp.source_multiplier, 0) > 0
+            AND LOWER(p.name) NOT LIKE '%deposit%'
+          GROUP BY pp.source_multiplier
+          ORDER BY totalRows DESC, pp.source_multiplier DESC
+          LIMIT 1
+        `,
+        [vendorId]
+      );
+
+      nextSourceMultiplier =
+        factorRows[0]?.sourceMultiplier ?? SOURCE_PRICING_VENDOR_FACTOR_DEFAULT;
+    }
+
+    await connection.query(
+      `
+        UPDATE vendors
+        SET price_list_markup = COALESCE(price_list_markup, ?),
+            source_multiplier = COALESCE(source_multiplier, ?)
+        WHERE id = ?
+      `,
+      [nextPriceListMarkup, nextSourceMultiplier, vendorId]
+    );
+  }
+}
+
 export function initDb() {
   if (db) return db;
 
@@ -925,6 +1042,20 @@ export async function ensureAdminPricelistIndexes(connection = getPool()) {
   }
 
   return runAdminPricelistIndexBootstrap(connection);
+}
+
+export async function ensureVendorPricingSchema(connection = getPool()) {
+  if (connection === getPool()) {
+    if (!vendorPricingSchemaPromise) {
+      vendorPricingSchemaPromise = runVendorPricingSchemaBootstrap(connection).catch((error) => {
+        vendorPricingSchemaPromise = null;
+        throw error;
+      });
+    }
+    return vendorPricingSchemaPromise;
+  }
+
+  return runVendorPricingSchemaBootstrap(connection);
 }
 
 export function isMissingTableError(error, tableName = "") {

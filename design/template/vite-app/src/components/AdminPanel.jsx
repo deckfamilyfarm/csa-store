@@ -221,18 +221,41 @@ function computeDraftPackagePrice(draft, pkg) {
   const sourceUnitPrice = toNumber(draft?.sourceUnitPrice);
   const sourceMultiplier = toNumber(draft?.sourceMultiplier);
   if (sourceUnitPrice === null || sourceMultiplier === null) return null;
+  const saleDiscount = Math.max(0, Math.min((toNumber(draft?.saleDiscount) || 0) / 100, 1));
+  const vendorFundedSaleDiscount =
+    draft?.onSale && saleDiscount > 0 ? saleDiscount / 2 : 0;
+  const effectiveSourceMultiplier = sourceMultiplier * (1 - vendorFundedSaleDiscount);
 
   if (draft?.unitOfMeasure === "lbs") {
     const averageWeight = computeDraftAverageWeight(draft);
     if (averageWeight === null || averageWeight <= 0) return null;
-    return roundCurrency(sourceUnitPrice * averageWeight * sourceMultiplier);
+    return roundCurrency(sourceUnitPrice * averageWeight * effectiveSourceMultiplier);
   }
 
   const quantity = Math.max(toNumber(pkg?.numOfItems) || 1, 1);
-  return roundCurrency(sourceUnitPrice * quantity * sourceMultiplier);
+  return roundCurrency(sourceUnitPrice * quantity * effectiveSourceMultiplier);
+}
+
+function getProductPricingValue(product, key, fallback = "") {
+  const profileValue = product?.pricingProfile?.[key];
+  if (profileValue !== null && typeof profileValue !== "undefined") {
+    return profileValue;
+  }
+  const directValue = product?.[key];
+  if (directValue !== null && typeof directValue !== "undefined") {
+    return directValue;
+  }
+  return fallback;
 }
 
 function buildProductDraftFromProduct(product, sanitizeHtml) {
+  const unitOfMeasure = getProductPricingValue(product, "unitOfMeasure", "each");
+  const sourceUnitPrice = getProductPricingValue(product, "sourceUnitPrice", null);
+  const minWeight = getProductPricingValue(product, "minWeight", null);
+  const maxWeight = getProductPricingValue(product, "maxWeight", null);
+  const avgWeightOverride = getProductPricingValue(product, "avgWeightOverride", null);
+  const sourceMultiplier = getProductPricingValue(product, "sourceMultiplier", "0.5412");
+
   return {
     name: product?.name || "",
     description: sanitizeHtml(product?.description || ""),
@@ -241,35 +264,17 @@ function buildProductDraftFromProduct(product, sanitizeHtml) {
     visible: Boolean(product?.visible),
     trackInventory: Boolean(product?.trackInventory),
     inventory: Number(product?.inventory) || 0,
-    unitOfMeasure:
-      String(product?.pricingProfile?.unitOfMeasure || "each").toLowerCase() === "lbs"
-        ? "lbs"
-        : "each",
+    unitOfMeasure: String(unitOfMeasure || "each").toLowerCase() === "lbs" ? "lbs" : "each",
     sourceUnitPrice:
-      product?.pricingProfile?.sourceUnitPrice === null ||
-      typeof product?.pricingProfile?.sourceUnitPrice === "undefined"
-        ? ""
-        : String(product.pricingProfile.sourceUnitPrice),
+      sourceUnitPrice === null || typeof sourceUnitPrice === "undefined" ? "" : String(sourceUnitPrice),
     minWeight:
-      product?.pricingProfile?.minWeight === null ||
-      typeof product?.pricingProfile?.minWeight === "undefined"
-        ? ""
-        : String(product.pricingProfile.minWeight),
+      minWeight === null || typeof minWeight === "undefined" ? "" : String(minWeight),
     maxWeight:
-      product?.pricingProfile?.maxWeight === null ||
-      typeof product?.pricingProfile?.maxWeight === "undefined"
-        ? ""
-        : String(product.pricingProfile.maxWeight),
+      maxWeight === null || typeof maxWeight === "undefined" ? "" : String(maxWeight),
     avgWeightOverride:
-      product?.pricingProfile?.avgWeightOverride === null ||
-      typeof product?.pricingProfile?.avgWeightOverride === "undefined"
-        ? ""
-        : String(product.pricingProfile.avgWeightOverride),
+      avgWeightOverride === null || typeof avgWeightOverride === "undefined" ? "" : String(avgWeightOverride),
     sourceMultiplier:
-      product?.pricingProfile?.sourceMultiplier === null ||
-      typeof product?.pricingProfile?.sourceMultiplier === "undefined"
-        ? "0.5412"
-        : String(product.pricingProfile.sourceMultiplier),
+      sourceMultiplier === null || typeof sourceMultiplier === "undefined" ? "0.5412" : String(sourceMultiplier),
     onSale: Boolean(product?.onSale),
     saleDiscount: Math.round((Number(product?.saleDiscount) || 0) * 100),
     packages: (product?.packages || []).map((pkg) =>
@@ -326,6 +331,41 @@ function isSourcePricingVendorName(value) {
     normalized.includes("hyland") ||
     normalized.includes("creamy cow")
   );
+}
+
+function getVendorPriceListMarkupDecimal(vendor) {
+  return toNumber(vendor?.priceListMarkup ?? vendor?.memberMarkup ?? vendor?.guestMarkup);
+}
+
+function createVendorPricingDraft(vendor) {
+  const markupDecimal = getVendorPriceListMarkupDecimal(vendor);
+  const sourceMultiplier = toNumber(vendor?.sourceMultiplier);
+  return {
+    priceListMarkup:
+      markupDecimal === null ? "" : Number((markupDecimal * 100).toFixed(2)),
+    sourceMultiplier:
+      sourceMultiplier === null ? "" : String(sourceMultiplier)
+  };
+}
+
+function vendorPricingDraftEquals(vendor, draft) {
+  if (!draft) return true;
+  const currentMarkup = getVendorPriceListMarkupDecimal(vendor);
+  const draftMarkup = draft.priceListMarkup === "" ? null : Number(draft.priceListMarkup) / 100;
+  const currentSourceMultiplier = toNumber(vendor?.sourceMultiplier);
+  const draftSourceMultiplier =
+    draft.sourceMultiplier === "" ? null : toNumber(draft.sourceMultiplier);
+
+  const markupMatches =
+    currentMarkup === null || draftMarkup === null
+      ? currentMarkup === draftMarkup
+      : Number(currentMarkup.toFixed(4)) === Number(draftMarkup.toFixed(4));
+  const factorMatches =
+    currentSourceMultiplier === null || draftSourceMultiplier === null
+      ? currentSourceMultiplier === draftSourceMultiplier
+      : Number(currentSourceMultiplier.toFixed(4)) === Number(draftSourceMultiplier.toFixed(4));
+
+  return markupMatches && factorMatches;
 }
 
 function stripHtmlPreview(value) {
@@ -385,6 +425,8 @@ export function AdminPanel({ onCatalogRefresh }) {
   const [message, setMessage] = useState("");
   const [newCategory, setNewCategory] = useState("");
   const [newVendor, setNewVendor] = useState("");
+  const [vendorEdits, setVendorEdits] = useState({});
+  const [savingVendorId, setSavingVendorId] = useState(null);
   const [newDropSite, setNewDropSite] = useState({ name: "", address: "", dayOfWeek: "", openTime: "", closeTime: "" });
   const [newRecipe, setNewRecipe] = useState({ title: "", note: "", imageUrl: "", ingredients: "", steps: "" });
   const [productNameSearch, setProductNameSearch] = useState("");
@@ -497,6 +539,7 @@ export function AdminPanel({ onCatalogRefresh }) {
     ]);
     setCategories(categoryData.categories || []);
     setVendors(vendorData.vendors || []);
+    setVendorEdits({});
   }
 
   async function loadProductsData() {
@@ -1031,7 +1074,9 @@ export function AdminPanel({ onCatalogRefresh }) {
     productDraft?.minWeight,
     productDraft?.maxWeight,
     productDraft?.avgWeightOverride,
-    productDraft?.sourceMultiplier
+    productDraft?.sourceMultiplier,
+    productDraft?.onSale,
+    productDraft?.saleDiscount
   ]);
 
   useEffect(() => {
@@ -1268,9 +1313,7 @@ export function AdminPanel({ onCatalogRefresh }) {
       maxWeight:
         productDraft?.maxWeight === "" ? null : Number(productDraft?.maxWeight),
       avgWeightOverride:
-        productDraft?.avgWeightOverride === "" ? null : Number(productDraft?.avgWeightOverride),
-      sourceMultiplier:
-        productDraft?.sourceMultiplier === "" ? null : Number(productDraft?.sourceMultiplier)
+        productDraft?.avgWeightOverride === "" ? null : Number(productDraft?.avgWeightOverride)
     };
   }
 
@@ -1432,6 +1475,7 @@ export function AdminPanel({ onCatalogRefresh }) {
       );
 
       await adminPost("products/bulk-update", token, {
+        syncPricingProfileSale: true,
         updates: [
           {
             productId: activeProduct.id,
@@ -1633,6 +1677,50 @@ export function AdminPanel({ onCatalogRefresh }) {
     await adminPost("vendors", token, { name: newVendor });
     setNewVendor("");
     loadAll();
+  }
+
+  function updateVendorDraft(vendor, patch) {
+    if (!vendor?.id) return;
+    setVendorEdits((prev) => {
+      const currentDraft = prev[vendor.id] || createVendorPricingDraft(vendor);
+      const nextDraft = { ...currentDraft, ...patch };
+      if (vendorPricingDraftEquals(vendor, nextDraft)) {
+        const next = { ...prev };
+        delete next[vendor.id];
+        return next;
+      }
+      return {
+        ...prev,
+        [vendor.id]: nextDraft
+      };
+    });
+  }
+
+  async function handleSaveVendorPricing(vendor) {
+    if (!vendor?.id) return;
+    const draft = vendorEdits[vendor.id] || createVendorPricingDraft(vendor);
+    if (vendorPricingDraftEquals(vendor, draft)) {
+      return;
+    }
+
+    setSavingVendorId(vendor.id);
+    setMessage("");
+    try {
+      await adminPut(`vendors/${vendor.id}`, token, {
+        priceListMarkup:
+          draft.priceListMarkup === "" ? null : Number(draft.priceListMarkup) / 100,
+        sourceMultiplier:
+          draft.sourceMultiplier === "" ? null : Number(draft.sourceMultiplier)
+      });
+      await loadAll();
+      await refreshLocalPricelistIfNeeded();
+      await refreshCatalogFromAdmin();
+      setMessage(`Vendor pricing updated for ${vendor.name}.`);
+    } catch (err) {
+      setMessage(err?.message || "Vendor pricing update failed.");
+    } finally {
+      setSavingVendorId(null);
+    }
   }
 
   async function handleAddDropSite() {
@@ -2933,7 +3021,7 @@ export function AdminPanel({ onCatalogRefresh }) {
         </aside>
 
         <div className="admin-content">
-          {activeSection === "localPricelist" && canManageLocalPricelist && !showProductEditor && (
+          {activeSection === "localPricelist" && canManageLocalPricelist && (
             <section className="admin-section">
               <h3>Local Pricelist</h3>
               <div className="small">
@@ -3308,9 +3396,21 @@ export function AdminPanel({ onCatalogRefresh }) {
                     <select
                       className="input"
                       value={productDraft.vendorId}
-                      onChange={(event) =>
-                        setProductDraft((prev) => ({ ...prev, vendorId: event.target.value }))
-                      }
+                      onChange={(event) => {
+                        const nextVendorId = event.target.value;
+                        const nextVendor = vendors.find(
+                          (vendor) => String(vendor.id) === String(nextVendorId)
+                        ) || null;
+                        setProductDraft((prev) => ({
+                          ...prev,
+                          vendorId: nextVendorId,
+                          sourceMultiplier:
+                            isSourcePricingVendorName(nextVendor?.name) &&
+                            toNumber(nextVendor?.sourceMultiplier) !== null
+                              ? String(nextVendor.sourceMultiplier)
+                              : prev.sourceMultiplier
+                        }));
+                      }}
                     >
                       <option value="">Select vendor</option>
                       {editorVendorOptions.map((vendor) => (
@@ -3455,13 +3555,10 @@ export function AdminPanel({ onCatalogRefresh }) {
                             type="number"
                             step="0.0001"
                             value={productDraft.sourceMultiplier}
-                            onChange={(event) =>
-                              setProductDraft((prev) => ({
-                                ...prev,
-                                sourceMultiplier: event.target.value
-                              }))
-                            }
+                            disabled
+                            readOnly
                           />
+                          <span className="small">Vendor controlled in the Vendors tab.</span>
                         </label>
                       ) : null}
                     </>
@@ -3996,6 +4093,13 @@ export function AdminPanel({ onCatalogRefresh }) {
                             {displayAverage.toFixed(2)} avg/week
                             {dropSiteTrendMode ? " (6 mo avg)" : ""}
                           </div>
+                          {site.derivedHostContact?.name || site.derivedHostContact?.phone ? (
+                            <div className="small">
+                              Derived Contact: {[site.derivedHostContact?.name, site.derivedHostContact?.phone]
+                                .filter(Boolean)
+                                .join(" · ")}
+                            </div>
+                          ) : null}
                           {showDropSiteOrderCounts ? (
                             <div className="small">
                               {Number(site.orderCount || 0)} orders · {Number(site.scheduledDrops || 0)} scheduled drops
@@ -4092,7 +4196,7 @@ export function AdminPanel({ onCatalogRefresh }) {
             </section>
           )}
 
-          {activeSection === "pricelist" && canManagePricing && !showProductEditor && (
+          {activeSection === "pricelist" && canManagePricing && (
             <>
               <AdminPriceListSection
                 token={token}
@@ -4303,18 +4407,70 @@ export function AdminPanel({ onCatalogRefresh }) {
           {activeSection === "vendors" && canManageCoreAdmin && (
             <section className="admin-section">
               <h3>Vendors</h3>
+              <div className="small">
+                Set the vendor-level pricelist markup and, for Deck / Hyland / Creamy vendors,
+                the FFCSA factor used by source-priced products.
+              </div>
               <table className="admin-table">
                 <thead>
                   <tr>
                     <th>Name</th>
+                    <th>Pricelist Markup %</th>
+                    <th>FFCSA Factor</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {vendors.map((vendor) => (
-                    <tr key={vendor.id}>
-                      <td>{vendor.name}</td>
-                    </tr>
-                  ))}
+                  {sortedVendors.map((vendor) => {
+                    const draft = vendorEdits[vendor.id] || createVendorPricingDraft(vendor);
+                    const isDirty = !vendorPricingDraftEquals(vendor, draft);
+                    const isSourceVendor = isSourcePricingVendorName(vendor?.name);
+                    const isSaving = savingVendorId === vendor.id;
+
+                    return (
+                      <tr key={vendor.id} className={isDirty ? "edited" : ""}>
+                        <td>{vendor.name}</td>
+                        <td>
+                          <input
+                            className="input"
+                            type="number"
+                            step="0.01"
+                            value={draft.priceListMarkup}
+                            onChange={(event) =>
+                              updateVendorDraft(vendor, {
+                                priceListMarkup: event.target.value === "" ? "" : Number(event.target.value)
+                              })
+                            }
+                          />
+                        </td>
+                        <td>
+                          <input
+                            className="input"
+                            type="number"
+                            step="0.0001"
+                            value={draft.sourceMultiplier}
+                            placeholder={isSourceVendor ? "0.5412" : "N/A"}
+                            disabled={!isSourceVendor}
+                            onChange={(event) =>
+                              updateVendorDraft(vendor, {
+                                sourceMultiplier: event.target.value
+                              })
+                            }
+                          />
+                        </td>
+                        <td>
+                          <button
+                            className="button alt"
+                            type="button"
+                            disabled={!isDirty || isSaving}
+                            onClick={() => handleSaveVendorPricing(vendor)}
+                          >
+                            {isSaving ? "Saving..." : "Save"}
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
               <div className="admin-grid">

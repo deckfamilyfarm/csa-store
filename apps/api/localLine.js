@@ -17,6 +17,7 @@ import {
 } from "./localLineAuth.js";
 import {
   computePackageBasePrice,
+  getCustomerFacingSaleDiscount,
   getPriceListDefinitions,
   resolvePricingProfile
 } from "./lib/productPricing.js";
@@ -85,6 +86,10 @@ function buildPriceListsFromEnv() {
 const DAIRY_PRICE_LIST_IDS = parseIdList(process.env.LL_DAIRY_PRICE_LIST_IDS);
 const DAIRY_MARKUP = parseNumber(process.env.LL_MARKUP_DAIRY, null);
 const DEBUG_PRODUCT_ID = Number(process.env.LL_DEBUG_PRODUCT_ID || "");
+const LOCAL_LINE_RETRY_ATTEMPTS = Math.max(
+  1,
+  Number.parseInt(process.env.LOCALLINE_FETCH_RETRY_ATTEMPTS || "2", 10) || 2
+);
 let cachedProductUnits = null;
 
 function debugEnabled(productId) {
@@ -99,14 +104,29 @@ export function isLocalLineEnabled() {
   return isLocalLineAuthConfigured();
 }
 
+async function fetchLocalLineWithRetry(url, options, label) {
+  let lastError = null;
+  for (let attempt = 1; attempt <= LOCAL_LINE_RETRY_ATTEMPTS; attempt += 1) {
+    try {
+      return await fetch(url, options);
+    } catch (error) {
+      lastError = error;
+      if (attempt >= LOCAL_LINE_RETRY_ATTEMPTS) {
+        break;
+      }
+    }
+  }
+  throw new Error(`${label} request failed: ${lastError?.message || "fetch failed"}`);
+}
+
 async function fetchLocalLineCollection(path, accessToken) {
   const results = [];
   let nextUrl = path.startsWith("http") ? path : `${LL_BASEURL}${path}`;
 
   while (nextUrl) {
-    const response = await fetch(nextUrl, {
+    const response = await fetchLocalLineWithRetry(nextUrl, {
       headers: { Authorization: `Bearer ${accessToken}` }
-    });
+    }, "LocalLine collection fetch");
     if (!response.ok) {
       const body = await response.text();
       throw new Error(`LocalLine collection fetch failed: ${response.status} ${body}`);
@@ -132,9 +152,9 @@ async function fetchLocalLineCollection(path, accessToken) {
 
 async function fetchLocalLineProduct(productId, accessToken) {
   const url = `${LL_BASEURL}products/${productId}/?expand=packages,product_price_list_entries`;
-  const response = await fetch(url, {
+  const response = await fetchLocalLineWithRetry(url, {
     headers: { Authorization: `Bearer ${accessToken}` }
-  });
+  }, `LocalLine GET product ${productId}`);
   if (!response.ok) {
     const body = await response.text();
     throw new Error(`LocalLine GET failed: ${response.status} ${body}`);
@@ -145,7 +165,7 @@ async function fetchLocalLineProduct(productId, accessToken) {
 async function patchLocalLineProduct(productId, accessToken, payload) {
   const url = `${LL_BASEURL}products/${productId}/`;
   const companyBaseUrl = process.env.LL_COMPANY_BASEURL || "";
-  const response = await fetch(url, {
+  const response = await fetchLocalLineWithRetry(url, {
     method: "PATCH",
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -158,7 +178,7 @@ async function patchLocalLineProduct(productId, accessToken, payload) {
         : {})
     },
     body: JSON.stringify(payload)
-  });
+  }, `LocalLine PATCH product ${productId}`);
   if (!response.ok) {
     const body = await response.text();
     throw new Error(`LocalLine PATCH failed: ${response.status} ${body}`);
@@ -168,7 +188,7 @@ async function patchLocalLineProduct(productId, accessToken, payload) {
 async function createLocalLineProduct(accessToken, payload) {
   const url = `${LL_BASEURL}products/`;
   const companyBaseUrl = process.env.LL_COMPANY_BASEURL || "";
-  const response = await fetch(url, {
+  const response = await fetchLocalLineWithRetry(url, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -181,7 +201,7 @@ async function createLocalLineProduct(accessToken, payload) {
         : {})
     },
     body: JSON.stringify(payload)
-  });
+  }, "LocalLine POST product");
   if (!response.ok) {
     const body = await response.text();
     throw new Error(`LocalLine POST failed: ${response.status} ${body}`);
@@ -195,7 +215,7 @@ async function createLocalLineProductImage(accessToken, imageBuffer, filename, c
   const formData = new FormData();
   formData.append("image", new Blob([imageBuffer], { type: contentType }), filename);
 
-  const response = await fetch(url, {
+  const response = await fetchLocalLineWithRetry(url, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -207,7 +227,7 @@ async function createLocalLineProductImage(accessToken, imageBuffer, filename, c
         : {})
     },
     body: formData
-  });
+  }, "LocalLine product image upload");
   if (!response.ok) {
     const body = await response.text();
     throw new Error(`LocalLine product image upload failed: ${response.status} ${body}`);
@@ -221,9 +241,9 @@ async function fetchLocalLineProductUnits(accessToken) {
   }
 
   const url = `${LL_BASEURL}product-units/`;
-  const response = await fetch(url, {
+  const response = await fetchLocalLineWithRetry(url, {
     headers: { Authorization: `Bearer ${accessToken}` }
-  });
+  }, "LocalLine product units");
   if (!response.ok) {
     const body = await response.text();
     throw new Error(`LocalLine product units failed: ${response.status} ${body}`);
@@ -250,9 +270,9 @@ export async function fetchLocalLineOrdersPage(options = {}) {
     ordering
   });
   const url = `${LL_BASEURL}orders/?${params.toString()}`;
-  const response = await fetch(url, {
+  const response = await fetchLocalLineWithRetry(url, {
     headers: { Authorization: `Bearer ${accessToken}` }
-  });
+  }, "LocalLine orders fetch");
   if (!response.ok) {
     const body = await response.text();
     throw new Error(`LocalLine orders fetch failed: ${response.status} ${body}`);
@@ -541,7 +561,7 @@ function buildInventoryPayload(changes) {
   return payload;
 }
 
-function buildPriceListEntry(basePrice, entry, markupDecimal, saleEnabled, saleDiscount) {
+function buildPriceListEntry(basePrice, regularBasePrice, entry, markupDecimal, saleEnabled, saleDiscount) {
   if (!entry) return null;
   const safeMarkup = Number(markupDecimal);
   if (!Number.isFinite(safeMarkup)) return null;
@@ -559,7 +579,8 @@ function buildPriceListEntry(basePrice, entry, markupDecimal, saleEnabled, saleD
   }
 
   let basePriceUsed = roundCurrency(safeBase);
-  const regularFinalPrice = roundCurrency(safeBase * (1 + safeMarkup));
+  const unroundedRegularFinalPrice = safeBase * (1 + safeMarkup);
+  const regularFinalPrice = roundCurrency(unroundedRegularFinalPrice);
   let adjustmentValue =
     adjustmentType === 1
       ? roundCurrency(regularFinalPrice - basePriceUsed)
@@ -572,7 +593,7 @@ function buildPriceListEntry(basePrice, entry, markupDecimal, saleEnabled, saleD
 
   const salePct = Number(saleDiscount);
   if (saleEnabled && Number.isFinite(salePct) && salePct > 0) {
-    const discountedFinal = regularFinalPrice * (1 - salePct);
+    const discountedFinal = unroundedRegularFinalPrice * (1 - salePct);
     calculated = roundCurrency(discountedFinal);
     strikethrough = regularFinalPrice;
     onSaleToggle = true;
@@ -580,8 +601,8 @@ function buildPriceListEntry(basePrice, entry, markupDecimal, saleEnabled, saleD
     if (adjustmentType === 1) {
       adjustmentValue = roundCurrency(calculated - basePriceUsed);
     } else if (adjustmentType === 2) {
-      basePriceUsed = roundCurrency(discountedFinal / (1 + safeMarkup));
-      const saleMarkup = (discountedFinal - basePriceUsed) / basePriceUsed;
+      basePriceUsed = roundCurrency(safeBase);
+      const saleMarkup = basePriceUsed > 0 ? (calculated - basePriceUsed) / basePriceUsed : 0;
       adjustmentValue = roundCurrency(saleMarkup * 100);
     } else {
       adjustmentValue = calculated;
@@ -705,7 +726,11 @@ async function updateLocalLinePrices(db, productId, changes) {
       : profileRows.length
         ? resolvedProfile.saleDiscount
         : saleRow.saleDiscount;
-  const saleDiscount = Number(saleDiscountRaw || 0);
+  const saleDiscount = getCustomerFacingSaleDiscount({
+    ...resolvedProfile,
+    onSale: saleEnabled,
+    saleDiscount: Number(saleDiscountRaw || 0)
+  });
 
   if (!packageRows.length) {
     if (debugEnabled(productId)) {
@@ -739,8 +764,20 @@ async function updateLocalLinePrices(db, productId, changes) {
 
   const packagePayloads = [];
   for (const pkg of packageRows) {
+    const packageMeta = packageMetaByPackageId.get(Number(pkg.id));
     const purchasePrice =
-      computePackageBasePrice(resolvedProfile, pkg, packageMetaByPackageId.get(Number(pkg.id))) ??
+      computePackageBasePrice(resolvedProfile, pkg, packageMeta) ??
+      Number(pkg.price);
+    const regularPurchasePrice =
+      computePackageBasePrice(
+        {
+          ...resolvedProfile,
+          onSale: false,
+          saleDiscount: 0
+        },
+        pkg,
+        packageMeta
+      ) ??
       Number(pkg.price);
     if (!Number.isFinite(purchasePrice)) {
       continue;
@@ -768,7 +805,14 @@ async function updateLocalLinePrices(db, productId, changes) {
       if (!existingEntry) {
         continue;
       }
-      const built = buildPriceListEntry(purchasePrice, existingEntry, markup, saleEnabled, saleDiscount);
+      const built = buildPriceListEntry(
+        purchasePrice,
+        regularPurchasePrice,
+        existingEntry,
+        markup,
+        saleEnabled,
+        saleDiscount
+      );
       if (built) {
         entries.push(built);
       }

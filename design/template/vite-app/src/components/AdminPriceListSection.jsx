@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { adminGet, adminPost } from "../adminApi.js";
 
-const COLUMN_STORAGE_KEY = "adminPricelistColumnPrefs.v1";
-const COLUMN_DEFAULT_STORAGE_KEY = "adminPricelistColumnDefaultPrefs.v1";
+const COLUMN_STORAGE_KEY = "adminPricelistColumnPrefs.v2";
+const COLUMN_DEFAULT_STORAGE_KEY = "adminPricelistColumnDefaultPrefs.v2";
 const PRICELIST_DEFAULT_PAGE_SIZE = 50;
 const PRICELIST_PAGE_SIZE_OPTIONS = [50, 100, 200];
 const PRICELIST_SEARCH_DEBOUNCE_MS = 250;
@@ -12,26 +12,29 @@ const PRICELIST_COLUMNS = [
   { key: "product", label: "Product", width: 280, sticky: "left", required: true, defaultVisible: true },
   { key: "sourceUnitPrice", label: "Vendor's Retail Price", width: 156, defaultVisible: true },
   { key: "unit", label: "Vendor's Unit Type", width: 128, defaultVisible: true },
-  { key: "status", label: "Status", width: 150, defaultVisible: true },
-  { key: "category", label: "Category", width: 160, defaultVisible: true },
-  { key: "vendor", label: "Vendor", width: 170, defaultVisible: true },
-  { key: "pricingRule", label: "Rule", width: 150, defaultVisible: true },
+  { key: "basePrice", label: "CSA Package Price", width: 146, defaultVisible: true },
+  { key: "memberPrice", label: "Member Adjusted $", width: 152, defaultVisible: true },
+  { key: "visible", label: "Visible", width: 96, defaultVisible: true },
+  { key: "trackInventory", label: "Track Inventory", width: 132, defaultVisible: true },
+  { key: "inventory", label: "Stock", width: 90, defaultVisible: true },
+  { key: "onSale", label: "Sale", width: 82, defaultVisible: true },
+  { key: "saleDiscount", label: "Sale %", width: 96, defaultVisible: true },
+  { key: "status", label: "Status", width: 150, defaultVisible: false },
+  { key: "category", label: "Category", width: 160, defaultVisible: false },
+  { key: "vendor", label: "Vendor", width: 170, defaultVisible: false },
+  { key: "pricingRule", label: "Rule", width: 150, defaultVisible: false },
   { key: "minWeight", label: "Min Wt", width: 100, defaultVisible: false },
   { key: "maxWeight", label: "Max Wt", width: 100, defaultVisible: false },
   { key: "avgWeightOverride", label: "Avg Wt", width: 100, defaultVisible: false },
   { key: "sourceMultiplier", label: "FFCSA Factor", width: 116, defaultVisible: false },
-  { key: "basePrice", label: "CSA Package Price", width: 146, defaultVisible: false },
   { key: "guestMarkup", label: "Guest Adj %", width: 112, defaultVisible: false },
   { key: "guestPrice", label: "Guest Adjusted $", width: 142, defaultVisible: false },
   { key: "memberMarkup", label: "Member Adj %", width: 118, defaultVisible: false },
-  { key: "memberPrice", label: "Member Adjusted $", width: 152, defaultVisible: false },
   { key: "herdShareMarkup", label: "Herd Adj %", width: 110, defaultVisible: false },
   { key: "herdSharePrice", label: "Herd Adjusted $", width: 144, defaultVisible: false },
   { key: "snapMarkup", label: "SNAP Adj %", width: 110, defaultVisible: false },
   { key: "snapPrice", label: "SNAP Adjusted $", width: 144, defaultVisible: false },
-  { key: "onSale", label: "Sale", width: 82, defaultVisible: true },
-  { key: "saleDiscount", label: "Sale %", width: 96, defaultVisible: true },
-  { key: "packages", label: "Packages", width: 340, defaultVisible: true },
+  { key: "packages", label: "Packages", width: 340, defaultVisible: false },
   { key: "lastRemote", label: "Last Remote", width: 260, defaultVisible: false },
   { key: "actions", label: "Actions", width: 154, sticky: "right", required: true, defaultVisible: true }
 ];
@@ -162,6 +165,46 @@ function roundCurrency(value) {
   return Number(Number(value).toFixed(2));
 }
 
+function getRowDefaults(row) {
+  const saleDiscount = Number.isFinite(Number(row.saleDiscount)) ? Number(row.saleDiscount) : 0;
+  return {
+    visible: Boolean(row.visible),
+    trackInventory: Boolean(row.trackInventory),
+    inventory: Number.isFinite(Number(row.inventory)) ? Number(row.inventory) : 0,
+    onSale: Boolean(row.onSale),
+    saleDiscount: Math.round(saleDiscount * 100)
+  };
+}
+
+function editsMatch(a, b) {
+  return (
+    a.visible === b.visible &&
+    a.trackInventory === b.trackInventory &&
+    Number(a.inventory) === Number(b.inventory) &&
+    a.onSale === b.onSale &&
+    Number(a.saleDiscount) === Number(b.saleDiscount)
+  );
+}
+
+function normalizePricelistEdit(changes, defaults) {
+  return {
+    visible: typeof changes.visible === "boolean" ? changes.visible : defaults.visible,
+    trackInventory:
+      typeof changes.trackInventory === "boolean"
+        ? changes.trackInventory
+        : defaults.trackInventory,
+    inventory:
+      changes.inventory === null || typeof changes.inventory === "undefined"
+        ? defaults.inventory
+        : Number(changes.inventory) || 0,
+    onSale: typeof changes.onSale === "boolean" ? changes.onSale : defaults.onSale,
+    saleDiscount:
+      changes.saleDiscount === null || typeof changes.saleDiscount === "undefined"
+        ? defaults.saleDiscount
+        : Math.min(Math.max(Number(changes.saleDiscount) || 0, 0), 100)
+  };
+}
+
 function formatMoney(value) {
   const numeric = toNumber(value);
   return numeric === null ? "n/a" : `$${numeric.toFixed(2)}`;
@@ -172,6 +215,76 @@ function formatDateTime(value) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "Never";
   return date.toLocaleString();
+}
+
+function computeEditedBasePrice(row, rowValues) {
+  if (!row?.usesSourcePricing) {
+    return toNumber(row?.basePrice);
+  }
+
+  const sourceUnitPrice = toNumber(row?.sourceUnitPrice);
+  const sourceMultiplier = toNumber(row?.sourceMultiplier);
+  if (sourceUnitPrice === null || sourceMultiplier === null) {
+    return toNumber(row?.basePrice);
+  }
+
+  const saleDiscount =
+    rowValues?.onSale && Number.isFinite(Number(rowValues?.saleDiscount))
+      ? Math.max(0, Math.min(Number(rowValues.saleDiscount) / 100, 1))
+      : 0;
+  const vendorFundedSaleDiscount = saleDiscount > 0 ? saleDiscount / 2 : 0;
+  const effectiveSourceMultiplier = sourceMultiplier * (1 - vendorFundedSaleDiscount);
+  const packages = Array.isArray(row?.packages) ? row.packages : [];
+
+  const packageBasePrices = packages
+    .map((pkg) => {
+      if (String(row?.unitOfMeasure || "").toLowerCase() === "lbs") {
+        const averageWeight = toNumber(pkg?.averageWeight);
+        if (averageWeight === null || averageWeight <= 0) return null;
+        return roundCurrency(sourceUnitPrice * averageWeight * effectiveSourceMultiplier);
+      }
+
+      const quantity = Math.max(toNumber(pkg?.quantity) || 1, 1);
+      return roundCurrency(sourceUnitPrice * quantity * effectiveSourceMultiplier);
+    })
+    .filter((value) => value !== null);
+
+  if (!packageBasePrices.length) {
+    return toNumber(row?.basePrice);
+  }
+
+  return Math.min(...packageBasePrices);
+}
+
+function computeEditedFinalPrice(row, basePrice, markup, rowValues) {
+  const safeBasePrice = toNumber(basePrice);
+  const safeMarkup = toNumber(markup);
+  if (safeBasePrice === null || safeMarkup === null) return null;
+
+  const unroundedRegular = safeBasePrice * (1 + safeMarkup);
+  const regular = roundCurrency(unroundedRegular);
+  if (!rowValues?.onSale) {
+    return regular;
+  }
+
+  const saleDiscount = Math.max(0, Math.min((toNumber(rowValues?.saleDiscount) || 0) / 100, 1));
+  return roundCurrency(unroundedRegular * (1 - saleDiscount));
+}
+
+function buildDisplayRow(row, rowValues) {
+  const nextBasePrice = computeEditedBasePrice(row, rowValues);
+  return {
+    ...row,
+    basePrice: nextBasePrice,
+    guestPrice: computeEditedFinalPrice(row, nextBasePrice, row?.guestMarkup, rowValues),
+    memberPrice: computeEditedFinalPrice(row, nextBasePrice, row?.memberMarkup, rowValues),
+    herdSharePrice: computeEditedFinalPrice(row, nextBasePrice, row?.herdShareMarkup, rowValues),
+    snapPrice: computeEditedFinalPrice(row, nextBasePrice, row?.snapMarkup, rowValues),
+    onSale: Boolean(rowValues?.onSale),
+    saleDiscount: Number.isFinite(Number(rowValues?.saleDiscount))
+      ? Number(rowValues.saleDiscount) / 100
+      : 0
+  };
 }
 
 function compareNullableNumbers(left, right) {
@@ -222,6 +335,12 @@ function getSortValue(row, columnKey) {
       return toNumber(row.memberMarkup);
     case "memberPrice":
       return toNumber(row.memberPrice);
+    case "visible":
+      return row.visible ? 1 : 0;
+    case "trackInventory":
+      return row.trackInventory ? 1 : 0;
+    case "inventory":
+      return toNumber(row.inventory);
     case "herdShareMarkup":
       return toNumber(row.herdShareMarkup);
     case "herdSharePrice":
@@ -292,6 +411,7 @@ export function AdminPriceListSection({
   const [debouncedProductSearch, setDebouncedProductSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [vendorFilter, setVendorFilter] = useState("");
+  const [saleFilter, setSaleFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(PRICELIST_DEFAULT_PAGE_SIZE);
@@ -301,9 +421,27 @@ export function AdminPriceListSection({
   const [pushReviewLoading, setPushReviewLoading] = useState(false);
   const [pushReviewRows, setPushReviewRows] = useState([]);
   const [pushReviewProductIds, setPushReviewProductIds] = useState([]);
+  const [pushState, setPushState] = useState({
+    active: false,
+    completed: 0,
+    total: 0,
+    currentProductId: null,
+    currentProductName: "",
+    resultsById: {}
+  });
+  const [pricelistEdits, setPricelistEdits] = useState({});
+  const [applyLoading, setApplyLoading] = useState(false);
+  const [applyState, setApplyState] = useState({
+    open: false,
+    updates: [],
+    results: [],
+    error: "",
+    localOnly: false
+  });
   const [applyingProductIds, setApplyingProductIds] = useState([]);
   const [deletingProductIds, setDeletingProductIds] = useState([]);
   const [exportingGoogle, setExportingGoogle] = useState(false);
+  const [cleanupRecentChangeLoading, setCleanupRecentChangeLoading] = useState(false);
   const [columnPickerOpen, setColumnPickerOpen] = useState(false);
   const [pushReviewOpen, setPushReviewOpen] = useState(false);
   const [openActionMenuProductId, setOpenActionMenuProductId] = useState(null);
@@ -400,6 +538,7 @@ export function AdminPriceListSection({
     if (debouncedProductSearch) params.set("search", debouncedProductSearch);
     if (categoryFilter) params.set("categoryId", categoryFilter);
     if (vendorFilter) params.set("vendorId", vendorFilter);
+    if (saleFilter && saleFilter !== "all") params.set("sale", saleFilter);
     if (statusFilter && statusFilter !== "all") params.set("status", statusFilter);
     return params;
   }
@@ -420,6 +559,7 @@ export function AdminPriceListSection({
       if (debouncedProductSearch) params.set("search", debouncedProductSearch);
       if (categoryFilter) params.set("categoryId", categoryFilter);
       if (vendorFilter) params.set("vendorId", vendorFilter);
+      if (saleFilter && saleFilter !== "all") params.set("sale", saleFilter);
 
       const response = await adminGet(`pricelist?${params.toString()}`, token);
       const rowsForPage = Array.isArray(response.rows) ? response.rows : [];
@@ -466,7 +606,49 @@ export function AdminPriceListSection({
 
   useEffect(() => {
     loadPriceList();
-  }, [token, page, pageSize, debouncedProductSearch, categoryFilter, vendorFilter, statusFilter, sortConfig.key, sortConfig.direction]);
+  }, [token, page, pageSize, debouncedProductSearch, categoryFilter, vendorFilter, saleFilter, statusFilter, sortConfig.key, sortConfig.direction]);
+
+  function getPendingPricelistEditEntries() {
+    return Object.entries(pricelistEdits).filter(([, entry]) => {
+      if (!entry?.defaults || !entry?.values) return false;
+      return !editsMatch(entry.values, entry.defaults);
+    });
+  }
+
+  function updatePricelistEdit(row, patch) {
+    if (!row?.productId) return;
+
+    setPricelistEdits((prev) => {
+      const next = { ...prev };
+      const currentEntry = next[row.productId] || null;
+      const defaults = currentEntry?.defaults || getRowDefaults(row);
+      const updated = normalizePricelistEdit(
+        { ...(currentEntry?.values || defaults), ...patch },
+        defaults
+      );
+
+      if (updated.trackInventory && updated.visible && Number(updated.inventory) === 0) {
+        window.alert("If Track Inventory is on and stock is 0, set Visible to off.");
+        return prev;
+      }
+
+      if (editsMatch(updated, defaults)) {
+        delete next[row.productId];
+      } else {
+        next[row.productId] = {
+          defaults,
+          values: updated,
+          meta: {
+            productId: row.productId,
+            productName: row.name || `Product ${row.productId}`,
+            categoryName: row.categoryName || "Uncategorized"
+          }
+        };
+      }
+
+      return next;
+    });
+  }
 
   function setColumnVisibility(key, nextVisible) {
     setVisibleColumns((prev) => ({
@@ -543,15 +725,55 @@ export function AdminPriceListSection({
 
   async function applyRemote(productIds) {
     if (!productIds.length) return;
-    setApplyingProductIds(productIds);
+    const reviewRowsById = new Map(pushReviewRows.map((row) => [Number(row.productId), row]));
+    const nextResultsById = {};
+    setPushState({
+      active: true,
+      completed: 0,
+      total: productIds.length,
+      currentProductId: null,
+      currentProductName: "",
+      resultsById: {}
+    });
+    setApplyingProductIds([]);
     setMessage("");
     try {
-      const response = await adminPost("pricelist/apply-remote", token, { productIds });
-      const failures = (response.results || []).filter((row) => !row.ok);
+      for (let index = 0; index < productIds.length; index += 1) {
+        const productId = Number(productIds[index]);
+        const row = reviewRowsById.get(productId);
+        setApplyingProductIds([productId]);
+        setPushState((prev) => ({
+          ...prev,
+          currentProductId: productId,
+          currentProductName: row?.name || `Product ${productId}`
+        }));
+
+        try {
+          const response = await adminPost("pricelist/apply-remote", token, { productIds: [productId] });
+          const result = Array.isArray(response.results) && response.results.length
+            ? response.results[0]
+            : { productId, ok: true, message: "Changes applied." };
+          nextResultsById[productId] = result;
+        } catch (error) {
+          nextResultsById[productId] = {
+            productId,
+            ok: false,
+            message: error?.message || "Remote apply failed."
+          };
+        }
+
+        setPushState((prev) => ({
+          ...prev,
+          completed: index + 1,
+          resultsById: { ...nextResultsById }
+        }));
+      }
+
+      const failures = Object.values(nextResultsById).filter((row) => !row.ok);
       setMessage(
         failures.length
           ? failures.map((row) => `${row.productId}: ${row.message}`).join(" | ")
-          : "Pricing applied to the remote store."
+          : "Changes pushed to Local Line."
       );
       await loadPriceList();
       if (typeof onDataRefresh === "function") {
@@ -560,11 +782,16 @@ export function AdminPriceListSection({
       if (typeof onCatalogRefresh === "function") {
         await onCatalogRefresh();
       }
-      setPushReviewOpen(false);
     } catch (_error) {
       setMessage("Failed to apply pricelist remotely.");
     } finally {
       setApplyingProductIds([]);
+      setPushState((prev) => ({
+        ...prev,
+        active: false,
+        currentProductId: null,
+        currentProductName: ""
+      }));
     }
   }
 
@@ -576,14 +803,101 @@ export function AdminPriceListSection({
       const vendorSummary = Array.isArray(response.vendorNames) && response.vendorNames.length
         ? response.vendorNames.join(", ")
         : "No matching vendors";
+      const highlightSummary = Number(response.highlightedRowCount || 0)
+        ? ` ${Number(response.highlightedRowCount || 0)} row${Number(response.highlightedRowCount || 0) === 1 ? "" : "s"} highlighted in yellow.`
+        : "";
       setMessage(
-        `Google pricelist updated with ${response.rowCount || 0} rows: ${vendorSummary}`
+        `Google pricelist updated with ${response.rowCount || 0} rows: ${vendorSummary}.${highlightSummary}`
       );
     } catch (error) {
       setMessage(error?.message || "Failed to export Google pricelist.");
     } finally {
       setExportingGoogle(false);
     }
+  }
+
+  async function cleanupRecentChangeFalsePositives() {
+    setCleanupRecentChangeLoading(true);
+    setMessage("");
+    try {
+      const response = await adminPost("pricelist/cleanup-recent-change-false-positives", token, {});
+      setMessage(
+        Number(response.cleaned || 0)
+          ? `Cleaned ${Number(response.cleaned || 0)} existing recent-change false positive row${Number(response.cleaned || 0) === 1 ? "" : "s"}.`
+          : "No existing recent-change false positives needed cleanup."
+      );
+      await loadPriceList();
+      if (typeof onDataRefresh === "function") {
+        await onDataRefresh();
+      }
+    } catch (error) {
+      setMessage(error?.message || "Failed to clean recent-change false positives.");
+    } finally {
+      setCleanupRecentChangeLoading(false);
+    }
+  }
+
+  async function handleApplyChanges() {
+    if (!pendingPricelistEditEntries.length) return;
+
+    const updates = pendingPricelistEditEntries.map(([, entry]) => {
+      const safeDiscount = Math.min(Math.max(Number(entry.values.saleDiscount) || 0, 0), 100);
+      return {
+        productId: entry.meta.productId,
+        productName: entry.meta.productName,
+        category: entry.meta.categoryName,
+        changes: {
+          visible: entry.values.visible ? 1 : 0,
+          trackInventory: entry.values.trackInventory ? 1 : 0,
+          inventory: Number(entry.values.inventory) || 0,
+          onSale: entry.values.onSale ? 1 : 0,
+          saleDiscount: safeDiscount / 100
+        },
+        display: {
+          visible: entry.values.visible ? "On" : "Off",
+          trackInventory: entry.values.trackInventory ? "On" : "Off",
+          inventory: Number(entry.values.inventory) || 0,
+          onSale: entry.values.onSale ? "On" : "Off",
+          saleDiscount: safeDiscount
+        }
+      };
+    });
+
+    setApplyState({ open: true, updates, results: [], error: "", localOnly: true });
+    setApplyLoading(true);
+    setMessage("");
+
+    try {
+      const response = await adminPost("products/bulk-update", token, {
+        applyRemote: false,
+        queueRemoteSync: true,
+        syncPricingProfileSale: true,
+        updates: updates.map((update) => ({
+          productId: update.productId,
+          changes: update.changes
+        }))
+      });
+
+      setApplyState((prev) => ({ ...prev, results: response.results || [] }));
+      setPricelistEdits({});
+      setMessage("Local pricelist changes applied. Use Push to Local Line when ready.");
+      await loadPriceList();
+      if (typeof onDataRefresh === "function") {
+        await onDataRefresh();
+      }
+      if (typeof onCatalogRefresh === "function") {
+        await onCatalogRefresh();
+      }
+    } catch (_error) {
+      setApplyState((prev) => ({ ...prev, error: "Failed to apply pricelist changes." }));
+      setMessage("Pricelist update failed.");
+    } finally {
+      setApplyLoading(false);
+    }
+  }
+
+  function closeApplyPanel() {
+    setApplyState({ open: false, updates: [], results: [], error: "", localOnly: false });
   }
 
   async function handleDeleteRow(productId) {
@@ -610,6 +924,7 @@ export function AdminPriceListSection({
   const remoteReadyProductIds = rows
     .filter((row) => row.hasPendingRemoteApply)
     .map((row) => row.productId);
+  const pendingPricelistEditEntries = getPendingPricelistEditEntries();
   const pendingProductsOffPage = Math.max(0, filteredPendingCount - remoteReadyProductIds.length);
   const statusText = loading
     ? "Loading pricelist..."
@@ -650,6 +965,14 @@ export function AdminPriceListSection({
     if (!filteredPendingCount || applyingProductIds.length || pushReviewLoading) return;
     setPushReviewOpen(true);
     setPushReviewLoading(true);
+    setPushState({
+      active: false,
+      completed: 0,
+      total: 0,
+      currentProductId: null,
+      currentProductName: "",
+      resultsById: {}
+    });
     setPushReviewRows([]);
     setPushReviewProductIds([]);
     setMessage("");
@@ -670,11 +993,19 @@ export function AdminPriceListSection({
   }
 
   function closePushReview() {
-    if (applyingProductIds.length) return;
+    if (applyingProductIds.length || pushState.active) return;
     setPushReviewOpen(false);
     setPushReviewLoading(false);
     setPushReviewRows([]);
     setPushReviewProductIds([]);
+    setPushState({
+      active: false,
+      completed: 0,
+      total: 0,
+      currentProductId: null,
+      currentProductName: "",
+      resultsById: {}
+    });
   }
 
   function getProductMetaLine(row) {
@@ -689,7 +1020,12 @@ export function AdminPriceListSection({
   }
 
   function renderCell(column, row, isApplying, isDeleting) {
-    const rowBusy = isApplying || isDeleting;
+    const rowBusy = isApplying || isDeleting || applyLoading;
+    const editEntry = pricelistEdits[row.productId];
+    const defaults = editEntry?.defaults || getRowDefaults(row);
+    const rowValues = editEntry?.values || defaults;
+    const displayRow = buildDisplayRow(row, rowValues);
+
     switch (column.key) {
       case "status":
         return (
@@ -725,27 +1061,84 @@ export function AdminPriceListSection({
       case "sourceMultiplier":
         return row.usesSourcePricing ? row.sourceMultiplier ?? "" : "";
       case "basePrice":
-        return formatMoney(row.basePrice);
+        return formatMoney(displayRow.basePrice);
       case "guestMarkup":
         return row.usesNoMarkupPricing ? "0.00" : `${roundCurrency((toNumber(row.guestMarkup) || 0) * 100).toFixed(2)}`;
       case "guestPrice":
-        return formatMoney(row.guestPrice);
+        return formatMoney(displayRow.guestPrice);
       case "memberMarkup":
         return row.usesNoMarkupPricing ? "0.00" : `${roundCurrency((toNumber(row.memberMarkup) || 0) * 100).toFixed(2)}`;
       case "memberPrice":
-        return formatMoney(row.memberPrice);
+        return formatMoney(displayRow.memberPrice);
+      case "visible":
+        return (
+          <button
+            className={`toggle-switch ${rowValues.visible ? "active" : ""}`}
+            type="button"
+            disabled={rowBusy}
+            onClick={() => updatePricelistEdit(row, { visible: !rowValues.visible })}
+          />
+        );
+      case "trackInventory":
+        return (
+          <button
+            className={`toggle-switch ${rowValues.trackInventory ? "active" : ""}`}
+            type="button"
+            disabled={rowBusy}
+            onClick={() => updatePricelistEdit(row, { trackInventory: !rowValues.trackInventory })}
+          />
+        );
+      case "inventory":
+        return (
+          <input
+            className="stock-input"
+            type="number"
+            value={rowValues.inventory}
+            disabled={rowBusy}
+            onChange={(event) =>
+              updatePricelistEdit(row, {
+                inventory: Number(event.target.value)
+              })
+            }
+          />
+        );
       case "herdShareMarkup":
         return row.usesNoMarkupPricing ? "0.00" : `${roundCurrency((toNumber(row.herdShareMarkup) || 0) * 100).toFixed(2)}`;
       case "herdSharePrice":
-        return formatMoney(row.herdSharePrice);
+        return formatMoney(displayRow.herdSharePrice);
       case "snapMarkup":
         return row.usesNoMarkupPricing ? "0.00" : `${roundCurrency((toNumber(row.snapMarkup) || 0) * 100).toFixed(2)}`;
       case "snapPrice":
-        return formatMoney(row.snapPrice);
+        return formatMoney(displayRow.snapPrice);
       case "onSale":
-        return row.onSale ? "Yes" : "No";
+        return (
+          <button
+            className={`toggle-switch ${rowValues.onSale ? "active" : ""}`}
+            type="button"
+            disabled={rowBusy}
+            onClick={() => updatePricelistEdit(row, { onSale: !rowValues.onSale })}
+          />
+        );
       case "saleDiscount":
-        return `${roundCurrency((toNumber(row.saleDiscount) || 0) * 100).toFixed(2)}`;
+        return (
+          <span className="sale-discount-wrapper">
+            <input
+              className="sale-discount-input"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+              value={rowValues.saleDiscount}
+              disabled={rowBusy}
+              onChange={(event) =>
+                updatePricelistEdit(row, {
+                  saleDiscount: Number(event.target.value)
+                })
+              }
+            />
+            <span className="sale-discount-suffix">%</span>
+          </span>
+        );
       case "packages":
         return <div className="pricelist-package-cell">{row.packageSummary || "No packages"}</div>;
       case "lastRemote":
@@ -898,10 +1291,49 @@ export function AdminPriceListSection({
               <option value="not-applied">Not applied</option>
             </select>
           </label>
+          <label className="filter-field">
+            <span className="small">On sale</span>
+            <select
+              className="input"
+              value={saleFilter}
+              onChange={(event) => {
+                setSaleFilter(event.target.value);
+                setPage(1);
+              }}
+            >
+              <option value="all">All</option>
+              <option value="onSale">On sale only</option>
+              <option value="notOnSale">Not on sale</option>
+            </select>
+          </label>
         </div>
 
         <div className="pricelist-toolbar-actions">
           <div className="pricelist-toolbar-buttons">
+            <button
+              className="button"
+              type="button"
+              onClick={handleApplyChanges}
+              disabled={applyLoading || pendingPricelistEditEntries.length === 0}
+            >
+              {applyLoading
+                ? "Applying local changes..."
+                : `Apply Local Changes (${pendingPricelistEditEntries.length})`}
+            </button>
+            <button
+              className="button alt"
+              type="button"
+              disabled={applyLoading || pendingPricelistEditEntries.length === 0}
+              onClick={() => {
+                if (!window.confirm("Discard all pending pricelist changes? This cannot be undone.")) {
+                  return;
+                }
+                setPricelistEdits({});
+                setMessage("Pending pricelist changes discarded.");
+              }}
+            >
+              Cancel Changes
+            </button>
             <button
               className="button"
               type="button"
@@ -1015,6 +1447,14 @@ export function AdminPriceListSection({
             >
               {exportingGoogle ? "Exporting..." : "Push Google Pricelist"}
             </button>
+            <button
+              className="button alt"
+              type="button"
+              onClick={cleanupRecentChangeFalsePositives}
+              disabled={cleanupRecentChangeLoading}
+            >
+              {cleanupRecentChangeLoading ? "Cleaning..." : "Cleanup Recent Change Flags"}
+            </button>
             <button className="button alt" type="button" onClick={loadPriceList} disabled={loading}>
               {loading ? "Refreshing..." : "Refresh"}
             </button>
@@ -1023,6 +1463,9 @@ export function AdminPriceListSection({
       </div>
 
       <div className="small pricelist-count">{statusText}</div>
+      <div className="small pricelist-count">
+        Pending pricelist changes: {pendingPricelistEditEntries.length}
+      </div>
       <div className="small pricelist-count">
         {filteredPendingCount} product{filteredPendingCount === 1 ? "" : "s"} currently need a Local Line push.
       </div>
@@ -1034,7 +1477,7 @@ export function AdminPriceListSection({
       {pushReviewOpen ? (
         <div className="modal-backdrop" onClick={closePushReview}>
           <div className="modal response-modal pricelist-push-review-modal" onClick={(event) => event.stopPropagation()}>
-            <button className="modal-close" type="button" onClick={closePushReview} disabled={applyingProductIds.length > 0}>
+            <button className="modal-close" type="button" onClick={closePushReview} disabled={applyingProductIds.length > 0 || pushState.active}>
               Close
             </button>
             <h3>Review Local Line Push</h3>
@@ -1050,6 +1493,15 @@ export function AdminPriceListSection({
             <div className="response-progress">
               {pushReviewProductIds.length} product{pushReviewProductIds.length === 1 ? "" : "s"} will be pushed.
             </div>
+            {pushState.active ? (
+              <div className="small">
+                Pushing {pushState.completed + 1} of {pushState.total}: {pushState.currentProductName || `Product ${pushState.currentProductId}`}
+              </div>
+            ) : pushState.completed > 0 ? (
+              <div className="small">
+                Push complete: {pushState.completed} of {pushState.total} processed.
+              </div>
+            ) : null}
             {pendingProductsOffPage > 0 ? (
               <div className="small">
                 {pendingProductsOffPage} pending product{pendingProductsOffPage === 1 ? "" : "s"} are outside the current page, but will still be included.
@@ -1073,16 +1525,26 @@ export function AdminPriceListSection({
                       <td colSpan={6}>Loading pending products...</td>
                     </tr>
                   ) : pushReviewRows.length ? (
-                    pushReviewRows.map((row) => (
-                      <tr key={`push-review-${row.productId}`}>
-                        <td>{row.name}</td>
-                        <td>{row.vendorName}</td>
-                        <td>{formatMoney(row.basePrice)}</td>
-                        <td>{formatMoney(row.memberPrice)}</td>
-                        <td>{row.onSale ? `${roundCurrency((toNumber(row.saleDiscount) || 0) * 100).toFixed(2)}%` : "No"}</td>
-                        <td>{row.remoteSyncStatus}</td>
-                      </tr>
-                    ))
+                    pushReviewRows.map((row) => {
+                      const result = pushState.resultsById?.[row.productId] || null;
+                      let statusLabel = row.remoteSyncStatus;
+                      if (pushState.active && pushState.currentProductId === row.productId) {
+                        statusLabel = "Pushing...";
+                      } else if (result) {
+                        statusLabel = result.ok ? "Pushed" : `Failed: ${result.message || "Remote apply failed."}`;
+                      }
+
+                      return (
+                        <tr key={`push-review-${row.productId}`}>
+                          <td>{row.name}</td>
+                          <td>{row.vendorName}</td>
+                          <td>{formatMoney(row.basePrice)}</td>
+                          <td>{formatMoney(row.memberPrice)}</td>
+                          <td>{row.onSale ? `${roundCurrency((toNumber(row.saleDiscount) || 0) * 100).toFixed(2)}%` : "No"}</td>
+                          <td>{statusLabel}</td>
+                        </tr>
+                      );
+                    })
                   ) : (
                     <tr>
                       <td colSpan={6}>No pending products found for the current filters.</td>
@@ -1092,16 +1554,16 @@ export function AdminPriceListSection({
               </table>
             </div>
             <div className="response-actions">
-              <button className="button alt" type="button" onClick={closePushReview} disabled={applyingProductIds.length > 0}>
-                Cancel
+              <button className="button alt" type="button" onClick={closePushReview} disabled={applyingProductIds.length > 0 || pushState.active}>
+                {pushState.completed > 0 && !pushState.active ? "Close" : "Cancel"}
               </button>
               <button
                 className="button"
                 type="button"
                 onClick={() => applyRemote(pushReviewProductIds)}
-                disabled={applyingProductIds.length > 0 || pushReviewLoading || pushReviewProductIds.length === 0}
+                disabled={applyingProductIds.length > 0 || pushState.active || pushReviewLoading || pushReviewProductIds.length === 0}
               >
-                {applyingProductIds.length ? "Pushing..." : `Submit Push (${pushReviewProductIds.length})`}
+                {pushState.active ? "Pushing..." : `Submit Push (${pushReviewProductIds.length})`}
               </button>
             </div>
           </div>
@@ -1214,11 +1676,13 @@ export function AdminPriceListSection({
               {rows.map((row) => {
                 const isApplying = applyingProductIds.includes(row.productId);
                 const isDeleting = deletingProductIds.includes(row.productId);
+                const editEntry = pricelistEdits[row.productId];
+                const isEdited = Boolean(editEntry && !editsMatch(editEntry.values, editEntry.defaults));
 
                 return (
                   <tr
                     key={`pricelist-row-${row.productId}`}
-                    className={isDeleting ? "pricelist-row-processing" : ""}
+                    className={`${isEdited ? "edited" : ""}${isDeleting ? " pricelist-row-processing" : ""}`.trim()}
                   >
                     {visibleColumnDefs.map((column) => (
                       <td
@@ -1236,6 +1700,86 @@ export function AdminPriceListSection({
           </table>
         </div>
       </div>
+
+      {applyState.open ? (
+        <div className="modal-backdrop" onClick={closeApplyPanel}>
+          <div className="modal response-modal" onClick={(event) => event.stopPropagation()}>
+            <h3>{applyState.localOnly ? "Local Pricelist Changes Applied" : "Pricelist Updates Applied"}</h3>
+            <div className="response-progress">
+              Updating {applyState.results.length} of {applyState.updates.length} products
+            </div>
+            {applyState.localOnly ? (
+              <div className="small">Local database updated. Use `Push to Local Line` to send these changes remotely.</div>
+            ) : null}
+            {applyState.error ? <div className="small">{applyState.error}</div> : null}
+            <div className="response-list">
+              {applyState.updates.map((update) => {
+                const result = (applyState.results || []).find(
+                  (item) => item.productId === update.productId
+                );
+                const databaseOk = result ? result.databaseUpdate : null;
+                const localLineOk = result ? result.localLineUpdate : null;
+                const localLinePriceOk = result ? result.localLinePriceUpdate : null;
+                const dbLabel =
+                  databaseOk === null || databaseOk === undefined
+                    ? "Pending"
+                    : databaseOk
+                      ? "Updated"
+                      : "Failed";
+                const llLabel =
+                  localLineOk === null || localLineOk === undefined
+                    ? "Skipped"
+                    : localLineOk
+                      ? "Updated"
+                      : "Failed";
+                const llPriceLabel =
+                  localLinePriceOk === null || localLinePriceOk === undefined
+                    ? "Skipped"
+                    : localLinePriceOk
+                      ? "Updated"
+                      : "Failed";
+                const dbClass = databaseOk ? "ok" : databaseOk === null ? "pending" : "warn";
+                const llClass = localLineOk ? "ok" : localLineOk === null ? "pending" : "warn";
+                const llPriceClass =
+                  localLinePriceOk ? "ok" : localLinePriceOk === null ? "pending" : "warn";
+
+                return (
+                  <div className="response-card" key={`pricelist-result-${update.productId}`}>
+                    <div className="title">{update.productName}</div>
+                    <div className="small">Category: {update.category}</div>
+                    <div className="small">
+                      Visible: {update.display.visible} · Track: {update.display.trackInventory} ·
+                      Stock: {update.display.inventory}
+                    </div>
+                    <div className="small">
+                      Sale: {update.display.onSale} · Discount: {update.display.saleDiscount}%
+                    </div>
+                    <div>
+                      Database: <span className={`status ${dbClass}`}>{dbLabel}</span>
+                    </div>
+                    {applyState.localOnly ? null : (
+                      <>
+                        <div>
+                          LocalLine: <span className={`status ${llClass}`}>{llLabel}</span>
+                        </div>
+                        <div>
+                          LocalLine Pricing:{" "}
+                          <span className={`status ${llPriceClass}`}>{llPriceLabel}</span>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            <div className="response-actions">
+              <button className="button alt" type="button" onClick={closeApplyPanel}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }

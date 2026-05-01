@@ -12,7 +12,10 @@ import {
   productSales,
   vendors
 } from "../schema.js";
-import { computeProductPricingSnapshot, isSourcePricingVendor } from "../lib/productPricing.js";
+import {
+  computeProductPricingSnapshot,
+  isSourcePricingVendor
+} from "../lib/productPricing.js";
 import { ensureLocalLineSyncSchema, getDb, isMissingTableError } from "../db.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -33,6 +36,8 @@ const ORDERED_COLUMN_NAMES = [
   "highest_weight",
   "dff_unit_of_measure",
   "sourceMultiplier",
+  "avgWeightUsed",
+  "packageQuantityUsed",
   "ffcsaPurchasePrice",
   "ffcsaMemberSalesPrice",
   "ffcsaGuestSalesPrice",
@@ -48,6 +53,25 @@ const ORDERED_COLUMN_NAMES = [
   "visible",
   "remoteSyncStatus",
   "remoteSyncedAt"
+];
+const INTRO_NOTE_ROW_INDEX = 14;
+const COLUMN_INDEX_BY_NAME = new Map(ORDERED_COLUMN_NAMES.map((name, index) => [name, index]));
+const PRICE_SHEET_CURRENCY_COLUMNS = [
+  "retailSalesPrice",
+  "ffcsaPurchasePrice",
+  "ffcsaMemberSalesPrice",
+  "ffcsaGuestSalesPrice"
+];
+const PRICE_SHEET_PERCENT_COLUMNS = [
+  "memberMarkup",
+  "guestPercentOverRetail",
+  "herdShareMarkup",
+  "snapMarkup",
+  "saleDiscount"
+];
+const PRICE_SHEET_NUMBER_COLUMNS = [
+  { key: "avgWeightUsed", pattern: "0.000" },
+  { key: "packageQuantityUsed", pattern: "0.###" }
 ];
 
 function hasFlag(flag) {
@@ -85,6 +109,14 @@ function columnIndexToLetter(index) {
     remainder = Math.floor((remainder - 1) / 26);
   }
   return column;
+}
+
+function getColumnLetterByName(columnName) {
+  const index = COLUMN_INDEX_BY_NAME.get(columnName);
+  if (!Number.isFinite(index)) {
+    throw new Error(`Unknown Google pricelist column: ${columnName}`);
+  }
+  return columnIndexToLetter(index + 1);
 }
 
 function toNumber(value) {
@@ -152,13 +184,28 @@ function buildIntroductionValues(metadata) {
     ["Vendor filter", metadata.vendorSummary],
     [],
     ["Notes"],
+    ["Highlight note", "Rows highlighted in yellow show products with price changes in the last 1 day."],
     ["retailSalesPrice", "DFF source price from the store pricing profile"],
+    ["sourceMultiplier", "Multiplier used in the in-sheet purchase price formula"],
+    ["avgWeightUsed", "For weight-based products, the sheet uses the average of lowest_weight and highest_weight"],
+    ["packageQuantityUsed", "For each-based products, the sheet uses this package quantity in the purchase price formula"],
     ["packageName", "Combined package summary for the product"],
     ["ffcsaPurchasePrice", "Derived base package price before list markups"],
     ["ffcsaMemberSalesPrice", "Derived member-facing price"],
     ["ffcsaGuestSalesPrice", "Derived guest-facing price"],
     ["Sync behavior", "Google sync replaces all data in the configured prices tab"]
   ];
+}
+
+function toTimestamp(value) {
+  if (!value) return 0;
+  const timestamp = new Date(value).getTime();
+  return Number.isFinite(timestamp) ? timestamp : 0;
+}
+
+function hasRecentPriceOrSaleChange(profile, saleRow, windowDays = 1) {
+  const cutoff = Date.now() - windowDays * 24 * 60 * 60 * 1000;
+  return toTimestamp(profile?.updatedAt) >= cutoff || toTimestamp(saleRow?.updatedAt) >= cutoff;
 }
 
 async function getServiceAccountAccessToken(credentialsPath) {
@@ -300,6 +347,225 @@ async function formatGoogleSheetHeader({
   });
 }
 
+async function formatGooglePricelistColumns({
+  accessToken,
+  spreadsheetId,
+  sheetName,
+  rowCount
+}) {
+  const { sheetId } = await getGoogleSheetInfo({ accessToken, spreadsheetId, sheetName });
+  const safeRowCount = Math.max(Number(rowCount) || 1, 1);
+  const requests = [];
+
+  PRICE_SHEET_CURRENCY_COLUMNS.forEach((columnName) => {
+    const index = COLUMN_INDEX_BY_NAME.get(columnName);
+    if (!Number.isFinite(index)) return;
+    requests.push({
+      repeatCell: {
+        range: {
+          sheetId,
+          startRowIndex: 1,
+          endRowIndex: safeRowCount,
+          startColumnIndex: index,
+          endColumnIndex: index + 1
+        },
+        cell: {
+          userEnteredFormat: {
+            numberFormat: {
+              type: "CURRENCY",
+              pattern: "$#,##0.00"
+            }
+          }
+        },
+        fields: "userEnteredFormat.numberFormat"
+      }
+    });
+  });
+
+  PRICE_SHEET_PERCENT_COLUMNS.forEach((columnName) => {
+    const index = COLUMN_INDEX_BY_NAME.get(columnName);
+    if (!Number.isFinite(index)) return;
+    requests.push({
+      repeatCell: {
+        range: {
+          sheetId,
+          startRowIndex: 1,
+          endRowIndex: safeRowCount,
+          startColumnIndex: index,
+          endColumnIndex: index + 1
+        },
+        cell: {
+          userEnteredFormat: {
+            numberFormat: {
+              type: "PERCENT",
+              pattern: "0.00%"
+            }
+          }
+        },
+        fields: "userEnteredFormat.numberFormat"
+      }
+    });
+  });
+
+  PRICE_SHEET_NUMBER_COLUMNS.forEach(({ key, pattern }) => {
+    const index = COLUMN_INDEX_BY_NAME.get(key);
+    if (!Number.isFinite(index)) return;
+    requests.push({
+      repeatCell: {
+        range: {
+          sheetId,
+          startRowIndex: 1,
+          endRowIndex: safeRowCount,
+          startColumnIndex: index,
+          endColumnIndex: index + 1
+        },
+        cell: {
+          userEnteredFormat: {
+            numberFormat: {
+              type: "NUMBER",
+              pattern
+            }
+          }
+        },
+        fields: "userEnteredFormat.numberFormat"
+      }
+    });
+  });
+
+  if (!requests.length) return;
+
+  await googleSheetRequest(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}:batchUpdate`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ requests })
+  });
+}
+
+async function formatGoogleSheetHighlightedRows({
+  accessToken,
+  spreadsheetId,
+  sheetName,
+  columnCount,
+  rowCount,
+  highlightedRowIndices = []
+}) {
+  const { sheetId } = await getGoogleSheetInfo({ accessToken, spreadsheetId, sheetName });
+  const safeColumnCount = Math.max(Number(columnCount) || 1, 1);
+  const safeRowCount = Math.max(Number(rowCount) || 1, 1);
+  const requests = [];
+
+  if (safeRowCount > 1) {
+    requests.push({
+      repeatCell: {
+        range: {
+          sheetId,
+          startRowIndex: 1,
+          endRowIndex: safeRowCount,
+          startColumnIndex: 0,
+          endColumnIndex: safeColumnCount
+        },
+        cell: {
+          userEnteredFormat: {
+            backgroundColor: {
+              red: 1,
+              green: 1,
+              blue: 1
+            }
+          }
+        },
+        fields: "userEnteredFormat.backgroundColor"
+      }
+    });
+  }
+
+  highlightedRowIndices.forEach((rowIndex) => {
+    if (!Number.isFinite(rowIndex) || rowIndex < 1 || rowIndex >= safeRowCount) return;
+    requests.push({
+      repeatCell: {
+        range: {
+          sheetId,
+          startRowIndex: rowIndex,
+          endRowIndex: rowIndex + 1,
+          startColumnIndex: 0,
+          endColumnIndex: safeColumnCount
+        },
+        cell: {
+          userEnteredFormat: {
+            backgroundColor: {
+              red: 1,
+              green: 0.949,
+              blue: 0.6
+            }
+          }
+        },
+        fields: "userEnteredFormat.backgroundColor"
+      }
+    });
+  });
+
+  if (!requests.length) return;
+
+  await googleSheetRequest(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}:batchUpdate`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ requests })
+  });
+}
+
+async function formatGoogleSheetNoteRow({
+  accessToken,
+  spreadsheetId,
+  sheetName,
+  rowIndex,
+  columnCount
+}) {
+  const { sheetId } = await getGoogleSheetInfo({ accessToken, spreadsheetId, sheetName });
+  const safeColumnCount = Math.max(Number(columnCount) || 1, 1);
+  const safeRowIndex = Math.max(Number(rowIndex) || 0, 0);
+
+  await googleSheetRequest(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}:batchUpdate`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      requests: [
+        {
+          repeatCell: {
+            range: {
+              sheetId,
+              startRowIndex: safeRowIndex,
+              endRowIndex: safeRowIndex + 1,
+              startColumnIndex: 0,
+              endColumnIndex: safeColumnCount
+            },
+            cell: {
+              userEnteredFormat: {
+                backgroundColor: {
+                  red: 1,
+                  green: 0.949,
+                  blue: 0.6
+                },
+                textFormat: {
+                  bold: true
+                }
+              }
+            },
+            fields: "userEnteredFormat.backgroundColor,userEnteredFormat.textFormat.bold"
+          }
+        }
+      ]
+    })
+  });
+}
+
 async function updateGoogleSheet({ accessToken, spreadsheetId, sheetName, values }) {
   const sheetInfo = await getGoogleSheetInfo({ accessToken, spreadsheetId, sheetName });
   const resolvedSheetName = sheetInfo.sheetName;
@@ -320,7 +586,7 @@ async function updateGoogleSheet({ accessToken, spreadsheetId, sheetName, values
   });
 
   await googleSheetRequest(
-    `${baseUrl}/${encodeURIComponent(range)}?valueInputOption=RAW`,
+    `${baseUrl}/${encodeURIComponent(range)}?valueInputOption=USER_ENTERED`,
     {
       method: "PUT",
       headers: {
@@ -360,14 +626,35 @@ async function syncPricelistToGoogleSheet(sheetValues, introductionValues) {
     sheetName,
     columnCount: priceSheetUpdate.columnCount
   });
+  await formatGooglePricelistColumns({
+    accessToken,
+    spreadsheetId,
+    sheetName,
+    rowCount: priceSheetUpdate.rowCount
+  });
+  await formatGoogleSheetHighlightedRows({
+    accessToken,
+    spreadsheetId,
+    sheetName,
+    columnCount: priceSheetUpdate.columnCount,
+    rowCount: priceSheetUpdate.rowCount,
+    highlightedRowIndices: sheetValues.highlightedRowIndices || []
+  });
   console.log(`Google Sheet updated: ${spreadsheetId} (${sheetName})`);
 
   const introSheetName = process.env.GOOGLE_SHEETS_INTRO_TAB_NAME || "Introduction";
-  await updateGoogleSheet({
+  const introSheetUpdate = await updateGoogleSheet({
     accessToken,
     spreadsheetId,
     sheetName: introSheetName,
     values: introductionValues
+  });
+  await formatGoogleSheetNoteRow({
+    accessToken,
+    spreadsheetId,
+    sheetName: introSheetName,
+    rowIndex: introductionValues.noteRowIndex || 0,
+    columnCount: introSheetUpdate.columnCount
   });
   console.log(`Google Sheet updated: ${spreadsheetId} (${introSheetName})`);
 }
@@ -438,6 +725,7 @@ async function buildSheetValues({ vendorNameMatcher = null } = {}) {
     });
 
   const sheetValues = [ORDERED_COLUMN_NAMES];
+  const highlightedRowIndices = [];
 
   for (const product of filteredProducts) {
     const productId = Number(product.id);
@@ -455,6 +743,25 @@ async function buildSheetValues({ vendorNameMatcher = null } = {}) {
 
     const vendor = vendorMap.get(Number(product.vendorId)) || null;
     const usesSourcePricing = isSourcePricingVendor(vendor);
+    const saleRow = saleByProductId.get(productId) || null;
+    const chosenPackageRow =
+      snapshot.packageRows
+        .filter((row) => toNumber(row.basePrice) !== null)
+        .sort((left, right) => Number(left.basePrice) - Number(right.basePrice))[0] || null;
+    const rowNumber = sheetValues.length + 1;
+    const retailSalesPriceCol = getColumnLetterByName("retailSalesPrice");
+    const unitOfMeasureCol = getColumnLetterByName("dff_unit_of_measure");
+    const sourceMultiplierCol = getColumnLetterByName("sourceMultiplier");
+    const avgWeightUsedCol = getColumnLetterByName("avgWeightUsed");
+    const packageQuantityUsedCol = getColumnLetterByName("packageQuantityUsed");
+    const purchasePriceCol = getColumnLetterByName("ffcsaPurchasePrice");
+    const memberMarkupCol = getColumnLetterByName("memberMarkup");
+    const saleCol = getColumnLetterByName("sale");
+    const saleDiscountCol = getColumnLetterByName("saleDiscount");
+    const vendorSaleShareFormula = `IF(${saleCol}${rowNumber},${saleDiscountCol}${rowNumber}/2,0)`;
+    const customerSaleShareFormula = `IF(${saleCol}${rowNumber},${saleDiscountCol}${rowNumber},0)`;
+    const purchaseFormula = `=IF(LOWER(${unitOfMeasureCol}${rowNumber})="lbs",IF(OR(${retailSalesPriceCol}${rowNumber}="",${avgWeightUsedCol}${rowNumber}=""),"",ROUND(${retailSalesPriceCol}${rowNumber}*${avgWeightUsedCol}${rowNumber}*${sourceMultiplierCol}${rowNumber}*(1-${vendorSaleShareFormula}),2)),IF(OR(${retailSalesPriceCol}${rowNumber}="",${packageQuantityUsedCol}${rowNumber}=""),"",ROUND(${retailSalesPriceCol}${rowNumber}*${packageQuantityUsedCol}${rowNumber}*${sourceMultiplierCol}${rowNumber}*(1-${vendorSaleShareFormula}),2)))`;
+    const memberFormula = `=IF(OR(${purchasePriceCol}${rowNumber}="",${memberMarkupCol}${rowNumber}=""),"",ROUND(${purchasePriceCol}${rowNumber}*(1+${memberMarkupCol}${rowNumber})*(1-${customerSaleShareFormula}),2))`;
     const rowValues = {
       id: productId,
       localLineProductID: productId,
@@ -467,14 +774,22 @@ async function buildSheetValues({ vendorNameMatcher = null } = {}) {
       highest_weight: usesSourcePricing ? snapshot.profile.maxWeight : "",
       dff_unit_of_measure: usesSourcePricing ? snapshot.profile.unitOfMeasure : "",
       sourceMultiplier: usesSourcePricing ? snapshot.profile.sourceMultiplier : "",
-      ffcsaPurchasePrice: snapshot.basePrice,
-      ffcsaMemberSalesPrice: snapshot.memberPrice,
+      avgWeightUsed:
+        usesSourcePricing && String(snapshot.profile.unitOfMeasure || "").toLowerCase() === "lbs"
+          ? `=IF(AND(H${rowNumber}<>"",I${rowNumber}<>""),AVERAGE(H${rowNumber},I${rowNumber}),IF(H${rowNumber}<>"",H${rowNumber},IF(I${rowNumber}<>"",I${rowNumber},"")))`
+          : "",
+      packageQuantityUsed:
+        usesSourcePricing && String(snapshot.profile.unitOfMeasure || "").toLowerCase() !== "lbs"
+          ? (chosenPackageRow ? Number(chosenPackageRow.quantity || 1) : 1)
+          : "",
+      ffcsaPurchasePrice: purchaseFormula,
+      ffcsaMemberSalesPrice: memberFormula,
       ffcsaGuestSalesPrice: snapshot.guestPrice,
       memberMarkup: snapshot.profile.memberMarkup,
       guestPercentOverRetail: snapshot.profile.guestMarkup,
       herdShareMarkup: snapshot.profile.herdShareMarkup,
       snapMarkup: snapshot.profile.snapMarkup,
-      sale: toBooleanLabel(snapshot.profile.onSale),
+      sale: Boolean(snapshot.profile.onSale),
       saleDiscount: snapshot.profile.saleDiscount,
       packageCount: snapshot.packageRows.length,
       description: product.description || "",
@@ -484,15 +799,27 @@ async function buildSheetValues({ vendorNameMatcher = null } = {}) {
       remoteSyncedAt: formatDateTime(snapshot.profile.remoteSyncedAt)
     };
 
+    if (hasRecentPriceOrSaleChange(profileByProductId.get(productId) || null, saleRow)) {
+      highlightedRowIndices.push(sheetValues.length);
+    }
+
     sheetValues.push(
       ORDERED_COLUMN_NAMES.map((column) => toSheetValue(rowValues[column]))
     );
   }
 
+  Object.defineProperty(sheetValues, "highlightedRowIndices", {
+    value: highlightedRowIndices,
+    enumerable: false,
+    configurable: false,
+    writable: false
+  });
+
   return {
     sheetValues,
     rowCount: Math.max(sheetValues.length - 1, 0),
-    vendorNames: [...matchedVendorNames].sort((left, right) => left.localeCompare(right))
+    vendorNames: [...matchedVendorNames].sort((left, right) => left.localeCompare(right)),
+    highlightedRowCount: highlightedRowIndices.length
   };
 }
 
@@ -508,13 +835,19 @@ export async function exportMasterPricelist({
     ? `${spreadsheetId} (tab: ${tabName})`
     : "Not configured";
 
-  const { sheetValues, rowCount, vendorNames } = await buildSheetValues({ vendorNameMatcher });
+  const { sheetValues, rowCount, vendorNames, highlightedRowCount } = await buildSheetValues({ vendorNameMatcher });
   const vendorSummary = vendorNames.length ? vendorNames.join(", ") : "All vendors";
   const introductionValues = buildIntroductionValues({
     syncTimeUtc: new Date().toISOString(),
     environment: nodeEnv,
     spreadsheetSummary,
     vendorSummary
+  });
+  Object.defineProperty(introductionValues, "noteRowIndex", {
+    value: INTRO_NOTE_ROW_INDEX,
+    enumerable: false,
+    configurable: false,
+    writable: false
   });
 
   if (dryRun || skipGoogle) {
@@ -524,6 +857,7 @@ export async function exportMasterPricelist({
       spreadsheetSummary,
       vendorNames,
       rowCount,
+      highlightedRowCount,
       sampleRows: sheetValues.slice(0, 6)
     };
   }
@@ -534,7 +868,8 @@ export async function exportMasterPricelist({
     nodeEnv,
     spreadsheetSummary,
     vendorNames,
-    rowCount
+    rowCount,
+    highlightedRowCount
   };
 }
 

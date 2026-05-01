@@ -9,6 +9,7 @@ import {
   ensureAdminAccessSchema,
   ensureAdminPricelistIndexes,
   ensureLocalLineSyncSchema,
+  ensureVendorPricingSchema,
   getDb,
   getPool,
   isMissingTableError
@@ -72,6 +73,13 @@ import { sendPasswordResetForUser } from "../lib/passwordReset.js";
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
+
+router.use(async (_req, _res, next) => {
+  await ensureVendorPricingSchema().catch((error) => {
+    console.warn("Vendor pricing schema bootstrap skipped:", error.message);
+  });
+  next();
+});
 
 let spacesClient = null;
 
@@ -156,6 +164,71 @@ function toDbDecimal(value) {
   return numeric === null ? null : numeric;
 }
 
+function normalizeVendorMarkupInput(value) {
+  const numeric = toNumber(value);
+  if (numeric === null || numeric <= 0) return null;
+  return numeric;
+}
+
+function normalizeVendorSourceMultiplierInput(value) {
+  const numeric = toNumber(value);
+  if (numeric === null || numeric <= 0) return null;
+  return numeric;
+}
+
+function isSourcePricingVendorName(value) {
+  return isSourcePricingVendor({ name: value });
+}
+
+async function syncVendorPricingDefaultsForProducts(connection, vendorRecord, defaults = {}) {
+  const vendorId = Number(vendorRecord?.id);
+  const priceListMarkup = normalizeVendorMarkupInput(defaults.priceListMarkup);
+  const sourceMultiplier = normalizeVendorSourceMultiplierInput(defaults.sourceMultiplier);
+  if (!Number.isFinite(vendorId) || (!priceListMarkup && !sourceMultiplier)) {
+    return 0;
+  }
+
+  const isSourceVendor = isSourcePricingVendorName(vendorRecord?.name);
+  const updates = [];
+  const params = [];
+
+  if (priceListMarkup !== null) {
+    updates.push(
+      "pp.guest_markup = CASE WHEN LOWER(p.name) LIKE '%deposit%' THEN 0 ELSE ? END",
+      "pp.member_markup = CASE WHEN LOWER(p.name) LIKE '%deposit%' THEN 0 ELSE ? END",
+      "pp.herd_share_markup = CASE WHEN LOWER(p.name) LIKE '%deposit%' THEN 0 ELSE ? END",
+      "pp.snap_markup = CASE WHEN LOWER(p.name) LIKE '%deposit%' THEN 0 ELSE ? END"
+    );
+    params.push(priceListMarkup, priceListMarkup, priceListMarkup, priceListMarkup);
+  }
+
+  if (isSourceVendor && sourceMultiplier !== null) {
+    updates.push(
+      "pp.source_multiplier = CASE WHEN LOWER(p.name) LIKE '%deposit%' THEN pp.source_multiplier ELSE ? END"
+    );
+    params.push(sourceMultiplier);
+  }
+
+  updates.push(
+    "pp.remote_sync_status = 'pending'",
+    "pp.remote_sync_message = 'Vendor pricing defaults updated. Apply to remote store pending.'",
+    "pp.updated_at = NOW()"
+  );
+  params.push(vendorId);
+
+  const [result] = await connection.query(
+    `
+      UPDATE product_pricing_profiles pp
+      JOIN products p ON p.id = pp.product_id
+      SET ${updates.join(", ")}
+      WHERE p.vendor_id = ?
+    `,
+    params
+  );
+
+  return Number(result?.affectedRows || 0);
+}
+
 function normalizeCategoryName(value) {
   return String(value || "").trim().toLowerCase();
 }
@@ -166,6 +239,18 @@ function isMembershipCategoryName(value) {
 
 function toActiveFlag(value) {
   return value === false || value === 0 || value === "0" ? 0 : 1;
+}
+
+function toBooleanFlag(value, fallback = false) {
+  if (value === null || typeof value === "undefined" || value === "") {
+    return fallback;
+  }
+  return Number(value) ? true : Boolean(value);
+}
+
+function toInventoryValue(value, fallback = 0) {
+  const numeric = toOptionalInteger(value, fallback);
+  return Number.isFinite(numeric) ? numeric : fallback;
 }
 
 function isEmailAddress(value) {
@@ -536,6 +621,81 @@ function isMembershipPurchaseDropSite(site = {}) {
     formattedAddress.includes("online delivery") &&
     instructions.includes("subscribing to a full farm csa membership")
   );
+}
+
+function stripHtmlToText(value) {
+  return String(value || "")
+    .replace(/<br\s*\/?>/gi, " ")
+    .replace(/<\/p>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function normalizeHostContactName(value) {
+  const cleaned = String(value || "")
+    .replace(/^[,;:.\s]+|[,;:.\s]+$/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!cleaned) return null;
+
+  const lowered = cleaned.toLowerCase();
+  if (
+    lowered.includes("dropsite") ||
+    lowered.includes("host info") ||
+    lowered.includes("call ") ||
+    lowered.includes("text ") ||
+    lowered.includes("reach out") ||
+    lowered.includes("csa manager at")
+  ) {
+    return null;
+  }
+
+  return cleaned;
+}
+
+function extractDropSiteHostContact(site = {}) {
+  const raw = parseJsonValue(site?.rawJson || site?.raw_json, {});
+  const instructionText = stripHtmlToText(
+    raw?.availability?.instructions ||
+    site?.instructions ||
+    ""
+  );
+  if (!instructionText) return null;
+
+  const phonePattern = String.raw`(?:\+?1[-.\s]?)?(?:\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4})`;
+  const patterns = [
+    new RegExp(String.raw`hosts?\s+info\s+is:\s*([A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+){0,2})\s*[,;]?\s*(${phonePattern})`, "i"),
+    new RegExp(String.raw`reach out to (?:your )?host,\s*([A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+){0,2})\s*,?\s*at\s*(${phonePattern})`, "i"),
+    new RegExp(String.raw`reach out to (?:the )?host(?: and csa manager)?\s+([A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+){0,2})\s+at\s+(${phonePattern})`, "i"),
+    new RegExp(String.raw`call or text\s+([A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+){0,2})\s*(${phonePattern})`, "i"),
+    new RegExp(String.raw`text\s+([A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+){0,2})\s+at\s+(${phonePattern})`, "i"),
+    new RegExp(String.raw`host(?: and csa manager)?\s+([A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+){0,2})\s+at\s+(${phonePattern})`, "i")
+  ];
+
+  for (const pattern of patterns) {
+    const match = instructionText.match(pattern);
+    if (!match) continue;
+    const contactName = normalizeHostContactName(match[1]);
+    const phone = String(match[2] || "").trim();
+    if (!phone) continue;
+    if (!contactName) {
+      return {
+        name: null,
+        phone,
+        source: "instructions"
+      };
+    }
+    return {
+      name: contactName,
+      phone,
+      source: "instructions"
+    };
+  }
+
+  return null;
 }
 
 function parseMonthKey(value) {
@@ -990,14 +1150,19 @@ function normalizePricingProfileInput(payload = {}) {
 }
 
 function validateSourcePricingProfile(pricingProfile) {
-  if (!Number.isFinite(Number(pricingProfile.sourceUnitPrice))) {
+  const sourceUnitPrice = toNumber(pricingProfile.sourceUnitPrice);
+  if (sourceUnitPrice === null || sourceUnitPrice <= 0) {
     throw new Error("DFF source price is required for source-pricing vendors.");
   }
 }
 
-async function upsertProductPricingProfileRecord(connection, productId, payload = {}) {
+async function upsertProductPricingProfileRecord(connection, productId, payload = {}, options = {}) {
   const now = new Date();
   const normalized = normalizePricingProfileInput(payload);
+  const vendorSourceMultiplier =
+    isSourcePricingVendor(options.vendor)
+      ? normalizeVendorSourceMultiplierInput(options.vendor?.sourceMultiplier)
+      : null;
   const [existingRows] = await connection.query(
     "SELECT * FROM product_pricing_profiles WHERE product_id = ? LIMIT 1",
     [productId]
@@ -1023,11 +1188,15 @@ async function upsertProductPricingProfileRecord(connection, productId, payload 
         ? (existing?.avg_weight_override ?? null)
         : normalized.avgWeightOverride,
     source_multiplier:
-      typeof normalized.sourceMultiplier === "undefined" ||
-      normalized.sourceMultiplier === null ||
-      !Number.isFinite(Number(normalized.sourceMultiplier))
-        ? (existing?.source_multiplier ?? 0.5412)
-        : normalized.sourceMultiplier,
+      vendorSourceMultiplier !== null
+        ? vendorSourceMultiplier
+        : (
+            typeof normalized.sourceMultiplier === "undefined" ||
+            normalized.sourceMultiplier === null ||
+            !Number.isFinite(Number(normalized.sourceMultiplier))
+              ? (existing?.source_multiplier ?? 0.5412)
+              : normalized.sourceMultiplier
+          ),
     remote_sync_status: "pending",
     remote_sync_message: "Local source pricing updated. Apply to remote store pending.",
     remote_synced_at: null,
@@ -1159,7 +1328,14 @@ async function duplicateLocalProductRecord(connection, sourceProductId) {
   );
   const [vendorRows] = sourceProduct.vendor_id
     ? await connection.query(
-        "SELECT member_markup AS memberMarkup FROM vendors WHERE id = ? LIMIT 1",
+        `
+          SELECT
+            member_markup AS memberMarkup,
+            price_list_markup AS priceListMarkup,
+            source_multiplier AS sourceMultiplier
+          FROM vendors
+          WHERE id = ? LIMIT 1
+        `,
         [sourceProduct.vendor_id]
       )
     : [[]];
@@ -1216,8 +1392,10 @@ async function duplicateLocalProductRecord(connection, sourceProductId) {
   const defaultCsaMarkup = forceNoMarkup
     ? 0
     : (
-        Number.isFinite(Number(vendor?.memberMarkup))
-          ? Number(vendor.memberMarkup)
+        Number.isFinite(Number(vendor?.priceListMarkup))
+          ? Number(vendor.priceListMarkup)
+          : Number.isFinite(Number(vendor?.memberMarkup))
+            ? Number(vendor.memberMarkup)
           : (Number.isFinite(Number(profile?.member_markup)) ? Number(profile.member_markup) : 0.4)
       );
   const defaultSaleDiscount =
@@ -1245,7 +1423,9 @@ async function duplicateLocalProductRecord(connection, sourceProductId) {
       profile?.min_weight ?? null,
       profile?.max_weight ?? null,
       profile?.avg_weight_override ?? null,
-      Number.isFinite(Number(profile?.source_multiplier)) ? Number(profile.source_multiplier) : 0.5412,
+      Number.isFinite(Number(vendor?.sourceMultiplier))
+        ? Number(vendor.sourceMultiplier)
+        : (Number.isFinite(Number(profile?.source_multiplier)) ? Number(profile.source_multiplier) : 0.5412),
       defaultCsaMarkup,
       defaultCsaMarkup,
       defaultCsaMarkup,
@@ -2516,6 +2696,7 @@ function buildPricelistWhereClause({
   search,
   categoryId,
   vendorId,
+  saleFilter,
   statusFilter,
   membershipCategoryIds = []
 }) {
@@ -2540,6 +2721,12 @@ function buildPricelistWhereClause({
   if (Number.isFinite(vendorId)) {
     clauses.push("p.vendor_id = ?");
     params.push(vendorId);
+  }
+
+  if (saleFilter === "onSale") {
+    clauses.push("COALESCE(ps.on_sale, 0) = 1");
+  } else if (saleFilter === "notOnSale") {
+    clauses.push("COALESCE(ps.on_sale, 0) = 0");
   }
 
   switch (statusFilter) {
@@ -2678,6 +2865,32 @@ function hasPendingRemoteApply(pricingProfile) {
   );
 }
 
+function hasRecentPriceOrSaleChange(pricingProfile, saleRow, windowDays = 1) {
+  const cutoff = Date.now() - windowDays * 24 * 60 * 60 * 1000;
+  const pricingUpdatedAt = toTimestamp(pricingProfile?.updatedAt);
+  const saleUpdatedAt = toTimestamp(saleRow?.updatedAt);
+  return pricingUpdatedAt >= cutoff || saleUpdatedAt >= cutoff;
+}
+
+function normalizeSaleFlag(value) {
+  return Number(value || 0) ? 1 : 0;
+}
+
+function normalizeSaleDiscountComparable(value) {
+  if (value === null || typeof value === "undefined" || value === "") return null;
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return null;
+  return Number(numeric.toFixed(4));
+}
+
+function saleValuesMatch(left = {}, right = {}) {
+  return (
+    normalizeSaleFlag(left.onSale) === normalizeSaleFlag(right.onSale) &&
+    normalizeSaleDiscountComparable(left.saleDiscount) ===
+      normalizeSaleDiscountComparable(right.saleDiscount)
+  );
+}
+
 async function fetchPricelistSupportingRows(db, productRows) {
   const productIds = [...new Set(
     productRows
@@ -2768,18 +2981,35 @@ function buildPricelistRows(productRows, supportingRows) {
     const saleRow = saleByProductId.get(productId) || null;
     const vendor = vendorMap.get(Number(product.vendorId)) || null;
     const productMeta = productMetaByProductId.get(productId) || null;
+    const visibleSource =
+      product.visible === null || typeof product.visible === "undefined"
+        ? productMeta?.visible
+        : product.visible;
+    const trackInventorySource =
+      product.trackInventory === null || typeof product.trackInventory === "undefined"
+        ? productMeta?.trackInventory
+        : product.trackInventory;
+    const inventorySource =
+      product.inventory === null || typeof product.inventory === "undefined"
+        ? productMeta?.productInventory
+        : product.inventory;
+    const mergedProfile = pricingProfile
+      ? {
+          ...pricingProfile,
+          onSale: saleRow?.onSale ?? pricingProfile.onSale ?? 0,
+          saleDiscount: saleRow?.saleDiscount ?? pricingProfile.saleDiscount ?? 0
+        }
+      : {
+          productId,
+          onSale: saleRow?.onSale ?? 0,
+          saleDiscount: saleRow?.saleDiscount ?? 0
+        };
     const snapshot = computeProductPricingSnapshot({
       product,
       packages: packagesByProductId.get(productId) || [],
       packageMetaByPackageId,
       vendor,
-      profile: pricingProfile
-        ? pricingProfile
-        : {
-            productId,
-            onSale: saleRow?.onSale ?? 0,
-            saleDiscount: saleRow?.saleDiscount ?? 0
-          }
+      profile: mergedProfile
     });
     const usesSourcePricing = isSourcePricingVendor(vendor);
 
@@ -2790,6 +3020,9 @@ function buildPricelistRows(productRows, supportingRows) {
       categoryName: product.categoryName || "Uncategorized",
       vendorId: product.vendorId,
       vendorName: product.vendorName || vendor?.name || "N/A",
+      visible: toBooleanFlag(visibleSource, true),
+      trackInventory: toBooleanFlag(trackInventorySource, false),
+      inventory: toInventoryValue(inventorySource, 0),
       usesSourcePricing,
       usesNoMarkupPricing: snapshot.profile.usesNoMarkupPricing,
       pricingRule: snapshot.profile.pricingRule,
@@ -2824,11 +3057,13 @@ function buildPricelistRows(productRows, supportingRows) {
       memberPrice: snapshot.memberPrice,
       herdSharePrice: snapshot.herdSharePrice,
       snapPrice: snapshot.snapPrice,
-      remoteSyncStatus: pricingProfile?.remoteSyncStatus || "not-applied",
-      remoteSyncMessage: pricingProfile?.remoteSyncMessage || "",
-      remoteSyncedAt: pricingProfile?.remoteSyncedAt || null,
-      updatedAt: pricingProfile?.updatedAt || product.pricingUpdatedAt || null,
-      hasPendingRemoteApply: hasPendingRemoteApply(pricingProfile)
+      remoteSyncStatus: mergedProfile?.remoteSyncStatus || "not-applied",
+      remoteSyncMessage: mergedProfile?.remoteSyncMessage || "",
+      remoteSyncedAt: mergedProfile?.remoteSyncedAt || null,
+      updatedAt: mergedProfile?.updatedAt || product.pricingUpdatedAt || null,
+      saleUpdatedAt: saleRow?.updatedAt || null,
+      hasRecentPriceOrSaleChange: hasRecentPriceOrSaleChange(mergedProfile, saleRow),
+      hasPendingRemoteApply: hasPendingRemoteApply(mergedProfile)
     };
   });
 }
@@ -2846,6 +3081,7 @@ router.get("/pricelist", requireAdmin, async (req, res) => {
   const search = String(req.query?.search || "").trim();
   const categoryId = toOptionalInteger(req.query?.categoryId, null);
   const vendorId = toOptionalInteger(req.query?.vendorId, null);
+  const saleFilter = String(req.query?.sale || "all").trim();
   const statusFilter = String(req.query?.status || "all").trim();
   const requestedPageSize = parsePositiveInteger(req.query?.pageSize, PRICELIST_DEFAULT_PAGE_SIZE);
   const pageSize = Math.min(PRICELIST_MAX_PAGE_SIZE, Math.max(1, requestedPageSize));
@@ -2864,6 +3100,7 @@ router.get("/pricelist", requireAdmin, async (req, res) => {
     search,
     categoryId,
     vendorId,
+    saleFilter,
     statusFilter,
     membershipCategoryIds
   });
@@ -2873,6 +3110,7 @@ router.get("/pricelist", requireAdmin, async (req, res) => {
     LEFT JOIN categories c ON c.id = p.category_id
     LEFT JOIN vendors v ON v.id = p.vendor_id
     LEFT JOIN product_pricing_profiles pp ON pp.product_id = p.id
+    LEFT JOIN product_sales ps ON ps.product_id = p.id
   `;
   const selectSql = `
     SELECT
@@ -2991,6 +3229,7 @@ router.get("/pricelist/pending-remote", requireAdmin, async (req, res) => {
   const search = String(req.query?.search || "").trim();
   const categoryId = toOptionalInteger(req.query?.categoryId, null);
   const vendorId = toOptionalInteger(req.query?.vendorId, null);
+  const saleFilter = String(req.query?.sale || "all").trim();
   const statusFilter = String(req.query?.status || "all").trim();
 
   const categoryRows = await db.select().from(categories);
@@ -3003,6 +3242,7 @@ router.get("/pricelist/pending-remote", requireAdmin, async (req, res) => {
     search,
     categoryId,
     vendorId,
+    saleFilter,
     statusFilter,
     membershipCategoryIds
   });
@@ -3065,7 +3305,14 @@ router.post("/pricelist/bulk-save", requireAdminPermission("pricing_admin"), asy
     }
 
     const productRows = await db.select().from(products).where(eq(products.id, productId));
+    const product = productRows[0] || null;
+    const vendorRows = product?.vendorId
+      ? await db.select().from(vendors).where(eq(vendors.id, product.vendorId))
+      : [];
+    const vendor = vendorRows[0] || null;
     const forceNoMarkup = isNoMarkupProduct(productRows[0] || { id: productId });
+    const vendorPriceListMarkup = normalizeVendorMarkupInput(vendor?.priceListMarkup);
+    const vendorSourceMultiplier = normalizeVendorSourceMultiplierInput(vendor?.sourceMultiplier);
 
     const payload = {
       unitOfMeasure: String(row.unitOfMeasure || "each").toLowerCase() === "lbs" ? "lbs" : "each",
@@ -3073,11 +3320,14 @@ router.post("/pricelist/bulk-save", requireAdminPermission("pricing_admin"), asy
       minWeight: toDbDecimal(row.minWeight),
       maxWeight: toDbDecimal(row.maxWeight),
       avgWeightOverride: toDbDecimal(row.avgWeightOverride),
-      sourceMultiplier: toDbDecimal(row.sourceMultiplier),
-      guestMarkup: forceNoMarkup ? 0 : toDbDecimal(row.guestMarkup),
-      memberMarkup: forceNoMarkup ? 0 : toDbDecimal(row.memberMarkup),
-      herdShareMarkup: forceNoMarkup ? 0 : toDbDecimal(row.herdShareMarkup),
-      snapMarkup: forceNoMarkup ? 0 : toDbDecimal(row.snapMarkup),
+      sourceMultiplier:
+        isSourcePricingVendor(vendor) && vendorSourceMultiplier !== null
+          ? vendorSourceMultiplier
+          : toDbDecimal(row.sourceMultiplier),
+      guestMarkup: forceNoMarkup ? 0 : (vendorPriceListMarkup ?? toDbDecimal(row.guestMarkup)),
+      memberMarkup: forceNoMarkup ? 0 : (vendorPriceListMarkup ?? toDbDecimal(row.memberMarkup)),
+      herdShareMarkup: forceNoMarkup ? 0 : (vendorPriceListMarkup ?? toDbDecimal(row.herdShareMarkup)),
+      snapMarkup: forceNoMarkup ? 0 : (vendorPriceListMarkup ?? toDbDecimal(row.snapMarkup)),
       onSale: row.onSale ? 1 : 0,
       saleDiscount: toDbDecimal(row.saleDiscount),
       remoteSyncStatus: "pending",
@@ -3158,11 +3408,17 @@ router.post("/pricelist/apply-remote", requireAdminPermission("localline_push"),
           packageMetaRows.map((row) => [Number(row.packageId), row])
         ),
         vendor: vendorRows[0] || null,
-        profile: profileRows[0] || {
-          productId,
-          onSale: saleRows[0]?.onSale ?? 0,
-          saleDiscount: saleRows[0]?.saleDiscount ?? 0
-        }
+        profile: profileRows[0]
+          ? {
+              ...profileRows[0],
+              onSale: saleRows[0]?.onSale ?? profileRows[0].onSale ?? 0,
+              saleDiscount: saleRows[0]?.saleDiscount ?? profileRows[0].saleDiscount ?? 0
+            }
+          : {
+              productId,
+              onSale: saleRows[0]?.onSale ?? 0,
+              saleDiscount: saleRows[0]?.saleDiscount ?? 0
+            }
       });
 
       if (!Number.isFinite(Number(snapshot.profile.sourceUnitPrice))) {
@@ -3197,12 +3453,13 @@ router.post("/pricelist/apply-remote", requireAdminPermission("localline_push"),
         saleDiscount: snapshot.profile.saleDiscount,
         updatedAt: now
       };
-      if (saleRows.length) {
+      const saleChanged = !saleRows.length || !saleValuesMatch(saleRows[0], salePayload);
+      if (saleChanged && saleRows.length) {
         await db
           .update(productSales)
           .set(salePayload)
           .where(eq(productSales.productId, productId));
-      } else {
+      } else if (saleChanged) {
         await db.insert(productSales).values(salePayload);
       }
 
@@ -3238,18 +3495,23 @@ router.post("/pricelist/apply-remote", requireAdminPermission("localline_push"),
       }
 
       const remoteResult = await updateLocalLineForProduct(db, productId, {
+        visible: product.visible,
+        trackInventory: product.trackInventory,
+        inventory: product.inventory,
         onSale: snapshot.profile.onSale ? 1 : 0,
         saleDiscount: snapshot.profile.saleDiscount,
         forcePriceSync: true,
         forceImageSync: true
       });
-      const remoteFailed = isLocalLineEnabled() && remoteResult.priceOk === false;
+      const remoteFailed =
+        isLocalLineEnabled() &&
+        (remoteResult.inventoryOk === false || remoteResult.priceOk === false);
       if (remoteFailed) {
         await db
           .update(productPricingProfiles)
           .set({
             remoteSyncStatus: "failed",
-            remoteSyncMessage: "Local store updated, but Local Line price sync failed.",
+            remoteSyncMessage: "Local store updated, but Local Line sync failed.",
             updatedAt: now
           })
           .where(eq(productPricingProfiles.productId, productId));
@@ -3259,10 +3521,11 @@ router.post("/pricelist/apply-remote", requireAdminPermission("localline_push"),
         productId,
         ok: !remoteFailed,
         packageUpdates: pricedPackages.length,
+        remoteInventoryUpdate: remoteResult.inventoryOk,
         remotePriceUpdate: remoteResult.priceOk,
         message: remoteFailed
-          ? "Local store updated, but Local Line price sync failed."
-          : "Pricing applied."
+          ? "Local store updated, but Local Line sync failed."
+          : "Changes applied."
       });
     } catch (error) {
       await db
@@ -3294,6 +3557,7 @@ router.post("/pricelist/export-google", requireAdminPermission("pricing_admin"),
     res.json({
       ok: true,
       rowCount: summary.rowCount,
+      highlightedRowCount: summary.highlightedRowCount || 0,
       spreadsheetSummary: summary.spreadsheetSummary,
       vendorNames: summary.vendorNames
     });
@@ -3301,6 +3565,52 @@ router.post("/pricelist/export-google", requireAdminPermission("pricing_admin"),
     res.status(500).json({
       ok: false,
       error: error?.message || "Google pricelist export failed."
+    });
+  }
+});
+
+router.post("/pricelist/cleanup-recent-change-false-positives", requireAdminPermission("pricing_admin"), async (_req, res) => {
+  const db = getDb();
+
+  try {
+    const [saleRows, profileRows] = await Promise.all([
+      db.select().from(productSales),
+      db.select().from(productPricingProfiles)
+    ]);
+    const profileByProductId = new Map(
+      profileRows.map((row) => [Number(row.productId), row])
+    );
+
+    let cleaned = 0;
+    const cleanedProductIds = [];
+
+    for (const saleRow of saleRows) {
+      const productId = Number(saleRow.productId);
+      const profileRow = profileByProductId.get(productId);
+      if (!profileRow) continue;
+      if (!saleValuesMatch(saleRow, profileRow)) continue;
+      if (toTimestamp(saleRow.updatedAt) <= toTimestamp(profileRow.updatedAt)) continue;
+
+      await db
+        .update(productSales)
+        .set({
+          updatedAt: profileRow.updatedAt
+        })
+        .where(eq(productSales.productId, productId));
+
+      cleaned += 1;
+      cleanedProductIds.push(productId);
+    }
+
+    return res.json({
+      ok: true,
+      cleaned,
+      productIds: cleanedProductIds
+    });
+  } catch (error) {
+    return res.status(500).json({
+      ok: false,
+      error: error?.message || "Unable to clean recent-change false positives."
     });
   }
 });
@@ -3932,7 +4242,8 @@ router.get("/drop-sites", requireAdmin, async (_req, res) => {
   const normalizedSites = siteRows.map((row) => ({
     ...row,
     active: Boolean(row.active),
-    isOnlineOnlyMembership: isMembershipPurchaseDropSite(row)
+    isOnlineOnlyMembership: isMembershipPurchaseDropSite(row),
+    derivedHostContact: extractDropSiteHostContact(row)
   }));
 
   const visibleDropSites = normalizedSites.filter((site) => !site.isOnlineOnlyMembership);
@@ -4786,31 +5097,109 @@ router.post("/categories", requireAdminPermission("admin"), async (req, res) => 
 });
 
 router.post("/vendors", requireAdminPermission("admin"), async (req, res) => {
-  const db = getDb();
   const payload = req.body || {};
+  const name = String(payload.name || "").trim();
+  if (!name) {
+    return res.status(400).json({ error: "Vendor name is required." });
+  }
+
+  const priceListMarkup = normalizeVendorMarkupInput(payload.priceListMarkup);
+  const sourceMultiplier = normalizeVendorSourceMultiplierInput(payload.sourceMultiplier);
+  const db = getDb();
+
   await db.insert(vendors).values({
-    name: payload.name,
-    guestMarkup: payload.guestMarkup ?? undefined,
-    memberMarkup: payload.memberMarkup ?? undefined
+    name,
+    priceListMarkup: priceListMarkup ?? undefined,
+    sourceMultiplier: sourceMultiplier ?? undefined,
+    guestMarkup: priceListMarkup ?? undefined,
+    memberMarkup: priceListMarkup ?? undefined
   });
   res.json({ ok: true });
 });
 
 router.put("/vendors/:id", requireAdminPermission("admin"), async (req, res) => {
-  const db = getDb();
   const id = Number(req.params.id);
   const payload = req.body || {};
+  if (!Number.isFinite(id)) {
+    return res.status(400).json({ error: "Invalid vendor id." });
+  }
 
-  await db
-    .update(vendors)
-    .set({
-      name: payload.name ?? undefined,
-      guestMarkup: payload.guestMarkup ?? undefined,
-      memberMarkup: payload.memberMarkup ?? undefined
-    })
-    .where(eq(vendors.id, id));
+  const pool = getPool();
+  const connection = await pool.getConnection();
 
-  res.json({ ok: true });
+  try {
+    const [existingRows] = await connection.query(
+      `
+        SELECT
+          id,
+          name,
+          price_list_markup AS priceListMarkup,
+          source_multiplier AS sourceMultiplier,
+          guest_markup AS guestMarkup,
+          member_markup AS memberMarkup
+        FROM vendors
+        WHERE id = ?
+        LIMIT 1
+      `,
+      [id]
+    );
+    const existing = existingRows[0] || null;
+    if (!existing) {
+      return res.status(404).json({ error: "Vendor not found." });
+    }
+
+    const nextName = String(payload.name ?? existing.name ?? "").trim();
+    if (!nextName) {
+      return res.status(400).json({ error: "Vendor name is required." });
+    }
+
+    const nextPriceListMarkup =
+      typeof payload.priceListMarkup === "undefined"
+        ? normalizeVendorMarkupInput(existing.priceListMarkup)
+        : normalizeVendorMarkupInput(payload.priceListMarkup);
+    const nextSourceMultiplier =
+      typeof payload.sourceMultiplier === "undefined"
+        ? normalizeVendorSourceMultiplierInput(existing.sourceMultiplier)
+        : normalizeVendorSourceMultiplierInput(payload.sourceMultiplier);
+
+    await connection.beginTransaction();
+    await connection.query(
+      `
+        UPDATE vendors
+        SET name = ?,
+            price_list_markup = ?,
+            source_multiplier = ?,
+            guest_markup = ?,
+            member_markup = ?
+        WHERE id = ?
+      `,
+      [
+        nextName,
+        nextPriceListMarkup,
+        nextSourceMultiplier,
+        nextPriceListMarkup,
+        nextPriceListMarkup,
+        id
+      ]
+    );
+
+    const syncedProfiles = await syncVendorPricingDefaultsForProducts(
+      connection,
+      { id, name: nextName },
+      {
+        priceListMarkup: nextPriceListMarkup,
+        sourceMultiplier: nextSourceMultiplier
+      }
+    );
+
+    await connection.commit();
+    res.json({ ok: true, syncedProfiles });
+  } catch (error) {
+    await connection.rollback();
+    res.status(500).json({ error: error?.message || "Unable to update vendor." });
+  } finally {
+    connection.release();
+  }
 });
 
 router.post("/drop-sites", requireAdminPermission("dropsite_admin"), async (req, res) => {
@@ -4886,7 +5275,9 @@ router.post("/products", requireAdminPermission(["inventory_admin", "pricing_adm
       if (isSourcePricingVendor(vendor)) {
         const pricingProfile = normalizePricingProfileInput(payload.pricingProfile || payload);
         validateSourcePricingProfile(pricingProfile);
-        await upsertProductPricingProfileRecord(connection, created.productId, pricingProfile);
+        await upsertProductPricingProfileRecord(connection, created.productId, pricingProfile, {
+          vendor: vendorRows[0] || null
+        });
       }
     }
     await connection.commit();
@@ -5017,7 +5408,9 @@ router.put("/products/:id/pricing-profile", requireAdminPermission(["pricing_adm
 
     const pricingProfile = normalizePricingProfileInput(req.body || {});
     validateSourcePricingProfile(pricingProfile);
-    await upsertProductPricingProfileRecord(connection, productId, pricingProfile);
+    await upsertProductPricingProfileRecord(connection, productId, pricingProfile, {
+      vendor
+    });
     return res.json({ ok: true });
   } catch (error) {
     return res.status(400).json({ error: error?.message || "Unable to update pricing profile" });
@@ -5049,9 +5442,12 @@ router.post("/products/:id/push-to-localline", requireAdminPermission("localline
   }
 });
 
-router.post("/products/bulk-update", requireAdminPermission(["inventory_admin", "membership_admin", "local_pricelist_admin"]), async (req, res) => {
+router.post("/products/bulk-update", requireAdminPermission(["inventory_admin", "pricing_admin", "membership_admin", "local_pricelist_admin"]), async (req, res) => {
   const db = getDb();
   const updates = Array.isArray(req.body?.updates) ? req.body.updates : [];
+  const syncPricingProfileSale = Boolean(req.body?.syncPricingProfileSale);
+  const applyRemote = req.body?.applyRemote !== false;
+  const queueRemoteSync = Boolean(req.body?.queueRemoteSync);
   const results = [];
 
   for (const update of updates) {
@@ -5085,18 +5481,81 @@ router.post("/products/bulk-update", requireAdminPermission(["inventory_admin", 
         .from(productSales)
         .where(eq(productSales.productId, productId));
 
-      if (existingSale.length) {
+      const existingOnSale = existingSale.length ? Number(existingSale[0].onSale || 0) : 0;
+      const nextOnSale = Number(salePayload.onSale || 0);
+      const existingSaleDiscount =
+        existingSale.length && existingSale[0].saleDiscount !== null && typeof existingSale[0].saleDiscount !== "undefined"
+          ? Number(existingSale[0].saleDiscount)
+          : null;
+      const nextSaleDiscount =
+        salePayload.saleDiscount === null || typeof salePayload.saleDiscount === "undefined"
+          ? null
+          : Number(salePayload.saleDiscount);
+      const saleChanged =
+        !existingSale.length ||
+        existingOnSale !== nextOnSale ||
+        (
+          existingSaleDiscount === null || nextSaleDiscount === null
+            ? existingSaleDiscount !== nextSaleDiscount
+            : Number(existingSaleDiscount.toFixed(4)) !== Number(nextSaleDiscount.toFixed(4))
+        );
+
+      if (saleChanged && existingSale.length) {
         await db
           .update(productSales)
           .set(salePayload)
           .where(eq(productSales.productId, productId));
-      } else {
+      } else if (saleChanged) {
         await db.insert(productSales).values(salePayload);
+      }
+
+      const localInventoryChanged =
+        typeof changes.visible !== "undefined" ||
+        typeof changes.trackInventory !== "undefined" ||
+        typeof changes.inventory !== "undefined";
+      const shouldQueueRemoteSync = queueRemoteSync && (localInventoryChanged || saleChanged);
+
+      if (syncPricingProfileSale || shouldQueueRemoteSync) {
+        const existingProfile = await db
+          .select()
+          .from(productPricingProfiles)
+          .where(eq(productPricingProfiles.productId, productId));
+
+        const profileUpdatePayload = {
+          remoteSyncStatus: shouldQueueRemoteSync ? "pending" : undefined,
+          remoteSyncMessage: shouldQueueRemoteSync
+            ? "Local changes updated. Apply to remote store pending."
+            : undefined,
+          updatedAt: shouldQueueRemoteSync || saleChanged ? new Date() : undefined
+        };
+
+        if (syncPricingProfileSale && saleChanged) {
+          profileUpdatePayload.onSale = nextOnSale;
+          profileUpdatePayload.saleDiscount = nextSaleDiscount;
+          if (!shouldQueueRemoteSync) {
+            profileUpdatePayload.remoteSyncStatus = "pending";
+            profileUpdatePayload.remoteSyncMessage = "Local sale updated. Apply to remote store pending.";
+            profileUpdatePayload.updatedAt = new Date();
+          }
+        }
+
+        if (existingProfile.length) {
+          await db
+            .update(productPricingProfiles)
+            .set(profileUpdatePayload)
+            .where(eq(productPricingProfiles.productId, productId));
+        } else if (Object.values(profileUpdatePayload).some((value) => typeof value !== "undefined")) {
+          await db.insert(productPricingProfiles).values({
+            productId,
+            ...profileUpdatePayload,
+            createdAt: profileUpdatePayload.updatedAt || new Date()
+          });
+        }
       }
 
       let localLineUpdate = null;
       let localLinePriceUpdate = null;
-      if (isLocalLineEnabled()) {
+      if (applyRemote && isLocalLineEnabled()) {
         try {
           const result = await updateLocalLineForProduct(db, productId, changes);
           localLineUpdate = result.inventoryOk;
