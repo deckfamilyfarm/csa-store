@@ -5,6 +5,24 @@ function getRequestKey(url, token = "") {
   return `${url}::${token}`;
 }
 
+async function throwForError(response, fallbackMessage) {
+  let detail = "";
+  try {
+    const payload = await response.json();
+    detail = payload?.detail || payload?.error || "";
+  } catch (error) {
+    try {
+      detail = (await response.text()) || "";
+    } catch (textError) {
+      detail = "";
+    }
+  }
+
+  const error = new Error(detail || fallbackMessage);
+  error.status = response.status;
+  throw error;
+}
+
 async function fetchJsonGet(url, token, fallbackMessage) {
   const requestKey = getRequestKey(url, token);
   if (inflightGetRequests.has(requestKey)) {
@@ -16,9 +34,7 @@ async function fetchJsonGet(url, token, fallbackMessage) {
       cache: "no-store",
       headers: token ? { Authorization: `Bearer ${token}` } : undefined
     });
-    if (!response.ok) {
-      throw new Error(fallbackMessage);
-    }
+    if (!response.ok) await throwForError(response, fallbackMessage);
     return response.json();
   })();
 
@@ -102,9 +118,7 @@ export async function adminLogin(username, password) {
     body: JSON.stringify({ username, password })
   });
 
-  if (!response.ok) {
-    throw new Error("Invalid credentials");
-  }
+  if (!response.ok) await throwForError(response, "Invalid credentials");
 
   return response.json();
 }
@@ -117,9 +131,7 @@ export async function userLogin(username, password) {
     body: JSON.stringify({ username, password })
   });
 
-  if (!response.ok) {
-    throw new Error("Invalid credentials");
-  }
+  if (!response.ok) await throwForError(response, "Invalid credentials");
 
   return response.json();
 }

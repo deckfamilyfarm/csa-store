@@ -26,45 +26,54 @@ async function loadAdminRoleKeysForUser(userId) {
 }
 
 router.post("/login", async (req, res) => {
-  const username = String(req.body?.username || req.body?.email || "").trim();
-  const { password } = req.body || {};
-  if (!username || !password) {
-    return res.status(400).json({ error: "Missing credentials" });
-  }
-
-  const db = getDb();
-  await ensureAdminAccessSchema().catch((error) => {
-    console.warn("Admin access schema bootstrap skipped for /auth/login:", error.message);
-  });
-  const rows = await db.select().from(users).where(eq(users.username, username));
-  if (!rows.length) {
-    return res.status(401).json({ error: "Invalid credentials" });
-  }
-  if (rows[0].active === 0) {
-    return res.status(403).json({ error: "User is inactive" });
-  }
-
-  const valid = await bcrypt.compare(password, rows[0].passwordHash);
-  if (!valid) {
-    return res.status(401).json({ error: "Invalid credentials" });
-  }
-
-  const adminRoles = await loadAdminRoleKeysForUser(Number(rows[0].id)).catch(() => []);
-
-  const token = jwt.sign({ userId: rows[0].id, role: rows[0].role, adminRoles }, process.env.JWT_SECRET || "dev-secret", {
-    expiresIn: "30d"
-  });
-
-  res.json({
-    token,
-    user: {
-      id: rows[0].id,
-      username: rows[0].username,
-      email: rows[0].email,
-      role: rows[0].role,
-      adminRoles
+  try {
+    const username = String(req.body?.username || req.body?.email || "").trim();
+    const { password } = req.body || {};
+    if (!username || !password) {
+      return res.status(400).json({ error: "Missing credentials" });
     }
-  });
+
+    const db = getDb();
+    await ensureAdminAccessSchema().catch((error) => {
+      console.warn("Admin access schema bootstrap skipped for /auth/login:", error.message);
+    });
+    const rows = await db.select().from(users).where(eq(users.username, username));
+    if (!rows.length) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+    if (rows[0].active === 0) {
+      return res.status(403).json({ error: "User is inactive" });
+    }
+
+    const valid = await bcrypt.compare(password, rows[0].passwordHash);
+    if (!valid) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    const adminRoles = await loadAdminRoleKeysForUser(Number(rows[0].id)).catch(() => []);
+
+    const token = jwt.sign(
+      { userId: rows[0].id, role: rows[0].role, adminRoles },
+      process.env.JWT_SECRET || "dev-secret",
+      {
+        expiresIn: "30d"
+      }
+    );
+
+    return res.json({
+      token,
+      user: {
+        id: rows[0].id,
+        username: rows[0].username,
+        email: rows[0].email,
+        role: rows[0].role,
+        adminRoles
+      }
+    });
+  } catch (error) {
+    console.error("Auth login failed:", error.message);
+    return res.status(500).json({ error: "Server login error" });
+  }
 });
 
 router.post("/forgot-password", async (req, res) => {

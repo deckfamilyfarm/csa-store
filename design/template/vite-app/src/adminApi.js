@@ -54,9 +54,7 @@ export async function adminLogin(username, password) {
     body: JSON.stringify({ username, password })
   });
 
-  if (!response.ok) {
-    throw new Error("Invalid credentials");
-  }
+  if (!response.ok) await throwForError(response, "Invalid credentials");
 
   return response.json();
 }

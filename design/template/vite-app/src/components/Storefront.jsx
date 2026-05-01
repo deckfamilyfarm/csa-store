@@ -380,7 +380,10 @@ export function Storefront() {
         window.location.hash = "#/home";
       }
     } catch (err) {
-      setLoginState((prev) => ({ ...prev, error: "Invalid login" }));
+      setLoginState((prev) => ({
+        ...prev,
+        error: err?.message || "Unable to sign in"
+      }));
     }
   }
 

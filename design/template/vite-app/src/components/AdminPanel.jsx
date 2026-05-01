@@ -1190,7 +1190,10 @@ export function AdminPanel({ onCatalogRefresh }) {
       setSelectedProductDetail(null);
       setToken(result.token);
     } catch (err) {
-      setLoginState((prev) => ({ ...prev, error: "Invalid credentials" }));
+      setLoginState((prev) => ({
+        ...prev,
+        error: err?.message || "Unable to sign in"
+      }));
     }
   }
 
