@@ -35,20 +35,17 @@ const ORDERED_COLUMN_NAMES = [
   "packageName",
   "lowest_weight",
   "highest_weight",
+  "sale",
+  "saleDiscount",
+  "squareSalePrice",
+  "packageCount",
+  "description",
   "FFCSAFactor",
   "avgWeightUsed",
   "packageQuantityUsed",
   "ffcsaPurchasePrice",
   "ffcsaMemberSalesPrice",
-  "ffcsaGuestSalesPrice",
   "memberMarkup",
-  "guestPercentOverRetail",
-  "herdShareMarkup",
-  "snapMarkup",
-  "sale",
-  "saleDiscount",
-  "packageCount",
-  "description",
   "track_inventory",
   "visible",
   "remoteSyncStatus",
@@ -58,20 +55,19 @@ const INTRO_NOTE_ROW_INDEX = 14;
 const COLUMN_INDEX_BY_NAME = new Map(ORDERED_COLUMN_NAMES.map((name, index) => [name, index]));
 const PRICE_SHEET_CURRENCY_COLUMNS = [
   "retailSalesPrice",
+  "squareSalePrice",
   "ffcsaPurchasePrice",
-  "ffcsaMemberSalesPrice",
-  "ffcsaGuestSalesPrice"
+  "ffcsaMemberSalesPrice"
 ];
 const PRICE_SHEET_PERCENT_COLUMNS = [
+  "FFCSAFactor",
   "memberMarkup",
-  "guestPercentOverRetail",
-  "herdShareMarkup",
-  "snapMarkup",
   "saleDiscount"
 ];
 const PRICE_SHEET_NUMBER_COLUMNS = [
   { key: "avgWeightUsed", pattern: "0.000" },
-  { key: "packageQuantityUsed", pattern: "0.###" }
+  { key: "packageQuantityUsed", pattern: "0" },
+  { key: "packageCount", pattern: "0" }
 ];
 
 function hasFlag(flag) {
@@ -197,13 +193,13 @@ function buildIntroductionValues(metadata) {
     ["Notes"],
     ["Highlight note", "Rows highlighted in yellow show products with price changes in the last 2 weeks."],
     ["retailSalesPrice", "DFF source price from the store pricing profile"],
-    ["FFCSAFactor", "FFCSA factor used in the in-sheet purchase price formula"],
+    ["FFCSAFactor", "FFCSA factor used only in the FFCSA online-store purchase price formula"],
     ["avgWeightUsed", "For weight-based products, the sheet uses the average of lowest_weight and highest_weight"],
     ["packageQuantityUsed", "For each-based products, the sheet uses this package quantity in the purchase price formula"],
     ["packageName", "Combined package summary for the product"],
+    ["squareSalePrice", "Shown only for sale items. It is the Square / farmers-market sell price and is calculated from retailSalesPrice with the sale discount only."],
     ["ffcsaPurchasePrice", "Derived base package price before list markups"],
-    ["ffcsaMemberSalesPrice", "Derived member-facing price"],
-    ["ffcsaGuestSalesPrice", "Derived guest-facing price"],
+    ["ffcsaMemberSalesPrice", "Derived FFCSA online-store member-facing price"],
     ["Sync behavior", "Google sync replaces all data in the configured prices tab"]
   ];
 }
@@ -763,6 +759,8 @@ async function buildSheetValues({ vendorNameMatcher = null } = {}) {
     const rowNumber = sheetValues.length + 1;
     const retailSalesPriceCol = getColumnLetterByName("retailSalesPrice");
     const unitOfMeasureCol = getColumnLetterByName("dff_unit_of_measure");
+    const lowestWeightCol = getColumnLetterByName("lowest_weight");
+    const highestWeightCol = getColumnLetterByName("highest_weight");
     const sourceMultiplierCol = getColumnLetterByName("FFCSAFactor");
     const avgWeightUsedCol = getColumnLetterByName("avgWeightUsed");
     const packageQuantityUsedCol = getColumnLetterByName("packageQuantityUsed");
@@ -770,10 +768,17 @@ async function buildSheetValues({ vendorNameMatcher = null } = {}) {
     const memberMarkupCol = getColumnLetterByName("memberMarkup");
     const saleCol = getColumnLetterByName("sale");
     const saleDiscountCol = getColumnLetterByName("saleDiscount");
-    const vendorSaleShareFormula = `IF(${saleCol}${rowNumber},${saleDiscountCol}${rowNumber}/2,0)`;
     const customerSaleShareFormula = `IF(${saleCol}${rowNumber},${saleDiscountCol}${rowNumber},0)`;
-    const purchaseFormula = `=IF(LOWER(${unitOfMeasureCol}${rowNumber})="lbs",IF(OR(${retailSalesPriceCol}${rowNumber}="",${avgWeightUsedCol}${rowNumber}=""),"",ROUND(${retailSalesPriceCol}${rowNumber}*${avgWeightUsedCol}${rowNumber}*${sourceMultiplierCol}${rowNumber}*(1-${vendorSaleShareFormula}),2)),IF(OR(${retailSalesPriceCol}${rowNumber}="",${packageQuantityUsedCol}${rowNumber}=""),"",ROUND(${retailSalesPriceCol}${rowNumber}*${packageQuantityUsedCol}${rowNumber}*${sourceMultiplierCol}${rowNumber}*(1-${vendorSaleShareFormula}),2)))`;
-    const memberFormula = `=IF(OR(${purchasePriceCol}${rowNumber}="",${memberMarkupCol}${rowNumber}=""),"",ROUND(${purchasePriceCol}${rowNumber}*(1+${memberMarkupCol}${rowNumber})*(1-${customerSaleShareFormula}),2))`;
+    const purchaseFormula = `=IF(LOWER(${unitOfMeasureCol}${rowNumber})="lbs",IF(OR(${retailSalesPriceCol}${rowNumber}="",${avgWeightUsedCol}${rowNumber}=""),"",ROUND(${retailSalesPriceCol}${rowNumber}*${avgWeightUsedCol}${rowNumber}*${sourceMultiplierCol}${rowNumber},2)),IF(OR(${retailSalesPriceCol}${rowNumber}="",${packageQuantityUsedCol}${rowNumber}=""),"",ROUND(${retailSalesPriceCol}${rowNumber}*${packageQuantityUsedCol}${rowNumber}*${sourceMultiplierCol}${rowNumber},2)))`;
+    const memberFormulaBody = `IF(OR(${purchasePriceCol}${rowNumber}="",${memberMarkupCol}${rowNumber}=""),"",ROUND(${purchasePriceCol}${rowNumber}*(1+${memberMarkupCol}${rowNumber})*(1-${customerSaleShareFormula}),2))`;
+    const memberFormula = `=${memberFormulaBody}`;
+    const squareSalePriceFormulaBody = `IF(${retailSalesPriceCol}${rowNumber}="","",ROUND(${retailSalesPriceCol}${rowNumber}*(1-${customerSaleShareFormula}),2))`;
+    const squareSalePriceFormula = `=IF(${saleCol}${rowNumber},${squareSalePriceFormulaBody},"")`;
+    const isWeightBasedSourcePricing =
+      usesSourcePricing && String(snapshot.profile.unitOfMeasure || "").toLowerCase() === "lbs";
+    const isEachBasedSourcePricing =
+      usesSourcePricing && String(snapshot.profile.unitOfMeasure || "").toLowerCase() !== "lbs";
+    const saleEnabled = Boolean(snapshot.profile.onSale);
     const rowValues = {
       id: productId,
       localLineProductID: productId,
@@ -782,29 +787,26 @@ async function buildSheetValues({ vendorNameMatcher = null } = {}) {
       productName: product.name || "",
       packageName: buildPackageSummary(snapshot.packageRows, snapshot.profile.unitOfMeasure),
       retailSalesPrice: usesSourcePricing ? snapshot.profile.sourceUnitPrice : "",
-      lowest_weight: usesSourcePricing ? snapshot.profile.minWeight : "",
-      highest_weight: usesSourcePricing ? snapshot.profile.maxWeight : "",
+      lowest_weight: isWeightBasedSourcePricing ? snapshot.profile.minWeight : "",
+      highest_weight: isWeightBasedSourcePricing ? snapshot.profile.maxWeight : "",
       dff_unit_of_measure: usesSourcePricing ? snapshot.profile.unitOfMeasure : "",
+      sale: saleEnabled ? "TRUE" : "",
+      saleDiscount: saleEnabled ? snapshot.profile.saleDiscount : "",
+      squareSalePrice: saleEnabled ? squareSalePriceFormula : "",
+      packageCount: snapshot.packageRows.length,
+      description: flattenSheetText(product.description),
       FFCSAFactor: usesSourcePricing ? snapshot.profile.sourceMultiplier : "",
       avgWeightUsed:
-        usesSourcePricing && String(snapshot.profile.unitOfMeasure || "").toLowerCase() === "lbs"
-          ? `=IF(AND(H${rowNumber}<>"",I${rowNumber}<>""),AVERAGE(H${rowNumber},I${rowNumber}),IF(H${rowNumber}<>"",H${rowNumber},IF(I${rowNumber}<>"",I${rowNumber},"")))`
+        isWeightBasedSourcePricing
+          ? `=IF(AND(${lowestWeightCol}${rowNumber}<>"",${highestWeightCol}${rowNumber}<>""),AVERAGE(${lowestWeightCol}${rowNumber},${highestWeightCol}${rowNumber}),IF(${lowestWeightCol}${rowNumber}<>"",${lowestWeightCol}${rowNumber},IF(${highestWeightCol}${rowNumber}<>"",${highestWeightCol}${rowNumber},"")))`
           : "",
       packageQuantityUsed:
-        usesSourcePricing && String(snapshot.profile.unitOfMeasure || "").toLowerCase() !== "lbs"
+        isEachBasedSourcePricing
           ? (chosenPackageRow ? Number(chosenPackageRow.quantity || 1) : 1)
           : "",
       ffcsaPurchasePrice: purchaseFormula,
       ffcsaMemberSalesPrice: memberFormula,
-      ffcsaGuestSalesPrice: snapshot.guestPrice,
       memberMarkup: snapshot.profile.memberMarkup,
-      guestPercentOverRetail: snapshot.profile.guestMarkup,
-      herdShareMarkup: snapshot.profile.herdShareMarkup,
-      snapMarkup: snapshot.profile.snapMarkup,
-      sale: Boolean(snapshot.profile.onSale),
-      saleDiscount: snapshot.profile.saleDiscount,
-      packageCount: snapshot.packageRows.length,
-      description: flattenSheetText(product.description),
       track_inventory: toBooleanLabel(Boolean(product.trackInventory)),
       visible: toBooleanLabel(Boolean(product.visible)),
       remoteSyncStatus: snapshot.profile.remoteSyncStatus || "",

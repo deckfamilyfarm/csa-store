@@ -4,6 +4,7 @@ import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import multer from "multer";
 import sharp from "sharp";
+import xlsx from "xlsx";
 import { DeleteObjectCommand, S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import {
   ensureAdminAccessSchema,
@@ -45,6 +46,7 @@ import {
   isLocalLineEnabled,
   updateLocalLineForProduct
 } from "../localLine.js";
+import { getLocalLineAccessToken, getLocalLineBaseUrl } from "../localLineAuth.js";
 import {
   getLatestLocalLinePullJob,
   getLatestLocalLinePullJobs,
@@ -626,6 +628,51 @@ function isMembershipPurchaseDropSite(site = {}) {
     formattedAddress.includes("online delivery") &&
     instructions.includes("subscribing to a full farm csa membership")
   );
+}
+
+function getMembershipPurchaseOrderSql(orderAlias = "o", dropSiteAlias = "ds") {
+  const fulfillmentSiteSql = getFulfillmentSiteNameSql(orderAlias, dropSiteAlias);
+  return (
+    "(" +
+      `LOWER(${fulfillmentSiteSql}) LIKE '%membership purchase%' ` +
+      "OR EXISTS (" +
+        "SELECT 1 " +
+        "FROM local_line_order_entries membership_entries " +
+        `WHERE membership_entries.local_line_order_id = ${orderAlias}.local_line_order_id ` +
+        "AND LOWER(COALESCE(membership_entries.category_name, '')) = 'membership'" +
+      ")" +
+    ")"
+  );
+}
+
+function buildVendorEntryMatchSql({
+  orderAlias = "o",
+  entryAlias = "e",
+  vendorName = "",
+  vendorId = null
+} = {}) {
+  const clauses = [`COALESCE(${entryAlias}.vendor_name, '') = ?`];
+  if (Number.isFinite(Number(vendorId)) && Number(vendorId) > 0) {
+    clauses.push(
+      `EXISTS (
+        SELECT 1
+        FROM local_line_product_meta llpm_vendor
+        JOIN products vendor_products_by_id
+          ON vendor_products_by_id.id = llpm_vendor.product_id
+        WHERE llpm_vendor.local_line_product_id = ${entryAlias}.product_id
+          AND vendor_products_by_id.vendor_id = ?
+      )`
+    );
+    clauses.push(
+      `EXISTS (
+        SELECT 1
+        FROM products vendor_products_by_name
+        WHERE vendor_products_by_name.name = ${entryAlias}.product_name
+          AND vendor_products_by_name.vendor_id = ?
+      )`
+    );
+  }
+  return `(${clauses.join(" OR ")})`;
 }
 
 function stripHtmlToText(value) {
@@ -3653,8 +3700,450 @@ const LOCAL_LINE_FULFILLMENT_JOB_PHASES = [
 const LOCAL_LINE_ORDER_JOB_PHASES = [
   { key: "fetch", label: "Fetch Orders" },
   { key: "store", label: "Store Orders" },
+  { key: "reporting", label: "Build Reporting Cache" },
   { key: "finalize", label: "Finalize" }
 ];
+
+function formatYmd(date) {
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(date.getUTCDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function formatMonthKeyFromDate(date) {
+  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}`;
+}
+
+function startOfUtcMonth(date) {
+  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1));
+}
+
+function endOfUtcMonth(date) {
+  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0));
+}
+
+function addUtcMonths(date, delta) {
+  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + delta, 1));
+}
+
+function buildMonthlyRanges(startDate, endDate = new Date()) {
+  const ranges = [];
+  let cursor = startOfUtcMonth(startDate);
+  const endMonth = startOfUtcMonth(endDate);
+  while (cursor <= endMonth) {
+    const monthStart = startOfUtcMonth(cursor);
+    const monthEnd = endOfUtcMonth(cursor);
+    ranges.push({
+      monthKey: formatMonthKeyFromDate(monthStart),
+      startDate: monthStart,
+      endDate: monthEnd,
+      startStr: formatYmd(monthStart),
+      endStr: formatYmd(monthEnd)
+    });
+    cursor = addUtcMonths(cursor, 1);
+  }
+  return ranges;
+}
+
+function parseLooseDateString(value) {
+  if (!value) return null;
+  if (typeof value === "number" && Number.isFinite(value)) {
+    const parsedCode = xlsx.SSF.parse_date_code(value);
+    if (parsedCode?.y && parsedCode?.m && parsedCode?.d) {
+      return new Date(Date.UTC(parsedCode.y, parsedCode.m - 1, parsedCode.d));
+    }
+  }
+  const numericString = String(value).trim();
+  if (/^\d+(\.\d+)?$/.test(numericString)) {
+    const parsedCode = xlsx.SSF.parse_date_code(Number(numericString));
+    if (parsedCode?.y && parsedCode?.m && parsedCode?.d) {
+      return new Date(Date.UTC(parsedCode.y, parsedCode.m - 1, parsedCode.d));
+    }
+  }
+  const direct = new Date(value);
+  if (!Number.isNaN(direct.getTime())) return direct;
+  const ymdMatch = String(value).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (ymdMatch) {
+    return new Date(Date.UTC(Number(ymdMatch[1]), Number(ymdMatch[2]) - 1, Number(ymdMatch[3])));
+  }
+  const mdYMatch = String(value).match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (mdYMatch) {
+    return new Date(Date.UTC(Number(mdYMatch[3]), Number(mdYMatch[1]) - 1, Number(mdYMatch[2])));
+  }
+  return null;
+}
+
+function getUtcWeekStartKey(date) {
+  const monday = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+  const day = (monday.getUTCDay() + 6) % 7;
+  monday.setUTCDate(monday.getUTCDate() - day);
+  return formatYmd(monday);
+}
+
+function getTrimmedRowValue(row, candidates = []) {
+  for (const candidate of candidates) {
+    const value = row?.[candidate];
+    if (value === null || typeof value === "undefined") continue;
+    const trimmed = String(value).trim();
+    if (trimmed) return trimmed;
+  }
+  return "";
+}
+
+function normalizePackageId(value) {
+  if (value === null || typeof value === "undefined") return "";
+  const numeric = Number(value);
+  if (Number.isFinite(numeric)) {
+    return String(Math.trunc(numeric));
+  }
+  return String(value).trim();
+}
+
+function computeEffectiveReportingQuantity(row = {}) {
+  let quantity = Number(row?.Quantity);
+  if (!Number.isFinite(quantity)) quantity = 0;
+  quantity = Math.round(quantity);
+
+  let numItems = Number(row?.["# of Items"]);
+  if (!Number.isFinite(numItems)) numItems = 0;
+  numItems = Math.round(numItems);
+
+  if (numItems > 1 && quantity === 1) {
+    quantity = numItems;
+  }
+
+  return quantity;
+}
+
+function parseCurrencyCell(value) {
+  const numeric = Number(String(value ?? "").replace(/[^0-9.\-]/g, ""));
+  return Number.isFinite(numeric) ? numeric : 0;
+}
+
+function parseOptionalIntegerCell(value) {
+  const numeric = Number(String(value ?? "").trim());
+  return Number.isFinite(numeric) ? Math.trunc(numeric) : null;
+}
+
+function parseOrdersExportRows(csvText) {
+  const workbook = xlsx.read(csvText, { type: "string" });
+  const firstSheetName = workbook.SheetNames?.[0];
+  if (!firstSheetName) return [];
+  const worksheet = workbook.Sheets[firstSheetName];
+  return xlsx.utils.sheet_to_json(worksheet, { defval: "" });
+}
+
+function buildPackagePriceMapFromWorkbookBuffer(buffer) {
+  const workbook = xlsx.read(buffer, { type: "buffer" });
+  const worksheet =
+    workbook.Sheets["Packages and pricing"] ||
+    workbook.Sheets[workbook.SheetNames?.[1]] ||
+    workbook.Sheets[workbook.SheetNames?.[0]];
+  if (!worksheet) {
+    throw new Error('Could not find "Packages and pricing" worksheet');
+  }
+  const rows = xlsx.utils.sheet_to_json(worksheet, { defval: "" });
+  const map = new Map();
+  rows.forEach((row) => {
+    const packageId = normalizePackageId(row?.["Package ID"] || row?.PackageID || row?.package_id);
+    const packagePrice = parseCurrencyCell(row?.["Package Price"] || row?.PackagePrice || row?.package_price);
+    if (!packageId || !Number.isFinite(packagePrice) || packagePrice <= 0) return;
+    map.set(packageId, packagePrice);
+  });
+  return map;
+}
+
+async function fetchWithLocalLineRetry(url, options, label) {
+  const attempts = Math.max(
+    1,
+    Number.parseInt(process.env.LOCALLINE_FETCH_RETRY_ATTEMPTS || "2", 10) || 2
+  );
+  let lastError = null;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      return await fetch(url, options);
+    } catch (error) {
+      lastError = error;
+      if (attempt >= attempts) break;
+    }
+  }
+  throw new Error(`${label} request failed: ${lastError?.message || "fetch failed"}`);
+}
+
+async function requestLocalLineExport(url, accessToken) {
+  const response = await fetchWithLocalLineRetry(url, {
+    headers: { Authorization: `Bearer ${accessToken}` }
+  }, "Local Line export request");
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`Local Line export request failed: ${response.status} ${body}`);
+  }
+  const payload = await response.json();
+  const exportId = Number(payload?.id);
+  if (!Number.isFinite(exportId)) {
+    throw new Error("Local Line export request did not return an export id");
+  }
+  return exportId;
+}
+
+async function pollLocalLineExportFilePath(exportId, accessToken) {
+  const baseUrl = getLocalLineBaseUrl();
+  const timeoutMs = 90_000;
+  const pollIntervalMs = 5_000;
+  const startedAt = Date.now();
+
+  while (Date.now() - startedAt < timeoutMs) {
+    const response = await fetchWithLocalLineRetry(
+      `${baseUrl}export/${exportId}/`,
+      { headers: { Authorization: `Bearer ${accessToken}` } },
+      `Local Line export ${exportId}`
+    );
+    if (!response.ok) {
+      const body = await response.text();
+      throw new Error(`Local Line export poll failed: ${response.status} ${body}`);
+    }
+    const payload = await response.json();
+    if (payload?.status === "COMPLETE" && payload?.file_path) {
+      return String(payload.file_path);
+    }
+    await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
+  }
+
+  throw new Error(`Local Line export ${exportId} did not complete in time`);
+}
+
+async function downloadTextFile(url) {
+  const response = await fetchWithLocalLineRetry(url, {}, "Local Line text download");
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`Local Line text download failed: ${response.status} ${body}`);
+  }
+  return response.text();
+}
+
+async function downloadBinaryFile(url, accessToken) {
+  const response = await fetchWithLocalLineRetry(url, {
+    headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined
+  }, "Local Line binary download");
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`Local Line binary download failed: ${response.status} ${body}`);
+  }
+  const arrayBuffer = await response.arrayBuffer();
+  return Buffer.from(arrayBuffer);
+}
+
+function buildOrdersExportUrl(startStr, endStr) {
+  const baseUrl = getLocalLineBaseUrl();
+  const params = new URLSearchParams({
+    file_type: "orders_list_view",
+    send_to_email: "false",
+    destination_email: "fullfarmcsa@deckfamilyfarm.com",
+    direct: "true",
+    fulfillment_date_start: startStr,
+    fulfillment_date_end: endStr
+  });
+  return `${baseUrl}orders/export/?${params.toString()}`;
+}
+
+async function syncLocalLineOrderReportingCache({
+  connection,
+  reportProgress = () => {},
+  startDate = new Date("2026-01-01T00:00:00.000Z")
+} = {}) {
+  const ranges = buildMonthlyRanges(startDate, new Date());
+  const accessToken = await getLocalLineAccessToken();
+  const productWorkbookBuffer = await downloadBinaryFile(
+    `${getLocalLineBaseUrl()}products/export/?direct=true`,
+    accessToken
+  );
+  const packagePriceMap = buildPackagePriceMapFromWorkbookBuffer(productWorkbookBuffer);
+  let totalRows = 0;
+
+  reportProgress({
+    phaseKey: "reporting",
+    phaseLabel: "Build Reporting Cache",
+    status: "running",
+    percent: 0,
+    current: 0,
+    total: ranges.length,
+    message: `Syncing ${ranges.length} vendor reporting month${ranges.length === 1 ? "" : "s"}`
+  });
+
+  for (let index = 0; index < ranges.length; index += 1) {
+    const range = ranges[index];
+    const exportId = await requestLocalLineExport(
+      buildOrdersExportUrl(range.startStr, range.endStr),
+      accessToken
+    );
+    const filePath = await pollLocalLineExportFilePath(exportId, accessToken);
+    const csvText = await downloadTextFile(filePath);
+    const rows = parseOrdersExportRows(csvText);
+    const now = new Date();
+
+    const preparedRows = rows
+      .map((row) => {
+        const fulfillmentDateText = getTrimmedRowValue(row, [
+          "Fulfillment Date",
+          "Delivery Date",
+          "Pickup Date",
+          "Delivery/Pickup Date",
+          "Order Fulfillment Date",
+          "Date"
+        ]);
+        const fulfillmentDate = parseLooseDateString(fulfillmentDateText);
+        const normalizedFulfillmentDate = fulfillmentDate ? formatYmd(fulfillmentDate) : range.startStr;
+        const quantity = computeEffectiveReportingQuantity(row);
+        const packageId = normalizePackageId(
+          getTrimmedRowValue(row, ["Package ID", "Package Id", "package_id"])
+        );
+        const retailAmount = parseCurrencyCell(
+          getTrimmedRowValue(row, ["Product Subtotal", "Line Subtotal", "Subtotal", "Line Item Total", "Amount"])
+        );
+        const purchaseUnitPrice = packageId ? Number(packagePriceMap.get(packageId) || 0) : 0;
+        const purchaseTotal = Number((purchaseUnitPrice * quantity).toFixed(2));
+        return [
+          range.monthKey,
+          normalizedFulfillmentDate,
+          fulfillmentDate ? getUtcWeekStartKey(fulfillmentDate) : null,
+          parseOptionalIntegerCell(getTrimmedRowValue(row, ["Order", "Order ID", "Order Id"])),
+          getTrimmedRowValue(row, ["Customer", "Customer Name"]),
+          getTrimmedRowValue(row, ["Price List"]),
+          getTrimmedRowValue(row, ["Order Status", "Status"]),
+          getTrimmedRowValue(row, ["Payment Status"]),
+          getTrimmedRowValue(row, ["Fulfillment Name"]),
+          getTrimmedRowValue(row, ["Fulfillment Address"]),
+          parseOptionalIntegerCell(getTrimmedRowValue(row, ["Vendor ID", "Vendor Id", "vendor_id"])),
+          getTrimmedRowValue(row, ["Vendor"]),
+          getTrimmedRowValue(row, ["Category"]),
+          parseOptionalIntegerCell(getTrimmedRowValue(row, ["Product ID", "Product Id", "product_id"])),
+          getTrimmedRowValue(row, ["Product", "Product Name", "Item", "Item Name"]),
+          packageId || null,
+          getTrimmedRowValue(row, ["Package", "Package Name"]),
+          quantity,
+          retailAmount,
+          purchaseUnitPrice,
+          purchaseTotal,
+          stringifyJson(row),
+          now,
+          now,
+          now
+        ];
+      })
+      .filter((values) => Boolean(values[14]) || Boolean(values[11]));
+
+    await connection.beginTransaction();
+    await connection.query(
+      `
+        INSERT INTO local_line_order_reporting_months (
+          month_key, status, row_count, message, synced_at, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE
+          status = VALUES(status),
+          row_count = VALUES(row_count),
+          message = VALUES(message),
+          synced_at = VALUES(synced_at),
+          updated_at = VALUES(updated_at)
+      `,
+      [range.monthKey, "running", 0, `Refreshing ${range.monthKey}`, now, now, now]
+    );
+    await connection.query(
+      "DELETE FROM local_line_order_reporting_entries WHERE fulfillment_month = ?",
+      [range.monthKey]
+    );
+
+    const chunkSize = 250;
+    for (let startIndex = 0; startIndex < preparedRows.length; startIndex += chunkSize) {
+      const chunk = preparedRows.slice(startIndex, startIndex + chunkSize);
+      if (!chunk.length) continue;
+      const valuesSql = chunk.map(() => "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)").join(", ");
+      const flattened = chunk.flat();
+      await connection.query(
+        `
+          INSERT INTO local_line_order_reporting_entries (
+            fulfillment_month,
+            fulfillment_date,
+            week_start,
+            local_line_order_id,
+            customer_name,
+            price_list_name,
+            order_status,
+            payment_status,
+            fulfillment_name,
+            fulfillment_address,
+            vendor_id,
+            vendor_name,
+            category_name,
+            product_id,
+            product_name,
+            package_id,
+            package_name,
+            quantity,
+            retail_amount,
+            purchase_unit_price,
+            purchase_total,
+            raw_json,
+            created_at,
+            updated_at,
+            last_synced_at
+          ) VALUES ${valuesSql}
+        `,
+        flattened
+      );
+    }
+
+    await connection.query(
+      `
+        INSERT INTO local_line_order_reporting_months (
+          month_key, status, row_count, message, synced_at, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE
+          status = VALUES(status),
+          row_count = VALUES(row_count),
+          message = VALUES(message),
+          synced_at = VALUES(synced_at),
+          updated_at = VALUES(updated_at)
+      `,
+      [
+        range.monthKey,
+        "completed",
+        preparedRows.length,
+        `Stored ${preparedRows.length} reporting rows`,
+        now,
+        now,
+        now
+      ]
+    );
+    await connection.commit();
+
+    totalRows += preparedRows.length;
+    reportProgress({
+      phaseKey: "reporting",
+      phaseLabel: "Build Reporting Cache",
+      status: "running",
+      percent: Math.round(((index + 1) / ranges.length) * 100),
+      current: index + 1,
+      total: ranges.length,
+      message: `Reporting cache refreshed for ${range.monthKey} (${preparedRows.length} rows)`
+    });
+  }
+
+  reportProgress({
+    phaseKey: "reporting",
+    phaseLabel: "Build Reporting Cache",
+    status: "completed",
+    percent: 100,
+    current: ranges.length,
+    total: ranges.length,
+    message: `Stored ${totalRows} reporting rows`
+  });
+
+  return {
+    monthsSynced: ranges.length,
+    reportingRows: totalRows
+  };
+}
 
 async function syncLocalLineFulfillmentStrategiesToStore({ reportProgress = () => {} } = {}) {
   const strategies = await fetchAllLocalLineFulfillmentStrategies();
@@ -3897,6 +4386,10 @@ async function syncLocalLineOrdersToStore({ reportProgress = () => {}, cutoffDat
     let reachedCursor = false;
     let reachedCutoff = false;
     let totalAvailable = null;
+    const incrementalSync = Number(existingCursor?.cursorValue || 0) > 0;
+    const syncLabel = incrementalSync
+      ? `Fetching new orders since ${String(existingCursor?.syncedThroughAt || "").slice(0, 10) || "last sync"}`
+      : `Fetching orders since ${effectiveCutoffDate.toISOString().slice(0, 10)}`;
 
     reportProgress({
       phaseKey: "fetch",
@@ -3905,7 +4398,7 @@ async function syncLocalLineOrdersToStore({ reportProgress = () => {}, cutoffDat
       percent: 0,
       current: 0,
       total: null,
-      message: `Fetching orders since ${effectiveCutoffDate.toISOString().slice(0, 10)}`
+      message: syncLabel
     });
 
     while (!reachedCursor && !reachedCutoff) {
@@ -3921,10 +4414,12 @@ async function syncLocalLineOrdersToStore({ reportProgress = () => {}, cutoffDat
         phaseKey: "fetch",
         phaseLabel: "Fetch Orders",
         status: "running",
-        percent: totalAvailable ? Math.min(95, Math.round((totalFetched / totalAvailable) * 100)) : 0,
+        percent: incrementalSync
+          ? null
+          : (totalAvailable ? Math.min(95, Math.round((totalFetched / totalAvailable) * 100)) : 0),
         current: totalFetched,
-        total: totalAvailable,
-        message: `Fetched page ${page}`
+        total: incrementalSync ? null : totalAvailable,
+        message: incrementalSync ? `Scanned ${totalFetched} new orders` : `Fetched page ${page}`
       });
 
       await connection.beginTransaction();
@@ -4134,9 +4629,11 @@ async function syncLocalLineOrdersToStore({ reportProgress = () => {}, cutoffDat
         phaseKey: "store",
         phaseLabel: "Store Orders",
         status: "running",
-        percent: totalAvailable ? Math.min(95, Math.round((totalFetched / totalAvailable) * 100)) : 0,
+        percent: incrementalSync
+          ? null
+          : (totalAvailable ? Math.min(95, Math.round((totalFetched / totalAvailable) * 100)) : 0),
         current: stored,
-        total: totalAvailable,
+        total: incrementalSync ? null : totalAvailable,
         message: `Stored ${stored} orders`
       });
 
@@ -4172,13 +4669,19 @@ async function syncLocalLineOrdersToStore({ reportProgress = () => {}, cutoffDat
     });
     await connection.commit();
 
+    const reportingSummary = await syncLocalLineOrderReportingCache({
+      connection,
+      reportProgress,
+      startDate: effectiveCutoffDate
+    });
+
     reportProgress({
       phaseKey: "fetch",
       phaseLabel: "Fetch Orders",
       status: "completed",
       percent: 100,
       current: totalFetched,
-      total: totalAvailable,
+      total: incrementalSync ? null : totalAvailable,
       message: `Fetched ${totalFetched} new orders`
     });
     reportProgress({
@@ -4187,7 +4690,7 @@ async function syncLocalLineOrdersToStore({ reportProgress = () => {}, cutoffDat
       status: "completed",
       percent: 100,
       current: stored,
-      total: totalAvailable,
+      total: incrementalSync ? null : totalAvailable,
       message: `Stored ${stored} orders`
     });
     reportProgress({
@@ -4197,7 +4700,10 @@ async function syncLocalLineOrdersToStore({ reportProgress = () => {}, cutoffDat
       percent: 100,
       message: "Order sync complete"
     });
-    return summary;
+    return {
+      ...summary,
+      reportingSummary
+    };
   } catch (error) {
     await connection.rollback().catch(() => {});
     await upsertLocalLineSyncCursor(connection, "orders", {
@@ -4584,6 +5090,583 @@ router.get("/localline/status", requireAdmin, async (_req, res) => {
   });
 });
 
+function normalizeLookupKey(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function formatUtcDateKey(date) {
+  return new Date(Date.UTC(
+    date.getUTCFullYear(),
+    date.getUTCMonth(),
+    date.getUTCDate()
+  )).toISOString().slice(0, 10);
+}
+
+function formatUtcMonthKey(date) {
+  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}`;
+}
+
+function getUtcWeekStart(date) {
+  const start = new Date(Date.UTC(
+    date.getUTCFullYear(),
+    date.getUTCMonth(),
+    date.getUTCDate()
+  ));
+  const day = start.getUTCDay();
+  const offset = day === 0 ? -6 : 1 - day;
+  start.setUTCDate(start.getUTCDate() + offset);
+  return start;
+}
+
+function buildRecentMonthKeys(latestDate, count = 6) {
+  const keys = [];
+  const cursor = new Date(Date.UTC(latestDate.getUTCFullYear(), latestDate.getUTCMonth(), 1));
+  for (let index = 0; index < count; index += 1) {
+    const monthDate = new Date(Date.UTC(cursor.getUTCFullYear(), cursor.getUTCMonth() - index, 1));
+    keys.push(formatUtcMonthKey(monthDate));
+  }
+  return keys.reverse();
+}
+
+function buildRecentWeekKeys(latestDate, count = 12) {
+  const keys = [];
+  const latestWeekStart = getUtcWeekStart(latestDate);
+  for (let index = 0; index < count; index += 1) {
+    const weekStart = new Date(Date.UTC(
+      latestWeekStart.getUTCFullYear(),
+      latestWeekStart.getUTCMonth(),
+      latestWeekStart.getUTCDate() - index * 7
+    ));
+    keys.push(formatUtcDateKey(weekStart));
+  }
+  return keys.reverse();
+}
+
+function createAggregateBucket(label) {
+  return {
+    label,
+    orderIds: new Set(),
+    lineCount: 0,
+    unitCount: 0,
+    vendorBaseAmount: 0,
+    retailAmount: 0
+  };
+}
+
+function finalizeAggregateBucket(bucket) {
+  const vendorBaseAmount = Number(bucket.vendorBaseAmount.toFixed(2));
+  const retailAmount = Number(bucket.retailAmount.toFixed(2));
+  return {
+    label: bucket.label,
+    orderCount: bucket.orderIds.size,
+    lineCount: bucket.lineCount,
+    unitCount: Number(bucket.unitCount.toFixed(3)),
+    vendorBaseAmount,
+    retailAmount,
+    averageMarkup:
+      vendorBaseAmount > 0
+        ? Number(((retailAmount / vendorBaseAmount) - 1).toFixed(4))
+        : null
+  };
+}
+
+function chooseSnapshotBasePrice(snapshot, packageName = "") {
+  const packageRows = Array.isArray(snapshot?.packageRows) ? snapshot.packageRows : [];
+  if (!packageRows.length) return null;
+
+  const normalizedPackageName = normalizeLookupKey(packageName);
+  if (normalizedPackageName) {
+    const exactMatch = packageRows.find(
+      (row) => normalizeLookupKey(row?.name) === normalizedPackageName
+    );
+    if (Number.isFinite(Number(exactMatch?.basePrice))) {
+      return Number(exactMatch.basePrice);
+    }
+  }
+
+  if (packageRows.length === 1 && Number.isFinite(Number(packageRows[0]?.basePrice))) {
+    return Number(packageRows[0].basePrice);
+  }
+
+  const validBasePrices = packageRows
+    .map((row) => Number(row?.basePrice))
+    .filter((value) => Number.isFinite(value));
+  return validBasePrices.length ? Math.min(...validBasePrices) : null;
+}
+
+async function buildFilteredOrderMetrics({
+  pool,
+  whereSql,
+  whereParams,
+  vendor = "",
+  vendorId = null,
+  category = ""
+}) {
+  const entryWhereClauses = [];
+  const entryWhereParams = [];
+  if (vendor) {
+    entryWhereClauses.push(
+      buildVendorEntryMatchSql({
+        orderAlias: "o",
+        entryAlias: "e",
+        vendorName: vendor,
+        vendorId
+      })
+    );
+    entryWhereParams.push(vendor);
+    if (Number.isFinite(Number(vendorId)) && Number(vendorId) > 0) {
+      entryWhereParams.push(Number(vendorId), Number(vendorId));
+    }
+  }
+  if (category) {
+    entryWhereClauses.push("COALESCE(e.category_name, '') = ?");
+    entryWhereParams.push(category);
+  }
+  const entryWhereSql = entryWhereClauses.length
+    ? `${whereSql ? "AND" : "WHERE"} ${entryWhereClauses.join(" AND ")}`
+    : "";
+
+  const [entryRows] = await pool.query(
+    `
+      SELECT
+        o.local_line_order_id AS localLineOrderId,
+        o.created_at_remote AS createdAtRemote,
+        e.product_id AS remoteProductId,
+        e.product_name AS productName,
+        e.package_name AS packageName,
+        e.vendor_name AS vendorName,
+        e.category_name AS categoryName,
+        e.unit_quantity AS unitQuantity,
+        e.price AS price,
+        e.total_price AS totalPrice
+      FROM local_line_orders o
+      LEFT JOIN drop_sites ds
+        ON ds.local_line_fulfillment_strategy_id = ${getFulfillmentStrategyIdSql("o")}
+      INNER JOIN local_line_order_entries e
+        ON e.local_line_order_id = o.local_line_order_id
+      ${whereSql}
+      ${entryWhereSql}
+      ORDER BY o.created_at_remote DESC, o.local_line_order_id DESC, e.local_line_order_entry_id ASC
+    `,
+    [...whereParams, ...entryWhereParams]
+  );
+
+  if (!entryRows.length) {
+    return {
+      overview: {
+        vendorBaseAmount: 0,
+        retailAmount: 0,
+        averageMarkup: null,
+        lineCount: 0,
+        unitCount: 0
+      },
+      monthlyTrend: [],
+      weeklyTrend: [],
+      topProducts: []
+    };
+  }
+
+  const db = getDb();
+  const remoteProductIds = [...new Set(
+    entryRows
+      .map((row) => Number(row.remoteProductId))
+      .filter((value) => Number.isFinite(value) && value > 0)
+  )];
+
+  const productMetaRows = remoteProductIds.length
+    ? await db
+        .select()
+        .from(localLineProductMeta)
+        .where(inArray(localLineProductMeta.localLineProductId, remoteProductIds))
+        .catch(() => [])
+    : [];
+
+  const localProductIdByRemoteProductId = new Map(
+    productMetaRows.map((row) => [Number(row.localLineProductId), Number(row.productId)])
+  );
+
+  const localProductIds = [...new Set(
+    productMetaRows
+      .map((row) => Number(row.productId))
+      .filter((value) => Number.isFinite(value) && value > 0)
+  )];
+
+  const [
+    productRows,
+    packageRows,
+    profileRows,
+    vendorRows,
+    packageMetaRows
+  ] = await Promise.all([
+    localProductIds.length
+      ? db.select().from(products).where(inArray(products.id, localProductIds))
+      : Promise.resolve([]),
+    localProductIds.length
+      ? db.select().from(packages).where(inArray(packages.productId, localProductIds))
+      : Promise.resolve([]),
+    localProductIds.length
+      ? db.select().from(productPricingProfiles).where(inArray(productPricingProfiles.productId, localProductIds))
+      : Promise.resolve([]),
+    localProductIds.length
+      ? db.select().from(vendors)
+      : Promise.resolve([]),
+    localProductIds.length
+      ? db.select().from(localLinePackageMeta).where(inArray(localLinePackageMeta.productId, localProductIds)).catch(() => [])
+      : Promise.resolve([])
+  ]);
+
+  const productById = new Map(productRows.map((row) => [Number(row.id), row]));
+  const profileByProductId = new Map(profileRows.map((row) => [Number(row.productId), row]));
+  const vendorById = new Map(vendorRows.map((row) => [Number(row.id), row]));
+  const packagesByProductId = new Map();
+  packageRows.forEach((row) => {
+    const productId = Number(row.productId);
+    const list = packagesByProductId.get(productId) || [];
+    list.push(row);
+    packagesByProductId.set(productId, list);
+  });
+  const packageMetaByProductId = new Map();
+  packageMetaRows.forEach((row) => {
+    const productId = Number(row.productId);
+    const nextMap = packageMetaByProductId.get(productId) || new Map();
+    nextMap.set(Number(row.packageId), row);
+    packageMetaByProductId.set(productId, nextMap);
+  });
+
+  const snapshotByLocalProductId = new Map();
+  localProductIds.forEach((productId) => {
+    const product = productById.get(productId);
+    if (!product) return;
+    snapshotByLocalProductId.set(
+      productId,
+      computeProductPricingSnapshot({
+        product,
+        packages: packagesByProductId.get(productId) || [],
+        packageMetaByPackageId: packageMetaByProductId.get(productId) || new Map(),
+        vendor: vendorById.get(Number(product.vendorId)) || null,
+        profile: profileByProductId.get(productId) || null
+      })
+    );
+  });
+
+  const monthlyBuckets = new Map();
+  const weeklyBuckets = new Map();
+  const topProductBuckets = new Map();
+  let latestCreatedAt = null;
+  let vendorBaseAmountTotal = 0;
+  let retailAmountTotal = 0;
+  let lineCountTotal = 0;
+  let unitCountTotal = 0;
+
+  entryRows.forEach((row) => {
+    const createdAt = row.createdAtRemote ? new Date(row.createdAtRemote) : null;
+    if (!createdAt || Number.isNaN(createdAt.getTime())) return;
+    if (!latestCreatedAt || createdAt > latestCreatedAt) {
+      latestCreatedAt = createdAt;
+    }
+
+    const orderId = Number(row.localLineOrderId);
+    const units = (() => {
+      const parsed = toNumber(row.unitQuantity);
+      return parsed !== null && parsed > 0 ? parsed : 1;
+    })();
+    const retailAmount = (() => {
+      const lineTotal = toNumber(row.totalPrice);
+      if (lineTotal !== null) return lineTotal;
+      const unitPrice = toNumber(row.price);
+      return unitPrice !== null ? Number((unitPrice * units).toFixed(2)) : 0;
+    })();
+
+    const localProductId = localProductIdByRemoteProductId.get(Number(row.remoteProductId));
+    const snapshot = Number.isFinite(localProductId)
+      ? snapshotByLocalProductId.get(Number(localProductId))
+      : null;
+    const basePrice = snapshot ? chooseSnapshotBasePrice(snapshot, row.packageName) : null;
+    const vendorBaseAmount = Number.isFinite(basePrice)
+      ? Number((Number(basePrice) * units).toFixed(2))
+      : null;
+
+    const monthKey = formatUtcMonthKey(createdAt);
+    const weekKey = formatUtcDateKey(getUtcWeekStart(createdAt));
+    if (!monthlyBuckets.has(monthKey)) monthlyBuckets.set(monthKey, createAggregateBucket(monthKey));
+    if (!weeklyBuckets.has(weekKey)) weeklyBuckets.set(weekKey, createAggregateBucket(weekKey));
+
+    const productKey = localProductId || row.remoteProductId || row.productName || `entry-${row.packageName || "unknown"}`;
+    if (!topProductBuckets.has(productKey)) {
+      topProductBuckets.set(productKey, {
+        ...createAggregateBucket(`${row.productName || "Unknown product"}|${row.vendorName || ""}`),
+        productName: row.productName || "Unknown product",
+        vendorName: row.vendorName || "",
+        packageName: row.packageName || ""
+      });
+    }
+
+    [monthlyBuckets.get(monthKey), weeklyBuckets.get(weekKey), topProductBuckets.get(productKey)].forEach((bucket) => {
+      bucket.orderIds.add(orderId);
+      bucket.lineCount += 1;
+      bucket.unitCount += units;
+      bucket.retailAmount += retailAmount;
+      if (vendorBaseAmount !== null) {
+        bucket.vendorBaseAmount += vendorBaseAmount;
+      }
+    });
+
+    lineCountTotal += 1;
+    unitCountTotal += units;
+    retailAmountTotal += retailAmount;
+    if (vendorBaseAmount !== null) {
+      vendorBaseAmountTotal += vendorBaseAmount;
+    }
+  });
+
+  if (!latestCreatedAt) {
+    latestCreatedAt = new Date();
+  }
+
+  const monthlyTrend = buildRecentMonthKeys(latestCreatedAt, 6).map((monthKey) => {
+    const bucket = monthlyBuckets.get(monthKey) || createAggregateBucket(monthKey);
+    return {
+      month: monthKey,
+      ...finalizeAggregateBucket(bucket)
+    };
+  });
+
+  const weeklyTrend = buildRecentWeekKeys(latestCreatedAt, 12).map((weekKey) => {
+    const bucket = weeklyBuckets.get(weekKey) || createAggregateBucket(weekKey);
+    return {
+      weekStart: weekKey,
+      ...finalizeAggregateBucket(bucket)
+    };
+  });
+
+  const topProducts = [...topProductBuckets.values()]
+    .map((bucket) => {
+      const finalized = finalizeAggregateBucket(bucket);
+      return {
+        productName: bucket.productName,
+        vendorName: bucket.vendorName,
+        packageName: bucket.packageName,
+        ...finalized
+      };
+    })
+    .sort((left, right) => (
+      Number(right.retailAmount || 0) - Number(left.retailAmount || 0) ||
+      String(left.productName || "").localeCompare(String(right.productName || ""))
+    ))
+    .slice(0, 15);
+
+  return {
+    overview: {
+      vendorBaseAmount: Number(vendorBaseAmountTotal.toFixed(2)),
+      retailAmount: Number(retailAmountTotal.toFixed(2)),
+      averageMarkup:
+        vendorBaseAmountTotal > 0
+          ? Number(((retailAmountTotal / vendorBaseAmountTotal) - 1).toFixed(4))
+          : null,
+      lineCount: lineCountTotal,
+      unitCount: Number(unitCountTotal.toFixed(3))
+    },
+    monthlyTrend,
+    weeklyTrend,
+    topProducts
+  };
+}
+
+async function buildExportReportingMetrics({
+  pool,
+  search = "",
+  fulfillmentSite = "",
+  vendor = "",
+  category = "",
+  status = "",
+  paymentStatus = "",
+  month = "",
+  cycle = "",
+  orderType = "product"
+}) {
+  const whereClauses = [];
+  const whereParams = [];
+
+  if (search) {
+    const like = `%${search}%`;
+    whereClauses.push(
+      "(" +
+        "CAST(local_line_order_id AS CHAR) LIKE ? " +
+        "OR COALESCE(customer_name, '') LIKE ? " +
+        "OR COALESCE(fulfillment_name, '') LIKE ? " +
+        "OR COALESCE(price_list_name, '') LIKE ? " +
+        "OR COALESCE(product_name, '') LIKE ?" +
+      ")"
+    );
+    whereParams.push(like, like, like, like, like);
+  }
+  if (fulfillmentSite) {
+    whereClauses.push("COALESCE(fulfillment_name, '') = ?");
+    whereParams.push(fulfillmentSite);
+  }
+  if (vendor) {
+    whereClauses.push("COALESCE(vendor_name, '') = ?");
+    whereParams.push(vendor);
+  }
+  if (category) {
+    whereClauses.push("COALESCE(category_name, '') = ?");
+    whereParams.push(category);
+  }
+  if (status) {
+    whereClauses.push("UPPER(COALESCE(order_status, '')) = UPPER(?)");
+    whereParams.push(status);
+  }
+  if (paymentStatus) {
+    whereClauses.push("UPPER(COALESCE(payment_status, '')) = UPPER(?)");
+    whereParams.push(paymentStatus);
+  }
+  if (month) {
+    whereClauses.push("COALESCE(fulfillment_month, '') = ?");
+    whereParams.push(month);
+  }
+  if (cycle === "tuesday") {
+    whereClauses.push("DAYOFWEEK(STR_TO_DATE(fulfillment_date, '%Y-%m-%d')) = 3");
+  } else if (cycle === "fridaySaturday") {
+    whereClauses.push("DAYOFWEEK(STR_TO_DATE(fulfillment_date, '%Y-%m-%d')) IN (6, 7)");
+  }
+  if (orderType === "membership") {
+    whereClauses.push(
+      "(LOWER(COALESCE(category_name, '')) = 'membership' OR LOWER(COALESCE(fulfillment_name, '')) LIKE '%membership purchase%')"
+    );
+  } else if (orderType !== "all") {
+    whereClauses.push(
+      "NOT (LOWER(COALESCE(category_name, '')) = 'membership' OR LOWER(COALESCE(fulfillment_name, '')) LIKE '%membership purchase%')"
+    );
+  }
+
+  const whereSql = whereClauses.length ? `WHERE ${whereClauses.join(" AND ")}` : "";
+  const [rows] = await pool.query(
+    `
+      SELECT
+        fulfillment_month AS fulfillmentMonth,
+        fulfillment_date AS fulfillmentDate,
+        week_start AS weekStart,
+        local_line_order_id AS localLineOrderId,
+        vendor_name AS vendorName,
+        product_name AS productName,
+        package_name AS packageName,
+        retail_amount AS retailAmount,
+        purchase_total AS purchaseTotal,
+        quantity
+      FROM local_line_order_reporting_entries
+      ${whereSql}
+      ORDER BY fulfillment_date DESC, local_line_order_id DESC, id DESC
+    `,
+    whereParams
+  );
+
+  if (!rows.length) {
+    return {
+      overview: {
+        vendorBaseAmount: 0,
+        retailAmount: 0,
+        averageMarkup: null,
+        lineCount: 0,
+        unitCount: 0
+      },
+      monthlyTrend: [],
+      weeklyTrend: [],
+      topProducts: []
+    };
+  }
+
+  const latestDate = rows
+    .map((row) => parseLooseDateString(row.fulfillmentDate))
+    .filter((value) => value && !Number.isNaN(value.getTime()))
+    .sort((left, right) => right - left)[0] || new Date();
+
+  const monthlyBuckets = new Map();
+  const weeklyBuckets = new Map();
+  const topProductBuckets = new Map();
+  let vendorBaseAmountTotal = 0;
+  let retailAmountTotal = 0;
+  let lineCountTotal = 0;
+  let unitCountTotal = 0;
+
+  rows.forEach((row) => {
+    const retailAmount = Number(toNumber(row.retailAmount) || 0);
+    const purchaseTotal = Number(toNumber(row.purchaseTotal) || 0);
+    const quantity = Number(toNumber(row.quantity) || 0);
+    const monthKey = String(row.fulfillmentMonth || "");
+    const weekKey = String(row.weekStart || "");
+    if (!monthlyBuckets.has(monthKey)) monthlyBuckets.set(monthKey, createAggregateBucket(monthKey));
+    if (!weeklyBuckets.has(weekKey)) weeklyBuckets.set(weekKey, createAggregateBucket(weekKey));
+
+    const productKey = `${String(row.vendorName || "")}::${String(row.productName || "")}`;
+    if (!topProductBuckets.has(productKey)) {
+      topProductBuckets.set(productKey, {
+        ...createAggregateBucket(productKey),
+        productName: row.productName || "Unknown product",
+        vendorName: row.vendorName || "",
+        packageName: row.packageName || ""
+      });
+    }
+
+    [monthlyBuckets.get(monthKey), weeklyBuckets.get(weekKey), topProductBuckets.get(productKey)].forEach((bucket) => {
+      bucket.orderIds.add(Number(row.localLineOrderId));
+      bucket.lineCount += 1;
+      bucket.unitCount += quantity;
+      bucket.vendorBaseAmount += purchaseTotal;
+      bucket.retailAmount += retailAmount;
+    });
+
+    vendorBaseAmountTotal += purchaseTotal;
+    retailAmountTotal += retailAmount;
+    lineCountTotal += 1;
+    unitCountTotal += quantity;
+  });
+
+  const monthlyTrend = buildRecentMonthKeys(latestDate, 6).map((monthKey) => {
+    const bucket = monthlyBuckets.get(monthKey) || createAggregateBucket(monthKey);
+    return {
+      month: monthKey,
+      ...finalizeAggregateBucket(bucket)
+    };
+  });
+
+  const weeklyTrend = buildRecentWeekKeys(latestDate, 12).map((weekKey) => {
+    const bucket = weeklyBuckets.get(weekKey) || createAggregateBucket(weekKey);
+    return {
+      weekStart: weekKey,
+      ...finalizeAggregateBucket(bucket)
+    };
+  });
+
+  const topProducts = [...topProductBuckets.values()]
+    .map((bucket) => ({
+      productName: bucket.productName,
+      vendorName: bucket.vendorName,
+      packageName: bucket.packageName,
+      ...finalizeAggregateBucket(bucket)
+    }))
+    .sort((left, right) => (
+      Number(right.retailAmount || 0) - Number(left.retailAmount || 0) ||
+      String(left.productName || "").localeCompare(String(right.productName || ""))
+    ))
+    .slice(0, 15);
+
+  return {
+    overview: {
+      vendorBaseAmount: Number(vendorBaseAmountTotal.toFixed(2)),
+      retailAmount: Number(retailAmountTotal.toFixed(2)),
+      averageMarkup:
+        vendorBaseAmountTotal > 0
+          ? Number(((retailAmountTotal / vendorBaseAmountTotal) - 1).toFixed(4))
+          : null,
+      lineCount: lineCountTotal,
+      unitCount: Number(unitCountTotal.toFixed(3))
+    },
+    monthlyTrend,
+    weeklyTrend,
+    topProducts
+  };
+}
+
 router.get("/orders", requireAdmin, async (req, res) => {
   await ensureLocalLineSyncSchema().catch((error) => {
     console.warn("Local Line schema bootstrap skipped for /admin/orders:", error.message);
@@ -4598,6 +5681,7 @@ router.get("/orders", requireAdmin, async (req, res) => {
   const paymentStatus = String(req.query?.paymentStatus || "").trim();
   const month = String(req.query?.month || "").trim();
   const cycle = String(req.query?.cycle || "").trim();
+  const orderType = String(req.query?.orderType || "product").trim();
   const requestedPageSize = parsePositiveInteger(req.query?.pageSize, PRICELIST_DEFAULT_PAGE_SIZE);
   const pageSize = Math.min(PRICELIST_MAX_PAGE_SIZE, Math.max(1, requestedPageSize));
   const requestedPage = parsePositiveInteger(req.query?.page, 1);
@@ -4609,6 +5693,23 @@ router.get("/orders", requireAdmin, async (req, res) => {
   const pickupStartTimeSql = getPickupTimeSql("o", "pickup_start_time");
   const pickupEndTimeSql = getPickupTimeSql("o", "pickup_end_time");
   const fulfillmentSiteSql = getFulfillmentSiteNameSql("o", "ds");
+  const membershipPurchaseOrderSql = getMembershipPurchaseOrderSql("o", "ds");
+  let vendorId = null;
+  if (vendor) {
+    const [vendorLookupRows] = await pool.query(
+      `
+        SELECT id
+        FROM vendors
+        WHERE name = ?
+        LIMIT 1
+      `,
+      [vendor]
+    );
+    vendorId = Number(vendorLookupRows?.[0]?.id);
+    if (!Number.isFinite(vendorId) || vendorId <= 0) {
+      vendorId = null;
+    }
+  }
   const whereClauses = [];
   const whereParams = [];
 
@@ -4634,10 +5735,18 @@ router.get("/orders", requireAdmin, async (req, res) => {
         SELECT 1
         FROM local_line_order_entries e
         WHERE e.local_line_order_id = o.local_line_order_id
-          AND COALESCE(e.vendor_name, '') = ?
+          AND ${buildVendorEntryMatchSql({
+            orderAlias: "o",
+            entryAlias: "e",
+            vendorName: vendor,
+            vendorId
+          })}
       )`
     );
     whereParams.push(vendor);
+    if (Number.isFinite(vendorId) && vendorId > 0) {
+      whereParams.push(vendorId, vendorId);
+    }
   }
   if (category) {
     whereClauses.push(
@@ -4651,20 +5760,25 @@ router.get("/orders", requireAdmin, async (req, res) => {
     whereParams.push(category);
   }
   if (status) {
-    whereClauses.push("COALESCE(o.status, '') = ?");
+    whereClauses.push("UPPER(COALESCE(o.status, '')) = UPPER(?)");
     whereParams.push(status);
   }
   if (paymentStatus) {
-    whereClauses.push("COALESCE(o.payment_status, '') = ?");
+    whereClauses.push("UPPER(COALESCE(o.payment_status, '')) = UPPER(?)");
     whereParams.push(paymentStatus);
   }
   if (month) {
-    whereClauses.push("DATE_FORMAT(o.created_at_remote, '%Y-%m') = ?");
+    whereClauses.push(`DATE_FORMAT(${fulfillmentDateSql}, '%Y-%m') = ?`);
     whereParams.push(month);
   }
   if (cycle === "tuesday" || cycle === "fridaySaturday") {
     whereClauses.push(`${cycleSql.cycleType} = ?`);
     whereParams.push(cycle);
+  }
+  if (orderType === "membership") {
+    whereClauses.push(membershipPurchaseOrderSql);
+  } else if (orderType !== "all") {
+    whereClauses.push(`NOT ${membershipPurchaseOrderSql}`);
   }
 
   const whereSql = whereClauses.length ? `WHERE ${whereClauses.join(" AND ")}` : "";
@@ -4752,9 +5866,11 @@ router.get("/orders", requireAdmin, async (req, res) => {
   );
   const [monthRows] = await pool.query(
     `
-      SELECT DISTINCT DATE_FORMAT(created_at_remote, '%Y-%m') AS value
-      FROM local_line_orders
-      WHERE created_at_remote IS NOT NULL
+      SELECT DISTINCT DATE_FORMAT(${fulfillmentDateSql}, '%Y-%m') AS value
+      FROM local_line_orders o
+      LEFT JOIN drop_sites ds
+        ON ds.local_line_fulfillment_strategy_id = ${fulfillmentStrategyIdSql}
+      WHERE ${fulfillmentDateSql} IS NOT NULL
       ORDER BY value DESC
     `
   );
@@ -4792,26 +5908,38 @@ router.get("/orders", requireAdmin, async (req, res) => {
     whereParams
   );
 
+  let performanceMetrics;
+  try {
+    performanceMetrics = await buildExportReportingMetrics({
+      pool,
+      search,
+      fulfillmentSite,
+      vendor,
+      category,
+      status,
+      paymentStatus,
+      month,
+      cycle,
+      orderType
+    });
+  } catch (error) {
+    if (!isMissingTableError(error, "local_line_order_reporting_entries")) {
+      throw error;
+    }
+    performanceMetrics = await buildFilteredOrderMetrics({
+      pool,
+      whereSql,
+      whereParams,
+      vendor,
+      vendorId,
+      category
+    });
+  }
+
   const metricsMonth =
     month ||
     monthRows.map((row) => row.value).find(Boolean) ||
     "";
-
-  const [monthlyTrendRows] = await pool.query(
-    `
-      SELECT
-        DATE_FORMAT(o.created_at_remote, '%Y-%m') AS month,
-        COUNT(*) AS orderCount,
-        COALESCE(SUM(o.total), 0) AS revenue,
-        COUNT(DISTINCT ${fulfillmentSiteSql}) AS siteCount
-      FROM local_line_orders o
-      LEFT JOIN drop_sites ds
-        ON ds.local_line_fulfillment_strategy_id = ${fulfillmentStrategyIdSql}
-      GROUP BY DATE_FORMAT(o.created_at_remote, '%Y-%m')
-      ORDER BY month DESC
-      LIMIT 6
-    `
-  );
 
   return res.json({
     orders: orderRows,
@@ -4827,22 +5955,25 @@ router.get("/orders", requireAdmin, async (req, res) => {
       categories: categoryRows.map((row) => row.value).filter(Boolean),
       statuses: statusRows.map((row) => row.value).filter(Boolean),
       paymentStatuses: paymentStatusRows.map((row) => row.value).filter(Boolean),
-      months: monthRows.map((row) => row.value).filter(Boolean)
+      months: monthRows.map((row) => row.value).filter(Boolean),
+      orderType
     },
     metrics: {
       overview: {
         orderCount: Number(summaryRow?.orderCount || 0),
         customerCount: Number(summaryRow?.customerCount || 0),
         revenue: Number(summaryRow?.revenue || 0),
-        averageOrderValue: Number(summaryRow?.averageOrderValue || 0)
+        averageOrderValue: Number(summaryRow?.averageOrderValue || 0),
+        vendorBaseAmount: Number(performanceMetrics.overview?.vendorBaseAmount || 0),
+        retailAmount: Number(performanceMetrics.overview?.retailAmount || 0),
+        averageMarkup: performanceMetrics.overview?.averageMarkup ?? null,
+        lineCount: Number(performanceMetrics.overview?.lineCount || 0),
+        unitCount: Number(performanceMetrics.overview?.unitCount || 0)
       },
       metricsMonth,
-      monthlyTrend: monthlyTrendRows.map((row) => ({
-        month: row.month,
-        orderCount: Number(row.orderCount || 0),
-        revenue: Number(row.revenue || 0),
-        siteCount: Number(row.siteCount || 0)
-      }))
+      monthlyTrend: performanceMetrics.monthlyTrend || [],
+      weeklyTrend: performanceMetrics.weeklyTrend || [],
+      topProducts: performanceMetrics.topProducts || []
     }
   });
 });

@@ -123,6 +123,13 @@ export function AdminManualSection({ focusTopic = "overview" }) {
           </li>
         </ul>
         <p className="admin-manual-note">
+          The Google pricing sheet now shows two different sale concepts on purpose.
+          <strong> squareSalePrice</strong> is for the Square / farmers-market pricelist and is
+          just the vendor retail price with the sale discount applied. By contrast,
+          <strong> ffcsaMemberSalesPrice</strong> follows the FFCSA online-store formula using the
+          FFCSA Factor, package quantity or weight, and the member markup.
+        </p>
+        <p className="admin-manual-note">
           The app also keeps a single CSA Package Price for remote sync. When you push to Local
           Line, that computed package price becomes the starting point for the remote FFCSA store
           pricing, and the price-list adjusted prices are built from there.

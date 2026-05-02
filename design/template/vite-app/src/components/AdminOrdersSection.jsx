@@ -14,6 +14,11 @@ function formatCount(value) {
   return Number.isFinite(numeric) ? numeric.toLocaleString() : "0";
 }
 
+function formatPercent(value) {
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? `${(numeric * 100).toFixed(2)}%` : "n/a";
+}
+
 function formatDateTime(value) {
   if (!value) return "n/a";
   const date = new Date(value);
@@ -42,11 +47,12 @@ function toQueryString(params) {
 function createOrderFilterState(overrides = {}) {
   return {
     search: "",
+    orderType: "product",
     fulfillmentSite: "",
     vendor: "",
     category: "",
-    status: "",
-    paymentStatus: "",
+    status: "OPEN",
+    paymentStatus: "PAID",
     month: "",
     cycle: "",
     ...overrides
@@ -56,6 +62,7 @@ function createOrderFilterState(overrides = {}) {
 function orderFiltersEqual(left = {}, right = {}) {
   return (
     String(left.search || "") === String(right.search || "") &&
+    String(left.orderType || "product") === String(right.orderType || "product") &&
     String(left.fulfillmentSite || "") === String(right.fulfillmentSite || "") &&
     String(left.vendor || "") === String(right.vendor || "") &&
     String(left.category || "") === String(right.category || "") &&
@@ -69,6 +76,9 @@ function orderFiltersEqual(left = {}, right = {}) {
 function describeAppliedOrderFilters(filters = {}) {
   const parts = [];
   if (filters.search) parts.push(`Search: "${filters.search}"`);
+  if ((filters.orderType || "product") === "product") parts.push("Order type: Product only");
+  if (filters.orderType === "membership") parts.push("Order type: Membership only");
+  if (filters.orderType === "all") parts.push("Order type: All");
   if (filters.fulfillmentSite) parts.push(`Site: ${filters.fulfillmentSite}`);
   if (filters.vendor) parts.push(`Vendor: ${filters.vendor}`);
   if (filters.category) parts.push(`Category: ${filters.category}`);
@@ -110,6 +120,38 @@ function normalizeOrderDetail(order = {}) {
   };
 }
 
+function normalizeFilterText(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function entryMatchesOrderFilters(entry = {}, filters = {}) {
+  const orderType = String(filters.orderType || "product").trim() || "product";
+  const vendorFilter = normalizeFilterText(filters.vendor);
+  const categoryFilter = normalizeFilterText(filters.category);
+  const searchFilter = normalizeFilterText(filters.search);
+  const entryCategory = normalizeFilterText(entry.categoryName);
+  const isMembershipEntry = entryCategory === "membership";
+
+  if (orderType === "product" && isMembershipEntry) return false;
+  if (orderType === "membership" && !isMembershipEntry) return false;
+  if (vendorFilter && normalizeFilterText(entry.vendorName) !== vendorFilter) return false;
+  if (categoryFilter && entryCategory !== categoryFilter) return false;
+
+  if (searchFilter) {
+    const haystack = [
+      entry.vendorName,
+      entry.productName,
+      entry.packageName,
+      entry.categoryName
+    ]
+      .map(normalizeFilterText)
+      .join(" ");
+    if (!haystack.includes(searchFilter)) return false;
+  }
+
+  return true;
+}
+
 export function AdminOrdersSection({ token }) {
   const [draftFilters, setDraftFilters] = useState(createOrderFilterState);
   const [appliedFilters, setAppliedFilters] = useState(createOrderFilterState);
@@ -135,6 +177,7 @@ export function AdminOrdersSection({ token }) {
       try {
         const query = toQueryString({
           search: appliedFilters.search,
+          orderType: appliedFilters.orderType,
           fulfillmentSite: appliedFilters.fulfillmentSite,
           vendor: appliedFilters.vendor,
           category: appliedFilters.category,
@@ -202,7 +245,7 @@ export function AdminOrdersSection({ token }) {
           loading: false,
           error: "",
           data: {
-            order: normalizeOrderDetail(response?.order || {}),
+      order: normalizeOrderDetail(response?.order || {}),
             entries: Array.isArray(response?.entries) ? response.entries : []
           }
         });
@@ -235,13 +278,18 @@ export function AdminOrdersSection({ token }) {
     categories: [],
     statuses: [],
     paymentStatuses: [],
-    months: []
+    months: [],
+    orderType: "product"
   };
   const metrics = ordersState.data?.metrics || {};
-  const overview = metrics.overview || {};
   const monthlyTrend = metrics.monthlyTrend || [];
+  const weeklyTrend = metrics.weeklyTrend || [];
+  const topProducts = metrics.topProducts || [];
   const selectedOrder = selectedOrderState.data?.order || null;
   const selectedEntries = selectedOrderState.data?.entries || [];
+  const filteredSelectedEntries = selectedEntries.filter((entry) =>
+    entryMatchesOrderFilters(entry, appliedFilters)
+  );
   const showingCount = orders.length;
   const hasPendingFilterChanges = !orderFiltersEqual(draftFilters, appliedFilters);
   const appliedFilterLabel = describeAppliedOrderFilters(appliedFilters);
@@ -259,6 +307,7 @@ export function AdminOrdersSection({ token }) {
   function handleApplyFilters() {
     setAppliedFilters({
       search: String(draftFilters.search || "").trim(),
+      orderType: String(draftFilters.orderType || "product").trim() || "product",
       fulfillmentSite: String(draftFilters.fulfillmentSite || "").trim(),
       vendor: String(draftFilters.vendor || "").trim(),
       category: String(draftFilters.category || "").trim(),
@@ -282,7 +331,8 @@ export function AdminOrdersSection({ token }) {
       <h3>Orders</h3>
       <div className="small">
         Review Local Line orders stored in the local database. Orders are shown newest first, and
-        the filters below control the table and summary.
+        the filters below control the table, trend sections, top products, and the selected order
+        line items.
       </div>
 
       <div className="pricelist-toolbar orders-toolbar">
@@ -296,6 +346,15 @@ export function AdminOrdersSection({ token }) {
               value={draftFilters.search}
               onChange={updateFilter("search")}
             />
+          </label>
+
+          <label className="filter-field">
+            <span className="small">Order type</span>
+            <select className="select" value={draftFilters.orderType} onChange={updateFilter("orderType")}>
+              <option value="product">Product orders only</option>
+              <option value="membership">Membership orders only</option>
+              <option value="all">All orders</option>
+            </select>
           </label>
 
           <label className="filter-field">
@@ -455,41 +514,113 @@ export function AdminOrdersSection({ token }) {
 
       {ordersState.error ? <div className="small">{ordersState.error}</div> : null}
 
-      <div className="audit-summary-grid orders-summary-grid">
-        <div className="response-card">
-          <div className="title">Orders</div>
-          <div className="small">{formatCount(overview.orderCount)} matching orders</div>
-        </div>
-        <div className="response-card">
-          <div className="title">Revenue</div>
-          <div className="small">{formatMoney(overview.revenue)}</div>
-        </div>
-        <div className="response-card">
-          <div className="title">Average Order</div>
-          <div className="small">{formatMoney(overview.averageOrderValue)}</div>
-        </div>
-        <div className="response-card">
-          <div className="title">Customers</div>
-          <div className="small">{formatCount(overview.customerCount)}</div>
+      <div className="response-card orders-trend-card">
+        <div className="title">Monthly Trend</div>
+        <div className="small">Last 6 months using the current filters.</div>
+        <div className="admin-table-shell orders-entry-table-shell">
+          <div className="admin-table-body-scroll">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Month</th>
+                  <th>Orders</th>
+                  <th>Vendor/Base $</th>
+                  <th>Retail $</th>
+                  <th>Avg Markup</th>
+                </tr>
+              </thead>
+              <tbody>
+                {monthlyTrend.map((row) => (
+                  <tr key={`orders-monthly-trend-${row.month}`}>
+                    <td>{row.month}</td>
+                    <td>{formatCount(row.orderCount)}</td>
+                    <td>{formatMoney(row.vendorBaseAmount)}</td>
+                    <td>{formatMoney(row.retailAmount)}</td>
+                    <td>{formatPercent(row.averageMarkup)}</td>
+                  </tr>
+                ))}
+                {!monthlyTrend.length ? (
+                  <tr>
+                    <td colSpan={5}>No monthly trend data yet.</td>
+                  </tr>
+                ) : null}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
       <div className="response-card orders-trend-card">
-        <div className="title">Monthly Trend</div>
-        <div className="response-list orders-performance-list">
-          {monthlyTrend.length ? (
-            monthlyTrend.map((row) => (
-              <div className="response-card" key={`orders-trend-${row.month}`}>
-                <div className="title">{row.month}</div>
-                <div className="small">
-                  {formatCount(row.orderCount)} orders · {formatMoney(row.revenue)} revenue
-                </div>
-                <div className="small">{formatCount(row.siteCount)} fulfillment sites</div>
-              </div>
-            ))
-          ) : (
-            <div className="small">No monthly trend data yet.</div>
-          )}
+        <div className="title">Weekly Trend</div>
+        <div className="small">Last 12 weeks using the current filters.</div>
+        <div className="admin-table-shell orders-entry-table-shell">
+          <div className="admin-table-body-scroll">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Week Of</th>
+                  <th>Orders</th>
+                  <th>Vendor/Base $</th>
+                  <th>Retail $</th>
+                  <th>Avg Markup</th>
+                </tr>
+              </thead>
+              <tbody>
+                {weeklyTrend.map((row) => (
+                  <tr key={`orders-weekly-trend-${row.weekStart}`}>
+                    <td>{row.weekStart}</td>
+                    <td>{formatCount(row.orderCount)}</td>
+                    <td>{formatMoney(row.vendorBaseAmount)}</td>
+                    <td>{formatMoney(row.retailAmount)}</td>
+                    <td>{formatPercent(row.averageMarkup)}</td>
+                  </tr>
+                ))}
+                {!weeklyTrend.length ? (
+                  <tr>
+                    <td colSpan={5}>No weekly trend data yet.</td>
+                  </tr>
+                ) : null}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div className="response-card orders-trend-card">
+        <div className="title">Top Products</div>
+        <div className="small">Top filtered products by retail dollars.</div>
+        <div className="admin-table-shell orders-entry-table-shell">
+          <div className="admin-table-body-scroll">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Vendor</th>
+                  <th>Orders</th>
+                  <th>Vendor/Base $</th>
+                  <th>Retail $</th>
+                  <th>Avg Markup</th>
+                </tr>
+              </thead>
+              <tbody>
+                {topProducts.map((row, index) => (
+                  <tr key={`orders-top-product-${row.productName}-${index}`}>
+                    <td>{row.productName || "n/a"}</td>
+                    <td>{row.vendorName || "n/a"}</td>
+                    <td>{formatCount(row.orderCount)}</td>
+                    <td>{formatMoney(row.vendorBaseAmount)}</td>
+                    <td>{formatMoney(row.retailAmount)}</td>
+                    <td>{formatPercent(row.averageMarkup)}</td>
+                  </tr>
+                ))}
+                {!topProducts.length ? (
+                  <tr>
+                    <td colSpan={6}>No top product data yet.</td>
+                  </tr>
+                ) : null}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -618,6 +749,10 @@ export function AdminOrdersSection({ token }) {
 
             <div className="admin-table-shell orders-entry-table-shell">
               <div className="admin-table-body-scroll">
+                <div className="small">
+                  Showing {formatCount(filteredSelectedEntries.length)} matching product lines from
+                  this order for the current filters.
+                </div>
                 <table className="admin-table">
                   <thead>
                     <tr>
@@ -632,7 +767,7 @@ export function AdminOrdersSection({ token }) {
                     </tr>
                   </thead>
                   <tbody>
-                    {selectedEntries.map((entry) => (
+                    {filteredSelectedEntries.map((entry) => (
                       <tr key={`order-entry-${entry.localLineOrderEntryId}`}>
                         <td>{entry.vendorName || "n/a"}</td>
                         <td>{entry.productName || "n/a"}</td>
@@ -647,6 +782,14 @@ export function AdminOrdersSection({ token }) {
                     {!selectedEntries.length ? (
                       <tr>
                         <td colSpan={8}>No line items stored for this order.</td>
+                      </tr>
+                    ) : null}
+                    {selectedEntries.length && !filteredSelectedEntries.length ? (
+                      <tr>
+                        <td colSpan={8}>
+                          This order has line items, but none match the current vendor/category/search
+                          filters.
+                        </td>
                       </tr>
                     ) : null}
                   </tbody>

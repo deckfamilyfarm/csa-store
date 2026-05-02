@@ -251,19 +251,15 @@ export function computePackageBasePrice(profile, pkg, packageMeta = null) {
   const sourceUnitPrice = toNumber(profile?.sourceUnitPrice);
   const sourceMultiplier = toNumber(profile?.sourceMultiplier);
   if (sourceUnitPrice === null || sourceMultiplier === null) return null;
-  const vendorFundedSaleDiscount = getVendorFundedSaleDiscount(profile);
-  const effectiveSourceMultiplier = Number(
-    (sourceMultiplier * (1 - vendorFundedSaleDiscount)).toFixed(6)
-  );
 
   if (profile?.unitOfMeasure === "lbs") {
     const averageWeight = computeAverageWeight(profile, packageMeta);
     if (averageWeight === null || averageWeight <= 0) return null;
-    return roundCurrency(sourceUnitPrice * averageWeight * effectiveSourceMultiplier);
+    return roundCurrency(sourceUnitPrice * averageWeight * sourceMultiplier);
   }
 
   const quantity = getPackageQuantity(pkg, packageMeta);
-  return roundCurrency(sourceUnitPrice * quantity * effectiveSourceMultiplier);
+  return roundCurrency(sourceUnitPrice * quantity * sourceMultiplier);
 }
 
 export function computeFinalPrice(basePrice, markup, onSale, saleDiscount) {

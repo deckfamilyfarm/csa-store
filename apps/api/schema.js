@@ -267,6 +267,45 @@ export const localLineOrderEntries = mysqlTable(
   })
 );
 
+export const localLineOrderReportingEntries = mysqlTable("local_line_order_reporting_entries", {
+  id: int("id").autoincrement().primaryKey(),
+  fulfillmentMonth: varchar("fulfillment_month", { length: 7 }),
+  fulfillmentDate: varchar("fulfillment_date", { length: 32 }),
+  weekStart: varchar("week_start", { length: 10 }),
+  localLineOrderId: int("local_line_order_id"),
+  customerName: varchar("customer_name", { length: 255 }),
+  priceListName: varchar("price_list_name", { length: 255 }),
+  orderStatus: varchar("order_status", { length: 64 }),
+  paymentStatus: varchar("payment_status", { length: 64 }),
+  fulfillmentName: varchar("fulfillment_name", { length: 255 }),
+  fulfillmentAddress: varchar("fulfillment_address", { length: 512 }),
+  vendorId: int("vendor_id"),
+  vendorName: varchar("vendor_name", { length: 255 }),
+  categoryName: varchar("category_name", { length: 255 }),
+  productId: int("product_id"),
+  productName: varchar("product_name", { length: 255 }),
+  packageId: varchar("package_id", { length: 64 }),
+  packageName: varchar("package_name", { length: 255 }),
+  quantity: decimal("quantity", { precision: 10, scale: 3 }),
+  retailAmount: decimal("retail_amount", { precision: 10, scale: 2 }),
+  purchaseUnitPrice: decimal("purchase_unit_price", { precision: 10, scale: 2 }),
+  purchaseTotal: decimal("purchase_total", { precision: 10, scale: 2 }),
+  rawJson: text("raw_json"),
+  createdAt: datetime("created_at"),
+  updatedAt: datetime("updated_at"),
+  lastSyncedAt: datetime("last_synced_at")
+});
+
+export const localLineOrderReportingMonths = mysqlTable("local_line_order_reporting_months", {
+  monthKey: varchar("month_key", { length: 7 }).primaryKey(),
+  status: varchar("status", { length: 32 }),
+  rowCount: int("row_count"),
+  message: text("message"),
+  syncedAt: datetime("synced_at"),
+  createdAt: datetime("created_at"),
+  updatedAt: datetime("updated_at")
+});
+
 export const localLineSyncCursors = mysqlTable("local_line_sync_cursors", {
   syncKey: varchar("sync_key", { length: 64 }).primaryKey(),
   cursorValue: varchar("cursor_value", { length: 255 }),

@@ -228,12 +228,6 @@ function computeEditedBasePrice(row, rowValues) {
     return toNumber(row?.basePrice);
   }
 
-  const saleDiscount =
-    rowValues?.onSale && Number.isFinite(Number(rowValues?.saleDiscount))
-      ? Math.max(0, Math.min(Number(rowValues.saleDiscount) / 100, 1))
-      : 0;
-  const vendorFundedSaleDiscount = saleDiscount > 0 ? saleDiscount / 2 : 0;
-  const effectiveSourceMultiplier = sourceMultiplier * (1 - vendorFundedSaleDiscount);
   const packages = Array.isArray(row?.packages) ? row.packages : [];
 
   const packageBasePrices = packages
@@ -241,11 +235,11 @@ function computeEditedBasePrice(row, rowValues) {
       if (String(row?.unitOfMeasure || "").toLowerCase() === "lbs") {
         const averageWeight = toNumber(pkg?.averageWeight);
         if (averageWeight === null || averageWeight <= 0) return null;
-        return roundCurrency(sourceUnitPrice * averageWeight * effectiveSourceMultiplier);
+        return roundCurrency(sourceUnitPrice * averageWeight * sourceMultiplier);
       }
 
       const quantity = Math.max(toNumber(pkg?.quantity) || 1, 1);
-      return roundCurrency(sourceUnitPrice * quantity * effectiveSourceMultiplier);
+      return roundCurrency(sourceUnitPrice * quantity * sourceMultiplier);
     })
     .filter((value) => value !== null);
 
@@ -392,6 +386,7 @@ export function AdminPriceListSection({
   token,
   categories,
   vendors,
+  refreshNonce = 0,
   onDataRefresh,
   onCatalogRefresh,
   onReviewLocalLine,
@@ -607,6 +602,11 @@ export function AdminPriceListSection({
   useEffect(() => {
     loadPriceList();
   }, [token, page, pageSize, debouncedProductSearch, categoryFilter, vendorFilter, saleFilter, statusFilter, sortConfig.key, sortConfig.direction]);
+
+  useEffect(() => {
+    if (!token) return;
+    loadPriceList();
+  }, [token, refreshNonce]);
 
   function getPendingPricelistEditEntries() {
     return Object.entries(pricelistEdits).filter(([, entry]) => {

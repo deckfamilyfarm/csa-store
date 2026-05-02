@@ -281,6 +281,47 @@ const LOCAL_LINE_TABLE_STATEMENTS = [
     )
   `,
   `
+    CREATE TABLE IF NOT EXISTS local_line_order_reporting_entries (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      fulfillment_month VARCHAR(7),
+      fulfillment_date VARCHAR(32),
+      week_start VARCHAR(10),
+      local_line_order_id INT,
+      customer_name VARCHAR(255),
+      price_list_name VARCHAR(255),
+      order_status VARCHAR(64),
+      payment_status VARCHAR(64),
+      fulfillment_name VARCHAR(255),
+      fulfillment_address VARCHAR(512),
+      vendor_id INT,
+      vendor_name VARCHAR(255),
+      category_name VARCHAR(255),
+      product_id INT,
+      product_name VARCHAR(255),
+      package_id VARCHAR(64),
+      package_name VARCHAR(255),
+      quantity DECIMAL(10, 3),
+      retail_amount DECIMAL(10, 2),
+      purchase_unit_price DECIMAL(10, 2),
+      purchase_total DECIMAL(10, 2),
+      raw_json TEXT,
+      created_at DATETIME,
+      updated_at DATETIME,
+      last_synced_at DATETIME
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS local_line_order_reporting_months (
+      month_key VARCHAR(7) PRIMARY KEY,
+      status VARCHAR(32),
+      row_count INT,
+      message TEXT,
+      synced_at DATETIME,
+      created_at DATETIME,
+      updated_at DATETIME
+    )
+  `,
+  `
     CREATE TABLE IF NOT EXISTS local_line_sync_cursors (
       sync_key VARCHAR(64) PRIMARY KEY,
       cursor_value VARCHAR(255),
@@ -420,6 +461,36 @@ const LOCAL_LINE_INDEX_STATEMENTS = [
     tableName: "local_line_order_entries",
     indexName: "idx_local_line_order_entries_product",
     columns: "product_name"
+  },
+  {
+    tableName: "local_line_order_reporting_entries",
+    indexName: "idx_local_line_order_reporting_month",
+    columns: "fulfillment_month"
+  },
+  {
+    tableName: "local_line_order_reporting_entries",
+    indexName: "idx_local_line_order_reporting_week",
+    columns: "week_start"
+  },
+  {
+    tableName: "local_line_order_reporting_entries",
+    indexName: "idx_local_line_order_reporting_vendor",
+    columns: "vendor_name"
+  },
+  {
+    tableName: "local_line_order_reporting_entries",
+    indexName: "idx_local_line_order_reporting_category",
+    columns: "category_name"
+  },
+  {
+    tableName: "local_line_order_reporting_entries",
+    indexName: "idx_local_line_order_reporting_product",
+    columns: "product_name"
+  },
+  {
+    tableName: "local_line_order_reporting_entries",
+    indexName: "idx_local_line_order_reporting_fulfillment",
+    columns: "fulfillment_name"
   }
 ];
 

@@ -221,19 +221,15 @@ function computeDraftPackagePrice(draft, pkg) {
   const sourceUnitPrice = toNumber(draft?.sourceUnitPrice);
   const sourceMultiplier = toNumber(draft?.sourceMultiplier);
   if (sourceUnitPrice === null || sourceMultiplier === null) return null;
-  const saleDiscount = Math.max(0, Math.min((toNumber(draft?.saleDiscount) || 0) / 100, 1));
-  const vendorFundedSaleDiscount =
-    draft?.onSale && saleDiscount > 0 ? saleDiscount / 2 : 0;
-  const effectiveSourceMultiplier = sourceMultiplier * (1 - vendorFundedSaleDiscount);
 
   if (draft?.unitOfMeasure === "lbs") {
     const averageWeight = computeDraftAverageWeight(draft);
     if (averageWeight === null || averageWeight <= 0) return null;
-    return roundCurrency(sourceUnitPrice * averageWeight * effectiveSourceMultiplier);
+    return roundCurrency(sourceUnitPrice * averageWeight * sourceMultiplier);
   }
 
   const quantity = Math.max(toNumber(pkg?.numOfItems) || 1, 1);
-  return roundCurrency(sourceUnitPrice * quantity * effectiveSourceMultiplier);
+  return roundCurrency(sourceUnitPrice * quantity * sourceMultiplier);
 }
 
 function getProductPricingValue(product, key, fallback = "") {
@@ -436,6 +432,7 @@ export function AdminPanel({ onCatalogRefresh }) {
   const [productSaleFilter, setProductSaleFilter] = useState("all");
   const [debouncedProductNameSearch, setDebouncedProductNameSearch] = useState("");
   const [localPricelistProducts, setLocalPricelistProducts] = useState([]);
+  const [pricelistRefreshNonce, setPricelistRefreshNonce] = useState(0);
   const [localPricelistCategories, setLocalPricelistCategories] = useState([]);
   const [localPricelistLoading, setLocalPricelistLoading] = useState(false);
   const [localPricelistPage, setLocalPricelistPage] = useState(1);
@@ -1505,6 +1502,7 @@ export function AdminPanel({ onCatalogRefresh }) {
       await loadAll();
       await refreshLocalPricelistIfNeeded();
       await refreshCatalogFromAdmin();
+      setPricelistRefreshNonce((prev) => prev + 1);
       await refreshSelectedProductDetail(activeProduct.id);
       setMessage(pushToLocalLineOnSave ? "Product updated and pushed to Local Line." : "Product updated.");
     } catch (err) {
@@ -4205,6 +4203,7 @@ export function AdminPanel({ onCatalogRefresh }) {
                 token={token}
                 categories={categories}
                 vendors={vendors}
+                refreshNonce={pricelistRefreshNonce}
                 onDataRefresh={loadAll}
                 onCatalogRefresh={refreshCatalogFromAdmin}
                 onAddProduct={startNewProductDraft}
