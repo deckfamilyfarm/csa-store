@@ -185,6 +185,27 @@ async function patchLocalLineProduct(productId, accessToken, payload) {
   }
 }
 
+async function deleteLocalLineProduct(productId, accessToken) {
+  const url = `${LL_BASEURL}products/${productId}/`;
+  const companyBaseUrl = process.env.LL_COMPANY_BASEURL || "";
+  const response = await fetchLocalLineWithRetry(url, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      ...(companyBaseUrl
+        ? {
+            Referer: companyBaseUrl,
+            Origin: companyBaseUrl
+          }
+        : {})
+    }
+  }, `LocalLine DELETE product ${productId}`);
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`LocalLine DELETE failed: ${response.status} ${body}`);
+  }
+}
+
 async function createLocalLineProduct(accessToken, payload) {
   const url = `${LL_BASEURL}products/`;
   const companyBaseUrl = process.env.LL_COMPANY_BASEURL || "";
@@ -1050,4 +1071,19 @@ export async function updateLocalLineForProduct(db, productId, changes = {}) {
     priceOk: priceResult.ok ?? null,
     imagesOk: imageResult.ok ?? null
   };
+}
+
+export async function deleteLocalLineProductById(productId) {
+  if (!isLocalLineEnabled()) {
+    throw new Error("Local Line authentication is not configured");
+  }
+
+  const remoteProductId = Number(productId);
+  if (!Number.isFinite(remoteProductId) || remoteProductId <= 0) {
+    throw new Error("Invalid Local Line product id");
+  }
+
+  const token = await getLocalLineAccessToken();
+  await deleteLocalLineProduct(remoteProductId, token);
+  return { ok: true, localLineProductId: remoteProductId };
 }

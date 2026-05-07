@@ -442,6 +442,21 @@ const LOCAL_LINE_INDEX_STATEMENTS = [
     columns: "fulfillment_strategy_name"
   },
   {
+    tableName: "local_line_orders",
+    indexName: "idx_local_line_orders_status_payment_created",
+    columns: "status, payment_status, created_at_remote"
+  },
+  {
+    tableName: "local_line_orders",
+    indexName: "idx_local_line_orders_fulfillment_strategy",
+    columns: "fulfillment_strategy_id"
+  },
+  {
+    tableName: "local_line_orders",
+    indexName: "idx_local_line_orders_fulfillment_date",
+    columns: "fulfillment_date"
+  },
+  {
     tableName: "local_line_order_entries",
     indexName: "ux_local_line_order_entries_remote_id",
     unique: true,
@@ -461,6 +476,11 @@ const LOCAL_LINE_INDEX_STATEMENTS = [
     tableName: "local_line_order_entries",
     indexName: "idx_local_line_order_entries_product",
     columns: "product_name"
+  },
+  {
+    tableName: "local_line_order_entries",
+    indexName: "idx_local_line_order_entries_category",
+    columns: "category_name"
   },
   {
     tableName: "local_line_order_reporting_entries",
@@ -491,6 +511,16 @@ const LOCAL_LINE_INDEX_STATEMENTS = [
     tableName: "local_line_order_reporting_entries",
     indexName: "idx_local_line_order_reporting_fulfillment",
     columns: "fulfillment_name"
+  },
+  {
+    tableName: "local_line_order_reporting_entries",
+    indexName: "idx_local_line_order_reporting_status_payment_month",
+    columns: "order_status, payment_status, fulfillment_month"
+  },
+  {
+    tableName: "local_line_order_reporting_entries",
+    indexName: "idx_local_line_order_reporting_status_payment_week",
+    columns: "order_status, payment_status, week_start"
   }
 ];
 

@@ -41,6 +41,7 @@ import {
 import { requireAdmin, requireAdminPermission } from "../middleware/auth.js";
 import {
   createLocalLineProductFromStoreProduct,
+  deleteLocalLineProductById,
   fetchAllLocalLineFulfillmentStrategies,
   fetchLocalLineOrdersPage,
   isLocalLineEnabled,
@@ -63,6 +64,7 @@ import {
   isNoMarkupProduct,
   isSourcePricingVendor
 } from "../lib/productPricing.js";
+import { hasAdminPermission } from "../lib/adminRoles.js";
 import { runLocalLineAudit } from "../scripts/auditLocalLineSync.js";
 import {
   exportMasterPricelist,
@@ -561,6 +563,30 @@ function formatMonthKey(value) {
   return `${year}-${month}`;
 }
 
+function getDefaultDropSitePerformanceMonth(monthKeys = [], referenceDate = new Date()) {
+  const availableMonths = monthKeys.filter(Boolean);
+  if (!availableMonths.length) return "";
+
+  const today = toDateOrNull(referenceDate) || new Date();
+  const currentMonthKey = formatMonthKey(today);
+  const priorMonthDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+  const priorMonthKey = formatMonthKey(priorMonthDate);
+
+  if (today.getDate() >= 25 && availableMonths.includes(currentMonthKey)) {
+    return currentMonthKey;
+  }
+
+  if (availableMonths.includes(priorMonthKey)) {
+    return priorMonthKey;
+  }
+
+  if (availableMonths.includes(currentMonthKey)) {
+    return currentMonthKey;
+  }
+
+  return availableMonths[0] || "";
+}
+
 function formatDateKey(value) {
   const date = toDateOrNull(value);
   if (!date) return "";
@@ -708,16 +734,47 @@ function normalizeHostContactName(value) {
   return cleaned;
 }
 
-function extractDropSiteHostContact(site = {}) {
+function normalizeHostContactEmail(value) {
+  const cleaned = String(value || "")
+    .replace(/^[,;:.\s<]+|[,;:.\s>]+$/g, "")
+    .trim()
+    .toLowerCase();
+  if (!cleaned) return null;
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(cleaned)) return null;
+  return cleaned;
+}
+
+function buildDropSiteContactText(site = {}) {
   const raw = parseJsonValue(site?.rawJson || site?.raw_json, {});
-  const instructionText = stripHtmlToText(
-    raw?.availability?.instructions ||
-    site?.instructions ||
-    ""
-  );
+  const snippets = [
+    raw?.availability?.instructions,
+    raw?.description,
+    raw?.short_description,
+    raw?.pickup_instructions,
+    raw?.notes,
+    raw?.host_description,
+    raw?.location_description,
+    raw?.address?.description,
+    site?.instructions
+  ]
+    .map((value) => stripHtmlToText(value))
+    .filter(Boolean);
+
+  return snippets.join(" ");
+}
+
+function extractDropSiteHostContact(site = {}) {
+  const instructionText = buildDropSiteContactText(site);
   if (!instructionText) return null;
 
   const phonePattern = String.raw`(?:\+?1[-.\s]?)?(?:\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4})`;
+  const emailPattern = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
+  const emailMatches = Array.from(instructionText.matchAll(emailPattern));
+  const parsedEmails = emailMatches
+    .map((match) => normalizeHostContactEmail(match[0]))
+    .filter(Boolean);
+  const genericEmail = parsedEmails.find((email) => email === "fullfarmcsa@deckfamilyfarm.com") || null;
+  const hostEmail = parsedEmails.find((email) => email !== "fullfarmcsa@deckfamilyfarm.com") || null;
   const patterns = [
     new RegExp(String.raw`hosts?\s+info\s+is:\s*([A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+){0,2})\s*[,;]?\s*(${phonePattern})`, "i"),
     new RegExp(String.raw`reach out to (?:your )?host,\s*([A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+){0,2})\s*,?\s*at\s*(${phonePattern})`, "i"),
@@ -737,17 +794,58 @@ function extractDropSiteHostContact(site = {}) {
       return {
         name: null,
         phone,
+        email: hostEmail || genericEmail || null,
+        indicator: "phone",
         source: "instructions"
       };
     }
     return {
       name: contactName,
       phone,
+      email: hostEmail || genericEmail || null,
+      indicator: "phone",
       source: "instructions"
     };
   }
 
-  return null;
+  const fallbackPhoneMatch = instructionText.match(new RegExp(phonePattern, "i"));
+  if (fallbackPhoneMatch?.[0]) {
+    return {
+      name: null,
+      phone: String(fallbackPhoneMatch[0]).trim(),
+      email: hostEmail || genericEmail || null,
+      indicator: "phone",
+      source: "instructions"
+    };
+  }
+
+  if (hostEmail) {
+    return {
+      name: null,
+      phone: null,
+      email: hostEmail,
+      indicator: "email",
+      source: "instructions"
+    };
+  }
+
+  if (genericEmail) {
+    return {
+      name: null,
+      phone: null,
+      email: genericEmail,
+      indicator: "generic",
+      source: "instructions"
+    };
+  }
+
+  return {
+    name: null,
+    phone: null,
+    email: null,
+    indicator: "none",
+    source: "instructions"
+  };
 }
 
 function parseMonthKey(value) {
@@ -1545,7 +1643,7 @@ async function duplicateLocalProductRecord(connection, sourceProductId) {
   return created;
 }
 
-async function deleteLocalOnlyProductRecord(connection, productId) {
+async function loadProductDeleteContext(connection, productId) {
   const [productRows] = await connection.query(
     "SELECT id FROM products WHERE id = ? LIMIT 1",
     [productId]
@@ -1561,9 +1659,14 @@ async function deleteLocalOnlyProductRecord(connection, productId) {
     if (isMissingTableError(error, "local_line_product_meta")) return [[]];
     throw error;
   });
-  if (Number(productMetaRows?.[0]?.localLineProductId || 0) > 0) {
-    throw new Error("Only local-only products can be deleted. This product is linked to Local Line.");
-  }
+  return {
+    productId,
+    localLineProductId: Number(productMetaRows?.[0]?.localLineProductId || 0)
+  };
+}
+
+async function deleteProductRecord(connection, productId) {
+  await loadProductDeleteContext(connection, productId);
 
   const [packageRows] = await connection.query(
     "SELECT id FROM packages WHERE product_id = ?",
@@ -4784,10 +4887,14 @@ router.get("/drop-sites", requireAdmin, async (_req, res) => {
   const performanceMonths = monthRows.map((row) => row.value).filter(Boolean);
   const trendModeKey = "__trend6__";
   const isTrendMode = requestedMonth === trendModeKey && performanceMonths.length > 0;
+  const defaultSelectedMonth = getDefaultDropSitePerformanceMonth(
+    performanceMonths,
+    completedFulfillmentCutoff
+  );
   const selectedMonth =
     !isTrendMode && performanceMonths.includes(requestedMonth)
       ? requestedMonth
-      : (performanceMonths[0] || "");
+      : defaultSelectedMonth;
   const trendMonths = isTrendMode ? performanceMonths.slice(0, 6).reverse() : [];
   const trendWeeks = [];
   if (isTrendMode && trendMonths.length) {
@@ -4924,6 +5031,7 @@ router.get("/drop-sites", requireAdmin, async (_req, res) => {
           source: site.source,
           active: site.active,
           localLineFulfillmentStrategyId: site.localLineFulfillmentStrategyId,
+          derivedHostContact: site.derivedHostContact || null,
           orderCount: totalOrderCount,
           scheduledDrops: totalScheduledDrops,
           averageWeeklyOrders,
@@ -5513,11 +5621,11 @@ async function buildExportReportingMetrics({
     whereParams.push(category);
   }
   if (status) {
-    whereClauses.push("UPPER(COALESCE(order_status, '')) = UPPER(?)");
+    whereClauses.push("order_status = ?");
     whereParams.push(status);
   }
   if (paymentStatus) {
-    whereClauses.push("UPPER(COALESCE(payment_status, '')) = UPPER(?)");
+    whereClauses.push("payment_status = ?");
     whereParams.push(paymentStatus);
   }
   if (month) {
@@ -5540,27 +5648,22 @@ async function buildExportReportingMetrics({
   }
 
   const whereSql = whereClauses.length ? `WHERE ${whereClauses.join(" AND ")}` : "";
-  const [rows] = await pool.query(
+  const [[summaryRow]] = await pool.query(
     `
       SELECT
-        fulfillment_month AS fulfillmentMonth,
-        fulfillment_date AS fulfillmentDate,
-        week_start AS weekStart,
-        local_line_order_id AS localLineOrderId,
-        vendor_name AS vendorName,
-        product_name AS productName,
-        package_name AS packageName,
-        retail_amount AS retailAmount,
-        purchase_total AS purchaseTotal,
-        quantity
+        MAX(fulfillment_date) AS latestFulfillmentDate,
+        COUNT(DISTINCT local_line_order_id) AS orderCount,
+        COUNT(*) AS lineCount,
+        COALESCE(SUM(quantity), 0) AS unitCount,
+        COALESCE(SUM(purchase_total), 0) AS vendorBaseAmount,
+        COALESCE(SUM(retail_amount), 0) AS retailAmount
       FROM local_line_order_reporting_entries
       ${whereSql}
-      ORDER BY fulfillment_date DESC, local_line_order_id DESC, id DESC
     `,
     whereParams
   );
 
-  if (!rows.length) {
+  if (!Number(summaryRow?.lineCount || 0)) {
     return {
       overview: {
         vendorBaseAmount: 0,
@@ -5575,80 +5678,155 @@ async function buildExportReportingMetrics({
     };
   }
 
-  const latestDate = rows
-    .map((row) => parseLooseDateString(row.fulfillmentDate))
-    .filter((value) => value && !Number.isNaN(value.getTime()))
-    .sort((left, right) => right - left)[0] || new Date();
+  const latestDate = parseLooseDateString(summaryRow.latestFulfillmentDate) || new Date();
+  const monthKeys = buildRecentMonthKeys(latestDate, 6);
+  const weekKeys = buildRecentWeekKeys(latestDate, 12);
+  const monthPlaceholders = monthKeys.map(() => "?").join(", ");
+  const weekPlaceholders = weekKeys.map(() => "?").join(", ");
 
-  const monthlyBuckets = new Map();
-  const weeklyBuckets = new Map();
-  const topProductBuckets = new Map();
-  let vendorBaseAmountTotal = 0;
-  let retailAmountTotal = 0;
-  let lineCountTotal = 0;
-  let unitCountTotal = 0;
+  const [monthlyRows] = await pool.query(
+    `
+      SELECT
+        fulfillment_month AS monthKey,
+        COUNT(DISTINCT local_line_order_id) AS orderCount,
+        COUNT(*) AS lineCount,
+        COALESCE(SUM(quantity), 0) AS unitCount,
+        COALESCE(SUM(purchase_total), 0) AS vendorBaseAmount,
+        COALESCE(SUM(retail_amount), 0) AS retailAmount
+      FROM local_line_order_reporting_entries
+      ${whereSql}${whereSql ? " AND" : " WHERE"} fulfillment_month IN (${monthPlaceholders})
+      GROUP BY fulfillment_month
+    `,
+    [...whereParams, ...monthKeys]
+  );
 
-  rows.forEach((row) => {
-    const retailAmount = Number(toNumber(row.retailAmount) || 0);
-    const purchaseTotal = Number(toNumber(row.purchaseTotal) || 0);
-    const quantity = Number(toNumber(row.quantity) || 0);
-    const monthKey = String(row.fulfillmentMonth || "");
-    const weekKey = String(row.weekStart || "");
-    if (!monthlyBuckets.has(monthKey)) monthlyBuckets.set(monthKey, createAggregateBucket(monthKey));
-    if (!weeklyBuckets.has(weekKey)) weeklyBuckets.set(weekKey, createAggregateBucket(weekKey));
+  const [weeklyRows] = await pool.query(
+    `
+      SELECT
+        week_start AS weekKey,
+        COUNT(DISTINCT local_line_order_id) AS orderCount,
+        COUNT(*) AS lineCount,
+        COALESCE(SUM(quantity), 0) AS unitCount,
+        COALESCE(SUM(purchase_total), 0) AS vendorBaseAmount,
+        COALESCE(SUM(retail_amount), 0) AS retailAmount
+      FROM local_line_order_reporting_entries
+      ${whereSql}${whereSql ? " AND" : " WHERE"} week_start IN (${weekPlaceholders})
+      GROUP BY week_start
+    `,
+    [...whereParams, ...weekKeys]
+  );
 
-    const productKey = `${String(row.vendorName || "")}::${String(row.productName || "")}`;
-    if (!topProductBuckets.has(productKey)) {
-      topProductBuckets.set(productKey, {
-        ...createAggregateBucket(productKey),
-        productName: row.productName || "Unknown product",
-        vendorName: row.vendorName || "",
-        packageName: row.packageName || ""
-      });
-    }
+  const [topProductRows] = await pool.query(
+    `
+      SELECT
+        COALESCE(product_name, 'Unknown product') AS productName,
+        COALESCE(vendor_name, '') AS vendorName,
+        MAX(COALESCE(package_name, '')) AS packageName,
+        COUNT(DISTINCT local_line_order_id) AS orderCount,
+        COUNT(*) AS lineCount,
+        COALESCE(SUM(quantity), 0) AS unitCount,
+        COALESCE(SUM(purchase_total), 0) AS vendorBaseAmount,
+        COALESCE(SUM(retail_amount), 0) AS retailAmount
+      FROM local_line_order_reporting_entries
+      ${whereSql}
+      GROUP BY COALESCE(vendor_name, ''), COALESCE(product_name, 'Unknown product')
+      ORDER BY retailAmount DESC, productName ASC
+      LIMIT 15
+    `,
+    whereParams
+  );
 
-    [monthlyBuckets.get(monthKey), weeklyBuckets.get(weekKey), topProductBuckets.get(productKey)].forEach((bucket) => {
-      bucket.orderIds.add(Number(row.localLineOrderId));
-      bucket.lineCount += 1;
-      bucket.unitCount += quantity;
-      bucket.vendorBaseAmount += purchaseTotal;
-      bucket.retailAmount += retailAmount;
-    });
+  const monthlyBuckets = new Map(
+    monthlyRows.map((row) => [
+      String(row.monthKey || ""),
+      {
+        orderCount: Number(row.orderCount || 0),
+        lineCount: Number(row.lineCount || 0),
+        unitCount: Number(toNumber(row.unitCount) || 0),
+        vendorBaseAmount: Number(toNumber(row.vendorBaseAmount) || 0),
+        retailAmount: Number(toNumber(row.retailAmount) || 0)
+      }
+    ])
+  );
 
-    vendorBaseAmountTotal += purchaseTotal;
-    retailAmountTotal += retailAmount;
-    lineCountTotal += 1;
-    unitCountTotal += quantity;
-  });
+  const weeklyBuckets = new Map(
+    weeklyRows.map((row) => [
+      String(row.weekKey || ""),
+      {
+        orderCount: Number(row.orderCount || 0),
+        lineCount: Number(row.lineCount || 0),
+        unitCount: Number(toNumber(row.unitCount) || 0),
+        vendorBaseAmount: Number(toNumber(row.vendorBaseAmount) || 0),
+        retailAmount: Number(toNumber(row.retailAmount) || 0)
+      }
+    ])
+  );
 
-  const monthlyTrend = buildRecentMonthKeys(latestDate, 6).map((monthKey) => {
-    const bucket = monthlyBuckets.get(monthKey) || createAggregateBucket(monthKey);
+  const monthlyTrend = monthKeys.map((monthKey) => {
+    const bucket = monthlyBuckets.get(monthKey) || {
+      orderCount: 0,
+      lineCount: 0,
+      unitCount: 0,
+      vendorBaseAmount: 0,
+      retailAmount: 0
+    };
     return {
       month: monthKey,
-      ...finalizeAggregateBucket(bucket)
+      orderCount: bucket.orderCount,
+      lineCount: bucket.lineCount,
+      unitCount: Number(bucket.unitCount.toFixed(3)),
+      vendorBaseAmount: Number(bucket.vendorBaseAmount.toFixed(2)),
+      retailAmount: Number(bucket.retailAmount.toFixed(2)),
+      averageMarkup:
+        bucket.vendorBaseAmount > 0
+          ? Number(((bucket.retailAmount / bucket.vendorBaseAmount) - 1).toFixed(4))
+          : null
     };
   });
 
-  const weeklyTrend = buildRecentWeekKeys(latestDate, 12).map((weekKey) => {
-    const bucket = weeklyBuckets.get(weekKey) || createAggregateBucket(weekKey);
+  const weeklyTrend = weekKeys.map((weekKey) => {
+    const bucket = weeklyBuckets.get(weekKey) || {
+      orderCount: 0,
+      lineCount: 0,
+      unitCount: 0,
+      vendorBaseAmount: 0,
+      retailAmount: 0
+    };
     return {
       weekStart: weekKey,
-      ...finalizeAggregateBucket(bucket)
+      orderCount: bucket.orderCount,
+      lineCount: bucket.lineCount,
+      unitCount: Number(bucket.unitCount.toFixed(3)),
+      vendorBaseAmount: Number(bucket.vendorBaseAmount.toFixed(2)),
+      retailAmount: Number(bucket.retailAmount.toFixed(2)),
+      averageMarkup:
+        bucket.vendorBaseAmount > 0
+          ? Number(((bucket.retailAmount / bucket.vendorBaseAmount) - 1).toFixed(4))
+          : null
     };
   });
 
-  const topProducts = [...topProductBuckets.values()]
-    .map((bucket) => ({
-      productName: bucket.productName,
-      vendorName: bucket.vendorName,
-      packageName: bucket.packageName,
-      ...finalizeAggregateBucket(bucket)
-    }))
-    .sort((left, right) => (
-      Number(right.retailAmount || 0) - Number(left.retailAmount || 0) ||
-      String(left.productName || "").localeCompare(String(right.productName || ""))
-    ))
-    .slice(0, 15);
+  const topProducts = topProductRows.map((row) => {
+    const vendorBaseAmount = Number(toNumber(row.vendorBaseAmount) || 0);
+    const retailAmount = Number(toNumber(row.retailAmount) || 0);
+    return {
+      productName: row.productName || "Unknown product",
+      vendorName: row.vendorName || "",
+      packageName: row.packageName || "",
+      orderCount: Number(row.orderCount || 0),
+      lineCount: Number(row.lineCount || 0),
+      unitCount: Number(Number(toNumber(row.unitCount) || 0).toFixed(3)),
+      vendorBaseAmount: Number(vendorBaseAmount.toFixed(2)),
+      retailAmount: Number(retailAmount.toFixed(2)),
+      averageMarkup:
+        vendorBaseAmount > 0
+          ? Number(((retailAmount / vendorBaseAmount) - 1).toFixed(4))
+          : null
+    };
+  });
+
+  const vendorBaseAmountTotal = Number(toNumber(summaryRow.vendorBaseAmount) || 0);
+  const retailAmountTotal = Number(toNumber(summaryRow.retailAmount) || 0);
 
   return {
     overview: {
@@ -5658,8 +5836,9 @@ async function buildExportReportingMetrics({
         vendorBaseAmountTotal > 0
           ? Number(((retailAmountTotal / vendorBaseAmountTotal) - 1).toFixed(4))
           : null,
-      lineCount: lineCountTotal,
-      unitCount: Number(unitCountTotal.toFixed(3))
+      lineCount: Number(summaryRow.lineCount || 0),
+      unitCount: Number(Number(toNumber(summaryRow.unitCount) || 0).toFixed(3)),
+      orderCount: Number(summaryRow.orderCount || 0)
     },
     monthlyTrend,
     weeklyTrend,
@@ -5760,11 +5939,11 @@ router.get("/orders", requireAdmin, async (req, res) => {
     whereParams.push(category);
   }
   if (status) {
-    whereClauses.push("UPPER(COALESCE(o.status, '')) = UPPER(?)");
+    whereClauses.push("o.status = ?");
     whereParams.push(status);
   }
   if (paymentStatus) {
-    whereClauses.push("UPPER(COALESCE(o.payment_status, '')) = UPPER(?)");
+    whereClauses.push("o.payment_status = ?");
     whereParams.push(paymentStatus);
   }
   if (month) {
@@ -6492,12 +6671,29 @@ router.delete("/products/:id", requireAdminPermission(["inventory_admin", "prici
       console.warn("Local Line schema bootstrap skipped for /admin/products/:id DELETE:", error.message);
     });
 
+    const deleteContext = await loadProductDeleteContext(connection, productId);
+    const localLineProductId = Number(deleteContext.localLineProductId || 0);
+
+    if (localLineProductId > 0) {
+      if (!hasAdminPermission(req.admin?.adminRoles || [], "localline_push")) {
+        return res.status(403).json({
+          error: "Deleting a Local Line-linked product requires Local Line Push permission."
+        });
+      }
+      await deleteLocalLineProductById(localLineProductId);
+    }
+
     await connection.beginTransaction();
-    const deleted = await deleteLocalOnlyProductRecord(connection, productId);
+    const deleted = await deleteProductRecord(connection, productId);
     await connection.commit();
-    return res.json({ ok: true, productId: deleted.productId });
+    return res.json({
+      ok: true,
+      productId: deleted.productId,
+      remoteDeleted: localLineProductId > 0,
+      localLineProductId: localLineProductId > 0 ? localLineProductId : null
+    });
   } catch (error) {
-    await connection.rollback();
+    await connection.rollback().catch(() => {});
     const status = error?.message === "Product not found" ? 404 : 400;
     return res.status(status).json({ error: error?.message || "Unable to delete product" });
   } finally {

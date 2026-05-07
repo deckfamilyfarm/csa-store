@@ -298,7 +298,9 @@ async function getGoogleSheetInfo({ accessToken, spreadsheetId, sheetName }) {
 
   return {
     sheetId: Number(matchingSheet.properties.sheetId),
-    sheetName: String(matchingSheet.properties.title || sheetName)
+    sheetName: String(matchingSheet.properties.title || sheetName),
+    rowCount: Number(matchingSheet.properties?.gridProperties?.rowCount || 0),
+    columnCount: Number(matchingSheet.properties?.gridProperties?.columnCount || 0)
   };
 }
 
@@ -459,18 +461,28 @@ async function formatGoogleSheetHighlightedRows({
   rowCount,
   highlightedRowIndices = []
 }) {
-  const { sheetId } = await getGoogleSheetInfo({ accessToken, spreadsheetId, sheetName });
-  const safeColumnCount = Math.max(Number(columnCount) || 1, 1);
+  const sheetInfo = await getGoogleSheetInfo({ accessToken, spreadsheetId, sheetName });
+  const { sheetId } = sheetInfo;
+  const safeColumnCount = Math.max(
+    Number(columnCount) || 1,
+    Number(sheetInfo.columnCount) || 1,
+    1
+  );
   const safeRowCount = Math.max(Number(rowCount) || 1, 1);
+  const safeGridRowCount = Math.max(
+    safeRowCount,
+    Number(sheetInfo.rowCount) || 0,
+    1
+  );
   const requests = [];
 
-  if (safeRowCount > 1) {
+  if (safeGridRowCount > 1) {
     requests.push({
       repeatCell: {
         range: {
           sheetId,
           startRowIndex: 1,
-          endRowIndex: safeRowCount,
+          endRowIndex: safeGridRowCount,
           startColumnIndex: 0,
           endColumnIndex: safeColumnCount
         },

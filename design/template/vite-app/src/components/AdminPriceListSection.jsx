@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { adminGet, adminPost } from "../adminApi.js";
 
 const COLUMN_STORAGE_KEY = "adminPricelistColumnPrefs.v2";
@@ -440,6 +441,7 @@ export function AdminPriceListSection({
   const [columnPickerOpen, setColumnPickerOpen] = useState(false);
   const [pushReviewOpen, setPushReviewOpen] = useState(false);
   const [openActionMenuProductId, setOpenActionMenuProductId] = useState(null);
+  const [actionMenuPosition, setActionMenuPosition] = useState({ top: 0, left: 0 });
   const [visibleColumns, setVisibleColumns] = useState(() => loadCurrentColumnPreferences().visibleColumns);
   const [columnOrder, setColumnOrder] = useState(() => loadCurrentColumnPreferences().columnOrder);
   const [sortConfig, setSortConfig] = useState({ key: "product", direction: "asc" });
@@ -900,12 +902,14 @@ export function AdminPriceListSection({
     setApplyState({ open: false, updates: [], results: [], error: "", localOnly: false });
   }
 
-  async function handleDeleteRow(productId) {
+  async function handleDeleteRow(productId, row = null) {
     if (typeof onDeleteProduct !== "function") return;
     setDeletingProductIds((prev) => (prev.includes(productId) ? prev : [...prev, productId]));
     setMessage("");
     try {
-      await onDeleteProduct(productId);
+      await onDeleteProduct(productId, {
+        localLineProductId: row?.localLineProductId
+      });
       setRows((prev) => prev.filter((row) => row.productId !== productId));
       const nextTotalRows = Math.max(0, totalRows - 1);
       setTotalRows(nextTotalRows);
@@ -1015,8 +1019,33 @@ export function AdminPriceListSection({
     return `${primaryPackage} - ${row.vendorName || "N/A"}`;
   }
 
-  function toggleActionMenu(productId) {
-    setOpenActionMenuProductId((prev) => (prev === productId ? null : productId));
+  function toggleActionMenu(productId, event) {
+    if (openActionMenuProductId === productId) {
+      setOpenActionMenuProductId(null);
+      return;
+    }
+
+    const triggerRect = event?.currentTarget?.getBoundingClientRect?.();
+    if (triggerRect && typeof window !== "undefined") {
+      const estimatedMenuWidth = 188;
+      const estimatedMenuHeight = 132;
+      const openBelowTop = triggerRect.bottom + 6;
+      const openAboveTop = triggerRect.top - estimatedMenuHeight - 6;
+      const top =
+        openBelowTop + estimatedMenuHeight <= window.innerHeight - 8
+          ? openBelowTop
+          : Math.max(8, openAboveTop);
+      const left = Math.max(
+        8,
+        Math.min(
+          triggerRect.right - estimatedMenuWidth,
+          window.innerWidth - estimatedMenuWidth - 8
+        )
+      );
+      setActionMenuPosition({ top, left });
+    }
+
+    setOpenActionMenuProductId(productId);
   }
 
   function renderCell(column, row, isApplying, isDeleting) {
@@ -1150,7 +1179,7 @@ export function AdminPriceListSection({
         );
       case "actions":
         return (
-          <div className="admin-row-actions" ref={openActionMenuProductId === row.productId ? actionMenuRef : null}>
+          <div className="admin-row-actions">
             <button
               className="button alt"
               type="button"
@@ -1168,50 +1197,63 @@ export function AdminPriceListSection({
               className="button alt admin-row-menu-trigger"
               type="button"
               disabled={rowBusy}
-              onClick={() => toggleActionMenu(row.productId)}
+              onClick={(event) => toggleActionMenu(row.productId, event)}
               aria-haspopup="menu"
               aria-expanded={openActionMenuProductId === row.productId}
             >
               ...
             </button>
             {openActionMenuProductId === row.productId ? (
-              <div className="admin-row-menu" role="menu">
-                <button
-                  className="admin-row-menu-item"
-                  type="button"
-                  disabled={rowBusy}
-                  onClick={() => {
-                    setOpenActionMenuProductId(null);
-                    applyRemote([row.productId]);
-                  }}
-                >
-                  Push Product
-                </button>
-                <button
-                  className="admin-row-menu-item"
-                  type="button"
-                  disabled={rowBusy}
-                  onClick={() => {
-                    setOpenActionMenuProductId(null);
-                    if (typeof onDuplicateProduct === "function") {
-                      onDuplicateProduct(row.productId);
-                    }
-                  }}
-                >
-                  Duplicate Product
-                </button>
-                <button
-                  className="admin-row-menu-item"
-                  type="button"
-                  disabled={Number(row.localLineProductId || 0) > 0 || rowBusy}
-                  onClick={() => {
-                    setOpenActionMenuProductId(null);
-                    handleDeleteRow(row.productId);
-                  }}
-                >
-                  Delete Product
-                </button>
-              </div>
+              typeof document !== "undefined"
+                ? createPortal(
+                    <div
+                      className="admin-row-menu admin-row-menu-floating"
+                      role="menu"
+                      ref={actionMenuRef}
+                      style={{
+                        top: `${actionMenuPosition.top}px`,
+                        left: `${actionMenuPosition.left}px`
+                      }}
+                    >
+                      <button
+                        className="admin-row-menu-item"
+                        type="button"
+                        disabled={rowBusy}
+                        onClick={() => {
+                          setOpenActionMenuProductId(null);
+                          applyRemote([row.productId]);
+                        }}
+                      >
+                        Push Product
+                      </button>
+                      <button
+                        className="admin-row-menu-item"
+                        type="button"
+                        disabled={rowBusy}
+                        onClick={() => {
+                          setOpenActionMenuProductId(null);
+                          if (typeof onDuplicateProduct === "function") {
+                            onDuplicateProduct(row.productId);
+                          }
+                        }}
+                      >
+                        Duplicate Product
+                      </button>
+                      <button
+                        className="admin-row-menu-item"
+                        type="button"
+                        disabled={rowBusy}
+                        onClick={() => {
+                          setOpenActionMenuProductId(null);
+                          handleDeleteRow(row.productId, row);
+                        }}
+                      >
+                        Delete Product
+                      </button>
+                    </div>,
+                    document.body
+                  )
+                : null
             ) : null}
           </div>
         );

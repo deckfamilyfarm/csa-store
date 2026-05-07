@@ -166,6 +166,29 @@ function formatDeliveryCount(count) {
   return `${numeric} ${numeric === 1 ? "delivery" : "deliveries"}`;
 }
 
+function describeDropSiteContactIndicator(contact = null) {
+  const indicator = String(contact?.indicator || "none");
+  if (indicator === "phone") {
+    const detail = [contact?.name, contact?.phone].filter(Boolean).join(" · ");
+    return detail ? `Host contact phone: ${detail}` : "Host contact phone available";
+  }
+  if (indicator === "email") {
+    return contact?.email ? `Host contact email: ${contact.email}` : "Host contact email available";
+  }
+  if (indicator === "generic") {
+    return contact?.email ? `Generic contact only: ${contact.email}` : "Generic contact only";
+  }
+  return "No host contact found";
+}
+
+function renderDropSiteContactStatus(contact = null) {
+  const indicator = String(contact?.indicator || "none");
+  if (indicator === "phone" && contact?.phone) {
+    return `Found phone ${contact.phone}`;
+  }
+  return "No dropsite phone number found";
+}
+
 function buildTrendSvgLayout(series = [], maxValue = 1) {
   const width = 280;
   const height = 56;
@@ -314,6 +337,11 @@ function createEmptyProductDraft() {
 
 function hasLinkedLocalLineProduct(meta) {
   return Number(meta?.localLineProductId) > 0;
+}
+
+function toLinkedLocalLineProductId(value) {
+  const numeric = Number(value);
+  return Number.isFinite(numeric) && numeric > 0 ? numeric : 0;
 }
 
 function normalizeVendorName(value) {
@@ -1363,10 +1391,32 @@ export function AdminPanel({ onCatalogRefresh }) {
     }
   }
 
-  async function handleDeleteProduct(productId) {
+  function resolveLocalLineProductIdForDelete(productId, options = {}) {
+    const explicitId = toLinkedLocalLineProductId(options?.localLineProductId);
+    if (explicitId > 0) return explicitId;
+
+    if (Number(selectedProductId) === Number(productId)) {
+      const detailId = toLinkedLocalLineProductId(localLineProductDetail?.productMeta?.localLineProductId);
+      if (detailId > 0) return detailId;
+      const activeId = toLinkedLocalLineProductId(activeProduct?.localLineMeta?.localLineProductId);
+      if (activeId > 0) return activeId;
+    }
+
+    const localPricelistMatch = localPricelistProducts.find((product) => Number(product.id) === Number(productId));
+    const localPricelistId = toLinkedLocalLineProductId(localPricelistMatch?.localLineMeta?.localLineProductId);
+    if (localPricelistId > 0) return localPricelistId;
+
+    const catalogMatch = productMap.get(Number(productId));
+    return toLinkedLocalLineProductId(catalogMatch?.localLineMeta?.localLineProductId);
+  }
+
+  async function handleDeleteProduct(productId, options = {}) {
     if (!productId) return;
+    const localLineProductId = resolveLocalLineProductIdForDelete(productId, options);
     const confirmed = window.confirm(
-      "Delete this local-only product? This removes the product, packages, pricing profile, images, and local admin records."
+      localLineProductId > 0
+        ? "Delete this product from Local Line first, then remove it from the local database? This cannot be undone."
+        : "Delete this local-only product? This removes the product, packages, pricing profile, images, and local admin records."
     );
     if (!confirmed) return;
 
@@ -1378,7 +1428,11 @@ export function AdminPanel({ onCatalogRefresh }) {
       await loadAll();
       await refreshLocalPricelistIfNeeded();
       await refreshCatalogFromAdmin();
-      setMessage("Product deleted.");
+      setMessage(
+        response?.remoteDeleted
+          ? "Product deleted from Local Line and the local database."
+          : "Product deleted."
+      );
       return response;
     } catch (err) {
       setMessage(err?.message || "Product delete failed.");
@@ -3326,10 +3380,11 @@ export function AdminPanel({ onCatalogRefresh }) {
                                     <button
                                       className="admin-row-menu-item"
                                       type="button"
-                                      disabled={Number(product?.localLineMeta?.localLineProductId || 0) > 0}
                                       onClick={() => {
                                         setOpenLocalPricelistMenuProductId(null);
-                                        handleDeleteProduct(product.id);
+                                        handleDeleteProduct(product.id, {
+                                          localLineProductId: product?.localLineMeta?.localLineProductId
+                                        });
                                       }}
                                     >
                                       Delete Product
@@ -3648,16 +3703,18 @@ export function AdminPanel({ onCatalogRefresh }) {
                             {pushProductLoading ? "Pushing..." : "Push Product To Local Line"}
                           </button>
                         ) : null}
-                        {linkedLocalLineProductId <= 0 ? (
-                          <button
-                            className="button alt"
-                            type="button"
-                            onClick={() => handleDeleteProduct(activeProduct.id)}
-                            disabled={productDeleteLoading}
-                          >
-                            {productDeleteLoading ? "Deleting..." : "Delete Product"}
-                          </button>
-                        ) : null}
+                        <button
+                          className="button alt"
+                          type="button"
+                          onClick={() =>
+                            handleDeleteProduct(activeProduct.id, {
+                              localLineProductId: linkedLocalLineProductId
+                            })
+                          }
+                          disabled={productDeleteLoading}
+                        >
+                          {productDeleteLoading ? "Deleting..." : "Delete Product"}
+                        </button>
                       </div>
                       {linkedLocalLineProductId > 0 ? (
                         <div className="small">
@@ -3790,7 +3847,11 @@ export function AdminPanel({ onCatalogRefresh }) {
                       <button
                         className="button alt"
                         type="button"
-                        onClick={() => handleDeleteProduct(activeProduct.id)}
+                        onClick={() =>
+                          handleDeleteProduct(activeProduct.id, {
+                            localLineProductId: linkedLocalLineProductId
+                          })
+                        }
                         disabled={productDeleteLoading}
                       >
                         {productDeleteLoading ? "Deleting..." : "Delete Product"}
@@ -4149,6 +4210,15 @@ export function AdminPanel({ onCatalogRefresh }) {
                               ) : null}
                             </div>
                           )}
+                          <span
+                            className={`drop-site-contact-status ${
+                              site.derivedHostContact?.indicator === "phone" ? "phone" : "missing"
+                            }`}
+                            title={describeDropSiteContactIndicator(site.derivedHostContact)}
+                            aria-label={describeDropSiteContactIndicator(site.derivedHostContact)}
+                          >
+                            {renderDropSiteContactStatus(site.derivedHostContact)}
+                          </span>
                         </div>
                       </div>
                     );
