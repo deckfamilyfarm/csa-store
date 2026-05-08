@@ -163,7 +163,20 @@ function formatWeekOfLabel(value) {
 
 function formatDeliveryCount(count) {
   const numeric = Number(count) || 0;
-  return `${numeric} ${numeric === 1 ? "delivery" : "deliveries"}`;
+  return `${numeric} ${numeric === 1 ? "order" : "orders"}`;
+}
+
+function formatShortDateLabel(value) {
+  if (!value) return "";
+  const match = String(value).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  const date = match
+    ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]))
+    : new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
+  return date.toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric"
+  });
 }
 
 function describeDropSiteContactIndicator(contact = null) {
@@ -223,6 +236,66 @@ function buildTrendSvgLayout(series = [], maxValue = 1) {
     height,
     polylinePoints: points.map((point) => `${point.x},${point.y}`).join(" "),
     points
+  };
+}
+
+function getDisplayedDropSitePoints(points = [], includeZeroOrders = false) {
+  const series = Array.isArray(points) ? points : [];
+  return includeZeroOrders
+    ? series
+    : series.filter((entry) => Number(entry.orderCount || entry.averageWeeklyOrders || 0) > 0);
+}
+
+function computeDropSiteAverageFromDetailSeries(site = {}, includeZeroOrders = false) {
+  const detailSeries = getDisplayedDropSitePoints(site.detailSeries || [], includeZeroOrders);
+  if (!detailSeries.length) return 0;
+  const totalOrders = detailSeries.reduce((sum, point) => sum + Number(point.orderCount || 0), 0);
+  return Number((totalOrders / detailSeries.length).toFixed(2));
+}
+
+function buildDropSiteDetailSvgLayout(series = []) {
+  const width = 760;
+  const height = 280;
+  const paddingLeft = 44;
+  const paddingRight = 20;
+  const paddingTop = 16;
+  const paddingBottom = 48;
+  const usableWidth = width - paddingLeft - paddingRight;
+  const usableHeight = height - paddingTop - paddingBottom;
+  const safeSeries = Array.isArray(series) ? series : [];
+  const maxValue = Math.max(1, ...safeSeries.map((entry) => Number(entry.orderCount || 0)));
+  const pointCount = Math.max(safeSeries.length, 1);
+  const step = pointCount <= 1 ? usableWidth : usableWidth / Math.max(pointCount - 1, 1);
+  const labelStep = Math.max(1, Math.ceil(pointCount / 8));
+
+  const points = safeSeries.map((entry, index) => {
+    const value = Number(entry.orderCount || 0);
+    const x = paddingLeft + step * index;
+    const y = paddingTop + usableHeight - (usableHeight * value) / maxValue;
+    return {
+      x,
+      y,
+      value,
+      date: entry.date,
+      showLabel: index % labelStep === 0 || index === pointCount - 1
+    };
+  });
+
+  const yTicks = Array.from({ length: maxValue + 1 }, (_, value) => value)
+    .filter((value) => maxValue <= 5 || value === 0 || value === maxValue || value % Math.ceil(maxValue / 4) === 0);
+
+  return {
+    width,
+    height,
+    paddingLeft,
+    paddingRight,
+    paddingTop,
+    paddingBottom,
+    usableHeight,
+    maxValue,
+    points,
+    polylinePoints: points.map((point) => `${point.x},${point.y}`).join(" "),
+    yTicks
   };
 }
 
@@ -444,8 +517,10 @@ export function AdminPanel({ onCatalogRefresh }) {
   });
   const [dropSitePerformanceMonth, setDropSitePerformanceMonth] = useState("");
   const [showZeroDeliverySites, setShowZeroDeliverySites] = useState(false);
+  const [countZeroOrderPeriods, setCountZeroOrderPeriods] = useState(false);
   const [showHomeDeliverySites, setShowHomeDeliverySites] = useState(false);
   const [showDropSiteOrderCounts, setShowDropSiteOrderCounts] = useState(false);
+  const [expandedDropSiteGraph, setExpandedDropSiteGraph] = useState(null);
   const [message, setMessage] = useState("");
   const [newCategory, setNewCategory] = useState("");
   const [newVendor, setNewVendor] = useState("");
@@ -500,6 +575,27 @@ export function AdminPanel({ onCatalogRefresh }) {
     jobId: ""
   });
   const [localLineOrdersState, setLocalLineOrdersState] = useState({
+    open: false,
+    loading: false,
+    error: "",
+    data: null,
+    jobId: ""
+  });
+  const [localLineSubscriptionsState, setLocalLineSubscriptionsState] = useState({
+    open: false,
+    loading: false,
+    error: "",
+    data: null,
+    jobId: ""
+  });
+  const [localLineSubscriptionHistoryState, setLocalLineSubscriptionHistoryState] = useState({
+    open: false,
+    loading: false,
+    error: "",
+    data: null,
+    jobId: ""
+  });
+  const [localLineDashboardState, setLocalLineDashboardState] = useState({
     open: false,
     loading: false,
     error: "",
@@ -661,6 +757,27 @@ export function AdminPanel({ onCatalogRefresh }) {
           ...prev,
           data: response.orders.latestJob,
           jobId: response.orders.latestJob.jobId
+        }));
+      }
+      if (response?.subscriptions?.latestJob?.jobId) {
+        setLocalLineSubscriptionsState((prev) => ({
+          ...prev,
+          data: response.subscriptions.latestJob,
+          jobId: response.subscriptions.latestJob.jobId
+        }));
+      }
+      if (response?.subscriptions?.latestHistoryJob?.jobId) {
+        setLocalLineSubscriptionHistoryState((prev) => ({
+          ...prev,
+          data: response.subscriptions.latestHistoryJob,
+          jobId: response.subscriptions.latestHistoryJob.jobId
+        }));
+      }
+      if (response?.dashboard?.latestJob?.jobId) {
+        setLocalLineDashboardState((prev) => ({
+          ...prev,
+          data: response.dashboard.latestJob,
+          jobId: response.dashboard.latestJob.jobId
         }));
       }
     } catch (error) {
@@ -1048,6 +1165,135 @@ export function AdminPanel({ onCatalogRefresh }) {
       window.clearInterval(intervalId);
     };
   }, [token, localLineOrdersState.jobId, localLineOrdersState.data?.status]);
+
+  useEffect(() => {
+    const jobId = localLineSubscriptionsState.jobId;
+    const status = localLineSubscriptionsState.data?.status;
+
+    if (!token || !jobId || !status || (status !== "queued" && status !== "running")) {
+      return undefined;
+    }
+
+    let cancelled = false;
+
+    async function pollJob() {
+      try {
+        const response = await adminGet(`localline/pull-jobs/${jobId}`, token);
+        if (cancelled) return;
+        setLocalLineSubscriptionsState((prev) => ({
+          ...prev,
+          error: "",
+          data: response.job || null,
+          jobId: response.job?.jobId || jobId
+        }));
+
+        if (response.job?.status === "completed") {
+          setMessage("Local Line subscriber pull completed.");
+          await loadLocalLineStatusData();
+        }
+      } catch (error) {
+        if (cancelled) return;
+        setLocalLineSubscriptionsState((prev) => ({
+          ...prev,
+          error: error?.message || "Failed to refresh Local Line subscriber progress."
+        }));
+      }
+    }
+
+    pollJob();
+    const intervalId = window.setInterval(pollJob, 2000);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(intervalId);
+    };
+  }, [token, localLineSubscriptionsState.jobId, localLineSubscriptionsState.data?.status]);
+
+  useEffect(() => {
+    const jobId = localLineSubscriptionHistoryState.jobId;
+    const status = localLineSubscriptionHistoryState.data?.status;
+
+    if (!token || !jobId || !status || (status !== "queued" && status !== "running")) {
+      return undefined;
+    }
+
+    let cancelled = false;
+
+    async function pollJob() {
+      try {
+        const response = await adminGet(`localline/pull-jobs/${jobId}`, token);
+        if (cancelled) return;
+        setLocalLineSubscriptionHistoryState((prev) => ({
+          ...prev,
+          error: "",
+          data: response.job || null,
+          jobId: response.job?.jobId || jobId
+        }));
+
+        if (response.job?.status === "completed") {
+          setMessage("Subscriber history import completed.");
+          await loadLocalLineStatusData();
+        }
+      } catch (error) {
+        if (cancelled) return;
+        setLocalLineSubscriptionHistoryState((prev) => ({
+          ...prev,
+          error: error?.message || "Failed to refresh subscriber history import progress."
+        }));
+      }
+    }
+
+    pollJob();
+    const intervalId = window.setInterval(pollJob, 2000);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(intervalId);
+    };
+  }, [token, localLineSubscriptionHistoryState.jobId, localLineSubscriptionHistoryState.data?.status]);
+
+  useEffect(() => {
+    const jobId = localLineDashboardState.jobId;
+    const status = localLineDashboardState.data?.status;
+
+    if (!token || !jobId || !status || (status !== "queued" && status !== "running")) {
+      return undefined;
+    }
+
+    let cancelled = false;
+
+    async function pollJob() {
+      try {
+        const response = await adminGet(`localline/pull-jobs/${jobId}`, token);
+        if (cancelled) return;
+        setLocalLineDashboardState((prev) => ({
+          ...prev,
+          error: "",
+          data: response.job || null,
+          jobId: response.job?.jobId || jobId
+        }));
+
+        if (response.job?.status === "completed") {
+          setMessage("Dashboard publish completed.");
+          await loadLocalLineStatusData();
+        }
+      } catch (error) {
+        if (cancelled) return;
+        setLocalLineDashboardState((prev) => ({
+          ...prev,
+          error: error?.message || "Failed to refresh dashboard publish progress."
+        }));
+      }
+    }
+
+    pollJob();
+    const intervalId = window.setInterval(pollJob, 2000);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(intervalId);
+    };
+  }, [token, localLineDashboardState.jobId, localLineDashboardState.data?.status]);
 
   useEffect(() => {
     if (productEditorMode === "new") {
@@ -1842,6 +2088,108 @@ export function AdminPanel({ onCatalogRefresh }) {
     }
   }
 
+  async function handleLocalLineSubscriptionSync() {
+    setMessage("");
+    setLocalLineSubscriptionsState({
+      open: true,
+      loading: true,
+      error: "",
+      data: null,
+      jobId: ""
+    });
+    try {
+      const response = await adminPost("localline/subscriptions-sync", token, {});
+      setLocalLineSubscriptionsState({
+        open: true,
+        loading: false,
+        error: "",
+        data: response.job || null,
+        jobId: response.job?.jobId || ""
+      });
+      setMessage(
+        response.alreadyRunning
+          ? "Attached to the running Local Line subscriber pull."
+          : "Local Line subscriber pull started."
+      );
+    } catch (error) {
+      setLocalLineSubscriptionsState({
+        open: true,
+        loading: false,
+        error: error?.message || "Failed to start Local Line subscriber pull.",
+        data: null,
+        jobId: ""
+      });
+    }
+  }
+
+  async function handleLocalLineSubscriptionHistoryImport() {
+    setMessage("");
+    setLocalLineSubscriptionHistoryState({
+      open: true,
+      loading: true,
+      error: "",
+      data: null,
+      jobId: ""
+    });
+    try {
+      const response = await adminPost("localline/subscriptions-import-history", token, {});
+      setLocalLineSubscriptionHistoryState({
+        open: true,
+        loading: false,
+        error: "",
+        data: response.job || null,
+        jobId: response.job?.jobId || ""
+      });
+      setMessage(
+        response.alreadyRunning
+          ? "Attached to the running subscriber history import."
+          : "Subscriber history import started."
+      );
+    } catch (error) {
+      setLocalLineSubscriptionHistoryState({
+        open: true,
+        loading: false,
+        error: error?.message || "Failed to start subscriber history import.",
+        data: null,
+        jobId: ""
+      });
+    }
+  }
+
+  async function handleLocalLineDashboardPush() {
+    setMessage("");
+    setLocalLineDashboardState({
+      open: true,
+      loading: true,
+      error: "",
+      data: null,
+      jobId: ""
+    });
+    try {
+      const response = await adminPost("localline/push-dashboard", token, {});
+      setLocalLineDashboardState({
+        open: true,
+        loading: false,
+        error: "",
+        data: response.job || null,
+        jobId: response.job?.jobId || ""
+      });
+      setMessage(
+        response.alreadyRunning
+          ? "Attached to the running dashboard publish."
+          : "Dashboard publish started."
+      );
+    } catch (error) {
+      setLocalLineDashboardState({
+        open: true,
+        loading: false,
+        error: error?.message || "Failed to start dashboard publish.",
+        data: null,
+        jobId: ""
+      });
+    }
+  }
+
   async function handleAddRecipe() {
     if (!newRecipe.title) return;
     await adminPost("recipes", token, {
@@ -2128,10 +2476,22 @@ export function AdminPanel({ onCatalogRefresh }) {
   const localLineStatus = localLineStatusState.data;
   const fulfillmentJob = localLineFulfillmentState.data || localLineStatus?.fulfillments?.latestJob || null;
   const ordersJob = localLineOrdersState.data || localLineStatus?.orders?.latestJob || null;
+  const subscriptionsJob =
+    localLineSubscriptionsState.data || localLineStatus?.subscriptions?.latestJob || null;
+  const subscriptionHistoryJob =
+    localLineSubscriptionHistoryState.data || localLineStatus?.subscriptions?.latestHistoryJob || null;
+  const dashboardJob =
+    localLineDashboardState.data || localLineStatus?.dashboard?.latestJob || null;
   const fulfillmentPullRunning =
     fulfillmentJob?.status === "queued" || fulfillmentJob?.status === "running";
   const ordersPullRunning =
     ordersJob?.status === "queued" || ordersJob?.status === "running";
+  const subscriptionsPullRunning =
+    subscriptionsJob?.status === "queued" || subscriptionsJob?.status === "running";
+  const subscriptionHistoryRunning =
+    subscriptionHistoryJob?.status === "queued" || subscriptionHistoryJob?.status === "running";
+  const dashboardPushRunning =
+    dashboardJob?.status === "queued" || dashboardJob?.status === "running";
   const dropSitePerformanceRows = dropSitePerformance?.rankedSites || [];
   const dropSiteTrendMode = dropSitePerformance?.mode === "trend6";
   const dropSitePerformanceByStrategyId = new Map(
@@ -2162,10 +2522,8 @@ export function AdminPanel({ onCatalogRefresh }) {
   const maxDropSiteAverage = Math.max(
     1,
     Number(dropSitePerformance?.strongAverage || 5),
-    ...filteredDropSitePerformanceRows.flatMap((row) =>
-      dropSiteTrendMode
-        ? (row.trendSeries || []).map((entry) => Number(entry.averageWeeklyOrders) || 0)
-        : [Number(row.averageWeeklyOrders) || 0]
+    ...filteredDropSitePerformanceRows.map((row) =>
+      computeDropSiteAverageFromDetailSeries(row, countZeroOrderPeriods)
     )
   );
   const productTableWidth = "1464px";
@@ -2182,6 +2540,11 @@ export function AdminPanel({ onCatalogRefresh }) {
   const canManageDropSites = hasRole(currentAdminRoles, "dropsite_admin");
   const canManageMembers = hasRole(currentAdminRoles, "member_admin");
   const canManageCoreAdmin = currentAdminRoles.includes("admin");
+  const expandedDropSiteDetailSeries = getDisplayedDropSitePoints(
+    expandedDropSiteGraph?.detailSeries || [],
+    countZeroOrderPeriods
+  );
+  const expandedDropSiteDetailLayout = buildDropSiteDetailSvgLayout(expandedDropSiteDetailSeries);
   const showProductEditor =
     (activeSection === "pricelist" || activeSection === "localPricelist") &&
     (canManagePricing || canManageLocalPricelist) &&
@@ -2208,6 +2571,14 @@ export function AdminPanel({ onCatalogRefresh }) {
       document.body.classList.remove("modal-open");
     };
   }, [showProductEditor]);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return undefined;
+    document.body.classList.toggle("modal-open", Boolean(expandedDropSiteGraph));
+    return () => {
+      document.body.classList.remove("modal-open");
+    };
+  }, [expandedDropSiteGraph]);
 
   useEffect(() => {
     if (!openLocalPricelistMenuProductId) return undefined;
@@ -4129,6 +4500,14 @@ export function AdminPanel({ onCatalogRefresh }) {
                     />
                     <span>show # orders and scheduled drops</span>
                   </label>
+                  <label className="checkbox drop-site-filter-toggle">
+                    <input
+                      type="checkbox"
+                      checked={countZeroOrderPeriods}
+                      onChange={(event) => setCountZeroOrderPeriods(event.target.checked)}
+                    />
+                    <span>count 0-order drops in averages</span>
+                  </label>
                 </div>
                 {dropSitesSectionLoading ? (
                   <div className="drop-site-loading">
@@ -4138,15 +4517,20 @@ export function AdminPanel({ onCatalogRefresh }) {
                 ) : null}
                 <div className="drop-site-performance-chart">
                   {filteredDropSitePerformanceRows.map((site) => {
-                    const averageWeeklyOrders = Number(site.averageWeeklyOrders) || 0;
-                    const displayAverage = dropSiteTrendMode
-                      ? averageWeeklyOrders
-                      : averageWeeklyOrders;
+                    const displayAverage = computeDropSiteAverageFromDetailSeries(
+                      site,
+                      countZeroOrderPeriods
+                    );
+                    const displayTrendSeries = getDisplayedDropSitePoints(
+                      site.trendSeries || [],
+                      countZeroOrderPeriods
+                    );
+                    const displayPerformanceTier = getDropSitePerformanceTier(displayAverage);
                     const widthPercent = Math.max(
                       0,
-                      Math.min(100, Math.round((averageWeeklyOrders / maxDropSiteAverage) * 100))
+                      Math.min(100, Math.round((displayAverage / maxDropSiteAverage) * 100))
                     );
-                    const trendLayout = buildTrendSvgLayout(site.trendSeries || [], maxDropSiteAverage);
+                    const trendLayout = buildTrendSvgLayout(displayTrendSeries, maxDropSiteAverage);
                     return (
                       <div className="drop-site-performance-row" key={`drop-site-performance-${site.id}`}>
                         <div className="drop-site-performance-meta">
@@ -4170,7 +4554,11 @@ export function AdminPanel({ onCatalogRefresh }) {
                         </div>
                         <div className="drop-site-performance-bar-row">
                           {dropSiteTrendMode ? (
-                            <div className="drop-site-trend-shell">
+                            <button
+                              className="drop-site-graph-button drop-site-trend-shell"
+                              type="button"
+                              onClick={() => setExpandedDropSiteGraph(site)}
+                            >
                               <svg
                                 className="drop-site-trend-svg"
                                 viewBox={`0 0 ${trendLayout.width} ${trendLayout.height}`}
@@ -4181,7 +4569,9 @@ export function AdminPanel({ onCatalogRefresh }) {
                                   className="drop-site-trend-line"
                                   fill="none"
                                   points={trendLayout.polylinePoints}
-                                />
+                                >
+                                  <title>{`${site.name} · ${Number(site.orderCount || 0)} total orders`}</title>
+                                </polyline>
                                 {trendLayout.points.map((point) => (
                                   <circle
                                     key={`${site.id}-${point.weekStart || point.month}`}
@@ -4196,19 +4586,24 @@ export function AdminPanel({ onCatalogRefresh }) {
                                   </circle>
                                 ))}
                               </svg>
-                            </div>
+                            </button>
                           ) : (
-                            <div className="drop-site-performance-bar-shell">
+                            <button
+                              className="drop-site-graph-button drop-site-performance-bar-shell"
+                              type="button"
+                              onClick={() => setExpandedDropSiteGraph(site)}
+                              title={`${site.name} · ${Number(site.orderCount || 0)} total orders`}
+                            >
                               <div
-                                className={`drop-site-performance-bar ${site.performanceTier || "bad"}`}
+                                className={`drop-site-performance-bar ${displayPerformanceTier || "bad"}`}
                                 style={{ width: `${widthPercent}%` }}
                               />
-                              {site.performanceTier === "bad" ? (
+                              {displayPerformanceTier === "bad" ? (
                                 <span className="drop-site-performance-warning">
                                   does not qualify for drop site host credit this month
                                 </span>
                               ) : null}
-                            </div>
+                            </button>
                           )}
                           <span
                             className={`drop-site-contact-status ${
@@ -4372,6 +4767,51 @@ export function AdminPanel({ onCatalogRefresh }) {
                     </button>
                   </div>
                 </div>
+                <div className="response-card">
+                  <div className="title">Subscribers</div>
+                  <div className="small">Stored weeks: {Number(localLineStatus?.subscriptions?.totalWeeks || 0)}</div>
+                  <div className="small">Latest snapshot week: {localLineStatus?.subscriptions?.latestWeekEnd || "Never"}</div>
+                  <div className="small">Last captured: {localLineStatus?.subscriptions?.lastCapturedAt || "Never"}</div>
+                  <div className="small">Cursor status: {localLineStatus?.subscriptions?.cursor?.lastStatus || "Never run"}</div>
+                  <div className="small">
+                    History import: {localLineStatus?.subscriptions?.historyImportCursor?.lastStatus || "Never run"}
+                  </div>
+                  <div className="admin-actions">
+                    <button
+                      className="button"
+                      type="button"
+                      onClick={handleLocalLineSubscriptionSync}
+                      disabled={!canPullFromLocalLine || subscriptionsPullRunning || localLineSubscriptionsState.loading}
+                    >
+                      {subscriptionsPullRunning || localLineSubscriptionsState.loading ? "Pull Running..." : "Pull Subscribers"}
+                    </button>
+                    <button
+                      className="button alt"
+                      type="button"
+                      onClick={handleLocalLineSubscriptionHistoryImport}
+                      disabled={!canPullFromLocalLine || subscriptionHistoryRunning || localLineSubscriptionHistoryState.loading}
+                    >
+                      {subscriptionHistoryRunning || localLineSubscriptionHistoryState.loading ? "Import Running..." : "Import History"}
+                    </button>
+                  </div>
+                </div>
+                <div className="response-card">
+                  <div className="title">Dashboard</div>
+                  <div className="small">Target tab: Dashboard-auto-26</div>
+                  <div className="small">Latest week: {localLineStatus?.dashboard?.cursor?.cursorValue || "Unknown"}</div>
+                  <div className="small">Last publish: {localLineStatus?.dashboard?.cursor?.lastFinishedAt || "Never"}</div>
+                  <div className="small">Publish status: {localLineStatus?.dashboard?.cursor?.lastStatus || "Never run"}</div>
+                  <div className="admin-actions">
+                    <button
+                      className="button"
+                      type="button"
+                      onClick={handleLocalLineDashboardPush}
+                      disabled={!canPullFromLocalLine || dashboardPushRunning || localLineDashboardState.loading}
+                    >
+                      {dashboardPushRunning || localLineDashboardState.loading ? "Publishing..." : "Push Dashboard"}
+                    </button>
+                  </div>
+                </div>
               </div>
               <div className="audit-section">
                 <h4>Recent Orders</h4>
@@ -4411,6 +4851,27 @@ export function AdminPanel({ onCatalogRefresh }) {
                 {renderLocalLinePullJobContent(
                   localLineOrdersState,
                   "No Local Line order pull has run yet."
+                )}
+              </div>
+              <div className="audit-section">
+                <h4>Pull Subscribers</h4>
+                {renderLocalLinePullJobContent(
+                  localLineSubscriptionsState,
+                  "No Local Line subscriber pull has run yet."
+                )}
+              </div>
+              <div className="audit-section">
+                <h4>Import Subscriber History</h4>
+                {renderLocalLinePullJobContent(
+                  localLineSubscriptionHistoryState,
+                  "No subscriber history import has run yet."
+                )}
+              </div>
+              <div className="audit-section">
+                <h4>Push Dashboard</h4>
+                {renderLocalLinePullJobContent(
+                  localLineDashboardState,
+                  "No dashboard publish has run yet."
                 )}
               </div>
             </section>
@@ -4651,6 +5112,107 @@ export function AdminPanel({ onCatalogRefresh }) {
                 Close
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {expandedDropSiteGraph && (
+        <div className="modal-backdrop" onClick={() => setExpandedDropSiteGraph(null)}>
+          <div className="modal audit-modal drop-site-detail-modal" onClick={(event) => event.stopPropagation()}>
+            <div className="drop-site-detail-modal-header">
+              <div>
+                <h3>{expandedDropSiteGraph.name}</h3>
+                <div className="small">
+                  Delivery-date detail for{" "}
+                  {dropSiteTrendMode
+                    ? "the last 6 months"
+                    : formatMonthLabel(dropSitePerformanceMonth || dropSitePerformance?.selectedMonth || "")}
+                  {countZeroOrderPeriods ? " including 0-order scheduled drops" : " excluding 0-order scheduled drops"}
+                </div>
+              </div>
+              <button className="button alt" type="button" onClick={() => setExpandedDropSiteGraph(null)}>
+                Close
+              </button>
+            </div>
+            {expandedDropSiteDetailSeries.length ? (
+              <div className="drop-site-detail-chart-shell">
+                <svg
+                  className="drop-site-detail-svg"
+                  viewBox={`0 0 ${expandedDropSiteDetailLayout.width} ${expandedDropSiteDetailLayout.height}`}
+                  role="img"
+                  aria-label={`${expandedDropSiteGraph.name} order detail by delivery date`}
+                >
+                  <line
+                    x1={expandedDropSiteDetailLayout.paddingLeft}
+                    y1={expandedDropSiteDetailLayout.paddingTop}
+                    x2={expandedDropSiteDetailLayout.paddingLeft}
+                    y2={expandedDropSiteDetailLayout.height - expandedDropSiteDetailLayout.paddingBottom}
+                    className="drop-site-detail-axis"
+                  />
+                  <line
+                    x1={expandedDropSiteDetailLayout.paddingLeft}
+                    y1={expandedDropSiteDetailLayout.height - expandedDropSiteDetailLayout.paddingBottom}
+                    x2={expandedDropSiteDetailLayout.width - expandedDropSiteDetailLayout.paddingRight}
+                    y2={expandedDropSiteDetailLayout.height - expandedDropSiteDetailLayout.paddingBottom}
+                    className="drop-site-detail-axis"
+                  />
+                  {expandedDropSiteDetailLayout.yTicks.map((tickValue) => {
+                    const y =
+                      expandedDropSiteDetailLayout.paddingTop +
+                      expandedDropSiteDetailLayout.usableHeight -
+                      (expandedDropSiteDetailLayout.usableHeight * tickValue) / expandedDropSiteDetailLayout.maxValue;
+                    return (
+                      <g key={`drop-site-detail-y-${tickValue}`}>
+                        <line
+                          x1={expandedDropSiteDetailLayout.paddingLeft}
+                          y1={y}
+                          x2={expandedDropSiteDetailLayout.width - expandedDropSiteDetailLayout.paddingRight}
+                          y2={y}
+                          className="drop-site-detail-grid"
+                        />
+                        <text
+                          x={expandedDropSiteDetailLayout.paddingLeft - 8}
+                          y={y + 4}
+                          className="drop-site-detail-axis-label"
+                          textAnchor="end"
+                        >
+                          {tickValue}
+                        </text>
+                      </g>
+                    );
+                  })}
+                  <polyline
+                    className="drop-site-detail-line"
+                    fill="none"
+                    points={expandedDropSiteDetailLayout.polylinePoints}
+                  />
+                  {expandedDropSiteDetailLayout.points.map((point) => (
+                    <g key={`drop-site-detail-point-${point.date}`}>
+                      <circle
+                        className="drop-site-detail-dot"
+                        cx={point.x}
+                        cy={point.y}
+                        r="4"
+                      >
+                        <title>{`${formatShortDateLabel(point.date)} · ${formatDeliveryCount(point.value)}`}</title>
+                      </circle>
+                      {point.showLabel ? (
+                        <text
+                          x={point.x}
+                          y={expandedDropSiteDetailLayout.height - 14}
+                          className="drop-site-detail-axis-label"
+                          textAnchor="middle"
+                        >
+                          {formatShortDateLabel(point.date)}
+                        </text>
+                      ) : null}
+                    </g>
+                  ))}
+                </svg>
+              </div>
+            ) : (
+              <div className="small">No delivery-date points are available for the current filter setting.</div>
+            )}
           </div>
         </div>
       )}

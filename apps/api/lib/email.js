@@ -35,7 +35,14 @@ function createTransporter() {
   return null;
 }
 
-export async function sendPasswordResetEmail({ to, name, username, resetUrl }) {
+function formatExpiryText(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "This link expires soon.";
+  const utcText = date.toISOString().replace(".000Z", " UTC");
+  return `This link expires on ${utcText}.`;
+}
+
+export async function sendPasswordResetEmail({ to, name, username, resetUrl, expiresAt }) {
   const transporter = createTransporter();
   if (!transporter) {
     console.warn("Password reset email skipped: SMTP_HOST/SMTP_USER/SMTP_PASS, EMAIL_USER/EMAIL_PASS, or MAIL_USER/MAIL_ACCESS is not configured.");
@@ -53,6 +60,7 @@ export async function sendPasswordResetEmail({ to, name, username, resetUrl }) {
   const appName = process.env.APP_NAME || "CSA Store";
   const safeName = escapeHtml(displayName);
   const safeUrl = escapeHtml(resetUrl);
+  const expiryText = formatExpiryText(expiresAt);
 
   await transporter.sendMail({
     from,
@@ -66,14 +74,18 @@ export async function sendPasswordResetEmail({ to, name, username, resetUrl }) {
       `Use this link to set your ${appName} password:`,
       resetUrl,
       "",
-      "This link expires soon. If you did not request it, you can ignore this email."
+      expiryText,
+      "If you request another password email, only the newest link will keep working.",
+      "If you did not request it, you can ignore this email."
     ].join("\n"),
     html: `
       <p>Hi ${safeName},</p>
       ${loginName ? `<p>Username: <strong>${escapeHtml(loginName)}</strong></p>` : ""}
       <p>Use this link to set your ${escapeHtml(appName)} password:</p>
       <p><a href="${safeUrl}">${safeUrl}</a></p>
-      <p>This link expires soon. If you did not request it, you can ignore this email.</p>
+      <p>${escapeHtml(expiryText)}</p>
+      <p>If you request another password email, only the newest link will keep working.</p>
+      <p>If you did not request it, you can ignore this email.</p>
     `
   });
 

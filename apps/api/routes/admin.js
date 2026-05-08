@@ -71,6 +71,11 @@ import {
   isGooglePricelistVendorName
 } from "../scripts/exportMasterPricelist.js";
 import {
+  importLocalLineSubscriberHistory,
+  publishLocalLineDashboard,
+  syncLocalLineSubscriberSnapshotCache
+} from "../lib/dashboardPublisher.js";
+import {
   ADMIN_ROLE_DEFINITIONS,
   normalizeAdminRoleKeys
 } from "../lib/adminRoles.js";
@@ -1024,42 +1029,106 @@ function countMonthlyDateOccurrencesInRange(rangeStart, rangeEnd, repeatOnDates 
   return count;
 }
 
-function getDropSiteScheduledDropCountForRange(site = {}, rangeStart, rangeEnd, fallbackOrderDates = []) {
+function getCustomDateKeysInRange(availability = {}, rangeStart, rangeEnd) {
+  const dates = Array.isArray(availability?.custom_dates) ? availability.custom_dates : [];
+  return [...new Set(
+    dates
+      .map((item) => toDateOrNull(item?.available_date || item?.date || item))
+      .filter((value) => isDateInRange(value, rangeStart, rangeEnd))
+      .map((value) => formatDateKey(value))
+      .filter(Boolean)
+  )].sort();
+}
+
+function getMonthlyDateKeysInRange(rangeStart, rangeEnd, repeatOnDates = [], repeatStartDate = null) {
+  if (!Array.isArray(repeatOnDates) || !repeatOnDates.length) return [];
+  const validDays = new Set(
+    repeatOnDates
+      .map((value) => Number(value))
+      .filter((value) => Number.isFinite(value) && value >= 1 && value <= 31)
+  );
+  if (!validDays.size) return [];
+  const startDate = toDateOrNull(repeatStartDate);
+  const keys = [];
+  for (let current = new Date(rangeStart); current < rangeEnd; current = addDays(current, 1)) {
+    if (startDate && current < startDate) continue;
+    if (validDays.has(current.getDate())) {
+      keys.push(formatDateKey(current));
+    }
+  }
+  return [...new Set(keys)].sort();
+}
+
+function getWeekdayDateKeysInRange(rangeStart, rangeEnd, weekdayNumbers = [], repeatStartDate = null) {
+  if (!Array.isArray(weekdayNumbers) || !weekdayNumbers.length) return [];
+  const allowedWeekdays = new Set(weekdayNumbers);
+  const startDate = toDateOrNull(repeatStartDate);
+  const keys = [];
+  for (let current = new Date(rangeStart); current < rangeEnd; current = addDays(current, 1)) {
+    if (startDate && current < startDate) continue;
+    if (allowedWeekdays.has(current.getDay())) {
+      keys.push(formatDateKey(current));
+    }
+  }
+  return [...new Set(keys)].sort();
+}
+
+function getAvailableDateKeysInRange(availability = {}, rangeStart, rangeEnd) {
+  const dates = Array.isArray(availability?.available_dates) ? availability.available_dates : [];
+  return [...new Set(
+    dates
+      .map((item) => toDateOrNull(item?.available_date))
+      .filter((value) => isDateInRange(value, rangeStart, rangeEnd))
+      .map((value) => formatDateKey(value))
+      .filter(Boolean)
+  )].sort();
+}
+
+function getDropSiteScheduledDateKeysForRange(site = {}, rangeStart, rangeEnd, fallbackOrderDates = []) {
   const availability =
     parseJsonValue(site?.availabilityJson || site?.availability_json, null) ||
     parseJsonValue(site?.rawJson || site?.raw_json, {})?.availability ||
     {};
 
-  const customDateCount = countCustomDatesInRange(availability, rangeStart, rangeEnd);
-  if (customDateCount > 0) return customDateCount;
+  const customDateKeys = getCustomDateKeysInRange(availability, rangeStart, rangeEnd);
+  if (customDateKeys.length) return customDateKeys;
 
   const repeatOnDates = Array.isArray(availability?.repeat_on_dates) ? availability.repeat_on_dates : [];
   const repeatStartDate = availability?.repeat_start_date || null;
-  const monthlyDateCount = countMonthlyDateOccurrencesInRange(
+  const monthlyDateKeys = getMonthlyDateKeysInRange(
     rangeStart,
     rangeEnd,
     repeatOnDates,
     repeatStartDate
   );
-  if (monthlyDateCount > 0) return monthlyDateCount;
+  if (monthlyDateKeys.length) return monthlyDateKeys;
 
   const weekdayNumbers = getAvailabilityWeekdayNumbers(availability);
-  const weeklyCount = countWeekdayOccurrencesInRange(rangeStart, rangeEnd, weekdayNumbers, repeatStartDate);
-  if (weeklyCount > 0) return weeklyCount;
+  const weekdayDateKeys = getWeekdayDateKeysInRange(rangeStart, rangeEnd, weekdayNumbers, repeatStartDate);
+  if (weekdayDateKeys.length) return weekdayDateKeys;
 
-  const availableDateCount = countAvailableDatesInRange(availability, rangeStart, rangeEnd);
-  if (availableDateCount > 0) return availableDateCount;
+  const availableDateKeys = getAvailableDateKeysInRange(availability, rangeStart, rangeEnd);
+  if (availableDateKeys.length) return availableDateKeys;
 
   const labelWeekdays = getWeekdayNumbersFromDayLabel(site?.dayOfWeek);
-  const labelWeekdayCount = countWeekdayOccurrencesInRange(rangeStart, rangeEnd, labelWeekdays);
-  if (labelWeekdayCount > 0) return labelWeekdayCount;
+  const labelWeekdayDateKeys = getWeekdayDateKeysInRange(rangeStart, rangeEnd, labelWeekdays);
+  if (labelWeekdayDateKeys.length) return labelWeekdayDateKeys;
 
-  return new Set(
+  return [...new Set(
     (fallbackOrderDates || [])
       .filter((value) => isDateInRange(value, rangeStart, rangeEnd))
       .map((value) => formatDateKey(value))
       .filter(Boolean)
-  ).size;
+  )].sort();
+}
+
+function getDropSiteScheduledDropCountForRange(site = {}, rangeStart, rangeEnd, fallbackOrderDates = []) {
+  return getDropSiteScheduledDateKeysForRange(
+    site,
+    rangeStart,
+    rangeEnd,
+    fallbackOrderDates
+  ).length;
 }
 
 function getDropSiteScheduledDropCount(site = {}, monthKey, fallbackOrderDates = []) {
@@ -3804,6 +3873,26 @@ const LOCAL_LINE_ORDER_JOB_PHASES = [
   { key: "fetch", label: "Fetch Orders" },
   { key: "store", label: "Store Orders" },
   { key: "reporting", label: "Build Reporting Cache" },
+  { key: "subscriptions", label: "Capture Subscribers" },
+  { key: "finalize", label: "Finalize" }
+];
+
+const LOCAL_LINE_SUBSCRIPTION_JOB_PHASES = [
+  { key: "fetch", label: "Fetch Subscribers" },
+  { key: "store", label: "Store Subscribers" },
+  { key: "finalize", label: "Finalize" }
+];
+
+const LOCAL_LINE_SUBSCRIPTION_HISTORY_JOB_PHASES = [
+  { key: "fetch", label: "Read Snapshot Files" },
+  { key: "store", label: "Store Snapshot History" },
+  { key: "finalize", label: "Finalize" }
+];
+
+const LOCAL_LINE_DASHBOARD_JOB_PHASES = [
+  { key: "prepare", label: "Prepare Dashboard" },
+  { key: "compute", label: "Compute Metrics" },
+  { key: "publish", label: "Publish Dashboard" },
   { key: "finalize", label: "Finalize" }
 ];
 
@@ -4777,6 +4866,17 @@ async function syncLocalLineOrdersToStore({ reportProgress = () => {}, cutoffDat
       reportProgress,
       startDate: effectiveCutoffDate
     });
+    const subscriptionSummary = await syncLocalLineSubscriberSnapshotCache({
+      reportProgress,
+      phase: {
+        fetchKey: "subscriptions",
+        storeKey: "subscriptions",
+        finalizeKey: "subscriptions",
+        fetchLabel: "Capture Subscribers",
+        storeLabel: "Capture Subscribers",
+        finalizeLabel: "Capture Subscribers"
+      }
+    });
 
     reportProgress({
       phaseKey: "fetch",
@@ -4805,7 +4905,8 @@ async function syncLocalLineOrdersToStore({ reportProgress = () => {}, cutoffDat
     });
     return {
       ...summary,
-      reportingSummary
+      reportingSummary,
+      subscriptionSummary
     };
   } catch (error) {
     await connection.rollback().catch(() => {});
@@ -4964,13 +5065,24 @@ router.get("/drop-sites", requireAdmin, async (_req, res) => {
               const fulfillmentDates = groupedRows
                 .map((row) => row.fulfillmentDate)
                 .filter((value) => isDateInRange(value, weekStart, weekEnd));
-              const orderCount = fulfillmentDates.length;
-              const scheduledDrops = getDropSiteScheduledDropCountForRange(
+              const orderCountByDate = fulfillmentDates.reduce((map, dateValue) => {
+                const key = formatDateKey(dateValue);
+                if (!key) return map;
+                map.set(key, Number(map.get(key) || 0) + 1);
+                return map;
+              }, new Map());
+              const scheduledDateKeys = getDropSiteScheduledDateKeysForRange(
                 site,
                 weekStart,
                 weekEnd,
                 fulfillmentDates
               );
+              const detailPoints = scheduledDateKeys.map((dateKey) => ({
+                date: dateKey,
+                orderCount: Number(orderCountByDate.get(dateKey) || 0)
+              }));
+              const orderCount = detailPoints.reduce((sum, point) => sum + Number(point.orderCount || 0), 0);
+              const scheduledDrops = detailPoints.length;
               const averageWeeklyOrders =
                 scheduledDrops > 0 ? Number((orderCount / scheduledDrops).toFixed(2)) : 0;
               return {
@@ -4979,6 +5091,7 @@ router.get("/drop-sites", requireAdmin, async (_req, res) => {
                 orderCount,
                 scheduledDrops,
                 averageWeeklyOrders,
+                detailPoints,
                 performanceTier: getDropSitePerformanceTier(averageWeeklyOrders)
               };
             })
@@ -4989,21 +5102,31 @@ router.get("/drop-sites", requireAdmin, async (_req, res) => {
           : monthsForData.map((monthKey) => {
               const groupedRows = orderGroupsByKeyMonth.get(`${siteKey}|${monthKey}`) || [];
               const fulfillmentDates = groupedRows.map((row) => row.fulfillmentDate).filter(Boolean);
-              const orderCount = groupedRows.length;
+              const orderCountByDate = fulfillmentDates.reduce((map, dateValue) => {
+                const key = formatDateKey(dateValue);
+                if (!key) return map;
+                map.set(key, Number(map.get(key) || 0) + 1);
+                return map;
+              }, new Map());
               const monthInfo = parseMonthKey(monthKey);
               const rangeEnd =
                 monthInfo && monthInfo.end > completedFulfillmentCutoff
                   ? completedFulfillmentCutoff
                   : monthInfo?.end || null;
-              const scheduledDrops =
+              const detailPoints =
                 monthInfo && rangeEnd && rangeEnd > monthInfo.start
-                  ? getDropSiteScheduledDropCountForRange(
+                  ? getDropSiteScheduledDateKeysForRange(
                       site,
                       monthInfo.start,
                       rangeEnd,
                       fulfillmentDates
-                    )
-                  : 0;
+                    ).map((dateKey) => ({
+                      date: dateKey,
+                      orderCount: Number(orderCountByDate.get(dateKey) || 0)
+                    }))
+                  : [];
+              const orderCount = detailPoints.reduce((sum, point) => sum + Number(point.orderCount || 0), 0);
+              const scheduledDrops = detailPoints.length;
               const averageWeeklyOrders =
                 scheduledDrops > 0 ? Number((orderCount / scheduledDrops).toFixed(2)) : 0;
               return {
@@ -5011,6 +5134,7 @@ router.get("/drop-sites", requireAdmin, async (_req, res) => {
                 orderCount,
                 scheduledDrops,
                 averageWeeklyOrders,
+                detailPoints,
                 performanceTier: getDropSitePerformanceTier(averageWeeklyOrders)
               };
             });
@@ -5024,6 +5148,9 @@ router.get("/drop-sites", requireAdmin, async (_req, res) => {
         const latestAverageWeeklyOrders = Number(
           trendSeries[trendSeries.length - 1]?.averageWeeklyOrders || 0
         );
+        const detailSeries = trendSeries
+          .flatMap((entry) => Array.isArray(entry.detailPoints) ? entry.detailPoints : [])
+          .sort((left, right) => String(left.date || "").localeCompare(String(right.date || "")));
 
         return {
           id: site.id,
@@ -5040,7 +5167,8 @@ router.get("/drop-sites", requireAdmin, async (_req, res) => {
           performanceTier: getDropSitePerformanceTier(
             isTrendMode ? latestAverageWeeklyOrders : averageWeeklyOrders
           ),
-          trendSeries
+          trendSeries,
+          detailSeries
         };
       })
       .sort((left, right) => {
@@ -5140,6 +5268,15 @@ router.get("/localline/status", requireAdmin, async (_req, res) => {
       FROM local_line_orders
     `
   );
+  const [subscriptionSummaryRows] = await pool.query(
+    `
+      SELECT
+        COUNT(*) AS totalWeeks,
+        MAX(snapshot_week_end) AS latestWeekEnd,
+        MAX(captured_at) AS lastCapturedAt
+      FROM local_line_subscription_snapshot_runs
+    `
+  );
   const [recentOrders] = await pool.query(
     `
       SELECT
@@ -5194,6 +5331,19 @@ router.get("/localline/status", requireAdmin, async (_req, res) => {
       cursor: cursorByKey.orders || null,
       latestJob: getLatestLocalLinePullJob("orders"),
       recentOrders
+    },
+    subscriptions: {
+      totalWeeks: Number(subscriptionSummaryRows?.[0]?.totalWeeks || 0),
+      latestWeekEnd: subscriptionSummaryRows?.[0]?.latestWeekEnd || null,
+      lastCapturedAt: subscriptionSummaryRows?.[0]?.lastCapturedAt || null,
+      cursor: cursorByKey.subscriptions || null,
+      latestJob: getLatestLocalLinePullJob("subscriptions"),
+      historyImportCursor: cursorByKey["subscriptions-history"] || null,
+      latestHistoryJob: getLatestLocalLinePullJob("subscriptions-history")
+    },
+    dashboard: {
+      cursor: cursorByKey.dashboard || null,
+      latestJob: getLatestLocalLinePullJob("dashboard")
     }
   });
 });
@@ -6289,6 +6439,55 @@ router.post("/localline/orders-sync", requireAdminPermission("localline_pull"), 
         reportProgress,
         cutoffDate
       })
+  });
+
+  return res.status(result.alreadyRunning ? 200 : 202).json(result);
+});
+
+router.post("/localline/subscriptions-sync", requireAdminPermission("localline_pull"), async (_req, res) => {
+  if (!isLocalLineEnabled()) {
+    return res.status(400).json({ error: "Local Line is not configured" });
+  }
+
+  await ensureLocalLineSyncSchema().catch((error) => {
+    console.warn("Local Line schema bootstrap skipped for /admin/localline/subscriptions-sync:", error.message);
+  });
+
+  const result = startLocalLinePullJob({
+    datasetKey: "subscriptions",
+    datasetLabel: "Local Line subscriber sync",
+    phases: LOCAL_LINE_SUBSCRIPTION_JOB_PHASES,
+    run: ({ reportProgress }) => syncLocalLineSubscriberSnapshotCache({ reportProgress })
+  });
+
+  return res.status(result.alreadyRunning ? 200 : 202).json(result);
+});
+
+router.post("/localline/subscriptions-import-history", requireAdminPermission("localline_pull"), async (_req, res) => {
+  await ensureLocalLineSyncSchema().catch((error) => {
+    console.warn("Local Line schema bootstrap skipped for /admin/localline/subscriptions-import-history:", error.message);
+  });
+
+  const result = startLocalLinePullJob({
+    datasetKey: "subscriptions-history",
+    datasetLabel: "Local Line subscriber history import",
+    phases: LOCAL_LINE_SUBSCRIPTION_HISTORY_JOB_PHASES,
+    run: ({ reportProgress }) => importLocalLineSubscriberHistory({ reportProgress })
+  });
+
+  return res.status(result.alreadyRunning ? 200 : 202).json(result);
+});
+
+router.post("/localline/push-dashboard", requireAdminPermission("localline_pull"), async (_req, res) => {
+  await ensureLocalLineSyncSchema().catch((error) => {
+    console.warn("Local Line schema bootstrap skipped for /admin/localline/push-dashboard:", error.message);
+  });
+
+  const result = startLocalLinePullJob({
+    datasetKey: "dashboard",
+    datasetLabel: "Local Line dashboard publish",
+    phases: LOCAL_LINE_DASHBOARD_JOB_PHASES,
+    run: ({ reportProgress }) => publishLocalLineDashboard({ reportProgress })
   });
 
   return res.status(result.alreadyRunning ? 200 : 202).json(result);

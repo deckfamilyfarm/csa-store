@@ -1574,6 +1574,14 @@ img {
   margin-left: 0;
 }
 
+.drop-site-graph-button {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
 .drop-site-contact-status {
   font-size: 12px;
   line-height: 1.2;
@@ -1613,6 +1621,62 @@ img {
 .drop-site-trend-dot.bad {
   fill: #cf4c45;
   cursor: pointer;
+}
+
+.drop-site-detail-modal {
+  width: min(920px, 96vw);
+}
+
+.drop-site-detail-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.drop-site-detail-modal-header h3 {
+  margin: 0 0 4px;
+}
+
+.drop-site-detail-chart-shell {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  padding: 12px;
+}
+
+.drop-site-detail-svg {
+  width: 100%;
+  min-width: 720px;
+  height: auto;
+  display: block;
+}
+
+.drop-site-detail-axis {
+  stroke: rgba(31, 27, 23, 0.35);
+  stroke-width: 1.25;
+}
+
+.drop-site-detail-grid {
+  stroke: rgba(31, 27, 23, 0.12);
+  stroke-width: 1;
+}
+
+.drop-site-detail-line {
+  stroke: #314c5b;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.drop-site-detail-dot {
+  fill: #7a9f43;
+}
+
+.drop-site-detail-axis-label {
+  fill: rgba(31, 27, 23, 0.72);
+  font-size: 11px;
 }
 
 .pricelist-page-buttons {

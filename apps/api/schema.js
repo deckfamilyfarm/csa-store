@@ -306,6 +306,44 @@ export const localLineOrderReportingMonths = mysqlTable("local_line_order_report
   updatedAt: datetime("updated_at")
 });
 
+export const localLineSubscriptionSnapshotRows = mysqlTable(
+  "local_line_subscription_snapshot_rows",
+  {
+    snapshotWeekEnd: varchar("snapshot_week_end", { length: 10 }).notNull(),
+    snapshotKey: varchar("snapshot_key", { length: 255 }).notNull(),
+    planNumber: varchar("plan_number", { length: 64 }),
+    customerName: varchar("customer_name", { length: 255 }),
+    email: varchar("email", { length: 255 }),
+    status: varchar("status", { length: 64 }),
+    nextFulfillmentStatus: varchar("next_fulfillment_status", { length: 64 }),
+    total: decimal("total", { precision: 10, scale: 2 }),
+    isFeedAFriend: tinyint("is_feed_a_friend").default(0),
+    rawJson: text("raw_json"),
+    capturedAt: datetime("captured_at"),
+    createdAt: datetime("created_at"),
+    updatedAt: datetime("updated_at")
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.snapshotWeekEnd, table.snapshotKey] })
+  })
+);
+
+export const localLineSubscriptionSnapshotRuns = mysqlTable(
+  "local_line_subscription_snapshot_runs",
+  {
+    snapshotWeekEnd: varchar("snapshot_week_end", { length: 10 }).primaryKey(),
+    rowCount: int("row_count"),
+    activeSubscriberCount: int("active_subscriber_count"),
+    snapSubscriberCount: int("snap_subscriber_count"),
+    projectedMonthlyRevenue: decimal("projected_monthly_revenue", { precision: 10, scale: 2 }),
+    skippedSubscriberCount: int("skipped_subscriber_count"),
+    feedAFriendSubscriberCount: int("feed_a_friend_subscriber_count"),
+    capturedAt: datetime("captured_at"),
+    createdAt: datetime("created_at"),
+    updatedAt: datetime("updated_at")
+  }
+);
+
 export const localLineSyncCursors = mysqlTable("local_line_sync_cursors", {
   syncKey: varchar("sync_key", { length: 64 }).primaryKey(),
   cursorValue: varchar("cursor_value", { length: 255 }),

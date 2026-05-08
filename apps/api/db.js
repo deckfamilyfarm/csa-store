@@ -322,6 +322,38 @@ const LOCAL_LINE_TABLE_STATEMENTS = [
     )
   `,
   `
+    CREATE TABLE IF NOT EXISTS local_line_subscription_snapshot_rows (
+      snapshot_week_end VARCHAR(10) NOT NULL,
+      snapshot_key VARCHAR(255) NOT NULL,
+      plan_number VARCHAR(64),
+      customer_name VARCHAR(255),
+      email VARCHAR(255),
+      status VARCHAR(64),
+      next_fulfillment_status VARCHAR(64),
+      total DECIMAL(10, 2),
+      is_feed_a_friend TINYINT(1) DEFAULT 0,
+      raw_json TEXT,
+      captured_at DATETIME,
+      created_at DATETIME,
+      updated_at DATETIME,
+      PRIMARY KEY (snapshot_week_end, snapshot_key)
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS local_line_subscription_snapshot_runs (
+      snapshot_week_end VARCHAR(10) PRIMARY KEY,
+      row_count INT,
+      active_subscriber_count INT,
+      snap_subscriber_count INT,
+      projected_monthly_revenue DECIMAL(10, 2),
+      skipped_subscriber_count INT,
+      feed_a_friend_subscriber_count INT,
+      captured_at DATETIME,
+      created_at DATETIME,
+      updated_at DATETIME
+    )
+  `,
+  `
     CREATE TABLE IF NOT EXISTS local_line_sync_cursors (
       sync_key VARCHAR(64) PRIMARY KEY,
       cursor_value VARCHAR(255),
@@ -521,6 +553,21 @@ const LOCAL_LINE_INDEX_STATEMENTS = [
     tableName: "local_line_order_reporting_entries",
     indexName: "idx_local_line_order_reporting_status_payment_week",
     columns: "order_status, payment_status, week_start"
+  },
+  {
+    tableName: "local_line_subscription_snapshot_rows",
+    indexName: "idx_local_line_subscription_snapshot_status",
+    columns: "snapshot_week_end, status"
+  },
+  {
+    tableName: "local_line_subscription_snapshot_rows",
+    indexName: "idx_local_line_subscription_snapshot_email",
+    columns: "email"
+  },
+  {
+    tableName: "local_line_subscription_snapshot_runs",
+    indexName: "idx_local_line_subscription_snapshot_runs_captured",
+    columns: "captured_at"
   }
 ];
 
@@ -684,6 +731,11 @@ const LOCAL_LINE_COLUMN_STATEMENTS = [
     tableName: "local_line_orders",
     columnName: "pickup_end_time",
     definition: "pickup_end_time VARCHAR(32)"
+  },
+  {
+    tableName: "local_line_subscription_snapshot_runs",
+    columnName: "snap_subscriber_count",
+    definition: "snap_subscriber_count INT"
   }
 ];
 

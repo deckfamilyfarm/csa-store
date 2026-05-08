@@ -3,7 +3,11 @@ import bcrypt from "bcryptjs";
 import { ensureAdminAccessSchema, getPool } from "../db.js";
 import { sendPasswordResetEmail } from "./email.js";
 
-const RESET_TOKEN_TTL_MS = 2 * 60 * 60 * 1000;
+const RESET_TOKEN_TTL_MS =
+  Math.max(1, Number.parseInt(process.env.PASSWORD_RESET_TTL_HOURS || "24", 10) || 24) *
+  60 *
+  60 *
+  1000;
 
 function hashToken(token) {
   return crypto.createHash("sha256").update(String(token || "")).digest("hex");
@@ -25,6 +29,12 @@ function getAppBaseUrl(req) {
 
 function buildResetUrl(req, token) {
   return `${getAppBaseUrl(req)}/#/reset-password?token=${encodeURIComponent(token)}`;
+}
+
+function formatUtcExpiry(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toISOString().replace(".000Z", " UTC");
 }
 
 export async function sendPasswordResetForUser(user, options = {}) {
@@ -72,7 +82,8 @@ export async function sendPasswordResetForUser(user, options = {}) {
       to: user.email,
       name: user.name || user.username || user.email,
       username: user.username || "",
-      resetUrl
+      resetUrl,
+      expiresAt
     });
   } catch (error) {
     console.warn(`Password reset email failed for ${user.email}:`, error.message);
@@ -113,8 +124,24 @@ export async function resetPasswordWithToken(token, password) {
   );
 
   const row = rows[0];
-  if (!row || row.usedAt || new Date(row.expiresAt).getTime() <= Date.now()) {
-    const error = new Error("This password reset link is invalid or expired.");
+  if (!row) {
+    const error = new Error(
+      "This password reset link is invalid. It may be incomplete, already replaced by a newer email, or copied incorrectly."
+    );
+    error.status = 400;
+    throw error;
+  }
+  if (row.usedAt) {
+    const error = new Error(
+      "This password reset link was already used or was replaced by a newer password email. Request a new password reset email and use only the most recent link."
+    );
+    error.status = 400;
+    throw error;
+  }
+  if (new Date(row.expiresAt).getTime() <= Date.now()) {
+    const error = new Error(
+      `This password reset link expired on ${formatUtcExpiry(row.expiresAt)}. Request a new password reset email.`
+    );
     error.status = 400;
     throw error;
   }

@@ -61,6 +61,13 @@ function isEmailAddress(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim());
 }
 
+function formatResetExpiry(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleString();
+}
+
 export function AdminUsersSection({ token, currentAdmin }) {
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
@@ -148,7 +155,7 @@ export function AdminUsersSection({ token, currentAdmin }) {
       setMessage(
         response.emailSent === false
           ? `Admin user added, but password email was not sent: ${response.emailReason || "email is not configured."}`
-          : "Admin user added and password setup email sent."
+          : `Admin user added and password setup email sent. Expires ${formatResetExpiry(response.expiresAt)}. Only the newest password email link will work.`
       );
       await loadUsers();
     } catch (error) {
@@ -166,7 +173,7 @@ export function AdminUsersSection({ token, currentAdmin }) {
       setMessage(
         response.emailSent === false
           ? `Password reset was created, but email was not sent: ${response.emailReason || "email is not configured."}`
-          : `Password reset email sent to ${user.email}.`
+          : `Password reset email sent to ${user.email}. Expires ${formatResetExpiry(response.expiresAt)}. Only the newest password email link will work.`
       );
     } catch (error) {
       setMessage(error?.message || "Failed to send password reset email.");

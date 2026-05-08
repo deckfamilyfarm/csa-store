@@ -23,6 +23,11 @@ Schema notes
   `local_line_package_meta`,
   `local_line_sync_runs`,
   `local_line_sync_issues`.
+- Subscriber snapshots are cached locally in `local_line_subscription_snapshot_rows` and `local_line_subscription_snapshot_runs`.
+- `SNAP subscribers` on the dashboard are derived, not copied from the subscription export:
+  they are counted as distinct customers on a SNAP pricelist order within the trailing 5 weeks
+  ending on that snapshot week. They are added into `Total Subscribers`, but they are not used
+  for `New Subscribers` or `Exiting Subscribers`.
 
 Endpoints
 - GET /api/health
