@@ -56,6 +56,7 @@ export function Storefront() {
     submitting: false
   });
   const [resetToken, setResetToken] = useState("");
+  const [resetUsername, setResetUsername] = useState("");
   const [resetState, setResetState] = useState({
     password: "",
     confirm: "",
@@ -123,6 +124,7 @@ export function Storefront() {
         const query = window.location.hash.split("?")[1] || "";
         const params = new URLSearchParams(query);
         setResetToken(params.get("token") || "");
+        setResetUsername(params.get("username") || "");
         setView("resetPassword");
         return;
       }
@@ -483,6 +485,9 @@ export function Storefront() {
             <div className="container reset-password-panel">
               <div className="eyebrow">Account access</div>
               <h2 className="h2">Set Password</h2>
+              {resetUsername ? (
+                <div className="small">Setting password for username: <strong>{resetUsername}</strong></div>
+              ) : null}
               <form className="admin-form" onSubmit={handleResetPassword}>
                 <input
                   className="input"

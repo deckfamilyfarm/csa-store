@@ -27,8 +27,13 @@ function getAppBaseUrl(req) {
   return `${protocol}://${host}`;
 }
 
-function buildResetUrl(req, token) {
-  return `${getAppBaseUrl(req)}/#/reset-password?token=${encodeURIComponent(token)}`;
+function buildResetUrl(req, token, username = "") {
+  const params = new URLSearchParams();
+  params.set("token", String(token || ""));
+  if (String(username || "").trim()) {
+    params.set("username", String(username || "").trim());
+  }
+  return `${getAppBaseUrl(req)}/#/reset-password?${params.toString()}`;
 }
 
 function formatUtcExpiry(value) {
@@ -75,7 +80,7 @@ export async function sendPasswordResetForUser(user, options = {}) {
     ]
   );
 
-  const resetUrl = buildResetUrl(options.req, token);
+  const resetUrl = buildResetUrl(options.req, token, user.username || "");
   let emailResult;
   try {
     emailResult = await sendPasswordResetEmail({

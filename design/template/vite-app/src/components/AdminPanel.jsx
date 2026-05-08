@@ -166,6 +166,13 @@ function formatDeliveryCount(count) {
   return `${numeric} ${numeric === 1 ? "order" : "orders"}`;
 }
 
+function getDropSitePerformanceTier(value) {
+  const numeric = Number(value) || 0;
+  if (numeric > 5) return "good";
+  if (numeric >= 4) return "warn";
+  return "bad";
+}
+
 function formatShortDateLabel(value) {
   if (!value) return "";
   const match = String(value).match(/^(\d{4})-(\d{2})-(\d{2})$/);
