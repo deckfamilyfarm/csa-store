@@ -588,7 +588,7 @@ router.post("/subscribe", async (req, res) => {
     const sourcePath = cleanOptionalString(payload.sourcePath, 255);
 
     await db.insert(subscribeLeads).values({
-      status: "new",
+      status: "in_progress",
       firstName,
       lastName,
       email,

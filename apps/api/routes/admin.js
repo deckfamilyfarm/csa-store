@@ -7,6 +7,7 @@ import sharp from "sharp";
 import xlsx from "xlsx";
 import { DeleteObjectCommand, S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import {
+  ensureSubscriberCaptureSchema,
   ensureAdminAccessSchema,
   ensureAdminPricelistIndexes,
   ensureLocalLineSyncSchema,
@@ -34,6 +35,7 @@ import {
   productSales,
   recipes,
   reviews,
+  subscribeLeads,
   tags,
   users,
   vendors
@@ -283,6 +285,15 @@ function toNullableString(value) {
   if (value === null || typeof value === "undefined") return null;
   const trimmed = String(value).trim();
   return trimmed ? trimmed : null;
+}
+
+function normalizeSubscribeLeadStatus(value) {
+  const normalized = String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[\s-]+/g, "_");
+  if (normalized === "won") return "won";
+  return "in_progress";
 }
 
 function abbreviateRepeatDays(availability = {}) {
@@ -1967,6 +1978,82 @@ router.get("/admin-users", requireAdminPermission("user_admin"), async (_req, re
     }))
   });
 });
+
+router.get(
+  "/subscription-leads",
+  requireAdminPermission(["membership_admin", "member_admin"]),
+  async (_req, res) => {
+    try {
+      await ensureSubscriberCaptureSchema();
+      const rows = await getDb()
+        .select()
+        .from(subscribeLeads)
+        .orderBy(subscribeLeads.submittedAt, subscribeLeads.createdAt);
+      res.json({
+        leads: rows
+          .slice()
+          .sort((left, right) => {
+            const leftTime = toTimestamp(left.submittedAt || left.createdAt);
+            const rightTime = toTimestamp(right.submittedAt || right.createdAt);
+            return rightTime - leftTime || Number(right.id || 0) - Number(left.id || 0);
+          })
+          .map((row) => ({
+            ...row,
+            status: normalizeSubscribeLeadStatus(row.status)
+          }))
+      });
+    } catch (error) {
+      console.error("Subscription leads fetch failed:", error);
+      res.status(500).json({ error: "Failed to load subscription leads." });
+    }
+  }
+);
+
+router.put(
+  "/subscription-leads/:id",
+  requireAdminPermission(["membership_admin", "member_admin"]),
+  async (req, res) => {
+    try {
+      await ensureSubscriberCaptureSchema();
+      const leadId = Number(req.params.id);
+      if (!Number.isFinite(leadId) || leadId <= 0) {
+        return res.status(400).json({ error: "Invalid subscription lead id." });
+      }
+
+      const status = normalizeSubscribeLeadStatus(req.body?.status);
+      const adminNotes = toNullableString(req.body?.adminNotes);
+      const now = new Date();
+      const db = getDb();
+
+      const existing = await db.select().from(subscribeLeads).where(eq(subscribeLeads.id, leadId));
+      if (!existing.length) {
+        return res.status(404).json({ error: "Subscription lead not found." });
+      }
+
+      await db
+        .update(subscribeLeads)
+        .set({
+          status,
+          adminNotes,
+          updatedAt: now
+        })
+        .where(eq(subscribeLeads.id, leadId));
+
+      const updatedRows = await db.select().from(subscribeLeads).where(eq(subscribeLeads.id, leadId));
+      res.json({
+        lead: updatedRows.length
+          ? {
+              ...updatedRows[0],
+              status: normalizeSubscribeLeadStatus(updatedRows[0].status)
+            }
+          : null
+      });
+    } catch (error) {
+      console.error("Subscription lead update failed:", error);
+      res.status(500).json({ error: "Failed to update subscription lead." });
+    }
+  }
+);
 
 router.post("/admin-users", requireAdminPermission("user_admin"), async (req, res) => {
   const db = getDb();

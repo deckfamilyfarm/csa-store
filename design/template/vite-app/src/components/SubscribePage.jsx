@@ -8,8 +8,10 @@ const SUBSCRIBE_NAV_LINKS = [
   {
     label: "Our Farm",
     children: [
-      { label: "About", href: "https://www.deckfamilyfarm.com/about" },
-      { label: "Our Farmily", href: "https://www.deckfamilyfarm.com/our-farmily" }
+      { label: "About", href: "https://www.deckfamilyfarm.com/the-farm" },
+      { label: "Our Farmily", href: "https://www.deckfamilyfarm.com/the-farmily" },
+      { label: "Education", href: "https://www.deckfamilyfarm.com/intern-program" },
+      { label: "Farm Dogs", href: "https://www.deckfamilyfarm.com/dogs" }
     ]
   },
   {
@@ -31,9 +33,8 @@ const SUBSCRIBE_NAV_LINKS = [
   {
     label: "Shop",
     children: [
-      { label: "CSA Shopping", href: storeUrlFallback() },
-      { label: "Merchandise", href: "https://www.deckfamilyfarm.com/merchandise" },
-      { label: "Turkey", href: "https://www.deckfamilyfarm.com/turkey" }
+      { label: "CSA Shopping", href: "https://fullfarmcsa.deckfamilyfarm.com/" },
+      { label: "Merchandise", href: "https://www.deckfamilyfarm.com/merchandise" }
     ]
   }
 ];

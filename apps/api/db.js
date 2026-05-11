@@ -40,7 +40,7 @@ const SUBSCRIBER_CAPTURE_TABLE_STATEMENTS = [
   `
     CREATE TABLE IF NOT EXISTS subscribe_leads (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      status VARCHAR(32) DEFAULT 'new',
+      status VARCHAR(32) NOT NULL DEFAULT 'in_progress',
       first_name VARCHAR(255) NOT NULL,
       last_name VARCHAR(255) NOT NULL,
       email VARCHAR(255) NOT NULL,
@@ -56,6 +56,7 @@ const SUBSCRIBER_CAPTURE_TABLE_STATEMENTS = [
       selected_plan_label VARCHAR(255),
       selected_drop_site VARCHAR(255),
       notes TEXT,
+      admin_notes TEXT,
       source_host VARCHAR(255),
       source_path VARCHAR(255),
       utm_source VARCHAR(255),
@@ -86,6 +87,14 @@ const SUBSCRIBER_CAPTURE_INDEX_STATEMENTS = [
     tableName: "subscribe_leads",
     indexName: "idx_subscribe_leads_status",
     columns: "status"
+  }
+];
+
+const SUBSCRIBER_CAPTURE_COLUMN_STATEMENTS = [
+  {
+    tableName: "subscribe_leads",
+    columnName: "admin_notes",
+    definition: "admin_notes TEXT"
   }
 ];
 
@@ -1236,6 +1245,36 @@ async function runSubscriberCaptureSchemaBootstrap(connection) {
   for (const statement of SUBSCRIBER_CAPTURE_TABLE_STATEMENTS) {
     await connection.query(statement);
   }
+
+  for (const columnDefinition of SUBSCRIBER_CAPTURE_COLUMN_STATEMENTS) {
+    const exists = await columnExists(
+      connection,
+      columnDefinition.tableName,
+      columnDefinition.columnName
+    );
+    if (exists) continue;
+
+    await connection.query(
+      `ALTER TABLE ${columnDefinition.tableName} ADD COLUMN ${columnDefinition.definition}`
+    );
+  }
+
+  await connection.query(
+    `
+      UPDATE subscribe_leads
+      SET status = 'in_progress'
+      WHERE status IS NULL
+        OR TRIM(status) = ''
+        OR LOWER(TRIM(status)) = 'new'
+    `
+  );
+
+  await connection.query(
+    `
+      ALTER TABLE subscribe_leads
+      MODIFY COLUMN status VARCHAR(32) NOT NULL DEFAULT 'in_progress'
+    `
+  );
 
   for (const indexDefinition of SUBSCRIBER_CAPTURE_INDEX_STATEMENTS) {
     const exists = await indexExists(

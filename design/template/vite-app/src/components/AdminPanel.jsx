@@ -4,6 +4,7 @@ import { AdminManualSection } from "./AdminManualSection.jsx";
 import { AdminMembershipSection } from "./AdminMembershipSection.jsx";
 import { AdminOrdersSection } from "./AdminOrdersSection.jsx";
 import { AdminPriceListSection } from "./AdminPriceListSection.jsx";
+import { AdminSubscriptionLeadsSection } from "./AdminSubscriptionLeadsSection.jsx";
 import { AdminUsersSection } from "./AdminUsersSection.jsx";
 import {
   adminDeleteImage,
@@ -47,6 +48,8 @@ function canAccessAdminSection(roleKeys, section) {
       return roleKeys.includes("inventory_admin");
     case "membership":
       return roleKeys.includes("membership_admin");
+    case "subscriptions":
+      return roleKeys.includes("membership_admin") || roleKeys.includes("member_admin");
     case "dropSites":
       return roleKeys.includes("dropsite_admin");
     case "reviews":
@@ -70,6 +73,7 @@ function getDefaultAdminSection(roleKeys = []) {
     "pricelist",
     "localPricelist",
     "inventory",
+    "subscriptions",
     "membership",
     "dropSites",
     "reviews",
@@ -2657,6 +2661,7 @@ export function AdminPanel({ onCatalogRefresh }) {
   const canManageOrders = canAccessAdminSection(currentAdminRoles, "orders");
   const canManageInventory = hasRole(currentAdminRoles, "inventory_admin");
   const canManageMembership = hasRole(currentAdminRoles, "membership_admin");
+  const canManageSubscriptions = canAccessAdminSection(currentAdminRoles, "subscriptions");
   const canPullFromLocalLine = hasRole(currentAdminRoles, "localline_pull");
   const canPushToLocalLine = hasRole(currentAdminRoles, "localline_push");
   const canManageDropSites = hasRole(currentAdminRoles, "dropsite_admin");
@@ -3497,6 +3502,18 @@ export function AdminPanel({ onCatalogRefresh }) {
               type="button"
             >
               Membership
+            </button>
+          ) : null}
+          {canManageSubscriptions ? (
+            <button
+              className={`admin-nav-item ${activeSection === "subscriptions" ? "active" : ""}`}
+              onClick={() => {
+                setActiveSection("subscriptions");
+                closeProductEditor();
+              }}
+              type="button"
+            >
+              Subscriptions
             </button>
           ) : null}
           {canManageCoreAdmin ? (
@@ -4998,6 +5015,10 @@ export function AdminPanel({ onCatalogRefresh }) {
               onDataRefresh={loadAll}
               onCatalogRefresh={refreshCatalogFromAdmin}
             />
+          )}
+
+          {activeSection === "subscriptions" && canManageSubscriptions && (
+            <AdminSubscriptionLeadsSection token={token} />
           )}
 
           {activeSection === "users" && canManageUsers && (

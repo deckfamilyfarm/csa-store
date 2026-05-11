@@ -170,7 +170,7 @@ export const subscribeLeads = mysqlTable(
   "subscribe_leads",
   {
     id: int("id").autoincrement().primaryKey(),
-    status: varchar("status", { length: 32 }).default("new"),
+    status: varchar("status", { length: 32 }).default("in_progress"),
     firstName: varchar("first_name", { length: 255 }).notNull(),
     lastName: varchar("last_name", { length: 255 }).notNull(),
     email: varchar("email", { length: 255 }).notNull(),
@@ -186,6 +186,7 @@ export const subscribeLeads = mysqlTable(
     selectedPlanLabel: varchar("selected_plan_label", { length: 255 }),
     selectedDropSite: varchar("selected_drop_site", { length: 255 }),
     notes: text("notes"),
+    adminNotes: text("admin_notes"),
     sourceHost: varchar("source_host", { length: 255 }),
     sourcePath: varchar("source_path", { length: 255 }),
     utmSource: varchar("utm_source", { length: 255 }),
