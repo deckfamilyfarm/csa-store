@@ -1,13 +1,41 @@
 import React, { useMemo, useState } from "react";
 import { submitSubscribeLead } from "../api.js";
 
+const DELIVERY_MAP_URL =
+  "https://berkeleymapper.berkeley.edu/index.html?tabfile=https://raw.githubusercontent.com/jdeck88/ffcsa_scripts/refs/heads/main/localline/data/delivery_data.tsv&configfile=https://raw.githubusercontent.com/jdeck88/ffcsa_scripts/refs/heads/main/dropsite_maps/dropsites2.xml&pointDisplay=markers&hideLegendItems=true";
+
 const SUBSCRIBE_NAV_LINKS = [
-  { label: "Our Farm", href: "https://www.deckfamilyfarm.com/about" },
-  { label: "Full Farm CSA", href: "https://www.deckfamilyfarm.com/subscribe" },
-  { label: "Locations", href: "https://www.deckfamilyfarm.com/subscribe#locations" },
-  { label: "FAQs", href: "https://www.deckfamilyfarm.com/subscribe#faqs" },
-  { label: "Events", href: "https://www.deckfamilyfarm.com/events" },
-  { label: "Newsletter", href: "https://www.deckfamilyfarm.com/newsletter" }
+  {
+    label: "Our Farm",
+    children: [
+      { label: "About", href: "https://www.deckfamilyfarm.com/about" },
+      { label: "Our Farmily", href: "https://www.deckfamilyfarm.com/our-farmily" }
+    ]
+  },
+  {
+    label: "Full Farm CSA",
+    children: [
+      { label: "Subscribe", href: "https://www.deckfamilyfarm.com/subscribe" },
+      { label: "Plans", href: "https://www.deckfamilyfarm.com/subscribe#plans" },
+      { label: "Locations", href: "https://www.deckfamilyfarm.com/subscribe#locations" }
+    ]
+  },
+  {
+    label: "Newsletter",
+    href: "https://www.deckfamilyfarm.com/newsletter"
+  },
+  {
+    label: "Events",
+    href: "https://www.deckfamilyfarm.com/events"
+  },
+  {
+    label: "Shop",
+    children: [
+      { label: "CSA Shopping", href: storeUrlFallback() },
+      { label: "Merchandise", href: "https://www.deckfamilyfarm.com/merchandise" },
+      { label: "Turkey", href: "https://www.deckfamilyfarm.com/turkey" }
+    ]
+  }
 ];
 
 const SUBSCRIBE_PLANS = [
@@ -174,6 +202,10 @@ const PARTNERS = [
   }
 ];
 
+function storeUrlFallback() {
+  return "https://store.deckfamilyfarm.com";
+}
+
 function buildInitialForm(dropSites = []) {
   return {
     firstName: "",
@@ -193,10 +225,88 @@ function buildInitialForm(dropSites = []) {
   };
 }
 
+function isVisibleSubscribeDropSite(site) {
+  const name = String(site?.name || "").toLowerCase();
+  if (!name) return false;
+  if (
+    name.includes("membership purchase") ||
+    name.includes("herdshare purchase") ||
+    name.includes("snap fulfillment membership")
+  ) {
+    return false;
+  }
+  return true;
+}
+
+function formatDropSiteWindow(site) {
+  const openTime = String(site?.openTime || "").trim();
+  const closeTime = String(site?.closeTime || "").trim();
+  if (!openTime && !closeTime) return "";
+  return [openTime, closeTime].filter(Boolean).join(" - ");
+}
+
+function formatDropSiteAddress(site) {
+  return String(site?.address || "").trim();
+}
+
 export function SubscribePage({ dropSites = [], storeUrl }) {
   const siteOptions = useMemo(
-    () => dropSites.map((site) => site.name).filter(Boolean).sort((left, right) => left.localeCompare(right)),
+    () =>
+      dropSites
+        .filter((site) => isVisibleSubscribeDropSite(site))
+        .map((site) => site.name)
+        .filter(Boolean)
+        .sort((left, right) => left.localeCompare(right)),
     [dropSites]
+  );
+  const visibleDropSites = useMemo(
+    () => dropSites.filter((site) => isVisibleSubscribeDropSite(site)),
+    [dropSites]
+  );
+  const homeDeliverySites = useMemo(
+    () =>
+      visibleDropSites
+        .filter(
+          (site) =>
+            String(site.fulfillmentType || "").toLowerCase() === "delivery" ||
+            String(site.type || "").toLowerCase() === "postalcodes" ||
+            String(site.name || "").toLowerCase().includes("home delivery")
+        )
+        .sort((left, right) => String(left.name || "").localeCompare(String(right.name || ""))),
+    [visibleDropSites]
+  );
+  const pickupDropSites = useMemo(
+    () =>
+      visibleDropSites.filter(
+        (site) =>
+          !(
+            String(site.fulfillmentType || "").toLowerCase() === "delivery" ||
+            String(site.type || "").toLowerCase() === "postalcodes" ||
+            String(site.name || "").toLowerCase().includes("home delivery")
+          )
+      ),
+    [visibleDropSites]
+  );
+  const tuesdayDropSites = useMemo(
+    () =>
+      pickupDropSites
+        .filter((site) => String(site.dayOfWeek || "").toLowerCase() === "tue")
+        .sort((left, right) => String(left.name || "").localeCompare(String(right.name || ""))),
+    [pickupDropSites]
+  );
+  const saturdayDropSites = useMemo(
+    () =>
+      pickupDropSites
+        .filter((site) => String(site.dayOfWeek || "").toLowerCase() === "sat")
+        .sort((left, right) => String(left.name || "").localeCompare(String(right.name || ""))),
+    [pickupDropSites]
+  );
+  const fridayDropSites = useMemo(
+    () =>
+      pickupDropSites
+        .filter((site) => String(site.dayOfWeek || "").toLowerCase() === "fri")
+        .sort((left, right) => String(left.name || "").localeCompare(String(right.name || ""))),
+    [pickupDropSites]
   );
   const [form, setForm] = useState(() => buildInitialForm(siteOptions));
   const [status, setStatus] = useState({ submitting: false, success: false, error: "" });
@@ -239,30 +349,37 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
             />
           </a>
           <nav className="subscribe-nav">
-            {SUBSCRIBE_NAV_LINKS.map((link) => (
-              <a key={link.href} href={link.href}>
-                {link.label}
-              </a>
-            ))}
-            <a className="button alt subscribe-shop-link" href={storeUrl}>
-              Visit store
-            </a>
+            {SUBSCRIBE_NAV_LINKS.map((link) =>
+              Array.isArray(link.children) ? (
+                <div key={link.label} className="subscribe-nav-group">
+                  <span className="subscribe-nav-group-title">{link.label}</span>
+                  <div className="subscribe-nav-group-links">
+                    {link.children.map((child) => (
+                      <a key={child.href} href={child.href === storeUrlFallback() ? storeUrl : child.href}>
+                        {child.label}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <a key={link.href} className="subscribe-nav-single" href={link.href}>
+                  {link.label}
+                </a>
+              )
+            )}
           </nav>
         </div>
       </header>
 
       <main>
         <section className="subscribe-hero">
-          <div className="subscribe-hero-backdrop">
-            <img
-              src="/images/subscribe-background.avif"
-              alt="Deck Family Farm fields and livestock"
-            />
-          </div>
           <div className="container subscribe-hero-grid">
             <div className="subscribe-hero-copy">
               <div className="eyebrow">Deck Family Farm</div>
               <h1 className="subscribe-title">Welcome to Full Farm CSA</h1>
+              <div className="subscribe-hero-subtitle">
+                Nourishing our community with pasture-raised foods and local farm partners
+              </div>
               <p className="subscribe-lede">
                 The Full Farm CSA program provides essential staples from Deck Family Farm and other
                 hyper-local farms with shared growing standards. Members shop online for pickup at
@@ -468,6 +585,10 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
 
         <section className="section subscribe-proof">
           <div className="container">
+            <div className="subscribe-section-head subscribe-section-head-centered">
+              <div className="eyebrow">What people say</div>
+              <h2 className="h2">Member feedback</h2>
+            </div>
             <div className="subscribe-proof-grid">
               {TESTIMONIALS.map((testimonial) => (
                 <article key={testimonial.author} className="card subscribe-quote-card">
@@ -481,8 +602,10 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
 
         <section className="section" id="plans">
           <div className="container">
-            <div className="eyebrow">Subscription plans</div>
-            <h2 className="h2">Choose the plan that fits your table</h2>
+            <div className="subscribe-section-head">
+              <div className="eyebrow">Subscription plans</div>
+              <h2 className="h2">Choose the plan that fits your table</h2>
+            </div>
             <div className="subscribe-plan-grid">
               {SUBSCRIBE_PLANS.map((plan) => (
                 <article
@@ -509,42 +632,98 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
         <section className="section subscribe-location-section" id="locations">
           <div className="container subscribe-location-grid">
             <div>
-              <div className="eyebrow">Locations</div>
-              <h2 className="h2">Pickup sites, home delivery, and order days</h2>
-              <p className="lede">
-                Members can order for host-home dropsites, markets, and home delivery zones from
-                Eugene to Portland. Choose a preferred site above if you already know it, or browse
-                the current locations and delivery radius.
-              </p>
+              <div className="subscribe-section-head">
+                <div className="eyebrow">Locations</div>
+                <h2 className="h2">Pickup sites, home delivery, and order days</h2>
+              </div>
+              <div className="subscribe-location-copy">
+                <h3>Home Delivery</h3>
+                <p className="lede">
+                  There is a $20 fee for home delivery with free delivery for orders over $125. See
+                  map for delivery area. Eugene, Springfield, and Junction City deliveries happen on
+                  Tuesdays and Corvallis deliveries happen on Saturdays.
+                </p>
+                {homeDeliverySites.length ? (
+                  <div className="subscribe-delivery-list">
+                    {homeDeliverySites.map((site) => (
+                      <div key={site.id || site.name} className="card subscribe-delivery-card">
+                        <strong>{site.name}</strong>
+                        <span>{String(site.dayOfWeek || "").toUpperCase()}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+                <h3>Drop Sites (Free)</h3>
+                <p className="lede">
+                  Drop site locations and days are listed below. All dropsite deliveries are free.
+                  You can choose your preferred dropsite location when placing your order.
+                </p>
+              </div>
               <div className="button-row">
-                <a
-                  className="button"
-                  href="https://www.deckfamilyfarm.com/subscribe#locations"
-                >
-                  View location details
+                <a className="button" href={DELIVERY_MAP_URL} target="_blank" rel="noreferrer">
+                  See delivery map
                 </a>
                 <a className="button alt" href={storeUrl}>
                   Visit the store
                 </a>
               </div>
             </div>
-            <a
-              className="subscribe-location-card card"
-              href="https://www.deckfamilyfarm.com/subscribe#locations"
-            >
-              <img
-                src="https://static.wixstatic.com/media/11062b_0d7ebf8cb92f4025a69adfe959f8fda8~mv2.png"
-                alt="Deck Family Farm pickup and delivery map"
-              />
-              <span>Click through to see pickup locations, drop days, and delivery radius.</span>
-            </a>
+            <div className="subscribe-drop-site-groups">
+              {tuesdayDropSites.length ? (
+                <section className="card subscribe-drop-site-group">
+                  <h3>Tuesday Dropsites</h3>
+                  <p>Order window Thursday through Sunday</p>
+                  <div className="subscribe-drop-site-list">
+                    {tuesdayDropSites.map((site) => (
+                      <article key={site.id || site.name} className="subscribe-drop-site-item">
+                        <strong>{site.name}</strong>
+                        {formatDropSiteWindow(site) ? <span>{formatDropSiteWindow(site)}</span> : null}
+                        {formatDropSiteAddress(site) ? <small>{formatDropSiteAddress(site)}</small> : null}
+                      </article>
+                    ))}
+                  </div>
+                </section>
+              ) : null}
+              {saturdayDropSites.length ? (
+                <section className="card subscribe-drop-site-group">
+                  <h3>Saturday Dropsites</h3>
+                  <p>Order window Monday through Wednesday</p>
+                  <div className="subscribe-drop-site-list">
+                    {saturdayDropSites.map((site) => (
+                      <article key={site.id || site.name} className="subscribe-drop-site-item">
+                        <strong>{site.name}</strong>
+                        {formatDropSiteWindow(site) ? <span>{formatDropSiteWindow(site)}</span> : null}
+                        {formatDropSiteAddress(site) ? <small>{formatDropSiteAddress(site)}</small> : null}
+                      </article>
+                    ))}
+                  </div>
+                </section>
+              ) : null}
+              {fridayDropSites.length ? (
+                <section className="card subscribe-drop-site-group">
+                  <h3>Friday Dropsites</h3>
+                  <p>Order window Tuesday through Thursday</p>
+                  <div className="subscribe-drop-site-list">
+                    {fridayDropSites.map((site) => (
+                      <article key={site.id || site.name} className="subscribe-drop-site-item">
+                        <strong>{site.name}</strong>
+                        {formatDropSiteWindow(site) ? <span>{formatDropSiteWindow(site)}</span> : null}
+                        {formatDropSiteAddress(site) ? <small>{formatDropSiteAddress(site)}</small> : null}
+                      </article>
+                    ))}
+                  </div>
+                </section>
+              ) : null}
+            </div>
           </div>
         </section>
 
         <section className="section subscribe-partners-section">
           <div className="container">
-            <div className="eyebrow">Meet our partners</div>
-            <h2 className="h2">Hyper-local farms and food makers</h2>
+            <div className="subscribe-section-head">
+              <div className="eyebrow">Meet our partners</div>
+              <h2 className="h2">Hyper-local farms and food makers</h2>
+            </div>
             <p className="lede">
               All products are grown, raised, or crafted within roughly 100 miles of the farm in
               Junction City, with shared standards around regenerative practices, natural cycles,
@@ -553,6 +732,9 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
             <div className="subscribe-partner-grid">
               {PARTNERS.map((partner) => (
                 <article key={partner.name} className="card subscribe-partner-card">
+                  <div className="subscribe-partner-crest" aria-hidden="true">
+                    {partner.name.slice(0, 1)}
+                  </div>
                   <div className="subscribe-partner-card-name">{partner.name}</div>
                   <p>{partner.description}</p>
                 </article>
@@ -563,8 +745,10 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
 
         <section className="section subscribe-faq-section" id="faqs">
           <div className="container">
-            <div className="eyebrow">Frequently asked questions</div>
-            <h2 className="h2">How membership works</h2>
+            <div className="subscribe-section-head">
+              <div className="eyebrow">Frequently asked questions</div>
+              <h2 className="h2">How membership works</h2>
+            </div>
             <div className="subscribe-faq-list">
               {FAQS.map((faq) => (
                 <details key={faq.question} className="card subscribe-faq-item">

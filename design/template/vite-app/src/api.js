@@ -51,6 +51,10 @@ export async function fetchCatalog() {
   return fetchJsonGet(`${base}/catalog`, "", "Failed to load catalog");
 }
 
+export async function fetchDropSites() {
+  return fetchJsonGet(`${base}/drop-sites`, "", "Failed to load drop sites");
+}
+
 export async function submitSubscribeLead(payload) {
   const response = await fetch(`${base}/subscribe`, {
     method: "POST",

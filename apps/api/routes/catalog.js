@@ -541,6 +541,22 @@ router.get("/catalog", async (_req, res) => {
   }
 });
 
+router.get("/drop-sites", async (_req, res) => {
+  try {
+    const db = getDb();
+    try {
+      await ensureLocalLineSyncSchema();
+    } catch (error) {
+      console.warn("Local Line schema bootstrap skipped for /drop-sites:", error.message);
+    }
+    const dropSiteRows = await db.select().from(dropSites).where(eq(dropSites.active, 1));
+    res.json({ dropSites: dropSiteRows });
+  } catch (error) {
+    console.error("Drop sites error:", error);
+    res.status(500).json({ error: "Failed to load drop sites" });
+  }
+});
+
 router.post("/subscribe", async (req, res) => {
   try {
     const db = getDb();

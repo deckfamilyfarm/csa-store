@@ -14,6 +14,7 @@ import {
 import {
   deleteReview,
   fetchCatalog,
+  fetchDropSites,
   fetchMe,
   fetchMyReviews,
   requestPasswordReset,
@@ -68,6 +69,28 @@ function getStoreUrl() {
   return "https://store.deckfamilyfarm.com";
 }
 
+const SUBSCRIBE_DROP_SITES_CACHE_KEY = "subscribeDropSitesCache";
+
+function readCachedSubscribeDropSites() {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(SUBSCRIBE_DROP_SITES_CACHE_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (_error) {
+    return [];
+  }
+}
+
+function writeCachedSubscribeDropSites(sites) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(SUBSCRIBE_DROP_SITES_CACHE_KEY, JSON.stringify(sites || []));
+  } catch (_error) {
+    // Ignore cache write failures; the live response is still usable.
+  }
+}
+
 export function Storefront() {
   const experienceMode = getExperienceMode();
   const [userToken, setUserToken] = useState(() => localStorage.getItem("userToken") || "");
@@ -102,7 +125,7 @@ export function Storefront() {
     vendors: [],
     products: [],
     recipes: [],
-    dropSites: []
+    dropSites: experienceMode === "subscribe" ? readCachedSubscribeDropSites() : []
   });
   const [catalogError, setCatalogError] = useState("");
   const productGridRef = useRef(null);
@@ -118,6 +141,7 @@ export function Storefront() {
 
   async function reloadCatalog() {
     const data = await fetchCatalog();
+    writeCachedSubscribeDropSites(data.dropSites || []);
     setCatalog({
       categories: data.categories || [],
       vendors: data.vendors || [],
@@ -169,6 +193,19 @@ export function Storefront() {
         setCatalogError("Unable to load catalog.");
       });
   }, []);
+
+  useEffect(() => {
+    if (experienceMode !== "subscribe") return;
+    fetchDropSites()
+      .then((data) => {
+        const nextDropSites = data?.dropSites || [];
+        setCatalog((current) => ({ ...current, dropSites: nextDropSites }));
+        writeCachedSubscribeDropSites(nextDropSites);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, [experienceMode]);
 
   useEffect(() => {
     if (!userToken) {
@@ -239,7 +276,19 @@ export function Storefront() {
   }, [catalog.dropSites]);
 
   const subscribeDropSites = useMemo(
-    () => (catalog.dropSites || []).map((site) => ({ name: site.name })).filter((site) => site.name),
+    () =>
+      (catalog.dropSites || [])
+        .map((site) => ({
+          id: site.id,
+          name: site.name,
+          address: site.address,
+          dayOfWeek: site.dayOfWeek,
+          openTime: site.openTime,
+          closeTime: site.closeTime,
+          type: site.type,
+          fulfillmentType: site.fulfillmentType
+        }))
+        .filter((site) => site.name),
     [catalog.dropSites]
   );
 
