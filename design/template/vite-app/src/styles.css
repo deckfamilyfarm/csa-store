@@ -672,12 +672,47 @@ img {
   align-items: start;
 }
 
+.subscribe-map-link {
+  display: block;
+  width: fit-content;
+  margin: 24px auto 18px;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  max-width: 100%;
+}
+
+.subscribe-map-image {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+}
+
+.subscribe-map-caption {
+  margin: 0 auto 18px;
+  text-align: center;
+  color: var(--navy);
+  font-family: "Tomarik Extrovert", var(--subscribe-serif);
+  font-weight: 700;
+}
+
 .subscribe-location-copy h3,
 .subscribe-drop-site-group h3 {
   font-family: var(--subscribe-serif);
   font-size: 28px;
   color: var(--navy);
   margin: 22px 0 10px;
+}
+
+.subscribe-location-section .subscribe-section-head,
+.subscribe-location-copy {
+  text-align: center;
+}
+
+.subscribe-location-copy .lede {
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .subscribe-location-copy h3:first-child {
@@ -708,49 +743,62 @@ img {
 
 .subscribe-drop-site-groups {
   display: grid;
-  gap: 16px;
+  gap: 18px;
+  margin-top: 20px;
 }
 
-.subscribe-drop-site-group {
+.subscribe-drop-site-table-card {
   padding: 22px 22px 18px;
   border-radius: 24px;
 }
 
-.subscribe-drop-site-group p {
-  margin: 0 0 16px;
+.subscribe-drop-site-table-card h3 {
+  font-family: var(--subscribe-serif);
+  font-size: 28px;
+  color: var(--navy);
+  margin: 0 0 14px;
+}
+
+.subscribe-drop-site-table-card h3 span {
+  font-size: 18px;
   color: #5e564b;
   font-weight: 600;
 }
 
-.subscribe-drop-site-list {
-  display: grid;
-  gap: 12px;
+.subscribe-drop-site-table-shell {
+  overflow-x: auto;
 }
 
-.subscribe-drop-site-item {
-  display: grid;
-  gap: 4px;
-  padding-top: 10px;
+.subscribe-drop-site-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 720px;
+}
+
+.subscribe-drop-site-table th,
+.subscribe-drop-site-table td {
+  text-align: left;
+  padding: 12px 10px;
   border-top: 1px solid rgba(31, 27, 23, 0.08);
+  vertical-align: top;
 }
 
-.subscribe-drop-site-item:first-child {
+.subscribe-drop-site-table thead th {
   border-top: 0;
-  padding-top: 0;
-}
-
-.subscribe-drop-site-item strong {
   color: var(--navy);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
-.subscribe-drop-site-item span {
-  color: #5e564b;
-  font-size: 14px;
-}
-
-.subscribe-drop-site-item small {
-  color: #7a6f62;
+.subscribe-drop-site-table tbody td {
+  color: #3f3a34;
   line-height: 1.5;
+}
+
+.subscribe-drop-site-table tbody td:first-child {
+  color: var(--navy);
+  font-weight: 700;
 }
 
 .subscribe-partner-grid {
@@ -760,10 +808,80 @@ img {
   margin-top: 24px;
 }
 
+.subscribe-herdshare-section {
+  background: #ffffff;
+  padding-top: 76px;
+  padding-bottom: 76px;
+}
+
+.subscribe-herdshare-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.subscribe-herdshare-copy {
+  display: grid;
+  gap: 16px;
+}
+
+.subscribe-herdshare-copy .lede {
+  max-width: none;
+  margin: 0;
+}
+
+.subscribe-herdshare-copy a {
+  color: var(--barn);
+  text-decoration: underline;
+}
+
+.subscribe-herdshare-logo-wrap {
+  width: fit-content;
+  padding: 14px 18px;
+  border-radius: 20px;
+  background: rgba(141, 148, 117, 0.12);
+  border: 1px solid rgba(31, 27, 23, 0.08);
+}
+
+.subscribe-herdshare-logo {
+  width: auto;
+  max-height: 82px;
+}
+
+.subscribe-herdshare-media {
+  display: grid;
+  gap: 16px;
+  width: 60%;
+  margin: 0 auto;
+}
+
+.subscribe-herdshare-figure {
+  margin: 0;
+  overflow: hidden;
+  border-radius: 24px;
+}
+
+.subscribe-herdshare-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 .subscribe-partners-section {
   background: rgba(102, 112, 66, 1);
   padding-top: 78px;
   padding-bottom: 78px;
+}
+
+.subscribe-partners-section .subscribe-section-head,
+.subscribe-partners-section > .container > .lede {
+  text-align: center;
+}
+
+.subscribe-partners-section > .container > .lede {
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .subscribe-partner-card {
@@ -3237,11 +3355,14 @@ img {
   }
 
   .subscribe-hero-grid,
-  .subscribe-location-grid,
   .subscribe-proof-grid,
   .subscribe-plan-grid,
   .subscribe-form-grid,
   .subscribe-form-grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .subscribe-herdshare-grid {
     grid-template-columns: 1fr;
   }
 

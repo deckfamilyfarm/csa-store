@@ -207,6 +207,10 @@ function storeUrlFallback() {
   return "https://store.deckfamilyfarm.com";
 }
 
+function subscriptionStoreUrl() {
+  return "https://fullfarmcsa.deckfamilyfarm.com/";
+}
+
 function buildInitialForm(dropSites = []) {
   return {
     firstName: "",
@@ -248,6 +252,37 @@ function formatDropSiteWindow(site) {
 
 function formatDropSiteAddress(site) {
   return String(site?.address || "").trim();
+}
+
+function DropSiteTable({ title, orderWindow, sites = [] }) {
+  if (!sites.length) return null;
+  return (
+    <section className="card subscribe-drop-site-table-card">
+      <h3>
+        {title} <span>({orderWindow})</span>
+      </h3>
+      <div className="subscribe-drop-site-table-shell">
+        <table className="subscribe-drop-site-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Time of Day</th>
+              <th>Address</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sites.map((site) => (
+              <tr key={site.id || site.name}>
+                <td>{site.name}</td>
+                <td>{formatDropSiteWindow(site) || "—"}</td>
+                <td>{formatDropSiteAddress(site) || "—"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
 }
 
 export function SubscribePage({ dropSites = [], storeUrl }) {
@@ -418,7 +453,7 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
                     for follow-up from the farm.
                   </p>
                   <div className="button-row">
-                    <a className="button" href={storeUrl}>
+                    <a className="button" href={subscriptionStoreUrl()}>
                       Continue to store
                     </a>
                     <button
@@ -631,90 +666,119 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
         </section>
 
         <section className="section subscribe-location-section" id="locations">
-          <div className="container subscribe-location-grid">
-            <div>
-              <div className="subscribe-section-head">
-                <div className="eyebrow">Locations</div>
-                <h2 className="h2">Pickup sites, home delivery, and order days</h2>
-              </div>
-              <div className="subscribe-location-copy">
-                <h3>Home Delivery</h3>
-                <p className="lede">
-                  There is a $20 fee for home delivery with free delivery for orders over $125. See
-                  map for delivery area. Eugene, Springfield, and Junction City deliveries happen on
-                  Tuesdays and Corvallis deliveries happen on Saturdays.
-                </p>
-                {homeDeliverySites.length ? (
-                  <div className="subscribe-delivery-list">
-                    {homeDeliverySites.map((site) => (
-                      <div key={site.id || site.name} className="card subscribe-delivery-card">
-                        <strong>{site.name}</strong>
-                        <span>{String(site.dayOfWeek || "").toUpperCase()}</span>
-                      </div>
-                    ))}
-                  </div>
-                ) : null}
-                <h3>Drop Sites (Free)</h3>
-                <p className="lede">
-                  Drop site locations and days are listed below. All dropsite deliveries are free.
-                  You can choose your preferred dropsite location when placing your order.
-                </p>
-              </div>
-              <div className="button-row">
-                <a className="button" href={DELIVERY_MAP_URL} target="_blank" rel="noreferrer">
-                  See delivery map
-                </a>
-                <a className="button alt" href={storeUrl}>
-                  Visit the store
-                </a>
-              </div>
+          <div className="container">
+            <div className="subscribe-section-head">
+              <div className="eyebrow">Locations</div>
+              <h2 className="h2">Pickup sites, home delivery, and order days</h2>
+            </div>
+            <div className="subscribe-location-copy">
+              <h3>Home Delivery</h3>
+              <p className="lede">
+                There is a $20 fee for home delivery with free delivery for orders over $125. See
+                map for delivery area. Eugene/Springfield/ and Junction City deliveries happen on
+                Tuesdays and Corvallis deliveries happen on Saturdays.
+              </p>
+              <h3>Drop Sites (Free)</h3>
+              <p className="lede">
+                Drop site locations and days are listed below. All dropsite deliveries are free. You
+                can choose your preferred dropsite location when placing your order.
+              </p>
+            </div>
+            <a
+              className="subscribe-map-link"
+              href={DELIVERY_MAP_URL}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Open delivery map in a new window"
+            >
+              <img
+                className="subscribe-map-image"
+                src="/images/subscribe-map.avif"
+                alt="Deck Family Farm delivery area map"
+              />
+            </a>
+            <div className="subscribe-map-caption">
+              Click the Map to See Our Pickup Locations/Dates and Delivery Radius
             </div>
             <div className="subscribe-drop-site-groups">
-              {tuesdayDropSites.length ? (
-                <section className="card subscribe-drop-site-group">
-                  <h3>Tuesday Dropsites</h3>
-                  <p>Order window Thursday through Sunday</p>
-                  <div className="subscribe-drop-site-list">
-                    {tuesdayDropSites.map((site) => (
-                      <article key={site.id || site.name} className="subscribe-drop-site-item">
-                        <strong>{site.name}</strong>
-                        {formatDropSiteWindow(site) ? <span>{formatDropSiteWindow(site)}</span> : null}
-                        {formatDropSiteAddress(site) ? <small>{formatDropSiteAddress(site)}</small> : null}
-                      </article>
-                    ))}
-                  </div>
-                </section>
-              ) : null}
-              {saturdayDropSites.length ? (
-                <section className="card subscribe-drop-site-group">
-                  <h3>Saturday Dropsites</h3>
-                  <p>Order window Monday through Wednesday</p>
-                  <div className="subscribe-drop-site-list">
-                    {saturdayDropSites.map((site) => (
-                      <article key={site.id || site.name} className="subscribe-drop-site-item">
-                        <strong>{site.name}</strong>
-                        {formatDropSiteWindow(site) ? <span>{formatDropSiteWindow(site)}</span> : null}
-                        {formatDropSiteAddress(site) ? <small>{formatDropSiteAddress(site)}</small> : null}
-                      </article>
-                    ))}
-                  </div>
-                </section>
-              ) : null}
-              {fridayDropSites.length ? (
-                <section className="card subscribe-drop-site-group">
-                  <h3>Friday Dropsites</h3>
-                  <p>Order window Tuesday through Thursday</p>
-                  <div className="subscribe-drop-site-list">
-                    {fridayDropSites.map((site) => (
-                      <article key={site.id || site.name} className="subscribe-drop-site-item">
-                        <strong>{site.name}</strong>
-                        {formatDropSiteWindow(site) ? <span>{formatDropSiteWindow(site)}</span> : null}
-                        {formatDropSiteAddress(site) ? <small>{formatDropSiteAddress(site)}</small> : null}
-                      </article>
-                    ))}
-                  </div>
-                </section>
-              ) : null}
+              <DropSiteTable
+                title="Tuesday Dropsites"
+                orderWindow="order window Thursday through Sunday"
+                sites={tuesdayDropSites}
+              />
+              <DropSiteTable
+                title="Friday Dropsites"
+                orderWindow="order window Monday through Wednesday"
+                sites={fridayDropSites}
+              />
+              <DropSiteTable
+                title="Saturday Dropsites"
+                orderWindow="order window Monday through Wednesday"
+                sites={saturdayDropSites}
+              />
+            </div>
+          </div>
+        </section>
+
+        <section className="section subscribe-herdshare-section" id="herdshare">
+          <div className="container">
+            <div className="subscribe-section-head">
+              <div className="eyebrow">Raw Dairy</div>
+              <h2 className="h2">About our Herdshare</h2>
+            </div>
+            <div className="subscribe-herdshare-grid">
+              <div className="subscribe-herdshare-copy">
+                <div className="subscribe-herdshare-logo-wrap">
+                  <img
+                    className="subscribe-herdshare-logo"
+                    src="/images/subscribe-cclogo.avif"
+                    alt="Creamy Cow herdshare logo"
+                  />
+                </div>
+                <p className="lede">
+                  We have been milking dairy cows since 2006 and our raw cow milk, butter, sour
+                  cream, and cheeses have been a staple of our CSA since we began delivering CSA
+                  products in 2017. The herdshare agreement means that each member owns a portion of
+                  a cow, and in turn, Creamy Cow, LLC performs a milking service (see agistment
+                  agreement).
+                </p>
+                <p className="lede">
+                  Our $50 CSA membership fee includes financial support for the dairy herd, which
+                  allows members to purchase milk produced by the herd. Value added dairy products
+                  and bottling are charged a service fee.
+                </p>
+                <p className="lede">
+                  Members elect to consume raw milk products under their own understanding and
+                  advisement and are self-educated in all of the risks and benefits of consuming raw
+                  milk products. Creamy Cow, LLC regularly tests milk (records available upon
+                  request) and maintains a sanitary facility with modern milking equipment to cool
+                  the product.
+                </p>
+                <p className="lede">
+                  We are happy to answer any questions customers may have about raw milk and our
+                  procedures and facilities and encourage everyone to do research about consuming raw
+                  milk and make their own decision about whether it it right for you &amp; your
+                  family. Visit{" "}
+                  <a href="https://www.westonaprice.org" target="_blank" rel="noreferrer">
+                    www.westonaprice.org
+                  </a>{" "}
+                  for more information.
+                </p>
+              </div>
+              <div className="subscribe-herdshare-media">
+                <figure className="card subscribe-herdshare-figure">
+                  <img
+                    src="/images/subscribe-dairy.avif"
+                    alt="Pasture-raised dairy cows grazing on lush green fields at Deck Family Farm, showcasing regenerative and certified organic farming practices in Oregon."
+                  />
+                </figure>
+                <figure className="card subscribe-herdshare-figure">
+                  <img
+                    src="/images/subscribe-dairy-2.avif"
+                    alt="Deck Family Farm team with dairy cows, representing the herdshare program and the hands-on care the crew provides to grass-fed, pasture-raised animals in Junction City, Oregon."
+                  />
+                </figure>
+              </div>
             </div>
           </div>
         </section>
@@ -722,13 +786,17 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
         <section className="section subscribe-partners-section">
           <div className="container">
             <div className="subscribe-section-head">
-              <div className="eyebrow">Meet our partners</div>
-              <h2 className="h2">Hyper-local farms and food makers</h2>
+              <div className="eyebrow">Meet Our Partners</div>
+              <h2 className="h2">Meet Our Partners</h2>
             </div>
             <p className="lede">
-              All products are grown, raised, or crafted within roughly 100 miles of the farm in
-              Junction City, with shared standards around regenerative practices, natural cycles,
-              and careful stewardship.
+              All products are grown, raised or crafted within 100 miles of our farm in Junction
+              City with all farmers relying on natural cycles, regenerative practices or certified
+              organic. Over 70% of the products offered on the storefront is from our own farm!
+            </p>
+            <p className="lede">
+              From produce and meat to pasta and cookies, there are plenty of options to make
+              delicious meals all week long.
             </p>
             <div className="subscribe-partner-grid">
               {PARTNERS.map((partner) => (
