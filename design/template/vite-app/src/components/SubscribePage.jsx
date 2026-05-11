@@ -204,7 +204,7 @@ const PARTNERS = [
 ];
 
 function storeUrlFallback() {
-  return "https://store.deckfamilyfarm.com";
+  return "https://fullfarmcsa.deckfamilyfarm.com/";
 }
 
 function subscriptionStoreUrl() {

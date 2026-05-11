@@ -62,6 +62,9 @@ function getExperienceMode() {
 function getStoreUrl() {
   if (typeof window === "undefined") return "https://store.deckfamilyfarm.com";
   const host = String(window.location.host || "").trim().toLowerCase();
+  if (getExperienceMode() === "subscribe") {
+    return "https://fullfarmcsa.deckfamilyfarm.com/";
+  }
   if (host.startsWith("store.")) return window.location.origin;
   if (host.includes("localhost") || host.includes("127.0.0.1")) {
     return `${window.location.origin}/#/home`;
