@@ -51,6 +51,22 @@ export async function fetchCatalog() {
   return fetchJsonGet(`${base}/catalog`, "", "Failed to load catalog");
 }
 
+export async function submitSubscribeLead(payload) {
+  const response = await fetch(`${base}/subscribe`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload || {})
+  });
+
+  if (!response.ok) {
+    await throwForError(response, "Unable to submit subscribe request");
+  }
+
+  return response.json();
+}
+
 export async function submitReview({ productId, rating, title, body }, token) {
   const base = import.meta.env.VITE_API_BASE || "/api";
   const response = await fetch(`${base}/reviews`, {

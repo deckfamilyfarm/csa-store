@@ -34,6 +34,7 @@ import { ProductGrid } from "./ProductGrid.jsx";
 import { RecipesSection } from "./RecipesSection.jsx";
 import { AdminPanel } from "./AdminPanel.jsx";
 import { SeasonalHighlights } from "./SeasonalHighlights.jsx";
+import { SubscribePage } from "./SubscribePage.jsx";
 
 function hasBackendAccess(user) {
   return (
@@ -43,7 +44,32 @@ function hasBackendAccess(user) {
   );
 }
 
+function getExperienceMode() {
+  if (typeof window === "undefined") return "store";
+  const url = new URL(window.location.href);
+  const queryMode = String(url.searchParams.get("experience") || "").trim().toLowerCase();
+  if (queryMode === "subscribe") return "subscribe";
+  const host = String(window.location.host || "").trim().toLowerCase();
+  if (host.startsWith("subscribe.")) return "subscribe";
+  const path = String(window.location.pathname || "").trim().toLowerCase();
+  if (path === "/subscribe" || path.startsWith("/subscribe/")) return "subscribe";
+  const rawHash = window.location.hash.replace(/^#\/?/, "").trim().toLowerCase();
+  if (rawHash === "subscribe") return "subscribe";
+  return "store";
+}
+
+function getStoreUrl() {
+  if (typeof window === "undefined") return "https://store.deckfamilyfarm.com";
+  const host = String(window.location.host || "").trim().toLowerCase();
+  if (host.startsWith("store.")) return window.location.origin;
+  if (host.includes("localhost") || host.includes("127.0.0.1")) {
+    return `${window.location.origin}/#/home`;
+  }
+  return "https://store.deckfamilyfarm.com";
+}
+
 export function Storefront() {
+  const experienceMode = getExperienceMode();
   const [userToken, setUserToken] = useState(() => localStorage.getItem("userToken") || "");
   const [user, setUser] = useState(null);
   const [loginOpen, setLoginOpen] = useState(false);
@@ -211,6 +237,11 @@ export function Storefront() {
       options: names.length ? names : dropSite.options
     };
   }, [catalog.dropSites]);
+
+  const subscribeDropSites = useMemo(
+    () => (catalog.dropSites || []).map((site) => ({ name: site.name })).filter((site) => site.name),
+    [catalog.dropSites]
+  );
 
   useEffect(() => {
     if (isMember && productGridRef.current) {
@@ -441,6 +472,15 @@ export function Storefront() {
     setUserToken("");
     setUser(null);
     window.location.hash = "#/home";
+  }
+
+  if (experienceMode === "subscribe") {
+    return (
+      <SubscribePage
+        dropSites={subscribeDropSites}
+        storeUrl={getStoreUrl()}
+      />
+    );
   }
 
   return (

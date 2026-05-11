@@ -166,6 +166,45 @@ export const reviews = mysqlTable("reviews", {
   updatedAt: datetime("updated_at")
 });
 
+export const subscribeLeads = mysqlTable(
+  "subscribe_leads",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    status: varchar("status", { length: 32 }).default("new"),
+    firstName: varchar("first_name", { length: 255 }).notNull(),
+    lastName: varchar("last_name", { length: 255 }).notNull(),
+    email: varchar("email", { length: 255 }).notNull(),
+    phone: varchar("phone", { length: 64 }),
+    country: varchar("country", { length: 128 }),
+    addressLine1: varchar("address_line_1", { length: 255 }),
+    addressLine2: varchar("address_line_2", { length: 255 }),
+    city: varchar("city", { length: 255 }),
+    stateProvince: varchar("state_province", { length: 255 }),
+    postalCode: varchar("postal_code", { length: 32 }),
+    referralSource: text("referral_source"),
+    selectedPlan: varchar("selected_plan", { length: 64 }),
+    selectedPlanLabel: varchar("selected_plan_label", { length: 255 }),
+    selectedDropSite: varchar("selected_drop_site", { length: 255 }),
+    notes: text("notes"),
+    sourceHost: varchar("source_host", { length: 255 }),
+    sourcePath: varchar("source_path", { length: 255 }),
+    utmSource: varchar("utm_source", { length: 255 }),
+    utmMedium: varchar("utm_medium", { length: 255 }),
+    utmCampaign: varchar("utm_campaign", { length: 255 }),
+    utmContent: varchar("utm_content", { length: 255 }),
+    utmTerm: varchar("utm_term", { length: 255 }),
+    rawJson: text("raw_json"),
+    submittedAt: datetime("submitted_at"),
+    createdAt: datetime("created_at"),
+    updatedAt: datetime("updated_at")
+  },
+  (table) => ({
+    emailIdx: index("idx_subscribe_leads_email").on(table.email),
+    submittedIdx: index("idx_subscribe_leads_submitted_at").on(table.submittedAt),
+    statusIdx: index("idx_subscribe_leads_status").on(table.status)
+  })
+);
+
 export const dropSites = mysqlTable(
   "drop_sites",
   {

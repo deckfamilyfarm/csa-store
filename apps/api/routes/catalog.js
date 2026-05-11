@@ -1,5 +1,10 @@
 import express from "express";
-import { ensureLocalLineSyncSchema, getDb, isMissingTableError } from "../db.js";
+import {
+  ensureLocalLineSyncSchema,
+  ensureSubscriberCaptureSchema,
+  getDb,
+  isMissingTableError
+} from "../db.js";
 import { and, eq, inArray } from "drizzle-orm";
 import {
   categories,
@@ -12,6 +17,7 @@ import {
   productPricingProfiles,
   products,
   productSales,
+  subscribeLeads,
   productTags,
   recipes,
   reviews,
@@ -78,6 +84,22 @@ function isRealLocalLineSale(row) {
     row.strikethroughDisplayValue
   );
   return Boolean(row.onSaleToggle) || (Number.isFinite(derivedDiscount) && derivedDiscount > 0);
+}
+
+function cleanString(value, maxLength = 255) {
+  const trimmed = String(value ?? "").trim();
+  if (!trimmed) return "";
+  return trimmed.slice(0, maxLength);
+}
+
+function cleanOptionalString(value, maxLength = 255) {
+  const trimmed = cleanString(value, maxLength);
+  return trimmed || null;
+}
+
+function cleanOptionalText(value) {
+  const trimmed = String(value ?? "").trim();
+  return trimmed || null;
 }
 
 router.get("/catalog", async (_req, res) => {
@@ -516,6 +538,76 @@ router.get("/catalog", async (_req, res) => {
       error: "Catalog error",
       message: process.env.NODE_ENV === "development" ? err?.message : undefined
     });
+  }
+});
+
+router.post("/subscribe", async (req, res) => {
+  try {
+    const db = getDb();
+    await ensureSubscriberCaptureSchema().catch((error) => {
+      console.warn("Subscriber capture schema bootstrap skipped for /subscribe:", error.message);
+    });
+
+    const payload = req.body || {};
+    const firstName = cleanString(payload.firstName);
+    const lastName = cleanString(payload.lastName);
+    const email = cleanString(payload.email);
+
+    if (!firstName || !lastName || !email) {
+      res.status(400).json({ error: "First name, last name, and email are required." });
+      return;
+    }
+
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      res.status(400).json({ error: "Enter a valid email address." });
+      return;
+    }
+
+    const now = new Date();
+    const searchParams = new URLSearchParams(String(payload.queryString || ""));
+    const sourceHostHeader = cleanOptionalString(
+      req.get("x-forwarded-host") || req.get("host") || payload.sourceHost,
+      255
+    );
+    const sourcePath = cleanOptionalString(payload.sourcePath, 255);
+
+    await db.insert(subscribeLeads).values({
+      status: "new",
+      firstName,
+      lastName,
+      email,
+      phone: cleanOptionalString(payload.phone, 64),
+      country: cleanOptionalString(payload.country, 128),
+      addressLine1: cleanOptionalString(payload.addressLine1, 255),
+      addressLine2: cleanOptionalString(payload.addressLine2, 255),
+      city: cleanOptionalString(payload.city, 255),
+      stateProvince: cleanOptionalString(payload.stateProvince, 255),
+      postalCode: cleanOptionalString(payload.postalCode, 32),
+      referralSource: cleanOptionalText(payload.referralSource),
+      selectedPlan: cleanOptionalString(payload.selectedPlan, 64),
+      selectedPlanLabel: cleanOptionalString(payload.selectedPlanLabel, 255),
+      selectedDropSite: cleanOptionalString(payload.selectedDropSite, 255),
+      notes: cleanOptionalText(payload.notes),
+      sourceHost: sourceHostHeader,
+      sourcePath,
+      utmSource: cleanOptionalString(payload.utmSource || searchParams.get("utm_source"), 255),
+      utmMedium: cleanOptionalString(payload.utmMedium || searchParams.get("utm_medium"), 255),
+      utmCampaign: cleanOptionalString(
+        payload.utmCampaign || searchParams.get("utm_campaign"),
+        255
+      ),
+      utmContent: cleanOptionalString(payload.utmContent || searchParams.get("utm_content"), 255),
+      utmTerm: cleanOptionalString(payload.utmTerm || searchParams.get("utm_term"), 255),
+      rawJson: JSON.stringify(payload),
+      submittedAt: now,
+      createdAt: now,
+      updatedAt: now
+    });
+
+    res.json({ ok: true });
+  } catch (error) {
+    console.error("Subscribe lead capture error:", error);
+    res.status(500).json({ error: "Unable to submit subscribe request." });
   }
 });
 

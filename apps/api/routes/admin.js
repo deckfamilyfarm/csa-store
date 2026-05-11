@@ -6178,6 +6178,8 @@ router.get("/orders", requireAdmin, async (req, res) => {
   }
   const whereClauses = [];
   const whereParams = [];
+  const reportingOrderClauses = [];
+  const reportingOrderParams = [];
 
   if (search) {
     whereClauses.push(
@@ -6192,115 +6194,218 @@ router.get("/orders", requireAdmin, async (req, res) => {
     whereParams.push(searchLike, searchLike, searchLike, searchLike);
   }
   if (fulfillmentSite) {
-    whereClauses.push(`${fulfillmentSiteSql} = ?`);
-    whereParams.push(fulfillmentSite);
+    reportingOrderClauses.push("COALESCE(r.fulfillment_name, '') = ?");
+    reportingOrderParams.push(fulfillmentSite);
   }
   if (vendor) {
-    whereClauses.push(
-      `EXISTS (
-        SELECT 1
-        FROM local_line_order_entries e
-        WHERE e.local_line_order_id = o.local_line_order_id
-          AND ${buildVendorEntryMatchSql({
-            orderAlias: "o",
-            entryAlias: "e",
-            vendorName: vendor,
-            vendorId
-          })}
-      )`
-    );
-    whereParams.push(vendor);
     if (Number.isFinite(vendorId) && vendorId > 0) {
-      whereParams.push(vendorId, vendorId);
+      reportingOrderClauses.push("(COALESCE(r.vendor_name, '') = ? OR r.vendor_id = ?)");
+      reportingOrderParams.push(vendor, vendorId);
+    } else {
+      reportingOrderClauses.push("COALESCE(r.vendor_name, '') = ?");
+      reportingOrderParams.push(vendor);
     }
   }
   if (category) {
-    whereClauses.push(
-      `EXISTS (
-        SELECT 1
-        FROM local_line_order_entries e
-        WHERE e.local_line_order_id = o.local_line_order_id
-          AND COALESCE(e.category_name, '') = ?
-      )`
-    );
-    whereParams.push(category);
+    reportingOrderClauses.push("COALESCE(r.category_name, '') = ?");
+    reportingOrderParams.push(category);
   }
   if (status) {
-    whereClauses.push(buildOrdersStatusClause(status, "o"));
-    if (status !== "OPEN") {
-      whereParams.push(status);
-    }
+    reportingOrderClauses.push("r.order_status = ?");
+    reportingOrderParams.push(status);
   }
   if (paymentStatus) {
-    whereClauses.push(buildOrdersPaymentStatusClause(paymentStatus, "o"));
-    if (paymentStatus !== "PAID") {
-      whereParams.push(paymentStatus);
-    }
+    reportingOrderClauses.push("r.payment_status = ?");
+    reportingOrderParams.push(paymentStatus);
   }
   if (month) {
-    whereClauses.push(`DATE_FORMAT(${fulfillmentDateSql}, '%Y-%m') = ?`);
-    whereParams.push(month);
+    reportingOrderClauses.push("COALESCE(r.fulfillment_month, '') = ?");
+    reportingOrderParams.push(month);
   }
-  if (cycle === "tuesday" || cycle === "fridaySaturday") {
-    whereClauses.push(`${cycleSql.cycleType} = ?`);
-    whereParams.push(cycle);
+  if (cycle === "tuesday") {
+    reportingOrderClauses.push("DAYOFWEEK(STR_TO_DATE(r.fulfillment_date, '%Y-%m-%d')) = 3");
+  } else if (cycle === "fridaySaturday") {
+    reportingOrderClauses.push("DAYOFWEEK(STR_TO_DATE(r.fulfillment_date, '%Y-%m-%d')) IN (6, 7)");
   }
   if (orderType === "membership") {
-    whereClauses.push(membershipPurchaseOrderSql);
+    reportingOrderClauses.push(
+      "(LOWER(COALESCE(r.category_name, '')) = 'membership' OR LOWER(COALESCE(r.fulfillment_name, '')) LIKE '%membership purchase%')"
+    );
   } else if (orderType !== "all") {
-    whereClauses.push(`NOT ${membershipPurchaseOrderSql}`);
+    reportingOrderClauses.push(
+      "NOT (LOWER(COALESCE(r.category_name, '')) = 'membership' OR LOWER(COALESCE(r.fulfillment_name, '')) LIKE '%membership purchase%')"
+    );
+  }
+
+  const reportingOrderWhereSql = reportingOrderClauses.length
+    ? `WHERE ${reportingOrderClauses.join(" AND ")}`
+    : "";
+  const matchingReportingOrdersSql = reportingOrderClauses.length
+    ? `
+        SELECT DISTINCT r.local_line_order_id
+        FROM local_line_order_reporting_entries r
+        ${reportingOrderWhereSql}
+      `
+    : "";
+
+  if (reportingOrderClauses.length) {
+    whereClauses.push("o.local_line_order_id IN (" + matchingReportingOrdersSql + ")");
+    whereParams.push(...reportingOrderParams);
+  } else {
+    if (fulfillmentSite) {
+      whereClauses.push(`${fulfillmentSiteSql} = ?`);
+      whereParams.push(fulfillmentSite);
+    }
+    if (vendor) {
+      whereClauses.push(
+        `EXISTS (
+          SELECT 1
+          FROM local_line_order_entries e
+          WHERE e.local_line_order_id = o.local_line_order_id
+            AND ${buildVendorEntryMatchSql({
+              orderAlias: "o",
+              entryAlias: "e",
+              vendorName: vendor,
+              vendorId
+            })}
+        )`
+      );
+      whereParams.push(vendor);
+      if (Number.isFinite(vendorId) && vendorId > 0) {
+        whereParams.push(vendorId, vendorId);
+      }
+    }
+    if (category) {
+      whereClauses.push(
+        `EXISTS (
+          SELECT 1
+          FROM local_line_order_entries e
+          WHERE e.local_line_order_id = o.local_line_order_id
+            AND COALESCE(e.category_name, '') = ?
+        )`
+      );
+      whereParams.push(category);
+    }
+    if (status) {
+      whereClauses.push(buildOrdersStatusClause(status, "o"));
+      if (status !== "OPEN") {
+        whereParams.push(status);
+      }
+    }
+    if (paymentStatus) {
+      whereClauses.push(buildOrdersPaymentStatusClause(paymentStatus, "o"));
+      if (paymentStatus !== "PAID") {
+        whereParams.push(paymentStatus);
+      }
+    }
+    if (month) {
+      whereClauses.push(`DATE_FORMAT(${fulfillmentDateSql}, '%Y-%m') = ?`);
+      whereParams.push(month);
+    }
+    if (cycle === "tuesday" || cycle === "fridaySaturday") {
+      whereClauses.push(`${cycleSql.cycleType} = ?`);
+      whereParams.push(cycle);
+    }
+    if (orderType === "membership") {
+      whereClauses.push(membershipPurchaseOrderSql);
+    } else if (orderType !== "all") {
+      whereClauses.push(`NOT ${membershipPurchaseOrderSql}`);
+    }
   }
 
   const whereSql = whereClauses.length ? `WHERE ${whereClauses.join(" AND ")}` : "";
+  const countSql = reportingOrderClauses.length
+    ? `
+        SELECT COUNT(*) AS totalRows
+        FROM (${matchingReportingOrdersSql}) matched
+      `
+    : `
+        SELECT COUNT(*) AS totalRows
+        FROM local_line_orders o
+        LEFT JOIN drop_sites ds
+          ON ds.local_line_fulfillment_strategy_id = ${fulfillmentStrategyIdSql}
+        ${whereSql}
+      `;
   const [[countRow]] = await pool.query(
-    `
-      SELECT COUNT(*) AS totalRows
-      FROM local_line_orders o
-      LEFT JOIN drop_sites ds
-        ON ds.local_line_fulfillment_strategy_id = ${fulfillmentStrategyIdSql}
-      ${whereSql}
-    `,
-    whereParams
+    countSql,
+    reportingOrderClauses.length ? reportingOrderParams : whereParams
   );
   const totalRows = Number(countRow?.totalRows || 0);
   const totalPages = Math.max(1, Math.ceil(totalRows / pageSize));
   const page = Math.min(requestedPage, totalPages);
   const offset = (page - 1) * pageSize;
 
+  const orderRowsSql = reportingOrderClauses.length
+    ? `
+        SELECT
+          o.local_line_order_id AS localLineOrderId,
+          o.created_at_remote AS createdAtRemote,
+          o.updated_at_remote AS updatedAtRemote,
+          o.opened_at_remote AS openedAtRemote,
+          ${fulfillmentStrategyIdSql} AS fulfillmentStrategyId,
+          ${fulfillmentSiteSql} AS fulfillmentStrategyName,
+          ${fulfillmentTypeSql} AS fulfillmentType,
+          ${fulfillmentStatusSql} AS fulfillmentStatus,
+          ${fulfillmentDateSql} AS fulfillmentDate,
+          ${pickupStartTimeSql} AS pickupStartTime,
+          ${pickupEndTimeSql} AS pickupEndTime,
+          o.customer_name AS customerName,
+          o.status,
+          o.payment_status AS paymentStatus,
+          o.price_list_name AS priceListName,
+          o.total,
+          o.subtotal,
+          o.tax,
+          o.discount,
+          o.product_count AS productCount,
+          ${cycleSql.cycleType} AS cycleType,
+          ${cycleSql.cycleLabel} AS cycleLabel,
+          ${cycleSql.cycleStartDate} AS cycleStartDate
+        FROM (${matchingReportingOrdersSql}) matched
+        JOIN local_line_orders o
+          ON o.local_line_order_id = matched.local_line_order_id
+        LEFT JOIN drop_sites ds
+          ON ds.local_line_fulfillment_strategy_id = ${fulfillmentStrategyIdSql}
+        ORDER BY o.created_at_remote DESC, o.local_line_order_id DESC
+        LIMIT ? OFFSET ?
+      `
+    : `
+        SELECT
+          o.local_line_order_id AS localLineOrderId,
+          o.created_at_remote AS createdAtRemote,
+          o.updated_at_remote AS updatedAtRemote,
+          o.opened_at_remote AS openedAtRemote,
+          ${fulfillmentStrategyIdSql} AS fulfillmentStrategyId,
+          ${fulfillmentSiteSql} AS fulfillmentStrategyName,
+          ${fulfillmentTypeSql} AS fulfillmentType,
+          ${fulfillmentStatusSql} AS fulfillmentStatus,
+          ${fulfillmentDateSql} AS fulfillmentDate,
+          ${pickupStartTimeSql} AS pickupStartTime,
+          ${pickupEndTimeSql} AS pickupEndTime,
+          o.customer_name AS customerName,
+          o.status,
+          o.payment_status AS paymentStatus,
+          o.price_list_name AS priceListName,
+          o.total,
+          o.subtotal,
+          o.tax,
+          o.discount,
+          o.product_count AS productCount,
+          ${cycleSql.cycleType} AS cycleType,
+          ${cycleSql.cycleLabel} AS cycleLabel,
+          ${cycleSql.cycleStartDate} AS cycleStartDate
+        FROM local_line_orders o
+        LEFT JOIN drop_sites ds
+          ON ds.local_line_fulfillment_strategy_id = ${fulfillmentStrategyIdSql}
+        ${whereSql}
+        ORDER BY o.created_at_remote DESC, o.local_line_order_id DESC
+        LIMIT ? OFFSET ?
+      `;
   const [orderRows] = await pool.query(
-    `
-      SELECT
-        o.local_line_order_id AS localLineOrderId,
-        o.created_at_remote AS createdAtRemote,
-        o.updated_at_remote AS updatedAtRemote,
-        o.opened_at_remote AS openedAtRemote,
-        ${fulfillmentStrategyIdSql} AS fulfillmentStrategyId,
-        ${fulfillmentSiteSql} AS fulfillmentStrategyName,
-        ${fulfillmentTypeSql} AS fulfillmentType,
-        ${fulfillmentStatusSql} AS fulfillmentStatus,
-        ${fulfillmentDateSql} AS fulfillmentDate,
-        ${pickupStartTimeSql} AS pickupStartTime,
-        ${pickupEndTimeSql} AS pickupEndTime,
-        o.customer_name AS customerName,
-        o.status,
-        o.payment_status AS paymentStatus,
-        o.price_list_name AS priceListName,
-        o.total,
-        o.subtotal,
-        o.tax,
-        o.discount,
-        o.product_count AS productCount,
-        ${cycleSql.cycleType} AS cycleType,
-        ${cycleSql.cycleLabel} AS cycleLabel,
-        ${cycleSql.cycleStartDate} AS cycleStartDate
-      FROM local_line_orders o
-      LEFT JOIN drop_sites ds
-        ON ds.local_line_fulfillment_strategy_id = ${fulfillmentStrategyIdSql}
-      ${whereSql}
-      ORDER BY o.created_at_remote DESC, o.local_line_order_id DESC
-      LIMIT ? OFFSET ?
-    `,
-    [...whereParams, pageSize, offset]
+    orderRowsSql,
+    reportingOrderClauses.length
+      ? [...reportingOrderParams, pageSize, offset]
+      : [...whereParams, pageSize, offset]
   );
 
   const [siteRows] = await pool.query(
@@ -6363,19 +6468,31 @@ router.get("/orders", requireAdmin, async (req, res) => {
     `
   );
 
+  const summarySql = reportingOrderClauses.length
+    ? `
+        SELECT
+          COUNT(*) AS orderCount,
+          COUNT(DISTINCT COALESCE(o.customer_id, 0), COALESCE(o.customer_name, '')) AS customerCount,
+          COALESCE(SUM(o.total), 0) AS revenue,
+          COALESCE(AVG(o.total), 0) AS averageOrderValue
+        FROM (${matchingReportingOrdersSql}) matched
+        JOIN local_line_orders o
+          ON o.local_line_order_id = matched.local_line_order_id
+      `
+    : `
+        SELECT
+          COUNT(*) AS orderCount,
+          COUNT(DISTINCT COALESCE(customer_id, 0), COALESCE(customer_name, '')) AS customerCount,
+          COALESCE(SUM(total), 0) AS revenue,
+          COALESCE(AVG(total), 0) AS averageOrderValue
+        FROM local_line_orders o
+        LEFT JOIN drop_sites ds
+          ON ds.local_line_fulfillment_strategy_id = ${fulfillmentStrategyIdSql}
+        ${whereSql}
+      `;
   const [[summaryRow]] = await pool.query(
-    `
-      SELECT
-        COUNT(*) AS orderCount,
-        COUNT(DISTINCT COALESCE(customer_id, 0), COALESCE(customer_name, '')) AS customerCount,
-        COALESCE(SUM(total), 0) AS revenue,
-        COALESCE(AVG(total), 0) AS averageOrderValue
-      FROM local_line_orders o
-      LEFT JOIN drop_sites ds
-        ON ds.local_line_fulfillment_strategy_id = ${fulfillmentStrategyIdSql}
-      ${whereSql}
-    `,
-    whereParams
+    summarySql,
+    reportingOrderClauses.length ? reportingOrderParams : whereParams
   );
 
   let performanceMetrics;

@@ -1,8 +1,8 @@
 import crypto from "crypto";
 import dotenv from "dotenv";
 import fs from "fs";
+import mysql from "mysql2/promise";
 import path from "path";
-import { createRequire } from "module";
 import { fileURLToPath } from "url";
 import xlsx from "xlsx";
 import { getPool } from "../db.js";
@@ -11,7 +11,6 @@ import { getLocalLineAccessToken, getLocalLineBaseUrl } from "../localLineAuth.j
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, "../..");
-const require = createRequire(import.meta.url);
 const legacyEnvPath =
   process.env.LOCALLINE_DASHBOARD_ENV_PATH ||
   "/Users/jdeck/code/ffcsa_scripts/localline/.env";
@@ -51,9 +50,6 @@ const LOCAL_LINE_RETRY_ATTEMPTS = Math.max(
   Number.parseInt(process.env.LOCALLINE_FETCH_RETRY_ATTEMPTS || "2", 10) || 2
 );
 
-const TIMESHEETS_SERVICE_PATH = path.resolve(repoRoot, "../timesheets/server/services/userService.js");
-const TIMESHEETS_DB_PATH = path.resolve(repoRoot, "../timesheets/server/models/db.js");
-
 function toNullableString(value) {
   const trimmed = String(value ?? "").trim();
   return trimmed ? trimmed : null;
@@ -62,6 +58,10 @@ function toNullableString(value) {
 function toNumber(value) {
   const numeric = Number(value);
   return Number.isFinite(numeric) ? numeric : null;
+}
+
+function round2(value) {
+  return Math.round((Number(value) || 0) * 100) / 100;
 }
 
 function formatYmd(date) {
@@ -77,6 +77,18 @@ function parseYmd(value) {
   if (!match) return null;
   const date = new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])));
   return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function toYmdFromDateish(value) {
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    return formatYmd(
+      new Date(Date.UTC(value.getUTCFullYear(), value.getUTCMonth(), value.getUTCDate()))
+    );
+  }
+  const stringValue = String(value || "").trim();
+  const isoMatch = stringValue.match(/^(\d{4}-\d{2}-\d{2})/);
+  if (isoMatch) return isoMatch[1];
+  return null;
 }
 
 function addDaysYmd(ymd, days) {
@@ -181,6 +193,46 @@ function getYearFromWeekStart(weekStart) {
   return match ? match[1] : "";
 }
 
+function normalizeTimesheetTaskKey(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function formatTimesheetTaskFallbackLabel(value) {
+  const trimmed = String(value || "").trim();
+  if (!trimmed) return "No task";
+  return trimmed
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function computeTimesheetWorkingHours(row) {
+  const breakHours = Number(row?.break || 0) / 60;
+  const startValue = String(row?.start_time || "").trim();
+  const endValue = String(row?.end_time || "").trim();
+  const startMs = startValue ? new Date(startValue.replace(" ", "T")).getTime() : NaN;
+  const endMs = endValue ? new Date(endValue.replace(" ", "T")).getTime() : NaN;
+  const grossHours =
+    Number.isFinite(startMs) && Number.isFinite(endMs)
+      ? Math.max(0, (endMs - startMs) / (1000 * 60 * 60))
+      : 0;
+  const computedNet = round2(Math.max(0, grossHours - breakHours));
+  const provided = Number(row?.hours);
+  const hasProvided =
+    row?.hours !== undefined &&
+    row?.hours !== null &&
+    !Number.isNaN(provided);
+
+  if (hasProvided && provided > 0) {
+    if (computedNet <= 0) return round2(Math.max(0, provided));
+    if (provided <= computedNet + 1e-6) return round2(Math.max(0, provided));
+    return computedNet;
+  }
+
+  return computedNet;
+}
+
 function buildYearlyAverageMap(weeks, weeklyKpiMap, metricKey) {
   const totalsByYear = new Map();
 
@@ -209,11 +261,21 @@ function buildDashboardRows(
   weeklyKpiMap,
   vendorWeeklyMap,
   timesheetWeeklyMap,
+  timesheetTaskLabels,
   subscriberWeeklyMap,
   publishableWeekStarts = null
 ) {
   const yearlyAverageOrdersByYear = buildYearlyAverageMap(weeks, weeklyKpiMap, "numOrders");
   const yearlyAverageSalesByYear = buildYearlyAverageMap(weeks, weeklyKpiMap, "totalSales");
+  const wageTaskRows = (Array.isArray(timesheetTaskLabels) ? timesheetTaskLabels : []).map(
+    (taskLabel) => ({
+      label: `Wages - ${taskLabel}`,
+      entry: "AUTO",
+      source: "Timesheets DB (FFCSA wages + fringe)",
+      valueType: "currency",
+      auto: (w) => Number(timesheetWeeklyMap[w.start]?.tasks?.[taskLabel] || 0)
+    })
+  );
   const layout = [
     {
       section: "GIVENS",
@@ -255,18 +317,18 @@ function buildDashboardRows(
           auto: (w) => subscriberWeeklyMap[w.start]?.exitingSubscribers
         },
         {
-          label: "Total Subscribers",
-          entry: "AUTO",
-          source: "Subscriber snapshots",
-          valueType: "int",
-          auto: (w) => Number(subscriberWeeklyMap[w.start]?.totalSubscribers)
-        },
-        {
           label: "SNAP subscribers",
           entry: "AUTO",
           source: "SNAP pricelist orders in trailing 5 weeks",
           valueType: "int",
           auto: (w) => Number(subscriberWeeklyMap[w.start]?.snapSubscribers)
+        },
+        {
+          label: "Total Subscribers",
+          entry: "AUTO",
+          source: "Subscriber snapshots",
+          valueType: "int",
+          auto: (w) => Number(subscriberWeeklyMap[w.start]?.totalSubscribers)
         },
         {
           label: "Average items Per order",
@@ -319,12 +381,25 @@ function buildDashboardRows(
           source: "Manual / TODO automation",
           rowLabel: "$ Product Credits Given"
         },
+        ...wageTaskRows,
         {
-          label: "Wages",
+          label: "Total Wages",
           entry: "AUTO",
-          source: "timesheets DB (FFCSA)",
+          source: "Timesheets DB (FFCSA wages + fringe total)",
           valueType: "currency",
-          auto: (w) => Number(timesheetWeeklyMap[w.start]?.wages)
+          auto: (w) => Number(timesheetWeeklyMap[w.start]?.totalWages || 0)
+        },
+        {
+          label: "% Wages to Overall Sales",
+          entry: "AUTO",
+          source: "Timesheets total wages / dashboard retail sales",
+          valueType: "percent",
+          auto: (w) => {
+            const wages = Number(timesheetWeeklyMap[w.start]?.totalWages || 0);
+            const retailSales = Number(weeklyKpiMap[w.start]?.totalSales || 0);
+            if (!retailSales) return null;
+            return (wages / retailSales) * 100;
+          }
         },
         {
           label: "Other FFCSA operating costs Ops",
@@ -613,24 +688,34 @@ async function loadWeeklyOrderMetrics(weeks) {
 
   const membershipExclusion =
     "NOT (LOWER(COALESCE(category_name, '')) = 'membership' OR LOWER(COALESCE(fulfillment_name, '')) LIKE '%membership purchase%')";
-  const orderMembershipExclusion =
-    "NOT (LOWER(COALESCE(o.fulfillment_strategy_name, '')) LIKE '%membership purchase%' OR EXISTS (SELECT 1 FROM local_line_order_entries e WHERE e.local_line_order_id = o.local_line_order_id AND LOWER(COALESCE(e.category_name, '')) = 'membership'))";
   const weekSql = buildInClause(weekKeys);
 
   const [orderRows] = await pool.query(
     `
       SELECT
-        DATE_FORMAT(DATE_SUB(DATE(o.fulfillment_date), INTERVAL WEEKDAY(DATE(o.fulfillment_date)) DAY), '%Y-%m-%d') AS weekKey,
+        reporting_orders.weekKey,
         COUNT(*) AS orderCount,
-        COUNT(CASE WHEN LOWER(COALESCE(o.price_list_name, '')) LIKE '%guest%' THEN 1 END) AS guestOrderCount,
-        COALESCE(AVG(o.total), 0) AS averageOrderAmount
-      FROM local_line_orders o
-      WHERE o.status = 'OPEN'
-        AND o.payment_status = 'PAID'
-        AND o.fulfillment_date IS NOT NULL
-        AND ${orderMembershipExclusion}
-        AND DATE_FORMAT(DATE_SUB(DATE(o.fulfillment_date), INTERVAL WEEKDAY(DATE(o.fulfillment_date)) DAY), '%Y-%m-%d') IN (${weekSql})
-      GROUP BY weekKey
+        COUNT(CASE WHEN LOWER(COALESCE(reporting_orders.priceListName, '')) LIKE '%guest%' THEN 1 END) AS guestOrderCount,
+        COALESCE(AVG(order_totals.total), 0) AS averageOrderAmount
+      FROM (
+        SELECT
+          week_start AS weekKey,
+          local_line_order_id,
+          MAX(COALESCE(price_list_name, '')) AS priceListName
+        FROM local_line_order_reporting_entries
+        WHERE order_status = 'OPEN'
+          AND payment_status = 'PAID'
+          AND ${membershipExclusion}
+          AND week_start IN (${weekSql})
+        GROUP BY week_start, local_line_order_id
+      ) reporting_orders
+      LEFT JOIN (
+        SELECT local_line_order_id, MAX(COALESCE(total, 0)) AS total
+        FROM local_line_orders
+        GROUP BY local_line_order_id
+      ) order_totals
+        ON order_totals.local_line_order_id = reporting_orders.local_line_order_id
+      GROUP BY reporting_orders.weekKey
     `,
     weekKeys
   );
@@ -798,45 +883,197 @@ async function buildSubscriberWeeklyMap(weeks) {
   return result;
 }
 
-function getTimesheetsBackend() {
-  const timesheetDatabaseUrl = getDashboardEnv("TIMESHEET_DATABASE_URL");
-  if (!timesheetDatabaseUrl) {
-    return { backend: null, status: "TIMESHEET_DATABASE_URL not set" };
-  }
-  if (!fs.existsSync(TIMESHEETS_SERVICE_PATH) || !fs.existsSync(TIMESHEETS_DB_PATH)) {
-    return { backend: null, status: "timesheets backend not found at ../timesheets" };
+function getTimesheetDbConfig() {
+  const database =
+    getDashboardEnv("TIMESHEET_DB_DATABASE") ||
+    getDashboardEnv("TIMESHEET_DB_NAME") ||
+    "timesheets";
+  if (!database || (!getDashboardEnv("TIMESHEET_DB_HOST") && !getDashboardEnv("STORE_DB_HOST"))) {
+    return { config: null, status: "timesheets DB connection settings not available" };
   }
 
-  process.env.DATABASE_URL = timesheetDatabaseUrl;
-  const { getTimesheetsByWeek } = require(TIMESHEETS_SERVICE_PATH);
-  const { pool } = require(TIMESHEETS_DB_PATH);
-  return { backend: { getTimesheetsByWeek, pool }, status: "enabled" };
+  return {
+    config: {
+      host: getDashboardEnv("TIMESHEET_DB_HOST") || getDashboardEnv("STORE_DB_HOST"),
+      port: Number(
+        getDashboardEnv("TIMESHEET_DB_PORT") ||
+          getDashboardEnv("STORE_DB_PORT") ||
+          3306
+      ),
+      user: getDashboardEnv("TIMESHEET_DB_USER") || getDashboardEnv("STORE_DB_USER"),
+      password:
+        getDashboardEnv("TIMESHEET_DB_PASSWORD") || getDashboardEnv("STORE_DB_PASSWORD"),
+      database
+    },
+    status: "enabled"
+  };
+}
+
+async function loadTimesheetTaskDefinitions(pool, enterprise = "FFCSA") {
+  try {
+    const [rows] = await pool.query(
+      `
+        SELECT task_value, task_label, COALESCE(sort_order, 0) AS sort_order
+        FROM enterprise_subtasks
+        WHERE LOWER(TRIM(enterprise)) = LOWER(TRIM(?))
+          AND COALESCE(is_active, 1) = 1
+        ORDER BY
+          CASE WHEN COALESCE(sort_order, 0) = 0 THEN 1 ELSE 0 END ASC,
+          CASE WHEN COALESCE(sort_order, 0) = 0 THEN NULL ELSE sort_order END ASC,
+          task_label ASC,
+          task_value ASC
+      `,
+      [enterprise]
+    );
+    return (rows || []).map((row) => ({
+      key: normalizeTimesheetTaskKey(row.task_value || row.task_label),
+      label: String(row.task_label || row.task_value || "").trim(),
+      sortOrder: Number(row.sort_order || 0)
+    }));
+  } catch (_error) {
+    return [];
+  }
+}
+
+function findTimesheetRate(ladders, employeeId, atDate) {
+  const ladder = ladders.get(employeeId);
+  if (!ladder || !ladder.length) return null;
+  let chosen = null;
+  for (let index = 0; index < ladder.length; index += 1) {
+    if (ladder[index].from <= atDate) chosen = ladder[index];
+    else break;
+  }
+  return chosen;
 }
 
 async function buildTimesheetWeeklyMap(weeks) {
-  const { backend, status } = getTimesheetsBackend();
-  if (!backend) return { map: {}, status };
+  const weekKeys = (Array.isArray(weeks) ? weeks : []).map((week) => week.start).filter(Boolean);
+  if (!weekKeys.length) {
+    return { map: {}, taskLabels: [], status: "no dashboard weeks requested" };
+  }
 
-  const map = {};
+  const { config, status } = getTimesheetDbConfig();
+  if (!config) return { map: {}, taskLabels: [], status };
+
+  const pool = mysql.createPool({
+    ...config,
+    waitForConnections: true,
+    connectionLimit: 4,
+    queueLimit: 0
+  });
+
+  const map = Object.fromEntries(
+    weekKeys.map((weekKey) => [weekKey, { totalWages: 0, tasks: {} }])
+  );
+
   try {
-    for (const week of weeks) {
-      const result = await backend.getTimesheetsByWeek(
-        {},
-        week.start,
-        week.end,
-        "FFCSA",
-        TIMESHEET_APPROVED_STATUSES
-      );
-      map[week.start] = {
-        wages: Number(result?.summary?.wages?.total_wages || 0)
-      };
+    const oldestWeekStart = [...weekKeys].sort()[0];
+    const newestWeekStart = [...weekKeys].sort().slice(-1)[0];
+    const timesheetStart = `${oldestWeekStart} 00:00:00`;
+    const timesheetEnd = `${addDaysYmd(newestWeekStart, 6)} 23:59:59`;
+    const approvedStatuses = String(TIMESHEET_APPROVED_STATUSES || "")
+      .split(",")
+      .map((value) => value.trim())
+      .filter(Boolean);
+
+    let timesheetSql = `
+      SELECT employee_id, task, start_time, end_time, \`break\`, hours
+      FROM timesheets
+      WHERE start_time >= ?
+        AND start_time <= ?
+        AND enterprise LIKE ?
+    `;
+    const timesheetParams = [timesheetStart, timesheetEnd, "%FFCSA%"];
+    if (approvedStatuses.length) {
+      timesheetSql += ` AND approved IN (${buildInClause(approvedStatuses)})`;
+      timesheetParams.push(...approvedStatuses);
     }
-    return { map, status: `connected (${Object.keys(map).length}/${weeks.length} weeks)` };
+    timesheetSql += ` ORDER BY start_time ASC`;
+
+    const [timesheetRows] = await pool.query(timesheetSql, timesheetParams);
+    const employeeIds = Array.from(
+      new Set((timesheetRows || []).map((row) => row.employee_id).filter(Boolean))
+    );
+    const taskDefs = await loadTimesheetTaskDefinitions(pool, "FFCSA");
+    const taskDefByKey = new Map(
+      taskDefs
+        .filter((task) => task.key && task.label)
+        .map((task) => [task.key, task])
+    );
+
+    const ladders = new Map();
+    if (employeeIds.length) {
+      const [wageRows] = await pool.query(
+        `
+          SELECT employee_id, wage, fringe, start_date AS effective_from
+          FROM employee_wages
+          WHERE employee_id IN (${buildInClause(employeeIds)})
+            AND start_date <= ?
+          ORDER BY employee_id ASC, start_date ASC
+        `,
+        [...employeeIds, timesheetEnd]
+      );
+
+      for (const row of wageRows || []) {
+        const employeeId = row.employee_id;
+        let fringe = Number(row.fringe || 0);
+        if (fringe > 1) fringe = fringe / 100;
+        if (!ladders.has(employeeId)) ladders.set(employeeId, []);
+        ladders.get(employeeId).push({
+          from: new Date(row.effective_from),
+          wage: Number(row.wage || 0),
+          fringe
+        });
+      }
+    }
+
+    const observedTaskLabels = new Set();
+    for (const row of timesheetRows || []) {
+      const rowDate = toYmdFromDateish(row.start_time);
+      const rowDay = parseYmd(rowDate);
+      if (!rowDay) continue;
+      const weekStart = formatYmd(getUtcWeekStart(rowDay));
+      if (!map[weekStart]) continue;
+
+      const hours = computeTimesheetWorkingHours(row);
+      if (!hours) continue;
+
+      const rate = findTimesheetRate(ladders, row.employee_id, new Date(row.start_time));
+      const withFringe = rate
+        ? round2(hours * Number(rate.wage || 0) * (1 + Number(rate.fringe || 0)))
+        : 0;
+
+      const taskKey = normalizeTimesheetTaskKey(row.task);
+      const taskLabel =
+        taskDefByKey.get(taskKey)?.label || formatTimesheetTaskFallbackLabel(row.task);
+      observedTaskLabels.add(taskLabel);
+
+      const weekEntry = map[weekStart];
+      weekEntry.totalWages = round2(weekEntry.totalWages + withFringe);
+      weekEntry.tasks[taskLabel] = round2(
+        Number(weekEntry.tasks[taskLabel] || 0) + withFringe
+      );
+    }
+
+    const taskLabels = Array.from(observedTaskLabels).sort((left, right) => {
+      const leftKey = normalizeTimesheetTaskKey(left);
+      const rightKey = normalizeTimesheetTaskKey(right);
+      const leftSort = taskDefByKey.get(leftKey)?.sortOrder || Number.MAX_SAFE_INTEGER;
+      const rightSort = taskDefByKey.get(rightKey)?.sortOrder || Number.MAX_SAFE_INTEGER;
+      if (leftSort !== rightSort) return leftSort - rightSort;
+      return String(left).localeCompare(String(right));
+    });
+
+    return {
+      map,
+      taskLabels,
+      status: `connected (${Object.keys(map).length}/${weeks.length} weeks, ${taskLabels.length} wage task rows)`
+    };
   } catch (error) {
-    return { map: {}, status: `connection error: ${error?.message || error}` };
+    return { map: {}, taskLabels: [], status: `connection error: ${error?.message || error}` };
   } finally {
     try {
-      await backend.pool.end();
+      await pool.end();
     } catch (_error) {
       // no-op
     }
@@ -1079,10 +1316,11 @@ async function writeDashboardToSheet(accessToken, values, metricRows, sectionRow
         range: { sheetId, startRowIndex: rowIndex, endRowIndex: rowIndex + 1, startColumnIndex: 0, endColumnIndex: maxCols },
         cell: {
           userEnteredFormat: {
+            backgroundColor: hexColor("#D9E1F2"),
             textFormat: { bold: true }
           }
         },
-        fields: "userEnteredFormat(textFormat)"
+        fields: "userEnteredFormat(backgroundColor,textFormat)"
       }
     });
   });
@@ -1760,6 +1998,7 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       weeklyKpiMap,
       vendorWeeklyMap,
       timesheetResult.map || {},
+      timesheetResult.taskLabels || [],
       subscriberWeeklyMap,
       publishableWeekStarts
     );

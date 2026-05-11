@@ -2540,6 +2540,27 @@ export function AdminPanel({ onCatalogRefresh }) {
   const dashboardWarnings = Array.isArray(dashboardCursorSummary?.warnings)
     ? dashboardCursorSummary.warnings
     : [];
+  const dashboardLatestWeekLabel =
+    localLineStatus?.dashboard?.cursor?.cursorValue ||
+    dashboardJob?.result?.latestWeekEnd ||
+    dashboardJob?.result?.latestWeekStart ||
+    dashboardCursorSummary?.latestWeekEnd ||
+    dashboardCursorSummary?.latestWeekStart ||
+    "Not published yet";
+  const dashboardLastPublishLabel =
+    localLineStatus?.dashboard?.cursor?.lastFinishedAt ||
+    dashboardJob?.finishedAt ||
+    dashboardJob?.startedAt ||
+    "Not published yet";
+  const dashboardPublishStatusLabel =
+    localLineStatus?.dashboard?.cursor?.lastStatus ||
+    dashboardJob?.status ||
+    "Not started";
+  const dashboardStatusMessage =
+    localLineStatus?.dashboard?.cursor?.lastMessage ||
+    dashboardJob?.error?.message ||
+    dashboardJob?.progress?.message ||
+    "";
   const fulfillmentPullRunning =
     fulfillmentJob?.status === "queued" || fulfillmentJob?.status === "running";
   const ordersPullRunning =
@@ -4825,11 +4846,11 @@ export function AdminPanel({ onCatalogRefresh }) {
                 <div className="response-card">
                   <div className="title">Dashboard</div>
                   <div className="small">Target tab: Dashboard-auto-26</div>
-                  <div className="small">Latest week: {localLineStatus?.dashboard?.cursor?.cursorValue || "Unknown"}</div>
-                  <div className="small">Last publish: {localLineStatus?.dashboard?.cursor?.lastFinishedAt || "Never"}</div>
-                  <div className="small">Publish status: {localLineStatus?.dashboard?.cursor?.lastStatus || "Never run"}</div>
-                  {localLineStatus?.dashboard?.cursor?.lastMessage ? (
-                    <div className="small">Message: {localLineStatus.dashboard.cursor.lastMessage}</div>
+                  <div className="small">Latest week: {dashboardLatestWeekLabel}</div>
+                  <div className="small">Last publish: {dashboardLastPublishLabel}</div>
+                  <div className="small">Publish status: {dashboardPublishStatusLabel}</div>
+                  {dashboardStatusMessage ? (
+                    <div className="small">Message: {dashboardStatusMessage}</div>
                   ) : null}
                   {dashboardWarnings.length ? (
                     <div className="small">Warning: {dashboardWarnings[0]}</div>

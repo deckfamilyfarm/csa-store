@@ -11,6 +11,7 @@ let adminAccessSchemaPromise;
 let adminPricelistIndexesPromise;
 let vendorPricingSchemaPromise;
 let productPricingSchemaPromise;
+let subscriberCaptureSchemaPromise;
 
 const SOURCE_PRICING_VENDOR_FACTOR_DEFAULT = 0.5412;
 
@@ -32,6 +33,59 @@ const PRODUCT_PRICING_COLUMN_STATEMENTS = [
     tableName: "product_pricing_profiles",
     columnName: "price_changed_at",
     definition: "price_changed_at DATETIME"
+  }
+];
+
+const SUBSCRIBER_CAPTURE_TABLE_STATEMENTS = [
+  `
+    CREATE TABLE IF NOT EXISTS subscribe_leads (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      status VARCHAR(32) DEFAULT 'new',
+      first_name VARCHAR(255) NOT NULL,
+      last_name VARCHAR(255) NOT NULL,
+      email VARCHAR(255) NOT NULL,
+      phone VARCHAR(64),
+      country VARCHAR(128),
+      address_line_1 VARCHAR(255),
+      address_line_2 VARCHAR(255),
+      city VARCHAR(255),
+      state_province VARCHAR(255),
+      postal_code VARCHAR(32),
+      referral_source TEXT,
+      selected_plan VARCHAR(64),
+      selected_plan_label VARCHAR(255),
+      selected_drop_site VARCHAR(255),
+      notes TEXT,
+      source_host VARCHAR(255),
+      source_path VARCHAR(255),
+      utm_source VARCHAR(255),
+      utm_medium VARCHAR(255),
+      utm_campaign VARCHAR(255),
+      utm_content VARCHAR(255),
+      utm_term VARCHAR(255),
+      raw_json TEXT,
+      submitted_at DATETIME,
+      created_at DATETIME,
+      updated_at DATETIME
+    )
+  `
+];
+
+const SUBSCRIBER_CAPTURE_INDEX_STATEMENTS = [
+  {
+    tableName: "subscribe_leads",
+    indexName: "idx_subscribe_leads_email",
+    columns: "email"
+  },
+  {
+    tableName: "subscribe_leads",
+    indexName: "idx_subscribe_leads_submitted_at",
+    columns: "submitted_at"
+  },
+  {
+    tableName: "subscribe_leads",
+    indexName: "idx_subscribe_leads_status",
+    columns: "status"
   }
 ];
 
@@ -1178,6 +1232,25 @@ async function runProductPricingSchemaBootstrap(connection) {
   }
 }
 
+async function runSubscriberCaptureSchemaBootstrap(connection) {
+  for (const statement of SUBSCRIBER_CAPTURE_TABLE_STATEMENTS) {
+    await connection.query(statement);
+  }
+
+  for (const indexDefinition of SUBSCRIBER_CAPTURE_INDEX_STATEMENTS) {
+    const exists = await indexExists(
+      connection,
+      indexDefinition.tableName,
+      indexDefinition.indexName
+    );
+    if (exists) continue;
+
+    await connection.query(
+      `CREATE INDEX ${indexDefinition.indexName} ON ${indexDefinition.tableName} (${indexDefinition.columns})`
+    );
+  }
+}
+
 export function initDb() {
   if (db) return db;
 
@@ -1273,6 +1346,22 @@ export async function ensureProductPricingSchema(connection = getPool()) {
   }
 
   return runProductPricingSchemaBootstrap(connection);
+}
+
+export async function ensureSubscriberCaptureSchema(connection = getPool()) {
+  if (connection === getPool()) {
+    if (!subscriberCaptureSchemaPromise) {
+      subscriberCaptureSchemaPromise = runSubscriberCaptureSchemaBootstrap(connection).catch(
+        (error) => {
+          subscriberCaptureSchemaPromise = null;
+          throw error;
+        }
+      );
+    }
+    return subscriberCaptureSchemaPromise;
+  }
+
+  return runSubscriberCaptureSchemaBootstrap(connection);
 }
 
 export function isMissingTableError(error, tableName = "") {
