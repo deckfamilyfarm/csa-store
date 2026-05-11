@@ -104,6 +104,10 @@ function getLatestCompletedWeekEndYmd(referenceDate = new Date()) {
   return formatYmd(currentWeekStart);
 }
 
+function getLatestCompletedWeekStartYmd(referenceDate = new Date()) {
+  return addDaysYmd(getLatestCompletedWeekEndYmd(referenceDate), -6);
+}
+
 function getTodayYmd() {
   return formatYmd(startOfUtcDay(new Date()));
 }
@@ -167,14 +171,49 @@ function getManualSourceValue(rowMap, rowLabel, weekColIdx) {
   return row[weekColIdx] || "";
 }
 
+function getMinimumYmd(values = []) {
+  const filtered = values.filter(Boolean).sort();
+  return filtered[0] || null;
+}
+
+function getYearFromWeekStart(weekStart) {
+  const match = String(weekStart || "").match(/^(\d{4})-/);
+  return match ? match[1] : "";
+}
+
+function buildYearlyAverageMap(weeks, weeklyKpiMap, metricKey) {
+  const totalsByYear = new Map();
+
+  (Array.isArray(weeks) ? weeks : []).forEach((week) => {
+    const year = getYearFromWeekStart(week?.start);
+    if (!year) return;
+    const value = Number(weeklyKpiMap?.[week.start]?.[metricKey]);
+    if (!Number.isFinite(value)) return;
+    const current = totalsByYear.get(year) || { total: 0, count: 0 };
+    current.total += value;
+    current.count += 1;
+    totalsByYear.set(year, current);
+  });
+
+  return Object.fromEntries(
+    Array.from(totalsByYear.entries()).map(([year, summary]) => [
+      year,
+      summary.count ? summary.total / summary.count : 0
+    ])
+  );
+}
+
 function buildDashboardRows(
   weeks,
   rowMap,
   weeklyKpiMap,
   vendorWeeklyMap,
   timesheetWeeklyMap,
-  subscriberWeeklyMap
+  subscriberWeeklyMap,
+  publishableWeekStarts = null
 ) {
+  const yearlyAverageOrdersByYear = buildYearlyAverageMap(weeks, weeklyKpiMap, "numOrders");
+  const yearlyAverageSalesByYear = buildYearlyAverageMap(weeks, weeklyKpiMap, "totalSales");
   const layout = [
     {
       section: "GIVENS",
@@ -182,7 +221,18 @@ function buildDashboardRows(
         { label: "Errors/week", entry: "MANUAL", source: "Manual QA", rowLabel: "Errors/week" },
         { label: "Positive responses/week", entry: "MANUAL", source: "Manual QA", rowLabel: "Positive responses/week" },
         { label: "Num Orders", entry: "AUTO", source: "Local DB", valueType: "int", auto: (w) => Number(weeklyKpiMap[w.start]?.numOrders) },
-        { label: "Orders Comapred to Yearly Average", entry: "MANUAL", source: "Manual / Formula", rowLabel: "Orders Comapred to Yearly Average" },
+        {
+          label: "Orders Compared to Yearly Average",
+          entry: "AUTO",
+          source: "Local DB vs same-year weekly average",
+          valueType: "percent",
+          auto: (w) => {
+            const orders = Number(weeklyKpiMap[w.start]?.numOrders || 0);
+            const average = Number(yearlyAverageOrdersByYear[getYearFromWeekStart(w.start)] || 0);
+            if (!average) return null;
+            return ((orders - average) / average) * 100;
+          }
+        },
         { label: "Num Subscriber Orders", entry: "AUTO", source: "Local DB", valueType: "int", auto: (w) => Number(weeklyKpiMap[w.start]?.numSubscriberOrders) },
         { label: "Num Guest Orders", entry: "AUTO", source: "Local DB", valueType: "int", auto: (w) => Number(weeklyKpiMap[w.start]?.numGuestOrders) }
       ]
@@ -234,9 +284,15 @@ function buildDashboardRows(
         },
         {
           label: "Sales compared to yearly average",
-          entry: "MANUAL",
-          source: "Manual / Formula",
-          rowLabel: "Sales compared to yearly average"
+          entry: "AUTO",
+          source: "Local DB vs same-year weekly average",
+          valueType: "percent",
+          auto: (w) => {
+            const sales = Number(weeklyKpiMap[w.start]?.totalSales || 0);
+            const average = Number(yearlyAverageSalesByYear[getYearFromWeekStart(w.start)] || 0);
+            if (!average) return null;
+            return ((sales - average) / average) * 100;
+          }
         },
         {
           label: "Retail Sales",
@@ -306,6 +362,12 @@ function buildDashboardRows(
       const nextRow = ["", row.label, row.entry, row.source];
       for (let index = 0; index < weeks.length; index += 1) {
         const week = weeks[index];
+        const weekIsPublishable =
+          !publishableWeekStarts || publishableWeekStarts.has(week.start);
+        if (!weekIsPublishable) {
+          nextRow.push("");
+          continue;
+        }
         if (row.entry === "AUTO") {
           nextRow.push(normalizeAutoValue(row.valueType, row.auto ? row.auto(week) : null));
         } else {
@@ -322,6 +384,59 @@ function buildDashboardRows(
   }
 
   return { values, metricRows, sectionRows };
+}
+
+async function loadDashboardPublishAvailability() {
+  const pool = getPool();
+  const latestCompletedWeekStart = getLatestCompletedWeekStartYmd();
+  const [cursorRows] = await pool.query(
+    `
+      SELECT
+        sync_key AS syncKey,
+        last_finished_at AS lastFinishedAt,
+        last_status AS lastStatus
+      FROM local_line_sync_cursors
+      WHERE sync_key IN ('orders', 'subscriptions')
+    `
+  );
+  const [snapshotRows] = await pool.query(
+    `
+      SELECT MAX(snapshot_week_end) AS latestSnapshotWeekEnd
+      FROM local_line_subscription_snapshot_runs
+    `
+  );
+
+  const cursorByKey = Object.fromEntries(
+    (cursorRows || []).map((row) => [String(row.syncKey || ""), row])
+  );
+  const ordersCursor = cursorByKey.orders || null;
+  const subscriptionsCursor = cursorByKey.subscriptions || null;
+  const latestOrdersDownloadedWeekStart =
+    ordersCursor?.lastStatus === "completed" && ordersCursor?.lastFinishedAt
+      ? getLatestCompletedWeekStartYmd(new Date(ordersCursor.lastFinishedAt))
+      : null;
+  const latestSubscriptionSnapshotWeekStart = snapshotRows?.[0]?.latestSnapshotWeekEnd
+    ? addDaysYmd(String(snapshotRows[0].latestSnapshotWeekEnd), -6)
+    : null;
+  const latestSubscriptionsDownloadedWeekStart =
+    subscriptionsCursor?.lastStatus === "completed" && subscriptionsCursor?.lastFinishedAt
+      ? getLatestCompletedWeekStartYmd(new Date(subscriptionsCursor.lastFinishedAt))
+      : null;
+
+  const publishableThroughWeekStart = getMinimumYmd([
+    latestCompletedWeekStart,
+    latestOrdersDownloadedWeekStart,
+    latestSubscriptionSnapshotWeekStart,
+    latestSubscriptionsDownloadedWeekStart
+  ]);
+
+  return {
+    latestCompletedWeekStart,
+    latestOrdersDownloadedWeekStart,
+    latestSubscriptionSnapshotWeekStart,
+    latestSubscriptionsDownloadedWeekStart,
+    publishableThroughWeekStart
+  };
 }
 
 async function fetchWithRetry(url, options, label) {
@@ -830,7 +945,7 @@ async function sheetsRequest(accessToken, method, url, body) {
   return response.json().catch(() => ({}));
 }
 
-async function getOrCreateSheet(accessToken, spreadsheetId, title) {
+async function getOrCreateSheetProperties(accessToken, spreadsheetId, title) {
   const meta = await sheetsRequest(
     accessToken,
     "GET",
@@ -838,7 +953,7 @@ async function getOrCreateSheet(accessToken, spreadsheetId, title) {
   );
   const match = (meta.sheets || []).find((sheet) => sheet?.properties?.title === title);
   if (match?.properties?.sheetId || match?.properties?.sheetId === 0) {
-    return Number(match.properties.sheetId);
+    return match.properties;
   }
   const created = await sheetsRequest(
     accessToken,
@@ -848,13 +963,20 @@ async function getOrCreateSheet(accessToken, spreadsheetId, title) {
       requests: [{ addSheet: { properties: { title } } }]
     }
   );
-  return Number(created?.replies?.[0]?.addSheet?.properties?.sheetId);
+  return created?.replies?.[0]?.addSheet?.properties || null;
 }
 
 async function writeDashboardToSheet(accessToken, values, metricRows, sectionRows) {
-  const sheetId = await getOrCreateSheet(accessToken, DASHBOARD_SHEET_ID, DASHBOARD_TARGET_TITLE);
+  const sheetProperties = await getOrCreateSheetProperties(
+    accessToken,
+    DASHBOARD_SHEET_ID,
+    DASHBOARD_TARGET_TITLE
+  );
+  const sheetId = Number(sheetProperties?.sheetId);
   const maxCols = values[0]?.length || 1;
   const maxRows = values.length || 1;
+  const gridRowCount = Math.max(Number(sheetProperties?.gridProperties?.rowCount || 0), maxRows, 1);
+  const gridColumnCount = Math.max(Number(sheetProperties?.gridProperties?.columnCount || 0), maxCols, 1);
   const titleMergeEndCol = Math.min(4, maxCols);
 
   await sheetsRequest(
@@ -882,6 +1004,26 @@ async function writeDashboardToSheet(accessToken, values, metricRows, sectionRow
           gridProperties: { frozenRowCount: 2, frozenColumnCount: 4 }
         },
         fields: "gridProperties.frozenRowCount,gridProperties.frozenColumnCount"
+      }
+    },
+    {
+      repeatCell: {
+        range: {
+          sheetId,
+          startRowIndex: 0,
+          endRowIndex: gridRowCount,
+          startColumnIndex: 0,
+          endColumnIndex: gridColumnCount
+        },
+        cell: {
+          userEnteredFormat: {
+            backgroundColor: hexColor("#FFFFFF"),
+            textFormat: { foregroundColor: hexColor("#000000"), fontSize: 10, bold: false },
+            horizontalAlignment: "LEFT",
+            verticalAlignment: "MIDDLE"
+          }
+        },
+        fields: "userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)"
       }
     }
   ];
@@ -937,11 +1079,10 @@ async function writeDashboardToSheet(accessToken, values, metricRows, sectionRow
         range: { sheetId, startRowIndex: rowIndex, endRowIndex: rowIndex + 1, startColumnIndex: 0, endColumnIndex: maxCols },
         cell: {
           userEnteredFormat: {
-            backgroundColor: hexColor("#D9E1F2"),
             textFormat: { bold: true }
           }
         },
-        fields: "userEnteredFormat(backgroundColor,textFormat)"
+        fields: "userEnteredFormat(textFormat)"
       }
     });
   });
@@ -1550,6 +1691,41 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       throw new Error("No dashboard week columns found in the source sheet.");
     }
     const rowMap = mapRowsByLabel(sourceRows.slice(2));
+    const availability = await loadDashboardPublishAvailability();
+    const publishableWeekStarts = new Set(
+      weeks
+        .filter(
+          (week) =>
+            availability.publishableThroughWeekStart &&
+            String(week.start || "") <= String(availability.publishableThroughWeekStart)
+        )
+        .map((week) => week.start)
+    );
+    const skippedWeeks = weeks.filter((week) => !publishableWeekStarts.has(week.start));
+    const warningSkippedWeeks = skippedWeeks.filter(
+      (week) =>
+        availability.latestCompletedWeekStart &&
+        String(week.start || "") <= String(availability.latestCompletedWeekStart)
+    );
+    const futureSkippedWeeks = skippedWeeks.filter(
+      (week) =>
+        !availability.latestCompletedWeekStart ||
+        String(week.start || "") > String(availability.latestCompletedWeekStart)
+    );
+    const dashboardWarnings = [];
+
+    if (!availability.publishableThroughWeekStart) {
+      dashboardWarnings.push(
+        "No completed dashboard week is publishable yet because local orders/subscriber pulls do not cover a full week."
+      );
+    }
+    if (warningSkippedWeeks.length) {
+      dashboardWarnings.push(
+        `Left ${warningSkippedWeeks.length} completed but not-yet-pulled week columns blank: ${warningSkippedWeeks
+          .map((week) => week.label)
+          .join(", ")}`
+      );
+    }
 
     reportProgress({
       phaseKey: "prepare",
@@ -1558,7 +1734,9 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       percent: 100,
       current: weeks.length,
       total: weeks.length,
-      message: `Loaded ${weeks.length} dashboard weeks`
+      message: warningSkippedWeeks.length
+        ? `Loaded ${weeks.length} dashboard weeks; ${warningSkippedWeeks.length} completed week columns are still blank pending local data`
+        : `Loaded ${weeks.length} dashboard weeks`
     });
 
     reportProgress({
@@ -1582,11 +1760,15 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       weeklyKpiMap,
       vendorWeeklyMap,
       timesheetResult.map || {},
-      subscriberWeeklyMap
+      subscriberWeeklyMap,
+      publishableWeekStarts
     );
 
     const missingSubscriberWeeks = weeks
-      .filter((week) => !subscriberWeeklyMap[week.start]?.totalSubscribers)
+      .filter(
+        (week) =>
+          publishableWeekStarts.has(week.start) && !subscriberWeeklyMap[week.start]?.totalSubscribers
+      )
       .map((week) => week.end);
 
     reportProgress({
@@ -1596,7 +1778,9 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       percent: 100,
       current: weeks.length,
       total: weeks.length,
-      message: `Built dashboard rows for ${weeks.length} weeks`
+      message: dashboardWarnings.length
+        ? `${dashboardWarnings[0]}`
+        : `Built dashboard rows for ${weeks.length} weeks`
     });
 
     reportProgress({
@@ -1616,20 +1800,46 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       targetTitle: DASHBOARD_TARGET_TITLE,
       sourceGid: DASHBOARD_SOURCE_GID,
       weekCount: weeks.length,
+      publishableWeekCount: publishableWeekStarts.size,
       rowCount: values.length,
-      latestWeekStart: weeks[weeks.length - 1]?.start || null,
-      latestWeekEnd: weeks[weeks.length - 1]?.end || null,
+      latestWeekStart: availability.publishableThroughWeekStart || null,
+      latestWeekEnd: availability.publishableThroughWeekStart
+        ? addDaysYmd(availability.publishableThroughWeekStart, 6)
+        : null,
+      latestSourceWeekStart: weeks[weeks.length - 1]?.start || null,
+      latestSourceWeekEnd: weeks[weeks.length - 1]?.end || null,
+      skippedWeeks: skippedWeeks.map((week) => ({
+        label: week.label,
+        start: week.start,
+        end: week.end
+      })),
+      warningSkippedWeeks: warningSkippedWeeks.map((week) => ({
+        label: week.label,
+        start: week.start,
+        end: week.end
+      })),
+      futureSkippedWeeks: futureSkippedWeeks.map((week) => ({
+        label: week.label,
+        start: week.start,
+        end: week.end
+      })),
+      warnings: dashboardWarnings,
+      availability,
       missingSubscriberWeeks,
       timesheetStatus: timesheetResult.status
     };
 
     await upsertSyncCursor(connection, "dashboard", {
-      cursorValue: weeks[weeks.length - 1]?.end || null,
+      cursorValue: availability.publishableThroughWeekStart
+        ? addDaysYmd(availability.publishableThroughWeekStart, 6)
+        : null,
       syncedThroughAt: finishedAt,
       lastStartedAt: startedAt,
       lastFinishedAt: finishedAt,
       lastStatus: "completed",
-      lastMessage: `Published ${values.length} dashboard rows`,
+      lastMessage: dashboardWarnings.length
+        ? `Published dashboard with warning: ${dashboardWarnings[0]}`
+        : `Published ${values.length} dashboard rows`,
       summaryJson: stringifyJson(summary),
       updatedAt: finishedAt
     });
@@ -1639,7 +1849,9 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       phaseLabel: "Publish Dashboard",
       status: "completed",
       percent: 100,
-      message: `Published ${DASHBOARD_TARGET_TITLE}`
+      message: dashboardWarnings.length
+        ? `Published ${DASHBOARD_TARGET_TITLE} with warnings`
+        : `Published ${DASHBOARD_TARGET_TITLE}`
     });
     reportProgress({
       phaseKey: "finalize",

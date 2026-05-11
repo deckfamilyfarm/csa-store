@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import express from "express";
@@ -13,6 +14,17 @@ import authRoutes from "./routes/auth.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
+const legacyDashboardEnvPath =
+  process.env.LOCALLINE_DASHBOARD_ENV_PATH ||
+  "/Users/jdeck/code/ffcsa_scripts/localline/.env";
+
+try {
+  if (legacyDashboardEnvPath && fs.existsSync(legacyDashboardEnvPath)) {
+    dotenv.config({ path: legacyDashboardEnvPath, override: false });
+  }
+} catch (error) {
+  console.warn("Legacy Local Line dashboard env load skipped:", error?.message || error);
+}
 
 const app = express();
 const serveFrontend = process.env.STORE_SERVE_FRONTEND === "true";

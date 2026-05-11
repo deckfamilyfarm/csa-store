@@ -436,7 +436,6 @@ export function AdminPriceListSection({
   });
   const [applyingProductIds, setApplyingProductIds] = useState([]);
   const [deletingProductIds, setDeletingProductIds] = useState([]);
-  const [exportingGoogle, setExportingGoogle] = useState(false);
   const [cleanupRecentChangeLoading, setCleanupRecentChangeLoading] = useState(false);
   const [columnPickerOpen, setColumnPickerOpen] = useState(false);
   const [pushReviewOpen, setPushReviewOpen] = useState(false);
@@ -794,27 +793,6 @@ export function AdminPriceListSection({
         currentProductId: null,
         currentProductName: ""
       }));
-    }
-  }
-
-  async function exportGooglePricelist() {
-    setExportingGoogle(true);
-    setMessage("");
-    try {
-      const response = await adminPost("pricelist/export-google", token, {});
-      const vendorSummary = Array.isArray(response.vendorNames) && response.vendorNames.length
-        ? response.vendorNames.join(", ")
-        : "No matching vendors";
-      const highlightSummary = Number(response.highlightedRowCount || 0)
-        ? ` ${Number(response.highlightedRowCount || 0)} row${Number(response.highlightedRowCount || 0) === 1 ? "" : "s"} highlighted in yellow.`
-        : "";
-      setMessage(
-        `Google pricelist updated with ${response.rowCount || 0} rows: ${vendorSummary}.${highlightSummary}`
-      );
-    } catch (error) {
-      setMessage(error?.message || "Failed to export Google pricelist.");
-    } finally {
-      setExportingGoogle(false);
     }
   }
 
@@ -1480,14 +1458,6 @@ export function AdminPriceListSection({
               disabled={applyingProductIds.length > 0 || pushReviewLoading || filteredPendingCount === 0}
             >
               {applyingProductIds.length ? "Pushing..." : pushReviewLoading ? "Loading..." : "Push to Local Line"}
-            </button>
-            <button
-              className="button alt"
-              type="button"
-              onClick={exportGooglePricelist}
-              disabled={exportingGoogle}
-            >
-              {exportingGoogle ? "Exporting..." : "Push Google Pricelist"}
             </button>
             <button
               className="button alt"

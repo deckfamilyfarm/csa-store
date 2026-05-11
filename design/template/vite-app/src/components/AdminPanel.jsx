@@ -23,6 +23,12 @@ function hasRole(roleKeys, roleKey) {
 function canAccessAdminSection(roleKeys, section) {
   if (roleKeys.includes("admin")) return true;
   switch (section) {
+    case "googleDrive":
+      return (
+        roleKeys.includes("pricing_admin") ||
+        roleKeys.includes("localline_pull") ||
+        roleKeys.includes("localline_push")
+      );
     case "localLine":
       return roleKeys.includes("localline_pull") || roleKeys.includes("dropsite_admin");
     case "orders":
@@ -58,6 +64,7 @@ function canAccessAdminSection(roleKeys, section) {
 
 function getDefaultAdminSection(roleKeys = []) {
   const order = [
+    "googleDrive",
     "localLine",
     "orders",
     "pricelist",
@@ -131,6 +138,16 @@ function parseJsonArray(value) {
   }
 }
 
+function parseJsonObject(value) {
+  if (!value) return null;
+  try {
+    const parsed = JSON.parse(value);
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : null;
+  } catch (_error) {
+    return null;
+  }
+}
+
 function formatMonthLabel(value) {
   const match = String(value || "").match(/^(\d{4})-(\d{2})$/);
   if (!match) return value || "Unknown month";
@@ -184,6 +201,12 @@ function formatShortDateLabel(value) {
     month: "short",
     day: "numeric"
   });
+}
+
+function getTimestampValue(value) {
+  if (!value) return 0;
+  const timestamp = new Date(value).getTime();
+  return Number.isFinite(timestamp) ? timestamp : 0;
 }
 
 function describeDropSiteContactIndicator(contact = null) {
@@ -609,6 +632,7 @@ export function AdminPanel({ onCatalogRefresh }) {
     data: null,
     jobId: ""
   });
+  const [exportingGooglePricelist, setExportingGooglePricelist] = useState(false);
   const [localLineProductDetail, setLocalLineProductDetail] = useState(null);
   const [priceListEntryDrafts, setPriceListEntryDrafts] = useState([]);
   const [priceListSaveLoading, setPriceListSaveLoading] = useState(false);
@@ -2197,6 +2221,29 @@ export function AdminPanel({ onCatalogRefresh }) {
     }
   }
 
+  async function handleGooglePricelistExport() {
+    setExportingGooglePricelist(true);
+    setMessage("");
+    try {
+      const response = await adminPost("pricelist/export-google", token, {});
+      const vendorSummary =
+        Array.isArray(response.vendorNames) && response.vendorNames.length
+          ? response.vendorNames.join(", ")
+          : "No matching vendors";
+      const highlightedRowCount = Number(response.highlightedRowCount || 0);
+      const highlightSummary = highlightedRowCount
+        ? ` ${highlightedRowCount} row${highlightedRowCount === 1 ? "" : "s"} highlighted in yellow.`
+        : "";
+      setMessage(
+        `Google pricelist updated with ${response.rowCount || 0} rows: ${vendorSummary}.${highlightSummary}`
+      );
+    } catch (error) {
+      setMessage(error?.message || "Failed to export Google pricelist.");
+    } finally {
+      setExportingGooglePricelist(false);
+    }
+  }
+
   async function handleAddRecipe() {
     if (!newRecipe.title) return;
     await adminPost("recipes", token, {
@@ -2477,10 +2524,10 @@ export function AdminPanel({ onCatalogRefresh }) {
     .sort((left, right) => String(left.name || "").localeCompare(String(right.name || "")));
   const pendingProductEditEntries = getPendingProductEditEntries();
   const auditData = localLineAuditState.data;
-  const fullSyncJob = localLineCacheState.data;
+  const localLineStatus = localLineStatusState.data;
+  const fullSyncJob = localLineCacheState.data || localLineStatus?.products?.latestJob || null;
   const fullSyncRunning =
     fullSyncJob?.status === "queued" || fullSyncJob?.status === "running";
-  const localLineStatus = localLineStatusState.data;
   const fulfillmentJob = localLineFulfillmentState.data || localLineStatus?.fulfillments?.latestJob || null;
   const ordersJob = localLineOrdersState.data || localLineStatus?.orders?.latestJob || null;
   const subscriptionsJob =
@@ -2489,6 +2536,10 @@ export function AdminPanel({ onCatalogRefresh }) {
     localLineSubscriptionHistoryState.data || localLineStatus?.subscriptions?.latestHistoryJob || null;
   const dashboardJob =
     localLineDashboardState.data || localLineStatus?.dashboard?.latestJob || null;
+  const dashboardCursorSummary = parseJsonObject(localLineStatus?.dashboard?.cursor?.summaryJson);
+  const dashboardWarnings = Array.isArray(dashboardCursorSummary?.warnings)
+    ? dashboardCursorSummary.warnings
+    : [];
   const fulfillmentPullRunning =
     fulfillmentJob?.status === "queued" || fulfillmentJob?.status === "running";
   const ordersPullRunning =
@@ -2499,6 +2550,48 @@ export function AdminPanel({ onCatalogRefresh }) {
     subscriptionHistoryJob?.status === "queued" || subscriptionHistoryJob?.status === "running";
   const dashboardPushRunning =
     dashboardJob?.status === "queued" || dashboardJob?.status === "running";
+  const localLineJobSections = [
+    {
+      key: "products",
+      title: "Pull Products",
+      startedAt: fullSyncJob?.startedAt || "",
+      content: renderLocalLineCacheContent()
+    },
+    {
+      key: "fulfillments",
+      title: "Pull Fulfillments",
+      startedAt: fulfillmentJob?.startedAt || "",
+      content: renderLocalLinePullJobContent(
+        localLineFulfillmentState,
+        "No Local Line fulfillment pull has run yet."
+      )
+    },
+    {
+      key: "orders",
+      title: "Pull Orders",
+      startedAt: ordersJob?.startedAt || "",
+      content: renderLocalLinePullJobContent(
+        localLineOrdersState,
+        "No Local Line order pull has run yet."
+      )
+    },
+    {
+      key: "subscriptions",
+      title: "Pull Subscribers",
+      startedAt: subscriptionsJob?.startedAt || "",
+      content: renderLocalLinePullJobContent(
+        localLineSubscriptionsState,
+        "No Local Line subscriber pull has run yet."
+      )
+    }
+  ].sort((left, right) => {
+    const rightTimestamp = getTimestampValue(right.startedAt);
+    const leftTimestamp = getTimestampValue(left.startedAt);
+    if (rightTimestamp !== leftTimestamp) {
+      return rightTimestamp - leftTimestamp;
+    }
+    return left.title.localeCompare(right.title);
+  });
   const dropSitePerformanceRows = dropSitePerformance?.rankedSites || [];
   const dropSiteTrendMode = dropSitePerformance?.mode === "trend6";
   const dropSitePerformanceByStrategyId = new Map(
@@ -2538,6 +2631,7 @@ export function AdminPanel({ onCatalogRefresh }) {
   const canManageUsers = hasRole(currentAdminRoles, "user_admin");
   const canManagePricing = canAccessAdminSection(currentAdminRoles, "pricelist");
   const canManageLocalPricelist = canAccessAdminSection(currentAdminRoles, "localPricelist");
+  const canManageGoogleDrive = canAccessAdminSection(currentAdminRoles, "googleDrive");
   const canManageLocalLine = canAccessAdminSection(currentAdminRoles, "localLine");
   const canManageOrders = canAccessAdminSection(currentAdminRoles, "orders");
   const canManageInventory = hasRole(currentAdminRoles, "inventory_admin");
@@ -3300,6 +3394,18 @@ export function AdminPanel({ onCatalogRefresh }) {
 
       <div className="admin-layout">
         <aside className="admin-nav">
+          {canManageGoogleDrive ? (
+            <button
+              className={`admin-nav-item ${activeSection === "googleDrive" ? "active" : ""}`}
+              onClick={() => {
+                setActiveSection("googleDrive");
+                closeProductEditor();
+              }}
+              type="button"
+            >
+              Google Drive
+            </button>
+          ) : null}
           {canManageLocalLine ? (
             <button
               className={`admin-nav-item ${activeSection === "localLine" ? "active" : ""}`}
@@ -4694,12 +4800,67 @@ export function AdminPanel({ onCatalogRefresh }) {
             <AdminManualSection focusTopic={manualFocusTopic} />
           )}
 
+          {activeSection === "googleDrive" && canManageGoogleDrive && (
+            <section className="admin-section">
+              <h3>Google Drive</h3>
+              <div className="small">
+                Run Google Drive publishing tasks for the shared pricelist and dashboard sheets from one place.
+              </div>
+              <div className="audit-summary-grid">
+                <div className="response-card">
+                  <div className="title">Google Pricelist</div>
+                  <div className="small">Target: shared Google pricelist workbook</div>
+                  <div className="small">Action: push the current local pricelist export</div>
+                  <div className="admin-actions">
+                    <button
+                      className="button"
+                      type="button"
+                      onClick={handleGooglePricelistExport}
+                      disabled={!canManagePricing || exportingGooglePricelist}
+                    >
+                      {exportingGooglePricelist ? "Exporting..." : "Push Google Pricelist"}
+                    </button>
+                  </div>
+                </div>
+                <div className="response-card">
+                  <div className="title">Dashboard</div>
+                  <div className="small">Target tab: Dashboard-auto-26</div>
+                  <div className="small">Latest week: {localLineStatus?.dashboard?.cursor?.cursorValue || "Unknown"}</div>
+                  <div className="small">Last publish: {localLineStatus?.dashboard?.cursor?.lastFinishedAt || "Never"}</div>
+                  <div className="small">Publish status: {localLineStatus?.dashboard?.cursor?.lastStatus || "Never run"}</div>
+                  {localLineStatus?.dashboard?.cursor?.lastMessage ? (
+                    <div className="small">Message: {localLineStatus.dashboard.cursor.lastMessage}</div>
+                  ) : null}
+                  {dashboardWarnings.length ? (
+                    <div className="small">Warning: {dashboardWarnings[0]}</div>
+                  ) : null}
+                  <div className="admin-actions">
+                    <button
+                      className="button"
+                      type="button"
+                      onClick={handleLocalLineDashboardPush}
+                      disabled={!canPullFromLocalLine || dashboardPushRunning || localLineDashboardState.loading}
+                    >
+                      {dashboardPushRunning || localLineDashboardState.loading ? "Publishing..." : "Push Dashboard"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="audit-section">
+                <h4>Push Dashboard</h4>
+                {renderLocalLinePullJobContent(
+                  localLineDashboardState,
+                  "No dashboard publish has run yet."
+                )}
+              </div>
+            </section>
+          )}
+
           {activeSection === "localLine" && canManageLocalLine && (
             <section className="admin-section">
               <h3>Local Line</h3>
               <div className="small">
-                Review incoming Local Line catalog changes and run dataset pulls for products,
-                fulfillments, and orders from one place.
+                Run dataset pulls for products, fulfillments, orders, and subscribers from one place.
               </div>
               {localLineStatusState.loading && !localLineStatus ? (
                 <div className="small">Loading Local Line status...</div>
@@ -4709,20 +4870,12 @@ export function AdminPanel({ onCatalogRefresh }) {
               ) : null}
               <div className="audit-summary-grid">
                 <div className="response-card">
-                  <div className="title">Product Review</div>
+                  <div className="title">Products</div>
                   <div className="small">Cached products: {Number(localLineStatus?.products?.cachedProducts || 0)}</div>
                   <div className="small">Sync issues: {Number(localLineStatus?.products?.syncIssues || 0)}</div>
                   <div className="small">Last product sync: {localLineStatus?.products?.lastSyncedAt || "Never"}</div>
                   <div className="small">Latest pull job: {localLineStatus?.products?.latestJob?.status || "Never run"}</div>
                   <div className="admin-actions">
-                    <button
-                      className="button"
-                      type="button"
-                      onClick={handleLocalLineAudit}
-                      disabled={localLineAuditState.loading || !canPullFromLocalLine}
-                    >
-                      {localLineAuditState.loading ? "Reviewing..." : "Review Local Line"}
-                    </button>
                     <button
                       className="button"
                       type="button"
@@ -4780,9 +4933,6 @@ export function AdminPanel({ onCatalogRefresh }) {
                   <div className="small">Latest snapshot week: {localLineStatus?.subscriptions?.latestWeekEnd || "Never"}</div>
                   <div className="small">Last captured: {localLineStatus?.subscriptions?.lastCapturedAt || "Never"}</div>
                   <div className="small">Cursor status: {localLineStatus?.subscriptions?.cursor?.lastStatus || "Never run"}</div>
-                  <div className="small">
-                    History import: {localLineStatus?.subscriptions?.historyImportCursor?.lastStatus || "Never run"}
-                  </div>
                   <div className="admin-actions">
                     <button
                       className="button"
@@ -4792,95 +4942,15 @@ export function AdminPanel({ onCatalogRefresh }) {
                     >
                       {subscriptionsPullRunning || localLineSubscriptionsState.loading ? "Pull Running..." : "Pull Subscribers"}
                     </button>
-                    <button
-                      className="button alt"
-                      type="button"
-                      onClick={handleLocalLineSubscriptionHistoryImport}
-                      disabled={!canPullFromLocalLine || subscriptionHistoryRunning || localLineSubscriptionHistoryState.loading}
-                    >
-                      {subscriptionHistoryRunning || localLineSubscriptionHistoryState.loading ? "Import Running..." : "Import History"}
-                    </button>
-                  </div>
-                </div>
-                <div className="response-card">
-                  <div className="title">Dashboard</div>
-                  <div className="small">Target tab: Dashboard-auto-26</div>
-                  <div className="small">Latest week: {localLineStatus?.dashboard?.cursor?.cursorValue || "Unknown"}</div>
-                  <div className="small">Last publish: {localLineStatus?.dashboard?.cursor?.lastFinishedAt || "Never"}</div>
-                  <div className="small">Publish status: {localLineStatus?.dashboard?.cursor?.lastStatus || "Never run"}</div>
-                  <div className="admin-actions">
-                    <button
-                      className="button"
-                      type="button"
-                      onClick={handleLocalLineDashboardPush}
-                      disabled={!canPullFromLocalLine || dashboardPushRunning || localLineDashboardState.loading}
-                    >
-                      {dashboardPushRunning || localLineDashboardState.loading ? "Publishing..." : "Push Dashboard"}
-                    </button>
                   </div>
                 </div>
               </div>
-              <div className="audit-section">
-                <h4>Recent Orders</h4>
-                <div className="response-list">
-                  {(localLineStatus?.orders?.recentOrders || []).map((order) => (
-                    <div className="response-card" key={`recent-localline-order-${order.localLineOrderId}`}>
-                      <div className="title">Order {order.localLineOrderId}</div>
-                      <div className="small">Created: {order.createdAtRemote || "n/a"}</div>
-                      <div className="small">Status: {order.status || "n/a"}</div>
-                      <div className="small">Customer: {order.customerName || "n/a"}</div>
-                      <div className="small">Price list: {order.priceListName || "n/a"}</div>
-                      <div className="small">Total: {order.total || "0.00"}</div>
-                    </div>
-                  ))}
-                  {!(localLineStatus?.orders?.recentOrders || []).length ? (
-                    <div className="small">No Local Line orders cached yet.</div>
-                  ) : null}
+              {localLineJobSections.map((section) => (
+                <div className="audit-section" key={section.key}>
+                  <h4>{section.title}</h4>
+                  {section.content}
                 </div>
-              </div>
-              <div className="audit-section">
-                <h4>Review Local Line</h4>
-                {renderLocalLineAuditContent()}
-              </div>
-              <div className="audit-section">
-                <h4>Pull Products</h4>
-                {renderLocalLineCacheContent()}
-              </div>
-              <div className="audit-section">
-                <h4>Pull Fulfillments</h4>
-                {renderLocalLinePullJobContent(
-                  localLineFulfillmentState,
-                  "No Local Line fulfillment pull has run yet."
-                )}
-              </div>
-              <div className="audit-section">
-                <h4>Pull Orders</h4>
-                {renderLocalLinePullJobContent(
-                  localLineOrdersState,
-                  "No Local Line order pull has run yet."
-                )}
-              </div>
-              <div className="audit-section">
-                <h4>Pull Subscribers</h4>
-                {renderLocalLinePullJobContent(
-                  localLineSubscriptionsState,
-                  "No Local Line subscriber pull has run yet."
-                )}
-              </div>
-              <div className="audit-section">
-                <h4>Import Subscriber History</h4>
-                {renderLocalLinePullJobContent(
-                  localLineSubscriptionHistoryState,
-                  "No subscriber history import has run yet."
-                )}
-              </div>
-              <div className="audit-section">
-                <h4>Push Dashboard</h4>
-                {renderLocalLinePullJobContent(
-                  localLineDashboardState,
-                  "No dashboard publish has run yet."
-                )}
-              </div>
+              ))}
             </section>
           )}
 

@@ -3938,6 +3938,25 @@ function buildMonthlyRanges(startDate, endDate = new Date()) {
   return ranges;
 }
 
+function buildMonthlyRangesFromMonthKeys(monthKeys = []) {
+  return Array.from(new Set((Array.isArray(monthKeys) ? monthKeys : []).filter(Boolean)))
+    .sort()
+    .map((monthKey) => {
+      const match = String(monthKey).match(/^(\d{4})-(\d{2})$/);
+      if (!match) return null;
+      const monthStart = new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, 1));
+      const monthEnd = endOfUtcMonth(monthStart);
+      return {
+        monthKey,
+        startDate: monthStart,
+        endDate: monthEnd,
+        startStr: formatYmd(monthStart),
+        endStr: formatYmd(monthEnd)
+      };
+    })
+    .filter(Boolean);
+}
+
 function parseLooseDateString(value) {
   if (!value) return null;
   if (typeof value === "number" && Number.isFinite(value)) {
@@ -4142,9 +4161,28 @@ function buildOrdersExportUrl(startStr, endStr) {
 async function syncLocalLineOrderReportingCache({
   connection,
   reportProgress = () => {},
-  startDate = new Date("2026-01-01T00:00:00.000Z")
+  startDate = new Date("2026-01-01T00:00:00.000Z"),
+  monthKeys = null
 } = {}) {
-  const ranges = buildMonthlyRanges(startDate, new Date());
+  const ranges = Array.isArray(monthKeys) && monthKeys.length
+    ? buildMonthlyRangesFromMonthKeys(monthKeys)
+    : buildMonthlyRanges(startDate, new Date());
+  if (!ranges.length) {
+    reportProgress({
+      phaseKey: "reporting",
+      phaseLabel: "Build Reporting Cache",
+      status: "completed",
+      percent: 100,
+      current: 0,
+      total: 0,
+      message: "No reporting months needed refresh"
+    });
+    return {
+      monthsSynced: 0,
+      reportingRows: 0,
+      refreshedMonths: []
+    };
+  }
   const accessToken = await getLocalLineAccessToken();
   const productWorkbookBuffer = await downloadBinaryFile(
     `${getLocalLineBaseUrl()}products/export/?direct=true`,
@@ -4333,7 +4371,45 @@ async function syncLocalLineOrderReportingCache({
 
   return {
     monthsSynced: ranges.length,
-    reportingRows: totalRows
+    reportingRows: totalRows,
+    refreshedMonths: ranges.map((range) => range.monthKey)
+  };
+}
+
+async function backfillLocalLineOrderDatesFromReportingCache(connection, monthKeys = []) {
+  const normalizedMonthKeys = Array.from(new Set((Array.isArray(monthKeys) ? monthKeys : []).filter(Boolean)));
+  if (!normalizedMonthKeys.length) {
+    return { updatedOrders: 0 };
+  }
+
+  const placeholders = normalizedMonthKeys.map(() => "?").join(", ");
+  const [result] = await connection.query(
+    `
+      UPDATE local_line_orders o
+      JOIN (
+        SELECT
+          local_line_order_id,
+          MIN(fulfillment_date) AS reporting_fulfillment_date
+        FROM local_line_order_reporting_entries
+        WHERE fulfillment_month IN (${placeholders})
+          AND fulfillment_date IS NOT NULL
+          AND TRIM(fulfillment_date) <> ''
+        GROUP BY local_line_order_id
+      ) r
+        ON r.local_line_order_id = o.local_line_order_id
+      SET
+        o.fulfillment_date = STR_TO_DATE(r.reporting_fulfillment_date, '%Y-%m-%d'),
+        o.updated_at = NOW(),
+        o.last_synced_at = NOW()
+      WHERE
+        o.fulfillment_date IS NULL
+        OR DATE_FORMAT(o.fulfillment_date, '%Y-%m-%d') <> r.reporting_fulfillment_date
+    `,
+    normalizedMonthKeys
+  );
+
+  return {
+    updatedOrders: Number(result?.affectedRows || 0)
   };
 }
 
@@ -4578,6 +4654,7 @@ async function syncLocalLineOrdersToStore({ reportProgress = () => {}, cutoffDat
     let reachedCursor = false;
     let reachedCutoff = false;
     let totalAvailable = null;
+    const touchedReportingMonths = new Set();
     const incrementalSync = Number(existingCursor?.cursorValue || 0) > 0;
     const syncLabel = incrementalSync
       ? `Fetching new orders since ${String(existingCursor?.syncedThroughAt || "").slice(0, 10) || "last sync"}`
@@ -4615,6 +4692,8 @@ async function syncLocalLineOrdersToStore({ reportProgress = () => {}, cutoffDat
       });
 
       await connection.beginTransaction();
+      let scannedThisPage = 0;
+      const totalOrdersThisPage = orders.length;
 
       for (const order of orders) {
         const remoteOrderId = Number(order?.id);
@@ -4636,6 +4715,9 @@ async function syncLocalLineOrdersToStore({ reportProgress = () => {}, cutoffDat
         const payment = order?.payment || {};
         const orderEntries = Array.isArray(order?.order_entries) ? order.order_entries : [];
         const now = new Date();
+        const fulfillmentDate = toDateOrNull(fulfillment?.fulfillment_date);
+        const reportingMonthDate = fulfillmentDate || createdAtRemote || now;
+        touchedReportingMonths.add(formatMonthKeyFromDate(reportingMonthDate));
 
         await connection.query(
           `
@@ -4712,7 +4794,7 @@ async function syncLocalLineOrdersToStore({ reportProgress = () => {}, cutoffDat
               fulfillment?.fulfillment_type
             ),
             toNullableString(fulfillment?.status),
-            toDateOrNull(fulfillment?.fulfillment_date),
+            fulfillmentDate,
             toNullableString(fulfillment?.pickup_start_time),
             toNullableString(fulfillment?.pickup_end_time),
             toNullableString(payment?.status),
@@ -4807,11 +4889,28 @@ async function syncLocalLineOrdersToStore({ reportProgress = () => {}, cutoffDat
         }
 
         stored += 1;
+        scannedThisPage += 1;
         if (remoteOrderId > newestOrderId) {
           newestOrderId = remoteOrderId;
         }
         if (createdAtRemote && (!newestCreatedAt || createdAtRemote > newestCreatedAt)) {
           newestCreatedAt = createdAtRemote;
+        }
+
+        if (scannedThisPage === totalOrdersThisPage || scannedThisPage % 25 === 0) {
+          reportProgress({
+            phaseKey: "fetch",
+            phaseLabel: "Fetch Orders",
+            status: "running",
+            percent: incrementalSync
+              ? null
+              : (totalAvailable ? Math.min(95, Math.round((totalFetched / totalAvailable) * 100)) : 0),
+            current: totalFetched,
+            total: incrementalSync ? null : totalAvailable,
+            message: incrementalSync
+              ? `Scanned ${totalFetched} new orders (${scannedThisPage}/${totalOrdersThisPage} on current page)`
+              : `Fetched page ${page} (${scannedThisPage}/${totalOrdersThisPage} processed)`
+          });
         }
       }
 
@@ -4861,11 +4960,26 @@ async function syncLocalLineOrdersToStore({ reportProgress = () => {}, cutoffDat
     });
     await connection.commit();
 
+    const reportingMonthKeys = incrementalSync
+      ? Array.from(
+          new Set([
+            ...Array.from(touchedReportingMonths),
+            formatMonthKeyFromDate(new Date()),
+            formatMonthKeyFromDate(addUtcMonths(new Date(), -1))
+          ])
+        )
+      : null;
+
     const reportingSummary = await syncLocalLineOrderReportingCache({
       connection,
       reportProgress,
-      startDate: effectiveCutoffDate
+      startDate: effectiveCutoffDate,
+      monthKeys: reportingMonthKeys
     });
+    const orderDateBackfillSummary = await backfillLocalLineOrderDatesFromReportingCache(
+      connection,
+      reportingSummary?.refreshedMonths || reportingMonthKeys || []
+    );
     const subscriptionSummary = await syncLocalLineSubscriberSnapshotCache({
       reportProgress,
       phase: {
@@ -4906,6 +5020,7 @@ async function syncLocalLineOrdersToStore({ reportProgress = () => {}, cutoffDat
     return {
       ...summary,
       reportingSummary,
+      orderDateBackfillSummary,
       subscriptionSummary
     };
   } catch (error) {
@@ -5996,6 +6111,28 @@ async function buildExportReportingMetrics({
   };
 }
 
+function buildOrdersStatusClause(status = "", orderAlias = "o") {
+  if (!status) return null;
+  if (status === "OPEN") {
+    return `(${orderAlias}.status = 'OPEN' OR ${orderAlias}.status = 'DRAFT')`;
+  }
+  return `${orderAlias}.status = ?`;
+}
+
+function buildOrdersPaymentStatusClause(paymentStatus = "", orderAlias = "o") {
+  if (!paymentStatus) return null;
+  if (paymentStatus === "PAID") {
+    return `(
+      ${orderAlias}.payment_status = 'PAID'
+      OR (
+        ${orderAlias}.status = 'DRAFT'
+        AND (${orderAlias}.payment_status IS NULL OR TRIM(${orderAlias}.payment_status) = '')
+      )
+    )`;
+  }
+  return `${orderAlias}.payment_status = ?`;
+}
+
 router.get("/orders", requireAdmin, async (req, res) => {
   await ensureLocalLineSyncSchema().catch((error) => {
     console.warn("Local Line schema bootstrap skipped for /admin/orders:", error.message);
@@ -6089,12 +6226,16 @@ router.get("/orders", requireAdmin, async (req, res) => {
     whereParams.push(category);
   }
   if (status) {
-    whereClauses.push("o.status = ?");
-    whereParams.push(status);
+    whereClauses.push(buildOrdersStatusClause(status, "o"));
+    if (status !== "OPEN") {
+      whereParams.push(status);
+    }
   }
   if (paymentStatus) {
-    whereClauses.push("o.payment_status = ?");
-    whereParams.push(paymentStatus);
+    whereClauses.push(buildOrdersPaymentStatusClause(paymentStatus, "o"));
+    if (paymentStatus !== "PAID") {
+      whereParams.push(paymentStatus);
+    }
   }
   if (month) {
     whereClauses.push(`DATE_FORMAT(${fulfillmentDateSql}, '%Y-%m') = ?`);

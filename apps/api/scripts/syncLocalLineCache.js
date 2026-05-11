@@ -1587,7 +1587,8 @@ async function replaceProductSales(connection, rows, options = {}) {
   }
 }
 
-async function replaceProductMedia(connection, rows, productIds) {
+async function replaceProductMedia(connection, rows, productIds, options = {}) {
+  const onProgress = typeof options.onProgress === "function" ? options.onProgress : () => {};
   if (productIds.length) {
     for (const ids of chunk(productIds, 200)) {
       await connection.query(
@@ -1597,7 +1598,10 @@ async function replaceProductMedia(connection, rows, productIds) {
     }
   }
 
-  for (const row of rows) {
+  let completed = 0;
+  for (const rowChunk of chunk(rows, 200)) {
+    if (!rowChunk.length) continue;
+    const valuesSql = rowChunk.map(() => "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)").join(", ");
     await connection.query(
       `
         INSERT INTO product_media (
@@ -1620,9 +1624,9 @@ async function replaceProductMedia(connection, rows, productIds) {
           created_at,
           updated_at,
           last_synced_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES ${valuesSql}
       `,
-      [
+      rowChunk.flatMap((row) => [
         row.productId,
         row.source,
         row.sourceMediaId,
@@ -1642,12 +1646,15 @@ async function replaceProductMedia(connection, rows, productIds) {
         row.createdAt,
         row.updatedAt,
         row.lastSyncedAt
-      ]
+      ])
     );
+    completed += rowChunk.length;
+    onProgress({ completed, total: rows.length });
   }
 }
 
-async function replaceProductImages(connection, rows, productIds) {
+async function replaceProductImages(connection, rows, productIds, options = {}) {
+  const onProgress = typeof options.onProgress === "function" ? options.onProgress : () => {};
   if (productIds.length) {
     for (const ids of chunk(productIds, 200)) {
       await connection.query(
@@ -1664,17 +1671,22 @@ async function replaceProductImages(connection, rows, productIds) {
     }
   }
 
-  for (const row of rows) {
+  let completed = 0;
+  for (const rowChunk of chunk(rows, 200)) {
+    if (!rowChunk.length) continue;
+    const valuesSql = rowChunk.map(() => "(?, ?, ?)").join(", ");
     await connection.query(
       `
         INSERT INTO product_images (
           product_id,
           url,
           url_hash
-        ) VALUES (?, ?, ?)
+        ) VALUES ${valuesSql}
       `,
-      [row.productId, row.url, row.urlHash]
+      rowChunk.flatMap((row) => [row.productId, row.url, row.urlHash])
     );
+    completed += rowChunk.length;
+    onProgress({ completed, total: rows.length });
   }
 }
 
@@ -2274,8 +2286,32 @@ export async function runLocalLineCacheSync(options = {}) {
         current: null,
         total: null
       });
-      await replaceProductMedia(connection, dataset.productMediaRows, productIds);
-      await replaceProductImages(connection, dataset.mirroredProductImages, productIds);
+      await replaceProductMedia(connection, dataset.productMediaRows, productIds, {
+        onProgress: ({ completed, total }) => {
+          reportProgress({
+            phaseKey: "store-write",
+            phaseLabel: "Store Writes",
+            status: "running",
+            percent: 97,
+            message: `Writing cached media (${completed}/${total})`,
+            current: completed,
+            total
+          });
+        }
+      });
+      await replaceProductImages(connection, dataset.mirroredProductImages, productIds, {
+        onProgress: ({ completed, total }) => {
+          reportProgress({
+            phaseKey: "store-write",
+            phaseLabel: "Store Writes",
+            status: "running",
+            percent: 98,
+            message: `Writing mirrored product images (${completed}/${total})`,
+            current: completed,
+            total
+          });
+        }
+      });
       reportProgress({
         phaseKey: "store-write",
         phaseLabel: "Store Writes",
