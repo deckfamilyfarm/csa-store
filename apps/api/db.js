@@ -57,6 +57,11 @@ const SUBSCRIBER_CAPTURE_TABLE_STATEMENTS = [
       selected_drop_site VARCHAR(255),
       notes TEXT,
       admin_notes TEXT,
+      liability_agreement_accepted TINYINT(1) DEFAULT 0,
+      liability_agreement_signer_name VARCHAR(255),
+      liability_agreement_document_url VARCHAR(2048),
+      liability_agreement_record_url VARCHAR(2048),
+      liability_agreement_signed_at DATETIME,
       source_host VARCHAR(255),
       source_path VARCHAR(255),
       utm_source VARCHAR(255),
@@ -95,6 +100,31 @@ const SUBSCRIBER_CAPTURE_COLUMN_STATEMENTS = [
     tableName: "subscribe_leads",
     columnName: "admin_notes",
     definition: "admin_notes TEXT"
+  },
+  {
+    tableName: "subscribe_leads",
+    columnName: "liability_agreement_accepted",
+    definition: "liability_agreement_accepted TINYINT(1) DEFAULT 0"
+  },
+  {
+    tableName: "subscribe_leads",
+    columnName: "liability_agreement_signer_name",
+    definition: "liability_agreement_signer_name VARCHAR(255)"
+  },
+  {
+    tableName: "subscribe_leads",
+    columnName: "liability_agreement_document_url",
+    definition: "liability_agreement_document_url VARCHAR(2048)"
+  },
+  {
+    tableName: "subscribe_leads",
+    columnName: "liability_agreement_record_url",
+    definition: "liability_agreement_record_url VARCHAR(2048)"
+  },
+  {
+    tableName: "subscribe_leads",
+    columnName: "liability_agreement_signed_at",
+    definition: "liability_agreement_signed_at DATETIME"
   }
 ];
 

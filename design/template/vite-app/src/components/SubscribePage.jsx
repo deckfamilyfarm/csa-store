@@ -1,8 +1,10 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { submitSubscribeLead } from "../api.js";
 
 const DELIVERY_MAP_URL =
   "https://berkeleymapper.berkeley.edu/index.html?tabfile=https://raw.githubusercontent.com/jdeck88/ffcsa_scripts/refs/heads/main/localline/data/delivery_data.tsv&configfile=https://raw.githubusercontent.com/jdeck88/ffcsa_scripts/refs/heads/main/dropsite_maps/dropsites2.xml&pointDisplay=markers&hideLegendItems=true";
+const LIABILITY_AGREEMENT_URL =
+  "https://docs.google.com/document/d/1VFMc4euofQ1S1kjtd6jZI46uxo6YKft9cufT6Q3-nrc/edit?tab=t.0";
 
 const SUBSCRIBE_NAV_LINKS = [
   {
@@ -226,7 +228,10 @@ function buildInitialForm(dropSites = []) {
     referralSource: "",
     selectedPlan: "grazer",
     selectedDropSite: dropSites[0] || "",
-    notes: ""
+    notes: "",
+    liabilityAgreementAccepted: false,
+    liabilityAgreementSignerName: "",
+    liabilityAgreementSignatureMode: "draw"
   };
 }
 
@@ -346,30 +351,171 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
   );
   const [form, setForm] = useState(() => buildInitialForm(siteOptions));
   const [status, setStatus] = useState({ submitting: false, success: false, error: "" });
+  const [agreementModalOpen, setAgreementModalOpen] = useState(false);
+  const [agreementSaved, setAgreementSaved] = useState(false);
+  const [signaturePresent, setSignaturePresent] = useState(false);
+  const signatureCanvasRef = useRef(null);
+  const drawingRef = useRef(false);
+  const lastPointRef = useRef(null);
+  const formStatusRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = signatureCanvasRef.current;
+    if (!canvas) return;
+    const context = canvas.getContext("2d");
+    if (!context) return;
+    context.lineCap = "round";
+    context.lineJoin = "round";
+    context.strokeStyle = "#1e2d3b";
+    context.lineWidth = 2.2;
+  }, [agreementModalOpen]);
 
   function updateField(key, value) {
+    if (
+      key === "liabilityAgreementAccepted" ||
+      key === "liabilityAgreementSignerName" ||
+      key === "liabilityAgreementSignatureMode"
+    ) {
+      setAgreementSaved(false);
+      if (key === "liabilityAgreementSignatureMode" && value === "typed") {
+        clearSignature();
+      }
+    }
     setForm((prev) => ({ ...prev, [key]: value }));
+  }
+
+  function canvasPointFromEvent(event) {
+    const canvas = signatureCanvasRef.current;
+    if (!canvas) return null;
+    const rect = canvas.getBoundingClientRect();
+    if (!rect.width || !rect.height) return null;
+    const clientX = "touches" in event ? event.touches?.[0]?.clientX : event.clientX;
+    const clientY = "touches" in event ? event.touches?.[0]?.clientY : event.clientY;
+    if (typeof clientX !== "number" || typeof clientY !== "number") return null;
+    return {
+      x: clientX - rect.left,
+      y: clientY - rect.top
+    };
+  }
+
+  function startSignature(event) {
+    const canvas = signatureCanvasRef.current;
+    const point = canvasPointFromEvent(event);
+    if (!canvas || !point) return;
+    const context = canvas.getContext("2d");
+    if (!context) return;
+    drawingRef.current = true;
+    lastPointRef.current = point;
+    context.beginPath();
+    context.moveTo(point.x, point.y);
+    context.lineTo(point.x + 0.01, point.y + 0.01);
+    context.stroke();
+    setSignaturePresent(true);
+  }
+
+  function drawSignature(event) {
+    if (!drawingRef.current) return;
+    const canvas = signatureCanvasRef.current;
+    const point = canvasPointFromEvent(event);
+    if (!canvas || !point) return;
+    const context = canvas.getContext("2d");
+    if (!context) return;
+    const previous = lastPointRef.current || point;
+    context.beginPath();
+    context.moveTo(previous.x, previous.y);
+    context.lineTo(point.x, point.y);
+    context.stroke();
+    lastPointRef.current = point;
+    setSignaturePresent(true);
+  }
+
+  function endSignature() {
+    drawingRef.current = false;
+    lastPointRef.current = null;
+  }
+
+  function clearSignature() {
+    const canvas = signatureCanvasRef.current;
+    if (!canvas) return;
+    const context = canvas.getContext("2d");
+    if (!context) return;
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    setSignaturePresent(false);
+    setAgreementSaved(false);
+  }
+
+  function handleSaveAgreement() {
+    if (!form.liabilityAgreementAccepted) {
+      setStatus({
+        submitting: false,
+        success: false,
+        error: "You must agree to the product liability agreement."
+      });
+      return;
+    }
+    if (!form.liabilityAgreementSignerName.trim()) {
+      setStatus({
+        submitting: false,
+        success: false,
+        error: "Enter the signer name for the product liability agreement."
+      });
+      return;
+    }
+    if (form.liabilityAgreementSignatureMode === "draw" && !signaturePresent) {
+      setStatus({
+        submitting: false,
+        success: false,
+        error: "Please provide a drawn signature for the product liability agreement."
+      });
+      return;
+    }
+    setAgreementSaved(true);
+    setStatus({ submitting: false, success: false, error: "" });
+    setAgreementModalOpen(false);
   }
 
   async function handleSubmit(event) {
     event.preventDefault();
     setStatus({ submitting: true, success: false, error: "" });
     try {
+      const canvas = signatureCanvasRef.current;
+      if (!form.liabilityAgreementAccepted) {
+        throw new Error("You must agree to the product liability agreement.");
+      }
+      if (!form.liabilityAgreementSignerName.trim()) {
+        throw new Error("Enter the signer name for the product liability agreement.");
+      }
+      if (!agreementSaved) {
+        throw new Error("Please review and save the agreement before submitting.");
+      }
+      if (form.liabilityAgreementSignatureMode === "draw" && (!canvas || !signaturePresent)) {
+        throw new Error("Please sign the product liability agreement before submitting.");
+      }
       const plan = SUBSCRIBE_PLANS.find((entry) => entry.value === form.selectedPlan);
       await submitSubscribeLead({
         ...form,
         selectedPlanLabel: plan?.title || form.selectedPlan,
+        liabilityAgreementSignatureDataUrl:
+          form.liabilityAgreementSignatureMode === "draw" && canvas
+            ? canvas.toDataURL("image/png")
+            : "",
         sourceHost: window.location.host,
         sourcePath: window.location.pathname,
         queryString: window.location.search
       });
       setStatus({ submitting: false, success: true, error: "" });
+      window.setTimeout(() => {
+        formStatusRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }, 0);
     } catch (error) {
       setStatus({
         submitting: false,
         success: false,
         error: error?.message || "Unable to submit your information right now."
       });
+      window.setTimeout(() => {
+        formStatusRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 0);
     }
   }
 
@@ -461,6 +607,8 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
                       type="button"
                       onClick={() => {
                         setForm(buildInitialForm(siteOptions));
+                        clearSignature();
+                        setAgreementSaved(false);
                         setStatus({ submitting: false, success: false, error: "" });
                       }}
                     >
@@ -603,7 +751,35 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
                     />
                   </label>
 
-                  {status.error ? <div className="small subscribe-error">{status.error}</div> : null}
+                  <div className="subscribe-agreement-card">
+                    <div className="small subscribe-agreement-eyebrow">Required before submitting</div>
+                    <h3>Product liability agreement</h3>
+                    <p>
+                      Review the agreement, then open the signer to sign at the bottom of the
+                      document flow. Your signed PDF copy will be stored with your subscription
+                      request.
+                    </p>
+                    <div className="button-row">
+                      <button
+                        className="button alt"
+                        type="button"
+                        onClick={() => setAgreementModalOpen(true)}
+                      >
+                        {agreementSaved ? "Review Saved Agreement" : "Review and Sign Agreement"}
+                      </button>
+                    </div>
+                    <div className="small">
+                      {agreementSaved && form.liabilityAgreementSignerName && form.liabilityAgreementAccepted
+                        ? `Agreement saved for ${form.liabilityAgreementSignerName} using ${
+                            form.liabilityAgreementSignatureMode === "typed" ? "typed name" : "drawn signature"
+                          }.`
+                        : "Agreement not saved yet."}
+                    </div>
+                  </div>
+
+                  <div ref={formStatusRef}>
+                    {status.error ? <div className="small subscribe-error">{status.error}</div> : null}
+                  </div>
 
                   <div className="button-row">
                     <button className="button" type="submit" disabled={status.submitting}>
@@ -830,6 +1006,105 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
         </section>
       </main>
 
+      {agreementModalOpen ? (
+        <div className="modal-backdrop" onClick={() => setAgreementModalOpen(false)}>
+          <div className="modal response-modal" onClick={(event) => event.stopPropagation()}>
+            <div className="button-row" style={{ justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <strong>Product Liability Agreement</strong>
+                <div className="small">Review, acknowledge, and sign below.</div>
+              </div>
+              <button className="button alt" type="button" onClick={() => setAgreementModalOpen(false)}>
+                Close
+              </button>
+            </div>
+            <div className="subscribe-agreement-card" style={{ marginTop: 16 }}>
+              <p>
+                <a href={LIABILITY_AGREEMENT_URL} target="_blank" rel="noreferrer">
+                  Open the Deck Family Farm product liability agreement
+                </a>
+              </p>
+              <label className="filter-field">
+                <span className="small">Signer full name*</span>
+                <input
+                  className="input"
+                  value={form.liabilityAgreementSignerName}
+                  onChange={(event) =>
+                    updateField("liabilityAgreementSignerName", event.target.value)
+                  }
+                  placeholder="Type your full legal name"
+                />
+              </label>
+              <label className="subscribe-agreement-check">
+                <input
+                  type="checkbox"
+                  checked={Boolean(form.liabilityAgreementAccepted)}
+                  onChange={(event) =>
+                    updateField("liabilityAgreementAccepted", event.target.checked)
+                  }
+                />
+                <span>
+                  I have reviewed the product liability agreement and agree to sign it electronically.
+                </span>
+              </label>
+              <div className="button-row">
+                <button
+                  className={`button alt${form.liabilityAgreementSignatureMode === "draw" ? " selected" : ""}`}
+                  type="button"
+                  onClick={() => updateField("liabilityAgreementSignatureMode", "draw")}
+                >
+                  Draw signature
+                </button>
+                <button
+                  className={`button alt${form.liabilityAgreementSignatureMode === "typed" ? " selected" : ""}`}
+                  type="button"
+                  onClick={() => updateField("liabilityAgreementSignatureMode", "typed")}
+                >
+                  Type my name instead
+                </button>
+              </div>
+              <div className="small">Sign here*</div>
+              {form.liabilityAgreementSignatureMode === "draw" ? (
+                <>
+                  <canvas
+                    ref={signatureCanvasRef}
+                    className="subscribe-signature-pad"
+                    width={560}
+                    height={180}
+                    onMouseDown={startSignature}
+                    onMouseMove={drawSignature}
+                    onMouseUp={endSignature}
+                    onMouseLeave={endSignature}
+                    onTouchStart={startSignature}
+                    onTouchMove={drawSignature}
+                    onTouchEnd={endSignature}
+                  />
+                  <div className="button-row">
+                    <button className="button alt" type="button" onClick={clearSignature}>
+                      Clear signature
+                    </button>
+                    <button className="button" type="button" onClick={handleSaveAgreement}>
+                      Save Agreement
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="small">
+                    Your typed full name above will be used as your electronic signature on the saved PDF.
+                  </div>
+                  <div className="button-row">
+                    <button className="button" type="button" onClick={handleSaveAgreement}>
+                      Save Agreement
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       <footer className="subscribe-footer">
         <div className="container subscribe-footer-row">
           <div>
@@ -840,7 +1115,7 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
             <a className="button alt" href="https://www.deckfamilyfarm.com">
               Main site
             </a>
-            <a className="button" href={storeUrl}>
+            <a className="button" href={subscriptionStoreUrl()}>
               Store
             </a>
           </div>

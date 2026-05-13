@@ -207,6 +207,17 @@ function formatShortDateLabel(value) {
   });
 }
 
+function getSubscribePageUrl() {
+  if (typeof window === "undefined") {
+    return "https://subscribe.deckfamilyfarm.com/";
+  }
+  const host = String(window.location.host || "").trim().toLowerCase();
+  if (host.includes("localhost") || host.includes("127.0.0.1")) {
+    return `${window.location.origin}/?experience=subscribe`;
+  }
+  return "https://subscribe.deckfamilyfarm.com/";
+}
+
 function getTimestampValue(value) {
   if (!value) return 0;
   const timestamp = new Date(value).getTime();
@@ -3414,6 +3425,14 @@ export function AdminPanel({ onCatalogRefresh }) {
     <div className="container admin-panel">
       <div className="admin-header">
         <h2 className="h2">Admin Dashboard</h2>
+        <a
+          className="button alt"
+          href={getSubscribePageUrl()}
+          target="_blank"
+          rel="noreferrer"
+        >
+          Subscribe Page
+        </a>
       </div>
       {message && <div className="small">{message}</div>}
       {loading && <div className="small">Loading...</div>}

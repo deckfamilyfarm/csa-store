@@ -1,4 +1,7 @@
 import express from "express";
+import crypto from "crypto";
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import {
   ensureLocalLineSyncSchema,
   ensureSubscriberCaptureSchema,
@@ -100,6 +103,288 @@ function cleanOptionalString(value, maxLength = 255) {
 function cleanOptionalText(value) {
   const trimmed = String(value ?? "").trim();
   return trimmed || null;
+}
+
+const LIABILITY_AGREEMENT_URL =
+  "https://docs.google.com/document/d/1VFMc4euofQ1S1kjtd6jZI46uxo6YKft9cufT6Q3-nrc/edit?tab=t.0";
+const LIABILITY_AGREEMENT_TITLE = "Full Farm CSA LLC Product Liability Agreement";
+const LIABILITY_AGREEMENT_PARAGRAPHS = [
+  "Mailing address: P.O. Box 565, Junction City, OR 97128",
+  "Farm Location: 25362 High Pass Rd, Junction City, OR 97448",
+  "541-321-0925 • fullfarmcsa@deckfamilyfarm.com",
+  "Thank you for becoming a member of the Full Farm CSA! We are excited to have you be part of our “farmily” and share in the adventure of producing wholesome, nutrient dense foods. Our commitment to you is to produce our farm products in the cleanest and safest way possible; however, it is important to acknowledge that there are inherent risks in consuming food direct from the farm, and we expect that you are educated in the decision to eat as we do. Your food options will include raw milk, farm-processed meat animals, eggs, vegetables, fruit, grains, and other incidentals. Oregon State law prohibits selling these products to consumers, so it needs to be made explicitly clear that our Full Farm CSA, herein called “FFCSA” is a membership group that shares ownership with the farm in the meat, milk and other products that the FFCSA produces.",
+  "Ownership agreement:",
+  "I/we agree to become full members in the FFCSA and take ownership, along with other FFCSA members, Deck Family Farm, Sweet Leaf Organics, Organic Corner Market, Little Wings Farm, Lonesome Whistle Farm, Camas Country Mill, Beetanical Apiary, and any additional member farms, in the dairy herd, any meat animals (hogs, cattle, poultry, sheep), laying hens, and produce, grains, legumes, nuts, honey and fruit crops. My membership fees listed on the financial agreement compensate the farmers for pasturing, feeding, milking, and any required health care for my animals, as well as the cost of producing the non-animal crops. Full Farm CSA LLC retains full decision-making power over animals and crops.",
+  "I/we agree and understand that raw milk, farm processed meat, and the products that come to me direct from the garden are raw agricultural products and I/we accept all of the health benefits and concerns associated with it, and I/we do not hold Full Farm CSA LLC nor its members or member farms responsible for any food borne illnesses associated with raw milk, meat or raw produce, nuts, honey or fruit consumption.",
+  "I/we have been informed and understand that I/we are choosing to receive as part of my farm membership raw cow milk and other raw agricultural products. I/we will not hold Full Farm CSA LLC, other FFCSA members, or member farms responsible or liable for any injury, in any way, after purchasing this membership and receiving the products including but not limited to raw milk, meat, eggs; and I/we am solely responsible for my health and safety while on the farm premises for any activity, including but not limited to: CSA pick-up, U-pick harvests, and farm events.",
+  "I/we agree that I/we will not pursue any legal actions, suits, claims for relief, demands, damages, and any other obligations, known and unknown, suspected and unsuspected, in law or equity, direct or indirect, and whether now or in the future, for any injury or death arising from use of these products what-so-ever.",
+  "I/we agree that my FFCSA Membership is not transferable and that I/we will not sell nor share my membership to/with anyone else. I/we agree to give written notice immediately upon decision to cancel membership. I/we agree that I am not entitled to a refund of unused membership shares, but may choose to donate unused funds to our Feed-a-Friend program.",
+  "I/we understand as a FFCSA Member that it is my responsibility to ensure that any product I/we purchase is cared for properly to guarantee its freshness and quality. Therefore, I/we agree to bring clean containers and a cooler with ice to pick-up for safe transport of my goods to my home refrigerator and pantry. I/we also agree to conscientiously follow all health and safety guidelines while at pick-up and on the farm.",
+  "I/we agree to pick up my share from my drop site or farm each week and if I/we intend to come to the farm for Friday pick up I/we will give 24 hours advance notice if I/we want to attend the farm dinner.",
+  "I/we understand that Full Farm CSA LLC is committed to supplying a wide variety of abundant fresh farm products, however I/we understand that farming is unpredictable. In joining Full Farm CSA LLC, I/we understand that there will be variations in the quantity and the quality of food that I/we receive, including substitutions, depending on weather and other factors.",
+  "By purchasing products through the Full Farm CSA, I/we have read and understand the Full Farm CSA LLC Product Liability Agreement and agree to their contents on behalf of my member household. This document supersedes any prior document on the same subject."
+];
+
+let spacesClient = null;
+
+function getSpacesClient() {
+  if (!spacesClient) {
+    spacesClient = new S3Client({
+      region: process.env.DO_SPACES_REGION || "sfo3",
+      endpoint: process.env.DO_SPACES_ENDPOINT,
+      credentials: {
+        accessKeyId: process.env.DO_SPACES_KEY,
+        secretAccessKey: process.env.DO_SPACES_SECRET
+      }
+    });
+  }
+  return spacesClient;
+}
+
+function hasSpacesUploadConfig() {
+  return Boolean(
+    process.env.DO_SPACES_BUCKET &&
+      process.env.DO_SPACES_ENDPOINT &&
+      process.env.DO_SPACES_KEY &&
+      process.env.DO_SPACES_SECRET
+  );
+}
+
+function buildPublicUrl(key) {
+  const base = process.env.DO_SPACES_PUBLIC_BASE_URL;
+  if (base) return `${base.replace(/\/$/, "")}/${key}`;
+  return `${process.env.DO_SPACES_ENDPOINT}/${process.env.DO_SPACES_BUCKET}/${key}`;
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function parseSignatureDataUrl(value) {
+  const input = String(value || "").trim();
+  const match = input.match(/^data:(image\/png);base64,([a-z0-9+/=\s]+)$/i);
+  if (!match) return null;
+  try {
+    const buffer = Buffer.from(match[2].replace(/\s+/g, ""), "base64");
+    if (!buffer.length) return null;
+    return {
+      mimeType: match[1].toLowerCase(),
+      buffer,
+      dataUrl: input
+    };
+  } catch (_error) {
+    return null;
+  }
+}
+
+function wrapPdfText(text, maxChars = 86) {
+  const words = String(text || "").split(/\s+/).filter(Boolean);
+  const lines = [];
+  let current = "";
+  for (const word of words) {
+    const next = current ? `${current} ${word}` : word;
+    if (next.length > maxChars && current) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = next;
+    }
+  }
+  if (current) lines.push(current);
+  return lines;
+}
+
+async function buildSignedAgreementPdf({
+  signerName,
+  email,
+  submittedAt,
+  sourceHost,
+  sourcePath,
+  signatureBuffer,
+  signatureMode
+}) {
+  const pdfDoc = await PDFDocument.create();
+  let page = pdfDoc.addPage([612, 792]);
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  const signatureImage = signatureBuffer ? await pdfDoc.embedPng(signatureBuffer) : null;
+  const signedLabel = submittedAt.toLocaleString("en-US", {
+    dateStyle: "long",
+    timeStyle: "short"
+  });
+  const pageSize = [612, 792];
+  const marginX = 48;
+  const bodyWidth = 516;
+  const pageBottom = 56;
+
+  function newPage() {
+    page = pdfDoc.addPage(pageSize);
+    return 740;
+  }
+
+  let y = 740;
+  page.drawText(LIABILITY_AGREEMENT_TITLE, {
+    x: marginX,
+    y,
+    size: 20,
+    font: boldFont,
+    color: rgb(0.12, 0.18, 0.23)
+  });
+  y -= 30;
+  page.drawText(`Agreement source: ${LIABILITY_AGREEMENT_URL}`, {
+    x: marginX,
+    y,
+    size: 10,
+    font,
+    color: rgb(0.35, 0.3, 0.26)
+  });
+  y -= 30;
+
+  const metaLines = [
+    `Signer: ${signerName}`,
+    `Email: ${email}`,
+    `Signed at: ${signedLabel}`,
+    `Source: ${sourceHost || ""}${sourcePath || ""}`,
+    "Statement: I have reviewed the Deck Family Farm product liability agreement and submit this signature as my agreement."
+  ];
+
+  for (const metaLine of metaLines) {
+    for (const line of wrapPdfText(metaLine, 88)) {
+      if (y <= pageBottom) y = newPage();
+      page.drawText(line, {
+        x: marginX,
+        y,
+        size: 11,
+        font,
+        color: rgb(0.12, 0.11, 0.09)
+      });
+      y -= 18;
+    }
+    y -= 6;
+  }
+
+  y -= 12;
+  page.drawText("Agreement Text", {
+    x: marginX,
+    y,
+    size: 14,
+    font: boldFont,
+    color: rgb(0.12, 0.18, 0.23)
+  });
+  y -= 24;
+
+  for (const paragraph of LIABILITY_AGREEMENT_PARAGRAPHS) {
+    const isHeading = paragraph.endsWith(":");
+    const lines = wrapPdfText(paragraph, 92);
+    for (const line of lines) {
+      if (y <= pageBottom) y = newPage();
+      page.drawText(line, {
+        x: marginX,
+        y,
+        size: isHeading ? 12 : 10.5,
+        font: isHeading ? boldFont : font,
+        color: rgb(0.12, 0.11, 0.09),
+        maxWidth: bodyWidth,
+        lineHeight: 14
+      });
+      y -= isHeading ? 16 : 14;
+    }
+    y -= isHeading ? 6 : 10;
+  }
+
+  y = newPage();
+  page.drawText("Signature", {
+    x: marginX,
+    y,
+    size: 14,
+    font: boldFont,
+    color: rgb(0.12, 0.18, 0.23)
+  });
+  y -= 160;
+  if (signatureImage) {
+    const dims = signatureImage.scale(0.5);
+    page.drawImage(signatureImage, {
+      x: marginX,
+      y,
+      width: Math.min(dims.width, 320),
+      height: Math.min(dims.height, 120)
+    });
+  } else {
+    page.drawText(`Electronically signed by typing name: ${signerName}`, {
+      x: marginX,
+      y: y + 50,
+      size: 16,
+      font: boldFont,
+      color: rgb(0.12, 0.11, 0.09)
+    });
+    page.drawText(`Signature mode: ${signatureMode === "typed" ? "Typed name" : "Electronic"}`, {
+      x: marginX,
+      y: y + 28,
+      size: 10,
+      font,
+      color: rgb(0.35, 0.3, 0.26)
+    });
+  }
+  page.drawLine({
+    start: { x: marginX, y: y - 8 },
+    end: { x: 380, y: y - 8 },
+    thickness: 1,
+    color: rgb(0.12, 0.11, 0.09)
+  });
+  page.drawText(signerName, {
+    x: marginX,
+    y: y - 24,
+    size: 10,
+    font,
+    color: rgb(0.12, 0.11, 0.09)
+  });
+
+  return Buffer.from(await pdfDoc.save());
+}
+
+async function uploadSignedAgreementRecord({
+  signerName,
+  email,
+  submittedAt,
+  sourceHost,
+  sourcePath,
+  signatureBuffer,
+  signatureMode
+}) {
+  if (!hasSpacesUploadConfig()) {
+    throw new Error(
+      "Signed agreement storage is not configured. Set DO_SPACES_BUCKET, DO_SPACES_ENDPOINT, DO_SPACES_KEY, and DO_SPACES_SECRET."
+    );
+  }
+  const stamp = submittedAt.toISOString().replace(/[:.]/g, "-");
+  const slug = crypto.randomBytes(6).toString("hex");
+  const key = `subscribe-agreements/${submittedAt.getUTCFullYear()}/${String(
+    submittedAt.getUTCMonth() + 1
+  ).padStart(2, "0")}/${stamp}-${slug}.pdf`;
+  const pdf = await buildSignedAgreementPdf({
+    signerName,
+    email,
+    submittedAt,
+    sourceHost,
+    sourcePath,
+    signatureBuffer,
+    signatureMode
+  });
+  await getSpacesClient().send(
+    new PutObjectCommand({
+      Bucket: process.env.DO_SPACES_BUCKET,
+      Key: key,
+      Body: pdf,
+      ContentType: "application/pdf",
+      ACL: "public-read"
+    })
+  );
+  return buildPublicUrl(key);
 }
 
 router.get("/catalog", async (_req, res) => {
@@ -568,6 +853,15 @@ router.post("/subscribe", async (req, res) => {
     const firstName = cleanString(payload.firstName);
     const lastName = cleanString(payload.lastName);
     const email = cleanString(payload.email);
+    const signerName = cleanString(
+      payload.liabilityAgreementSignerName || `${firstName} ${lastName}`.trim()
+    );
+    const agreementAccepted = Boolean(payload.liabilityAgreementAccepted);
+    const signatureMode =
+      String(payload.liabilityAgreementSignatureMode || "draw").trim().toLowerCase() === "typed"
+        ? "typed"
+        : "draw";
+    const signature = parseSignatureDataUrl(payload.liabilityAgreementSignatureDataUrl);
 
     if (!firstName || !lastName || !email) {
       res.status(400).json({ error: "First name, last name, and email are required." });
@@ -579,6 +873,21 @@ router.post("/subscribe", async (req, res) => {
       return;
     }
 
+    if (!agreementAccepted) {
+      res.status(400).json({ error: "You must agree to the product liability agreement." });
+      return;
+    }
+
+    if (!signerName) {
+      res.status(400).json({ error: "Enter the signer name for the liability agreement." });
+      return;
+    }
+
+    if (signatureMode === "draw" && !signature) {
+      res.status(400).json({ error: "Please provide a drawn signature for the liability agreement." });
+      return;
+    }
+
     const now = new Date();
     const searchParams = new URLSearchParams(String(payload.queryString || ""));
     const sourceHostHeader = cleanOptionalString(
@@ -586,6 +895,15 @@ router.post("/subscribe", async (req, res) => {
       255
     );
     const sourcePath = cleanOptionalString(payload.sourcePath, 255);
+    const liabilityAgreementRecordUrl = await uploadSignedAgreementRecord({
+      signerName,
+      email,
+      submittedAt: now,
+      sourceHost: sourceHostHeader,
+      sourcePath,
+      signatureBuffer: signature?.buffer || null,
+      signatureMode
+    });
 
     await db.insert(subscribeLeads).values({
       status: "in_progress",
@@ -604,6 +922,11 @@ router.post("/subscribe", async (req, res) => {
       selectedPlanLabel: cleanOptionalString(payload.selectedPlanLabel, 255),
       selectedDropSite: cleanOptionalString(payload.selectedDropSite, 255),
       notes: cleanOptionalText(payload.notes),
+      liabilityAgreementAccepted: 1,
+      liabilityAgreementSignerName: cleanOptionalString(signerName, 255),
+      liabilityAgreementDocumentUrl: LIABILITY_AGREEMENT_URL,
+      liabilityAgreementRecordUrl: liabilityAgreementRecordUrl,
+      liabilityAgreementSignedAt: now,
       sourceHost: sourceHostHeader,
       sourcePath,
       utmSource: cleanOptionalString(payload.utmSource || searchParams.get("utm_source"), 255),
@@ -620,7 +943,7 @@ router.post("/subscribe", async (req, res) => {
       updatedAt: now
     });
 
-    res.json({ ok: true });
+    res.json({ ok: true, liabilityAgreementRecordUrl });
   } catch (error) {
     console.error("Subscribe lead capture error:", error);
     res.status(500).json({ error: "Unable to submit subscribe request." });

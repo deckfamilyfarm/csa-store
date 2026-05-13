@@ -42,12 +42,44 @@ function DetailRow({ label, value }) {
   );
 }
 
+function DetailLinkRow({ label, href, text }) {
+  return (
+    <div>
+      <div className="small">
+        <strong>{label}</strong>
+      </div>
+      {href ? (
+        <a href={href} target="_blank" rel="noreferrer">
+          {text || href}
+        </a>
+      ) : (
+        <div>—</div>
+      )}
+    </div>
+  );
+}
+
+function AgreementCell({ href }) {
+  if (!href) return <span className="small">No PDF</span>;
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      onClick={(event) => event.stopPropagation()}
+    >
+      Signed PDF
+    </a>
+  );
+}
+
 export function AdminSubscriptionLeadsSection({ token }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [leads, setLeads] = useState([]);
   const [selectedLeadId, setSelectedLeadId] = useState(null);
+  const [modalLeadId, setModalLeadId] = useState(null);
   const [drafts, setDrafts] = useState({});
   const [savingLeadId, setSavingLeadId] = useState(null);
 
@@ -84,6 +116,10 @@ export function AdminSubscriptionLeadsSection({ token }) {
     () => leads.find((lead) => lead.id === selectedLeadId) || null,
     [leads, selectedLeadId]
   );
+  const modalLead = useMemo(
+    () => leads.find((lead) => lead.id === modalLeadId) || null,
+    [leads, modalLeadId]
+  );
   const selectedDraft = selectedLead ? drafts[selectedLead.id] || createLeadDraft(selectedLead) : null;
   const selectedDirty = selectedLead ? draftChanged(selectedLead, selectedDraft) : false;
 
@@ -97,13 +133,15 @@ export function AdminSubscriptionLeadsSection({ token }) {
     }));
   }
 
-  async function handleSaveSelected() {
-    if (!selectedLead || !selectedDraft) return;
-    setSavingLeadId(selectedLead.id);
+  async function handleSaveLead(leadId) {
+    const lead = leads.find((entry) => entry.id === leadId);
+    const draft = drafts[leadId] || createLeadDraft(lead);
+    if (!lead || !draft) return;
+    setSavingLeadId(leadId);
     setError("");
     setMessage("");
     try {
-      const response = await adminPut(`subscription-leads/${selectedLead.id}`, token, selectedDraft);
+      const response = await adminPut(`subscription-leads/${leadId}`, token, draft);
       const updatedLead = response.lead || null;
       if (updatedLead) {
         setLeads((current) =>
@@ -145,129 +183,159 @@ export function AdminSubscriptionLeadsSection({ token }) {
                 <th>Email</th>
                 <th>Plan</th>
                 <th>Drop Site</th>
+                <th>Agreement</th>
                 <th>Status</th>
+                <th>Notes</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {leads.map((lead) => (
-                <tr
-                  key={lead.id}
-                  className={lead.id === selectedLeadId ? "selected" : ""}
-                  onClick={() => {
-                    setSelectedLeadId(lead.id);
-                    setMessage("");
-                    setError("");
-                  }}
-                  style={{ cursor: "pointer" }}
-                >
-                  <td>{formatDateTime(lead.submittedAt || lead.createdAt)}</td>
-                  <td>{[lead.firstName, lead.lastName].filter(Boolean).join(" ") || "—"}</td>
-                  <td>{lead.email || "—"}</td>
-                  <td>{lead.selectedPlanLabel || lead.selectedPlan || "—"}</td>
-                  <td>{lead.selectedDropSite || "—"}</td>
-                  <td>{formatStatusLabel(lead.status)}</td>
-                </tr>
-              ))}
+              {leads.map((lead) => {
+                const draft = drafts[lead.id] || createLeadDraft(lead);
+                const dirty = draftChanged(lead, draft);
+                return (
+                  <tr
+                    key={lead.id}
+                    className={lead.id === selectedLeadId ? "selected" : ""}
+                    onClick={() => {
+                      setSelectedLeadId(lead.id);
+                      setModalLeadId(lead.id);
+                      setMessage("");
+                      setError("");
+                    }}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <td>{formatDateTime(lead.submittedAt || lead.createdAt)}</td>
+                    <td>{[lead.firstName, lead.lastName].filter(Boolean).join(" ") || "—"}</td>
+                    <td>{lead.email || "—"}</td>
+                    <td>{lead.selectedPlanLabel || lead.selectedPlan || "—"}</td>
+                    <td>{lead.selectedDropSite || "—"}</td>
+                    <td>
+                      <AgreementCell href={lead.liabilityAgreementRecordUrl} />
+                    </td>
+                    <td onClick={(event) => event.stopPropagation()}>
+                      <select
+                        className="input"
+                        value={draft.status || "in_progress"}
+                        onChange={(event) =>
+                          updateDraft(lead.id, { status: event.target.value })
+                        }
+                      >
+                        {STATUS_OPTIONS.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                    <td onClick={(event) => event.stopPropagation()}>
+                      <textarea
+                        className="textarea"
+                        rows={2}
+                        value={draft.adminNotes || ""}
+                        onChange={(event) =>
+                          updateDraft(lead.id, { adminNotes: event.target.value })
+                        }
+                      />
+                    </td>
+                    <td onClick={(event) => event.stopPropagation()}>
+                      <button
+                        className="button alt"
+                        type="button"
+                        disabled={!dirty || savingLeadId === lead.id}
+                        onClick={() => handleSaveLead(lead.id)}
+                      >
+                        {savingLeadId === lead.id ? "Saving..." : "Save"}
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
-
-          {selectedLead ? (
-            <div className="card pad" style={{ marginTop: 20 }}>
-              <div className="button-row" style={{ justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <strong>
-                    {[selectedLead.firstName, selectedLead.lastName].filter(Boolean).join(" ")}
-                  </strong>
-                  <div className="small">{selectedLead.email}</div>
-                </div>
-                <button
-                  className="button alt"
-                  type="button"
-                  onClick={loadLeads}
-                  disabled={loading}
-                >
-                  Refresh
-                </button>
-              </div>
-
-              <div className="admin-grid" style={{ marginTop: 16 }}>
-                <DetailRow label="Submitted" value={formatDateTime(selectedLead.submittedAt || selectedLead.createdAt)} />
-                <DetailRow label="Phone" value={selectedLead.phone} />
-                <DetailRow label="Country" value={selectedLead.country} />
-                <DetailRow label="Address 1" value={selectedLead.addressLine1} />
-                <DetailRow label="Address 2" value={selectedLead.addressLine2} />
-                <DetailRow label="City" value={selectedLead.city} />
-                <DetailRow label="State / Province" value={selectedLead.stateProvince} />
-                <DetailRow label="Postal Code" value={selectedLead.postalCode} />
-                <DetailRow label="Plan" value={selectedLead.selectedPlanLabel || selectedLead.selectedPlan} />
-                <DetailRow label="Drop Site" value={selectedLead.selectedDropSite} />
-                <DetailRow label="Referral Source" value={selectedLead.referralSource} />
-                <DetailRow label="UTM Source" value={selectedLead.utmSource} />
-                <DetailRow label="UTM Medium" value={selectedLead.utmMedium} />
-                <DetailRow label="UTM Campaign" value={selectedLead.utmCampaign} />
-                <DetailRow label="UTM Content" value={selectedLead.utmContent} />
-                <DetailRow label="UTM Term" value={selectedLead.utmTerm} />
-                <DetailRow label="Source Host" value={selectedLead.sourceHost} />
-                <DetailRow label="Source Path" value={selectedLead.sourcePath} />
-              </div>
-
-              <div style={{ marginTop: 20 }}>
-                <div className="small">
-                  <strong>Customer Notes</strong>
-                </div>
-                <div>{selectedLead.notes || "—"}</div>
-              </div>
-
-              <div className="admin-grid" style={{ marginTop: 20 }}>
-                <div>
-                  <label className="small" htmlFor="subscription-lead-status">
-                    <strong>Status</strong>
-                  </label>
-                  <select
-                    id="subscription-lead-status"
-                    className="input"
-                    value={selectedDraft?.status || "in_progress"}
-                    onChange={(event) =>
-                      updateDraft(selectedLead.id, { status: event.target.value })
-                    }
-                  >
-                    {STATUS_OPTIONS.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="small" htmlFor="subscription-lead-admin-notes">
-                    <strong>Internal Notes</strong>
-                  </label>
-                  <textarea
-                    id="subscription-lead-admin-notes"
-                    className="textarea"
-                    rows={6}
-                    value={selectedDraft?.adminNotes || ""}
-                    onChange={(event) =>
-                      updateDraft(selectedLead.id, { adminNotes: event.target.value })
-                    }
-                  />
-                </div>
-              </div>
-
-              <div className="button-row">
-                <button
-                  className="button alt"
-                  type="button"
-                  disabled={!selectedDirty || savingLeadId === selectedLead.id}
-                  onClick={handleSaveSelected}
-                >
-                  {savingLeadId === selectedLead.id ? "Saving..." : "Save Lead"}
-                </button>
-              </div>
-            </div>
-          ) : null}
+          <div className="button-row" style={{ marginTop: 16 }}>
+            <button className="button alt" type="button" onClick={loadLeads} disabled={loading}>
+              Refresh
+            </button>
+          </div>
         </>
       )}
+      {modalLead ? (
+        <div className="modal-backdrop" onClick={() => setModalLeadId(null)}>
+          <div
+            className="modal response-modal subscription-lead-modal"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="button-row" style={{ justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <strong>{[modalLead.firstName, modalLead.lastName].filter(Boolean).join(" ")}</strong>
+                <div className="small">{modalLead.email}</div>
+              </div>
+              <button className="button alt" type="button" onClick={() => setModalLeadId(null)}>
+                Close
+              </button>
+            </div>
+            <div className="admin-grid" style={{ marginTop: 16 }}>
+              <DetailRow label="Submitted" value={formatDateTime(modalLead.submittedAt || modalLead.createdAt)} />
+              <DetailRow label="Phone" value={modalLead.phone} />
+              <DetailRow label="Country" value={modalLead.country} />
+              <DetailRow label="Address 1" value={modalLead.addressLine1} />
+              <DetailRow label="Address 2" value={modalLead.addressLine2} />
+              <DetailRow label="City" value={modalLead.city} />
+              <DetailRow label="State / Province" value={modalLead.stateProvince} />
+              <DetailRow label="Postal Code" value={modalLead.postalCode} />
+              <DetailRow label="Plan" value={modalLead.selectedPlanLabel || modalLead.selectedPlan} />
+              <DetailRow label="Drop Site" value={modalLead.selectedDropSite} />
+              <DetailRow label="Referral Source" value={modalLead.referralSource} />
+              <DetailRow label="UTM Source" value={modalLead.utmSource} />
+              <DetailRow label="UTM Medium" value={modalLead.utmMedium} />
+              <DetailRow label="UTM Campaign" value={modalLead.utmCampaign} />
+              <DetailRow label="UTM Content" value={modalLead.utmContent} />
+              <DetailRow label="UTM Term" value={modalLead.utmTerm} />
+              <DetailRow label="Source Host" value={modalLead.sourceHost} />
+              <DetailRow label="Source Path" value={modalLead.sourcePath} />
+              <DetailRow label="Agreement Signed" value={modalLead.liabilityAgreementSignedAt ? formatDateTime(modalLead.liabilityAgreementSignedAt) : "No"} />
+              <DetailRow label="Agreement Signer" value={modalLead.liabilityAgreementSignerName} />
+              <DetailLinkRow label="Agreement Source" href={modalLead.liabilityAgreementDocumentUrl} text="View agreement" />
+              <DetailLinkRow label="Signed Agreement Record" href={modalLead.liabilityAgreementRecordUrl} text="Open signed agreement" />
+            </div>
+            <div style={{ marginTop: 20 }}>
+              <div className="small">
+                <strong>Customer Notes</strong>
+              </div>
+              <div>{modalLead.notes || "—"}</div>
+            </div>
+            {modalLead.liabilityAgreementRecordUrl ? (
+              <div style={{ marginTop: 20 }}>
+                <div className="small">
+                  <strong>Signed Agreement Preview</strong>
+                </div>
+                <div className="button-row" style={{ marginTop: 8, marginBottom: 8 }}>
+                  <a
+                    className="button alt"
+                    href={modalLead.liabilityAgreementRecordUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Open PDF in New Tab
+                  </a>
+                </div>
+                <iframe
+                  src={modalLead.liabilityAgreementRecordUrl}
+                  title={`Signed agreement for ${modalLead.email}`}
+                  style={{
+                    width: "100%",
+                    minHeight: 820,
+                    border: "1px solid rgba(31, 27, 23, 0.12)",
+                    borderRadius: 16,
+                    background: "#fff"
+                  }}
+                />
+              </div>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }

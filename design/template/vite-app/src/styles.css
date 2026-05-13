@@ -536,6 +536,10 @@ img {
 .subscribe-error {
   color: var(--barn);
   font-weight: 600;
+  background: rgba(255, 242, 240, 0.98);
+  border: 1px solid rgba(143, 46, 43, 0.2);
+  border-radius: 14px;
+  padding: 12px 14px;
 }
 
 .subscribe-proof {
@@ -695,6 +699,63 @@ img {
   color: var(--navy);
   font-family: "Tomarik Extrovert", var(--subscribe-serif);
   font-weight: 700;
+}
+
+.subscribe-agreement-card {
+  margin-top: 12px;
+  padding: 18px 18px 20px;
+  border: 1px solid rgba(31, 27, 23, 0.12);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.76);
+  display: grid;
+  gap: 12px;
+}
+
+.subscribe-agreement-card h3 {
+  margin: 0;
+  font-family: var(--subscribe-serif);
+  color: var(--navy);
+  font-size: 28px;
+}
+
+.subscribe-agreement-card p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.subscribe-agreement-card a {
+  color: var(--barn);
+  text-decoration: underline;
+}
+
+.subscribe-agreement-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--field);
+  font-weight: 700;
+}
+
+.subscribe-agreement-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  line-height: 1.5;
+}
+
+.subscribe-agreement-check input {
+  margin-top: 4px;
+}
+
+.subscribe-signature-pad {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  min-height: 180px;
+  background: #ffffff;
+  border: 1px solid rgba(31, 27, 23, 0.16);
+  border-radius: 16px;
+  touch-action: none;
+  cursor: crosshair;
 }
 
 .subscribe-location-copy h3,
@@ -3152,6 +3213,12 @@ img {
   width: min(640px, 94vw);
   display: grid;
   gap: 12px;
+}
+
+.subscription-lead-modal {
+  width: min(1120px, 96vw);
+  max-height: 92vh;
+  overflow: auto;
 }
 
 .audit-modal {
