@@ -105,6 +105,322 @@ function cleanOptionalText(value) {
   return trimmed || null;
 }
 
+function toFloat(value) {
+  const numeric = Number.parseFloat(String(value ?? ""));
+  return Number.isFinite(numeric) ? numeric : null;
+}
+
+function normalizeCoordinatePair(value) {
+  if (!Array.isArray(value) || value.length < 2) return null;
+  const longitude = toFloat(value[0]);
+  const latitude = toFloat(value[1]);
+  if (latitude === null || longitude === null) return null;
+  return { latitude, longitude };
+}
+
+function parseKmlCoordinateBlock(block) {
+  return String(block || "")
+    .trim()
+    .split(/\s+/)
+    .map((entry) => normalizeCoordinatePair(entry.split(",")))
+    .filter(Boolean);
+}
+
+function closePolygon(points) {
+  if (!Array.isArray(points) || points.length < 3) return [];
+  const first = points[0];
+  const last = points[points.length - 1];
+  if (first.latitude === last.latitude && first.longitude === last.longitude) {
+    return points;
+  }
+  return [...points, first];
+}
+
+function parseKmlPolygons(kmlText) {
+  const polygons = [];
+  const matches = String(kmlText || "").matchAll(/<coordinates>([\s\S]*?)<\/coordinates>/gi);
+  for (const match of matches) {
+    const points = closePolygon(parseKmlCoordinateBlock(match[1]));
+    if (points.length >= 4) polygons.push(points);
+  }
+  return polygons;
+}
+
+function pointInPolygon(latitude, longitude, polygon) {
+  if (!Array.isArray(polygon) || polygon.length < 4) return false;
+  let inside = false;
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const xi = polygon[i].longitude;
+    const yi = polygon[i].latitude;
+    const xj = polygon[j].longitude;
+    const yj = polygon[j].latitude;
+    const intersects =
+      yi > latitude !== yj > latitude &&
+      longitude < ((xj - xi) * (latitude - yi)) / ((yj - yi) || Number.EPSILON) + xi;
+    if (intersects) inside = !inside;
+  }
+  return inside;
+}
+
+function haversineMiles(lat1, lon1, lat2, lon2) {
+  const toRadians = (degrees) => (degrees * Math.PI) / 180;
+  const earthRadiusMiles = 3958.7613;
+  const dLat = toRadians(lat2 - lat1);
+  const dLon = toRadians(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.sin(dLon / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return earthRadiusMiles * c;
+}
+
+function isVisibleSubscribeDropSiteRow(site) {
+  const name = String(site?.name || "").trim().toLowerCase();
+  if (!name) return false;
+  return !(
+    name.includes("membership purchase") ||
+    name.includes("herdshare purchase") ||
+    name.includes("snap fulfillment membership")
+  );
+}
+
+function isDeliveryDropSiteRow(site) {
+  return (
+    String(site?.fulfillmentType || "").trim().toLowerCase() === "delivery" ||
+    String(site?.type || "").trim().toLowerCase() === "postalcodes" ||
+    String(site?.name || "").trim().toLowerCase().includes("home delivery")
+  );
+}
+
+function getLocationIqConfig() {
+  const apiKey = String(
+    process.env.LOCATIONIQ_API_KEY || process.env.LOCATIONIQ_KEY || ""
+  ).trim();
+  const baseUrl = String(process.env.LOCATIONIQ_BASE_URL || "https://us1.locationiq.com/v1")
+    .trim()
+    .replace(/\/$/, "");
+  return { apiKey, baseUrl };
+}
+
+function getFetchTimeoutMs(envKey, fallbackMs) {
+  const numeric = Number.parseInt(String(process.env[envKey] || ""), 10);
+  return Number.isFinite(numeric) && numeric > 0 ? numeric : fallbackMs;
+}
+
+async function fetchWithTimeout(url, options = {}, timeoutMs = 8000, timeoutMessage = "Request timed out.") {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(new Error(timeoutMessage)), timeoutMs);
+  try {
+    return await fetch(url, {
+      ...options,
+      signal: controller.signal
+    });
+  } catch (error) {
+    if (error?.name === "AbortError") {
+      throw new Error(timeoutMessage);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+function buildLocationIqAddressPayload({
+  addressLine1,
+  addressLine2,
+  city,
+  stateProvince,
+  postalCode,
+  country
+}) {
+  return {
+    street: [cleanString(addressLine1), cleanString(addressLine2)].filter(Boolean).join(" "),
+    city: cleanString(city),
+    state: cleanString(stateProvince),
+    postalcode: cleanString(postalCode, 32),
+    country: cleanString(country || "United States", 128)
+  };
+}
+
+let deliveryAreaPolygonCache = null;
+let deliveryAreaPolygonFetchedAt = 0;
+let deliveryAreaPolygonPromise = null;
+let activeDropSitesCache = null;
+let activeDropSitesFetchedAt = 0;
+let activeDropSitesPromise = null;
+
+async function getActiveDropSites(db) {
+  const now = Date.now();
+  if (activeDropSitesCache && now - activeDropSitesFetchedAt < 10 * 60 * 1000) {
+    return activeDropSitesCache;
+  }
+
+  if (!activeDropSitesPromise) {
+    activeDropSitesPromise = (async () => {
+      const rows = await db.select().from(dropSites).where(eq(dropSites.active, 1));
+      activeDropSitesCache = rows;
+      activeDropSitesFetchedAt = Date.now();
+      return rows;
+    })().finally(() => {
+      activeDropSitesPromise = null;
+    });
+  }
+
+  return activeDropSitesPromise;
+}
+
+async function getDeliveryAreaPolygons() {
+  const now = Date.now();
+  if (deliveryAreaPolygonCache && now - deliveryAreaPolygonFetchedAt < 15 * 60 * 1000) {
+    return deliveryAreaPolygonCache;
+  }
+
+  if (!deliveryAreaPolygonPromise) {
+    const deliveryAreaUrl =
+      process.env.DELIVERY_AREA_KML_URL ||
+      "https://raw.githubusercontent.com/jdeck88/ffcsa_scripts/refs/heads/main/dropsite_maps/dropsites.kml";
+    const timeoutMs = getFetchTimeoutMs("DELIVERY_AREA_FETCH_TIMEOUT_MS", 5000);
+    deliveryAreaPolygonPromise = (async () => {
+      const response = await fetchWithTimeout(
+        deliveryAreaUrl,
+        {
+        headers: { "User-Agent": "csa-store/subscribe-address-check" }
+        },
+        timeoutMs,
+        "Delivery area lookup timed out."
+      );
+      if (!response.ok) {
+        throw new Error(`Delivery area fetch failed (${response.status})`);
+      }
+      const kmlText = await response.text();
+      const polygons = parseKmlPolygons(kmlText);
+      if (!polygons.length) {
+        throw new Error("No delivery polygons found in KML");
+      }
+      deliveryAreaPolygonCache = polygons;
+      deliveryAreaPolygonFetchedAt = Date.now();
+      return polygons;
+    })().finally(() => {
+      deliveryAreaPolygonPromise = null;
+    });
+  }
+
+  return deliveryAreaPolygonPromise;
+}
+
+async function geocodeAddressWithLocationIq(addressInput) {
+  const { apiKey, baseUrl } = getLocationIqConfig();
+  if (!apiKey) {
+    throw new Error("Address validation is not configured.");
+  }
+
+  const params = new URLSearchParams({
+    key: apiKey,
+    format: "json",
+    normalizeaddress: "1",
+    addressdetails: "1",
+    ...buildLocationIqAddressPayload(addressInput)
+  });
+
+  const response = await fetchWithTimeout(
+    `${baseUrl}/search/structured?${params.toString()}`,
+    {
+      headers: { "User-Agent": "csa-store/subscribe-address-check" }
+    },
+    getFetchTimeoutMs("LOCATIONIQ_TIMEOUT_MS", 8000),
+    "Address lookup timed out. Please try again."
+  );
+  if (!response.ok) {
+    const detail = await response.text().catch(() => "");
+    throw new Error(detail || `Geocoding failed (${response.status})`);
+  }
+
+  const payload = await response.json();
+  if (!Array.isArray(payload) || !payload.length) {
+    throw new Error("Address could not be located.");
+  }
+
+  const match = payload[0] || {};
+  const latitude = toFloat(match.lat);
+  const longitude = toFloat(match.lon);
+  if (latitude === null || longitude === null) {
+    throw new Error("Address geocoding returned no usable coordinates.");
+  }
+
+  return {
+    latitude,
+    longitude,
+    displayName: cleanOptionalString(match.display_name, 1024)
+  };
+}
+
+async function resolveSubscriptionAddressInsights(db, addressInput) {
+  const geocoded = await geocodeAddressWithLocationIq(addressInput);
+  const dropSiteRows = await getActiveDropSites(db);
+  const pickupDropSites = dropSiteRows.filter(
+    (site) =>
+      isVisibleSubscribeDropSiteRow(site) &&
+      !isDeliveryDropSiteRow(site) &&
+      toFloat(site.latitude) !== null &&
+      toFloat(site.longitude) !== null
+  );
+  const nearestPickupSites = pickupDropSites
+    .map((site) => {
+      const siteLatitude = toFloat(site.latitude);
+      const siteLongitude = toFloat(site.longitude);
+      if (siteLatitude === null || siteLongitude === null) return null;
+      return {
+        name: String(site.name || "").trim() || null,
+        address: cleanOptionalString(site.address, 1024),
+        dayOfWeek: cleanOptionalString(site.dayOfWeek, 16),
+        distanceMiles: Number(
+          haversineMiles(
+            geocoded.latitude,
+            geocoded.longitude,
+            siteLatitude,
+            siteLongitude
+          ).toFixed(2)
+        )
+      };
+    })
+    .filter(Boolean)
+    .sort((left, right) => left.distanceMiles - right.distanceMiles)
+    .slice(0, 3);
+
+  let closestDropSite = null;
+  let closestDropSiteAddress = null;
+  let closestDropSiteDistanceMiles = null;
+  if (nearestPickupSites.length) {
+    closestDropSite = nearestPickupSites[0].name;
+    closestDropSiteAddress = nearestPickupSites[0].address;
+    closestDropSiteDistanceMiles = nearestPickupSites[0].distanceMiles;
+  }
+
+  let insideHomeDeliveryArea = null;
+  try {
+    const polygons = await getDeliveryAreaPolygons();
+    insideHomeDeliveryArea = polygons.some((polygon) =>
+      pointInPolygon(geocoded.latitude, geocoded.longitude, polygon)
+    );
+  } catch (error) {
+    console.warn("Delivery area lookup failed:", error.message);
+  }
+
+  return {
+    geocodedLatitude: geocoded.latitude,
+    geocodedLongitude: geocoded.longitude,
+    geocodedDisplayName: geocoded.displayName,
+    closestDropSite,
+    closestDropSiteAddress,
+    closestDropSiteDistanceMiles:
+      closestDropSiteDistanceMiles === null
+        ? null
+        : Number(closestDropSiteDistanceMiles.toFixed(2)),
+    insideHomeDeliveryArea,
+    nearestPickupSites
+  };
+}
+
 const LIABILITY_AGREEMENT_URL =
   "https://docs.google.com/document/d/1VFMc4euofQ1S1kjtd6jZI46uxo6YKft9cufT6Q3-nrc/edit?tab=t.0";
 const LIABILITY_AGREEMENT_TITLE = "Full Farm CSA LLC Product Liability Agreement";
@@ -842,6 +1158,33 @@ router.get("/drop-sites", async (_req, res) => {
   }
 });
 
+router.post("/subscribe/address-insights", async (req, res) => {
+  try {
+    const db = getDb();
+    await ensureLocalLineSyncSchema().catch((error) => {
+      console.warn("Local Line schema bootstrap skipped for /subscribe/address-insights:", error.message);
+    });
+
+    const payload = req.body || {};
+    const addressLine1 = cleanString(payload.addressLine1);
+    const city = cleanString(payload.city);
+    const stateProvince = cleanString(payload.stateProvince);
+    const postalCode = cleanString(payload.postalCode, 32);
+
+    if (!addressLine1 || !city || !stateProvince || !postalCode) {
+      return res.status(400).json({
+        error: "Address, city, state, and zip are required to validate the location."
+      });
+    }
+
+    const insights = await resolveSubscriptionAddressInsights(db, payload);
+    res.json({ ok: true, insights });
+  } catch (error) {
+    console.error("Subscribe address insights failed:", error);
+    res.status(500).json({ error: error?.message || "Unable to validate address." });
+  }
+});
+
 router.post("/subscribe", async (req, res) => {
   try {
     const db = getDb();
@@ -853,6 +1196,11 @@ router.post("/subscribe", async (req, res) => {
     const firstName = cleanString(payload.firstName);
     const lastName = cleanString(payload.lastName);
     const email = cleanString(payload.email);
+    const phone = cleanString(payload.phone, 64);
+    const addressLine1 = cleanString(payload.addressLine1);
+    const city = cleanString(payload.city);
+    const stateProvince = cleanString(payload.stateProvince);
+    const postalCode = cleanString(payload.postalCode, 32);
     const signerName = cleanString(
       payload.liabilityAgreementSignerName || `${firstName} ${lastName}`.trim()
     );
@@ -863,8 +1211,10 @@ router.post("/subscribe", async (req, res) => {
         : "draw";
     const signature = parseSignatureDataUrl(payload.liabilityAgreementSignatureDataUrl);
 
-    if (!firstName || !lastName || !email) {
-      res.status(400).json({ error: "First name, last name, and email are required." });
+    if (!firstName || !lastName || !email || !phone || !addressLine1 || !city || !stateProvince || !postalCode) {
+      res
+        .status(400)
+        .json({ error: "First name, last name, email, phone, address, city, state, and zip are required." });
       return;
     }
 
@@ -895,6 +1245,12 @@ router.post("/subscribe", async (req, res) => {
       255
     );
     const sourcePath = cleanOptionalString(payload.sourcePath, 255);
+    let addressInsights = null;
+    try {
+      addressInsights = await resolveSubscriptionAddressInsights(db, payload);
+    } catch (addressError) {
+      console.warn("Subscribe lead address insights skipped:", addressError.message);
+    }
     const liabilityAgreementRecordUrl = await uploadSignedAgreementRecord({
       signerName,
       email,
@@ -910,13 +1266,26 @@ router.post("/subscribe", async (req, res) => {
       firstName,
       lastName,
       email,
-      phone: cleanOptionalString(payload.phone, 64),
+      phone,
       country: cleanOptionalString(payload.country, 128),
-      addressLine1: cleanOptionalString(payload.addressLine1, 255),
+      addressLine1,
       addressLine2: cleanOptionalString(payload.addressLine2, 255),
-      city: cleanOptionalString(payload.city, 255),
-      stateProvince: cleanOptionalString(payload.stateProvince, 255),
-      postalCode: cleanOptionalString(payload.postalCode, 32),
+      city,
+      stateProvince,
+      postalCode,
+      geocodedLatitude: addressInsights?.geocodedLatitude ?? null,
+      geocodedLongitude: addressInsights?.geocodedLongitude ?? null,
+      geocodedDisplayName: cleanOptionalString(addressInsights?.geocodedDisplayName, 1024),
+      closestDropSite: cleanOptionalString(addressInsights?.closestDropSite, 255),
+      closestDropSiteAddress: cleanOptionalString(addressInsights?.closestDropSiteAddress, 1024),
+      closestDropSiteDistanceMiles: addressInsights?.closestDropSiteDistanceMiles ?? null,
+      insideHomeDeliveryArea:
+        typeof addressInsights?.insideHomeDeliveryArea === "boolean"
+          ? addressInsights.insideHomeDeliveryArea
+            ? 1
+            : 0
+          : null,
+      addressValidatedAt: addressInsights ? now : null,
       referralSource: cleanOptionalText(payload.referralSource),
       selectedPlan: cleanOptionalString(payload.selectedPlan, 64),
       selectedPlanLabel: cleanOptionalString(payload.selectedPlanLabel, 255),
@@ -943,7 +1312,7 @@ router.post("/subscribe", async (req, res) => {
       updatedAt: now
     });
 
-    res.json({ ok: true, liabilityAgreementRecordUrl });
+    res.json({ ok: true, liabilityAgreementRecordUrl, addressInsights });
   } catch (error) {
     console.error("Subscribe lead capture error:", error);
     res.status(500).json({ error: "Unable to submit subscribe request." });

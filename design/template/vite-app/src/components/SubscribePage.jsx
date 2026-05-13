@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { submitSubscribeLead } from "../api.js";
+import { fetchSubscribeAddressInsights, submitSubscribeLead } from "../api.js";
 
 const DELIVERY_MAP_URL =
   "https://berkeleymapper.berkeley.edu/index.html?tabfile=https://raw.githubusercontent.com/jdeck88/ffcsa_scripts/refs/heads/main/localline/data/delivery_data.tsv&configfile=https://raw.githubusercontent.com/jdeck88/ffcsa_scripts/refs/heads/main/dropsite_maps/dropsites2.xml&pointDisplay=markers&hideLegendItems=true";
@@ -56,7 +56,7 @@ const SUBSCRIBE_PLANS = [
   },
   {
     value: "forager",
-    title: "The Forager",
+    title: "Forager ($200/mo)",
     price: "$200/month",
     note: "Minimum purchase",
     featured: false,
@@ -71,7 +71,7 @@ const SUBSCRIBE_PLANS = [
   },
   {
     value: "grazer",
-    title: "The Grazer",
+    title: "Grazer ($300/mo)",
     price: "$300/month",
     note: "Most popular",
     featured: true,
@@ -87,7 +87,7 @@ const SUBSCRIBE_PLANS = [
   },
   {
     value: "harvester",
-    title: "The Harvester",
+    title: "Harvester ($500/mo)",
     price: "$500/month",
     note: "Best for stocking up",
     featured: false,
@@ -226,7 +226,7 @@ function buildInitialForm(dropSites = []) {
     stateProvince: "Oregon",
     postalCode: "",
     referralSource: "",
-    selectedPlan: "grazer",
+    selectedPlan: "forager",
     selectedDropSite: dropSites[0] || "",
     notes: "",
     liabilityAgreementAccepted: false,
@@ -257,6 +257,19 @@ function formatDropSiteWindow(site) {
 
 function formatDropSiteAddress(site) {
   return String(site?.address || "").trim();
+}
+
+function formatDayOfWeekLabel(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (!normalized) return "";
+  if (normalized === "mon") return "Monday";
+  if (normalized === "tue") return "Tuesday";
+  if (normalized === "wed") return "Wednesday";
+  if (normalized === "thu") return "Thursday";
+  if (normalized === "fri") return "Friday";
+  if (normalized === "sat") return "Saturday";
+  if (normalized === "sun") return "Sunday";
+  return normalized.charAt(0).toUpperCase() + normalized.slice(1);
 }
 
 function DropSiteTable({ title, orderWindow, sites = [] }) {
@@ -349,11 +362,15 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
         .sort((left, right) => String(left.name || "").localeCompare(String(right.name || ""))),
     [pickupDropSites]
   );
+  const preferredHomeDeliverySite = homeDeliverySites[0] || null;
   const [form, setForm] = useState(() => buildInitialForm(siteOptions));
   const [status, setStatus] = useState({ submitting: false, success: false, error: "" });
   const [agreementModalOpen, setAgreementModalOpen] = useState(false);
   const [agreementSaved, setAgreementSaved] = useState(false);
   const [signaturePresent, setSignaturePresent] = useState(false);
+  const [addressInsights, setAddressInsights] = useState(null);
+  const [addressCheckError, setAddressCheckError] = useState("");
+  const [checkingAddress, setCheckingAddress] = useState(false);
   const signatureCanvasRef = useRef(null);
   const drawingRef = useRef(false);
   const lastPointRef = useRef(null);
@@ -372,6 +389,17 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
 
   function updateField(key, value) {
     if (
+      key === "addressLine1" ||
+      key === "addressLine2" ||
+      key === "city" ||
+      key === "stateProvince" ||
+      key === "postalCode" ||
+      key === "country"
+    ) {
+      setAddressInsights(null);
+      setAddressCheckError("");
+    }
+    if (
       key === "liabilityAgreementAccepted" ||
       key === "liabilityAgreementSignerName" ||
       key === "liabilityAgreementSignatureMode"
@@ -382,6 +410,34 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
       }
     }
     setForm((prev) => ({ ...prev, [key]: value }));
+  }
+
+  function setPreferredDropSite(siteName) {
+    setForm((prev) => ({
+      ...prev,
+      selectedDropSite: siteName || ""
+    }));
+  }
+
+  async function handleCheckAddress() {
+    setCheckingAddress(true);
+    setAddressCheckError("");
+    try {
+      const response = await fetchSubscribeAddressInsights({
+        addressLine1: form.addressLine1,
+        addressLine2: form.addressLine2,
+        city: form.city,
+        stateProvince: form.stateProvince,
+        postalCode: form.postalCode,
+        country: form.country
+      });
+      setAddressInsights(response?.insights || null);
+    } catch (error) {
+      setAddressInsights(null);
+      setAddressCheckError(error?.message || "Unable to validate address right now.");
+    } finally {
+      setCheckingAddress(false);
+    }
   }
 
   function canvasPointFromEvent(event) {
@@ -492,7 +548,7 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
         throw new Error("Please sign the product liability agreement before submitting.");
       }
       const plan = SUBSCRIBE_PLANS.find((entry) => entry.value === form.selectedPlan);
-      await submitSubscribeLead({
+      const response = await submitSubscribeLead({
         ...form,
         selectedPlanLabel: plan?.title || form.selectedPlan,
         liabilityAgreementSignatureDataUrl:
@@ -503,6 +559,7 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
         sourcePath: window.location.pathname,
         queryString: window.location.search
       });
+      setAddressInsights(response?.addressInsights || addressInsights);
       setStatus({ submitting: false, success: true, error: "" });
       window.setTimeout(() => {
         formStatusRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -609,6 +666,8 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
                         setForm(buildInitialForm(siteOptions));
                         clearSignature();
                         setAgreementSaved(false);
+                        setAddressInsights(null);
+                        setAddressCheckError("");
                         setStatus({ submitting: false, success: false, error: "" });
                       }}
                     >
@@ -648,21 +707,23 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
                       />
                     </label>
                     <label className="filter-field">
-                      <span className="small">Phone</span>
+                      <span className="small">Phone*</span>
                       <input
                         className="input"
                         value={form.phone}
                         onChange={(event) => updateField("phone", event.target.value)}
+                        required
                       />
                     </label>
                   </div>
 
                   <label className="filter-field">
-                    <span className="small">Address</span>
+                    <span className="small">Address*</span>
                     <input
                       className="input"
                       value={form.addressLine1}
                       onChange={(event) => updateField("addressLine1", event.target.value)}
+                      required
                     />
                   </label>
                   <label className="filter-field">
@@ -676,30 +737,136 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
 
                   <div className="subscribe-form-grid subscribe-form-grid-3">
                     <label className="filter-field">
-                      <span className="small">City</span>
+                      <span className="small">City*</span>
                       <input
                         className="input"
                         value={form.city}
                         onChange={(event) => updateField("city", event.target.value)}
+                        required
                       />
                     </label>
                     <label className="filter-field">
-                      <span className="small">State</span>
+                      <span className="small">State*</span>
                       <input
                         className="input"
                         value={form.stateProvince}
                         onChange={(event) => updateField("stateProvince", event.target.value)}
+                        required
                       />
                     </label>
                     <label className="filter-field">
-                      <span className="small">Zip / Postal code</span>
+                      <span className="small">Zip / Postal code*</span>
                       <input
                         className="input"
                         value={form.postalCode}
                         onChange={(event) => updateField("postalCode", event.target.value)}
+                        required
                       />
                     </label>
                   </div>
+                  <div className="button-row">
+                    <button
+                      className="button alt"
+                      type="button"
+                      onClick={handleCheckAddress}
+                      disabled={
+                        checkingAddress ||
+                        !form.addressLine1.trim() ||
+                        !form.city.trim() ||
+                        !form.stateProvince.trim() ||
+                        !form.postalCode.trim()
+                      }
+                    >
+                      {checkingAddress ? "Checking address..." : "Check delivery area and nearest site"}
+                    </button>
+                  </div>
+                  {addressCheckError ? (
+                    <div className="small subscribe-error">{addressCheckError}</div>
+                  ) : null}
+                  {addressInsights ? (
+                    <div className="subscribe-address-insights card">
+                      <div className="small subscribe-address-insights-eyebrow">
+                        Address insights
+                      </div>
+                      <div className="subscribe-address-insights-grid">
+                        <div>
+                          <strong>Validated address</strong>
+                          <div>{addressInsights.geocodedDisplayName || "—"}</div>
+                        </div>
+                        <div>
+                          <strong>Closest pickup site</strong>
+                          <div>
+                            {addressInsights.closestDropSite || "Unknown"}
+                            {Number.isFinite(Number(addressInsights.closestDropSiteDistanceMiles))
+                              ? ` (${Number(addressInsights.closestDropSiteDistanceMiles).toFixed(2)} miles)`
+                              : ""}
+                          </div>
+                          {addressInsights.closestDropSiteAddress ? (
+                            <div className="small">{addressInsights.closestDropSiteAddress}</div>
+                          ) : null}
+                        </div>
+                        <div>
+                          <strong>Home delivery area</strong>
+                          <div>
+                            {addressInsights.insideHomeDeliveryArea === true
+                              ? "Inside delivery area"
+                              : addressInsights.insideHomeDeliveryArea === false
+                                ? "Outside delivery area"
+                              : "Unavailable"}
+                          </div>
+                          {addressInsights.insideHomeDeliveryArea === true && preferredHomeDeliverySite ? (
+                            <div className="button-row" style={{ marginTop: 8 }}>
+                              <button
+                                className="button alt"
+                                type="button"
+                                onClick={() => setPreferredDropSite(preferredHomeDeliverySite.name)}
+                              >
+                                Set home delivery as preferred option
+                              </button>
+                            </div>
+                          ) : null}
+                        </div>
+                      </div>
+                      {Array.isArray(addressInsights.nearestPickupSites) &&
+                      addressInsights.nearestPickupSites.length ? (
+                        <div className="subscribe-nearest-pickup-list">
+                          <strong>Three closest pickup sites</strong>
+                          <div className="subscribe-nearest-pickup-items">
+                            {addressInsights.nearestPickupSites.map((site) => (
+                              <div
+                                key={`${site.name}-${site.address || ""}`}
+                                className="subscribe-nearest-pickup-item"
+                              >
+                                <div>
+                                  <div>
+                                    <strong>{site.name || "Unknown site"}</strong>
+                                    {Number.isFinite(Number(site.distanceMiles))
+                                      ? ` (${Number(site.distanceMiles).toFixed(2)} miles)`
+                                      : ""}
+                                  </div>
+                                  {site.dayOfWeek ? (
+                                    <div className="small">
+                                      {formatDayOfWeekLabel(site.dayOfWeek)}
+                                    </div>
+                                  ) : null}
+                                  {site.address ? <div className="small">{site.address}</div> : null}
+                                </div>
+                                {site.name ? (
+                                  <button
+                                    className="button alt"
+                                    type="button"
+                                    onClick={() => setPreferredDropSite(site.name)}
+                                  >
+                                    Set as preferred site
+                                  </button>
+                                ) : null}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ) : null}
+                    </div>
+                  ) : null}
 
                   <div className="subscribe-form-grid">
                     <label className="filter-field">

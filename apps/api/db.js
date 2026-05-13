@@ -51,6 +51,14 @@ const SUBSCRIBER_CAPTURE_TABLE_STATEMENTS = [
       city VARCHAR(255),
       state_province VARCHAR(255),
       postal_code VARCHAR(32),
+      geocoded_latitude DECIMAL(10, 7),
+      geocoded_longitude DECIMAL(10, 7),
+      geocoded_display_name VARCHAR(1024),
+      closest_drop_site VARCHAR(255),
+      closest_drop_site_address VARCHAR(1024),
+      closest_drop_site_distance_miles DECIMAL(10, 2),
+      inside_home_delivery_area TINYINT(1) DEFAULT 0,
+      address_validated_at DATETIME,
       referral_source TEXT,
       selected_plan VARCHAR(64),
       selected_plan_label VARCHAR(255),
@@ -125,6 +133,46 @@ const SUBSCRIBER_CAPTURE_COLUMN_STATEMENTS = [
     tableName: "subscribe_leads",
     columnName: "liability_agreement_signed_at",
     definition: "liability_agreement_signed_at DATETIME"
+  },
+  {
+    tableName: "subscribe_leads",
+    columnName: "geocoded_latitude",
+    definition: "geocoded_latitude DECIMAL(10, 7)"
+  },
+  {
+    tableName: "subscribe_leads",
+    columnName: "geocoded_longitude",
+    definition: "geocoded_longitude DECIMAL(10, 7)"
+  },
+  {
+    tableName: "subscribe_leads",
+    columnName: "geocoded_display_name",
+    definition: "geocoded_display_name VARCHAR(1024)"
+  },
+  {
+    tableName: "subscribe_leads",
+    columnName: "closest_drop_site",
+    definition: "closest_drop_site VARCHAR(255)"
+  },
+  {
+    tableName: "subscribe_leads",
+    columnName: "closest_drop_site_address",
+    definition: "closest_drop_site_address VARCHAR(1024)"
+  },
+  {
+    tableName: "subscribe_leads",
+    columnName: "closest_drop_site_distance_miles",
+    definition: "closest_drop_site_distance_miles DECIMAL(10, 2)"
+  },
+  {
+    tableName: "subscribe_leads",
+    columnName: "inside_home_delivery_area",
+    definition: "inside_home_delivery_area TINYINT(1) DEFAULT 0"
+  },
+  {
+    tableName: "subscribe_leads",
+    columnName: "address_validated_at",
+    definition: "address_validated_at DATETIME"
   }
 ];
 

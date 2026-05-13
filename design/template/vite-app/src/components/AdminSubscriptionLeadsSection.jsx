@@ -284,6 +284,42 @@ export function AdminSubscriptionLeadsSection({ token }) {
               <DetailRow label="City" value={modalLead.city} />
               <DetailRow label="State / Province" value={modalLead.stateProvince} />
               <DetailRow label="Postal Code" value={modalLead.postalCode} />
+              <DetailRow label="Validated Address" value={modalLead.geocodedDisplayName} />
+              <DetailRow
+                label="Closest Drop Site"
+                value={
+                  modalLead.closestDropSite
+                    ? `${modalLead.closestDropSite}${
+                        modalLead.closestDropSiteDistanceMiles
+                          ? ` (${Number(modalLead.closestDropSiteDistanceMiles).toFixed(2)} miles)`
+                          : ""
+                      }`
+                    : "—"
+                }
+              />
+              <DetailRow
+                label="Closest Drop Site Address"
+                value={modalLead.closestDropSiteAddress}
+              />
+              <DetailRow
+                label="Home Delivery Area"
+                value={
+                  typeof modalLead.insideHomeDeliveryArea === "number" ||
+                  typeof modalLead.insideHomeDeliveryArea === "boolean"
+                    ? Number(modalLead.insideHomeDeliveryArea)
+                      ? "Inside delivery area"
+                      : "Outside delivery area"
+                    : "—"
+                }
+              />
+              <DetailRow
+                label="Geocoded Coordinates"
+                value={
+                  modalLead.geocodedLatitude && modalLead.geocodedLongitude
+                    ? `${modalLead.geocodedLatitude}, ${modalLead.geocodedLongitude}`
+                    : "—"
+                }
+              />
               <DetailRow label="Plan" value={modalLead.selectedPlanLabel || modalLead.selectedPlan} />
               <DetailRow label="Drop Site" value={modalLead.selectedDropSite} />
               <DetailRow label="Referral Source" value={modalLead.referralSource} />

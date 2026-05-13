@@ -1,5 +1,6 @@
 const base = import.meta.env.VITE_API_BASE || "/api";
 const inflightGetRequests = new Map();
+const DEFAULT_POST_TIMEOUT_MS = 20000;
 
 function getRequestKey(url, token = "") {
   return `${url}::${token}`;
@@ -47,6 +48,26 @@ async function fetchJsonGet(url, token, fallbackMessage) {
   }
 }
 
+async function fetchWithTimeout(url, options = {}, timeoutMs = DEFAULT_POST_TIMEOUT_MS) {
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, {
+      ...options,
+      signal: controller.signal
+    });
+  } catch (error) {
+    if (error?.name === "AbortError") {
+      const timeoutError = new Error("Lookup timed out. Please try again.");
+      timeoutError.status = 408;
+      throw timeoutError;
+    }
+    throw error;
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
+}
+
 export async function fetchCatalog() {
   return fetchJsonGet(`${base}/catalog`, "", "Failed to load catalog");
 }
@@ -66,6 +87,22 @@ export async function submitSubscribeLead(payload) {
 
   if (!response.ok) {
     await throwForError(response, "Unable to submit subscribe request");
+  }
+
+  return response.json();
+}
+
+export async function fetchSubscribeAddressInsights(payload) {
+  const response = await fetchWithTimeout(`${base}/subscribe/address-insights`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload || {})
+  });
+
+  if (!response.ok) {
+    await throwForError(response, "Unable to validate address");
   }
 
   return response.json();

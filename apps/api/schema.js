@@ -181,6 +181,17 @@ export const subscribeLeads = mysqlTable(
     city: varchar("city", { length: 255 }),
     stateProvince: varchar("state_province", { length: 255 }),
     postalCode: varchar("postal_code", { length: 32 }),
+    geocodedLatitude: decimal("geocoded_latitude", { precision: 10, scale: 7 }),
+    geocodedLongitude: decimal("geocoded_longitude", { precision: 10, scale: 7 }),
+    geocodedDisplayName: varchar("geocoded_display_name", { length: 1024 }),
+    closestDropSite: varchar("closest_drop_site", { length: 255 }),
+    closestDropSiteAddress: varchar("closest_drop_site_address", { length: 1024 }),
+    closestDropSiteDistanceMiles: decimal("closest_drop_site_distance_miles", {
+      precision: 10,
+      scale: 2
+    }),
+    insideHomeDeliveryArea: tinyint("inside_home_delivery_area").default(0),
+    addressValidatedAt: datetime("address_validated_at"),
     referralSource: text("referral_source"),
     selectedPlan: varchar("selected_plan", { length: 64 }),
     selectedPlanLabel: varchar("selected_plan_label", { length: 255 }),
