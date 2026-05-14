@@ -192,6 +192,26 @@ function isDeliveryDropSiteRow(site) {
   );
 }
 
+function selectPreferredHomeDeliverySite(deliverySites, addressInput, geocodedDisplayName) {
+  const normalizedCity = String(addressInput?.city || "").trim().toLowerCase();
+  const normalizedDisplay = String(geocodedDisplayName || "").trim().toLowerCase();
+  const wantsCorvallis = normalizedCity.includes("corvallis") || normalizedDisplay.includes("corvallis");
+  const normalizedSites = Array.isArray(deliverySites) ? deliverySites : [];
+  const corvallisSite = normalizedSites.find((site) =>
+    String(site?.name || "").trim().toLowerCase().includes("corvallis")
+  );
+  const valleySite = normalizedSites.find((site) => {
+    const name = String(site?.name || "").trim().toLowerCase();
+    return (
+      name.includes("eugene") ||
+      name.includes("springfield") ||
+      name.includes("junction city")
+    );
+  });
+
+  return wantsCorvallis ? corvallisSite || valleySite || null : valleySite || corvallisSite || null;
+}
+
 function getLocationIqConfig() {
   const apiKey = String(
     process.env.LOCATIONIQ_API_KEY || process.env.LOCATIONIQ_KEY || ""
@@ -357,6 +377,13 @@ async function geocodeAddressWithLocationIq(addressInput) {
 async function resolveSubscriptionAddressInsights(db, addressInput) {
   const geocoded = await geocodeAddressWithLocationIq(addressInput);
   const dropSiteRows = await getActiveDropSites(db);
+  const deliverySites = dropSiteRows
+    .filter((site) => isVisibleSubscribeDropSiteRow(site) && isDeliveryDropSiteRow(site))
+    .map((site) => ({
+      name: String(site.name || "").trim() || null,
+      address: cleanOptionalString(site.address, 1024),
+      dayOfWeek: cleanOptionalString(site.dayOfWeek, 16)
+    }));
   const pickupDropSites = dropSiteRows.filter(
     (site) =>
       isVisibleSubscribeDropSiteRow(site) &&
@@ -396,6 +423,12 @@ async function resolveSubscriptionAddressInsights(db, addressInput) {
     closestDropSiteDistanceMiles = nearestPickupSites[0].distanceMiles;
   }
 
+  const preferredHomeDeliverySite = selectPreferredHomeDeliverySite(
+    deliverySites,
+    addressInput,
+    geocoded.displayName
+  );
+
   let insideHomeDeliveryArea = null;
   try {
     const polygons = await getDeliveryAreaPolygons();
@@ -417,7 +450,8 @@ async function resolveSubscriptionAddressInsights(db, addressInput) {
         ? null
         : Number(closestDropSiteDistanceMiles.toFixed(2)),
     insideHomeDeliveryArea,
-    nearestPickupSites
+    nearestPickupSites,
+    preferredHomeDeliverySite
   };
 }
 

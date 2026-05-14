@@ -17,6 +17,12 @@ function formatStatusLabel(value) {
   return STATUS_OPTIONS.find((option) => option.value === value)?.label || "In progress";
 }
 
+function truncateText(value, maxLength = 56) {
+  const text = String(value || "").trim();
+  if (!text) return "—";
+  return text.length > maxLength ? `${text.slice(0, maxLength - 1)}…` : text;
+}
+
 function createLeadDraft(lead = {}) {
   return {
     status: lead.status || "in_progress",
@@ -82,6 +88,7 @@ export function AdminSubscriptionLeadsSection({ token }) {
   const [modalLeadId, setModalLeadId] = useState(null);
   const [drafts, setDrafts] = useState({});
   const [savingLeadId, setSavingLeadId] = useState(null);
+  const [editingNotesLeadId, setEditingNotesLeadId] = useState(null);
 
   async function loadLeads() {
     setLoading(true);
@@ -120,9 +127,6 @@ export function AdminSubscriptionLeadsSection({ token }) {
     () => leads.find((lead) => lead.id === modalLeadId) || null,
     [leads, modalLeadId]
   );
-  const selectedDraft = selectedLead ? drafts[selectedLead.id] || createLeadDraft(selectedLead) : null;
-  const selectedDirty = selectedLead ? draftChanged(selectedLead, selectedDraft) : false;
-
   function updateDraft(leadId, updates) {
     setDrafts((current) => ({
       ...current,
@@ -175,7 +179,7 @@ export function AdminSubscriptionLeadsSection({ token }) {
         <div className="small">No subscription leads submitted yet.</div>
       ) : (
         <>
-          <table className="admin-table">
+          <table className="admin-table subscription-leads-table">
             <thead>
               <tr>
                 <th>Submitted</th>
@@ -205,11 +209,31 @@ export function AdminSubscriptionLeadsSection({ token }) {
                     }}
                     style={{ cursor: "pointer" }}
                   >
-                    <td>{formatDateTime(lead.submittedAt || lead.createdAt)}</td>
-                    <td>{[lead.firstName, lead.lastName].filter(Boolean).join(" ") || "—"}</td>
-                    <td>{lead.email || "—"}</td>
-                    <td>{lead.selectedPlanLabel || lead.selectedPlan || "—"}</td>
-                    <td>{lead.selectedDropSite || "—"}</td>
+                    <td title={formatDateTime(lead.submittedAt || lead.createdAt)}>
+                      <span className="subscription-leads-cell-text">
+                        {truncateText(formatDateTime(lead.submittedAt || lead.createdAt), 22)}
+                      </span>
+                    </td>
+                    <td title={[lead.firstName, lead.lastName].filter(Boolean).join(" ") || "—"}>
+                      <span className="subscription-leads-cell-text">
+                        {truncateText([lead.firstName, lead.lastName].filter(Boolean).join(" "), 28)}
+                      </span>
+                    </td>
+                    <td title={lead.email || "—"}>
+                      <span className="subscription-leads-cell-text">
+                        {truncateText(lead.email, 28)}
+                      </span>
+                    </td>
+                    <td title={lead.selectedPlanLabel || lead.selectedPlan || "—"}>
+                      <span className="subscription-leads-cell-text">
+                        {truncateText(lead.selectedPlanLabel || lead.selectedPlan, 24)}
+                      </span>
+                    </td>
+                    <td title={lead.selectedDropSite || "—"}>
+                      <span className="subscription-leads-cell-text">
+                        {truncateText(lead.selectedDropSite, 32)}
+                      </span>
+                    </td>
                     <td>
                       <AgreementCell href={lead.liabilityAgreementRecordUrl} />
                     </td>
@@ -228,15 +252,54 @@ export function AdminSubscriptionLeadsSection({ token }) {
                         ))}
                       </select>
                     </td>
-                    <td onClick={(event) => event.stopPropagation()}>
-                      <textarea
-                        className="textarea"
-                        rows={2}
-                        value={draft.adminNotes || ""}
-                        onChange={(event) =>
-                          updateDraft(lead.id, { adminNotes: event.target.value })
-                        }
-                      />
+                    <td onClick={(event) => event.stopPropagation()} className="subscription-leads-notes-cell">
+                      {editingNotesLeadId === lead.id ? (
+                        <div className="subscription-leads-notes-editor">
+                          <textarea
+                            className="textarea"
+                            rows={4}
+                            value={draft.adminNotes || ""}
+                            onChange={(event) =>
+                              updateDraft(lead.id, { adminNotes: event.target.value })
+                            }
+                          />
+                          <div className="button-row">
+                            <button
+                              className="button alt"
+                              type="button"
+                              onClick={() => setEditingNotesLeadId(null)}
+                            >
+                              Done
+                            </button>
+                            <button
+                              className="button alt"
+                              type="button"
+                              onClick={() => {
+                                updateDraft(lead.id, { adminNotes: lead.adminNotes || "" });
+                                setEditingNotesLeadId(null);
+                              }}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="subscription-leads-notes-preview">
+                          <span
+                            className="subscription-leads-cell-text"
+                            title={draft.adminNotes || "—"}
+                          >
+                            {truncateText(draft.adminNotes, 44)}
+                          </span>
+                          <button
+                            className="button alt"
+                            type="button"
+                            onClick={() => setEditingNotesLeadId(lead.id)}
+                          >
+                            Edit
+                          </button>
+                        </div>
+                      )}
                     </td>
                     <td onClick={(event) => event.stopPropagation()}>
                       <button

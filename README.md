@@ -14,6 +14,65 @@ API location
 - The API lives in `apps/api` (Express + Drizzle + MySQL).
 - Local Line schema additions for the store DB are in `apps/api/sql/localline_sync.sql`.
 
+How To Edit The Site Directly
+- This site is not edited through Wix or a visual CMS. It is edited directly in this repo using normal files.
+- The current subscribe page is a React page. If you want to change wording, images, layout, or styling, you edit the files below and rebuild the frontend.
+
+Files to edit
+- Main subscribe page content and layout:
+  - `design/template/vite-app/src/components/SubscribePage.jsx`
+- Subscribe page styling:
+  - `design/template/vite-app/src/styles.css`
+- Partner/vendor content for `Meet Our Partners`:
+  - `design/template/vite-app/src/data/subscribePartners.js`
+- Local subscribe-page images:
+  - `design/template/vite-app/public/images/`
+- Local partner/vendor images:
+  - `design/template/vite-app/public/images/partners/`
+- Public API endpoints used by the subscribe page:
+  - `apps/api/routes/catalog.js`
+
+What to edit where
+- Header/menu links:
+  - update `SUBSCRIBE_NAV_LINKS` in `SubscribePage.jsx`
+- Plan cards and plan dropdown labels:
+  - update `SUBSCRIBE_PLANS` in `SubscribePage.jsx`
+- Hero text, herdshare text, FAQ text, section headings, and other written copy:
+  - update the JSX text in `SubscribePage.jsx`
+- Partner descriptions and partner images:
+  - update `subscribePartners.js`
+  - update image files in `public/images/partners/` if needed
+- Static page images such as the logo, map, dairy photos, and other local assets:
+  - replace or add files in `public/images/`
+  - then update the matching `src="/images/..."` reference in `SubscribePage.jsx`
+- Colors, spacing, typography, card layout, and responsive behavior:
+  - update `styles.css`
+
+Local testing
+- Start the app:
+  - `npm run dev`
+- Open the subscribe page locally:
+  - `http://localhost:5176/?experience=subscribe`
+- Production subscribe host:
+  - `https://subscribe.deckfamilyfarm.com/`
+
+Typical editing workflow
+1. Open the file that controls the content you want to change.
+2. Make the content or style update.
+3. Run:
+   - `npm --prefix design/template/vite-app run build`
+4. If the build succeeds, restart or redeploy the app so the new frontend bundle is served.
+
+Practical examples
+- Change the welcome text:
+  - edit `SubscribePage.jsx`
+- Change a vendor description:
+  - edit `subscribePartners.js`
+- Replace a vendor image:
+  - replace the file in `public/images/partners/`
+- Change colors or spacing:
+  - edit `styles.css`
+
 Admin panel
 - Visit `/#/admin` to log in as an admin.
 - Backend admin access is local to this app. Full admins can use the admin `Users` section to add backend users and assign one or more roles: `admin`, `user_admin`, `inventory_admin`, `pricing_admin`, `localline_pull`, `localline_push`, `dropsite_admin`, `membership_admin`, and `member_admin`.

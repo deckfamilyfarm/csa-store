@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { fetchSubscribeAddressInsights, submitSubscribeLead } from "../api.js";
+import { SUBSCRIBE_PARTNERS } from "../data/subscribePartners.js";
 
 const DELIVERY_MAP_URL =
   "https://berkeleymapper.berkeley.edu/index.html?tabfile=https://raw.githubusercontent.com/jdeck88/ffcsa_scripts/refs/heads/main/localline/data/delivery_data.tsv&configfile=https://raw.githubusercontent.com/jdeck88/ffcsa_scripts/refs/heads/main/dropsite_maps/dropsites2.xml&pointDisplay=markers&hideLegendItems=true";
@@ -44,8 +45,8 @@ const SUBSCRIBE_NAV_LINKS = [
 const SUBSCRIBE_PLANS = [
   {
     value: "guest",
-    title: "Guest",
-    price: "Check out",
+    title: "Guest Checkout",
+    price: "Guest Checkout",
     note: "No minimum purchase",
     bullets: [
       "Pay in cart with credit card each time you shop",
@@ -56,30 +57,32 @@ const SUBSCRIBE_PLANS = [
   },
   {
     value: "forager",
-    title: "Forager ($200/mo)",
+    title: "The Forager",
+    selectLabel: "Forager ($200/mo)",
     price: "$200/month",
-    note: "Minimum purchase",
-    featured: false,
+    note: "",
+    featured: true,
     bullets: [
       "Loads $200 balance each month to spend on your individualized choice of farm products",
       "$200 minimum purchase, unused funds roll over",
-      "15% discount on all products",
-      "5% discount at Deck Family Farm farmers market booth",
+      "15% over guest pricing",
+      "10% discount at Farmers Market Booths.",
       "Access to raw dairy",
       "One-time $50 joining fee"
     ]
   },
   {
     value: "grazer",
-    title: "Grazer ($300/mo)",
+    title: "The Grazer",
+    selectLabel: "Grazer ($300/mo)",
     price: "$300/month",
-    note: "Most popular",
-    featured: true,
+    note: "",
+    featured: false,
     bullets: [
       "Loads $300 balance each month to spend on your individualized choice of farm products",
       "$300 minimum purchase, unused funds roll over",
-      "15% discount on all products",
-      "5% discount at Deck Family Farm farmers market booth",
+      "15% over guest pricing",
+      "10% discount at Farmers Market Booths.",
       "Access to raw dairy",
       "One-time $50 joining fee",
       "Free Deck Family Farm tote bag and t-shirt"
@@ -87,15 +90,16 @@ const SUBSCRIBE_PLANS = [
   },
   {
     value: "harvester",
-    title: "Harvester ($500/mo)",
+    title: "The Harvester",
+    selectLabel: "Harvester ($500/mo)",
     price: "$500/month",
     note: "Best for stocking up",
     featured: false,
     bullets: [
       "Loads $500 balance each month to spend on your individualized choice of farm products",
       "$500 minimum purchase, unused funds roll over",
-      "15% discount on all products",
-      "5% discount at Deck Family Farm farmers market booth",
+      "15% over guest pricing",
+      "10% discount at Farmers Market Booths.",
       "Access to raw dairy",
       "One-time $50 joining fee",
       "Free Deck Family Farm tote bag and t-shirt",
@@ -153,58 +157,6 @@ const FAQS = [
   }
 ];
 
-const PARTNERS = [
-  {
-    name: "Deck Family Farm",
-    description: "Pasture-raised meats, eggs, and regenerative agriculture from Junction City."
-  },
-  {
-    name: "Creamy Cow, LLC",
-    description: "Raw dairy, butter, sour cream, and cheeses connected to the herdshare program."
-  },
-  {
-    name: "Grazier's Garden",
-    description: "Hyper-local produce grown with shared standards around natural cycles and stewardship."
-  },
-  {
-    name: "Hyland Artisanal Meats",
-    description: "Carefully crafted meats that fit the same local, values-driven food system."
-  },
-  {
-    name: "Little Wings",
-    description: "Sustainable local produce supporting the pasture-raised and organic storefront mix."
-  },
-  {
-    name: "Lonesome Whistle",
-    description: "Organic grains and legumes grown regionally for staple pantry items."
-  },
-  {
-    name: "River Ranch Oregon Olive Oil",
-    description: "Premium Oregon olive oil produced with the same regional sourcing ethos."
-  },
-  {
-    name: "Creole Me Up",
-    description: "Creole-inspired sauces and seasonings that add ready-to-cook flavor options."
-  },
-  {
-    name: "Reality Kitchen Bakery",
-    description: "Locally made baked goods and pantry pairings for full-week meal planning."
-  },
-  {
-    name: "Small Is Beautiful Farm",
-    description:
-      "A small-scale diversified farm using organic and biodynamic practices with on-site fertility."
-  },
-  {
-    name: "Red Tail Organics",
-    description: "Regional produce and pantry diversity that complements the farm's staple offerings."
-  },
-  {
-    name: "Camas Country Mill / Camas Swale Farm",
-    description: "Regional grains and milling that round out the broader Full Farm CSA pantry."
-  }
-];
-
 function storeUrlFallback() {
   return "https://fullfarmcsa.deckfamilyfarm.com/";
 }
@@ -227,7 +179,7 @@ function buildInitialForm(dropSites = []) {
     postalCode: "",
     referralSource: "",
     selectedPlan: "forager",
-    selectedDropSite: dropSites[0] || "",
+    selectedDropSite: "",
     notes: "",
     liabilityAgreementAccepted: false,
     liabilityAgreementSignerName: "",
@@ -317,18 +269,6 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
     () => dropSites.filter((site) => isVisibleSubscribeDropSite(site)),
     [dropSites]
   );
-  const homeDeliverySites = useMemo(
-    () =>
-      visibleDropSites
-        .filter(
-          (site) =>
-            String(site.fulfillmentType || "").toLowerCase() === "delivery" ||
-            String(site.type || "").toLowerCase() === "postalcodes" ||
-            String(site.name || "").toLowerCase().includes("home delivery")
-        )
-        .sort((left, right) => String(left.name || "").localeCompare(String(right.name || ""))),
-    [visibleDropSites]
-  );
   const pickupDropSites = useMemo(
     () =>
       visibleDropSites.filter(
@@ -362,7 +302,6 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
         .sort((left, right) => String(left.name || "").localeCompare(String(right.name || ""))),
     [pickupDropSites]
   );
-  const preferredHomeDeliverySite = homeDeliverySites[0] || null;
   const [form, setForm] = useState(() => buildInitialForm(siteOptions));
   const [status, setStatus] = useState({ submitting: false, success: false, error: "" });
   const [agreementModalOpen, setAgreementModalOpen] = useState(false);
@@ -616,27 +555,40 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
             <div className="subscribe-hero-copy">
               <div className="eyebrow">Deck Family Farm</div>
               <h1 className="subscribe-title">Welcome to Full Farm CSA</h1>
-              <div className="subscribe-hero-subtitle">
-                Nourishing our community with pasture-raised foods and local farm partners
-              </div>
+              <p className="subscribe-lede subscribe-welcome-line">
+                We are happy you're here.
+              </p>
+              <figure className="subscribe-hero-image-card">
+                <img
+                  src="/images/subscribe-products.jpg"
+                  alt="Full Farm CSA products arranged together"
+                />
+              </figure>
               <p className="subscribe-lede">
-                The Full Farm CSA program provides essential staples from Deck Family Farm and other
-                hyper-local farms with shared growing standards. Members shop online for pickup at
-                local markets, drop sites, and home delivery.
+                The Full Farm Community Supported Agriculture (FFCSA) program provides essential
+                staples from Deck Family Farm and other hyper-local farms with shared growing
+                standards. Members can shop online for pickup at local Farmers markets, drop sites
+                and home delivery. Membership involves a scheduled monthly payment: 100% of your
+                monthly payment is store credit, with no hidden fees. Any unused balance rolls over
+                for future shopping!
               </p>
               <p className="subscribe-lede">
-                Membership includes a scheduled monthly payment: 100% of that payment becomes store
-                credit, unused balances roll forward, and members gain access to raw dairy through
-                the herdshare agreement.
+                Read our FAQs at the bottom of this page to learn more.
               </p>
+              <figure className="subscribe-hero-image-card subscribe-hero-image-card-secondary">
+                <img
+                  src="/images/subscribe-dairy-top.jpg"
+                  alt="Deck Family Farm dairy products"
+                />
+              </figure>
               <div className="subscribe-hero-notes">
                 <div className="subscribe-note-card">
                   <strong>$50 one-time membership fee</strong>
-                  <span>Includes herdshare agreement and access to raw dairy products.</span>
+                  <span>Includes Herdshare Agreement and access to raw dairy products.</span>
                 </div>
                 <div className="subscribe-note-card">
-                  <strong>After submitting</strong>
-                  <span>We will capture your information locally and you can continue into the store.</span>
+                  <strong>After submitting this form</strong>
+                  <span>Follow the link to the store to create your account and enter your payment method.</span>
                 </div>
               </div>
             </div>
@@ -656,9 +608,6 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
                     for follow-up from the farm.
                   </p>
                   <div className="button-row">
-                    <a className="button" href={subscriptionStoreUrl()}>
-                      Continue to store
-                    </a>
                     <button
                       className="button alt"
                       type="button"
@@ -671,8 +620,11 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
                         setStatus({ submitting: false, success: false, error: "" });
                       }}
                     >
-                      Submit another
+                      Close
                     </button>
+                    <a className="button" href={subscriptionStoreUrl()}>
+                      Continue to Store
+                    </a>
                   </div>
                 </div>
               ) : (
@@ -814,14 +766,36 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
                                 ? "Outside delivery area"
                               : "Unavailable"}
                           </div>
-                          {addressInsights.insideHomeDeliveryArea === true && preferredHomeDeliverySite ? (
-                            <div className="button-row" style={{ marginTop: 8 }}>
+                          {addressInsights.insideHomeDeliveryArea === true &&
+                          addressInsights.preferredHomeDeliverySite?.name ? (
+                            <div className="subscribe-nearest-pickup-item" style={{ marginTop: 8 }}>
+                              <div>
+                                <div>
+                                  <strong>{addressInsights.preferredHomeDeliverySite.name}</strong>
+                                </div>
+                                {addressInsights.preferredHomeDeliverySite.dayOfWeek ? (
+                                  <div className="small">
+                                    {formatDayOfWeekLabel(
+                                      addressInsights.preferredHomeDeliverySite.dayOfWeek
+                                    )}
+                                  </div>
+                                ) : null}
+                                {addressInsights.preferredHomeDeliverySite.address ? (
+                                  <div className="small">
+                                    {addressInsights.preferredHomeDeliverySite.address}
+                                  </div>
+                                ) : null}
+                              </div>
                               <button
                                 className="button alt"
                                 type="button"
-                                onClick={() => setPreferredDropSite(preferredHomeDeliverySite.name)}
+                                onClick={() =>
+                                  setPreferredDropSite(
+                                    addressInsights.preferredHomeDeliverySite.name
+                                  )
+                                }
                               >
-                                Set home delivery as preferred option
+                                Set as preferred option
                               </button>
                             </div>
                           ) : null}
@@ -878,7 +852,7 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
                       >
                         {SUBSCRIBE_PLANS.map((plan) => (
                           <option key={plan.value} value={plan.value}>
-                            {plan.title}
+                            {plan.selectLabel || plan.title}
                           </option>
                         ))}
                       </select>
@@ -996,7 +970,7 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
                     {plan.featured ? <span className="subscribe-plan-badge">Most popular</span> : null}
                   </div>
                   <div className="subscribe-plan-price">{plan.price}</div>
-                  <div className="small subscribe-plan-note">{plan.note}</div>
+                  {plan.note ? <div className="small subscribe-plan-note">{plan.note}</div> : null}
                   <ul className="subscribe-plan-list">
                     {plan.bullets.map((bullet) => (
                       <li key={bullet}>{bullet}</li>
@@ -1142,11 +1116,11 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
               delicious meals all week long.
             </p>
             <div className="subscribe-partner-grid">
-              {PARTNERS.map((partner) => (
+              {SUBSCRIBE_PARTNERS.map((partner) => (
                 <article key={partner.name} className="card subscribe-partner-card">
-                  <div className="subscribe-partner-crest" aria-hidden="true">
-                    {partner.name.slice(0, 1)}
-                  </div>
+                  <figure className="subscribe-partner-image-frame">
+                    <img src={partner.imageUrl} alt={partner.alt} loading="lazy" />
+                  </figure>
                   <div className="subscribe-partner-card-name">{partner.name}</div>
                   <p>{partner.description}</p>
                 </article>

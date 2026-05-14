@@ -475,11 +475,39 @@ img {
   color: rgba(255, 255, 255, 0.92);
 }
 
+.subscribe-welcome-line {
+  font-size: clamp(24px, 3vw, 34px);
+  line-height: 1.35;
+  font-style: italic;
+  font-family: var(--subscribe-serif);
+  color: rgba(255, 255, 255, 0.98);
+  margin-bottom: 18px;
+}
+
 .subscribe-hero-notes {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
   margin-top: 24px;
+}
+
+.subscribe-hero-image-card {
+  margin: 26px 0 0;
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 18px 42px rgba(31, 27, 23, 0.18);
+  max-width: 620px;
+}
+
+.subscribe-hero-image-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.subscribe-hero-image-card-secondary {
+  margin-top: 18px;
 }
 
 .subscribe-note-card {
@@ -703,6 +731,9 @@ img {
 
 .subscribe-plan-note {
   color: var(--field);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
 }
 
 .subscribe-plan-list {
@@ -914,8 +945,8 @@ img {
 
 .subscribe-partner-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
   margin-top: 24px;
 }
 
@@ -996,27 +1027,33 @@ img {
 }
 
 .subscribe-partner-card {
-  padding: 24px 22px;
+  padding: 20px;
   text-align: left;
   background: rgba(255, 255, 255, 0.96);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   border-radius: 24px;
   min-height: 100%;
 }
 
-.subscribe-partner-crest {
-  width: 44px;
-  height: 44px;
-  border-radius: 999px;
+.subscribe-partner-image-frame {
+  margin: 0;
+  aspect-ratio: 1 / 1;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid rgba(31, 27, 23, 0.08);
+  padding: 12px;
   display: grid;
   place-items: center;
-  background: rgba(143, 46, 43, 0.12);
-  color: var(--barn);
-  font-family: var(--subscribe-serif);
-  font-size: 26px;
-  line-height: 1;
+}
+
+.subscribe-partner-image-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .subscribe-partner-card-name {
