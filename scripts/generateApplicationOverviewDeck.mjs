@@ -57,7 +57,7 @@ function addTitle(slide, title, subtitle = "") {
     w: 12,
     h: 0.5,
     fontFace: "Aptos Display",
-    fontSize: 24,
+    fontSize: 28,
     bold: true,
     color: COLORS.ink,
     margin: 0
@@ -68,7 +68,7 @@ function addTitle(slide, title, subtitle = "") {
       y: 1.28,
       w: 12,
       h: 0.35,
-      fontSize: 11,
+      fontSize: 10,
       color: COLORS.slate,
       italic: true,
       margin: 0
@@ -81,7 +81,7 @@ function addBullets(slide, bullets, opts = {}) {
   const y = opts.y ?? 1.75;
   const w = opts.w ?? 11.7;
   const h = opts.h ?? 5.2;
-  const fontSize = opts.fontSize ?? 20;
+  const fontSize = opts.fontSize ?? 18;
   const lines = [];
   for (const bullet of bullets) {
     if (typeof bullet === "string") {
@@ -264,7 +264,7 @@ function slideTitle() {
     y: 2.05,
     w: 5.9,
     h: 1.1,
-    fontSize: 17,
+    fontSize: 18,
     color: COLORS.white,
     breakLine: true,
     margin: 0
@@ -301,24 +301,24 @@ function slideTitle() {
   addBullets(
     slide,
     [
-      "Consolidate operations into one interface",
-      "Improve subscriptions, pricing, analytics, and marketing control",
-      "Build a platform the farm can actually own and steer"
+      "One interface",
+      "Better conversion",
+      "Stronger control"
     ],
-    { x: 8.4, y: 1.85, w: 4.2, h: 3.4, fontSize: 16 }
+    { x: 8.4, y: 1.85, w: 4.2, h: 3.4, fontSize: 18 }
   );
 }
 
 function slideCurrentSituation() {
   const slide = pptx.addSlide();
-  addTitle(slide, "Current situation", "Today’s workflow is spread across several systems and manual handoffs.");
+  addTitle(slide, "Current situation", "Too many systems. Too many handoffs.");
   addBullets(slide, [
-    "Wix portal front-end and Wix CMS tables handle customer-facing pieces.",
-    "Zapier hooks move data between tools.",
-    "Local Line remains the core storefront backend.",
-    "Standalone Node.js scripts fill reporting and operational gaps.",
-    "Google Sheets still carries part of the customer and operations load.",
-    "Result: duplicated work, weaker attribution, brittle reporting, and slower changes."
+    "Wix front-end and Wix CMS",
+    "Zapier hooks",
+    "Local Line backend",
+    "Standalone Node scripts",
+    "Google Sheets for customer operations",
+    "Result: duplicated work and weak reporting"
   ]);
   addSummaryBox(slide, "Current stack", "6+ moving parts", 8.25, 4.75, 2.1, 1.2, COLORS.barn);
   addSummaryBox(slide, "Operating pattern", "Scotch-tape ecosystem", 10.55, 4.75, 2.1, 1.2, COLORS.green);
@@ -327,40 +327,43 @@ function slideCurrentSituation() {
 
 function slideNow() {
   const slide = pptx.addSlide();
-  addTitle(slide, "What CSA Store does now", "The application already functions as an operating layer around Local Line, subscriptions, and reporting.");
+  addTitle(slide, "What CSA Store does now", "The platform already acts as the operating layer.");
   addBullets(slide, [
-    "Pulls Local Line products, orders, fulfillments, and subscriber snapshots into one local admin.",
-    "Applies consistent pricing controls and formula-pricing rules from one place.",
-    "Tracks drop-site performance, trends, and order behavior.",
-    "Publishes operational dashboards and Google outputs from local data.",
-    "Runs a local subscribe page with lead capture, agreement handling, and nearest drop-site / home-delivery guidance.",
-    "Manages subscription leads in admin with status, notes, and signed records."
+    "Pulls Local Line orders, products, fulfillments, and subscribers",
+    "Controls pricing from one place",
+    "Tracks drop-site performance",
+    "Publishes dashboards from local data",
+    "Runs a local subscribe page",
+    "Tracks subscription leads in admin"
   ]);
   addFooter(slide);
 }
 
 function slideWhyOneInterface() {
   const slide = pptx.addSlide();
-  addTitle(slide, "Why one interface matters", "Consolidation is not just cleaner architecture; it creates operating leverage.");
+  addTitle(slide, "Why one interface matters", "This is not just cleaner. It is more effective.");
   addBullets(slide, [
-    "One source of truth for pricing, subscriptions, analytics, and operations.",
-    "Less reliance on Wix CMS tables, Zapier glue, standalone scripts, and Google Sheet workarounds.",
-    "Faster changes because the team edits one application instead of coordinating several tools.",
-    "Clearer control over pricing, customer conversion, reporting, and advertising efficiency.",
-    "A platform that can keep expanding instead of adding another side tool each time a gap appears."
+    "One source of truth",
+    "Less Wix, Zapier, script, and Sheet overhead",
+    "Faster changes",
+    "Better pricing control",
+    "Better conversion tracking",
+    "Less manual work for Laura"
   ]);
+  addSummaryBox(slide, "Laura's time", "Less admin friction", 8.9, 5.0, 2.8, 1.1, COLORS.slate);
   addFooter(slide);
 }
 
 function slideFutureState() {
   const slide = pptx.addSlide();
-  addTitle(slide, "What we want it to do next", "The goal is vertical control of the system on a DigitalOcean-hosted application.");
+  addTitle(slide, "What we want next", "One vertically managed platform.");
   addBullets(slide, [
-    "Replace remaining stitched-together workflows with one interface.",
-    "Make subscriptions more efficient: capture leads, match people to nearest drop site or delivery, and track status through conversion.",
-    "Add marketing attribution: campaigns, tracked links, subscriber source tracking, and location-aware analytics.",
-    "Add better member lifecycle tools for retention, communication, and cleaner customer records.",
-    "Use Codex-assisted design and iteration to improve the platform quickly without fragmenting the stack further."
+    "Replace the remaining stitched-together workflow",
+    "Capture and convert subscription leads more efficiently",
+    "Match members to nearest drop site or delivery",
+    "Add campaign tracking and subscriber attribution",
+    "Add better retention and communication tools",
+    "Run it on DigitalOcean with Codex-assisted iteration"
   ]);
   addSummaryBox(slide, "End goal", "Operate the system in one place", 8.6, 5.0, 3.2, 1.1, COLORS.green);
   addFooter(slide);
@@ -368,7 +371,7 @@ function slideFutureState() {
 
 function slideCostSavings() {
   const slide = pptx.addSlide();
-  addTitle(slide, "ROI: direct cost savings", "The current tool stack carries recurring cost before counting lost efficiency.");
+  addTitle(slide, "ROI: direct cost savings", "Savings begin before growth upside.");
   addTwoColumnTableLike(slide, "Current annual tools and support", "Annual cost", [
     { label: "Local Line subscription", value: "$2,500" },
     { label: "Wix", value: "$1,500" },
@@ -379,20 +382,22 @@ function slideCostSavings() {
     { label: "Direct annual savings", value: "$5,000", bold: true }
   ], { x: 0.85, y: 1.85, leftW: 6.6, rightW: 2.3, rowH: 0.45 });
   addSummaryBox(slide, "Direct savings", "$5K / year", 9.55, 2.4, 2.8, 1.3, COLORS.barn);
+  addSummaryBox(slide, "Labor savings", "Less manual work", 9.55, 4.1, 2.8, 1.1, COLORS.green);
   addFooter(slide);
 }
 
 function slideGrowthUpside() {
   const slide = pptx.addSlide();
-  addTitle(slide, "ROI: conversion and retention upside", "Better subscription tools create value even before marketing optimization.");
+  addTitle(slide, "ROI: conversion and retention", "A better portal should grow members.");
   addBullets(slide, [
-    "Current assumption: about 150 members leave each year and about 150 new members come in.",
-    "If better portal design and subscription tools improve new intake by 5% and retention by 5%, the business gains about 30 additional members per year.",
-    "Estimated annual value of those 30 members: about $28,800."
+    "About 150 members leave each year",
+    "About 150 new members join each year",
+    "Better intake and retention can add about 30 members",
+    "Estimated annual value: about $72,000"
   ], { h: 2.6 });
   addSummaryBox(slide, "Member upside", "30 additional members / year", 1.0, 4.8, 3.8, 1.2, COLORS.green);
-  addSummaryBox(slide, "Estimated value", "$28.8K / year", 5.1, 4.8, 3.1, 1.2, COLORS.barn);
-  slide.addText("This includes the value of better customer conversion and reduced churn from a cleaner member experience.", {
+  addSummaryBox(slide, "Estimated value", "$72K / year", 5.1, 4.8, 3.1, 1.2, COLORS.barn);
+  slide.addText("This reflects both better conversion and better retention.", {
     x: 0.95,
     y: 6.35,
     w: 9.2,
@@ -407,12 +412,12 @@ function slideGrowthUpside() {
 
 function slidePricingUpside() {
   const slide = pptx.addSlide();
-  addTitle(slide, "ROI: pricing and margin control", "Centralized pricing control creates profit leverage.");
+  addTitle(slide, "ROI: pricing and margin", "Pricing control directly drives profit.");
   addBullets(slide, [
-    "The application already centralizes price controls instead of scattering them across side tools.",
-    "Better formula pricing, cleaner review, and less inconsistency improve margin discipline.",
-    "Even a 2% improvement in markup management is estimated to produce more than $10,000 in annual net profit.",
-    "This is not labor savings; it is direct operating value from better business control."
+    "Cleaner formula pricing",
+    "Less inconsistency",
+    "Better review of margin decisions",
+    "A 2% markup improvement is worth more than $10K per year"
   ], { h: 3.2 });
   addSummaryBox(slide, "Pricing upside", "> $10K / year", 4.55, 4.9, 4.1, 1.35, COLORS.gold);
   addFooter(slide);
@@ -420,12 +425,12 @@ function slidePricingUpside() {
 
 function slideMarketingUpside() {
   const slide = pptx.addSlide();
-  addTitle(slide, "Marketing and attribution value", "The next phase is not just ad tracking; it is better allocation of spend and message.");
+  addTitle(slide, "Marketing and attribution", "Spend should be guided by data.");
   addBullets(slide, [
-    "Today, campaign performance and subscriber attribution are weak because the stack is fragmented.",
-    "The planned marketing module would connect campaigns, tracked links, subscriber capture, drop-site demand, and spend decisions.",
-    "This improves the ability to answer: where should we spend, which message belongs on which channel, and which locations are responding?",
-    "That value is real, but it is not included in the base ROI math here."
+    "Today, attribution is weak",
+    "Future module connects campaigns, locations, subscriptions, and spend",
+    "That improves where to spend and what to promote",
+    "This upside is not included in the base ROI math"
   ], { h: 3.2 });
   addSummaryBox(slide, "Not yet counted", "Advertising efficiency upside", 4.45, 4.95, 4.4, 1.25, COLORS.green);
   addFooter(slide);
@@ -433,27 +438,27 @@ function slideMarketingUpside() {
 
 function slideSummary() {
   const slide = pptx.addSlide();
-  addTitle(slide, "Annual value summary", "Base ROI case before additional marketing upside.");
+  addTitle(slide, "Annual value summary", "Base ROI before added marketing upside.");
   addTwoColumnTableLike(slide, "Source of value", "Annual value", [
     { label: "Direct software / support savings", value: "$5,000" },
-    { label: "Conversion and retention upside", value: "$28,800" },
+    { label: "Conversion and retention upside", value: "$72,000" },
     { label: "Pricing and margin upside", value: ">$10,000" },
-    { label: "Total identified annual value", value: ">$43,800", bold: true }
+    { label: "Total identified annual value", value: ">$87,000", bold: true }
   ], { x: 0.9, y: 1.95, leftW: 6.6, rightW: 2.5, rowH: 0.52 });
   addSummaryBox(slide, "Annual maintenance", "$5K", 9.85, 2.3, 2.1, 1.15, COLORS.slate);
-  addSummaryBox(slide, "Gross benefit", ">$43.8K", 9.85, 3.75, 2.1, 1.15, COLORS.green);
-  addSummaryBox(slide, "ROI multiple", ">8x", 9.85, 5.2, 2.1, 1.15, COLORS.barn);
+  addSummaryBox(slide, "Gross benefit", ">$87K", 9.85, 3.75, 2.1, 1.15, COLORS.green);
+  addSummaryBox(slide, "ROI multiple", ">17x", 9.85, 5.2, 2.1, 1.15, COLORS.barn);
   addFooter(slide);
 }
 
 function slideEndGoal() {
   const slide = pptx.addSlide();
-  addTitle(slide, "End goal", "Move from stitched-together operations to one controllable platform.");
+  addTitle(slide, "End goal", "One operating platform.");
   addBullets(slide, [
-    "Manage subscriptions, pricing, analytics, customer workflows, and marketing in one place.",
-    "Reduce reliance on fragile handoffs between Wix, Zapier, scripts, Local Line, and Google Sheets.",
-    "Give the farm a platform it can improve, own, and operate deliberately over time.",
-    "Use Codex-assisted design and iteration to keep improving workflow and business intelligence instead of paying for fragmented fixes."
+    "Run subscriptions, pricing, analytics, workflows, and marketing in one place",
+    "Reduce fragile handoffs",
+    "Own the platform",
+    "Keep improving it with Codex-assisted iteration"
   ]);
   addFooter(slide, "CSA Store target state | One operating platform instead of many stitched-together tools");
 }
