@@ -27,7 +27,7 @@ const SUBSCRIBE_NAV_LINKS = [
   },
   {
     label: "Newsletter",
-    href: "https://www.deckfamilyfarm.com/newsletter"
+    href: "https://www.deckfamilyfarm.com/blog"
   },
   {
     label: "Events",

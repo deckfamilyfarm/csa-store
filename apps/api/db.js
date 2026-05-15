@@ -12,6 +12,7 @@ let adminPricelistIndexesPromise;
 let vendorPricingSchemaPromise;
 let productPricingSchemaPromise;
 let subscriberCaptureSchemaPromise;
+let marketingSchemaPromise;
 
 const SOURCE_PRICING_VENDOR_FACTOR_DEFAULT = 0.5412;
 
@@ -77,6 +78,14 @@ const SUBSCRIBER_CAPTURE_TABLE_STATEMENTS = [
       utm_campaign VARCHAR(255),
       utm_content VARCHAR(255),
       utm_term VARCHAR(255),
+      csa_track_token VARCHAR(64),
+      csa_link_slug VARCHAR(255),
+      csa_campaign_slug VARCHAR(255),
+      message_focus VARCHAR(32),
+      target_city VARCHAR(255),
+      target_zip VARCHAR(64),
+      target_location_label VARCHAR(255),
+      target_drop_site_id INT,
       raw_json TEXT,
       submitted_at DATETIME,
       created_at DATETIME,
@@ -173,6 +182,355 @@ const SUBSCRIBER_CAPTURE_COLUMN_STATEMENTS = [
     tableName: "subscribe_leads",
     columnName: "address_validated_at",
     definition: "address_validated_at DATETIME"
+  },
+  {
+    tableName: "subscribe_leads",
+    columnName: "csa_track_token",
+    definition: "csa_track_token VARCHAR(64)"
+  },
+  {
+    tableName: "subscribe_leads",
+    columnName: "csa_link_slug",
+    definition: "csa_link_slug VARCHAR(255)"
+  },
+  {
+    tableName: "subscribe_leads",
+    columnName: "csa_campaign_slug",
+    definition: "csa_campaign_slug VARCHAR(255)"
+  },
+  {
+    tableName: "subscribe_leads",
+    columnName: "message_focus",
+    definition: "message_focus VARCHAR(32)"
+  },
+  {
+    tableName: "subscribe_leads",
+    columnName: "target_city",
+    definition: "target_city VARCHAR(255)"
+  },
+  {
+    tableName: "subscribe_leads",
+    columnName: "target_zip",
+    definition: "target_zip VARCHAR(64)"
+  },
+  {
+    tableName: "subscribe_leads",
+    columnName: "target_location_label",
+    definition: "target_location_label VARCHAR(255)"
+  },
+  {
+    tableName: "subscribe_leads",
+    columnName: "target_drop_site_id",
+    definition: "target_drop_site_id INT"
+  }
+];
+
+const MARKETING_TABLE_STATEMENTS = [
+  `
+    CREATE TABLE IF NOT EXISTS marketing_campaigns (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      slug VARCHAR(255) NOT NULL,
+      name VARCHAR(255) NOT NULL,
+      status VARCHAR(32) DEFAULT 'active',
+      platform VARCHAR(64),
+      channel VARCHAR(64),
+      message_focus VARCHAR(32),
+      target_city VARCHAR(255),
+      target_zip VARCHAR(64),
+      target_location_label VARCHAR(255),
+      target_drop_site_id INT,
+      destination_type VARCHAR(64),
+      destination_url VARCHAR(2048),
+      budget_amount DECIMAL(10, 2),
+      notes TEXT,
+      created_at DATETIME,
+      updated_at DATETIME
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS marketing_content_posts (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      campaign_id INT,
+      title VARCHAR(255) NOT NULL,
+      platform VARCHAR(64),
+      content_type VARCHAR(64),
+      status VARCHAR(32) DEFAULT 'draft',
+      message_focus VARCHAR(32),
+      notes TEXT,
+      created_at DATETIME,
+      updated_at DATETIME
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS marketing_utm_links (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      campaign_id INT,
+      content_post_id INT,
+      slug VARCHAR(255) NOT NULL,
+      label VARCHAR(255) NOT NULL,
+      is_active TINYINT(1) DEFAULT 1,
+      destination_type VARCHAR(64),
+      destination_url VARCHAR(2048) NOT NULL,
+      channel VARCHAR(64),
+      usage_instructions TEXT,
+      utm_source VARCHAR(255),
+      utm_medium VARCHAR(255),
+      utm_campaign VARCHAR(255),
+      utm_content VARCHAR(255),
+      utm_term VARCHAR(255),
+      track_token VARCHAR(64),
+      message_focus VARCHAR(32),
+      target_city VARCHAR(255),
+      target_zip VARCHAR(64),
+      target_location_label VARCHAR(255),
+      target_drop_site_id INT,
+      created_at DATETIME,
+      updated_at DATETIME
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS marketing_sessions (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      session_token VARCHAR(64) NOT NULL,
+      campaign_id INT,
+      utm_link_id INT,
+      source_host VARCHAR(255),
+      source_path VARCHAR(255),
+      landing_url VARCHAR(2048),
+      referrer_url VARCHAR(2048),
+      utm_source VARCHAR(255),
+      utm_medium VARCHAR(255),
+      utm_campaign VARCHAR(255),
+      utm_content VARCHAR(255),
+      utm_term VARCHAR(255),
+      message_focus VARCHAR(32),
+      target_city VARCHAR(255),
+      target_zip VARCHAR(64),
+      target_location_label VARCHAR(255),
+      target_drop_site_id INT,
+      client_ip VARCHAR(255),
+      user_agent VARCHAR(1024),
+      first_seen_at DATETIME,
+      last_seen_at DATETIME,
+      created_at DATETIME,
+      updated_at DATETIME
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS marketing_click_events (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      session_id INT,
+      campaign_id INT,
+      utm_link_id INT,
+      content_post_id INT,
+      event_type VARCHAR(32) DEFAULT 'click',
+      page_url VARCHAR(2048),
+      referrer_url VARCHAR(2048),
+      destination_url VARCHAR(2048),
+      source_host VARCHAR(255),
+      source_path VARCHAR(255),
+      utm_source VARCHAR(255),
+      utm_medium VARCHAR(255),
+      utm_campaign VARCHAR(255),
+      utm_content VARCHAR(255),
+      utm_term VARCHAR(255),
+      message_focus VARCHAR(32),
+      target_city VARCHAR(255),
+      target_zip VARCHAR(64),
+      target_location_label VARCHAR(255),
+      target_drop_site_id INT,
+      occurred_at DATETIME,
+      created_at DATETIME
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS marketing_subscriber_events (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      subscribe_lead_id INT,
+      campaign_id INT,
+      utm_link_id INT,
+      session_id INT,
+      external_subscriber_id VARCHAR(255),
+      match_method VARCHAR(64),
+      email VARCHAR(255),
+      first_name VARCHAR(255),
+      last_name VARCHAR(255),
+      city VARCHAR(255),
+      postal_code VARCHAR(64),
+      selected_drop_site VARCHAR(255),
+      subscribed_at DATETIME,
+      source_host VARCHAR(255),
+      source_path VARCHAR(255),
+      utm_source VARCHAR(255),
+      utm_medium VARCHAR(255),
+      utm_campaign VARCHAR(255),
+      utm_content VARCHAR(255),
+      utm_term VARCHAR(255),
+      csa_track_token VARCHAR(64),
+      csa_link_slug VARCHAR(255),
+      csa_campaign_slug VARCHAR(255),
+      message_focus VARCHAR(32),
+      target_city VARCHAR(255),
+      target_zip VARCHAR(64),
+      target_location_label VARCHAR(255),
+      target_drop_site_id INT,
+      created_at DATETIME,
+      updated_at DATETIME
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS marketing_ad_spend (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      campaign_id INT,
+      platform VARCHAR(64),
+      spend_date DATETIME,
+      spend_amount DECIMAL(10, 2),
+      impressions INT,
+      clicks INT,
+      notes TEXT,
+      created_at DATETIME,
+      updated_at DATETIME
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS marketing_recommendations (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      campaign_id INT,
+      status VARCHAR(32) DEFAULT 'draft',
+      title VARCHAR(255) NOT NULL,
+      summary TEXT,
+      rationale TEXT,
+      channel_recommendation VARCHAR(64),
+      message_focus VARCHAR(32),
+      target_city VARCHAR(255),
+      target_zip VARCHAR(64),
+      target_location_label VARCHAR(255),
+      target_drop_site_id INT,
+      data_json TEXT,
+      created_at DATETIME,
+      updated_at DATETIME
+    )
+  `
+];
+
+const MARKETING_INDEX_STATEMENTS = [
+  {
+    tableName: "marketing_campaigns",
+    indexName: "ux_marketing_campaigns_slug",
+    columns: "slug",
+    unique: true
+  },
+  {
+    tableName: "marketing_campaigns",
+    indexName: "idx_marketing_campaigns_status",
+    columns: "status"
+  },
+  {
+    tableName: "marketing_campaigns",
+    indexName: "idx_marketing_campaigns_channel",
+    columns: "channel"
+  },
+  {
+    tableName: "marketing_content_posts",
+    indexName: "idx_marketing_content_posts_campaign",
+    columns: "campaign_id"
+  },
+  {
+    tableName: "marketing_utm_links",
+    indexName: "ux_marketing_utm_links_slug",
+    columns: "slug",
+    unique: true
+  },
+  {
+    tableName: "marketing_utm_links",
+    indexName: "idx_marketing_utm_links_campaign",
+    columns: "campaign_id"
+  },
+  {
+    tableName: "marketing_utm_links",
+    indexName: "idx_marketing_utm_links_active",
+    columns: "is_active"
+  },
+  {
+    tableName: "marketing_sessions",
+    indexName: "ux_marketing_sessions_token",
+    columns: "session_token",
+    unique: true
+  },
+  {
+    tableName: "marketing_sessions",
+    indexName: "idx_marketing_sessions_campaign",
+    columns: "campaign_id"
+  },
+  {
+    tableName: "marketing_sessions",
+    indexName: "idx_marketing_sessions_link",
+    columns: "utm_link_id"
+  },
+  {
+    tableName: "marketing_sessions",
+    indexName: "idx_marketing_sessions_first_seen",
+    columns: "first_seen_at"
+  },
+  {
+    tableName: "marketing_click_events",
+    indexName: "idx_marketing_click_events_session",
+    columns: "session_id"
+  },
+  {
+    tableName: "marketing_click_events",
+    indexName: "idx_marketing_click_events_campaign",
+    columns: "campaign_id"
+  },
+  {
+    tableName: "marketing_click_events",
+    indexName: "idx_marketing_click_events_link",
+    columns: "utm_link_id"
+  },
+  {
+    tableName: "marketing_click_events",
+    indexName: "idx_marketing_click_events_occurred",
+    columns: "occurred_at"
+  },
+  {
+    tableName: "marketing_subscriber_events",
+    indexName: "idx_marketing_subscriber_events_lead",
+    columns: "subscribe_lead_id"
+  },
+  {
+    tableName: "marketing_subscriber_events",
+    indexName: "idx_marketing_subscriber_events_email",
+    columns: "email"
+  },
+  {
+    tableName: "marketing_subscriber_events",
+    indexName: "idx_marketing_subscriber_events_campaign",
+    columns: "campaign_id"
+  },
+  {
+    tableName: "marketing_subscriber_events",
+    indexName: "idx_marketing_subscriber_events_subscribed",
+    columns: "subscribed_at"
+  },
+  {
+    tableName: "marketing_ad_spend",
+    indexName: "idx_marketing_ad_spend_campaign",
+    columns: "campaign_id"
+  },
+  {
+    tableName: "marketing_ad_spend",
+    indexName: "idx_marketing_ad_spend_date",
+    columns: "spend_date"
+  },
+  {
+    tableName: "marketing_recommendations",
+    indexName: "idx_marketing_recommendations_campaign",
+    columns: "campaign_id"
+  },
+  {
+    tableName: "marketing_recommendations",
+    indexName: "idx_marketing_recommendations_status",
+    columns: "status"
   }
 ];
 
@@ -1368,6 +1726,26 @@ async function runSubscriberCaptureSchemaBootstrap(connection) {
   }
 }
 
+async function runMarketingSchemaBootstrap(connection) {
+  for (const statement of MARKETING_TABLE_STATEMENTS) {
+    await connection.query(statement);
+  }
+
+  for (const indexDefinition of MARKETING_INDEX_STATEMENTS) {
+    const exists = await indexExists(
+      connection,
+      indexDefinition.tableName,
+      indexDefinition.indexName
+    );
+    if (exists) continue;
+
+    const uniqueClause = indexDefinition.unique ? "UNIQUE " : "";
+    await connection.query(
+      `CREATE ${uniqueClause}INDEX ${indexDefinition.indexName} ON ${indexDefinition.tableName} (${indexDefinition.columns})`
+    );
+  }
+}
+
 export function initDb() {
   if (db) return db;
 
@@ -1479,6 +1857,20 @@ export async function ensureSubscriberCaptureSchema(connection = getPool()) {
   }
 
   return runSubscriberCaptureSchemaBootstrap(connection);
+}
+
+export async function ensureMarketingSchema(connection = getPool()) {
+  if (connection === getPool()) {
+    if (!marketingSchemaPromise) {
+      marketingSchemaPromise = runMarketingSchemaBootstrap(connection).catch((error) => {
+        marketingSchemaPromise = null;
+        throw error;
+      });
+    }
+    return marketingSchemaPromise;
+  }
+
+  return runMarketingSchemaBootstrap(connection);
 }
 
 export function isMissingTableError(error, tableName = "") {

@@ -7,6 +7,7 @@ import sharp from "sharp";
 import xlsx from "xlsx";
 import { DeleteObjectCommand, S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import {
+  ensureMarketingSchema,
   ensureSubscriberCaptureSchema,
   ensureAdminAccessSchema,
   ensureAdminPricelistIndexes,
@@ -21,6 +22,11 @@ import { and, eq, inArray } from "drizzle-orm";
 import {
   categories,
   dropSites,
+  marketingCampaigns,
+  marketingClickEvents,
+  marketingSessions,
+  marketingSubscriberEvents,
+  marketingUtmLinks,
   localLinePackageMeta,
   localLinePriceListEntries,
   localLineProductMeta,
@@ -294,6 +300,59 @@ function normalizeSubscribeLeadStatus(value) {
     .replace(/[\s-]+/g, "_");
   if (normalized === "won") return "won";
   return "in_progress";
+}
+
+function slugifyMarketingValue(value, fallback = "campaign") {
+  const normalized = String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return normalized || fallback;
+}
+
+function normalizeMarketingStatus(value, fallback = "active") {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (["draft", "active", "paused", "archived"].includes(normalized)) return normalized;
+  return fallback;
+}
+
+function normalizeMarketingMessageFocus(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (["farm", "csa", "food", "event", "mixed"].includes(normalized)) return normalized;
+  return null;
+}
+
+function buildChannelUsageInstructions(channel, destinationType = "subscribe") {
+  const normalizedChannel = String(channel || "").trim().toLowerCase();
+  const destinationLabel = destinationType === "subscribe" ? "subscribe page" : "destination";
+  if (normalizedChannel === "instagram-organic") {
+    return `Use as the temporary bio link for the main account and point the post CTA to the ${destinationLabel}.`;
+  }
+  if (normalizedChannel === "instagram-paid") {
+    return `Use as the direct CTA link for the paid Instagram campaign to the ${destinationLabel}.`;
+  }
+  if (normalizedChannel === "facebook") {
+    return `Use directly in the Facebook post or ad as the landing link for the ${destinationLabel}.`;
+  }
+  if (normalizedChannel === "google") {
+    return `Use as the Google Ads landing URL for the ${destinationLabel}.`;
+  }
+  if (normalizedChannel === "youtube") {
+    return `Use in the YouTube description and pinned comment linking to the ${destinationLabel}.`;
+  }
+  return `Use as the tracked destination link for the ${destinationLabel}.`;
+}
+
+function getPublicSubscribeBaseUrl(req) {
+  const configuredBase =
+    process.env.PUBLIC_SUBSCRIBE_URL ||
+    process.env.SUBSCRIBE_APP_BASE_URL ||
+    process.env.FRONTEND_BASE_URL;
+  if (configuredBase) {
+    return String(configuredBase).replace(/\/$/, "");
+  }
+  return `${req.protocol}://${req.get("host") || ""}`;
 }
 
 function abbreviateRepeatDays(availability = {}) {
@@ -2051,6 +2110,399 @@ router.put(
     } catch (error) {
       console.error("Subscription lead update failed:", error);
       res.status(500).json({ error: "Failed to update subscription lead." });
+    }
+  }
+);
+
+router.get(
+  "/marketing/overview",
+  requireAdminPermission(["marketing_admin", "campaign_manager", "analytics_viewer"]),
+  async (_req, res) => {
+    try {
+      await ensureMarketingSchema();
+      await ensureSubscriberCaptureSchema();
+      const db = getDb();
+      const [campaignRows, linkRows, sessionRows, clickRows, subscriberRows, leadRows] =
+        await Promise.all([
+          db.select().from(marketingCampaigns),
+          db.select().from(marketingUtmLinks),
+          db.select().from(marketingSessions),
+          db.select().from(marketingClickEvents),
+          db.select().from(marketingSubscriberEvents),
+          db.select().from(subscribeLeads)
+        ]);
+
+      const recentSubscriberEvents = subscriberRows
+        .slice()
+        .sort((left, right) => {
+          const leftTime = toTimestamp(left.subscribedAt || left.createdAt);
+          const rightTime = toTimestamp(right.subscribedAt || right.createdAt);
+          return rightTime - leftTime || Number(right.id || 0) - Number(left.id || 0);
+        })
+        .slice(0, 25);
+
+      const attributedLeadCount = leadRows.filter(
+        (row) =>
+          row.utmSource ||
+          row.utmMedium ||
+          row.utmCampaign ||
+          row.csaTrackToken ||
+          row.csaLinkSlug ||
+          row.csaCampaignSlug
+      ).length;
+
+      res.json({
+        summary: {
+          campaigns: campaignRows.length,
+          trackedLinks: linkRows.length,
+          sessions: sessionRows.length,
+          clickEvents: clickRows.length,
+          subscriberEvents: subscriberRows.length,
+          attributedSubscriptionLeads: attributedLeadCount
+        },
+        recentSubscriberEvents
+      });
+    } catch (error) {
+      console.error("Marketing overview fetch failed:", error);
+      res.status(500).json({ error: "Failed to load marketing overview." });
+    }
+  }
+);
+
+router.get(
+  "/marketing/campaigns",
+  requireAdminPermission(["marketing_admin", "campaign_manager", "analytics_viewer"]),
+  async (_req, res) => {
+    try {
+      await ensureMarketingSchema();
+      const rows = await getDb().select().from(marketingCampaigns);
+      res.json({
+        campaigns: rows
+          .slice()
+          .sort((left, right) => {
+            const leftTime = toTimestamp(left.updatedAt || left.createdAt);
+            const rightTime = toTimestamp(right.updatedAt || right.createdAt);
+            return rightTime - leftTime || Number(right.id || 0) - Number(left.id || 0);
+          })
+      });
+    } catch (error) {
+      console.error("Marketing campaigns fetch failed:", error);
+      res.status(500).json({ error: "Failed to load marketing campaigns." });
+    }
+  }
+);
+
+router.post(
+  "/marketing/campaigns",
+  requireAdminPermission(["marketing_admin", "campaign_manager"]),
+  async (req, res) => {
+    try {
+      await ensureMarketingSchema();
+      const payload = req.body || {};
+      const name = toNullableString(payload.name);
+      if (!name) {
+        return res.status(400).json({ error: "Campaign name is required." });
+      }
+
+      const now = new Date();
+      const slug = slugifyMarketingValue(payload.slug || name, "campaign");
+      const result = await getDb().insert(marketingCampaigns).values({
+        slug,
+        name,
+        status: normalizeMarketingStatus(payload.status, "active"),
+        platform: toNullableString(payload.platform),
+        channel: toNullableString(payload.channel),
+        messageFocus: normalizeMarketingMessageFocus(payload.messageFocus),
+        targetCity: toNullableString(payload.targetCity),
+        targetZip: toNullableString(payload.targetZip),
+        targetLocationLabel: toNullableString(payload.targetLocationLabel),
+        targetDropSiteId: toOptionalInteger(payload.targetDropSiteId),
+        destinationType: toNullableString(payload.destinationType),
+        destinationUrl: toNullableString(payload.destinationUrl),
+        budgetAmount: toNumber(payload.budgetAmount),
+        notes: toNullableString(payload.notes),
+        createdAt: now,
+        updatedAt: now
+      });
+      const campaignId = Number(result[0]?.insertId);
+      const rows = await getDb()
+        .select()
+        .from(marketingCampaigns)
+        .where(eq(marketingCampaigns.id, campaignId));
+      res.json({ campaign: rows[0] || null });
+    } catch (error) {
+      console.error("Marketing campaign create failed:", error);
+      res.status(500).json({ error: "Failed to create marketing campaign." });
+    }
+  }
+);
+
+router.put(
+  "/marketing/campaigns/:id",
+  requireAdminPermission(["marketing_admin", "campaign_manager"]),
+  async (req, res) => {
+    try {
+      await ensureMarketingSchema();
+      const campaignId = Number(req.params.id);
+      if (!Number.isFinite(campaignId) || campaignId <= 0) {
+        return res.status(400).json({ error: "Invalid campaign id." });
+      }
+
+      const payload = req.body || {};
+      const existingRows = await getDb()
+        .select()
+        .from(marketingCampaigns)
+        .where(eq(marketingCampaigns.id, campaignId));
+      if (!existingRows.length) {
+        return res.status(404).json({ error: "Campaign not found." });
+      }
+
+      const existing = existingRows[0];
+      const name = toNullableString(payload.name) || existing.name;
+      await getDb()
+        .update(marketingCampaigns)
+        .set({
+          slug: slugifyMarketingValue(payload.slug || name, "campaign"),
+          name,
+          status: normalizeMarketingStatus(payload.status, existing.status || "active"),
+          platform: payload.platform !== undefined ? toNullableString(payload.platform) : existing.platform,
+          channel: payload.channel !== undefined ? toNullableString(payload.channel) : existing.channel,
+          messageFocus:
+            payload.messageFocus !== undefined
+              ? normalizeMarketingMessageFocus(payload.messageFocus)
+              : existing.messageFocus,
+          targetCity:
+            payload.targetCity !== undefined ? toNullableString(payload.targetCity) : existing.targetCity,
+          targetZip:
+            payload.targetZip !== undefined ? toNullableString(payload.targetZip) : existing.targetZip,
+          targetLocationLabel:
+            payload.targetLocationLabel !== undefined
+              ? toNullableString(payload.targetLocationLabel)
+              : existing.targetLocationLabel,
+          targetDropSiteId:
+            payload.targetDropSiteId !== undefined
+              ? toOptionalInteger(payload.targetDropSiteId)
+              : existing.targetDropSiteId,
+          destinationType:
+            payload.destinationType !== undefined
+              ? toNullableString(payload.destinationType)
+              : existing.destinationType,
+          destinationUrl:
+            payload.destinationUrl !== undefined
+              ? toNullableString(payload.destinationUrl)
+              : existing.destinationUrl,
+          budgetAmount:
+            payload.budgetAmount !== undefined ? toNumber(payload.budgetAmount) : existing.budgetAmount,
+          notes: payload.notes !== undefined ? toNullableString(payload.notes) : existing.notes,
+          updatedAt: new Date()
+        })
+        .where(eq(marketingCampaigns.id, campaignId));
+
+      const updatedRows = await getDb()
+        .select()
+        .from(marketingCampaigns)
+        .where(eq(marketingCampaigns.id, campaignId));
+      res.json({ campaign: updatedRows[0] || null });
+    } catch (error) {
+      console.error("Marketing campaign update failed:", error);
+      res.status(500).json({ error: "Failed to update marketing campaign." });
+    }
+  }
+);
+
+router.get(
+  "/marketing/utm-links",
+  requireAdminPermission(["marketing_admin", "campaign_manager", "analytics_viewer"]),
+  async (req, res) => {
+    try {
+      await ensureMarketingSchema();
+      const baseUrl = getPublicSubscribeBaseUrl(req);
+      const rows = await getDb().select().from(marketingUtmLinks);
+      res.json({
+        links: rows
+          .slice()
+          .sort((left, right) => {
+            const leftTime = toTimestamp(left.updatedAt || left.createdAt);
+            const rightTime = toTimestamp(right.updatedAt || right.createdAt);
+            return rightTime - leftTime || Number(right.id || 0) - Number(left.id || 0);
+          })
+          .map((row) => ({
+            ...row,
+            trackedUrl: `${baseUrl}/api/marketing/go/${row.slug}`
+          }))
+      });
+    } catch (error) {
+      console.error("Marketing UTM links fetch failed:", error);
+      res.status(500).json({ error: "Failed to load marketing tracked links." });
+    }
+  }
+);
+
+router.post(
+  "/marketing/utm-links",
+  requireAdminPermission(["marketing_admin", "campaign_manager"]),
+  async (req, res) => {
+    try {
+      await ensureMarketingSchema();
+      const payload = req.body || {};
+      const label = toNullableString(payload.label);
+      if (!label) {
+        return res.status(400).json({ error: "Tracked link label is required." });
+      }
+
+      const campaignId = toOptionalInteger(payload.campaignId);
+      const campaignRows = campaignId
+        ? await getDb().select().from(marketingCampaigns).where(eq(marketingCampaigns.id, campaignId))
+        : [];
+      const campaign = campaignRows[0] || null;
+      const now = new Date();
+      const slug = slugifyMarketingValue(payload.slug || label, "tracked-link");
+      const destinationType = toNullableString(payload.destinationType) || "subscribe";
+      const destinationUrl =
+        toNullableString(payload.destinationUrl) ||
+        campaign?.destinationUrl ||
+        process.env.PUBLIC_SUBSCRIBE_URL ||
+        "https://subscribe.deckfamilyfarm.com/";
+      const channel = toNullableString(payload.channel);
+      const usageInstructions =
+        toNullableString(payload.usageInstructions) ||
+        buildChannelUsageInstructions(channel, destinationType);
+      const result = await getDb().insert(marketingUtmLinks).values({
+        campaignId,
+        contentPostId: toOptionalInteger(payload.contentPostId),
+        slug,
+        label,
+        isActive: payload.isActive === false || payload.isActive === 0 || payload.isActive === "0" ? 0 : 1,
+        destinationType,
+        destinationUrl,
+        channel,
+        usageInstructions,
+        utmSource: toNullableString(payload.utmSource),
+        utmMedium: toNullableString(payload.utmMedium),
+        utmCampaign: toNullableString(payload.utmCampaign) || campaign?.slug || null,
+        utmContent: toNullableString(payload.utmContent),
+        utmTerm: toNullableString(payload.utmTerm),
+        trackToken: crypto.randomBytes(12).toString("hex"),
+        messageFocus:
+          normalizeMarketingMessageFocus(payload.messageFocus) || campaign?.messageFocus || null,
+        targetCity: toNullableString(payload.targetCity) || campaign?.targetCity || null,
+        targetZip: toNullableString(payload.targetZip) || campaign?.targetZip || null,
+        targetLocationLabel:
+          toNullableString(payload.targetLocationLabel) || campaign?.targetLocationLabel || null,
+        targetDropSiteId: toOptionalInteger(payload.targetDropSiteId) || campaign?.targetDropSiteId || null,
+        createdAt: now,
+        updatedAt: now
+      });
+      const linkId = Number(result[0]?.insertId);
+      const rows = await getDb().select().from(marketingUtmLinks).where(eq(marketingUtmLinks.id, linkId));
+      const baseUrl = getPublicSubscribeBaseUrl(req);
+      res.json({
+        link: rows[0]
+          ? {
+              ...rows[0],
+              trackedUrl: `${baseUrl}/api/marketing/go/${rows[0].slug}`
+            }
+          : null
+      });
+    } catch (error) {
+      console.error("Marketing UTM link create failed:", error);
+      res.status(500).json({ error: "Failed to create marketing tracked link." });
+    }
+  }
+);
+
+router.put(
+  "/marketing/utm-links/:id",
+  requireAdminPermission(["marketing_admin", "campaign_manager"]),
+  async (req, res) => {
+    try {
+      await ensureMarketingSchema();
+      const linkId = Number(req.params.id);
+      if (!Number.isFinite(linkId) || linkId <= 0) {
+        return res.status(400).json({ error: "Invalid tracked link id." });
+      }
+
+      const existingRows = await getDb().select().from(marketingUtmLinks).where(eq(marketingUtmLinks.id, linkId));
+      if (!existingRows.length) {
+        return res.status(404).json({ error: "Tracked link not found." });
+      }
+
+      const existing = existingRows[0];
+      const payload = req.body || {};
+      const nextChannel =
+        payload.channel !== undefined ? toNullableString(payload.channel) : existing.channel;
+      const nextDestinationType =
+        payload.destinationType !== undefined
+          ? toNullableString(payload.destinationType)
+          : existing.destinationType;
+
+      await getDb()
+        .update(marketingUtmLinks)
+        .set({
+          campaignId:
+            payload.campaignId !== undefined ? toOptionalInteger(payload.campaignId) : existing.campaignId,
+          contentPostId:
+            payload.contentPostId !== undefined
+              ? toOptionalInteger(payload.contentPostId)
+              : existing.contentPostId,
+          slug: slugifyMarketingValue(payload.slug || existing.slug, "tracked-link"),
+          label: toNullableString(payload.label) || existing.label,
+          isActive:
+            payload.isActive !== undefined
+              ? (payload.isActive === false || payload.isActive === 0 || payload.isActive === "0" ? 0 : 1)
+              : existing.isActive,
+          destinationType: nextDestinationType,
+          destinationUrl:
+            payload.destinationUrl !== undefined
+              ? toNullableString(payload.destinationUrl)
+              : existing.destinationUrl,
+          channel: nextChannel,
+          usageInstructions:
+            payload.usageInstructions !== undefined
+              ? toNullableString(payload.usageInstructions)
+              : (existing.usageInstructions || buildChannelUsageInstructions(nextChannel, nextDestinationType)),
+          utmSource:
+            payload.utmSource !== undefined ? toNullableString(payload.utmSource) : existing.utmSource,
+          utmMedium:
+            payload.utmMedium !== undefined ? toNullableString(payload.utmMedium) : existing.utmMedium,
+          utmCampaign:
+            payload.utmCampaign !== undefined ? toNullableString(payload.utmCampaign) : existing.utmCampaign,
+          utmContent:
+            payload.utmContent !== undefined ? toNullableString(payload.utmContent) : existing.utmContent,
+          utmTerm: payload.utmTerm !== undefined ? toNullableString(payload.utmTerm) : existing.utmTerm,
+          messageFocus:
+            payload.messageFocus !== undefined
+              ? normalizeMarketingMessageFocus(payload.messageFocus)
+              : existing.messageFocus,
+          targetCity:
+            payload.targetCity !== undefined ? toNullableString(payload.targetCity) : existing.targetCity,
+          targetZip:
+            payload.targetZip !== undefined ? toNullableString(payload.targetZip) : existing.targetZip,
+          targetLocationLabel:
+            payload.targetLocationLabel !== undefined
+              ? toNullableString(payload.targetLocationLabel)
+              : existing.targetLocationLabel,
+          targetDropSiteId:
+            payload.targetDropSiteId !== undefined
+              ? toOptionalInteger(payload.targetDropSiteId)
+              : existing.targetDropSiteId,
+          updatedAt: new Date()
+        })
+        .where(eq(marketingUtmLinks.id, linkId));
+
+      const updatedRows = await getDb().select().from(marketingUtmLinks).where(eq(marketingUtmLinks.id, linkId));
+      const baseUrl = getPublicSubscribeBaseUrl(req);
+      res.json({
+        link: updatedRows[0]
+          ? {
+              ...updatedRows[0],
+              trackedUrl: `${baseUrl}/api/marketing/go/${updatedRows[0].slug}`
+            }
+          : null
+      });
+    } catch (error) {
+      console.error("Marketing UTM link update failed:", error);
+      res.status(500).json({ error: "Failed to update marketing tracked link." });
     }
   }
 );

@@ -210,6 +210,14 @@ export const subscribeLeads = mysqlTable(
     utmCampaign: varchar("utm_campaign", { length: 255 }),
     utmContent: varchar("utm_content", { length: 255 }),
     utmTerm: varchar("utm_term", { length: 255 }),
+    csaTrackToken: varchar("csa_track_token", { length: 64 }),
+    csaLinkSlug: varchar("csa_link_slug", { length: 255 }),
+    csaCampaignSlug: varchar("csa_campaign_slug", { length: 255 }),
+    messageFocus: varchar("message_focus", { length: 32 }),
+    targetCity: varchar("target_city", { length: 255 }),
+    targetZip: varchar("target_zip", { length: 64 }),
+    targetLocationLabel: varchar("target_location_label", { length: 255 }),
+    targetDropSiteId: int("target_drop_site_id"),
     rawJson: text("raw_json"),
     submittedAt: datetime("submitted_at"),
     createdAt: datetime("created_at"),
@@ -219,6 +227,247 @@ export const subscribeLeads = mysqlTable(
     emailIdx: index("idx_subscribe_leads_email").on(table.email),
     submittedIdx: index("idx_subscribe_leads_submitted_at").on(table.submittedAt),
     statusIdx: index("idx_subscribe_leads_status").on(table.status)
+  })
+);
+
+export const marketingCampaigns = mysqlTable(
+  "marketing_campaigns",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    slug: varchar("slug", { length: 255 }).notNull(),
+    name: varchar("name", { length: 255 }).notNull(),
+    status: varchar("status", { length: 32 }).default("active"),
+    platform: varchar("platform", { length: 64 }),
+    channel: varchar("channel", { length: 64 }),
+    messageFocus: varchar("message_focus", { length: 32 }),
+    targetCity: varchar("target_city", { length: 255 }),
+    targetZip: varchar("target_zip", { length: 64 }),
+    targetLocationLabel: varchar("target_location_label", { length: 255 }),
+    targetDropSiteId: int("target_drop_site_id"),
+    destinationType: varchar("destination_type", { length: 64 }),
+    destinationUrl: varchar("destination_url", { length: 2048 }),
+    budgetAmount: decimal("budget_amount", { precision: 10, scale: 2 }),
+    notes: text("notes"),
+    createdAt: datetime("created_at"),
+    updatedAt: datetime("updated_at")
+  },
+  (table) => ({
+    slugIdx: uniqueIndex("ux_marketing_campaigns_slug").on(table.slug),
+    statusIdx: index("idx_marketing_campaigns_status").on(table.status),
+    channelIdx: index("idx_marketing_campaigns_channel").on(table.channel)
+  })
+);
+
+export const marketingContentPosts = mysqlTable(
+  "marketing_content_posts",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    campaignId: int("campaign_id"),
+    title: varchar("title", { length: 255 }).notNull(),
+    platform: varchar("platform", { length: 64 }),
+    contentType: varchar("content_type", { length: 64 }),
+    status: varchar("status", { length: 32 }).default("draft"),
+    messageFocus: varchar("message_focus", { length: 32 }),
+    notes: text("notes"),
+    createdAt: datetime("created_at"),
+    updatedAt: datetime("updated_at")
+  },
+  (table) => ({
+    campaignIdx: index("idx_marketing_content_posts_campaign").on(table.campaignId),
+    platformIdx: index("idx_marketing_content_posts_platform").on(table.platform)
+  })
+);
+
+export const marketingUtmLinks = mysqlTable(
+  "marketing_utm_links",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    campaignId: int("campaign_id"),
+    contentPostId: int("content_post_id"),
+    slug: varchar("slug", { length: 255 }).notNull(),
+    label: varchar("label", { length: 255 }).notNull(),
+    isActive: tinyint("is_active").default(1),
+    destinationType: varchar("destination_type", { length: 64 }),
+    destinationUrl: varchar("destination_url", { length: 2048 }).notNull(),
+    channel: varchar("channel", { length: 64 }),
+    usageInstructions: text("usage_instructions"),
+    utmSource: varchar("utm_source", { length: 255 }),
+    utmMedium: varchar("utm_medium", { length: 255 }),
+    utmCampaign: varchar("utm_campaign", { length: 255 }),
+    utmContent: varchar("utm_content", { length: 255 }),
+    utmTerm: varchar("utm_term", { length: 255 }),
+    trackToken: varchar("track_token", { length: 64 }),
+    messageFocus: varchar("message_focus", { length: 32 }),
+    targetCity: varchar("target_city", { length: 255 }),
+    targetZip: varchar("target_zip", { length: 64 }),
+    targetLocationLabel: varchar("target_location_label", { length: 255 }),
+    targetDropSiteId: int("target_drop_site_id"),
+    createdAt: datetime("created_at"),
+    updatedAt: datetime("updated_at")
+  },
+  (table) => ({
+    slugIdx: uniqueIndex("ux_marketing_utm_links_slug").on(table.slug),
+    campaignIdx: index("idx_marketing_utm_links_campaign").on(table.campaignId),
+    activeIdx: index("idx_marketing_utm_links_active").on(table.isActive)
+  })
+);
+
+export const marketingSessions = mysqlTable(
+  "marketing_sessions",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    sessionToken: varchar("session_token", { length: 64 }).notNull(),
+    campaignId: int("campaign_id"),
+    utmLinkId: int("utm_link_id"),
+    sourceHost: varchar("source_host", { length: 255 }),
+    sourcePath: varchar("source_path", { length: 255 }),
+    landingUrl: varchar("landing_url", { length: 2048 }),
+    referrerUrl: varchar("referrer_url", { length: 2048 }),
+    utmSource: varchar("utm_source", { length: 255 }),
+    utmMedium: varchar("utm_medium", { length: 255 }),
+    utmCampaign: varchar("utm_campaign", { length: 255 }),
+    utmContent: varchar("utm_content", { length: 255 }),
+    utmTerm: varchar("utm_term", { length: 255 }),
+    messageFocus: varchar("message_focus", { length: 32 }),
+    targetCity: varchar("target_city", { length: 255 }),
+    targetZip: varchar("target_zip", { length: 64 }),
+    targetLocationLabel: varchar("target_location_label", { length: 255 }),
+    targetDropSiteId: int("target_drop_site_id"),
+    clientIp: varchar("client_ip", { length: 255 }),
+    userAgent: varchar("user_agent", { length: 1024 }),
+    firstSeenAt: datetime("first_seen_at"),
+    lastSeenAt: datetime("last_seen_at"),
+    createdAt: datetime("created_at"),
+    updatedAt: datetime("updated_at")
+  },
+  (table) => ({
+    tokenIdx: uniqueIndex("ux_marketing_sessions_token").on(table.sessionToken),
+    campaignIdx: index("idx_marketing_sessions_campaign").on(table.campaignId),
+    linkIdx: index("idx_marketing_sessions_link").on(table.utmLinkId),
+    firstSeenIdx: index("idx_marketing_sessions_first_seen").on(table.firstSeenAt)
+  })
+);
+
+export const marketingClickEvents = mysqlTable(
+  "marketing_click_events",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    sessionId: int("session_id"),
+    campaignId: int("campaign_id"),
+    utmLinkId: int("utm_link_id"),
+    contentPostId: int("content_post_id"),
+    eventType: varchar("event_type", { length: 32 }).default("click"),
+    pageUrl: varchar("page_url", { length: 2048 }),
+    referrerUrl: varchar("referrer_url", { length: 2048 }),
+    destinationUrl: varchar("destination_url", { length: 2048 }),
+    sourceHost: varchar("source_host", { length: 255 }),
+    sourcePath: varchar("source_path", { length: 255 }),
+    utmSource: varchar("utm_source", { length: 255 }),
+    utmMedium: varchar("utm_medium", { length: 255 }),
+    utmCampaign: varchar("utm_campaign", { length: 255 }),
+    utmContent: varchar("utm_content", { length: 255 }),
+    utmTerm: varchar("utm_term", { length: 255 }),
+    messageFocus: varchar("message_focus", { length: 32 }),
+    targetCity: varchar("target_city", { length: 255 }),
+    targetZip: varchar("target_zip", { length: 64 }),
+    targetLocationLabel: varchar("target_location_label", { length: 255 }),
+    targetDropSiteId: int("target_drop_site_id"),
+    occurredAt: datetime("occurred_at"),
+    createdAt: datetime("created_at")
+  },
+  (table) => ({
+    sessionIdx: index("idx_marketing_click_events_session").on(table.sessionId),
+    campaignIdx: index("idx_marketing_click_events_campaign").on(table.campaignId),
+    linkIdx: index("idx_marketing_click_events_link").on(table.utmLinkId),
+    occurredIdx: index("idx_marketing_click_events_occurred").on(table.occurredAt)
+  })
+);
+
+export const marketingSubscriberEvents = mysqlTable(
+  "marketing_subscriber_events",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    subscribeLeadId: int("subscribe_lead_id"),
+    campaignId: int("campaign_id"),
+    utmLinkId: int("utm_link_id"),
+    sessionId: int("session_id"),
+    externalSubscriberId: varchar("external_subscriber_id", { length: 255 }),
+    matchMethod: varchar("match_method", { length: 64 }),
+    email: varchar("email", { length: 255 }),
+    firstName: varchar("first_name", { length: 255 }),
+    lastName: varchar("last_name", { length: 255 }),
+    city: varchar("city", { length: 255 }),
+    postalCode: varchar("postal_code", { length: 64 }),
+    selectedDropSite: varchar("selected_drop_site", { length: 255 }),
+    subscribedAt: datetime("subscribed_at"),
+    sourceHost: varchar("source_host", { length: 255 }),
+    sourcePath: varchar("source_path", { length: 255 }),
+    utmSource: varchar("utm_source", { length: 255 }),
+    utmMedium: varchar("utm_medium", { length: 255 }),
+    utmCampaign: varchar("utm_campaign", { length: 255 }),
+    utmContent: varchar("utm_content", { length: 255 }),
+    utmTerm: varchar("utm_term", { length: 255 }),
+    csaTrackToken: varchar("csa_track_token", { length: 64 }),
+    csaLinkSlug: varchar("csa_link_slug", { length: 255 }),
+    csaCampaignSlug: varchar("csa_campaign_slug", { length: 255 }),
+    messageFocus: varchar("message_focus", { length: 32 }),
+    targetCity: varchar("target_city", { length: 255 }),
+    targetZip: varchar("target_zip", { length: 64 }),
+    targetLocationLabel: varchar("target_location_label", { length: 255 }),
+    targetDropSiteId: int("target_drop_site_id"),
+    createdAt: datetime("created_at"),
+    updatedAt: datetime("updated_at")
+  },
+  (table) => ({
+    leadIdx: index("idx_marketing_subscriber_events_lead").on(table.subscribeLeadId),
+    emailIdx: index("idx_marketing_subscriber_events_email").on(table.email),
+    campaignIdx: index("idx_marketing_subscriber_events_campaign").on(table.campaignId),
+    subscribedIdx: index("idx_marketing_subscriber_events_subscribed").on(table.subscribedAt)
+  })
+);
+
+export const marketingAdSpend = mysqlTable(
+  "marketing_ad_spend",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    campaignId: int("campaign_id"),
+    platform: varchar("platform", { length: 64 }),
+    spendDate: datetime("spend_date"),
+    spendAmount: decimal("spend_amount", { precision: 10, scale: 2 }),
+    impressions: int("impressions"),
+    clicks: int("clicks"),
+    notes: text("notes"),
+    createdAt: datetime("created_at"),
+    updatedAt: datetime("updated_at")
+  },
+  (table) => ({
+    campaignIdx: index("idx_marketing_ad_spend_campaign").on(table.campaignId),
+    spendDateIdx: index("idx_marketing_ad_spend_date").on(table.spendDate)
+  })
+);
+
+export const marketingRecommendations = mysqlTable(
+  "marketing_recommendations",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    campaignId: int("campaign_id"),
+    status: varchar("status", { length: 32 }).default("draft"),
+    title: varchar("title", { length: 255 }).notNull(),
+    summary: text("summary"),
+    rationale: text("rationale"),
+    channelRecommendation: varchar("channel_recommendation", { length: 64 }),
+    messageFocus: varchar("message_focus", { length: 32 }),
+    targetCity: varchar("target_city", { length: 255 }),
+    targetZip: varchar("target_zip", { length: 64 }),
+    targetLocationLabel: varchar("target_location_label", { length: 255 }),
+    targetDropSiteId: int("target_drop_site_id"),
+    dataJson: text("data_json"),
+    createdAt: datetime("created_at"),
+    updatedAt: datetime("updated_at")
+  },
+  (table) => ({
+    campaignIdx: index("idx_marketing_recommendations_campaign").on(table.campaignId),
+    statusIdx: index("idx_marketing_recommendations_status").on(table.status)
   })
 );
 

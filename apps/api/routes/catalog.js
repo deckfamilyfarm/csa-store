@@ -4,6 +4,7 @@ import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import {
   ensureLocalLineSyncSchema,
+  ensureMarketingSchema,
   ensureSubscriberCaptureSchema,
   getDb,
   isMissingTableError
@@ -11,6 +12,11 @@ import {
 import { and, eq, inArray } from "drizzle-orm";
 import {
   categories,
+  marketingCampaigns,
+  marketingClickEvents,
+  marketingSessions,
+  marketingSubscriberEvents,
+  marketingUtmLinks,
   localLinePriceListEntries,
   localLinePackageMeta,
   dropSites,
@@ -105,9 +111,305 @@ function cleanOptionalText(value) {
   return trimmed || null;
 }
 
+function cleanOptionalUrl(value) {
+  return cleanOptionalString(value, 2048);
+}
+
 function toFloat(value) {
   const numeric = Number.parseFloat(String(value ?? ""));
   return Number.isFinite(numeric) ? numeric : null;
+}
+
+function toInteger(value) {
+  const numeric = Number.parseInt(String(value ?? ""), 10);
+  return Number.isFinite(numeric) ? numeric : null;
+}
+
+function normalizeMessageFocus(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (["farm", "csa", "food", "event", "mixed"].includes(normalized)) {
+    return normalized;
+  }
+  return null;
+}
+
+function buildMergedSearchParams(...values) {
+  const params = new URLSearchParams();
+  for (const value of values) {
+    const raw = String(value || "").trim();
+    if (!raw) continue;
+    const next = new URLSearchParams(raw.replace(/^\?/, ""));
+    for (const [key, entryValue] of next.entries()) {
+      params.set(key, entryValue);
+    }
+  }
+  return params;
+}
+
+function deriveSourceFromUrl(urlValue, fallbackHost = null, fallbackPath = null) {
+  let sourceHost = cleanOptionalString(fallbackHost, 255);
+  let sourcePath = cleanOptionalString(fallbackPath, 255);
+  const url = cleanOptionalUrl(urlValue);
+  if (!url) return { sourceHost, sourcePath };
+
+  try {
+    const parsed = new URL(url);
+    sourceHost = sourceHost || cleanOptionalString(parsed.host, 255);
+    sourcePath = sourcePath || cleanOptionalString(parsed.pathname, 255);
+  } catch (_error) {
+    // Ignore invalid URLs and preserve fallbacks.
+  }
+
+  return { sourceHost, sourcePath };
+}
+
+function extractMarketingParams(payload = {}, searchParams = new URLSearchParams()) {
+  const csaTargetDropSite = cleanOptionalString(
+    payload.csaTargetDropSite ||
+      payload.csa_target_drop_site ||
+      payload.targetDropSite ||
+      searchParams.get("csa_target_drop_site"),
+    255
+  );
+  return {
+    utmSource: cleanOptionalString(payload.utmSource || payload.utm_source || searchParams.get("utm_source"), 255),
+    utmMedium: cleanOptionalString(payload.utmMedium || payload.utm_medium || searchParams.get("utm_medium"), 255),
+    utmCampaign: cleanOptionalString(
+      payload.utmCampaign || payload.utm_campaign || searchParams.get("utm_campaign"),
+      255
+    ),
+    utmContent: cleanOptionalString(payload.utmContent || payload.utm_content || searchParams.get("utm_content"), 255),
+    utmTerm: cleanOptionalString(payload.utmTerm || payload.utm_term || searchParams.get("utm_term"), 255),
+    csaTrackToken: cleanOptionalString(
+      payload.csaTrackToken ||
+        payload.csa_track ||
+        payload.sessionToken ||
+        searchParams.get("csa_track") ||
+        searchParams.get("csa_session"),
+      64
+    ),
+    csaLinkSlug: cleanOptionalString(payload.csaLinkSlug || payload.csa_link || searchParams.get("csa_link"), 255),
+    csaCampaignSlug: cleanOptionalString(
+      payload.csaCampaignSlug || payload.csa_campaign || searchParams.get("csa_campaign"),
+      255
+    ),
+    messageFocus: normalizeMessageFocus(
+      payload.messageFocus || payload.csa_message_focus || searchParams.get("csa_message_focus")
+    ),
+    targetCity: cleanOptionalString(
+      payload.targetCity || payload.csa_target_city || searchParams.get("csa_target_city"),
+      255
+    ),
+    targetZip: cleanOptionalString(
+      payload.targetZip || payload.csa_target_zip || searchParams.get("csa_target_zip"),
+      64
+    ),
+    targetLocationLabel: cleanOptionalString(
+      payload.targetLocationLabel ||
+        payload.csa_target_location ||
+        searchParams.get("csa_target_location") ||
+        (searchParams.get("csa_target_drop_site") && !searchParams.get("csa_target_location")
+          ? searchParams.get("csa_target_drop_site")
+          : null),
+      255
+    ),
+    targetDropSiteId: toInteger(
+      payload.targetDropSiteId ||
+        payload.csa_target_drop_site ||
+        searchParams.get("csa_target_drop_site")
+    ),
+    targetDropSiteLabel: csaTargetDropSite
+  };
+}
+
+function buildMarketingTagSpec(baseUrl = "") {
+  const normalizedBase = String(baseUrl || "").trim().replace(/\/$/, "");
+  const subscribeBase =
+    process.env.PUBLIC_SUBSCRIBE_URL ||
+    process.env.SUBSCRIBE_APP_BASE_URL ||
+    "https://subscribe.deckfamilyfarm.com";
+  return {
+    version: 1,
+    standardUtmTags: [
+      "utm_source",
+      "utm_medium",
+      "utm_campaign",
+      "utm_content",
+      "utm_term"
+    ],
+    csaTags: [
+      "csa_track",
+      "csa_link",
+      "csa_campaign",
+      "csa_message_focus",
+      "csa_target_city",
+      "csa_target_zip",
+      "csa_target_location",
+      "csa_target_drop_site"
+    ],
+    messageFocusValues: ["farm", "csa", "food", "event", "mixed"],
+    exampleSubscribeUrl:
+      `${subscribeBase}/?utm_source=facebook&utm_medium=paid-social&` +
+      "utm_campaign=spring_csa_eugene&utm_content=creative_a&" +
+      "csa_message_focus=csa&csa_target_city=Eugene&csa_target_location=Eugene",
+    exampleRedirectUrl: normalizedBase
+      ? `${normalizedBase}/api/marketing/go/spring-csa-eugene-fb-a`
+      : "/api/marketing/go/spring-csa-eugene-fb-a"
+  };
+}
+
+async function loadMarketingCampaignById(db, campaignId) {
+  if (!Number.isFinite(Number(campaignId)) || Number(campaignId) <= 0) return null;
+  const rows = await db
+    .select()
+    .from(marketingCampaigns)
+    .where(eq(marketingCampaigns.id, Number(campaignId)));
+  return rows[0] || null;
+}
+
+async function loadMarketingUtmLinkById(db, linkId) {
+  if (!Number.isFinite(Number(linkId)) || Number(linkId) <= 0) return null;
+  const rows = await db
+    .select()
+    .from(marketingUtmLinks)
+    .where(eq(marketingUtmLinks.id, Number(linkId)));
+  return rows[0] || null;
+}
+
+async function resolveMarketingAttribution(db, marketingParams) {
+  let sessionRow = null;
+  let linkRow = null;
+  let campaignRow = null;
+  let matchMethod = null;
+
+  if (marketingParams.csaTrackToken) {
+    const rows = await db
+      .select()
+      .from(marketingSessions)
+      .where(eq(marketingSessions.sessionToken, marketingParams.csaTrackToken));
+    sessionRow = rows[0] || null;
+    if (sessionRow) matchMethod = "session_token";
+  }
+
+  if (!linkRow && marketingParams.csaLinkSlug) {
+    const rows = await db
+      .select()
+      .from(marketingUtmLinks)
+      .where(eq(marketingUtmLinks.slug, marketingParams.csaLinkSlug));
+    linkRow = rows[0] || null;
+    if (linkRow && !matchMethod) matchMethod = "link_slug";
+  }
+
+  if (!campaignRow && marketingParams.csaCampaignSlug) {
+    const rows = await db
+      .select()
+      .from(marketingCampaigns)
+      .where(eq(marketingCampaigns.slug, marketingParams.csaCampaignSlug));
+    campaignRow = rows[0] || null;
+    if (campaignRow && !matchMethod) matchMethod = "campaign_slug";
+  }
+
+  if (!linkRow && sessionRow?.utmLinkId) {
+    linkRow = await loadMarketingUtmLinkById(db, sessionRow.utmLinkId);
+    if (linkRow && !matchMethod) matchMethod = "session_link";
+  }
+
+  if (!campaignRow && linkRow?.campaignId) {
+    campaignRow = await loadMarketingCampaignById(db, linkRow.campaignId);
+    if (campaignRow && !matchMethod) matchMethod = "link_campaign";
+  }
+
+  if (!campaignRow && sessionRow?.campaignId) {
+    campaignRow = await loadMarketingCampaignById(db, sessionRow.campaignId);
+    if (campaignRow && !matchMethod) matchMethod = "session_campaign";
+  }
+
+  return {
+    sessionRow,
+    linkRow,
+    campaignRow,
+    matchMethod
+  };
+}
+
+async function upsertMarketingSession(db, {
+  sessionToken,
+  campaignId = null,
+  utmLinkId = null,
+  sourceHost = null,
+  sourcePath = null,
+  landingUrl = null,
+  referrerUrl = null,
+  utmSource = null,
+  utmMedium = null,
+  utmCampaign = null,
+  utmContent = null,
+  utmTerm = null,
+  messageFocus = null,
+  targetCity = null,
+  targetZip = null,
+  targetLocationLabel = null,
+  targetDropSiteId = null,
+  clientIp = null,
+  userAgent = null,
+  now = new Date()
+}) {
+  if (!sessionToken) return null;
+
+  const existingRows = await db
+    .select()
+    .from(marketingSessions)
+    .where(eq(marketingSessions.sessionToken, sessionToken));
+  const existing = existingRows[0] || null;
+
+  const nextValues = {
+    campaignId: campaignId ?? existing?.campaignId ?? null,
+    utmLinkId: utmLinkId ?? existing?.utmLinkId ?? null,
+    sourceHost: sourceHost ?? existing?.sourceHost ?? null,
+    sourcePath: sourcePath ?? existing?.sourcePath ?? null,
+    landingUrl: landingUrl ?? existing?.landingUrl ?? null,
+    referrerUrl: referrerUrl ?? existing?.referrerUrl ?? null,
+    utmSource: utmSource ?? existing?.utmSource ?? null,
+    utmMedium: utmMedium ?? existing?.utmMedium ?? null,
+    utmCampaign: utmCampaign ?? existing?.utmCampaign ?? null,
+    utmContent: utmContent ?? existing?.utmContent ?? null,
+    utmTerm: utmTerm ?? existing?.utmTerm ?? null,
+    messageFocus: messageFocus ?? existing?.messageFocus ?? null,
+    targetCity: targetCity ?? existing?.targetCity ?? null,
+    targetZip: targetZip ?? existing?.targetZip ?? null,
+    targetLocationLabel: targetLocationLabel ?? existing?.targetLocationLabel ?? null,
+    targetDropSiteId: targetDropSiteId ?? existing?.targetDropSiteId ?? null,
+    clientIp: clientIp ?? existing?.clientIp ?? null,
+    userAgent: userAgent ?? existing?.userAgent ?? null,
+    lastSeenAt: now,
+    updatedAt: now
+  };
+
+  if (existing) {
+    await db
+      .update(marketingSessions)
+      .set(nextValues)
+      .where(eq(marketingSessions.id, existing.id));
+    const updatedRows = await db
+      .select()
+      .from(marketingSessions)
+      .where(eq(marketingSessions.id, existing.id));
+    return updatedRows[0] || existing;
+  }
+
+  const result = await db.insert(marketingSessions).values({
+    sessionToken,
+    ...nextValues,
+    firstSeenAt: now,
+    createdAt: now
+  });
+  const insertedId = Number(result[0]?.insertId);
+  if (!Number.isFinite(insertedId) || insertedId <= 0) return null;
+  const insertedRows = await db
+    .select()
+    .from(marketingSessions)
+    .where(eq(marketingSessions.id, insertedId));
+  return insertedRows[0] || null;
 }
 
 function normalizeCoordinatePair(value) {
@@ -1192,6 +1494,281 @@ router.get("/drop-sites", async (_req, res) => {
   }
 });
 
+router.get("/marketing/utm-format", (req, res) => {
+  const baseUrl = `${req.protocol}://${req.get("host") || ""}`;
+  res.json(buildMarketingTagSpec(baseUrl));
+});
+
+async function handleMarketingTrack(req, res) {
+  try {
+    const db = getDb();
+    await ensureMarketingSchema().catch((error) => {
+      console.warn("Marketing schema bootstrap skipped for /marketing/track:", error.message);
+    });
+
+    const payload = req.method === "GET" ? req.query : (req.body || {});
+    const pageUrl = cleanOptionalUrl(payload.pageUrl || payload.url);
+    const referrerUrl = cleanOptionalUrl(payload.referrerUrl || req.get("referer"));
+    const queryString = String(payload.queryString || "").trim();
+    const inlineParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(payload)) {
+      if (Array.isArray(value)) {
+        for (const item of value) inlineParams.append(key, String(item));
+      } else if (value !== null && typeof value !== "undefined") {
+        inlineParams.set(key, String(value));
+      }
+    }
+    const searchParams = buildMergedSearchParams(queryString, inlineParams.toString());
+    const derivedSource = deriveSourceFromUrl(
+      pageUrl,
+      payload.sourceHost,
+      payload.sourcePath
+    );
+    const marketingParams = extractMarketingParams(payload, searchParams);
+    const attribution = await resolveMarketingAttribution(db, marketingParams);
+    const now = new Date();
+    const sessionToken =
+      marketingParams.csaTrackToken || crypto.randomBytes(16).toString("hex");
+    const sessionRow = await upsertMarketingSession(db, {
+      sessionToken,
+      campaignId:
+        attribution.campaignRow?.id ??
+        attribution.sessionRow?.campaignId ??
+        attribution.linkRow?.campaignId ??
+        null,
+      utmLinkId:
+        attribution.linkRow?.id ??
+        attribution.sessionRow?.utmLinkId ??
+        null,
+      sourceHost: derivedSource.sourceHost,
+      sourcePath: derivedSource.sourcePath,
+      landingUrl: pageUrl,
+      referrerUrl,
+      utmSource: marketingParams.utmSource,
+      utmMedium: marketingParams.utmMedium,
+      utmCampaign: marketingParams.utmCampaign,
+      utmContent: marketingParams.utmContent,
+      utmTerm: marketingParams.utmTerm,
+      messageFocus:
+        marketingParams.messageFocus ??
+        attribution.linkRow?.messageFocus ??
+        attribution.campaignRow?.messageFocus ??
+        null,
+      targetCity:
+        marketingParams.targetCity ??
+        attribution.linkRow?.targetCity ??
+        attribution.campaignRow?.targetCity ??
+        null,
+      targetZip:
+        marketingParams.targetZip ??
+        attribution.linkRow?.targetZip ??
+        attribution.campaignRow?.targetZip ??
+        null,
+      targetLocationLabel:
+        marketingParams.targetLocationLabel ??
+        attribution.linkRow?.targetLocationLabel ??
+        attribution.campaignRow?.targetLocationLabel ??
+        null,
+      targetDropSiteId:
+        marketingParams.targetDropSiteId ??
+        attribution.linkRow?.targetDropSiteId ??
+        attribution.campaignRow?.targetDropSiteId ??
+        null,
+      clientIp: cleanOptionalString(req.ip, 255),
+      userAgent: cleanOptionalString(req.get("user-agent"), 1024),
+      now
+    });
+
+    await db.insert(marketingClickEvents).values({
+      sessionId: sessionRow?.id ?? null,
+      campaignId:
+        attribution.campaignRow?.id ??
+        sessionRow?.campaignId ??
+        attribution.linkRow?.campaignId ??
+        null,
+      utmLinkId:
+        attribution.linkRow?.id ??
+        sessionRow?.utmLinkId ??
+        null,
+      contentPostId: attribution.linkRow?.contentPostId ?? null,
+      eventType: cleanOptionalString(payload.eventType, 32) || "page_view",
+      pageUrl,
+      referrerUrl,
+      destinationUrl: cleanOptionalUrl(payload.destinationUrl),
+      sourceHost: derivedSource.sourceHost,
+      sourcePath: derivedSource.sourcePath,
+      utmSource: marketingParams.utmSource,
+      utmMedium: marketingParams.utmMedium,
+      utmCampaign: marketingParams.utmCampaign,
+      utmContent: marketingParams.utmContent,
+      utmTerm: marketingParams.utmTerm,
+      messageFocus:
+        marketingParams.messageFocus ??
+        attribution.linkRow?.messageFocus ??
+        attribution.campaignRow?.messageFocus ??
+        null,
+      targetCity:
+        marketingParams.targetCity ??
+        attribution.linkRow?.targetCity ??
+        attribution.campaignRow?.targetCity ??
+        null,
+      targetZip:
+        marketingParams.targetZip ??
+        attribution.linkRow?.targetZip ??
+        attribution.campaignRow?.targetZip ??
+        null,
+      targetLocationLabel:
+        marketingParams.targetLocationLabel ??
+        attribution.linkRow?.targetLocationLabel ??
+        attribution.campaignRow?.targetLocationLabel ??
+        null,
+      targetDropSiteId:
+        marketingParams.targetDropSiteId ??
+        attribution.linkRow?.targetDropSiteId ??
+        attribution.campaignRow?.targetDropSiteId ??
+        null,
+      occurredAt: now,
+      createdAt: now
+    });
+
+    res.json({
+      ok: true,
+      sessionToken,
+      campaignSlug: attribution.campaignRow?.slug || null,
+      linkSlug: attribution.linkRow?.slug || marketingParams.csaLinkSlug || null
+    });
+  } catch (error) {
+    console.error("Marketing track failed:", error);
+    res.status(500).json({ error: "Failed to record marketing event." });
+  }
+}
+
+router.get("/marketing/track", handleMarketingTrack);
+router.post("/marketing/track", handleMarketingTrack);
+
+router.get("/marketing/go/:slug", async (req, res) => {
+  try {
+    const db = getDb();
+    await ensureMarketingSchema().catch((error) => {
+      console.warn("Marketing schema bootstrap skipped for /marketing/go:", error.message);
+    });
+
+    const slug = cleanString(req.params.slug);
+    if (!slug) {
+      return res.status(400).json({ error: "Missing link slug." });
+    }
+
+    const linkRows = await db
+      .select()
+      .from(marketingUtmLinks)
+      .where(eq(marketingUtmLinks.slug, slug));
+    const linkRow = linkRows[0] || null;
+    if (!linkRow || Number(linkRow.isActive || 0) !== 1) {
+      return res.status(404).json({ error: "Tracked link not found." });
+    }
+
+    const campaignRow = linkRow.campaignId
+      ? await loadMarketingCampaignById(db, linkRow.campaignId)
+      : null;
+    const destination = new URL(String(linkRow.destinationUrl));
+    for (const [key, value] of Object.entries(req.query || {})) {
+      if (Array.isArray(value)) {
+        for (const item of value) {
+          destination.searchParams.append(key, String(item));
+        }
+      } else if (typeof value !== "undefined") {
+        destination.searchParams.set(key, String(value));
+      }
+    }
+
+    if (linkRow.utmSource) destination.searchParams.set("utm_source", String(linkRow.utmSource));
+    if (linkRow.utmMedium) destination.searchParams.set("utm_medium", String(linkRow.utmMedium));
+    if (linkRow.utmCampaign) destination.searchParams.set("utm_campaign", String(linkRow.utmCampaign));
+    if (linkRow.utmContent) destination.searchParams.set("utm_content", String(linkRow.utmContent));
+    if (linkRow.utmTerm) destination.searchParams.set("utm_term", String(linkRow.utmTerm));
+
+    const sessionToken =
+      cleanOptionalString(
+        req.query?.csa_track ||
+          req.query?.csaTrackToken ||
+          req.query?.sessionToken,
+        64
+      ) || crypto.randomBytes(16).toString("hex");
+    destination.searchParams.set("csa_track", sessionToken);
+    destination.searchParams.set("csa_link", String(linkRow.slug));
+    if (campaignRow?.slug) destination.searchParams.set("csa_campaign", String(campaignRow.slug));
+    if (linkRow.messageFocus) {
+      destination.searchParams.set("csa_message_focus", String(linkRow.messageFocus));
+    } else if (campaignRow?.messageFocus) {
+      destination.searchParams.set("csa_message_focus", String(campaignRow.messageFocus));
+    }
+    if (linkRow.targetCity) destination.searchParams.set("csa_target_city", String(linkRow.targetCity));
+    if (linkRow.targetZip) destination.searchParams.set("csa_target_zip", String(linkRow.targetZip));
+    if (linkRow.targetLocationLabel) {
+      destination.searchParams.set("csa_target_location", String(linkRow.targetLocationLabel));
+    }
+    if (Number.isFinite(Number(linkRow.targetDropSiteId))) {
+      destination.searchParams.set("csa_target_drop_site", String(linkRow.targetDropSiteId));
+    }
+
+    const sourceHost = cleanOptionalString(req.get("host"), 255);
+    const sourcePath = cleanOptionalString(req.originalUrl?.split("?")[0], 255);
+    const now = new Date();
+    const sessionRow = await upsertMarketingSession(db, {
+      sessionToken,
+      campaignId: campaignRow?.id ?? linkRow.campaignId ?? null,
+      utmLinkId: linkRow.id,
+      sourceHost,
+      sourcePath,
+      landingUrl: cleanOptionalUrl(`${req.protocol}://${req.get("host")}${req.originalUrl}`),
+      referrerUrl: cleanOptionalUrl(req.get("referer")),
+      utmSource: cleanOptionalString(linkRow.utmSource, 255),
+      utmMedium: cleanOptionalString(linkRow.utmMedium, 255),
+      utmCampaign: cleanOptionalString(linkRow.utmCampaign, 255),
+      utmContent: cleanOptionalString(linkRow.utmContent, 255),
+      utmTerm: cleanOptionalString(linkRow.utmTerm, 255),
+      messageFocus: linkRow.messageFocus || campaignRow?.messageFocus || null,
+      targetCity: linkRow.targetCity || campaignRow?.targetCity || null,
+      targetZip: linkRow.targetZip || campaignRow?.targetZip || null,
+      targetLocationLabel: linkRow.targetLocationLabel || campaignRow?.targetLocationLabel || null,
+      targetDropSiteId: linkRow.targetDropSiteId || campaignRow?.targetDropSiteId || null,
+      clientIp: cleanOptionalString(req.ip, 255),
+      userAgent: cleanOptionalString(req.get("user-agent"), 1024),
+      now
+    });
+
+    await db.insert(marketingClickEvents).values({
+      sessionId: sessionRow?.id ?? null,
+      campaignId: campaignRow?.id ?? linkRow.campaignId ?? null,
+      utmLinkId: linkRow.id,
+      contentPostId: linkRow.contentPostId ?? null,
+      eventType: "click",
+      pageUrl: cleanOptionalUrl(`${req.protocol}://${req.get("host")}${req.originalUrl}`),
+      referrerUrl: cleanOptionalUrl(req.get("referer")),
+      destinationUrl: cleanOptionalUrl(destination.toString()),
+      sourceHost,
+      sourcePath,
+      utmSource: cleanOptionalString(linkRow.utmSource, 255),
+      utmMedium: cleanOptionalString(linkRow.utmMedium, 255),
+      utmCampaign: cleanOptionalString(linkRow.utmCampaign, 255),
+      utmContent: cleanOptionalString(linkRow.utmContent, 255),
+      utmTerm: cleanOptionalString(linkRow.utmTerm, 255),
+      messageFocus: linkRow.messageFocus || campaignRow?.messageFocus || null,
+      targetCity: linkRow.targetCity || campaignRow?.targetCity || null,
+      targetZip: linkRow.targetZip || campaignRow?.targetZip || null,
+      targetLocationLabel: linkRow.targetLocationLabel || campaignRow?.targetLocationLabel || null,
+      targetDropSiteId: linkRow.targetDropSiteId || campaignRow?.targetDropSiteId || null,
+      occurredAt: now,
+      createdAt: now
+    });
+
+    res.redirect(destination.toString());
+  } catch (error) {
+    console.error("Marketing redirect failed:", error);
+    res.status(500).json({ error: "Unable to resolve tracked marketing link." });
+  }
+});
+
 router.post("/subscribe/address-insights", async (req, res) => {
   try {
     const db = getDb();
@@ -1224,6 +1801,9 @@ router.post("/subscribe", async (req, res) => {
     const db = getDb();
     await ensureSubscriberCaptureSchema().catch((error) => {
       console.warn("Subscriber capture schema bootstrap skipped for /subscribe:", error.message);
+    });
+    await ensureMarketingSchema().catch((error) => {
+      console.warn("Marketing schema bootstrap skipped for /subscribe:", error.message);
     });
 
     const payload = req.body || {};
@@ -1274,11 +1854,13 @@ router.post("/subscribe", async (req, res) => {
 
     const now = new Date();
     const searchParams = new URLSearchParams(String(payload.queryString || ""));
+    const marketingParams = extractMarketingParams(payload, searchParams);
     const sourceHostHeader = cleanOptionalString(
       req.get("x-forwarded-host") || req.get("host") || payload.sourceHost,
       255
     );
     const sourcePath = cleanOptionalString(payload.sourcePath, 255);
+    const attribution = await resolveMarketingAttribution(db, marketingParams);
     let addressInsights = null;
     try {
       addressInsights = await resolveSubscriptionAddressInsights(db, payload);
@@ -1295,7 +1877,7 @@ router.post("/subscribe", async (req, res) => {
       signatureMode
     });
 
-    await db.insert(subscribeLeads).values({
+    const subscribeInsert = await db.insert(subscribeLeads).values({
       status: "in_progress",
       firstName,
       lastName,
@@ -1332,19 +1914,113 @@ router.post("/subscribe", async (req, res) => {
       liabilityAgreementSignedAt: now,
       sourceHost: sourceHostHeader,
       sourcePath,
-      utmSource: cleanOptionalString(payload.utmSource || searchParams.get("utm_source"), 255),
-      utmMedium: cleanOptionalString(payload.utmMedium || searchParams.get("utm_medium"), 255),
-      utmCampaign: cleanOptionalString(
-        payload.utmCampaign || searchParams.get("utm_campaign"),
-        255
-      ),
-      utmContent: cleanOptionalString(payload.utmContent || searchParams.get("utm_content"), 255),
-      utmTerm: cleanOptionalString(payload.utmTerm || searchParams.get("utm_term"), 255),
+      utmSource: marketingParams.utmSource,
+      utmMedium: marketingParams.utmMedium,
+      utmCampaign: marketingParams.utmCampaign,
+      utmContent: marketingParams.utmContent,
+      utmTerm: marketingParams.utmTerm,
+      csaTrackToken: marketingParams.csaTrackToken,
+      csaLinkSlug: marketingParams.csaLinkSlug,
+      csaCampaignSlug: marketingParams.csaCampaignSlug,
+      messageFocus:
+        marketingParams.messageFocus ??
+        attribution.linkRow?.messageFocus ??
+        attribution.campaignRow?.messageFocus ??
+        null,
+      targetCity:
+        marketingParams.targetCity ??
+        attribution.linkRow?.targetCity ??
+        attribution.campaignRow?.targetCity ??
+        null,
+      targetZip:
+        marketingParams.targetZip ??
+        attribution.linkRow?.targetZip ??
+        attribution.campaignRow?.targetZip ??
+        null,
+      targetLocationLabel:
+        marketingParams.targetLocationLabel ??
+        attribution.linkRow?.targetLocationLabel ??
+        attribution.campaignRow?.targetLocationLabel ??
+        null,
+      targetDropSiteId:
+        marketingParams.targetDropSiteId ??
+        attribution.linkRow?.targetDropSiteId ??
+        attribution.campaignRow?.targetDropSiteId ??
+        null,
       rawJson: JSON.stringify(payload),
       submittedAt: now,
       createdAt: now,
       updatedAt: now
     });
+
+    const subscribeLeadId = Number(subscribeInsert[0]?.insertId);
+    const shouldRecordSubscriberEvent = Boolean(
+      subscribeLeadId > 0 &&
+        (
+          marketingParams.utmSource ||
+          marketingParams.utmMedium ||
+          marketingParams.utmCampaign ||
+          marketingParams.csaTrackToken ||
+          marketingParams.csaLinkSlug ||
+          marketingParams.csaCampaignSlug ||
+          attribution.linkRow ||
+          attribution.campaignRow
+        )
+    );
+
+    if (shouldRecordSubscriberEvent) {
+      await db.insert(marketingSubscriberEvents).values({
+        subscribeLeadId,
+        campaignId: attribution.campaignRow?.id ?? attribution.sessionRow?.campaignId ?? null,
+        utmLinkId: attribution.linkRow?.id ?? attribution.sessionRow?.utmLinkId ?? null,
+        sessionId: attribution.sessionRow?.id ?? null,
+        matchMethod: attribution.matchMethod || "direct_utm",
+        email,
+        firstName,
+        lastName,
+        city,
+        postalCode,
+        selectedDropSite: cleanOptionalString(payload.selectedDropSite, 255),
+        subscribedAt: now,
+        sourceHost: sourceHostHeader,
+        sourcePath,
+        utmSource: marketingParams.utmSource,
+        utmMedium: marketingParams.utmMedium,
+        utmCampaign: marketingParams.utmCampaign,
+        utmContent: marketingParams.utmContent,
+        utmTerm: marketingParams.utmTerm,
+        csaTrackToken: marketingParams.csaTrackToken,
+        csaLinkSlug: marketingParams.csaLinkSlug,
+        csaCampaignSlug: marketingParams.csaCampaignSlug,
+        messageFocus:
+          marketingParams.messageFocus ??
+          attribution.linkRow?.messageFocus ??
+          attribution.campaignRow?.messageFocus ??
+          null,
+        targetCity:
+          marketingParams.targetCity ??
+          attribution.linkRow?.targetCity ??
+          attribution.campaignRow?.targetCity ??
+          null,
+        targetZip:
+          marketingParams.targetZip ??
+          attribution.linkRow?.targetZip ??
+          attribution.campaignRow?.targetZip ??
+          null,
+        targetLocationLabel:
+          marketingParams.targetLocationLabel ??
+          attribution.linkRow?.targetLocationLabel ??
+          attribution.campaignRow?.targetLocationLabel ??
+          null,
+        targetDropSiteId:
+          marketingParams.targetDropSiteId ??
+          attribution.linkRow?.targetDropSiteId ??
+          attribution.campaignRow?.targetDropSiteId ??
+          null,
+        createdAt: now,
+        updatedAt: now
+      });
+    }
 
     res.json({ ok: true, liabilityAgreementRecordUrl, addressInsights });
   } catch (error) {

@@ -1,5 +1,6 @@
 ﻿import React, { useEffect, useRef, useState } from "react";
 import { AdminInventorySection } from "./AdminInventorySection.jsx";
+import { AdminMarketingSection } from "./AdminMarketingSection.jsx";
 import { AdminManualSection } from "./AdminManualSection.jsx";
 import { AdminMembershipSection } from "./AdminMembershipSection.jsx";
 import { AdminOrdersSection } from "./AdminOrdersSection.jsx";
@@ -50,6 +51,12 @@ function canAccessAdminSection(roleKeys, section) {
       return roleKeys.includes("membership_admin");
     case "subscriptions":
       return roleKeys.includes("membership_admin") || roleKeys.includes("member_admin");
+    case "marketing":
+      return (
+        roleKeys.includes("marketing_admin") ||
+        roleKeys.includes("campaign_manager") ||
+        roleKeys.includes("analytics_viewer")
+      );
     case "dropSites":
       return roleKeys.includes("dropsite_admin");
     case "reviews":
@@ -73,6 +80,7 @@ function getDefaultAdminSection(roleKeys = []) {
     "pricelist",
     "localPricelist",
     "inventory",
+    "marketing",
     "subscriptions",
     "membership",
     "dropSites",
@@ -2673,6 +2681,7 @@ export function AdminPanel({ onCatalogRefresh }) {
   const canManageInventory = hasRole(currentAdminRoles, "inventory_admin");
   const canManageMembership = hasRole(currentAdminRoles, "membership_admin");
   const canManageSubscriptions = canAccessAdminSection(currentAdminRoles, "subscriptions");
+  const canManageMarketing = canAccessAdminSection(currentAdminRoles, "marketing");
   const canPullFromLocalLine = hasRole(currentAdminRoles, "localline_pull");
   const canPushToLocalLine = hasRole(currentAdminRoles, "localline_push");
   const canManageDropSites = hasRole(currentAdminRoles, "dropsite_admin");
@@ -3425,14 +3434,16 @@ export function AdminPanel({ onCatalogRefresh }) {
     <div className="container admin-panel">
       <div className="admin-header">
         <h2 className="h2">Admin Dashboard</h2>
-        <a
-          className="button alt"
-          href={getSubscribePageUrl()}
-          target="_blank"
-          rel="noreferrer"
-        >
-          Subscribe Page
-        </a>
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+          <a
+            className="button alt"
+            href={getSubscribePageUrl()}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Subscribe Page
+          </a>
+        </div>
       </div>
       {message && <div className="small">{message}</div>}
       {loading && <div className="small">Loading...</div>}
@@ -3533,6 +3544,18 @@ export function AdminPanel({ onCatalogRefresh }) {
               type="button"
             >
               Subscriptions
+            </button>
+          ) : null}
+          {canManageMarketing ? (
+            <button
+              className={`admin-nav-item ${activeSection === "marketing" ? "active" : ""}`}
+              onClick={() => {
+                setActiveSection("marketing");
+                closeProductEditor();
+              }}
+              type="button"
+            >
+              Marketing
             </button>
           ) : null}
           {canManageCoreAdmin ? (
@@ -5038,6 +5061,10 @@ export function AdminPanel({ onCatalogRefresh }) {
 
           {activeSection === "subscriptions" && canManageSubscriptions && (
             <AdminSubscriptionLeadsSection token={token} />
+          )}
+
+          {activeSection === "marketing" && canManageMarketing && (
+            <AdminMarketingSection token={token} />
           )}
 
           {activeSection === "users" && canManageUsers && (

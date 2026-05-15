@@ -48,6 +48,31 @@ export const ADMIN_ROLE_DEFINITIONS = [
     key: "member_admin",
     label: "Member Admin",
     description: "Manage storefront members and member records."
+  },
+  {
+    key: "marketing_admin",
+    label: "Marketing Admin",
+    description: "Full access to campaign tracking, attribution, and marketing reporting."
+  },
+  {
+    key: "campaign_manager",
+    label: "Campaign Manager",
+    description: "Create campaigns, tracked links, and managed channel guidance."
+  },
+  {
+    key: "content_editor",
+    label: "Content Editor",
+    description: "Manage marketing content records and message metadata."
+  },
+  {
+    key: "ad_spend_approver",
+    label: "Ad Spend Approver",
+    description: "Review and update marketing spend records."
+  },
+  {
+    key: "analytics_viewer",
+    label: "Analytics Viewer",
+    description: "View campaign attribution and marketing analytics."
   }
 ];
 
