@@ -391,6 +391,42 @@ export function AdminMarketingSection({ token }) {
               </table>
             )}
           </div>
+
+          <div className="audit-section">
+            <h4>Link Analytics</h4>
+            {!overview?.linkStats?.length ? (
+              <div className="small">No tracked-link analytics yet.</div>
+            ) : (
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Slug</th>
+                    <th>Focus</th>
+                    <th>Clicks</th>
+                    <th>Signups</th>
+                    <th>Conv %</th>
+                    <th>Top Source</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {overview.linkStats.map((stat) => (
+                    <tr key={stat.linkId || stat.slug}>
+                      <td title={stat.slug || "—"}>{truncateText(stat.slug, 36)}</td>
+                      <td>{stat.messageFocus || "—"}</td>
+                      <td>{stat.clicks || 0}</td>
+                      <td>{stat.subscribers || 0}</td>
+                      <td>{Number(stat.conversionRate || 0).toFixed(1)}%</td>
+                      <td title={stat.topReferrers?.map((entry) => `${entry.host} (${entry.count})`).join(", ") || "—"}>
+                        {stat.topReferrers?.length
+                          ? `${stat.topReferrers[0].host} (${stat.topReferrers[0].count})`
+                          : "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
         </>
       )}
     </section>

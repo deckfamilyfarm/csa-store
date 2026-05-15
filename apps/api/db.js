@@ -1755,8 +1755,11 @@ export function initDb() {
     user: process.env.STORE_DB_USER,
     password: process.env.STORE_DB_PASSWORD,
     database: process.env.STORE_DB_DATABASE || "store",
+    connectTimeout: Number(process.env.STORE_DB_CONNECT_TIMEOUT_MS || 15000),
+    enableKeepAlive: true,
+    keepAliveInitialDelay: Number(process.env.STORE_DB_KEEPALIVE_INITIAL_DELAY_MS || 10000),
     waitForConnections: true,
-    connectionLimit: 10,
+    connectionLimit: Number(process.env.STORE_DB_CONNECTION_LIMIT || 10),
     queueLimit: 0
   });
 

@@ -355,6 +355,15 @@ function getPublicSubscribeBaseUrl(req) {
   return `${req.protocol}://${req.get("host") || ""}`;
 }
 
+function deriveHostFromUrl(value) {
+  if (!value) return null;
+  try {
+    return String(new URL(String(value)).host || "").trim() || null;
+  } catch (_error) {
+    return null;
+  }
+}
+
 function abbreviateRepeatDays(availability = {}) {
   const flags = [
     ["repeat_on_monday", "Mon"],
@@ -2151,6 +2160,54 @@ router.get(
           row.csaCampaignSlug
       ).length;
 
+      const clickCountsByLinkId = new Map();
+      const subscriberCountsByLinkId = new Map();
+      const referrersByLinkId = new Map();
+
+      for (const click of clickRows) {
+        if (String(click.eventType || "click").toLowerCase() !== "click") continue;
+        const linkId = Number(click.utmLinkId);
+        if (!Number.isFinite(linkId) || linkId <= 0) continue;
+        clickCountsByLinkId.set(linkId, (clickCountsByLinkId.get(linkId) || 0) + 1);
+        const referrerHost = deriveHostFromUrl(click.referrerUrl);
+        if (referrerHost) {
+          const refMap = referrersByLinkId.get(linkId) || new Map();
+          refMap.set(referrerHost, (refMap.get(referrerHost) || 0) + 1);
+          referrersByLinkId.set(linkId, refMap);
+        }
+      }
+
+      for (const subscriberEvent of subscriberRows) {
+        const linkId = Number(subscriberEvent.utmLinkId);
+        if (!Number.isFinite(linkId) || linkId <= 0) continue;
+        subscriberCountsByLinkId.set(linkId, (subscriberCountsByLinkId.get(linkId) || 0) + 1);
+      }
+
+      const linkStats = linkRows
+        .map((link) => {
+          const linkId = Number(link.id);
+          const clicks = clickCountsByLinkId.get(linkId) || 0;
+          const subscribers = subscriberCountsByLinkId.get(linkId) || 0;
+          const refMap = referrersByLinkId.get(linkId) || new Map();
+          const topReferrers = [...refMap.entries()]
+            .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
+            .slice(0, 3)
+            .map(([host, count]) => ({ host, count }));
+          return {
+            linkId,
+            slug: link.slug,
+            label: link.label,
+            campaignId: link.campaignId,
+            utmContent: link.utmContent,
+            messageFocus: link.messageFocus,
+            clicks,
+            subscribers,
+            conversionRate: clicks > 0 ? Number(((subscribers / clicks) * 100).toFixed(1)) : 0,
+            topReferrers
+          };
+        })
+        .sort((left, right) => right.clicks - left.clicks || right.subscribers - left.subscribers || left.slug.localeCompare(right.slug));
+
       res.json({
         summary: {
           campaigns: campaignRows.length,
@@ -2160,7 +2217,8 @@ router.get(
           subscriberEvents: subscriberRows.length,
           attributedSubscriptionLeads: attributedLeadCount
         },
-        recentSubscriberEvents
+        recentSubscriberEvents,
+        linkStats
       });
     } catch (error) {
       console.error("Marketing overview fetch failed:", error);

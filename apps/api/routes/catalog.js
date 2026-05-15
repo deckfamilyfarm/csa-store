@@ -163,6 +163,16 @@ function deriveSourceFromUrl(urlValue, fallbackHost = null, fallbackPath = null)
   return { sourceHost, sourcePath };
 }
 
+function deriveHostFromUrl(urlValue) {
+  const value = cleanOptionalUrl(urlValue);
+  if (!value) return null;
+  try {
+    return cleanOptionalString(new URL(value).host, 255);
+  } catch (_error) {
+    return null;
+  }
+}
+
 function extractMarketingParams(payload = {}, searchParams = new URLSearchParams()) {
   const csaTargetDropSite = cleanOptionalString(
     payload.csaTargetDropSite ||
@@ -1707,7 +1717,11 @@ router.get("/marketing/go/:slug", async (req, res) => {
     if (linkRow.targetLocationLabel) {
       destination.searchParams.set("csa_target_location", String(linkRow.targetLocationLabel));
     }
-    if (Number.isFinite(Number(linkRow.targetDropSiteId))) {
+    if (
+      linkRow.targetDropSiteId !== null &&
+      typeof linkRow.targetDropSiteId !== "undefined" &&
+      String(linkRow.targetDropSiteId).trim() !== ""
+    ) {
       destination.searchParams.set("csa_target_drop_site", String(linkRow.targetDropSiteId));
     }
 
