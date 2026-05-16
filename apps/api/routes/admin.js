@@ -7862,8 +7862,21 @@ router.delete("/products/:id", requireAdminPermission(["inventory_admin", "prici
 
 router.put("/products/:id", requireAdminPermission(["inventory_admin", "pricing_admin", "membership_admin", "local_pricelist_admin"]), async (req, res) => {
   const db = getDb();
+  const pool = getPool();
   const id = Number(req.params.id);
   const updates = req.body || {};
+  const existingRows = await db.select().from(products).where(eq(products.id, id));
+  const existing = existingRows[0] || null;
+
+  if (!existing) {
+    return res.status(404).json({ error: "Product not found" });
+  }
+
+  const nextName = updates.name ?? existing.name ?? null;
+  const nextDescription = updates.description ?? existing.description ?? null;
+  const nextVisible = updates.visible ?? existing.visible ?? null;
+  const nextTrackInventory = updates.trackInventory ?? existing.trackInventory ?? null;
+  const nextInventory = updates.inventory ?? existing.inventory ?? null;
 
   await db
     .update(products)
@@ -7878,6 +7891,21 @@ router.put("/products/:id", requireAdminPermission(["inventory_admin", "pricing_
       thumbnailUrl: updates.thumbnailUrl ?? undefined
     })
     .where(eq(products.id, id));
+
+  const remoteRelevantChanged =
+    String(nextName ?? "") !== String(existing.name ?? "") ||
+    String(nextDescription ?? "") !== String(existing.description ?? "") ||
+    Number(nextVisible ?? 0) !== Number(existing.visible ?? 0) ||
+    Number(nextTrackInventory ?? 0) !== Number(existing.trackInventory ?? 0) ||
+    Number(nextInventory ?? 0) !== Number(existing.inventory ?? 0);
+
+  if (remoteRelevantChanged) {
+    await markProductRemoteSyncPending(
+      pool,
+      id,
+      "Local product details updated. Apply to remote store pending."
+    );
+  }
 
   res.json({ ok: true });
 });
@@ -8093,8 +8121,26 @@ router.post("/products/bulk-update", requireAdminPermission(["inventory_admin", 
 
 router.put("/packages/:id", requireAdminPermission(["pricing_admin", "membership_admin", "local_pricelist_admin"]), async (req, res) => {
   const db = getDb();
+  const pool = getPool();
   const id = Number(req.params.id);
   const updates = req.body || {};
+  const existingRows = await db.select().from(packages).where(eq(packages.id, id));
+  const existing = existingRows[0] || null;
+
+  if (!existing) {
+    return res.status(404).json({ error: "Package not found" });
+  }
+
+  const nextName = updates.name ?? existing.name ?? null;
+  const nextPrice = updates.price ?? existing.price ?? null;
+  const nextPackageCode = updates.packageCode ?? existing.packageCode ?? null;
+  const nextUnit = updates.unit ?? existing.unit ?? null;
+  const nextNumOfItems = updates.numOfItems ?? existing.numOfItems ?? null;
+  const nextTrackType = updates.trackType ?? existing.trackType ?? null;
+  const nextChargeType = updates.chargeType ?? existing.chargeType ?? null;
+  const nextInventory = updates.inventory ?? existing.inventory ?? null;
+  const nextVisible = updates.visible ?? existing.visible ?? null;
+  const nextTrackInventory = updates.trackInventory ?? existing.trackInventory ?? null;
 
   await db
     .update(packages)
@@ -8111,6 +8157,26 @@ router.put("/packages/:id", requireAdminPermission(["pricing_admin", "membership
       trackInventory: updates.trackInventory ?? undefined
     })
     .where(eq(packages.id, id));
+
+  const remoteRelevantChanged =
+    String(nextName ?? "") !== String(existing.name ?? "") ||
+    Number(nextPrice ?? 0) !== Number(existing.price ?? 0) ||
+    String(nextPackageCode ?? "") !== String(existing.packageCode ?? "") ||
+    String(nextUnit ?? "") !== String(existing.unit ?? "") ||
+    Number(nextNumOfItems ?? 0) !== Number(existing.numOfItems ?? 0) ||
+    String(nextTrackType ?? "") !== String(existing.trackType ?? "") ||
+    String(nextChargeType ?? "") !== String(existing.chargeType ?? "") ||
+    Number(nextInventory ?? 0) !== Number(existing.inventory ?? 0) ||
+    Number(nextVisible ?? 0) !== Number(existing.visible ?? 0) ||
+    Number(nextTrackInventory ?? 0) !== Number(existing.trackInventory ?? 0);
+
+  if (remoteRelevantChanged) {
+    await markProductRemoteSyncPending(
+      pool,
+      Number(existing.productId),
+      "Local package details updated. Apply to remote store pending."
+    );
+  }
 
   res.json({ ok: true });
 });
