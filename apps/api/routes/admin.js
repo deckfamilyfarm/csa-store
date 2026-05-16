@@ -2228,6 +2228,111 @@ router.get(
 );
 
 router.get(
+  "/marketing/activity",
+  requireAdminPermission(["marketing_admin", "campaign_manager", "analytics_viewer"]),
+  async (_req, res) => {
+    try {
+      await ensureMarketingSchema();
+      await ensureSubscriberCaptureSchema();
+      const db = getDb();
+      const [campaignRows, linkRows, clickRows, subscriberRows, leadRows] = await Promise.all([
+        db.select().from(marketingCampaigns),
+        db.select().from(marketingUtmLinks),
+        db.select().from(marketingClickEvents),
+        db.select().from(marketingSubscriberEvents),
+        db.select().from(subscribeLeads)
+      ]);
+
+      const campaignById = new Map(campaignRows.map((row) => [Number(row.id), row]));
+      const linkById = new Map(linkRows.map((row) => [Number(row.id), row]));
+      const leadById = new Map(leadRows.map((row) => [Number(row.id), row]));
+
+      const recentClicks = clickRows
+        .slice()
+        .sort((left, right) => {
+          const leftTime = toTimestamp(left.occurredAt || left.createdAt);
+          const rightTime = toTimestamp(right.occurredAt || right.createdAt);
+          return rightTime - leftTime || Number(right.id || 0) - Number(left.id || 0);
+        })
+        .slice(0, 100)
+        .map((click) => {
+          const link = linkById.get(Number(click.utmLinkId)) || null;
+          const campaign =
+            campaignById.get(Number(click.campaignId)) ||
+            (link ? campaignById.get(Number(link.campaignId)) : null) ||
+            null;
+          return {
+            id: click.id,
+            occurredAt: click.occurredAt || click.createdAt,
+            eventType: click.eventType,
+            campaignSlug: campaign?.slug || null,
+            campaignName: campaign?.name || null,
+            linkSlug: link?.slug || null,
+            linkLabel: link?.label || null,
+            sourceHost: deriveHostFromUrl(click.referrerUrl) || click.sourceHost || null,
+            referrerUrl: click.referrerUrl || null,
+            pageUrl: click.pageUrl || null,
+            destinationUrl: click.destinationUrl || null,
+            utmSource: click.utmSource || null,
+            utmMedium: click.utmMedium || null,
+            utmCampaign: click.utmCampaign || null,
+            utmContent: click.utmContent || null,
+            messageFocus: click.messageFocus || null
+          };
+        });
+
+      const recentConversions = subscriberRows
+        .slice()
+        .sort((left, right) => {
+          const leftTime = toTimestamp(left.subscribedAt || left.createdAt);
+          const rightTime = toTimestamp(right.subscribedAt || right.createdAt);
+          return rightTime - leftTime || Number(right.id || 0) - Number(left.id || 0);
+        })
+        .slice(0, 100)
+        .map((event) => {
+          const link = linkById.get(Number(event.utmLinkId)) || null;
+          const campaign =
+            campaignById.get(Number(event.campaignId)) ||
+            (link ? campaignById.get(Number(link.campaignId)) : null) ||
+            null;
+          const lead = leadById.get(Number(event.subscribeLeadId)) || null;
+          return {
+            id: event.id,
+            subscribedAt: event.subscribedAt || event.createdAt,
+            campaignSlug: campaign?.slug || null,
+            campaignName: campaign?.name || null,
+            linkSlug: link?.slug || event.csaLinkSlug || null,
+            linkLabel: link?.label || null,
+            email: event.email || null,
+            firstName: event.firstName || lead?.firstName || null,
+            lastName: event.lastName || lead?.lastName || null,
+            city: event.city || lead?.city || null,
+            postalCode: event.postalCode || lead?.postalCode || null,
+            selectedDropSite: event.selectedDropSite || lead?.selectedDropSite || null,
+            sourceHost: event.sourceHost || lead?.sourceHost || null,
+            utmSource: event.utmSource || null,
+            utmMedium: event.utmMedium || null,
+            utmCampaign: event.utmCampaign || null,
+            utmContent: event.utmContent || null,
+            messageFocus: event.messageFocus || lead?.messageFocus || null,
+            matchMethod: event.matchMethod || null,
+            subscribeLeadId: event.subscribeLeadId || null,
+            leadStatus: lead?.status || null
+          };
+        });
+
+      res.json({
+        clicks: recentClicks,
+        conversions: recentConversions
+      });
+    } catch (error) {
+      console.error("Marketing activity fetch failed:", error);
+      res.status(500).json({ error: "Failed to load marketing activity." });
+    }
+  }
+);
+
+router.get(
   "/marketing/campaigns",
   requireAdminPermission(["marketing_admin", "campaign_manager", "analytics_viewer"]),
   async (_req, res) => {

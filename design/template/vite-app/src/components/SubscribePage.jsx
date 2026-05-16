@@ -154,8 +154,91 @@ const FAQS = [
     question: "What if I miss the order window?",
     answer:
       "We know life gets busy, but unfortunately we cannot accommodate late or missed orders."
+  },
+  {
+    question: "Where can I find pasture-raised eggs and meat in Portland?",
+    answer:
+      "Deck Family Farm and Full Farm CSA offer pasture-raised eggs, meat, raw dairy, and other nutrient-dense local foods for Portland-area members through Saturday pickup locations including Beaverton, Cully, Hollywood Farmers Market, Irvington, PSU Farmers Market, St. Johns Farmers Market, and Woodstock."
+  },
+  {
+    question: "Where can I find pasture-raised eggs and meat in Eugene or Springfield?",
+    answer:
+      "Full Farm CSA serves Eugene, Springfield, and Junction City with Tuesday, Friday, and Saturday pickup options as well as home delivery in the Eugene, Springfield, and Junction City area. Members can shop Deck Family Farm staples and partner-farm foods in one place."
+  },
+  {
+    question: "Where can I find pasture-raised eggs and meat in Salem?",
+    answer:
+      "Full Farm CSA offers a Salem Saturday pickup option for shoppers looking for Deck Family Farm pasture-raised eggs, meat, raw dairy, and other local farm foods."
+  },
+  {
+    question: "Where can I get farm food delivered to my house?",
+    answer:
+      "Full Farm CSA offers home delivery for qualifying addresses, with Tuesday delivery in Eugene, Springfield, and Junction City and Saturday delivery in Corvallis. The subscribe form can check your address and show whether you are inside the current delivery area."
+  },
+  {
+    question: "Where can I join a CSA for nutrient-dense local food in Oregon?",
+    answer:
+      "You can join Full Farm CSA from Deck Family Farm on this page. Membership gives you access to pasture-raised eggs, meat, raw dairy, vegetables, pantry goods, and other hyper-local foods through pickup sites and home delivery."
   }
 ];
+
+const DISCOVERY_CARDS = [
+  {
+    title: "Portland-area pickup",
+    copy:
+      "Find Deck Family Farm pasture-raised eggs, meat, raw dairy, and local farm staples through Portland-area Saturday pickup locations including Beaverton, Cully, Hollywood Farmers Market, Irvington, PSU Farmers Market, St. Johns Farmers Market, and Woodstock."
+  },
+  {
+    title: "Eugene, Springfield, and Junction City",
+    copy:
+      "Shop nutrient-dense local food from Deck Family Farm and partner farms with Tuesday, Friday, and Saturday pickup options plus home delivery in the Eugene, Springfield, and Junction City area."
+  },
+  {
+    title: "Salem and Corvallis access",
+    copy:
+      "Join Full Farm CSA for Salem and Corvallis access to pasture-raised eggs, meat, dairy, and weekly farm food pickup. Corvallis also has a Saturday home-delivery route."
+  },
+  {
+    title: "Good diet options",
+    copy:
+      "Members use Full Farm CSA for nutrient-dense staples like pasture-raised eggs, grass-fed and pasture-raised meats, raw dairy, vegetables, pantry items, and meal-building ingredients for whole-food diets."
+  }
+];
+
+function ensureMetaTag(name, content, attribute = "name") {
+  if (typeof document === "undefined") return;
+  const selector = `meta[${attribute}="${name}"]`;
+  let element = document.head.querySelector(selector);
+  if (!element) {
+    element = document.createElement("meta");
+    element.setAttribute(attribute, name);
+    document.head.appendChild(element);
+  }
+  element.setAttribute("content", content);
+}
+
+function ensureCanonicalLink(href) {
+  if (typeof document === "undefined") return;
+  let element = document.head.querySelector('link[rel="canonical"]');
+  if (!element) {
+    element = document.createElement("link");
+    element.setAttribute("rel", "canonical");
+    document.head.appendChild(element);
+  }
+  element.setAttribute("href", href);
+}
+
+function applyJsonLd(id, payload) {
+  if (typeof document === "undefined") return;
+  let element = document.getElementById(id);
+  if (!element) {
+    element = document.createElement("script");
+    element.type = "application/ld+json";
+    element.id = id;
+    document.head.appendChild(element);
+  }
+  element.textContent = JSON.stringify(payload);
+}
 
 function storeUrlFallback() {
   return "https://fullfarmcsa.deckfamilyfarm.com/";
@@ -183,7 +266,7 @@ function buildInitialForm(dropSites = []) {
     notes: "",
     liabilityAgreementAccepted: false,
     liabilityAgreementSignerName: "",
-    liabilityAgreementSignatureMode: "draw"
+    liabilityAgreementSignatureMode: "typed"
   };
 }
 
@@ -243,9 +326,9 @@ function DropSiteTable({ title, orderWindow, sites = [] }) {
           <tbody>
             {sites.map((site) => (
               <tr key={site.id || site.name}>
-                <td>{site.name}</td>
-                <td>{formatDropSiteWindow(site) || "—"}</td>
-                <td>{formatDropSiteAddress(site) || "—"}</td>
+                <td data-label="Name">{site.name}</td>
+                <td data-label="Time of Day">{formatDropSiteWindow(site) || "—"}</td>
+                <td data-label="Address">{formatDropSiteAddress(site) || "—"}</td>
               </tr>
             ))}
           </tbody>
@@ -256,6 +339,8 @@ function DropSiteTable({ title, orderWindow, sites = [] }) {
 }
 
 export function SubscribePage({ dropSites = [], storeUrl }) {
+  const allFaqs = useMemo(() => FAQS, []);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const siteOptions = useMemo(
     () =>
       dropSites
@@ -306,25 +391,99 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
   const [status, setStatus] = useState({ submitting: false, success: false, error: "" });
   const [agreementModalOpen, setAgreementModalOpen] = useState(false);
   const [agreementSaved, setAgreementSaved] = useState(false);
-  const [signaturePresent, setSignaturePresent] = useState(false);
   const [addressInsights, setAddressInsights] = useState(null);
   const [addressCheckError, setAddressCheckError] = useState("");
   const [checkingAddress, setCheckingAddress] = useState(false);
-  const signatureCanvasRef = useRef(null);
-  const drawingRef = useRef(false);
-  const lastPointRef = useRef(null);
   const formStatusRef = useRef(null);
+  const formCardRef = useRef(null);
 
   useEffect(() => {
-    const canvas = signatureCanvasRef.current;
-    if (!canvas) return;
-    const context = canvas.getContext("2d");
-    if (!context) return;
-    context.lineCap = "round";
-    context.lineJoin = "round";
-    context.strokeStyle = "#1e2d3b";
-    context.lineWidth = 2.2;
-  }, [agreementModalOpen]);
+    const canonicalUrl = window.location.href.split("#")[0];
+    const title =
+      "Join Full Farm CSA | Pasture-Raised Eggs, Meat, Raw Dairy, Pickup & Home Delivery";
+    const description =
+      "Join Full Farm CSA from Deck Family Farm for pasture-raised eggs, meat, raw dairy, and nutrient-dense local food with pickup in Portland, Eugene, Salem, Corvallis, and home delivery in qualifying Oregon areas.";
+    const faqEntities = allFaqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer
+      }
+    }));
+    const organizationSchema = {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: "Deck Family Farm",
+      url: canonicalUrl,
+      brand: {
+        "@type": "Brand",
+        name: "Full Farm CSA"
+      },
+      areaServed: [
+        "Portland, Oregon",
+        "Eugene, Oregon",
+        "Springfield, Oregon",
+        "Junction City, Oregon",
+        "Salem, Oregon",
+        "Corvallis, Oregon",
+        "Beaverton, Oregon",
+        "Oregon City, Oregon"
+      ],
+      knowsAbout: [
+        "pasture-raised eggs",
+        "pasture-raised meat",
+        "raw dairy",
+        "grass-fed beef",
+        "local farm food",
+        "CSA membership",
+        "home delivery",
+        "pickup sites"
+      ]
+    };
+    const serviceSchema = {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      serviceType: "CSA membership, farm food pickup, and home delivery",
+      provider: {
+        "@type": "Organization",
+        name: "Deck Family Farm"
+      },
+      areaServed: [
+        "Portland, Oregon",
+        "Eugene, Oregon",
+        "Springfield, Oregon",
+        "Junction City, Oregon",
+        "Salem, Oregon",
+        "Corvallis, Oregon"
+      ],
+      description:
+        "Full Farm CSA helps Oregon households buy pasture-raised eggs, meat, raw dairy, and other nutrient-dense local foods through neighborhood pickup sites and home delivery in qualifying areas.",
+      offers: SUBSCRIBE_PLANS.filter((plan) => plan.value !== "guest").map((plan) => ({
+        "@type": "Offer",
+        name: plan.title,
+        priceCurrency: "USD",
+        price: String(plan.price || "").replace(/[^0-9.]/g, "")
+      }))
+    };
+    const faqSchema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: faqEntities
+    };
+
+    document.title = title;
+    ensureMetaTag("description", description);
+    ensureMetaTag("robots", "index,follow,max-image-preview:large");
+    ensureMetaTag("og:title", title, "property");
+    ensureMetaTag("og:description", description, "property");
+    ensureMetaTag("og:type", "website", "property");
+    ensureMetaTag("og:url", canonicalUrl, "property");
+    ensureCanonicalLink(canonicalUrl);
+    applyJsonLd("subscribe-organization-schema", organizationSchema);
+    applyJsonLd("subscribe-service-schema", serviceSchema);
+    applyJsonLd("subscribe-faq-schema", faqSchema);
+  }, [allFaqs]);
 
   function updateField(key, value) {
     if (
@@ -340,13 +499,9 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
     }
     if (
       key === "liabilityAgreementAccepted" ||
-      key === "liabilityAgreementSignerName" ||
-      key === "liabilityAgreementSignatureMode"
+      key === "liabilityAgreementSignerName"
     ) {
       setAgreementSaved(false);
-      if (key === "liabilityAgreementSignatureMode" && value === "typed") {
-        clearSignature();
-      }
     }
     setForm((prev) => ({ ...prev, [key]: value }));
   }
@@ -356,6 +511,8 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
       ...prev,
       selectedDropSite: siteName || ""
     }));
+    setAddressInsights(null);
+    setAddressCheckError("");
   }
 
   async function handleCheckAddress() {
@@ -379,66 +536,6 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
     }
   }
 
-  function canvasPointFromEvent(event) {
-    const canvas = signatureCanvasRef.current;
-    if (!canvas) return null;
-    const rect = canvas.getBoundingClientRect();
-    if (!rect.width || !rect.height) return null;
-    const clientX = "touches" in event ? event.touches?.[0]?.clientX : event.clientX;
-    const clientY = "touches" in event ? event.touches?.[0]?.clientY : event.clientY;
-    if (typeof clientX !== "number" || typeof clientY !== "number") return null;
-    return {
-      x: clientX - rect.left,
-      y: clientY - rect.top
-    };
-  }
-
-  function startSignature(event) {
-    const canvas = signatureCanvasRef.current;
-    const point = canvasPointFromEvent(event);
-    if (!canvas || !point) return;
-    const context = canvas.getContext("2d");
-    if (!context) return;
-    drawingRef.current = true;
-    lastPointRef.current = point;
-    context.beginPath();
-    context.moveTo(point.x, point.y);
-    context.lineTo(point.x + 0.01, point.y + 0.01);
-    context.stroke();
-    setSignaturePresent(true);
-  }
-
-  function drawSignature(event) {
-    if (!drawingRef.current) return;
-    const canvas = signatureCanvasRef.current;
-    const point = canvasPointFromEvent(event);
-    if (!canvas || !point) return;
-    const context = canvas.getContext("2d");
-    if (!context) return;
-    const previous = lastPointRef.current || point;
-    context.beginPath();
-    context.moveTo(previous.x, previous.y);
-    context.lineTo(point.x, point.y);
-    context.stroke();
-    lastPointRef.current = point;
-    setSignaturePresent(true);
-  }
-
-  function endSignature() {
-    drawingRef.current = false;
-    lastPointRef.current = null;
-  }
-
-  function clearSignature() {
-    const canvas = signatureCanvasRef.current;
-    if (!canvas) return;
-    const context = canvas.getContext("2d");
-    if (!context) return;
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    setSignaturePresent(false);
-    setAgreementSaved(false);
-  }
-
   function handleSaveAgreement() {
     if (!form.liabilityAgreementAccepted) {
       setStatus({
@@ -456,14 +553,6 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
       });
       return;
     }
-    if (form.liabilityAgreementSignatureMode === "draw" && !signaturePresent) {
-      setStatus({
-        submitting: false,
-        success: false,
-        error: "Please provide a drawn signature for the product liability agreement."
-      });
-      return;
-    }
     setAgreementSaved(true);
     setStatus({ submitting: false, success: false, error: "" });
     setAgreementModalOpen(false);
@@ -473,7 +562,6 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
     event.preventDefault();
     setStatus({ submitting: true, success: false, error: "" });
     try {
-      const canvas = signatureCanvasRef.current;
       if (!form.liabilityAgreementAccepted) {
         throw new Error("You must agree to the product liability agreement.");
       }
@@ -483,17 +571,12 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
       if (!agreementSaved) {
         throw new Error("Please review and save the agreement before submitting.");
       }
-      if (form.liabilityAgreementSignatureMode === "draw" && (!canvas || !signaturePresent)) {
-        throw new Error("Please sign the product liability agreement before submitting.");
-      }
       const plan = SUBSCRIBE_PLANS.find((entry) => entry.value === form.selectedPlan);
       const response = await submitSubscribeLead({
         ...form,
         selectedPlanLabel: plan?.title || form.selectedPlan,
-        liabilityAgreementSignatureDataUrl:
-          form.liabilityAgreementSignatureMode === "draw" && canvas
-            ? canvas.toDataURL("image/png")
-            : "",
+        liabilityAgreementSignatureMode: "typed",
+        liabilityAgreementSignatureDataUrl: "",
         sourceHost: window.location.host,
         sourcePath: window.location.pathname,
         queryString: window.location.search
@@ -501,7 +584,7 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
       setAddressInsights(response?.addressInsights || addressInsights);
       setStatus({ submitting: false, success: true, error: "" });
       window.setTimeout(() => {
-        formStatusRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        formCardRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 0);
     } catch (error) {
       setStatus({
@@ -510,7 +593,7 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
         error: error?.message || "Unable to submit your information right now."
       });
       window.setTimeout(() => {
-        formStatusRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+        formCardRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 0);
     }
   }
@@ -526,21 +609,41 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
               alt="Deck Family Farm logo"
             />
           </a>
-          <nav className="subscribe-nav">
+          <button
+            className={`subscribe-mobile-menu-button${mobileMenuOpen ? " open" : ""}`}
+            type="button"
+            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileMenuOpen ? "true" : "false"}
+            onClick={() => setMobileMenuOpen((value) => !value)}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+          <nav className={`subscribe-nav${mobileMenuOpen ? " mobile-open" : ""}`}>
             {SUBSCRIBE_NAV_LINKS.map((link) =>
               Array.isArray(link.children) ? (
                 <div key={link.label} className="subscribe-nav-group">
                   <span className="subscribe-nav-group-title">{link.label}</span>
                   <div className="subscribe-nav-group-links">
                     {link.children.map((child) => (
-                      <a key={child.href} href={child.href === storeUrlFallback() ? storeUrl : child.href}>
+                      <a
+                        key={child.href}
+                        href={child.href === storeUrlFallback() ? storeUrl : child.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
                         {child.label}
                       </a>
                     ))}
                   </div>
                 </div>
               ) : (
-                <a key={link.href} className="subscribe-nav-single" href={link.href}>
+                <a
+                  key={link.href}
+                  className="subscribe-nav-single"
+                  href={link.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
                   {link.label}
                 </a>
               )
@@ -573,7 +676,11 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
                 for future shopping!
               </p>
               <p className="subscribe-lede">
-                Read our FAQs at the bottom of this page to learn more.
+                We charge a one-time membership fee of $50 which includes Herdshare Agreement and
+                access to raw dairy products.
+              </p>
+              <p className="subscribe-lede">
+                Read our <a href="#faqs">FAQs</a> at the bottom of this page to learn more.
               </p>
               <figure className="subscribe-hero-image-card subscribe-hero-image-card-secondary">
                 <img
@@ -593,7 +700,7 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
               </div>
             </div>
 
-            <div className="subscribe-form-card card">
+            <div ref={formCardRef} className="subscribe-form-card card">
               <div className="eyebrow">Get started</div>
               <h2 className="h2">Personal information</h2>
               <p className="small">
@@ -613,7 +720,6 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
                       type="button"
                       onClick={() => {
                         setForm(buildInitialForm(siteOptions));
-                        clearSignature();
                         setAgreementSaved(false);
                         setAddressInsights(null);
                         setAddressCheckError("");
@@ -911,9 +1017,7 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
                     </div>
                     <div className="small">
                       {agreementSaved && form.liabilityAgreementSignerName && form.liabilityAgreementAccepted
-                        ? `Agreement saved for ${form.liabilityAgreementSignerName} using ${
-                            form.liabilityAgreementSignatureMode === "typed" ? "typed name" : "drawn signature"
-                          }.`
+                        ? `Agreement saved for ${form.liabilityAgreementSignerName} using typed name signature.`
                         : "Agreement not saved yet."}
                     </div>
                   </div>
@@ -926,9 +1030,6 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
                     <button className="button" type="submit" disabled={status.submitting}>
                       {status.submitting ? "Submitting..." : "Submit subscription request"}
                     </button>
-                    <a className="button alt" href="#plans">
-                      Review plans
-                    </a>
                   </div>
                 </form>
               )}
@@ -939,14 +1040,39 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
         <section className="section subscribe-proof">
           <div className="container">
             <div className="subscribe-section-head subscribe-section-head-centered">
-              <div className="eyebrow">What people say</div>
-              <h2 className="h2">Member feedback</h2>
+              <div className="eyebrow">Testimonials</div>
+              <h2 className="h2">What people are saying</h2>
             </div>
+            <div className="subscribe-proof-title">What people are saying</div>
             <div className="subscribe-proof-grid">
               {TESTIMONIALS.map((testimonial) => (
                 <article key={testimonial.author} className="card subscribe-quote-card">
                   <p>{testimonial.quote}</p>
                   <strong>{testimonial.author}</strong>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="section subscribe-discovery-section">
+          <div className="container">
+            <div className="subscribe-section-head subscribe-section-head-centered">
+              <div className="eyebrow">Find local food</div>
+              <h2 className="h2">
+                Where to find pasture-raised eggs, meat, CSA pickup, and home delivery
+              </h2>
+            </div>
+            <p className="lede subscribe-discovery-lede">
+              Deck Family Farm and Full Farm CSA help households in Portland, Eugene, Salem,
+              Corvallis, Springfield, and nearby areas find nutrient-dense local food with pickup
+              sites, farmers market access, and home delivery for qualifying addresses.
+            </p>
+            <div className="subscribe-discovery-grid">
+              {DISCOVERY_CARDS.map((card) => (
+                <article key={card.title} className="card subscribe-discovery-card">
+                  <h3>{card.title}</h3>
+                  <p>{card.copy}</p>
                 </article>
               ))}
             </div>
@@ -1136,7 +1262,7 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
               <h2 className="h2">How membership works</h2>
             </div>
             <div className="subscribe-faq-list">
-              {FAQS.map((faq) => (
+              {allFaqs.map((faq) => (
                 <details key={faq.question} className="card subscribe-faq-item">
                   <summary>{faq.question}</summary>
                   <p>{faq.answer}</p>
@@ -1188,59 +1314,14 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
                   I have reviewed the product liability agreement and agree to sign it electronically.
                 </span>
               </label>
+              <div className="small">
+                Your typed full name above will be used as your electronic signature on the saved PDF.
+              </div>
               <div className="button-row">
-                <button
-                  className={`button alt${form.liabilityAgreementSignatureMode === "draw" ? " selected" : ""}`}
-                  type="button"
-                  onClick={() => updateField("liabilityAgreementSignatureMode", "draw")}
-                >
-                  Draw signature
-                </button>
-                <button
-                  className={`button alt${form.liabilityAgreementSignatureMode === "typed" ? " selected" : ""}`}
-                  type="button"
-                  onClick={() => updateField("liabilityAgreementSignatureMode", "typed")}
-                >
-                  Type my name instead
+                <button className="button" type="button" onClick={handleSaveAgreement}>
+                  Save Agreement
                 </button>
               </div>
-              <div className="small">Sign here*</div>
-              {form.liabilityAgreementSignatureMode === "draw" ? (
-                <>
-                  <canvas
-                    ref={signatureCanvasRef}
-                    className="subscribe-signature-pad"
-                    width={560}
-                    height={180}
-                    onMouseDown={startSignature}
-                    onMouseMove={drawSignature}
-                    onMouseUp={endSignature}
-                    onMouseLeave={endSignature}
-                    onTouchStart={startSignature}
-                    onTouchMove={drawSignature}
-                    onTouchEnd={endSignature}
-                  />
-                  <div className="button-row">
-                    <button className="button alt" type="button" onClick={clearSignature}>
-                      Clear signature
-                    </button>
-                    <button className="button" type="button" onClick={handleSaveAgreement}>
-                      Save Agreement
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="small">
-                    Your typed full name above will be used as your electronic signature on the saved PDF.
-                  </div>
-                  <div className="button-row">
-                    <button className="button" type="button" onClick={handleSaveAgreement}>
-                      Save Agreement
-                    </button>
-                  </div>
-                </>
-              )}
             </div>
           </div>
         </div>
@@ -1248,13 +1329,42 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
 
       <footer className="subscribe-footer">
         <div className="container subscribe-footer-row">
-          <div>
-            <strong>Deck Family Farm</strong>
-            <div className="small">Full Farm CSA is the CSA arm of Deck Family Farm.</div>
+          <div className="subscribe-footer-brand">
+            <div className="subscribe-footer-brand-top">
+              <img
+                className="subscribe-footer-logo"
+                src="/images/subscribe-footer-logo.avif"
+                alt="Deck Family Farm icon logo"
+              />
+              <strong className="subscribe-footer-wordmark">Deck Family Farm</strong>
+            </div>
+            <div className="small">
+              Full Farm CSA is Deck Family Farm’s CSA membership program, featuring
+              pasture-raised food from our farm and trusted local partners, with convenient
+              neighborhood pickup sites and home delivery.
+            </div>
           </div>
-          <div className="button-row">
-            <a className="button alt" href="https://www.deckfamilyfarm.com">
-              Main site
+          <div className="subscribe-footer-contact">
+            <div>25362 High Pass Road</div>
+            <div>Junction City, OR 97448</div>
+            <div>
+              <a href="tel:15413210925">541-321-0925</a>
+            </div>
+            <div>
+              <a href="mailto:fullfarmcsa@deckfamilyfarm.com">fullfarmcsa@deckfamilyfarm.com</a>
+            </div>
+          </div>
+          <div className="subscribe-footer-links">
+            <a
+              className="subscribe-review-link"
+              href="https://app.goodreviews.io/mode?type=link&grid=GRI_ZN9UOZ3YIM5"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <span className="subscribe-review-link-star" aria-hidden="true">
+                ☆
+              </span>
+              <span>Leave us a Review!</span>
             </a>
             <a className="button" href={subscriptionStoreUrl()}>
               Store

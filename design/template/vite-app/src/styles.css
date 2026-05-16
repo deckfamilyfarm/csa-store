@@ -333,6 +333,30 @@ img {
   justify-content: flex-end;
 }
 
+.subscribe-mobile-menu-button {
+  display: none;
+  border: 1px solid rgba(31, 27, 23, 0.14);
+  background: #ffffff;
+  border-radius: 999px;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.subscribe-mobile-menu-button span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--navy);
+  transition: transform 0.18s ease, opacity 0.18s ease;
+}
+
 .subscribe-nav-group {
   display: flex;
   flex-direction: column;
@@ -621,7 +645,7 @@ img {
 }
 
 .subscribe-proof {
-  padding-top: 28px;
+  padding-top: 18px;
   position: relative;
   overflow: hidden;
 }
@@ -644,6 +668,61 @@ img {
   gap: 22px;
   position: relative;
   z-index: 1;
+}
+
+.subscribe-proof-title {
+  margin: -6px 0 20px;
+  text-align: center;
+  font-family: var(--subscribe-serif);
+  font-size: clamp(28px, 3vw, 40px);
+  line-height: 1.05;
+  color: #ffffff;
+  position: relative;
+  z-index: 1;
+}
+
+.subscribe-proof .subscribe-section-head {
+  margin-bottom: 10px;
+}
+
+.subscribe-discovery-section {
+  background: #ffffff;
+  padding-top: 68px;
+  padding-bottom: 72px;
+}
+
+.subscribe-discovery-lede {
+  max-width: 64ch;
+  margin: 0 auto 24px;
+  text-align: center;
+  color: #3f3a34;
+}
+
+.subscribe-discovery-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.subscribe-discovery-card {
+  padding: 24px;
+  border-radius: 24px;
+  display: grid;
+  gap: 12px;
+  background: rgba(248, 248, 242, 0.98);
+}
+
+.subscribe-discovery-card h3 {
+  margin: 0;
+  font-family: var(--subscribe-serif);
+  font-size: 28px;
+  color: var(--navy);
+}
+
+.subscribe-discovery-card p {
+  margin: 0;
+  line-height: 1.7;
+  color: #3f3a34;
 }
 
 .subscribe-quote-card {
@@ -1106,7 +1185,8 @@ img {
 .subscribe-footer {
   padding: 26px 0 34px;
   border-top: 1px solid rgba(31, 27, 23, 0.08);
-  background: #ffffff;
+  background: rgba(91, 42, 57, 1);
+  color: #ffffff;
 }
 
 .subscribe-footer-row {
@@ -1114,6 +1194,93 @@ img {
   align-items: center;
   justify-content: space-between;
   gap: 20px;
+}
+
+.subscribe-footer-brand,
+.subscribe-footer-contact,
+.subscribe-footer-links {
+  display: grid;
+  gap: 6px;
+}
+
+.subscribe-footer-brand {
+  max-width: 420px;
+}
+
+.subscribe-footer-brand-top {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.subscribe-footer-logo {
+  display: block;
+  width: auto;
+  max-height: 78px;
+}
+
+.subscribe-footer-wordmark {
+  display: block;
+  font-family: var(--subscribe-serif);
+  font-size: clamp(30px, 3vw, 40px);
+  line-height: 0.95;
+  color: #ffffff;
+}
+
+.subscribe-footer-contact {
+  color: rgba(255, 255, 255, 0.92);
+  line-height: 1.6;
+}
+
+.subscribe-footer strong,
+.subscribe-footer .small {
+  color: #ffffff;
+}
+
+.subscribe-footer-contact a {
+  color: #ffffff;
+}
+
+.subscribe-footer-links {
+  justify-items: end;
+}
+
+.subscribe-footer-links .button {
+  background: #ffffff;
+  color: rgba(91, 42, 57, 1);
+  border-color: #ffffff;
+}
+
+.subscribe-footer-links .button:hover {
+  background: rgba(255, 255, 255, 0.92);
+  color: rgba(91, 42, 57, 1);
+}
+
+.subscribe-review-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.subscribe-review-link-star {
+  width: 40px;
+  height: 40px;
+  display: inline-grid;
+  place-items: center;
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+  border-radius: 999px;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.subscribe-review-link:hover,
+.subscribe-review-link:hover .subscribe-review-link-star {
+  color: rgba(255, 244, 215, 1);
+  border-color: rgba(255, 244, 215, 1);
 }
 
 .card.pad {
@@ -1159,6 +1326,10 @@ img {
 
   .shop-filters {
     position: static;
+  }
+
+  .subscribe-discovery-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -3566,20 +3737,242 @@ img {
 }
 
 @media (max-width: 640px) {
+  .container {
+    width: min(1160px, calc(100vw - 24px));
+  }
+
   .subscribe-header {
     position: static;
+  }
+
+  .subscribe-header-row {
+    min-height: 0;
+    align-items: center;
+    gap: 16px;
+    padding-top: 10px;
+    padding-bottom: 12px;
+    position: relative;
+  }
+
+  .subscribe-wordmark-logo {
+    height: 58px;
+  }
+
+  .subscribe-mobile-menu-button {
+    display: inline-flex;
+    margin-left: auto;
+  }
+
+  .subscribe-mobile-menu-button.open span:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+  }
+
+  .subscribe-mobile-menu-button.open span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .subscribe-mobile-menu-button.open span:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+  }
+
+  .subscribe-nav {
+    display: none;
+    position: absolute;
+    top: calc(100% - 2px);
+    right: 0;
+    left: 0;
+    z-index: 35;
+    padding: 16px 12px 14px;
+    border-top: 1px solid rgba(31, 27, 23, 0.08);
+    border-bottom: 1px solid rgba(31, 27, 23, 0.08);
+    background: rgba(255, 255, 255, 0.99);
+    box-shadow: 0 16px 36px rgba(31, 27, 23, 0.12);
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .subscribe-nav.mobile-open {
+    display: grid;
+  }
+
+  .subscribe-nav-group {
+    gap: 6px;
+    width: 100%;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(31, 27, 23, 0.08);
+  }
+
+  .subscribe-nav-group:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .subscribe-nav-group-title,
+  .subscribe-nav-single {
+    font-size: 19px;
+    line-height: 1;
+  }
+
+  .subscribe-nav-group-links {
+    position: static;
+    display: flex;
+    min-width: 0;
+    padding: 0;
+    margin-top: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+    gap: 6px;
+  }
+
+  .subscribe-nav-group-links::before {
+    display: none;
+  }
+
+  .subscribe-nav-group-links a {
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .subscribe-hero {
+    padding: 22px 0 34px;
+  }
+
+  .subscribe-hero-copy {
+    padding: 10px 0 0;
   }
 
   .subscribe-title {
     max-width: none;
   }
 
+  .subscribe-welcome-line {
+    margin-bottom: 14px;
+  }
+
+  .subscribe-lede {
+    font-size: 16px;
+    line-height: 1.62;
+  }
+
+  .subscribe-hero-image-card {
+    margin-top: 18px;
+    border-radius: 18px;
+  }
+
+  .subscribe-hero-image-card-secondary {
+    max-width: 84%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
   .subscribe-form-card {
-    padding: 20px;
+    padding: 18px;
+    border-radius: 18px;
+  }
+
+  .subscribe-page .button-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .subscribe-page .button-row .button,
+  .subscribe-page .button-row .subscribe-review-link {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .subscribe-nearest-pickup-item {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .subscribe-discovery-card,
+  .subscribe-quote-card,
+  .subscribe-plan-card,
+  .subscribe-drop-site-table-card,
+  .subscribe-partner-card,
+  .subscribe-faq-item {
+    padding: 18px;
+  }
+
+  .subscribe-drop-site-table-card {
+    border-radius: 20px;
+  }
+
+  .subscribe-drop-site-table-shell {
+    overflow: visible;
+  }
+
+  .subscribe-drop-site-table {
+    min-width: 0;
+  }
+
+  .subscribe-drop-site-table thead {
+    display: none;
+  }
+
+  .subscribe-drop-site-table,
+  .subscribe-drop-site-table tbody,
+  .subscribe-drop-site-table tr,
+  .subscribe-drop-site-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .subscribe-drop-site-table tbody {
+    display: grid;
+    gap: 12px;
+  }
+
+  .subscribe-drop-site-table tr {
+    padding: 14px;
+    border: 1px solid rgba(31, 27, 23, 0.08);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.78);
+  }
+
+  .subscribe-drop-site-table td {
+    border-top: 0;
+    padding: 0;
+  }
+
+  .subscribe-drop-site-table td + td {
+    margin-top: 8px;
+  }
+
+  .subscribe-drop-site-table td::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 2px;
+    color: var(--field);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .subscribe-herdshare-media {
+    width: min(100%, 260px);
   }
 
   .subscribe-partner-grid {
     grid-template-columns: 1fr;
+  }
+
+  .subscribe-footer-brand {
+    max-width: none;
+  }
+
+  .subscribe-footer-wordmark {
+    font-size: 28px;
+  }
+
+  .subscribe-footer-links {
+    justify-items: stretch;
+    width: 100%;
   }
 
   .subscribe-plan-card.featured {

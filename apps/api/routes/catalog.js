@@ -874,6 +874,7 @@ async function buildSignedAgreementPdf({
   let page = pdfDoc.addPage([612, 792]);
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  const italicFont = await pdfDoc.embedFont(StandardFonts.TimesRomanItalic);
   const signatureImage = signatureBuffer ? await pdfDoc.embedPng(signatureBuffer) : null;
   const signedLabel = submittedAt.toLocaleString("en-US", {
     dateStyle: "long",
@@ -977,16 +978,16 @@ async function buildSignedAgreementPdf({
       height: Math.min(dims.height, 120)
     });
   } else {
-    page.drawText(`Electronically signed by typing name: ${signerName}`, {
+    page.drawText(signerName, {
       x: marginX,
-      y: y + 50,
-      size: 16,
-      font: boldFont,
+      y: y + 42,
+      size: 28,
+      font: italicFont,
       color: rgb(0.12, 0.11, 0.09)
     });
-    page.drawText(`Signature mode: ${signatureMode === "typed" ? "Typed name" : "Electronic"}`, {
+    page.drawText("Electronic signature by typed name", {
       x: marginX,
-      y: y + 28,
+      y: y + 16,
       size: 10,
       font,
       color: rgb(0.35, 0.3, 0.26)
@@ -1834,9 +1835,9 @@ router.post("/subscribe", async (req, res) => {
     );
     const agreementAccepted = Boolean(payload.liabilityAgreementAccepted);
     const signatureMode =
-      String(payload.liabilityAgreementSignatureMode || "draw").trim().toLowerCase() === "typed"
-        ? "typed"
-        : "draw";
+      String(payload.liabilityAgreementSignatureMode || "typed").trim().toLowerCase() === "draw"
+        ? "draw"
+        : "typed";
     const signature = parseSignatureDataUrl(payload.liabilityAgreementSignatureDataUrl);
 
     if (!firstName || !lastName || !email || !phone || !addressLine1 || !city || !stateProvince || !postalCode) {
