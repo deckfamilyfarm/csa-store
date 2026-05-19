@@ -1682,6 +1682,9 @@ async function replaceProductImages(connection, rows, productIds, options = {}) 
           url,
           url_hash
         ) VALUES ${valuesSql}
+        ON DUPLICATE KEY UPDATE
+          url = VALUES(url),
+          url_hash = VALUES(url_hash)
       `,
       rowChunk.flatMap((row) => [row.productId, row.url, row.urlHash])
     );

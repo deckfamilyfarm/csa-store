@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { adminGet, adminPut } from "../adminApi.js";
+import { adminGet, adminPost, adminPut } from "../adminApi.js";
 
 const STATUS_OPTIONS = [
   { value: "in_progress", label: "In progress" },
@@ -15,6 +15,14 @@ function formatDateTime(value) {
 
 function formatStatusLabel(value) {
   return STATUS_OPTIONS.find((option) => option.value === value)?.label || "In progress";
+}
+
+function formatMoney(cents) {
+  const numeric = Number(cents || 0) / 100;
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD"
+  }).format(numeric);
 }
 
 function truncateText(value, maxLength = 56) {
@@ -89,6 +97,15 @@ export function AdminSubscriptionLeadsSection({ token }) {
   const [drafts, setDrafts] = useState({});
   const [savingLeadId, setSavingLeadId] = useState(null);
   const [editingNotesLeadId, setEditingNotesLeadId] = useState(null);
+  const [opsBusy, setOpsBusy] = useState("");
+  const [opsResult, setOpsResult] = useState(null);
+  const [creditStatusLoading, setCreditStatusLoading] = useState(true);
+  const [creditStatusRows, setCreditStatusRows] = useState([]);
+  const [creditStatusMeta, setCreditStatusMeta] = useState({
+    count: 0,
+    includeRemote: true,
+    localLineAuthConfigured: false
+  });
 
   async function loadLeads() {
     setLoading(true);
@@ -117,6 +134,27 @@ export function AdminSubscriptionLeadsSection({ token }) {
 
   useEffect(() => {
     loadLeads();
+  }, [token]);
+
+  async function loadCreditStatus() {
+    setCreditStatusLoading(true);
+    try {
+      const response = await adminGet("subscription-ops/localline-credit-status", token);
+      setCreditStatusRows(Array.isArray(response?.rows) ? response.rows : []);
+      setCreditStatusMeta({
+        count: Number(response?.count || 0),
+        includeRemote: response?.includeRemote !== false,
+        localLineAuthConfigured: response?.localLineAuthConfigured === true
+      });
+    } catch (nextError) {
+      setError(nextError?.message || "Failed to load Local Line credit status.");
+    } finally {
+      setCreditStatusLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadCreditStatus();
   }, [token]);
 
   const selectedLead = useMemo(
@@ -164,12 +202,200 @@ export function AdminSubscriptionLeadsSection({ token }) {
     }
   }
 
+  async function runSubscriptionOp(actionKey, path, dryRun = true) {
+    setOpsBusy(actionKey);
+    setError("");
+    setMessage("");
+    try {
+      const response = await adminPost(path, token, { dryRun });
+      setOpsResult({
+        actionKey,
+        dryRun,
+        response
+      });
+      await loadCreditStatus();
+      setMessage(
+        dryRun
+          ? "Subscription operation preview complete."
+          : "Subscription operation executed."
+      );
+    } catch (nextError) {
+      setError(nextError?.message || "Subscription operation failed.");
+    } finally {
+      setOpsBusy("");
+    }
+  }
+
   return (
     <section className="admin-section">
       <h3>Subscription Leads</h3>
       <div className="small">
         Review subscribe form submissions captured by the store and track whether each lead is still
         in progress or won.
+      </div>
+      <div className="response-card" style={{ marginTop: 16, marginBottom: 16 }}>
+        <div className="title">Subscription Operations</div>
+        <div className="small">
+          Preview or run Local Line credit sync, Local Line purchase debit sync, and paused-member
+          herdshare billing from here.
+        </div>
+        <div className="button-row" style={{ marginTop: 12, flexWrap: "wrap" }}>
+          <button
+            className="button alt"
+            type="button"
+            onClick={() => runSubscriptionOp("credits-preview", "subscription-ops/localline-credits-sync", true)}
+            disabled={Boolean(opsBusy)}
+          >
+            {opsBusy === "credits-preview" ? "Running..." : "Preview Credit Sync"}
+          </button>
+          <button
+            className="button"
+            type="button"
+            onClick={() => runSubscriptionOp("credits-run", "subscription-ops/localline-credits-sync", false)}
+            disabled={Boolean(opsBusy)}
+          >
+            {opsBusy === "credits-run" ? "Running..." : "Run Credit Sync"}
+          </button>
+          <button
+            className="button alt"
+            type="button"
+            onClick={() => runSubscriptionOp("purchases-preview", "subscription-ops/localline-purchase-sync", true)}
+            disabled={Boolean(opsBusy)}
+          >
+            {opsBusy === "purchases-preview" ? "Running..." : "Preview Purchase Debit Sync"}
+          </button>
+          <button
+            className="button"
+            type="button"
+            onClick={() => runSubscriptionOp("purchases-run", "subscription-ops/localline-purchase-sync", false)}
+            disabled={Boolean(opsBusy)}
+          >
+            {opsBusy === "purchases-run" ? "Running..." : "Run Purchase Debit Sync"}
+          </button>
+          <button
+            className="button alt"
+            type="button"
+            onClick={() => runSubscriptionOp("herdshare-preview", "subscription-ops/process-paused-herdshare", true)}
+            disabled={Boolean(opsBusy)}
+          >
+            {opsBusy === "herdshare-preview" ? "Running..." : "Preview Paused Herdshare"}
+          </button>
+          <button
+            className="button"
+            type="button"
+            onClick={() => runSubscriptionOp("herdshare-run", "subscription-ops/process-paused-herdshare", false)}
+            disabled={Boolean(opsBusy)}
+          >
+            {opsBusy === "herdshare-run" ? "Running..." : "Run Paused Herdshare"}
+          </button>
+        </div>
+        {opsResult ? (
+          <pre className="small" style={{ marginTop: 12, whiteSpace: "pre-wrap" }}>
+            {JSON.stringify(opsResult.response, null, 2)}
+          </pre>
+        ) : null}
+      </div>
+      <div className="response-card" style={{ marginTop: 16, marginBottom: 16 }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 12,
+            flexWrap: "wrap"
+          }}
+        >
+          <div>
+            <div className="title">Local Line Credit Status</div>
+            <div className="small">
+              Inspect linked members, wallet balance, mirrored balance, remote Local Line balance,
+              and sync deltas before running credit sync.
+            </div>
+            <div className="small" style={{ marginTop: 4 }}>
+              Linked members: {creditStatusMeta.count} · Remote balance checks:{" "}
+              {creditStatusMeta.localLineAuthConfigured ? "enabled" : "not configured"}
+            </div>
+          </div>
+          <button
+            className="button alt"
+            type="button"
+            onClick={loadCreditStatus}
+            disabled={creditStatusLoading || Boolean(opsBusy)}
+          >
+            {creditStatusLoading ? "Refreshing..." : "Refresh Credit Status"}
+          </button>
+        </div>
+        {creditStatusLoading ? (
+          <div className="small" style={{ marginTop: 12 }}>
+            Loading Local Line credit status...
+          </div>
+        ) : !creditStatusRows.length ? (
+          <div className="small" style={{ marginTop: 12 }}>
+            No Local Line member links yet.
+          </div>
+        ) : (
+          <div style={{ overflowX: "auto", marginTop: 12 }}>
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Member</th>
+                  <th>Local Line Id</th>
+                  <th>Wallet</th>
+                  <th>Mirrored</th>
+                  <th>Remote</th>
+                  <th>Delta vs Remote</th>
+                  <th>Delta vs Mirror</th>
+                  <th>Orders</th>
+                  <th>Last Mirror</th>
+                </tr>
+              </thead>
+              <tbody>
+                {creditStatusRows.map((row) => (
+                  <tr key={`credit-status-${row.userId}`}>
+                    <td>
+                      <div>{row.memberName || "—"}</div>
+                      <div className="small">{row.email || row.username || "—"}</div>
+                    </td>
+                    <td title={row.externalEmail || ""}>
+                      <div>{row.externalCustomerId || "—"}</div>
+                      <div className="small">{row.externalEmail || "—"}</div>
+                    </td>
+                    <td>{formatMoney(row.walletBalanceCents)}</td>
+                    <td>{formatMoney(row.mirroredBalanceCents)}</td>
+                    <td>
+                      {typeof row.remoteBalanceCents === "number"
+                        ? formatMoney(row.remoteBalanceCents)
+                        : row.remoteError
+                          ? "Error"
+                          : "—"}
+                      {row.remoteError ? (
+                        <div className="small" title={row.remoteError}>
+                          {truncateText(row.remoteError, 52)}
+                        </div>
+                      ) : null}
+                    </td>
+                    <td>
+                      {typeof row.deltaFromRemoteCents === "number"
+                        ? formatMoney(row.deltaFromRemoteCents)
+                        : "—"}
+                    </td>
+                    <td>{formatMoney(row.deltaFromMirrorCents)}</td>
+                    <td>
+                      <div>{Number(row.syncableOrderCount || 0)} syncable</div>
+                      <div className="small">{Number(row.linkedOrderCount || 0)} linked</div>
+                    </td>
+                    <td>
+                      <div>{row.lastMirroredAt ? formatDateTime(row.lastMirroredAt) : "Never"}</div>
+                      <div className="small">
+                        Orders: {row.lastOrderSyncedAt ? formatDateTime(row.lastOrderSyncedAt) : "Never"}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
       {message ? <div className="small">{message}</div> : null}
       {error ? <div className="small">{error}</div> : null}

@@ -217,13 +217,35 @@ function formatShortDateLabel(value) {
 
 function getSubscribePageUrl() {
   if (typeof window === "undefined") {
-    return "https://subscribe.deckfamilyfarm.com/";
+    return "https://subscribe.deckfamilyfarm.com/#/subscribe";
   }
   const host = String(window.location.host || "").trim().toLowerCase();
   if (host.includes("localhost") || host.includes("127.0.0.1")) {
-    return `${window.location.origin}/?experience=subscribe`;
+    return `${window.location.origin}/?experience=subscribe#/subscribe`;
   }
-  return "https://subscribe.deckfamilyfarm.com/";
+  return "https://subscribe.deckfamilyfarm.com/#/subscribe";
+}
+
+function getMemberPortalUrl() {
+  if (typeof window === "undefined") {
+    return "https://subscribe.deckfamilyfarm.com/#/account";
+  }
+  const host = String(window.location.host || "").trim().toLowerCase();
+  if (host.includes("localhost") || host.includes("127.0.0.1")) {
+    return `${window.location.origin}/?experience=subscribe#/account`;
+  }
+  return "https://subscribe.deckfamilyfarm.com/#/account";
+}
+
+function getCurrentStoreUrl() {
+  if (typeof window === "undefined") {
+    return "https://fullfarmcsa.deckfamilyfarm.com/";
+  }
+  const host = String(window.location.host || "").trim().toLowerCase();
+  if (host.includes("localhost") || host.includes("127.0.0.1")) {
+    return `${window.location.origin}/#/home`;
+  }
+  return "https://fullfarmcsa.deckfamilyfarm.com/";
 }
 
 function getTimestampValue(value) {
@@ -799,6 +821,13 @@ export function AdminPanel({ onCatalogRefresh }) {
         error: "",
         data: response
       });
+      if (response?.products?.latestJob?.jobId) {
+        setLocalLineCacheState((prev) => ({
+          ...prev,
+          data: response.products.latestJob,
+          jobId: response.products.latestJob.jobId
+        }));
+      }
       if (response?.fulfillments?.latestJob?.jobId) {
         setLocalLineFulfillmentState((prev) => ({
           ...prev,
@@ -2484,6 +2513,54 @@ export function AdminPanel({ onCatalogRefresh }) {
     }
   }
 
+  const currentAdminRoles = currentAdmin?.adminRoles || [];
+  const canManagePricing = canAccessAdminSection(currentAdminRoles, "pricelist");
+  const canManageLocalPricelist = canAccessAdminSection(currentAdminRoles, "localPricelist");
+  const showProductEditor =
+    (activeSection === "pricelist" || activeSection === "localPricelist") &&
+    (canManagePricing || canManageLocalPricelist) &&
+    (productEditorMode === "new" || (selectedProductId && activeProduct));
+
+  useEffect(() => {
+    if (typeof document === "undefined") return undefined;
+    document.body.classList.toggle("modal-open", showProductEditor);
+    return () => {
+      document.body.classList.remove("modal-open");
+    };
+  }, [showProductEditor]);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return undefined;
+    document.body.classList.toggle("modal-open", Boolean(expandedDropSiteGraph));
+    return () => {
+      document.body.classList.remove("modal-open");
+    };
+  }, [expandedDropSiteGraph]);
+
+  useEffect(() => {
+    if (!openLocalPricelistMenuProductId) return undefined;
+
+    function handlePointerDown(event) {
+      if (!localPricelistMenuRef.current?.contains(event.target)) {
+        setOpenLocalPricelistMenuProductId(null);
+      }
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === "Escape") {
+        setOpenLocalPricelistMenuProductId(null);
+      }
+    }
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [openLocalPricelistMenuProductId]);
+
   if (!token) {
     return (
       <div className="container admin-panel">
@@ -2493,6 +2570,7 @@ export function AdminPanel({ onCatalogRefresh }) {
             <input
               className="input"
               placeholder="Admin username"
+              autoComplete="username"
               value={forgotState.username}
               onChange={(event) =>
                 setForgotState((prev) => ({ ...prev, username: event.target.value }))
@@ -2512,6 +2590,7 @@ export function AdminPanel({ onCatalogRefresh }) {
             <input
               className="input"
               placeholder="Admin username"
+              autoComplete="username"
               value={loginState.username}
               onChange={(event) =>
                 setLoginState((prev) => ({ ...prev, username: event.target.value }))
@@ -2521,6 +2600,7 @@ export function AdminPanel({ onCatalogRefresh }) {
               className="input"
               placeholder="Password"
               type="password"
+              autoComplete="current-password"
               value={loginState.password}
               onChange={(event) =>
                 setLoginState((prev) => ({ ...prev, password: event.target.value }))
@@ -2671,10 +2751,7 @@ export function AdminPanel({ onCatalogRefresh }) {
     )
   );
   const productTableWidth = "1464px";
-  const currentAdminRoles = currentAdmin?.adminRoles || [];
   const canManageUsers = hasRole(currentAdminRoles, "user_admin");
-  const canManagePricing = canAccessAdminSection(currentAdminRoles, "pricelist");
-  const canManageLocalPricelist = canAccessAdminSection(currentAdminRoles, "localPricelist");
   const canManageGoogleDrive = canAccessAdminSection(currentAdminRoles, "googleDrive");
   const canManageLocalLine = canAccessAdminSection(currentAdminRoles, "localLine");
   const canManageOrders = canAccessAdminSection(currentAdminRoles, "orders");
@@ -2692,10 +2769,6 @@ export function AdminPanel({ onCatalogRefresh }) {
     countZeroOrderPeriods
   );
   const expandedDropSiteDetailLayout = buildDropSiteDetailSvgLayout(expandedDropSiteDetailSeries);
-  const showProductEditor =
-    (activeSection === "pricelist" || activeSection === "localPricelist") &&
-    (canManagePricing || canManageLocalPricelist) &&
-    (productEditorMode === "new" || (selectedProductId && activeProduct));
   const selectedDraftVendor = vendors.find(
     (vendor) => String(vendor.id) === String(productDraft?.vendorId || "")
   );
@@ -2710,46 +2783,6 @@ export function AdminPanel({ onCatalogRefresh }) {
       ? Number(activeProduct?.localLineMeta?.localLineProductId)
       : 0) ||
     0;
-
-  useEffect(() => {
-    if (typeof document === "undefined") return undefined;
-    document.body.classList.toggle("modal-open", showProductEditor);
-    return () => {
-      document.body.classList.remove("modal-open");
-    };
-  }, [showProductEditor]);
-
-  useEffect(() => {
-    if (typeof document === "undefined") return undefined;
-    document.body.classList.toggle("modal-open", Boolean(expandedDropSiteGraph));
-    return () => {
-      document.body.classList.remove("modal-open");
-    };
-  }, [expandedDropSiteGraph]);
-
-  useEffect(() => {
-    if (!openLocalPricelistMenuProductId) return undefined;
-
-    function handlePointerDown(event) {
-      if (!localPricelistMenuRef.current?.contains(event.target)) {
-        setOpenLocalPricelistMenuProductId(null);
-      }
-    }
-
-    function handleKeyDown(event) {
-      if (event.key === "Escape") {
-        setOpenLocalPricelistMenuProductId(null);
-      }
-    }
-
-    document.addEventListener("mousedown", handlePointerDown);
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("mousedown", handlePointerDown);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [openLocalPricelistMenuProductId]);
 
   function getProductPrice(product) {
     const prices = (product.packages || [])
@@ -3441,7 +3474,23 @@ export function AdminPanel({ onCatalogRefresh }) {
             target="_blank"
             rel="noreferrer"
           >
-            Subscribe Page
+            Subscribe
+          </a>
+          <a
+            className="button alt"
+            href={getMemberPortalUrl()}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Member Portal
+          </a>
+          <a
+            className="button alt"
+            href={getCurrentStoreUrl()}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Current Store
           </a>
         </div>
       </div>
@@ -4951,10 +5000,10 @@ export function AdminPanel({ onCatalogRefresh }) {
               <div className="audit-summary-grid">
                 <div className="response-card">
                   <div className="title">Products</div>
-                  <div className="small">Cached products: {Number(localLineStatus?.products?.cachedProducts || 0)}</div>
+                  <div className="small">Rows stored locally: {Number(localLineStatus?.products?.cachedProducts || 0)}</div>
                   <div className="small">Sync issues: {Number(localLineStatus?.products?.syncIssues || 0)}</div>
-                  <div className="small">Last product sync: {localLineStatus?.products?.lastSyncedAt || "Never"}</div>
-                  <div className="small">Latest pull job: {localLineStatus?.products?.latestJob?.status || "Never run"}</div>
+                  <div className="small">Last synced: {localLineStatus?.products?.lastSyncedAt || "Never"}</div>
+                  <div className="small">Latest sync status: {localLineStatus?.products?.latestJob?.status || "Never run"}</div>
                   <div className="admin-actions">
                     <button
                       className="button"
@@ -4972,10 +5021,15 @@ export function AdminPanel({ onCatalogRefresh }) {
                 </div>
                 <div className="response-card">
                   <div className="title">Fulfillments</div>
-                  <div className="small">Stored locally: {Number(localLineStatus?.fulfillments?.totalRows || 0)}</div>
-                  <div className="small">Active: {Number(localLineStatus?.fulfillments?.activeRows || 0)}</div>
-                  <div className="small">Last fulfillment sync: {localLineStatus?.fulfillments?.lastSyncedAt || "Never"}</div>
-                  <div className="small">Cursor status: {localLineStatus?.fulfillments?.cursor?.lastStatus || "Never run"}</div>
+                  <div className="small">Rows stored locally: {Number(localLineStatus?.fulfillments?.totalRows || 0)}</div>
+                  <div className="small">Active rows: {Number(localLineStatus?.fulfillments?.activeRows || 0)}</div>
+                  <div className="small">Last synced: {localLineStatus?.fulfillments?.lastSyncedAt || "Never"}</div>
+                  <div className="small">
+                    Latest sync status:{" "}
+                    {localLineStatus?.fulfillments?.latestJob?.status ||
+                      localLineStatus?.fulfillments?.cursor?.lastStatus ||
+                      "Never run"}
+                  </div>
                   <div className="admin-actions">
                     <button
                       className="button"
@@ -4989,10 +5043,15 @@ export function AdminPanel({ onCatalogRefresh }) {
                 </div>
                 <div className="response-card">
                   <div className="title">Orders</div>
-                  <div className="small">Stored locally: {Number(localLineStatus?.orders?.totalRows || 0)}</div>
+                  <div className="small">Rows stored locally: {Number(localLineStatus?.orders?.totalRows || 0)}</div>
                   <div className="small">Latest remote order: {localLineStatus?.orders?.latestCreatedAt || "Never"}</div>
-                  <div className="small">Cursor: {localLineStatus?.orders?.cursor?.cursorValue || "Not set"}</div>
-                  <div className="small">Cursor status: {localLineStatus?.orders?.cursor?.lastStatus || "Never run"}</div>
+                  <div className="small">Sync cursor: {localLineStatus?.orders?.cursor?.cursorValue || "Not set"}</div>
+                  <div className="small">
+                    Latest sync status:{" "}
+                    {localLineStatus?.orders?.latestJob?.status ||
+                      localLineStatus?.orders?.cursor?.lastStatus ||
+                      "Never run"}
+                  </div>
                   <div className="small">
                     Sync window start: January 1, 2026
                   </div>
@@ -5009,10 +5068,15 @@ export function AdminPanel({ onCatalogRefresh }) {
                 </div>
                 <div className="response-card">
                   <div className="title">Subscribers</div>
-                  <div className="small">Stored weeks: {Number(localLineStatus?.subscriptions?.totalWeeks || 0)}</div>
+                  <div className="small">Snapshots stored locally: {Number(localLineStatus?.subscriptions?.totalWeeks || 0)}</div>
                   <div className="small">Latest snapshot week: {localLineStatus?.subscriptions?.latestWeekEnd || "Never"}</div>
-                  <div className="small">Last captured: {localLineStatus?.subscriptions?.lastCapturedAt || "Never"}</div>
-                  <div className="small">Cursor status: {localLineStatus?.subscriptions?.cursor?.lastStatus || "Never run"}</div>
+                  <div className="small">Last synced: {localLineStatus?.subscriptions?.lastCapturedAt || "Never"}</div>
+                  <div className="small">
+                    Latest sync status:{" "}
+                    {localLineStatus?.subscriptions?.latestJob?.status ||
+                      localLineStatus?.subscriptions?.cursor?.lastStatus ||
+                      "Never run"}
+                  </div>
                   <div className="admin-actions">
                     <button
                       className="button"

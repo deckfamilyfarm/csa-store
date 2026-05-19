@@ -1,46 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { fetchSubscribeAddressInsights, submitSubscribeLead } from "../api.js";
 import { SUBSCRIBE_PARTNERS } from "../data/subscribePartners.js";
+import { DeckPageHeader } from "./DeckPageHeader.jsx";
 
 const DELIVERY_MAP_URL =
   "https://berkeleymapper.berkeley.edu/index.html?tabfile=https://raw.githubusercontent.com/jdeck88/ffcsa_scripts/refs/heads/main/localline/data/delivery_data.tsv&configfile=https://raw.githubusercontent.com/jdeck88/ffcsa_scripts/refs/heads/main/dropsite_maps/dropsites2.xml&pointDisplay=markers&hideLegendItems=true";
 const LIABILITY_AGREEMENT_URL =
   "https://docs.google.com/document/d/1VFMc4euofQ1S1kjtd6jZI46uxo6YKft9cufT6Q3-nrc/edit?tab=t.0";
-
-const SUBSCRIBE_NAV_LINKS = [
-  {
-    label: "Our Farm",
-    children: [
-      { label: "About", href: "https://www.deckfamilyfarm.com/the-farm" },
-      { label: "Our Farmily", href: "https://www.deckfamilyfarm.com/the-farmily" },
-      { label: "Education", href: "https://www.deckfamilyfarm.com/intern-program" },
-      { label: "Farm Dogs", href: "https://www.deckfamilyfarm.com/dogs" }
-    ]
-  },
-  {
-    label: "Full Farm CSA",
-    children: [
-      { label: "Subscribe", href: "https://www.deckfamilyfarm.com/subscribe" },
-      { label: "Plans", href: "https://www.deckfamilyfarm.com/subscribe#plans" },
-      { label: "Locations", href: "https://www.deckfamilyfarm.com/subscribe#locations" }
-    ]
-  },
-  {
-    label: "Newsletter",
-    href: "https://www.deckfamilyfarm.com/blog"
-  },
-  {
-    label: "Events",
-    href: "https://www.deckfamilyfarm.com/events"
-  },
-  {
-    label: "Shop",
-    children: [
-      { label: "CSA Shopping", href: "https://fullfarmcsa.deckfamilyfarm.com/" },
-      { label: "Merchandise", href: "https://www.deckfamilyfarm.com/merchandise" }
-    ]
-  }
-];
 
 const SUBSCRIBE_PLANS = [
   {
@@ -253,6 +219,8 @@ function buildInitialForm(dropSites = []) {
     firstName: "",
     lastName: "",
     email: "",
+    password: "",
+    confirmPassword: "",
     phone: "",
     country: "United States",
     addressLine1: "",
@@ -262,6 +230,7 @@ function buildInitialForm(dropSites = []) {
     postalCode: "",
     referralSource: "",
     selectedPlan: "forager",
+    billingDayOfMonth: 1,
     selectedDropSite: "",
     notes: "",
     liabilityAgreementAccepted: false,
@@ -338,9 +307,32 @@ function DropSiteTable({ title, orderWindow, sites = [] }) {
   );
 }
 
-export function SubscribePage({ dropSites = [], storeUrl }) {
+export function SubscribePage({
+  dropSites = [],
+  portalBaseUrl,
+  isLoggedIn = false,
+  onAuthAction = null
+}) {
   const allFaqs = useMemo(() => FAQS, []);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const portalBaseHref = useMemo(
+    () => String(portalBaseUrl || subscriptionStoreUrl()).replace(/#.*$/, "").replace(/\/+$/, ""),
+    [portalBaseUrl]
+  );
+  const portalAccountUrl = useMemo(() => {
+    return `${portalBaseHref}#/account`;
+  }, [portalBaseHref]);
+  const subscribeRouteUrl = useMemo(() => {
+    return `${portalBaseHref}#/subscribe`;
+  }, [portalBaseHref]);
+  const subscribeNavLinks = useMemo(
+    () => [
+      { label: "Home", href: "https://www.deckfamilyfarm.com/" },
+      { label: "Subscribe", href: subscribeRouteUrl },
+      { label: "Member Portal", href: portalAccountUrl },
+      { label: "Shop", href: subscriptionStoreUrl() }
+    ],
+    [portalAccountUrl, subscribeRouteUrl]
+  );
   const siteOptions = useMemo(
     () =>
       dropSites
@@ -562,6 +554,12 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
     event.preventDefault();
     setStatus({ submitting: true, success: false, error: "" });
     try {
+      if (!form.password || form.password.length < 8) {
+        throw new Error("Create a password with at least 8 characters.");
+      }
+      if (form.password !== form.confirmPassword) {
+        throw new Error("Password confirmation does not match.");
+      }
       if (!form.liabilityAgreementAccepted) {
         throw new Error("You must agree to the product liability agreement.");
       }
@@ -575,6 +573,7 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
       const response = await submitSubscribeLead({
         ...form,
         selectedPlanLabel: plan?.title || form.selectedPlan,
+        billingDayOfMonth: Number(form.billingDayOfMonth || 1),
         liabilityAgreementSignatureMode: "typed",
         liabilityAgreementSignatureDataUrl: "",
         sourceHost: window.location.host,
@@ -582,6 +581,14 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
         queryString: window.location.search
       });
       setAddressInsights(response?.addressInsights || addressInsights);
+      if (response?.token) {
+        window.localStorage.setItem("userToken", response.token);
+        setStatus({ submitting: false, success: true, error: "" });
+        window.setTimeout(() => {
+          window.location.href = portalAccountUrl;
+        }, 0);
+        return;
+      }
       setStatus({ submitting: false, success: true, error: "" });
       window.setTimeout(() => {
         formCardRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -600,57 +607,11 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
 
   return (
     <div className="subscribe-page">
-      <header className="subscribe-header">
-        <div className="container subscribe-header-row">
-          <a className="subscribe-wordmark" href="https://www.deckfamilyfarm.com">
-            <img
-              className="subscribe-wordmark-logo"
-              src="/images/subscribe-logo.avif"
-              alt="Deck Family Farm logo"
-            />
-          </a>
-          <button
-            className={`subscribe-mobile-menu-button${mobileMenuOpen ? " open" : ""}`}
-            type="button"
-            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-            aria-expanded={mobileMenuOpen ? "true" : "false"}
-            onClick={() => setMobileMenuOpen((value) => !value)}
-          >
-            <span />
-            <span />
-            <span />
-          </button>
-          <nav className={`subscribe-nav${mobileMenuOpen ? " mobile-open" : ""}`}>
-            {SUBSCRIBE_NAV_LINKS.map((link) =>
-              Array.isArray(link.children) ? (
-                <div key={link.label} className="subscribe-nav-group">
-                  <span className="subscribe-nav-group-title">{link.label}</span>
-                  <div className="subscribe-nav-group-links">
-                    {link.children.map((child) => (
-                      <a
-                        key={child.href}
-                        href={child.href === storeUrlFallback() ? storeUrl : child.href}
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        {child.label}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <a
-                  key={link.href}
-                  className="subscribe-nav-single"
-                  href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  {link.label}
-                </a>
-              )
-            )}
-          </nav>
-        </div>
-      </header>
+      <DeckPageHeader
+        navLinks={subscribeNavLinks}
+        authLabel={isLoggedIn ? "Log out" : "Log in"}
+        onAuthAction={onAuthAction}
+      />
 
       <main>
         <section className="subscribe-hero">
@@ -695,7 +656,7 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
                 </div>
                 <div className="subscribe-note-card">
                   <strong>After submitting this form</strong>
-                  <span>Follow the link to the store to create your account and enter your payment method.</span>
+                  <span>Your account will be created and you will continue into the member portal to enter your payment method.</span>
                 </div>
               </div>
             </div>
@@ -709,10 +670,10 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
 
               {status.success ? (
                 <div className="subscribe-success">
-                  <h3>Thanks for your interest.</h3>
+                  <h3>Account created.</h3>
                   <p>
-                    We recorded your subscription request. You can now continue to the store or wait
-                    for follow-up from the farm.
+                    We recorded your subscription request and created your member account. Continue
+                    to the member portal to add a payment method and activate recurring billing.
                   </p>
                   <div className="button-row">
                     <button
@@ -728,8 +689,8 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
                     >
                       Close
                     </button>
-                    <a className="button" href={subscriptionStoreUrl()}>
-                      Continue to Store
+                    <a className="button" href={portalAccountUrl}>
+                      Continue to Member Portal
                     </a>
                   </div>
                 </div>
@@ -770,6 +731,28 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
                         className="input"
                         value={form.phone}
                         onChange={(event) => updateField("phone", event.target.value)}
+                        required
+                      />
+                    </label>
+                    <label className="filter-field">
+                      <span className="small">Create password*</span>
+                      <input
+                        className="input"
+                        type="password"
+                        value={form.password}
+                        onChange={(event) => updateField("password", event.target.value)}
+                        minLength={8}
+                        required
+                      />
+                    </label>
+                    <label className="filter-field">
+                      <span className="small">Confirm password*</span>
+                      <input
+                        className="input"
+                        type="password"
+                        value={form.confirmPassword}
+                        onChange={(event) => updateField("confirmPassword", event.target.value)}
+                        minLength={8}
                         required
                       />
                     </label>
@@ -962,6 +945,17 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
                           </option>
                         ))}
                       </select>
+                    </label>
+                    <label className="filter-field">
+                      <span className="small">Billing day of month</span>
+                      <input
+                        className="input"
+                        type="number"
+                        min="1"
+                        max="28"
+                        value={form.billingDayOfMonth}
+                        onChange={(event) => updateField("billingDayOfMonth", event.target.value)}
+                      />
                     </label>
                     <label className="filter-field">
                       <span className="small">Preferred pickup / delivery site</span>
@@ -1365,9 +1359,6 @@ export function SubscribePage({ dropSites = [], storeUrl }) {
                 ☆
               </span>
               <span>Leave us a Review!</span>
-            </a>
-            <a className="button" href={subscriptionStoreUrl()}>
-              Store
             </a>
           </div>
         </div>

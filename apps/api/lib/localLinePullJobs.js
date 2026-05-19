@@ -1,4 +1,10 @@
 import { randomUUID } from "crypto";
+import {
+  getLatestPersistedLocalLineJobRun,
+  getLatestPersistedLocalLineJobsByType,
+  getPersistedLocalLineJobRun,
+  persistLocalLineJobRun
+} from "./localLineJobStore.js";
 
 const DEFAULT_PHASES = [
   { key: "fetch", label: "Fetch" },
@@ -9,6 +15,7 @@ const DEFAULT_PHASES = [
 const jobs = new Map();
 const latestJobIdsByDataset = new Map();
 const activeJobIdsByDataset = new Map();
+const PULL_JOB_TYPE = "pull";
 
 function cloneJob(job) {
   return JSON.parse(JSON.stringify(job));
@@ -90,6 +97,12 @@ function updateJobProgress(job, progress = {}) {
   if (Object.prototype.hasOwnProperty.call(progress, "total")) {
     phase.total = typeof progress.total === "number" ? progress.total : null;
   }
+
+  if (job.jobId) {
+    persistLocalLineJobRun(job).catch((error) => {
+      console.warn("Failed to persist Local Line pull job progress:", error?.message || error);
+    });
+  }
 }
 
 function finalizeRunningPhases(job, status, message) {
@@ -105,7 +118,7 @@ function finalizeRunningPhases(job, status, message) {
   });
 }
 
-export function startLocalLinePullJob({ datasetKey, datasetLabel, run, phases = DEFAULT_PHASES }) {
+export async function startLocalLinePullJob({ datasetKey, datasetLabel, run, phases = DEFAULT_PHASES }) {
   const runningJob = getActiveJob(datasetKey);
   if (runningJob) {
     return {
@@ -119,6 +132,7 @@ export function startLocalLinePullJob({ datasetKey, datasetLabel, run, phases = 
     jobId: randomUUID(),
     datasetKey,
     datasetLabel,
+    jobType: PULL_JOB_TYPE,
     status: "queued",
     createdAt: now,
     startedAt: null,
@@ -140,6 +154,7 @@ export function startLocalLinePullJob({ datasetKey, datasetLabel, run, phases = 
   jobs.set(job.jobId, job);
   latestJobIdsByDataset.set(datasetKey, job.jobId);
   activeJobIdsByDataset.set(datasetKey, job.jobId);
+  await persistLocalLineJobRun(job);
 
   Promise.resolve()
     .then(async () => {
@@ -152,6 +167,7 @@ export function startLocalLinePullJob({ datasetKey, datasetLabel, run, phases = 
         percent: 0,
         message: `Starting ${datasetLabel}`
       });
+      await persistLocalLineJobRun(job);
 
       const result = await run({
         reportProgress: (progress) => updateJobProgress(job, progress)
@@ -168,6 +184,7 @@ export function startLocalLinePullJob({ datasetKey, datasetLabel, run, phases = 
         message: `${datasetLabel} complete`
       });
       finalizeRunningPhases(job, "completed");
+      await persistLocalLineJobRun(job);
       activeJobIdsByDataset.delete(datasetKey);
     })
     .catch((error) => {
@@ -184,6 +201,9 @@ export function startLocalLinePullJob({ datasetKey, datasetLabel, run, phases = 
         message: error?.message || `${datasetLabel} failed`
       });
       finalizeRunningPhases(job, "failed", error?.message || `${datasetLabel} failed`);
+      persistLocalLineJobRun(job).catch((persistError) => {
+        console.warn("Failed to persist Local Line pull job failure:", persistError?.message || persistError);
+      });
       activeJobIdsByDataset.delete(datasetKey);
     });
 
@@ -193,19 +213,22 @@ export function startLocalLinePullJob({ datasetKey, datasetLabel, run, phases = 
   };
 }
 
-export function getLocalLinePullJob(jobId) {
+export async function getLocalLinePullJob(jobId) {
   const job = jobs.get(jobId);
-  return job ? cloneJob(job) : null;
+  if (job) return cloneJob(job);
+  return getPersistedLocalLineJobRun(jobId);
 }
 
-export function getLatestLocalLinePullJob(datasetKey) {
+export async function getLatestLocalLinePullJob(datasetKey) {
   const jobId = latestJobIdsByDataset.get(datasetKey);
-  if (!jobId) return null;
-  const job = jobs.get(jobId);
-  return job ? cloneJob(job) : null;
+  if (jobId) {
+    const job = jobs.get(jobId);
+    if (job) return cloneJob(job);
+  }
+  return getLatestPersistedLocalLineJobRun(datasetKey, PULL_JOB_TYPE);
 }
 
-export function getLatestLocalLinePullJobs() {
+export async function getLatestLocalLinePullJobs() {
   const result = {};
   for (const [datasetKey, jobId] of latestJobIdsByDataset.entries()) {
     const job = jobs.get(jobId);
@@ -213,5 +236,9 @@ export function getLatestLocalLinePullJobs() {
       result[datasetKey] = cloneJob(job);
     }
   }
-  return result;
+  const persisted = await getLatestPersistedLocalLineJobsByType(PULL_JOB_TYPE);
+  return {
+    ...persisted,
+    ...result
+  };
 }

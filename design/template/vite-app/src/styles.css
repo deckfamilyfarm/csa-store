@@ -290,12 +290,53 @@ img {
   min-height: 118px;
   padding-top: 14px;
   padding-bottom: 14px;
+  position: relative;
 }
 
 .subscribe-wordmark {
   display: inline-flex;
   align-items: center;
   gap: 14px;
+}
+
+.subscribe-header-utility {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: absolute;
+  top: 8px;
+  right: 0;
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  z-index: 3;
+}
+
+.subscribe-header-utility a {
+  color: var(--field);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.subscribe-header-utility a:hover {
+  color: var(--navy);
+}
+
+.subscribe-auth-link {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--field);
+  font: inherit;
+  font-weight: 800;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}
+
+.subscribe-auth-link:hover {
+  color: var(--navy);
 }
 
 .subscribe-wordmark-logo {
@@ -366,15 +407,15 @@ img {
   position: relative;
 }
 
-.subscribe-nav-group-title,
 .subscribe-nav-single {
-  font-family: "Tomarik Extrovert", var(--subscribe-serif);
-  font-size: 22px;
+  font-family: var(--serif);
+  font-size: 20px;
   font-weight: 600;
-  letter-spacing: 0.02em;
+  font-synthesis: none;
+  letter-spacing: 0.01em;
   text-transform: none;
   color: rgba(30, 45, 59, 0.9);
-  line-height: 0.95;
+  line-height: 1.05;
 }
 
 .subscribe-nav-group-links {
@@ -3760,7 +3801,14 @@ img {
 
   .subscribe-mobile-menu-button {
     display: inline-flex;
-    margin-left: auto;
+    margin-left: 0;
+  }
+
+  .subscribe-header-utility {
+    gap: 10px;
+    font-size: 11px;
+    top: 10px;
+    right: 0;
   }
 
   .subscribe-mobile-menu-button.open span:nth-child(1) {
@@ -3807,7 +3855,6 @@ img {
     padding-bottom: 0;
   }
 
-  .subscribe-nav-group-title,
   .subscribe-nav-single {
     font-size: 19px;
     line-height: 1;
@@ -3977,5 +4024,181 @@ img {
 
   .subscribe-plan-card.featured {
     transform: none;
+  }
+}
+
+.member-portal-shell {
+  background: var(--mist);
+  min-height: 100vh;
+}
+
+.member-portal-section .container {
+  display: grid;
+  gap: 24px;
+}
+
+.member-portal-intro-card .lede {
+  margin-bottom: 0;
+}
+
+.member-portal-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.member-portal-footer-admin {
+  padding-top: 8px;
+  padding-bottom: 18px;
+  text-align: center;
+}
+
+.member-portal-footer-admin a {
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.88);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.member-portal-footer-admin a:hover {
+  color: #ffffff;
+}
+
+.member-portal-card-columns {
+  column-count: 2;
+  column-gap: 24px;
+}
+
+.member-portal-card-columns > .card {
+  display: inline-block;
+  width: 100%;
+  margin: 0 0 24px;
+  break-inside: avoid;
+}
+
+.member-portal-money {
+  font-size: clamp(2.1rem, 4vw, 3.3rem);
+  margin: 8px 0 10px;
+  line-height: 1;
+}
+
+.member-portal-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.member-portal-stat-grid div {
+  display: grid;
+  gap: 4px;
+}
+
+.member-portal-stat-grid strong {
+  font-size: 1.1rem;
+}
+
+.member-portal-stat-grid span {
+  font-size: 0.83rem;
+  color: var(--field);
+}
+
+.member-portal-payment-form,
+.member-portal-payment-methods,
+.member-portal-ledger-card,
+.member-portal-ledger-shell {
+  display: grid;
+  gap: 14px;
+}
+
+.member-portal-payment-element {
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(31, 27, 23, 0.12);
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.member-portal-payment-method {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+  padding: 12px 0;
+  border-top: 1px solid rgba(31, 27, 23, 0.08);
+}
+
+.member-portal-payment-method:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.member-portal-choice-grid,
+.member-portal-localline-status {
+  display: grid;
+  gap: 12px;
+}
+
+.member-portal-localline-activity,
+.member-portal-localline-activity-list {
+  display: grid;
+  gap: 10px;
+}
+
+.member-portal-localline-activity-item {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(31, 27, 23, 0.1);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.member-portal-account-card h3 {
+  margin: 8px 0 10px;
+}
+
+.member-portal-account-list {
+  display: grid;
+  gap: 8px;
+}
+
+.member-portal-inline-button {
+  margin-top: 14px;
+}
+
+.member-portal-ledger-shell {
+  overflow-x: auto;
+}
+
+.member-portal-ledger-table td:last-child,
+.member-portal-ledger-table th:last-child {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.member-portal-message {
+  color: #1f5d33;
+}
+
+.member-portal-error {
+  color: #8a1f1f;
+}
+
+@media (max-width: 800px) {
+  .member-portal-header,
+  .member-portal-payment-method {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .member-portal-card-columns {
+    column-count: 1;
+  }
+
+  .member-portal-stat-grid {
+    grid-template-columns: 1fr;
   }
 }

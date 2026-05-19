@@ -1,10 +1,12 @@
 import express from "express";
 import crypto from "crypto";
+import bcrypt from "bcryptjs";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import {
   ensureLocalLineSyncSchema,
   ensureMarketingSchema,
+  ensureSubscriptionPortalSchema,
   ensureSubscriberCaptureSchema,
   getDb,
   isMissingTableError
@@ -26,15 +28,29 @@ import {
   productPricingProfiles,
   products,
   productSales,
+  memberHerdshareStatuses,
+  memberProfiles,
+  memberSubscriptions,
   subscribeLeads,
   productTags,
   recipes,
   reviews,
+  subscriptionSettings,
   tags,
+  users,
   vendors
 } from "../schema.js";
 import { requireUser } from "../middleware/auth.js";
 import { computeProductPricingSnapshot } from "../lib/productPricing.js";
+import { issueUserToken } from "../lib/authTokens.js";
+import {
+  computeNextBillingDate,
+  ensureMemberLedgerAccounts,
+  getPlanDefinition,
+  loadSubscriptionSettings,
+  normalizeBillingDay,
+  normalizePlanKey
+} from "../lib/memberPortal.js";
 
 const router = express.Router();
 
@@ -1811,6 +1827,136 @@ router.post("/subscribe/address-insights", async (req, res) => {
   }
 });
 
+async function createPortalMemberFromSubscribeLead({
+  db,
+  subscribeLeadId,
+  firstName,
+  lastName,
+  email,
+  phone,
+  country,
+  addressLine1,
+  addressLine2,
+  city,
+  stateProvince,
+  postalCode,
+  password,
+  addressInsights,
+  referralSource,
+  selectedPlan,
+  selectedDropSite,
+  notes,
+  sourceHost,
+  sourcePath,
+  signerName,
+  liabilityAgreementRecordUrl,
+  liabilityAgreementSignedAt,
+  desiredBillingDayOfMonth
+}) {
+  const existingUserRows = await db.select().from(users).where(eq(users.username, email)).limit(1);
+  if (existingUserRows.length) {
+    const error = new Error("An account already exists for this email. Please log in instead.");
+    error.status = 409;
+    throw error;
+  }
+
+  const plan = getPlanDefinition(selectedPlan);
+  if (!plan) {
+    const error = new Error("Choose a valid membership plan.");
+    error.status = 400;
+    throw error;
+  }
+
+  const settings = await loadSubscriptionSettings(db);
+  const now = new Date();
+  const passwordHash = await bcrypt.hash(String(password || ""), 10);
+  const userInsert = await db.insert(users).values({
+    username: email,
+    email,
+    passwordHash,
+    role: "member",
+    name: `${firstName} ${lastName}`.trim(),
+    active: 1,
+    createdAt: now,
+    updatedAt: now
+  });
+  const userId = Number(userInsert[0]?.insertId);
+
+  await db.insert(memberProfiles).values({
+    userId,
+    subscribeLeadId,
+    firstName,
+    lastName,
+    phone,
+    country: cleanOptionalString(country, 128),
+    addressLine1,
+    addressLine2: cleanOptionalString(addressLine2, 255),
+    city,
+    stateProvince,
+    postalCode,
+    geocodedLatitude: addressInsights?.geocodedLatitude ?? null,
+    geocodedLongitude: addressInsights?.geocodedLongitude ?? null,
+    geocodedDisplayName: cleanOptionalString(addressInsights?.geocodedDisplayName, 1024),
+    preferredDropSite: cleanOptionalString(selectedDropSite, 255),
+    insideHomeDeliveryArea:
+      typeof addressInsights?.insideHomeDeliveryArea === "boolean"
+        ? addressInsights.insideHomeDeliveryArea
+          ? 1
+          : 0
+        : null,
+    closestDropSite: cleanOptionalString(addressInsights?.closestDropSite, 255),
+    closestDropSiteAddress: cleanOptionalString(addressInsights?.closestDropSiteAddress, 1024),
+    closestDropSiteDistanceMiles: addressInsights?.closestDropSiteDistanceMiles ?? null,
+    referralSource: cleanOptionalText(referralSource),
+    notes: cleanOptionalText(notes),
+    sourceHost: cleanOptionalString(sourceHost, 255),
+    sourcePath: cleanOptionalString(sourcePath, 255),
+    createdAt: now,
+    updatedAt: now
+  });
+
+  const nextBillingDate = computeNextBillingDate(desiredBillingDayOfMonth, now);
+  await db.insert(memberSubscriptions).values({
+    userId,
+    subscribeLeadId,
+    planKey: plan.key,
+    planAmountCents: plan.amountCents,
+    billingDayOfMonth: desiredBillingDayOfMonth,
+    status: "pending_payment_method",
+    nextBillingDate,
+    createdAt: now,
+    updatedAt: now
+  });
+
+  await db.insert(memberHerdshareStatuses).values({
+    userId,
+    monthlyFeeCents: Number(settings.herdshareMonthlyFeeCents || 500),
+    status: "active",
+    nextBillingDate,
+    agreementAccepted: 1,
+    agreementSignerName: cleanOptionalString(signerName, 255),
+    agreementDocumentUrl: LIABILITY_AGREEMENT_URL,
+    agreementRecordUrl: liabilityAgreementRecordUrl,
+    signedAt: liabilityAgreementSignedAt,
+    createdAt: now,
+    updatedAt: now
+  });
+
+  await ensureMemberLedgerAccounts(userId, db);
+
+  return {
+    userId,
+    token: issueUserToken({ userId, role: "member", adminRoles: [] }),
+    user: {
+      id: userId,
+      username: email,
+      email,
+      role: "member",
+      adminRoles: []
+    }
+  };
+}
+
 router.post("/subscribe", async (req, res) => {
   try {
     const db = getDb();
@@ -1819,6 +1965,9 @@ router.post("/subscribe", async (req, res) => {
     });
     await ensureMarketingSchema().catch((error) => {
       console.warn("Marketing schema bootstrap skipped for /subscribe:", error.message);
+    });
+    await ensureSubscriptionPortalSchema().catch((error) => {
+      console.warn("Subscription portal schema bootstrap skipped for /subscribe:", error.message);
     });
 
     const payload = req.body || {};
@@ -1833,6 +1982,9 @@ router.post("/subscribe", async (req, res) => {
     const signerName = cleanString(
       payload.liabilityAgreementSignerName || `${firstName} ${lastName}`.trim()
     );
+    const password = String(payload.password || "");
+    const desiredBillingDayOfMonth = normalizeBillingDay(payload.billingDayOfMonth, 1);
+    const selectedPlan = normalizePlanKey(payload.selectedPlan);
     const agreementAccepted = Boolean(payload.liabilityAgreementAccepted);
     const signatureMode =
       String(payload.liabilityAgreementSignatureMode || "typed").trim().toLowerCase() === "draw"
@@ -1845,6 +1997,14 @@ router.post("/subscribe", async (req, res) => {
         .status(400)
         .json({ error: "First name, last name, email, phone, address, city, state, and zip are required." });
       return;
+    }
+
+    if (!selectedPlan) {
+      return res.status(400).json({ error: "Select a valid membership plan." });
+    }
+
+    if (!password || password.length < 8) {
+      return res.status(400).json({ error: "Create a password with at least 8 characters." });
     }
 
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
@@ -1920,6 +2080,7 @@ router.post("/subscribe", async (req, res) => {
       referralSource: cleanOptionalText(payload.referralSource),
       selectedPlan: cleanOptionalString(payload.selectedPlan, 64),
       selectedPlanLabel: cleanOptionalString(payload.selectedPlanLabel, 255),
+      desiredBillingDayOfMonth,
       selectedDropSite: cleanOptionalString(payload.selectedDropSite, 255),
       notes: cleanOptionalText(payload.notes),
       liabilityAgreementAccepted: 1,
@@ -1969,6 +2130,42 @@ router.post("/subscribe", async (req, res) => {
     });
 
     const subscribeLeadId = Number(subscribeInsert[0]?.insertId);
+    const activation = await createPortalMemberFromSubscribeLead({
+      db,
+      subscribeLeadId,
+      password,
+      firstName,
+      lastName,
+      email,
+      phone,
+      country: payload.country,
+      addressLine1,
+      addressLine2: payload.addressLine2,
+      city,
+      stateProvince,
+      postalCode,
+      addressInsights,
+      referralSource: payload.referralSource,
+      selectedPlan,
+      selectedDropSite: payload.selectedDropSite,
+      notes: payload.notes,
+      sourceHost: sourceHostHeader,
+      sourcePath,
+      signerName,
+      liabilityAgreementRecordUrl,
+      liabilityAgreementSignedAt: now,
+      desiredBillingDayOfMonth
+    });
+
+    await db
+      .update(subscribeLeads)
+      .set({
+        memberUserId: activation.userId,
+        activationCompletedAt: now,
+        updatedAt: now
+      })
+      .where(eq(subscribeLeads.id, subscribeLeadId));
+
     const shouldRecordSubscriberEvent = Boolean(
       subscribeLeadId > 0 &&
         (
@@ -2037,10 +2234,17 @@ router.post("/subscribe", async (req, res) => {
       });
     }
 
-    res.json({ ok: true, liabilityAgreementRecordUrl, addressInsights });
+    res.json({
+      ok: true,
+      liabilityAgreementRecordUrl,
+      addressInsights,
+      token: activation.token,
+      user: activation.user,
+      memberCreated: true
+    });
   } catch (error) {
     console.error("Subscribe lead capture error:", error);
-    res.status(500).json({ error: "Unable to submit subscribe request." });
+    res.status(error?.status || 500).json({ error: error?.message || "Unable to submit subscribe request." });
   }
 });
 
