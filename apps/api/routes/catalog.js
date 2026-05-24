@@ -43,6 +43,7 @@ import {
 import { requireUser } from "../middleware/auth.js";
 import { computeProductPricingSnapshot } from "../lib/productPricing.js";
 import { issueUserToken } from "../lib/authTokens.js";
+import { sendSubscribeLeadNotification } from "../lib/email.js";
 import {
   computeNextBillingDate,
   ensureMemberLedgerAccounts,
@@ -129,6 +130,16 @@ function cleanOptionalText(value) {
 
 function cleanOptionalUrl(value) {
   return cleanOptionalString(value, 2048);
+}
+
+function isEnvEnabled(value) {
+  return ["1", "true", "yes", "on"].includes(String(value || "").trim().toLowerCase());
+}
+
+function isSubscribePortalOnboardingEnabled() {
+  // Temporary merge-prep toggle. Set SUBSCRIBE_PORTAL_ONBOARDING_ENABLED=true
+  // to restore account/subscription creation from the public subscribe form.
+  return isEnvEnabled(process.env.SUBSCRIBE_PORTAL_ONBOARDING_ENABLED);
 }
 
 function toFloat(value) {
@@ -1960,15 +1971,18 @@ async function createPortalMemberFromSubscribeLead({
 router.post("/subscribe", async (req, res) => {
   try {
     const db = getDb();
+    const portalOnboardingEnabled = isSubscribePortalOnboardingEnabled();
     await ensureSubscriberCaptureSchema().catch((error) => {
       console.warn("Subscriber capture schema bootstrap skipped for /subscribe:", error.message);
     });
     await ensureMarketingSchema().catch((error) => {
       console.warn("Marketing schema bootstrap skipped for /subscribe:", error.message);
     });
-    await ensureSubscriptionPortalSchema().catch((error) => {
-      console.warn("Subscription portal schema bootstrap skipped for /subscribe:", error.message);
-    });
+    if (portalOnboardingEnabled) {
+      await ensureSubscriptionPortalSchema().catch((error) => {
+        console.warn("Subscription portal schema bootstrap skipped for /subscribe:", error.message);
+      });
+    }
 
     const payload = req.body || {};
     const firstName = cleanString(payload.firstName);
@@ -1984,7 +1998,8 @@ router.post("/subscribe", async (req, res) => {
     );
     const password = String(payload.password || "");
     const desiredBillingDayOfMonth = normalizeBillingDay(payload.billingDayOfMonth, 1);
-    const selectedPlan = normalizePlanKey(payload.selectedPlan);
+    const submittedPlanKey = cleanString(payload.selectedPlan, 64);
+    const selectedPlan = normalizePlanKey(submittedPlanKey);
     const agreementAccepted = Boolean(payload.liabilityAgreementAccepted);
     const signatureMode =
       String(payload.liabilityAgreementSignatureMode || "typed").trim().toLowerCase() === "draw"
@@ -1999,11 +2014,15 @@ router.post("/subscribe", async (req, res) => {
       return;
     }
 
-    if (!selectedPlan) {
+    if (!submittedPlanKey) {
+      return res.status(400).json({ error: "Select a membership plan." });
+    }
+
+    if (portalOnboardingEnabled && !selectedPlan) {
       return res.status(400).json({ error: "Select a valid membership plan." });
     }
 
-    if (!password || password.length < 8) {
+    if (portalOnboardingEnabled && (!password || password.length < 8)) {
       return res.status(400).json({ error: "Create a password with at least 8 characters." });
     }
 
@@ -2130,41 +2149,44 @@ router.post("/subscribe", async (req, res) => {
     });
 
     const subscribeLeadId = Number(subscribeInsert[0]?.insertId);
-    const activation = await createPortalMemberFromSubscribeLead({
-      db,
-      subscribeLeadId,
-      password,
-      firstName,
-      lastName,
-      email,
-      phone,
-      country: payload.country,
-      addressLine1,
-      addressLine2: payload.addressLine2,
-      city,
-      stateProvince,
-      postalCode,
-      addressInsights,
-      referralSource: payload.referralSource,
-      selectedPlan,
-      selectedDropSite: payload.selectedDropSite,
-      notes: payload.notes,
-      sourceHost: sourceHostHeader,
-      sourcePath,
-      signerName,
-      liabilityAgreementRecordUrl,
-      liabilityAgreementSignedAt: now,
-      desiredBillingDayOfMonth
-    });
+    let activation = null;
+    if (portalOnboardingEnabled) {
+      activation = await createPortalMemberFromSubscribeLead({
+        db,
+        subscribeLeadId,
+        password,
+        firstName,
+        lastName,
+        email,
+        phone,
+        country: payload.country,
+        addressLine1,
+        addressLine2: payload.addressLine2,
+        city,
+        stateProvince,
+        postalCode,
+        addressInsights,
+        referralSource: payload.referralSource,
+        selectedPlan,
+        selectedDropSite: payload.selectedDropSite,
+        notes: payload.notes,
+        sourceHost: sourceHostHeader,
+        sourcePath,
+        signerName,
+        liabilityAgreementRecordUrl,
+        liabilityAgreementSignedAt: now,
+        desiredBillingDayOfMonth
+      });
 
-    await db
-      .update(subscribeLeads)
-      .set({
-        memberUserId: activation.userId,
-        activationCompletedAt: now,
-        updatedAt: now
-      })
-      .where(eq(subscribeLeads.id, subscribeLeadId));
+      await db
+        .update(subscribeLeads)
+        .set({
+          memberUserId: activation.userId,
+          activationCompletedAt: now,
+          updatedAt: now
+        })
+        .where(eq(subscribeLeads.id, subscribeLeadId));
+    }
 
     const shouldRecordSubscriberEvent = Boolean(
       subscribeLeadId > 0 &&
@@ -2234,13 +2256,45 @@ router.post("/subscribe", async (req, res) => {
       });
     }
 
+    void sendSubscribeLeadNotification({
+      submittedAt: now,
+      lead: {
+        firstName,
+        lastName,
+        email,
+        phone,
+        country: payload.country,
+        addressLine1,
+        addressLine2: payload.addressLine2,
+        city,
+        stateProvince,
+        postalCode,
+        selectedPlan: payload.selectedPlan,
+        selectedPlanLabel: payload.selectedPlanLabel,
+        desiredBillingDayOfMonth,
+        selectedDropSite: payload.selectedDropSite,
+        referralSource: payload.referralSource,
+        notes: payload.notes,
+        liabilityAgreementSignerName: signerName,
+        liabilityAgreementRecordUrl,
+        sourceHost: sourceHostHeader,
+        sourcePath
+      },
+      marketing: {
+        ...marketingParams,
+        matchMethod: attribution.matchMethod || null
+      }
+    }).catch((error) => {
+      console.warn("Subscribe lead notification skipped:", error.message);
+    });
+
     res.json({
       ok: true,
       liabilityAgreementRecordUrl,
       addressInsights,
-      token: activation.token,
-      user: activation.user,
-      memberCreated: true
+      token: activation?.token,
+      user: activation?.user,
+      memberCreated: Boolean(activation)
     });
   } catch (error) {
     console.error("Subscribe lead capture error:", error);

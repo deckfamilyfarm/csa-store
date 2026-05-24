@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { DeckPageHeader } from "./DeckPageHeader.jsx";
+import { MEMBER_PORTAL_LINK_ENABLED } from "../portalFeatureFlags.js";
 import {
   cancelMemberSubscription,
   createMemberSetupIntent,
@@ -186,15 +187,17 @@ export function MemberPortalSection({
   }, [subscribeUrl]);
   const subscribeRouteUrl = useMemo(() => `${portalBaseHref}#/subscribe`, [portalBaseHref]);
   const portalAccountUrl = useMemo(() => `${portalBaseHref}#/account`, [portalBaseHref]);
-  const portalNavLinks = useMemo(
-    () => [
+  const portalNavLinks = useMemo(() => {
+    const links = [
       { label: "Home", href: "https://www.deckfamilyfarm.com/" },
-      { label: "Subscribe", href: subscribeRouteUrl },
-      { label: "Member Portal", href: portalAccountUrl },
-      { label: "Shop", href: memberPortalStoreUrl() }
-    ],
-    [portalAccountUrl, subscribeRouteUrl]
-  );
+      { label: "Subscribe", href: subscribeRouteUrl }
+    ];
+    if (MEMBER_PORTAL_LINK_ENABLED) {
+      links.push({ label: "Member Portal", href: portalAccountUrl });
+    }
+    links.push({ label: "Shop", href: memberPortalStoreUrl() });
+    return links;
+  }, [portalAccountUrl, subscribeRouteUrl]);
 
   const subscriptionForm = useMemo(
     () => ({

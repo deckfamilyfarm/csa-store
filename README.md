@@ -56,6 +56,14 @@ Local testing
 - Production subscribe host:
   - `https://subscribe.deckfamilyfarm.com/`
 
+Temporary portal toggles
+- By default, the subscribe page is in lightweight lead-capture mode: it gathers contact, address, plan, pickup/delivery, notes, and the signed agreement, then logs the lead without public portal onboarding.
+- Set `SUBSCRIBE_LEAD_NOTIFY_TO=admin@example.com` on the API to email new subscribe leads to an administrator. If it is not set, the API falls back to the configured sender address when possible.
+- To restore the public member portal link and full subscribe-to-portal onboarding, set all three flags to `true`:
+  - `VITE_MEMBER_PORTAL_LINK_ENABLED=true`
+  - `VITE_SUBSCRIBE_PORTAL_ONBOARDING_ENABLED=true`
+  - `SUBSCRIBE_PORTAL_ONBOARDING_ENABLED=true`
+
 Typical editing workflow
 1. Open the file that controls the content you want to change.
 2. Make the content or style update.

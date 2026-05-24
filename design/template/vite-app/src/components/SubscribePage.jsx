@@ -1,6 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { fetchSubscribeAddressInsights, submitSubscribeLead } from "../api.js";
 import { SUBSCRIBE_PARTNERS } from "../data/subscribePartners.js";
+import {
+  MEMBER_PORTAL_LINK_ENABLED,
+  SUBSCRIBE_PORTAL_ONBOARDING_ENABLED
+} from "../portalFeatureFlags.js";
 import { DeckPageHeader } from "./DeckPageHeader.jsx";
 
 const DELIVERY_MAP_URL =
@@ -324,15 +328,17 @@ export function SubscribePage({
   const subscribeRouteUrl = useMemo(() => {
     return `${portalBaseHref}#/subscribe`;
   }, [portalBaseHref]);
-  const subscribeNavLinks = useMemo(
-    () => [
+  const subscribeNavLinks = useMemo(() => {
+    const links = [
       { label: "Home", href: "https://www.deckfamilyfarm.com/" },
-      { label: "Subscribe", href: subscribeRouteUrl },
-      { label: "Member Portal", href: portalAccountUrl },
-      { label: "Shop", href: subscriptionStoreUrl() }
-    ],
-    [portalAccountUrl, subscribeRouteUrl]
-  );
+      { label: "Subscribe", href: subscribeRouteUrl }
+    ];
+    if (MEMBER_PORTAL_LINK_ENABLED) {
+      links.push({ label: "Member Portal", href: portalAccountUrl });
+    }
+    links.push({ label: "Shop", href: subscriptionStoreUrl() });
+    return links;
+  }, [portalAccountUrl, subscribeRouteUrl]);
   const siteOptions = useMemo(
     () =>
       dropSites
@@ -554,11 +560,13 @@ export function SubscribePage({
     event.preventDefault();
     setStatus({ submitting: true, success: false, error: "" });
     try {
-      if (!form.password || form.password.length < 8) {
-        throw new Error("Create a password with at least 8 characters.");
-      }
-      if (form.password !== form.confirmPassword) {
-        throw new Error("Password confirmation does not match.");
+      if (SUBSCRIBE_PORTAL_ONBOARDING_ENABLED) {
+        if (!form.password || form.password.length < 8) {
+          throw new Error("Create a password with at least 8 characters.");
+        }
+        if (form.password !== form.confirmPassword) {
+          throw new Error("Password confirmation does not match.");
+        }
       }
       if (!form.liabilityAgreementAccepted) {
         throw new Error("You must agree to the product liability agreement.");
@@ -581,7 +589,7 @@ export function SubscribePage({
         queryString: window.location.search
       });
       setAddressInsights(response?.addressInsights || addressInsights);
-      if (response?.token) {
+      if (SUBSCRIBE_PORTAL_ONBOARDING_ENABLED && response?.token) {
         window.localStorage.setItem("userToken", response.token);
         setStatus({ submitting: false, success: true, error: "" });
         window.setTimeout(() => {
@@ -656,7 +664,11 @@ export function SubscribePage({
                 </div>
                 <div className="subscribe-note-card">
                   <strong>After submitting this form</strong>
-                  <span>Your account will be created and you will continue into the member portal to enter your payment method.</span>
+                  <span>
+                    {SUBSCRIBE_PORTAL_ONBOARDING_ENABLED
+                      ? "Your account will be created and you will continue into the member portal to enter your payment method."
+                      : "We will record your subscription request and follow up manually with next steps."}
+                  </span>
                 </div>
               </div>
             </div>
@@ -670,11 +682,20 @@ export function SubscribePage({
 
               {status.success ? (
                 <div className="subscribe-success">
-                  <h3>Account created.</h3>
-                  <p>
-                    We recorded your subscription request and created your member account. Continue
-                    to the member portal to add a payment method and activate recurring billing.
-                  </p>
+                  <h3>
+                    {SUBSCRIBE_PORTAL_ONBOARDING_ENABLED ? "Account created." : "Request received."}
+                  </h3>
+                  {SUBSCRIBE_PORTAL_ONBOARDING_ENABLED ? (
+                    <p>
+                      We recorded your subscription request and created your member account. Continue
+                      to the member portal to add a payment method and activate recurring billing.
+                    </p>
+                  ) : (
+                    <p>
+                      We recorded your subscription request. We will review it and follow up with
+                      next steps for setting up your membership manually.
+                    </p>
+                  )}
                   <div className="button-row">
                     <button
                       className="button alt"
@@ -689,9 +710,11 @@ export function SubscribePage({
                     >
                       Close
                     </button>
-                    <a className="button" href={portalAccountUrl}>
-                      Continue to Member Portal
-                    </a>
+                    {SUBSCRIBE_PORTAL_ONBOARDING_ENABLED ? (
+                      <a className="button" href={portalAccountUrl}>
+                        Continue to Member Portal
+                      </a>
+                    ) : null}
                   </div>
                 </div>
               ) : (
@@ -734,28 +757,32 @@ export function SubscribePage({
                         required
                       />
                     </label>
-                    <label className="filter-field">
-                      <span className="small">Create password*</span>
-                      <input
-                        className="input"
-                        type="password"
-                        value={form.password}
-                        onChange={(event) => updateField("password", event.target.value)}
-                        minLength={8}
-                        required
-                      />
-                    </label>
-                    <label className="filter-field">
-                      <span className="small">Confirm password*</span>
-                      <input
-                        className="input"
-                        type="password"
-                        value={form.confirmPassword}
-                        onChange={(event) => updateField("confirmPassword", event.target.value)}
-                        minLength={8}
-                        required
-                      />
-                    </label>
+                    {SUBSCRIBE_PORTAL_ONBOARDING_ENABLED ? (
+                      <>
+                        <label className="filter-field">
+                          <span className="small">Create password*</span>
+                          <input
+                            className="input"
+                            type="password"
+                            value={form.password}
+                            onChange={(event) => updateField("password", event.target.value)}
+                            minLength={8}
+                            required
+                          />
+                        </label>
+                        <label className="filter-field">
+                          <span className="small">Confirm password*</span>
+                          <input
+                            className="input"
+                            type="password"
+                            value={form.confirmPassword}
+                            onChange={(event) => updateField("confirmPassword", event.target.value)}
+                            minLength={8}
+                            required
+                          />
+                        </label>
+                      </>
+                    ) : null}
                   </div>
 
                   <label className="filter-field">
