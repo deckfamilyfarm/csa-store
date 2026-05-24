@@ -24,6 +24,13 @@ Schema notes
   `local_line_sync_runs`,
   `local_line_sync_issues`.
 - Subscriber snapshots are cached locally in `local_line_subscription_snapshot_rows` and `local_line_subscription_snapshot_runs`.
+- `New Subscribers`, `Exiting Subscribers`, and the non-SNAP portion of `Total Subscribers`
+  are counted from the subscription export's `Created` and `Cancelled Date` fields for each
+  dashboard week. This avoids treating a late live export as a true point-in-time snapshot
+  for an earlier week.
+- `Average Order Amount` uses the orders export `Order Total` value, not the order detail API
+  `total`, because the API total can be reduced to zero by store credits. By default it uses
+  the legacy KPI price lists `2966,2718,3124`; override with `DASHBOARD_ORDER_PRICE_LIST_IDS`.
 - `SNAP subscribers` on the dashboard are derived, not copied from the subscription export:
   they are counted as distinct customers on a SNAP pricelist order within the trailing 5 weeks
   ending on that snapshot week. They are added into `Total Subscribers`, but they are not used

@@ -45,10 +45,25 @@ const DEFAULT_SUBSCRIBER_HISTORY_DIR =
   "/Users/jdeck/code/ffcsa_scripts/localline/data";
 const TIMESHEET_APPROVED_STATUSES =
   getDashboardEnv("TIMESHEET_APPROVED_STATUSES", "1,0,2,3");
+const DASHBOARD_ORDER_PRICE_LIST_IDS = parseDashboardIdList(
+  getDashboardEnv("DASHBOARD_ORDER_PRICE_LIST_IDS") ||
+    [
+      getDashboardEnv("LL_PRICE_LIST_HERDSHARE_ID", "2966"),
+      getDashboardEnv("LL_PRICE_LIST_CSA_MEMBERS_ID", "2718"),
+      getDashboardEnv("LL_PRICE_LIST_GUEST_ID", "3124")
+    ].join(",")
+);
 const LOCAL_LINE_RETRY_ATTEMPTS = Math.max(
   1,
   Number.parseInt(process.env.LOCALLINE_FETCH_RETRY_ATTEMPTS || "2", 10) || 2
 );
+
+function parseDashboardIdList(value) {
+  return String(value || "")
+    .split(",")
+    .map((item) => Number(item.trim()))
+    .filter((item) => Number.isFinite(item));
+}
 
 function toNullableString(value) {
   const trimmed = String(value ?? "").trim();
@@ -164,6 +179,30 @@ function buildSubscriberSnapshotKey(row) {
 function parseCurrencyCell(value) {
   const numeric = Number(String(value ?? "").replace(/[^0-9.\-]/g, ""));
   return Number.isFinite(numeric) ? numeric : 0;
+}
+
+function parseLocalLineExportDate(value) {
+  const isoDate = toYmdFromDateish(value);
+  if (isoDate) return isoDate;
+  const match = String(value || "")
+    .trim()
+    .match(/^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/);
+  if (!match) return null;
+  const year = match[3].length === 2 ? `20${match[3]}` : match[3];
+  return `${year}-${String(Number(match[1])).padStart(2, "0")}-${String(Number(match[2])).padStart(2, "0")}`;
+}
+
+function parseSnapshotRawJson(value) {
+  if (!value) return {};
+  try {
+    return JSON.parse(value);
+  } catch (_error) {
+    return {};
+  }
+}
+
+function isYmdInRange(value, start, end) {
+  return Boolean(value && start && end && String(value) >= String(start) && String(value) <= String(end));
 }
 
 function isFeedAFriendAmount(amount) {
@@ -305,14 +344,14 @@ function buildDashboardRows(
         {
           label: "New Subscribers",
           entry: "AUTO",
-          source: "Subscriber snapshots",
+          source: "Subscriber export Created dates",
           valueType: "int",
           auto: (w) => subscriberWeeklyMap[w.start]?.newSubscribers
         },
         {
           label: "Exiting Subscribers",
           entry: "AUTO",
-          source: "Subscriber snapshots",
+          source: "Subscriber export Cancelled Date values",
           valueType: "int",
           auto: (w) => subscriberWeeklyMap[w.start]?.exitingSubscribers
         },
@@ -326,7 +365,7 @@ function buildDashboardRows(
         {
           label: "Total Subscribers",
           entry: "AUTO",
-          source: "Subscriber snapshots",
+          source: "Subscriber export active as of week end + SNAP",
           valueType: "int",
           auto: (w) => Number(subscriberWeeklyMap[w.start]?.totalSubscribers)
         },
@@ -340,7 +379,7 @@ function buildDashboardRows(
         {
           label: "Average Order Amount",
           entry: "AUTO",
-          source: "Local DB",
+          source: "Order export Order Total",
           valueType: "currency",
           auto: (w) => Number(weeklyKpiMap[w.start]?.averageOrderAmount)
         },
@@ -736,14 +775,72 @@ async function loadWeeklyOrderMetrics(weeks) {
     `,
     weekKeys
   );
+  const [orderTotalRows] = await pool.query(
+    `
+      SELECT
+        reporting_entries.week_start AS weekKey,
+        reporting_entries.local_line_order_id AS localLineOrderId,
+        reporting_entries.raw_json AS rawJson,
+        orders.price_list_id AS priceListId,
+        orders.total AS apiTotal
+      FROM local_line_order_reporting_entries reporting_entries
+      LEFT JOIN local_line_orders orders
+        ON orders.local_line_order_id = reporting_entries.local_line_order_id
+      WHERE reporting_entries.order_status = 'OPEN'
+        AND reporting_entries.payment_status = 'PAID'
+        AND NOT (
+          LOWER(COALESCE(reporting_entries.category_name, '')) = 'membership'
+          OR LOWER(COALESCE(reporting_entries.fulfillment_name, '')) LIKE '%membership purchase%'
+        )
+        AND reporting_entries.week_start IN (${weekSql})
+    `,
+    weekKeys
+  );
 
   const orderMap = new Map(orderRows.map((row) => [String(row.weekKey), row]));
   const reportingMap = new Map(reportingRows.map((row) => [String(row.weekKey), row]));
+  const averageOrderAmountMap = new Map();
+  const orderTotalsByWeekAndOrder = new Map();
+
+  for (const row of orderTotalRows) {
+    const priceListId = Number(row.priceListId);
+    if (
+      DASHBOARD_ORDER_PRICE_LIST_IDS.length &&
+      !DASHBOARD_ORDER_PRICE_LIST_IDS.includes(priceListId)
+    ) {
+      continue;
+    }
+
+    const weekKey = String(row.weekKey || "");
+    const orderId = String(row.localLineOrderId || "");
+    if (!weekKey || !orderId) continue;
+
+    const mapKey = `${weekKey}:${orderId}`;
+    if (orderTotalsByWeekAndOrder.has(mapKey)) continue;
+
+    const raw = parseSnapshotRawJson(row.rawJson);
+    const exportTotal = parseCurrencyCell(raw["Order Total"]);
+    const apiTotal = Number(row.apiTotal);
+    orderTotalsByWeekAndOrder.set(
+      mapKey,
+      exportTotal || (Number.isFinite(apiTotal) ? apiTotal : 0)
+    );
+  }
+
+  for (const [key, total] of orderTotalsByWeekAndOrder.entries()) {
+    const weekKey = key.split(":")[0];
+    const summary = averageOrderAmountMap.get(weekKey) || { total: 0, count: 0 };
+    summary.total += total;
+    summary.count += 1;
+    averageOrderAmountMap.set(weekKey, summary);
+  }
+
   const result = {};
 
   weekKeys.forEach((weekKey) => {
     const orderRow = orderMap.get(weekKey);
     const reportingRow = reportingMap.get(weekKey);
+    const averageOrderSummary = averageOrderAmountMap.get(weekKey);
     const numOrders = Number(orderRow?.orderCount || 0);
     const numGuestOrders = Number(orderRow?.guestOrderCount || 0);
     const lineCount = Number(reportingRow?.lineCount || 0);
@@ -752,7 +849,10 @@ async function loadWeeklyOrderMetrics(weeks) {
       numGuestOrders,
       numSubscriberOrders: Math.max(0, numOrders - numGuestOrders),
       averageItemsPerOrder: numOrders ? Math.round(lineCount / numOrders) : 0,
-      averageOrderAmount: Number(Number(orderRow?.averageOrderAmount || 0).toFixed(2)),
+      averageOrderAmount:
+        averageOrderSummary?.count
+          ? Number((averageOrderSummary.total / averageOrderSummary.count).toFixed(2))
+          : Number(Number(orderRow?.averageOrderAmount || 0).toFixed(2)),
       totalSales: Number(Number(reportingRow?.retailAmount || 0).toFixed(2))
     };
   });
@@ -842,7 +942,8 @@ async function buildSubscriberWeeklyMap(weeks) {
       SELECT
         snapshot_week_end AS snapshotWeekEnd,
         snapshot_key AS snapshotKey,
-        status
+        status,
+        raw_json AS rawJson
       FROM local_line_subscription_snapshot_rows
       WHERE snapshot_week_end IN (${buildInClause(snapshotWeekEnds)})
     `,
@@ -850,10 +951,14 @@ async function buildSubscriberWeeklyMap(weeks) {
   );
 
   const summaryMap = new Map(summaryRows.map((row) => [String(row.snapshotWeekEnd), row]));
+  const rowsByWeekEnd = new Map();
   const activeKeysByWeekEnd = new Map();
   rowRows.forEach((row) => {
-    if (String(row.status || "").trim().toLowerCase() !== "active") return;
     const weekEnd = String(row.snapshotWeekEnd || "");
+    const nextRows = rowsByWeekEnd.get(weekEnd) || [];
+    nextRows.push(row);
+    rowsByWeekEnd.set(weekEnd, nextRows);
+    if (String(row.status || "").trim().toLowerCase() !== "active") return;
     const nextSet = activeKeysByWeekEnd.get(weekEnd) || new Set();
     nextSet.add(String(row.snapshotKey || ""));
     activeKeysByWeekEnd.set(weekEnd, nextSet);
@@ -864,17 +969,51 @@ async function buildSubscriberWeeklyMap(weeks) {
     const currentSet = activeKeysByWeekEnd.get(week.end) || null;
     const previousSet = activeKeysByWeekEnd.get(addDaysYmd(week.end, -7)) || null;
     const currentSummary = summaryMap.get(week.end);
+    const currentRows = rowsByWeekEnd.get(week.end) || [];
+    const newSubscriberKeys = new Set();
+    const exitingSubscriberKeys = new Set();
+    const activeAsOfWeekEndKeys = new Set();
+    let hasCreatedDates = false;
+    let hasCancelledDates = false;
+
+    for (const row of currentRows) {
+      const raw = parseSnapshotRawJson(row.rawJson);
+      const snapshotKey = String(row.snapshotKey || "");
+      const createdDate = parseLocalLineExportDate(raw.Created);
+      const cancelledDate = parseLocalLineExportDate(raw["Cancelled Date"]);
+      if (Object.prototype.hasOwnProperty.call(raw, "Created")) hasCreatedDates = true;
+      if (Object.prototype.hasOwnProperty.call(raw, "Cancelled Date")) hasCancelledDates = true;
+      if (
+        createdDate &&
+        String(createdDate) <= String(week.end) &&
+        (String(row.status || "").trim().toLowerCase() === "active" ||
+          (cancelledDate && String(cancelledDate) > String(week.end)))
+      ) {
+        activeAsOfWeekEndKeys.add(snapshotKey);
+      }
+      if (isYmdInRange(createdDate, week.start, week.end)) {
+        newSubscriberKeys.add(snapshotKey);
+      }
+      if (isYmdInRange(cancelledDate, week.start, week.end)) {
+        exitingSubscriberKeys.add(snapshotKey);
+      }
+    }
+
     result[week.start] = {
       snapSubscribers: Number(currentSummary?.snapSubscriberCount || 0),
       totalSubscribers:
-        Number(currentSummary?.activeSubscriberCount || 0) +
+        (hasCreatedDates
+          ? activeAsOfWeekEndKeys.size
+          : Number(currentSummary?.activeSubscriberCount || 0)) +
         Number(currentSummary?.snapSubscriberCount || 0),
-      newSubscribers:
-        currentSet && previousSet
+      newSubscribers: hasCreatedDates
+        ? newSubscriberKeys.size
+        : currentSet && previousSet
           ? [...currentSet].filter((value) => !previousSet.has(value)).length
           : null,
-      exitingSubscribers:
-        currentSet && previousSet
+      exitingSubscribers: hasCancelledDates
+        ? exitingSubscriberKeys.size
+        : currentSet && previousSet
           ? [...previousSet].filter((value) => !currentSet.has(value)).length
           : null
     };
