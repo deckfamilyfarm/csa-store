@@ -1,11 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { loadStripe } from "@stripe/stripe-js";
-import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { DeckPageHeader } from "./DeckPageHeader.jsx";
 import { MEMBER_PORTAL_LINK_ENABLED } from "../portalFeatureFlags.js";
 import {
   cancelMemberSubscription,
-  createMemberSetupIntent,
   deleteMemberPaymentMethod,
   fetchMemberLocalLineCredit,
   fetchMemberLocalLineCustomer,
@@ -112,51 +109,6 @@ function memberPortalStoreUrl() {
   return "https://fullfarmcsa.deckfamilyfarm.com/";
 }
 
-function PaymentSetupForm({ token, onSaved }) {
-  const stripe = useStripe();
-  const elements = useElements();
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-
-  async function handleSubmit(event) {
-    event.preventDefault();
-    if (!stripe || !elements) return;
-    setSaving(true);
-    setError("");
-    try {
-      const result = await stripe.confirmSetup({
-        elements,
-        redirect: "if_required"
-      });
-      if (result.error) {
-        throw new Error(result.error.message || "Unable to save payment method.");
-      }
-      const paymentMethodId = result.setupIntent?.payment_method;
-      if (typeof paymentMethodId !== "string" || !paymentMethodId) {
-        throw new Error("Stripe did not return a saved payment method.");
-      }
-      await setMemberPaymentMethodDefault(token, paymentMethodId);
-      onSaved?.();
-    } catch (nextError) {
-      setError(nextError?.message || "Unable to save payment method.");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  return (
-    <form className="member-portal-payment-form" onSubmit={handleSubmit}>
-      <div className="member-portal-payment-element">
-        <PaymentElement />
-      </div>
-      {error ? <div className="small member-portal-error">{error}</div> : null}
-      <button className="button" type="submit" disabled={saving || !stripe || !elements}>
-        {saving ? "Saving..." : "Save payment method"}
-      </button>
-    </form>
-  );
-}
-
 export function MemberPortalSection({
   token,
   user,
@@ -171,17 +123,12 @@ export function MemberPortalSection({
   const [error, setError] = useState("");
   const [localLineFeedback, setLocalLineFeedback] = useState({ message: "", error: "" });
   const [busyAction, setBusyAction] = useState("");
-  const [setupClientSecret, setSetupClientSecret] = useState("");
   const [localLineChoice, setLocalLineChoice] = useState("choose");
   const [localLineForm, setLocalLineForm] = useState({ externalCustomerId: "", externalEmail: user?.email || "" });
   const [localLineLoginForm, setLocalLineLoginForm] = useState({ email: user?.email || "", password: "" });
   const [localLineCustomer, setLocalLineCustomer] = useState(null);
   const [localLineCredit, setLocalLineCredit] = useState(null);
   const [localLineActivityUpdatedAt, setLocalLineActivityUpdatedAt] = useState("");
-  const stripePromise = useMemo(() => {
-    const key = import.meta.env.VITE_STRIPE_PK || import.meta.env.VITE_STRIPE_PUBLIC_KEY;
-    return key ? loadStripe(key) : null;
-  }, []);
   const portalBaseHref = useMemo(() => {
     return String(subscribeUrl || memberPortalStoreUrl()).replace(/#.*$/, "").replace(/\/+$/, "");
   }, [subscribeUrl]);
@@ -308,25 +255,9 @@ export function MemberPortalSection({
     }
   }
 
-  async function refreshSetupIntent() {
-    if (!stripePromise) return;
-    try {
-      const response = await createMemberSetupIntent(token);
-      setSetupClientSecret(response.clientSecret || "");
-    } catch (nextError) {
-      setError(nextError?.message || "Unable to initialize payment setup.");
-    }
-  }
-
   useEffect(() => {
     loadPortal();
   }, [token]);
-
-  useEffect(() => {
-    if (!loading && stripePromise) {
-      refreshSetupIntent();
-    }
-  }, [loading, stripePromise]);
 
   async function runAction(actionKey, callback, successMessage) {
     setBusyAction(actionKey);
@@ -338,9 +269,6 @@ export function MemberPortalSection({
         setPortal(response);
       } else {
         await loadPortal();
-      }
-      if (stripePromise) {
-        await refreshSetupIntent();
       }
       setMessage(successMessage);
     } catch (nextError) {
@@ -391,9 +319,6 @@ export function MemberPortalSection({
       }
       const summary = response?.summary || (await fetchMemberPortal(token));
       setPortal(summary);
-      if (stripePromise) {
-        await refreshSetupIntent();
-      }
       const importSummary = response?.importResult?.results?.[0] || null;
       await refreshLocalLineDetails(summary?.localline?.link?.externalCustomerId || null);
       setMessage("Your Local Line shopping account is connected.");
@@ -899,21 +824,11 @@ export function MemberPortalSection({
           </div>
           <div className="card pad">
             <div className="eyebrow">Payment method</div>
-            {stripePromise && setupClientSecret ? (
-              <Elements stripe={stripePromise} options={{ clientSecret: setupClientSecret }}>
-                <PaymentSetupForm
-                  token={token}
-                  onSaved={() =>
-                    runAction("payment-refresh", () => fetchMemberPortal(token), "Payment method saved.")
-                  }
-                />
-              </Elements>
-            ) : (
-              <div className="small">
-                Stripe payment setup is not available yet. Add `VITE_STRIPE_PK` and backend Stripe
-                env vars to enable card setup here.
-              </div>
-            )}
+            <div className="small">
+              Stripe payment setup is not available in the lightweight subscribe deployment.
+              Reinstall the Stripe frontend packages and restore the payment element before
+              enabling card setup here.
+            </div>
             {Array.isArray(portal?.stripe?.paymentMethods) && portal.stripe.paymentMethods.length ? (
               <div className="member-portal-payment-methods">
                 {portal.stripe.paymentMethods.map((method) => (
