@@ -9,6 +9,7 @@ import { DeleteObjectCommand, S3Client, PutObjectCommand } from "@aws-sdk/client
 import {
   ensureMarketingSchema,
   ensureSubscriberCaptureSchema,
+  ensureSubscriptionPortalSchema,
   ensureAdminAccessSchema,
   ensureAdminPricelistIndexes,
   ensureLocalLineSyncSchema,
@@ -88,6 +89,12 @@ import {
   normalizeAdminRoleKeys
 } from "../lib/adminRoles.js";
 import { sendPasswordResetForUser } from "../lib/passwordReset.js";
+import {
+  listMemberLocalLineCreditStatus,
+  processPausedMemberHerdshareBilling,
+  syncMemberLocalLineCredits,
+  syncMemberLocalLinePurchaseDebits
+} from "../lib/memberPortalSync.js";
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -2119,6 +2126,76 @@ router.put(
     } catch (error) {
       console.error("Subscription lead update failed:", error);
       res.status(500).json({ error: "Failed to update subscription lead." });
+    }
+  }
+);
+
+router.post(
+  "/subscription-ops/localline-credits-sync",
+  requireAdminPermission(["membership_admin", "member_admin"]),
+  async (req, res) => {
+    try {
+      await ensureSubscriptionPortalSchema();
+      const dryRun = req.body?.dryRun !== false;
+      const userId = req.body?.userId ? Number(req.body.userId) : null;
+      const result = await syncMemberLocalLineCredits({ userId, dryRun });
+      res.json(result);
+    } catch (error) {
+      console.error("Subscription Local Line credit sync failed:", error);
+      res.status(500).json({ error: error?.message || "Failed to sync member Local Line credits." });
+    }
+  }
+);
+
+router.get(
+  "/subscription-ops/localline-credit-status",
+  requireAdminPermission(["membership_admin", "member_admin"]),
+  async (req, res) => {
+    try {
+      await ensureSubscriptionPortalSchema();
+      await ensureLocalLineSyncSchema();
+      const userId = req.query?.userId ? Number(req.query.userId) : null;
+      const includeRemote = String(req.query?.includeRemote || "1").trim() !== "0";
+      const result = await listMemberLocalLineCreditStatus({ userId, includeRemote });
+      res.json(result);
+    } catch (error) {
+      console.error("Subscription Local Line credit status failed:", error);
+      res.status(500).json({ error: error?.message || "Failed to load Local Line credit status." });
+    }
+  }
+);
+
+router.post(
+  "/subscription-ops/localline-purchase-sync",
+  requireAdminPermission(["membership_admin", "member_admin"]),
+  async (req, res) => {
+    try {
+      await ensureSubscriptionPortalSchema();
+      await ensureLocalLineSyncSchema();
+      const dryRun = req.body?.dryRun !== false;
+      const userId = req.body?.userId ? Number(req.body.userId) : null;
+      const result = await syncMemberLocalLinePurchaseDebits({ userId, dryRun });
+      res.json(result);
+    } catch (error) {
+      console.error("Subscription Local Line purchase sync failed:", error);
+      res.status(500).json({ error: error?.message || "Failed to sync member Local Line purchase debits." });
+    }
+  }
+);
+
+router.post(
+  "/subscription-ops/process-paused-herdshare",
+  requireAdminPermission(["membership_admin", "member_admin"]),
+  async (req, res) => {
+    try {
+      await ensureSubscriptionPortalSchema();
+      const dryRun = req.body?.dryRun !== false;
+      const userId = req.body?.userId ? Number(req.body.userId) : null;
+      const result = await processPausedMemberHerdshareBilling({ userId, dryRun });
+      res.json(result);
+    } catch (error) {
+      console.error("Paused herdshare processing failed:", error);
+      res.status(500).json({ error: error?.message || "Failed to process paused herdshare billing." });
     }
   }
 );
@@ -6023,20 +6100,20 @@ router.get("/drop-sites", requireAdmin, async (_req, res) => {
   });
 });
 
-router.get("/localline/pull-jobs", requireAdmin, (_req, res) => {
-  return res.json({ jobs: getLatestLocalLinePullJobs() });
+router.get("/localline/pull-jobs", requireAdmin, async (_req, res) => {
+  return res.json({ jobs: await getLatestLocalLinePullJobs() });
 });
 
-router.get("/localline/pull-jobs/:jobId", requireAdmin, (req, res) => {
-  const job = getLocalLinePullJob(req.params.jobId);
+router.get("/localline/pull-jobs/:jobId", requireAdmin, async (req, res) => {
+  const job = await getLocalLinePullJob(req.params.jobId);
   if (!job) {
     return res.status(404).json({ error: "Local Line pull job not found" });
   }
   return res.json({ job });
 });
 
-router.get("/localline/pull-jobs/latest/:datasetKey", requireAdmin, (req, res) => {
-  const job = getLatestLocalLinePullJob(req.params.datasetKey);
+router.get("/localline/pull-jobs/latest/:datasetKey", requireAdmin, async (req, res) => {
+  const job = await getLatestLocalLinePullJob(req.params.datasetKey);
   if (!job) {
     return res.status(404).json({ error: "No Local Line pull job found for this dataset" });
   }
@@ -6126,19 +6203,29 @@ router.get("/localline/status", requireAdmin, async (_req, res) => {
     ])
   );
 
+  const [latestProductsJob, latestFulfillmentsJob, latestOrdersJob, latestSubscriptionsJob, latestSubscriptionsHistoryJob, latestDashboardJob] =
+    await Promise.all([
+      getLatestLocalLineFullSyncJob(),
+      getLatestLocalLinePullJob("fulfillments"),
+      getLatestLocalLinePullJob("orders"),
+      getLatestLocalLinePullJob("subscriptions"),
+      getLatestLocalLinePullJob("subscriptions-history"),
+      getLatestLocalLinePullJob("dashboard")
+    ]);
+
   return res.json({
     products: {
       cachedProducts: Number(productSummaryRows?.[0]?.cachedProducts || 0),
       lastSyncedAt: productSummaryRows?.[0]?.lastSyncedAt || null,
       syncIssues: Number(syncIssueRows?.[0]?.syncIssues || 0),
-      latestJob: getLatestLocalLineFullSyncJob()
+      latestJob: latestProductsJob
     },
     fulfillments: {
       totalRows: Number(dropSiteSummaryRows?.[0]?.totalRows || 0),
       activeRows: Number(dropSiteSummaryRows?.[0]?.activeRows || 0),
       lastSyncedAt: dropSiteSummaryRows?.[0]?.lastSyncedAt || null,
       cursor: cursorByKey.fulfillments || null,
-      latestJob: getLatestLocalLinePullJob("fulfillments")
+      latestJob: latestFulfillmentsJob
     },
     orders: {
       totalRows: Number(orderSummaryRows?.[0]?.totalRows || 0),
@@ -6146,7 +6233,7 @@ router.get("/localline/status", requireAdmin, async (_req, res) => {
       latestUpdatedAt: orderSummaryRows?.[0]?.latestUpdatedAt || null,
       lastSyncedAt: orderSummaryRows?.[0]?.lastSyncedAt || null,
       cursor: cursorByKey.orders || null,
-      latestJob: getLatestLocalLinePullJob("orders"),
+      latestJob: latestOrdersJob,
       recentOrders
     },
     subscriptions: {
@@ -6154,13 +6241,13 @@ router.get("/localline/status", requireAdmin, async (_req, res) => {
       latestWeekEnd: subscriptionSummaryRows?.[0]?.latestWeekEnd || null,
       lastCapturedAt: subscriptionSummaryRows?.[0]?.lastCapturedAt || null,
       cursor: cursorByKey.subscriptions || null,
-      latestJob: getLatestLocalLinePullJob("subscriptions"),
+      latestJob: latestSubscriptionsJob,
       historyImportCursor: cursorByKey["subscriptions-history"] || null,
-      latestHistoryJob: getLatestLocalLinePullJob("subscriptions-history")
+      latestHistoryJob: latestSubscriptionsHistoryJob
     },
     dashboard: {
       cursor: cursorByKey.dashboard || null,
-      latestJob: getLatestLocalLinePullJob("dashboard")
+      latestJob: latestDashboardJob
     }
   });
 });
@@ -7368,8 +7455,8 @@ router.post("/localline/fulfillment-sync", requireAdminPermission(["dropsite_adm
     console.warn("Local Line schema bootstrap skipped for /admin/localline/fulfillment-sync:", error.message);
   });
 
-  const result = startLocalLinePullJob({
-    datasetKey: "fulfillments",
+    const result = await startLocalLinePullJob({
+      datasetKey: "fulfillments",
     datasetLabel: "Local Line fulfillment sync",
     phases: LOCAL_LINE_FULFILLMENT_JOB_PHASES,
     run: ({ reportProgress }) => syncLocalLineFulfillmentStrategiesToStore({ reportProgress })
@@ -7390,8 +7477,8 @@ router.post("/localline/orders-sync", requireAdminPermission("localline_pull"), 
   const cutoffDate =
     toDateOrNull(req.body?.cutoffDate) || new Date("2026-01-01T00:00:00.000Z");
 
-  const result = startLocalLinePullJob({
-    datasetKey: "orders",
+    const result = await startLocalLinePullJob({
+      datasetKey: "orders",
     datasetLabel: "Local Line order sync",
     phases: LOCAL_LINE_ORDER_JOB_PHASES,
     run: ({ reportProgress }) =>
@@ -7413,8 +7500,8 @@ router.post("/localline/subscriptions-sync", requireAdminPermission("localline_p
     console.warn("Local Line schema bootstrap skipped for /admin/localline/subscriptions-sync:", error.message);
   });
 
-  const result = startLocalLinePullJob({
-    datasetKey: "subscriptions",
+    const result = await startLocalLinePullJob({
+      datasetKey: "subscriptions",
     datasetLabel: "Local Line subscriber sync",
     phases: LOCAL_LINE_SUBSCRIPTION_JOB_PHASES,
     run: ({ reportProgress }) => syncLocalLineSubscriberSnapshotCache({ reportProgress })
@@ -7428,8 +7515,8 @@ router.post("/localline/subscriptions-import-history", requireAdminPermission("l
     console.warn("Local Line schema bootstrap skipped for /admin/localline/subscriptions-import-history:", error.message);
   });
 
-  const result = startLocalLinePullJob({
-    datasetKey: "subscriptions-history",
+    const result = await startLocalLinePullJob({
+      datasetKey: "subscriptions-history",
     datasetLabel: "Local Line subscriber history import",
     phases: LOCAL_LINE_SUBSCRIPTION_HISTORY_JOB_PHASES,
     run: ({ reportProgress }) => importLocalLineSubscriberHistory({ reportProgress })
@@ -7443,8 +7530,8 @@ router.post("/localline/push-dashboard", requireAdminPermission("localline_pull"
     console.warn("Local Line schema bootstrap skipped for /admin/localline/push-dashboard:", error.message);
   });
 
-  const result = startLocalLinePullJob({
-    datasetKey: "dashboard",
+    const result = await startLocalLinePullJob({
+      datasetKey: "dashboard",
     datasetLabel: "Local Line dashboard publish",
     phases: LOCAL_LINE_DASHBOARD_JOB_PHASES,
     run: ({ reportProgress }) => publishLocalLineDashboard({ reportProgress })
@@ -7539,7 +7626,7 @@ async function handleLocalLineFullSync(req, res) {
     const includePricelist = Boolean(req.body?.includePricelist);
     const forceFull = Boolean(req.body?.forceFull);
 
-    const result = startLocalLineFullSyncJob({
+    const result = await startLocalLineFullSyncJob({
       killdeerEnvPath: includePricelist ? process.env.LOCALLINE_AUDIT_KILLDEER_ENV || undefined : undefined,
       skipPricelist: !includePricelist,
       forceFull,
@@ -7560,15 +7647,15 @@ async function handleLocalLineFullSync(req, res) {
 router.post("/localline/full-sync", requireAdminPermission("localline_pull"), handleLocalLineFullSync);
 router.post("/localline/cache-sync", requireAdminPermission("localline_pull"), handleLocalLineFullSync);
 router.post("/localline/products-sync", requireAdminPermission("localline_pull"), handleLocalLineFullSync);
-router.get("/localline/full-sync", requireAdmin, (_req, res) => {
-  const job = getLatestLocalLineFullSyncJob();
+router.get("/localline/full-sync", requireAdmin, async (_req, res) => {
+  const job = await getLatestLocalLineFullSyncJob();
   if (!job) {
     return res.status(404).json({ error: "No Local Line full sync job found" });
   }
   return res.json({ job });
 });
-router.get("/localline/full-sync/:jobId", requireAdmin, (req, res) => {
-  const job = getLocalLineFullSyncJob(req.params.jobId);
+router.get("/localline/full-sync/:jobId", requireAdmin, async (req, res) => {
+  const job = await getLocalLineFullSyncJob(req.params.jobId);
   if (!job) {
     return res.status(404).json({ error: "Local Line full sync job not found" });
   }

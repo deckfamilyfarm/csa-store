@@ -34,6 +34,7 @@ import { ProductDetailSection } from "./ProductDetailSection.jsx";
 import { ProductGrid } from "./ProductGrid.jsx";
 import { RecipesSection } from "./RecipesSection.jsx";
 import { AdminPanel } from "./AdminPanel.jsx";
+import { MemberPortalSection } from "./MemberPortalSection.jsx";
 import { SeasonalHighlights } from "./SeasonalHighlights.jsx";
 import { SubscribePage } from "./SubscribePage.jsx";
 
@@ -63,6 +64,9 @@ function getStoreUrl() {
   if (typeof window === "undefined") return "https://store.deckfamilyfarm.com";
   const host = String(window.location.host || "").trim().toLowerCase();
   if (getExperienceMode() === "subscribe") {
+    if (host.includes("localhost") || host.includes("127.0.0.1")) {
+      return window.location.origin;
+    }
     return "https://fullfarmcsa.deckfamilyfarm.com/";
   }
   if (host.startsWith("store.")) return window.location.origin;
@@ -70,6 +74,20 @@ function getStoreUrl() {
     return `${window.location.origin}/#/home`;
   }
   return "https://store.deckfamilyfarm.com";
+}
+
+function getSubscribeAppUrl() {
+  if (typeof window === "undefined") return "https://subscribe.deckfamilyfarm.com/";
+  const host = String(window.location.host || "").trim().toLowerCase();
+  const path = String(window.location.pathname || "");
+  const query = String(window.location.search || "");
+  if (host.includes("localhost") || host.includes("127.0.0.1")) {
+    return `${window.location.origin}${path}?experience=subscribe`;
+  }
+  if (host.startsWith("subscribe.")) {
+    return `${window.location.origin}${path}${query}`;
+  }
+  return "https://subscribe.deckfamilyfarm.com/";
 }
 
 const SUBSCRIBE_DROP_SITES_CACHE_KEY = "subscribeDropSitesCache";
@@ -117,7 +135,7 @@ export function Storefront() {
     submitting: false
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [view, setView] = useState("home");
+  const [view, setView] = useState(experienceMode === "subscribe" ? "subscribe" : "home");
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -160,7 +178,13 @@ export function Storefront() {
     const raw = window.location.hash.replace(/^#\/?/, "").trim();
     if (!raw) return null;
     const route = raw.split("?")[0];
-    if (route === "admin" || route === "account" || route === "home" || route === "reset-password") {
+    if (
+      route === "admin" ||
+      route === "account" ||
+      route === "home" ||
+      route === "reset-password" ||
+      route === "subscribe"
+    ) {
       return route;
     }
     return null;
@@ -181,13 +205,21 @@ export function Storefront() {
         setView("resetPassword");
         return;
       }
-      setView(route === "account" ? "account" : "home");
+      if (route === "account") {
+        setView("account");
+        return;
+      }
+      if (route === "subscribe" || route === "home") {
+        setView("subscribe");
+        return;
+      }
+      setView(experienceMode === "subscribe" ? "subscribe" : "home");
     }
 
     syncView();
     window.addEventListener("hashchange", syncView);
     return () => window.removeEventListener("hashchange", syncView);
-  }, []);
+  }, [experienceMode]);
 
   useEffect(() => {
     reloadCatalog()
@@ -221,11 +253,11 @@ export function Storefront() {
         const route = getHashRoute();
         if (hasBackendAccess(data.user)) {
           localStorage.setItem("adminToken", userToken);
-          if (!route) {
+          if (!route && experienceMode !== "subscribe") {
             window.location.hash = "#/admin";
           }
-        } else if (!route) {
-          window.location.hash = "#/home";
+        } else if (!route && experienceMode !== "subscribe") {
+          window.location.hash = "#/subscribe";
         }
       })
       .catch(() => {
@@ -233,12 +265,21 @@ export function Storefront() {
         setUserToken("");
         setUser(null);
       });
-  }, [userToken]);
+  }, [userToken, experienceMode]);
 
   const isAccountView = view === "account";
   const isAdminView = view === "admin";
   const isResetPasswordView = view === "resetPassword";
   const showMemberCart = isMember && !isAdminView && !isResetPasswordView;
+
+  useEffect(() => {
+    if (experienceMode !== "subscribe" || view !== "account" || isMember || isResetPasswordView) {
+      return;
+    }
+    setLoginMode("login");
+    setLoginOpen(true);
+  }, [experienceMode, view, isMember, isResetPasswordView]);
+
   const activeCategory = catalog.categories.find(
     (category) => String(category.id) === String(selectedCategory)
   );
@@ -458,11 +499,19 @@ export function Storefront() {
       setUser(result.user || null);
       setLoginOpen(false);
       setLoginState({ username: "", password: "", error: "" });
+      const route = getHashRoute();
       if (hasBackendAccess(result.user)) {
         localStorage.setItem("adminToken", result.token);
-        window.location.hash = "#/admin";
+        if (route === "admin") {
+          window.location.hash = "#/admin";
+        } else if (experienceMode === "subscribe") {
+          window.location.hash = "#/account";
+        } else {
+          window.location.hash = "#/admin";
+        }
       } else {
-        window.location.hash = "#/home";
+        window.location.hash =
+          experienceMode === "subscribe" || route === "account" ? "#/account" : "#/subscribe";
       }
     } catch (err) {
       setLoginState((prev) => ({
@@ -523,53 +572,49 @@ export function Storefront() {
     localStorage.removeItem("adminToken");
     setUserToken("");
     setUser(null);
-    window.location.hash = "#/home";
+    window.location.hash = "#/subscribe";
   }
 
-  if (experienceMode === "subscribe") {
-    return (
-      <SubscribePage
-        dropSites={subscribeDropSites}
-        storeUrl={getStoreUrl()}
-      />
-    );
-  }
+  const subscribeAppUrl = getSubscribeAppUrl();
+  const currentStoreUrl = getStoreUrl();
 
   return (
     <div className="page">
       <main>
-        <div className="utility-bar">
-          <div className="brand">
-            <img src="/images/full-farm-csa-logo.png" alt={brand} />
-            <span className="brand-title">Full Farm CSA</span>
-          </div>
-          <div className="utility-actions">
-            {isMember ? (
-              <>
-                <a className={`button alt${isAccountView ? " selected" : ""}`} href="#/account">
-                  Member Settings
-                </a>
-                {isAdmin ? (
-                  <a className={`button alt${isAdminView ? " selected" : ""}`} href="#/admin">
-                    Administrator Settings
+        {experienceMode !== "subscribe" && view !== "subscribe" && !isAccountView ? (
+          <div className="utility-bar">
+            <div className="brand">
+              <img src="/images/full-farm-csa-logo.png" alt={brand} />
+              <span className="brand-title">Full Farm CSA</span>
+            </div>
+            <div className="utility-actions">
+              {isMember ? (
+                <>
+                  <a className={`button alt${isAccountView ? " selected" : ""}`} href="#/account">
+                    Member Settings
                   </a>
-                ) : null}
-                {showMemberCart ? (
-                  <button className="button alt" type="button">
-                    Cart (2)
-                  </button>
-                ) : null}
-              </>
-            ) : null}
-            <button
-              className="button"
-              type="button"
-              onClick={() => (isMember ? handleLogout() : setLoginOpen(true))}
-            >
-              {isMember ? "Log out" : "Log in"}
-            </button>
+                  {isAdmin ? (
+                    <a className={`button alt${isAdminView ? " selected" : ""}`} href="#/admin">
+                      Administrator Settings
+                    </a>
+                  ) : null}
+                  {showMemberCart ? (
+                    <button className="button alt" type="button">
+                      Cart (2)
+                    </button>
+                  ) : null}
+                </>
+              ) : null}
+              <button
+                className="button"
+                type="button"
+                onClick={() => (isMember ? handleLogout() : setLoginOpen(true))}
+              >
+                {isMember ? "Log out" : "Log in"}
+              </button>
+            </div>
           </div>
-        </div>
+        ) : null}
         {isAdminView ? (
           <AdminPanel onCatalogRefresh={reloadCatalog} />
         ) : isResetPasswordView ? (
@@ -608,7 +653,33 @@ export function Storefront() {
             </div>
           </section>
         ) : isAccountView ? (
-          <AccountPanelSection accountPanel={accountPanel} dropSite={dropSite} />
+          isMember ? (
+            <MemberPortalSection
+              token={userToken}
+              user={user}
+              onLogout={handleLogout}
+              subscribeUrl={`${subscribeAppUrl}#/subscribe`}
+              storeUrl={currentStoreUrl}
+              adminUrl={`${subscribeAppUrl}#/admin`}
+              canAccessAdmin={isAdmin}
+            />
+          ) : experienceMode === "subscribe" ? (
+            <SubscribePage
+              dropSites={subscribeDropSites}
+              portalBaseUrl={subscribeAppUrl}
+              isLoggedIn={isMember}
+              onAuthAction={() => (isMember ? handleLogout() : setLoginOpen(true))}
+            />
+          ) : (
+            <AccountPanelSection accountPanel={accountPanel} dropSite={dropSite} />
+          )
+        ) : experienceMode === "subscribe" || view === "subscribe" ? (
+          <SubscribePage
+            dropSites={subscribeDropSites}
+            portalBaseUrl={subscribeAppUrl}
+            isLoggedIn={isMember}
+            onAuthAction={() => (isMember ? handleLogout() : setLoginOpen(true))}
+          />
         ) : (
           <>
             {!isMember && <HeroSection hero={hero} showEyebrow={!isMember} showCard={!isMember} />}
@@ -807,7 +878,9 @@ export function Storefront() {
         </div>
       )}
 
-      <FooterSection brand={brand} />
+      {experienceMode !== "subscribe" && !isAccountView && !isAdminView ? (
+        <FooterSection brand={brand} />
+      ) : null}
 
       {selectedProduct && (
         <div className="modal-backdrop" onClick={() => setSelectedProduct(null)}>

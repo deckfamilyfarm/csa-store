@@ -4,12 +4,13 @@ import path from "path";
 import { fileURLToPath } from "url";
 import express from "express";
 import cors from "cors";
-import { ensureLocalLineSyncSchema, initDb } from "./db.js";
+import { ensureLocalLineSyncSchema, ensureSubscriptionPortalSchema, initDb } from "./db.js";
 import catalogRoutes from "./routes/catalog.js";
 import adminRoutes from "./routes/admin.js";
 import { ensureSeedAdmin } from "./scripts/seedAdmin.js";
 import { ensureSeedUser } from "./scripts/seedUser.js";
 import authRoutes from "./routes/auth.js";
+import memberRoutes, { stripeWebhookHandler } from "./routes/member.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -32,6 +33,7 @@ const port = Number(process.env.PORT || (serveFrontend ? 5176 : 5177));
 
 app.set("etag", false);
 app.use(cors());
+app.post("/api/member/stripe/webhook", express.raw({ type: "application/json" }), stripeWebhookHandler);
 app.use(express.json({ limit: "2mb" }));
 app.use("/api", (_req, res, next) => {
   res.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
@@ -43,6 +45,9 @@ app.use("/api", (_req, res, next) => {
 initDb();
 ensureLocalLineSyncSchema().catch((err) => {
   console.error("Local Line schema bootstrap failed:", err.message);
+});
+ensureSubscriptionPortalSchema().catch((err) => {
+  console.error("Subscription portal schema bootstrap failed:", err.message);
 });
 
 if (process.env.AUTO_SEED_ADMIN === "true") {
@@ -63,6 +68,7 @@ app.get("/api/health", (_req, res) => {
 
 app.use("/api", catalogRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/member", memberRoutes);
 app.use("/api/admin", adminRoutes);
 
 if (serveFrontend) {

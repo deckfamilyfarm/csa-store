@@ -66,6 +66,7 @@ router.post("/login", async (req, res) => {
         id: rows[0].id,
         username: rows[0].username,
         email: rows[0].email,
+        name: rows[0].name,
         role: rows[0].role,
         adminRoles
       }
@@ -172,6 +173,7 @@ router.get("/me", requireUser, async (req, res) => {
       id: rows[0].id,
       username: rows[0].username,
       email: rows[0].email,
+      name: rows[0].name,
       role: rows[0].role,
       adminRoles
     }

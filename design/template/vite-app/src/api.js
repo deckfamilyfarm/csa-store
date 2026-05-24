@@ -247,3 +247,169 @@ export async function changePassword(token, currentPassword, password) {
 export async function fetchMe(token) {
   return fetchJsonGet(`${base}/auth/me`, token, "Unauthorized");
 }
+
+export async function fetchMemberPortal(token) {
+  return fetchJsonGet(`${base}/member/portal`, token, "Unable to load member portal");
+}
+
+export async function createMemberSetupIntent(token) {
+  const response = await fetch(`${base}/member/setup-intent`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({})
+  });
+  if (!response.ok) await throwForError(response, "Unable to create payment setup intent");
+  return response.json();
+}
+
+export async function setMemberPaymentMethodDefault(token, paymentMethodId) {
+  const response = await fetch(`${base}/member/payment-method/default`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ paymentMethodId })
+  });
+  if (!response.ok) await throwForError(response, "Unable to set default payment method");
+  return response.json();
+}
+
+export async function deleteMemberPaymentMethod(token, paymentMethodId) {
+  const response = await fetch(`${base}/member/payment-method/delete`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ paymentMethodId })
+  });
+  if (!response.ok) await throwForError(response, "Unable to delete payment method");
+  return response.json();
+}
+
+export async function updateMemberSubscription(token, payload) {
+  const response = await fetch(`${base}/member/subscription`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload || {})
+  });
+  if (!response.ok) await throwForError(response, "Unable to update subscription");
+  return response.json();
+}
+
+export async function pauseMemberSubscription(token) {
+  const response = await fetch(`${base}/member/subscription/pause`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({})
+  });
+  if (!response.ok) await throwForError(response, "Unable to pause subscription");
+  return response.json();
+}
+
+export async function resumeMemberSubscription(token) {
+  const response = await fetch(`${base}/member/subscription/resume`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({})
+  });
+  if (!response.ok) await throwForError(response, "Unable to resume subscription");
+  return response.json();
+}
+
+export async function cancelMemberSubscription(token) {
+  const response = await fetch(`${base}/member/subscription/cancel`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({})
+  });
+  if (!response.ok) await throwForError(response, "Unable to cancel subscription");
+  return response.json();
+}
+
+export async function fetchMemberLocalLineLink(token) {
+  return fetchJsonGet(`${base}/member/localline-link`, token, "Unable to load Local Line link");
+}
+
+export async function loginMemberLocalLine(token, payload) {
+  const response = await fetch(`${base}/member/localline/login`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload || {})
+  });
+  if (!response.ok) await throwForError(response, "Unable to connect your Local Line account");
+  return response.json();
+}
+
+export async function requestMemberLocalLineCreate(token, payload) {
+  const response = await fetch(`${base}/member/localline/request-create`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload || {})
+  });
+  if (!response.ok) await throwForError(response, "Unable to save your Local Line setup request");
+  return response.json();
+}
+
+export async function fetchMemberLocalLineCustomer(token) {
+  return fetchJsonGet(
+    `${base}/member/localline/customer`,
+    token,
+    "Unable to load Local Line customer"
+  );
+}
+
+export async function fetchMemberLocalLineCredit(token, page = 1, pageSize = 25) {
+  const url = new URL(`${base}/member/localline/credit`, window.location.origin);
+  url.searchParams.set("page", String(page));
+  url.searchParams.set("page_size", String(pageSize));
+  return fetchJsonGet(url.toString(), token, "Unable to load Local Line credit");
+}
+
+export async function importMemberLocalLineLedger(token) {
+  const response = await fetch(`${base}/member/localline/import-ledger`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({})
+  });
+  if (!response.ok) await throwForError(response, "Unable to import Local Line ledger activity");
+  return response.json();
+}
+
+export async function saveMemberLocalLineLink(token, payload) {
+  const response = await fetch(`${base}/member/localline-link`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload || {})
+  });
+  if (!response.ok) await throwForError(response, "Unable to save Local Line link");
+  return response.json();
+}

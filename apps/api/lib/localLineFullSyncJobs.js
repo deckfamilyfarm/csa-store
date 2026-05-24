@@ -1,5 +1,10 @@
 import { randomUUID } from "crypto";
 import { runLocalLineFullSync } from "../scripts/syncLocalLineFull.js";
+import {
+  getLatestPersistedLocalLineJobRun,
+  getPersistedLocalLineJobRun,
+  persistLocalLineJobRun
+} from "./localLineJobStore.js";
 
 const PHASES = [
   { key: "catalog-sync", label: "Catalog Sync" },
@@ -12,6 +17,8 @@ const PHASES = [
 const jobs = new Map();
 let activeJobId = null;
 let latestJobId = null;
+const FULL_SYNC_DATASET_KEY = "products";
+const FULL_SYNC_JOB_TYPE = "full-sync";
 
 function buildPhases() {
   return PHASES.map((phase) => ({
@@ -92,6 +99,12 @@ function updateJobProgress(job, progress = {}) {
   if (Object.prototype.hasOwnProperty.call(progress, "total")) {
     phase.total = typeof progress.total === "number" ? progress.total : null;
   }
+
+  if (job.jobId) {
+    persistLocalLineJobRun(job).catch((error) => {
+      console.warn("Failed to persist Local Line full sync progress:", error?.message || error);
+    });
+  }
 }
 
 function finalizeRunningPhases(job, status, message) {
@@ -107,7 +120,7 @@ function finalizeRunningPhases(job, status, message) {
   });
 }
 
-export function startLocalLineFullSyncJob(options = {}) {
+export async function startLocalLineFullSyncJob(options = {}) {
   const runningJob = getActiveJob();
   if (runningJob) {
     return {
@@ -132,6 +145,9 @@ export function startLocalLineFullSyncJob(options = {}) {
       current: null,
       total: null
     },
+    datasetKey: FULL_SYNC_DATASET_KEY,
+    datasetLabel: "Local Line full product sync",
+    jobType: FULL_SYNC_JOB_TYPE,
     phases: buildPhases(),
     result: null,
     error: null
@@ -140,6 +156,7 @@ export function startLocalLineFullSyncJob(options = {}) {
   jobs.set(job.jobId, job);
   activeJobId = job.jobId;
   latestJobId = job.jobId;
+  await persistLocalLineJobRun(job);
 
   Promise.resolve()
     .then(async () => {
@@ -152,6 +169,7 @@ export function startLocalLineFullSyncJob(options = {}) {
         percent: 0,
         message: "Starting Local Line full sync"
       });
+      await persistLocalLineJobRun(job);
 
       const result = await runLocalLineFullSync({
         ...options,
@@ -169,6 +187,7 @@ export function startLocalLineFullSyncJob(options = {}) {
         message: "Local Line full sync complete"
       });
       finalizeRunningPhases(job, "completed");
+      await persistLocalLineJobRun(job);
       activeJobId = null;
     })
     .catch((error) => {
@@ -185,6 +204,9 @@ export function startLocalLineFullSyncJob(options = {}) {
         message: error?.message || "Local Line full sync failed"
       });
       finalizeRunningPhases(job, "failed", error?.message || "Local Line full sync failed");
+      persistLocalLineJobRun(job).catch((persistError) => {
+        console.warn("Failed to persist Local Line full sync failure:", persistError?.message || persistError);
+      });
       activeJobId = null;
     });
 
@@ -194,13 +216,16 @@ export function startLocalLineFullSyncJob(options = {}) {
   };
 }
 
-export function getLocalLineFullSyncJob(jobId) {
+export async function getLocalLineFullSyncJob(jobId) {
   const job = jobs.get(jobId);
-  return job ? cloneJob(job) : null;
+  if (job) return cloneJob(job);
+  return getPersistedLocalLineJobRun(jobId);
 }
 
-export function getLatestLocalLineFullSyncJob() {
-  if (!latestJobId) return null;
-  const job = jobs.get(latestJobId);
-  return job ? cloneJob(job) : null;
+export async function getLatestLocalLineFullSyncJob() {
+  if (latestJobId) {
+    const job = jobs.get(latestJobId);
+    if (job) return cloneJob(job);
+  }
+  return getLatestPersistedLocalLineJobRun(FULL_SYNC_DATASET_KEY, FULL_SYNC_JOB_TYPE);
 }

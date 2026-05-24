@@ -13,6 +13,7 @@ let vendorPricingSchemaPromise;
 let productPricingSchemaPromise;
 let subscriberCaptureSchemaPromise;
 let marketingSchemaPromise;
+let subscriptionPortalSchemaPromise;
 
 const SOURCE_PRICING_VENDOR_FACTOR_DEFAULT = 0.5412;
 
@@ -113,6 +114,21 @@ const SUBSCRIBER_CAPTURE_INDEX_STATEMENTS = [
 ];
 
 const SUBSCRIBER_CAPTURE_COLUMN_STATEMENTS = [
+  {
+    tableName: "subscribe_leads",
+    columnName: "member_user_id",
+    definition: "member_user_id INT"
+  },
+  {
+    tableName: "subscribe_leads",
+    columnName: "desired_billing_day_of_month",
+    definition: "desired_billing_day_of_month INT"
+  },
+  {
+    tableName: "subscribe_leads",
+    columnName: "activation_completed_at",
+    definition: "activation_completed_at DATETIME"
+  },
   {
     tableName: "subscribe_leads",
     columnName: "admin_notes",
@@ -411,6 +427,228 @@ const MARKETING_TABLE_STATEMENTS = [
       updated_at DATETIME
     )
   `
+];
+
+const SUBSCRIPTION_PORTAL_TABLE_STATEMENTS = [
+  `
+    CREATE TABLE IF NOT EXISTS subscription_settings (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      dividend_rate_percent DECIMAL(6, 3) DEFAULT 3.000,
+      herdshare_monthly_fee_cents INT DEFAULT 500,
+      created_at DATETIME,
+      updated_at DATETIME
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS member_profiles (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL,
+      subscribe_lead_id INT,
+      first_name VARCHAR(255) NOT NULL,
+      last_name VARCHAR(255) NOT NULL,
+      phone VARCHAR(64),
+      country VARCHAR(128),
+      address_line_1 VARCHAR(255),
+      address_line_2 VARCHAR(255),
+      city VARCHAR(255),
+      state_province VARCHAR(255),
+      postal_code VARCHAR(32),
+      geocoded_latitude DECIMAL(10, 7),
+      geocoded_longitude DECIMAL(10, 7),
+      geocoded_display_name VARCHAR(1024),
+      preferred_drop_site VARCHAR(255),
+      inside_home_delivery_area TINYINT(1) DEFAULT 0,
+      closest_drop_site VARCHAR(255),
+      closest_drop_site_address VARCHAR(1024),
+      closest_drop_site_distance_miles DECIMAL(10, 2),
+      referral_source TEXT,
+      notes TEXT,
+      local_line_setup_status VARCHAR(32),
+      local_line_setup_mode VARCHAR(32),
+      local_line_setup_note TEXT,
+      source_host VARCHAR(255),
+      source_path VARCHAR(255),
+      created_at DATETIME,
+      updated_at DATETIME
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS member_subscriptions (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL,
+      subscribe_lead_id INT,
+      plan_key VARCHAR(64) NOT NULL,
+      plan_amount_cents INT NOT NULL,
+      billing_day_of_month INT NOT NULL,
+      stripe_customer_id VARCHAR(255),
+      stripe_subscription_id VARCHAR(255),
+      status VARCHAR(32) DEFAULT 'pending_payment_method',
+      next_billing_date DATETIME,
+      current_period_start DATETIME,
+      current_period_end DATETIME,
+      paused_at DATETIME,
+      canceled_at DATETIME,
+      last_deposit_at DATETIME,
+      created_at DATETIME,
+      updated_at DATETIME
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS member_herdshare_statuses (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL,
+      monthly_fee_cents INT DEFAULT 500,
+      status VARCHAR(32) DEFAULT 'active',
+      next_billing_date DATETIME,
+      agreement_accepted TINYINT(1) DEFAULT 0,
+      agreement_signer_name VARCHAR(255),
+      agreement_document_url VARCHAR(2048),
+      agreement_record_url VARCHAR(2048),
+      signed_at DATETIME,
+      created_at DATETIME,
+      updated_at DATETIME
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS member_ledger_accounts (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL,
+      account_type VARCHAR(64) NOT NULL,
+      currency VARCHAR(3) DEFAULT 'USD',
+      created_at DATETIME,
+      updated_at DATETIME
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS member_ledger_entries (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      account_id INT NOT NULL,
+      user_id INT NOT NULL,
+      entry_type VARCHAR(64) NOT NULL,
+      amount_cents INT NOT NULL,
+      effective_date DATETIME NOT NULL,
+      reference_type VARCHAR(64),
+      reference_id VARCHAR(255),
+      description TEXT,
+      metadata_json TEXT,
+      created_at DATETIME,
+      updated_at DATETIME
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS member_external_account_links (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL,
+      provider VARCHAR(64) NOT NULL,
+      external_customer_id VARCHAR(255) NOT NULL,
+      external_email VARCHAR(255),
+      metadata_json TEXT,
+      linked_at DATETIME,
+      last_synced_at DATETIME,
+      created_at DATETIME,
+      updated_at DATETIME
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS member_credit_mirrors (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      external_link_id INT NOT NULL,
+      user_id INT NOT NULL,
+      provider VARCHAR(64) NOT NULL,
+      last_known_balance_cents INT DEFAULT 0,
+      last_order_synced_at DATETIME,
+      last_mirrored_at DATETIME,
+      last_ledger_import_at DATETIME,
+      last_ledger_imported_transaction_id VARCHAR(255),
+      last_ledger_imported_transaction_at DATETIME,
+      last_ledger_imported_balance_cents INT,
+      ledger_backfill_completed TINYINT DEFAULT 0,
+      last_ledger_import_error TEXT,
+      created_at DATETIME,
+      updated_at DATETIME
+    )
+  `
+];
+
+const SUBSCRIPTION_PORTAL_INDEX_STATEMENTS = [
+  {
+    tableName: "member_profiles",
+    indexName: "ux_member_profiles_user",
+    columns: "user_id",
+    unique: true
+  },
+  {
+    tableName: "member_profiles",
+    indexName: "idx_member_profiles_lead",
+    columns: "subscribe_lead_id"
+  },
+  {
+    tableName: "member_subscriptions",
+    indexName: "ux_member_subscriptions_user",
+    columns: "user_id",
+    unique: true
+  },
+  {
+    tableName: "member_subscriptions",
+    indexName: "ux_member_subscriptions_stripe",
+    columns: "stripe_subscription_id",
+    unique: true
+  },
+  {
+    tableName: "member_herdshare_statuses",
+    indexName: "ux_member_herdshare_user",
+    columns: "user_id",
+    unique: true
+  },
+  {
+    tableName: "member_ledger_accounts",
+    indexName: "ux_member_ledger_accounts_user_type",
+    columns: "user_id, account_type",
+    unique: true
+  },
+  {
+    tableName: "member_ledger_entries",
+    indexName: "idx_member_ledger_entries_account",
+    columns: "account_id"
+  },
+  {
+    tableName: "member_ledger_entries",
+    indexName: "idx_member_ledger_entries_user",
+    columns: "user_id"
+  },
+  {
+    tableName: "member_ledger_entries",
+    indexName: "idx_member_ledger_entries_reference",
+    columns: "reference_type, reference_id"
+  },
+  {
+    tableName: "member_ledger_entries",
+    indexName: "ux_member_ledger_entries_user_reference",
+    columns: "user_id, reference_type, reference_id",
+    unique: true
+  },
+  {
+    tableName: "member_ledger_entries",
+    indexName: "idx_member_ledger_entries_effective",
+    columns: "effective_date"
+  },
+  {
+    tableName: "member_external_account_links",
+    indexName: "ux_member_external_links_user_provider",
+    columns: "user_id, provider",
+    unique: true
+  },
+  {
+    tableName: "member_credit_mirrors",
+    indexName: "ux_member_credit_mirrors_link",
+    columns: "external_link_id",
+    unique: true
+  },
+  {
+    tableName: "member_credit_mirrors",
+    indexName: "idx_member_credit_mirrors_user_provider",
+    columns: "user_id, provider"
+  }
 ];
 
 const MARKETING_INDEX_STATEMENTS = [
@@ -864,6 +1102,28 @@ const LOCAL_LINE_TABLE_STATEMENTS = [
       summary_json TEXT,
       created_at DATETIME,
       updated_at DATETIME
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS local_line_job_runs (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      job_id VARCHAR(64) NOT NULL,
+      dataset_key VARCHAR(64) NOT NULL,
+      dataset_label VARCHAR(255),
+      job_type VARCHAR(32) NOT NULL,
+      status VARCHAR(32) NOT NULL,
+      progress_json LONGTEXT,
+      phases_json LONGTEXT,
+      result_json LONGTEXT,
+      error_json LONGTEXT,
+      created_at DATETIME,
+      started_at DATETIME,
+      finished_at DATETIME,
+      updated_at DATETIME,
+      UNIQUE KEY ux_local_line_job_runs_job_id (job_id),
+      KEY idx_local_line_job_runs_dataset_type (dataset_key, job_type),
+      KEY idx_local_line_job_runs_started (started_at),
+      KEY idx_local_line_job_runs_status (status)
     )
   `
 ];
@@ -1746,6 +2006,117 @@ async function runMarketingSchemaBootstrap(connection) {
   }
 }
 
+async function runSubscriptionPortalSchemaBootstrap(connection) {
+  for (const statement of SUBSCRIPTION_PORTAL_TABLE_STATEMENTS) {
+    await connection.query(statement);
+  }
+
+  const memberProfileColumnDefinitions = [
+    {
+      tableName: "member_profiles",
+      columnName: "local_line_setup_status",
+      definition: "local_line_setup_status VARCHAR(32)"
+    },
+    {
+      tableName: "member_profiles",
+      columnName: "local_line_setup_mode",
+      definition: "local_line_setup_mode VARCHAR(32)"
+    },
+    {
+      tableName: "member_profiles",
+      columnName: "local_line_setup_note",
+      definition: "local_line_setup_note TEXT"
+    },
+    {
+      tableName: "member_credit_mirrors",
+      columnName: "last_ledger_import_at",
+      definition: "last_ledger_import_at DATETIME"
+    },
+    {
+      tableName: "member_credit_mirrors",
+      columnName: "last_ledger_imported_transaction_id",
+      definition: "last_ledger_imported_transaction_id VARCHAR(255)"
+    },
+    {
+      tableName: "member_credit_mirrors",
+      columnName: "last_ledger_imported_transaction_at",
+      definition: "last_ledger_imported_transaction_at DATETIME"
+    },
+    {
+      tableName: "member_credit_mirrors",
+      columnName: "last_ledger_imported_balance_cents",
+      definition: "last_ledger_imported_balance_cents INT"
+    },
+    {
+      tableName: "member_credit_mirrors",
+      columnName: "ledger_backfill_completed",
+      definition: "ledger_backfill_completed TINYINT DEFAULT 0"
+    },
+    {
+      tableName: "member_credit_mirrors",
+      columnName: "last_ledger_import_error",
+      definition: "last_ledger_import_error TEXT"
+    }
+  ];
+
+  for (const columnDefinition of memberProfileColumnDefinitions) {
+    const exists = await columnExists(
+      connection,
+      columnDefinition.tableName,
+      columnDefinition.columnName
+    );
+    if (exists) continue;
+
+    await connection.query(
+      `ALTER TABLE ${columnDefinition.tableName} ADD COLUMN ${columnDefinition.definition}`
+    );
+  }
+
+  await connection.query(`
+    DELETE duplicate_entries
+    FROM member_ledger_entries AS duplicate_entries
+    INNER JOIN member_ledger_entries AS canonical_entries
+      ON duplicate_entries.user_id = canonical_entries.user_id
+      AND duplicate_entries.reference_type = canonical_entries.reference_type
+      AND duplicate_entries.reference_id = canonical_entries.reference_id
+      AND duplicate_entries.id < canonical_entries.id
+    WHERE duplicate_entries.reference_type = 'localline_credit_transaction'
+      AND duplicate_entries.reference_id IS NOT NULL
+  `);
+
+  for (const indexDefinition of SUBSCRIPTION_PORTAL_INDEX_STATEMENTS) {
+    const exists = await indexExists(
+      connection,
+      indexDefinition.tableName,
+      indexDefinition.indexName
+    );
+    if (exists) continue;
+
+    const uniqueClause = indexDefinition.unique ? "UNIQUE " : "";
+    await connection.query(
+      `CREATE ${uniqueClause}INDEX ${indexDefinition.indexName} ON ${indexDefinition.tableName} (${indexDefinition.columns})`
+    );
+  }
+
+  const [settingsRows] = await connection.query(
+    "SELECT id FROM subscription_settings ORDER BY id ASC LIMIT 1"
+  );
+  if (!settingsRows.length) {
+    const now = new Date();
+    await connection.query(
+      `
+        INSERT INTO subscription_settings (
+          dividend_rate_percent,
+          herdshare_monthly_fee_cents,
+          created_at,
+          updated_at
+        ) VALUES (?, ?, ?, ?)
+      `,
+      [3, 500, now, now]
+    );
+  }
+}
+
 export function initDb() {
   if (db) return db;
 
@@ -1874,6 +2245,22 @@ export async function ensureMarketingSchema(connection = getPool()) {
   }
 
   return runMarketingSchemaBootstrap(connection);
+}
+
+export async function ensureSubscriptionPortalSchema(connection = getPool()) {
+  if (connection === getPool()) {
+    if (!subscriptionPortalSchemaPromise) {
+      subscriptionPortalSchemaPromise = runSubscriptionPortalSchemaBootstrap(connection).catch(
+        (error) => {
+          subscriptionPortalSchemaPromise = null;
+          throw error;
+        }
+      );
+    }
+    return subscriptionPortalSchemaPromise;
+  }
+
+  return runSubscriptionPortalSchemaBootstrap(connection);
 }
 
 export function isMissingTableError(error, tableName = "") {
