@@ -578,10 +578,13 @@ export function SubscribePage({
         throw new Error("Please review and save the agreement before submitting.");
       }
       const plan = SUBSCRIBE_PLANS.find((entry) => entry.value === form.selectedPlan);
+      const { billingDayOfMonth, ...leadForm } = form;
       const response = await submitSubscribeLead({
-        ...form,
+        ...leadForm,
         selectedPlanLabel: plan?.title || form.selectedPlan,
-        billingDayOfMonth: Number(form.billingDayOfMonth || 1),
+        ...(SUBSCRIBE_PORTAL_ONBOARDING_ENABLED
+          ? { billingDayOfMonth: Number(billingDayOfMonth || 1) }
+          : {}),
         liabilityAgreementSignatureMode: "typed",
         liabilityAgreementSignatureDataUrl: "",
         sourceHost: window.location.host,
@@ -674,17 +677,21 @@ export function SubscribePage({
             </div>
 
             <div ref={formCardRef} className="subscribe-form-card card">
-              <div className="eyebrow">Get started</div>
-              <h2 className="h2">Personal information</h2>
-              <p className="small">
-                First, give us your name, email, phone number, address, and preferred plan.
-              </p>
+              {!status.success ? (
+                <>
+                  <div className="eyebrow">Get started</div>
+                  <h2 className="h2">Personal information</h2>
+                  <p className="small">
+                    First, give us your name, email, phone number, address, and preferred plan.
+                  </p>
+                </>
+              ) : null}
 
               {status.success ? (
                 <div className="subscribe-success">
-                  <h3>
-                    {SUBSCRIBE_PORTAL_ONBOARDING_ENABLED ? "Account created." : "Request received."}
-                  </h3>
+                  <h2 className="h2">
+                    {SUBSCRIBE_PORTAL_ONBOARDING_ENABLED ? "Account Created" : "Request Received"}
+                  </h2>
                   {SUBSCRIBE_PORTAL_ONBOARDING_ENABLED ? (
                     <p>
                       We recorded your subscription request and created your member account. Continue
@@ -973,17 +980,19 @@ export function SubscribePage({
                         ))}
                       </select>
                     </label>
-                    <label className="filter-field">
-                      <span className="small">Billing day of month</span>
-                      <input
-                        className="input"
-                        type="number"
-                        min="1"
-                        max="28"
-                        value={form.billingDayOfMonth}
-                        onChange={(event) => updateField("billingDayOfMonth", event.target.value)}
-                      />
-                    </label>
+                    {SUBSCRIBE_PORTAL_ONBOARDING_ENABLED ? (
+                      <label className="filter-field">
+                        <span className="small">Billing day of month</span>
+                        <input
+                          className="input"
+                          type="number"
+                          min="1"
+                          max="28"
+                          value={form.billingDayOfMonth}
+                          onChange={(event) => updateField("billingDayOfMonth", event.target.value)}
+                        />
+                      </label>
+                    ) : null}
                     <label className="filter-field">
                       <span className="small">Preferred pickup / delivery site</span>
                       <select

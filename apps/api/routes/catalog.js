@@ -1997,7 +1997,14 @@ router.post("/subscribe", async (req, res) => {
       payload.liabilityAgreementSignerName || `${firstName} ${lastName}`.trim()
     );
     const password = String(payload.password || "");
-    const desiredBillingDayOfMonth = normalizeBillingDay(payload.billingDayOfMonth, 1);
+    const hasSubmittedBillingDay =
+      payload.billingDayOfMonth !== null &&
+      typeof payload.billingDayOfMonth !== "undefined" &&
+      String(payload.billingDayOfMonth).trim() !== "";
+    const desiredBillingDayOfMonth =
+      portalOnboardingEnabled || hasSubmittedBillingDay
+        ? normalizeBillingDay(payload.billingDayOfMonth, 1)
+        : null;
     const submittedPlanKey = cleanString(payload.selectedPlan, 64);
     const selectedPlan = normalizePlanKey(submittedPlanKey);
     const agreementAccepted = Boolean(payload.liabilityAgreementAccepted);
