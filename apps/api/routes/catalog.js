@@ -43,7 +43,7 @@ import {
 import { requireUser } from "../middleware/auth.js";
 import { computeProductPricingSnapshot } from "../lib/productPricing.js";
 import { issueUserToken } from "../lib/authTokens.js";
-import { sendSubscribeLeadFollowupEmail, sendSubscribeLeadNotification } from "../lib/email.js";
+import { sendSubscribeLeadFollowupEmail } from "../lib/email.js";
 import {
   computeNextBillingDate,
   ensureMemberLedgerAccounts,
@@ -2286,14 +2286,10 @@ router.post("/subscribe", async (req, res) => {
       sourcePath
     };
 
-    void sendSubscribeLeadNotification({
+    void sendSubscribeLeadFollowupEmail({
       submittedAt: now,
       lead: notificationLead
     }).catch((error) => {
-      console.warn("Subscribe lead notification skipped:", error.message);
-    });
-
-    void sendSubscribeLeadFollowupEmail({ lead: notificationLead }).catch((error) => {
       console.warn("Subscribe lead follow-up email skipped:", error.message);
     });
 

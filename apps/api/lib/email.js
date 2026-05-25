@@ -87,6 +87,20 @@ function getSubscribeLoginUrl() {
   );
 }
 
+function getSubscribeLeadFromAddress() {
+  return process.env.SUBSCRIBE_LEAD_FROM || getSenderAddress() || "fullfarmcsa@deckfamilyfarm.com";
+}
+
+function getSubscribeLeadBccAddress() {
+  const addresses = [
+    "fullfarmcsa@deckfamilyfarm.com",
+    process.env.SUBSCRIBE_LEAD_NOTIFY_TO_BCC,
+    process.env.SUBSCRIBE_LEAD_NOTIFY_TO,
+    process.env.SUBSCRIBE_NOTIFY_TO
+  ];
+  return [...new Set(addresses.map((value) => String(value || "").trim()).filter(Boolean))].join(",");
+}
+
 function buildSubscriptionRequestIntro() {
   return {
     title: "One more step needed...",
@@ -97,7 +111,44 @@ function buildSubscriptionRequestIntro() {
   };
 }
 
-export async function sendSubscribeLeadFollowupEmail({ lead = {} }) {
+function buildSubscribeLeadFields(lead = {}, submittedAt) {
+  const leadName = [lead.firstName, lead.lastName].filter(Boolean).join(" ").trim();
+  const submittedLabel = formatMaybeDate(submittedAt) || "Unknown";
+  const address = formatAddress(lead);
+  return [
+    ["Submitted", submittedLabel],
+    ["Name", leadName],
+    ["Email", lead.email],
+    ["Phone", lead.phone],
+    ["Address", address],
+    ["Selected plan", lead.selectedPlanLabel || lead.selectedPlan],
+    ["Preferred pickup / delivery", lead.selectedDropSite],
+    ["Referral source", lead.referralSource],
+    ["Notes", lead.notes],
+    ["Agreement signer", lead.liabilityAgreementSignerName],
+    ["Agreement PDF", lead.liabilityAgreementRecordUrl]
+  ];
+}
+
+function renderSubmittedRows(fields = []) {
+  return fields
+    .map(([label, value]) => {
+      const displayed = displayValue(value);
+      const isAgreement = label === "Agreement PDF" && String(value || "").trim();
+      const valueHtml = isAgreement
+        ? `<a href="${escapeHtml(value)}">${escapeHtml(displayed)}</a>`
+        : escapeHtml(displayed);
+      return `
+        <tr>
+          <th align="left" valign="top" style="padding:4px 12px 4px 0;">${escapeHtml(label)}</th>
+          <td style="padding:4px 0; white-space:pre-line;">${valueHtml}</td>
+        </tr>
+      `;
+    })
+    .join("");
+}
+
+export async function sendSubscribeLeadFollowupEmail({ lead = {}, submittedAt }) {
   const transporter = createTransporter();
   if (!transporter) {
     console.warn("Subscribe lead follow-up email skipped: email is not configured.");
@@ -109,13 +160,18 @@ export async function sendSubscribeLeadFollowupEmail({ lead = {} }) {
     return { sent: false, reason: "Lead email is not configured." };
   }
 
-  const from = getSenderAddress();
+  const from = getSubscribeLeadFromAddress();
+  const bcc = String(getSubscribeLeadBccAddress() || "").trim();
   const intro = buildSubscriptionRequestIntro();
   const loginUrl = getSubscribeLoginUrl();
+  const fields = buildSubscribeLeadFields(lead, submittedAt);
+  const submittedText = fields.map(([label, value]) => `${label}: ${displayValue(value)}`).join("\n");
+  const submittedRows = renderSubmittedRows(fields);
 
   await transporter.sendMail({
     from,
     to,
+    bcc: bcc || undefined,
     subject: "New CSA subscription request received",
     text: [
       intro.title,
@@ -124,7 +180,11 @@ export async function sendSubscribeLeadFollowupEmail({ lead = {} }) {
       "",
       `LOGIN: ${loginUrl}`,
       "",
-      intro.footer
+      intro.footer,
+      "",
+      "What you submitted...",
+      "",
+      submittedText
     ].join("\n"),
     html: `
       <h2>${escapeHtml(intro.title)}</h2>
@@ -136,73 +196,8 @@ export async function sendSubscribeLeadFollowupEmail({ lead = {} }) {
       </p>
       <p><a href="${escapeHtml(loginUrl)}">${escapeHtml(loginUrl)}</a></p>
       <p>${escapeHtml(intro.footer)}</p>
-    `
-  });
-
-  return { sent: true };
-}
-
-export async function sendSubscribeLeadNotification({ lead = {}, submittedAt }) {
-  const transporter = createTransporter();
-  if (!transporter) {
-    console.warn("Subscribe lead notification skipped: email is not configured.");
-    return { sent: false, reason: "Email is not configured." };
-  }
-
-  const to = String(
-    process.env.SUBSCRIBE_LEAD_NOTIFY_TO ||
-      process.env.SUBSCRIBE_NOTIFY_TO ||
-      process.env.ADMIN_EMAIL ||
-      getSenderAddress()
-  ).trim();
-  if (!to) {
-    console.warn("Subscribe lead notification skipped: SUBSCRIBE_LEAD_NOTIFY_TO is not configured.");
-    return { sent: false, reason: "Notification recipient is not configured." };
-  }
-
-  const from = getSenderAddress();
-  const leadName = [lead.firstName, lead.lastName].filter(Boolean).join(" ").trim();
-  const submittedLabel = formatMaybeDate(submittedAt) || "Unknown";
-  const address = formatAddress(lead);
-  const subject = `New CSA subscription request: ${leadName || lead.email || "unknown"}`;
-  const fields = [
-    ["Submitted", submittedLabel],
-    ["Name", leadName],
-    ["Email", lead.email],
-    ["Phone", lead.phone],
-    ["Address", address],
-    ["Selected plan", lead.selectedPlanLabel || lead.selectedPlan],
-    ["Preferred pickup / delivery", lead.selectedDropSite],
-    ["Referral source", lead.referralSource],
-    ["Notes", lead.notes],
-    ["Agreement signer", lead.liabilityAgreementSignerName],
-    ["Agreement PDF", lead.liabilityAgreementRecordUrl],
-    ["Source", [lead.sourceHost, lead.sourcePath].filter(Boolean).join("")]
-  ];
-  const text = [
-    "A new Full Farm CSA subscription request was submitted.",
-    "",
-    ...fields.map(([label, value]) => `${label}: ${displayValue(value)}`)
-  ].join("\n");
-  const htmlRows = fields
-    .map(
-      ([label, value]) => `
-        <tr>
-          <th align="left" valign="top" style="padding:4px 12px 4px 0;">${escapeHtml(label)}</th>
-          <td style="padding:4px 0; white-space:pre-line;">${escapeHtml(displayValue(value))}</td>
-        </tr>
-      `
-    )
-    .join("");
-
-  await transporter.sendMail({
-    from,
-    to,
-    subject,
-    text,
-    html: `
-      <p>A new Full Farm CSA subscription request was submitted.</p>
-      <table>${htmlRows}</table>
+      <h3>What you submitted...</h3>
+      <table>${submittedRows}</table>
     `
   });
 

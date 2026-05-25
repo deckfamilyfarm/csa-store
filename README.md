@@ -58,7 +58,7 @@ Local testing
 
 Temporary portal toggles
 - By default, the subscribe page is in lightweight lead-capture mode: it gathers contact, address, plan, pickup/delivery, notes, and the signed agreement, then logs the lead without public portal onboarding.
-- Set `SUBSCRIBE_LEAD_NOTIFY_TO=admin@example.com` on the API to email new subscribe leads to an administrator. If it is not set, the API falls back to the configured sender address when possible.
+- Subscription request emails go to the submitted email address, include a `What you submitted` detail section, use `SUBSCRIBE_LEAD_FROM` if set, and always Bcc `fullfarmcsa@deckfamilyfarm.com` plus any `SUBSCRIBE_LEAD_NOTIFY_TO_BCC`, `SUBSCRIBE_LEAD_NOTIFY_TO`, or `SUBSCRIBE_NOTIFY_TO` values.
 - To restore the public member portal link and full subscribe-to-portal onboarding, set all three flags to `true`:
   - `VITE_MEMBER_PORTAL_LINK_ENABLED=true`
   - `VITE_SUBSCRIBE_PORTAL_ONBOARDING_ENABLED=true`
