@@ -79,7 +79,70 @@ function formatMaybeDate(value) {
   });
 }
 
-export async function sendSubscribeLeadNotification({ lead = {}, marketing = {}, submittedAt }) {
+function getSubscribeLoginUrl() {
+  return (
+    process.env.PUBLIC_SUBSCRIBE_LOGIN_URL ||
+    process.env.SUBSCRIBE_LOGIN_URL ||
+    "https://fullfarmcsa.deckfamilyfarm.com/"
+  );
+}
+
+function buildSubscriptionRequestIntro() {
+  return {
+    title: "One more step needed...",
+    body:
+      "In order to activate your Full Farm CSA Subscription, please create your account and add payment by clicking the LOGIN button below.",
+    footer:
+      "We will be reaching out shortly to confirm your subscription, but if you have any questions please don't hesitate to call us at 541-321-0925."
+  };
+}
+
+export async function sendSubscribeLeadFollowupEmail({ lead = {} }) {
+  const transporter = createTransporter();
+  if (!transporter) {
+    console.warn("Subscribe lead follow-up email skipped: email is not configured.");
+    return { sent: false, reason: "Email is not configured." };
+  }
+
+  const to = String(lead.email || "").trim();
+  if (!to) {
+    return { sent: false, reason: "Lead email is not configured." };
+  }
+
+  const from = getSenderAddress();
+  const intro = buildSubscriptionRequestIntro();
+  const loginUrl = getSubscribeLoginUrl();
+
+  await transporter.sendMail({
+    from,
+    to,
+    subject: "New CSA subscription request received",
+    text: [
+      intro.title,
+      "",
+      intro.body,
+      "",
+      `LOGIN: ${loginUrl}`,
+      "",
+      intro.footer
+    ].join("\n"),
+    html: `
+      <h2>${escapeHtml(intro.title)}</h2>
+      <p>${escapeHtml(intro.body)}</p>
+      <p>
+        <a href="${escapeHtml(loginUrl)}" style="display:inline-block;padding:12px 18px;background:#233427;color:#ffffff;text-decoration:none;font-weight:bold;">
+          LOGIN
+        </a>
+      </p>
+      <p><a href="${escapeHtml(loginUrl)}">${escapeHtml(loginUrl)}</a></p>
+      <p>${escapeHtml(intro.footer)}</p>
+    `
+  });
+
+  return { sent: true };
+}
+
+export async function sendSubscribeLeadNotification({ lead = {}, submittedAt }) {
   const transporter = createTransporter();
   if (!transporter) {
     console.warn("Subscribe lead notification skipped: email is not configured.");
@@ -101,7 +164,7 @@ export async function sendSubscribeLeadNotification({ lead = {}, marketing = {},
   const leadName = [lead.firstName, lead.lastName].filter(Boolean).join(" ").trim();
   const submittedLabel = formatMaybeDate(submittedAt) || "Unknown";
   const address = formatAddress(lead);
-  const subject = `New CSA subscribe request: ${leadName || lead.email || "unknown"}`;
+  const subject = `New CSA subscription request: ${leadName || lead.email || "unknown"}`;
   const fields = [
     ["Submitted", submittedLabel],
     ["Name", leadName],
@@ -114,19 +177,10 @@ export async function sendSubscribeLeadNotification({ lead = {}, marketing = {},
     ["Notes", lead.notes],
     ["Agreement signer", lead.liabilityAgreementSignerName],
     ["Agreement PDF", lead.liabilityAgreementRecordUrl],
-    ["Source", [lead.sourceHost, lead.sourcePath].filter(Boolean).join("")],
-    ["UTM source", marketing.utmSource],
-    ["UTM medium", marketing.utmMedium],
-    ["UTM campaign", marketing.utmCampaign],
-    ["UTM content", marketing.utmContent],
-    ["UTM term", marketing.utmTerm],
-    ["CSA link", marketing.csaLinkSlug],
-    ["CSA campaign", marketing.csaCampaignSlug],
-    ["CSA tracking token", marketing.csaTrackToken],
-    ["Attribution match", marketing.matchMethod]
+    ["Source", [lead.sourceHost, lead.sourcePath].filter(Boolean).join("")]
   ];
   const text = [
-    "A new Full Farm CSA subscribe request was submitted.",
+    "A new Full Farm CSA subscription request was submitted.",
     "",
     ...fields.map(([label, value]) => `${label}: ${displayValue(value)}`)
   ].join("\n");
@@ -147,7 +201,7 @@ export async function sendSubscribeLeadNotification({ lead = {}, marketing = {},
     subject,
     text,
     html: `
-      <p>A new Full Farm CSA subscribe request was submitted.</p>
+      <p>A new Full Farm CSA subscription request was submitted.</p>
       <table>${htmlRows}</table>
     `
   });

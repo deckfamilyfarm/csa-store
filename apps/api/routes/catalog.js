@@ -43,7 +43,7 @@ import {
 import { requireUser } from "../middleware/auth.js";
 import { computeProductPricingSnapshot } from "../lib/productPricing.js";
 import { issueUserToken } from "../lib/authTokens.js";
-import { sendSubscribeLeadNotification } from "../lib/email.js";
+import { sendSubscribeLeadFollowupEmail, sendSubscribeLeadNotification } from "../lib/email.js";
 import {
   computeNextBillingDate,
   ensureMemberLedgerAccounts,
@@ -2263,36 +2263,38 @@ router.post("/subscribe", async (req, res) => {
       });
     }
 
+    const notificationLead = {
+      firstName,
+      lastName,
+      email,
+      phone,
+      country: payload.country,
+      addressLine1,
+      addressLine2: payload.addressLine2,
+      city,
+      stateProvince,
+      postalCode,
+      selectedPlan: payload.selectedPlan,
+      selectedPlanLabel: payload.selectedPlanLabel,
+      desiredBillingDayOfMonth,
+      selectedDropSite: payload.selectedDropSite,
+      referralSource: payload.referralSource,
+      notes: payload.notes,
+      liabilityAgreementSignerName: signerName,
+      liabilityAgreementRecordUrl,
+      sourceHost: sourceHostHeader,
+      sourcePath
+    };
+
     void sendSubscribeLeadNotification({
       submittedAt: now,
-      lead: {
-        firstName,
-        lastName,
-        email,
-        phone,
-        country: payload.country,
-        addressLine1,
-        addressLine2: payload.addressLine2,
-        city,
-        stateProvince,
-        postalCode,
-        selectedPlan: payload.selectedPlan,
-        selectedPlanLabel: payload.selectedPlanLabel,
-        desiredBillingDayOfMonth,
-        selectedDropSite: payload.selectedDropSite,
-        referralSource: payload.referralSource,
-        notes: payload.notes,
-        liabilityAgreementSignerName: signerName,
-        liabilityAgreementRecordUrl,
-        sourceHost: sourceHostHeader,
-        sourcePath
-      },
-      marketing: {
-        ...marketingParams,
-        matchMethod: attribution.matchMethod || null
-      }
+      lead: notificationLead
     }).catch((error) => {
       console.warn("Subscribe lead notification skipped:", error.message);
+    });
+
+    void sendSubscribeLeadFollowupEmail({ lead: notificationLead }).catch((error) => {
+      console.warn("Subscribe lead follow-up email skipped:", error.message);
     });
 
     res.json({
