@@ -24,12 +24,16 @@ import {
   syncLocalLineFulfillmentStrategiesToStore,
   syncLocalLineOrdersToStore
 } from "../lib/localLineAutomationSync.js";
-import { persistLocalLineJobRun } from "../lib/localLineJobStore.js";
+import {
+  getPersistedLocalLineJobRun,
+  persistLocalLineJobRun
+} from "../lib/localLineJobStore.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const LOCK_NAME = "csa-store:localline-automation";
 const DEFAULT_ORDER_CUTOFF = "2026-01-01T00:00:00.000Z";
 const POLL_INTERVAL_MS = 5_000;
+const PERSIST_POLL_INTERVAL_MS = 500;
 const DEFAULT_TIMEOUT_MS = 3 * 60 * 60 * 1000;
 const DEFAULT_MAX_DASHBOARD_PREREQ_AGE_HOURS = 26;
 
@@ -271,6 +275,19 @@ async function waitForChildJob({
   throw new Error(`${phaseLabel} did not finish within ${Math.round(timeoutMs / 60000)} minutes.`);
 }
 
+async function waitForPersistedChildJob({ jobId, phaseLabel, timeoutMs }) {
+  const startedAt = Date.now();
+  while (Date.now() - startedAt < timeoutMs) {
+    const persisted = await getPersistedLocalLineJobRun(jobId);
+    if (persisted?.status === "completed") return persisted;
+    if (persisted?.status === "failed") {
+      throw new Error(persisted.error?.message || `${phaseLabel} failed before final persistence.`);
+    }
+    await sleep(PERSIST_POLL_INTERVAL_MS);
+  }
+  throw new Error(`${phaseLabel} completed but final job state was not persisted in time.`);
+}
+
 async function runChildJob({
   automationJob,
   phaseKey,
@@ -307,6 +324,11 @@ async function runChildJob({
     phaseLabel,
     timeoutMs
   });
+  const persistedFinished = await waitForPersistedChildJob({
+    jobId: childJob.jobId,
+    phaseLabel,
+    timeoutMs
+  });
   await updateAutomationJob(automationJob, {
     phaseKey,
     phaseLabel,
@@ -314,7 +336,7 @@ async function runChildJob({
     percent: 100,
     message: `${phaseLabel} complete`
   });
-  return finished;
+  return persistedFinished || finished;
 }
 
 export async function runLocalLineAutomation({ mode = "pull" } = {}) {
