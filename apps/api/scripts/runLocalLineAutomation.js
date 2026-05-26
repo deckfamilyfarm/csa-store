@@ -35,6 +35,7 @@ const DEFAULT_ORDER_CUTOFF = "2026-01-01T00:00:00.000Z";
 const POLL_INTERVAL_MS = 5_000;
 const PERSIST_POLL_INTERVAL_MS = 500;
 const DEFAULT_TIMEOUT_MS = 3 * 60 * 60 * 1000;
+const DEFAULT_PERSIST_TIMEOUT_MS = 15_000;
 const DEFAULT_MAX_DASHBOARD_PREREQ_AGE_HOURS = 26;
 
 function getArg(name, fallback = null) {
@@ -324,10 +325,16 @@ async function runChildJob({
     phaseLabel,
     timeoutMs
   });
+  if (finished?.status === "completed") {
+    await persistLocalLineJobRun(finished);
+  }
+  const persistTimeoutMs = Number(
+    process.env.LOCAL_LINE_AUTOMATION_PERSIST_TIMEOUT_MS || DEFAULT_PERSIST_TIMEOUT_MS
+  );
   const persistedFinished = await waitForPersistedChildJob({
     jobId: childJob.jobId,
     phaseLabel,
-    timeoutMs
+    timeoutMs: persistTimeoutMs
   });
   await updateAutomationJob(automationJob, {
     phaseKey,
