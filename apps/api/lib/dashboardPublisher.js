@@ -430,7 +430,7 @@ function buildDashboardRows(
       section: "COGS",
       rows: [
         {
-          label: "%  product markup",
+          label: "Average % product markup",
           entry: "AUTO",
           source: "Local DB reporting cache",
           valueType: "percent",
@@ -471,25 +471,19 @@ function buildDashboardRows(
           source: "Retail Sales - Purchase Cost",
           valueType: "currency",
           bold: true,
-          auto: (w) => getGrossProfit(w)
+          formula: ({ columnName, metricSheetRowsByLabel }) => {
+            const retailSalesRow = metricSheetRowsByLabel.get("Retail Sales");
+            const purchaseCostRow = metricSheetRowsByLabel.get("Purchase Cost");
+            return retailSalesRow && purchaseCostRow
+              ? `=${columnName}${retailSalesRow}-${columnName}${purchaseCostRow}`
+              : "";
+          }
         }
       ]
     },
     {
       section: "EXPENSES",
       rows: [
-        {
-          label: "$ Products Given",
-          entry: "MANUAL",
-          source: "Manual / TODO automation",
-          rowLabel: ["$ Products Given", "$ Product Credits Given"]
-        },
-        {
-          label: "Delivery Expenses",
-          entry: "MANUAL",
-          source: "Manual",
-          rowLabel: "Delivery Expenses"
-        },
         ...wageTaskRows,
         {
           label: "Total Wages",
@@ -509,6 +503,18 @@ function buildDashboardRows(
             if (!retailSales) return null;
             return (wages / retailSales) * 100;
           }
+        },
+        {
+          label: "$ Products Given",
+          entry: "MANUAL",
+          source: "Manual / TODO automation",
+          rowLabel: ["$ Products Given", "$ Product Credits Given"]
+        },
+        {
+          label: "Delivery Expenses",
+          entry: "MANUAL",
+          source: "Manual",
+          rowLabel: "Delivery Expenses"
         },
         {
           label: "Lease Charges",
