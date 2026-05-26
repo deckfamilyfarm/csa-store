@@ -306,6 +306,15 @@ function buildDashboardRows(
 ) {
   const yearlyAverageOrdersByYear = buildYearlyAverageMap(weeks, weeklyKpiMap, "numOrders");
   const yearlyAverageSalesByYear = buildYearlyAverageMap(weeks, weeklyKpiMap, "totalSales");
+  const getRetailSales = (week) => Number(weeklyKpiMap[week.start]?.totalSales || 0);
+  const getPurchaseCost = (week) => Number(vendorWeeklyMap[week.start]?.purchaseCost || 0);
+  const getGrossProfit = (week) => getRetailSales(week) - getPurchaseCost(week);
+  const getManualCurrency = (rowLabel, index) =>
+    parseCurrencyCell(getManualSourceValue(rowMap, rowLabel, index + 1));
+  const getExpenseTotal = (week, index) =>
+    getManualCurrency("$ Product Credits Given", index) +
+    Number(timesheetWeeklyMap[week.start]?.totalWages || 0) +
+    getManualCurrency("Other FFCSA operating costs Ops", index);
   const wageTaskRows = (Array.isArray(timesheetTaskLabels) ? timesheetTaskLabels : []).map(
     (taskLabel) => ({
       label: `Wages - ${taskLabel}`,
@@ -400,7 +409,8 @@ function buildDashboardRows(
           entry: "AUTO",
           source: "Local DB",
           valueType: "currency",
-          auto: (w) => Number(weeklyKpiMap[w.start]?.totalSales)
+          bold: true,
+          auto: (w) => getRetailSales(w)
         }
       ]
     },
@@ -408,12 +418,54 @@ function buildDashboardRows(
       section: "COGS",
       rows: [
         {
-          label: "PURCHASE COST",
+          label: "%  product markup",
+          entry: "AUTO",
+          source: "Local DB reporting cache",
+          valueType: "percent",
+          auto: (w) => {
+            const purchase = getPurchaseCost(w);
+            const retail = Number(vendorWeeklyMap[w.start]?.retailSales || 0);
+            if (!purchase) return null;
+            return ((retail - purchase) / purchase) * 100;
+          }
+        },
+        {
+          label: "Purchase Cost",
           entry: "AUTO",
           source: "Local DB reporting cache",
           valueType: "currency",
-          auto: (w) => Number(vendorWeeklyMap[w.start]?.purchaseCost)
+          bold: true,
+          auto: (w) => getPurchaseCost(w)
+        }
+      ]
+    },
+    {
+      section: "GROSS PROFIT",
+      rows: [
+        {
+          label: "GPPR %",
+          entry: "AUTO",
+          source: "Gross Profit Total / Retail Sales",
+          valueType: "percent",
+          auto: (w) => {
+            const retailSales = getRetailSales(w);
+            if (!retailSales) return null;
+            return (getGrossProfit(w) / retailSales) * 100;
+          }
         },
+        {
+          label: "Gross Profit Total",
+          entry: "AUTO",
+          source: "Retail Sales - Purchase Cost",
+          valueType: "currency",
+          bold: true,
+          auto: (w) => getGrossProfit(w)
+        }
+      ]
+    },
+    {
+      section: "EXPENSES",
+      rows: [
         {
           label: "$ Product Credits Given",
           entry: "MANUAL",
@@ -435,7 +487,7 @@ function buildDashboardRows(
           valueType: "percent",
           auto: (w) => {
             const wages = Number(timesheetWeeklyMap[w.start]?.totalWages || 0);
-            const retailSales = Number(weeklyKpiMap[w.start]?.totalSales || 0);
+            const retailSales = getRetailSales(w);
             if (!retailSales) return null;
             return (wages / retailSales) * 100;
           }
@@ -445,18 +497,19 @@ function buildDashboardRows(
           entry: "MANUAL",
           source: "Manual",
           rowLabel: "Other FFCSA operating costs Ops"
-        },
+        }
+      ]
+    },
+    {
+      section: "NET PROFIT",
+      rows: [
         {
-          label: "%  product markup",
+          label: "Net Profit Total",
           entry: "AUTO",
-          source: "Local DB reporting cache",
-          valueType: "percent",
-          auto: (w) => {
-            const purchase = Number(vendorWeeklyMap[w.start]?.purchaseCost || 0);
-            const retail = Number(vendorWeeklyMap[w.start]?.retailSales || 0);
-            if (!purchase) return null;
-            return ((retail - purchase) / purchase) * 100;
-          }
+          source: "Gross Profit Total - Expenses",
+          valueType: "currency",
+          bold: true,
+          auto: (w, index) => getGrossProfit(w) - getExpenseTotal(w, index)
         }
       ]
     }
@@ -483,7 +536,7 @@ function buildDashboardRows(
           continue;
         }
         if (row.entry === "AUTO") {
-          nextRow.push(normalizeAutoValue(row.valueType, row.auto ? row.auto(week) : null));
+          nextRow.push(normalizeAutoValue(row.valueType, row.auto ? row.auto(week, index) : null));
         } else {
           nextRow.push(getManualSourceValue(rowMap, row.rowLabel || row.label, index + 1));
         }
@@ -491,7 +544,8 @@ function buildDashboardRows(
       metricRows.push({
         rowIndex: values.length,
         valueType: row.valueType || null,
-        entry: row.entry
+        entry: row.entry,
+        bold: Boolean(row.bold)
       });
       values.push(nextRow);
     }
@@ -1480,6 +1534,20 @@ async function writeDashboardToSheet(accessToken, values, metricRows, sectionRow
         fields: "userEnteredFormat(backgroundColor,textFormat,horizontalAlignment)"
       }
     });
+
+    if (metric.bold) {
+      requests.push({
+        repeatCell: {
+          range: { sheetId, startRowIndex: metric.rowIndex, endRowIndex: metric.rowIndex + 1, startColumnIndex: 0, endColumnIndex: maxCols },
+          cell: {
+            userEnteredFormat: {
+              textFormat: { bold: true }
+            }
+          },
+          fields: "userEnteredFormat.textFormat.bold"
+        }
+      });
+    }
 
     let pattern = null;
     if (metric.valueType === "currency") pattern = "$#,##0.00";
