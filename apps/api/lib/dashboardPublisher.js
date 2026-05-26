@@ -1229,7 +1229,9 @@ function hexColor(hex) {
 }
 
 async function getSheetsAccessToken() {
-  const serviceAccountJson = getDashboardEnv("GOOGLE_SERVICE_ACCOUNT_JSON");
+  const serviceAccountJson =
+    getDashboardEnv("GOOGLE_SERVICE_ACCOUNT_JSON") ||
+    getDashboardEnv("GOOGLE_APPLICATION_CREDENTIALS");
   const directAccessToken = getDashboardEnv("GOOGLE_SHEETS_ACCESS_TOKEN");
   const googleClientId = getDashboardEnv("GOOGLE_CLIENT_ID");
   const googleClientSecret = getDashboardEnv("GOOGLE_CLIENT_SECRET");

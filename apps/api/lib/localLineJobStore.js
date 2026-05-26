@@ -56,8 +56,13 @@ async function ensureInterruptedJobsReconciled() {
   reconcilePromise = (async () => {
     const pool = getPool();
     const now = new Date();
+    const staleSeconds = Math.max(
+      60,
+      Number.parseInt(process.env.LOCAL_LINE_JOB_STALE_SECONDS || "1800", 10) || 1800
+    );
+    const staleBefore = new Date(now.getTime() - staleSeconds * 1000);
     const interruptedError = JSON.stringify({
-      message: "API server restarted before this Local Line job completed."
+      message: "No Local Line job progress was recorded before the stale-job timeout."
     });
     await pool.query(
       `
@@ -71,8 +76,9 @@ async function ensureInterruptedJobsReconciled() {
             ELSE error_json
           END
         WHERE status IN ('queued', 'running')
+          AND COALESCE(updated_at, started_at, created_at) < ?
       `,
-      [now, now, interruptedError]
+      [now, now, interruptedError, staleBefore]
     );
     reconciledInterruptedJobs = true;
   })().finally(() => {

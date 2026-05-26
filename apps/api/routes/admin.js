@@ -63,6 +63,11 @@ import {
   getLocalLinePullJob,
   startLocalLinePullJob
 } from "../lib/localLinePullJobs.js";
+import { getLatestPersistedLocalLineJobRun } from "../lib/localLineJobStore.js";
+import {
+  syncLocalLineFulfillmentStrategiesToStore as runLocalLineFulfillmentSync,
+  syncLocalLineOrdersToStore as runLocalLineOrdersSync
+} from "../lib/localLineAutomationSync.js";
 import {
   getLatestLocalLineFullSyncJob,
   getLocalLineFullSyncJob,
@@ -6203,15 +6208,23 @@ router.get("/localline/status", requireAdmin, async (_req, res) => {
     ])
   );
 
-  const [latestProductsJob, latestFulfillmentsJob, latestOrdersJob, latestSubscriptionsJob, latestSubscriptionsHistoryJob, latestDashboardJob] =
-    await Promise.all([
-      getLatestLocalLineFullSyncJob(),
-      getLatestLocalLinePullJob("fulfillments"),
-      getLatestLocalLinePullJob("orders"),
-      getLatestLocalLinePullJob("subscriptions"),
-      getLatestLocalLinePullJob("subscriptions-history"),
-      getLatestLocalLinePullJob("dashboard")
-    ]);
+  const [
+    latestProductsJob,
+    latestFulfillmentsJob,
+    latestOrdersJob,
+    latestSubscriptionsJob,
+    latestSubscriptionsHistoryJob,
+    latestDashboardJob,
+    latestAutomationJob
+  ] = await Promise.all([
+    getLatestLocalLineFullSyncJob(),
+    getLatestLocalLinePullJob("fulfillments"),
+    getLatestLocalLinePullJob("orders"),
+    getLatestLocalLinePullJob("subscriptions"),
+    getLatestLocalLinePullJob("subscriptions-history"),
+    getLatestLocalLinePullJob("dashboard"),
+    getLatestPersistedLocalLineJobRun("automation", "pipeline")
+  ]);
 
   return res.json({
     products: {
@@ -6248,6 +6261,9 @@ router.get("/localline/status", requireAdmin, async (_req, res) => {
     dashboard: {
       cursor: cursorByKey.dashboard || null,
       latestJob: latestDashboardJob
+    },
+    automation: {
+      latestJob: latestAutomationJob
     }
   });
 });
@@ -7459,7 +7475,7 @@ router.post("/localline/fulfillment-sync", requireAdminPermission(["dropsite_adm
       datasetKey: "fulfillments",
     datasetLabel: "Local Line fulfillment sync",
     phases: LOCAL_LINE_FULFILLMENT_JOB_PHASES,
-    run: ({ reportProgress }) => syncLocalLineFulfillmentStrategiesToStore({ reportProgress })
+    run: ({ reportProgress }) => runLocalLineFulfillmentSync({ reportProgress })
   });
 
   return res.status(result.alreadyRunning ? 200 : 202).json(result);
@@ -7482,7 +7498,7 @@ router.post("/localline/orders-sync", requireAdminPermission("localline_pull"), 
     datasetLabel: "Local Line order sync",
     phases: LOCAL_LINE_ORDER_JOB_PHASES,
     run: ({ reportProgress }) =>
-      syncLocalLineOrdersToStore({
+      runLocalLineOrdersSync({
         reportProgress,
         cutoffDate
       })

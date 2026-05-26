@@ -2639,6 +2639,10 @@ export function AdminPanel({ onCatalogRefresh }) {
     localLineSubscriptionHistoryState.data || localLineStatus?.subscriptions?.latestHistoryJob || null;
   const dashboardJob =
     localLineDashboardState.data || localLineStatus?.dashboard?.latestJob || null;
+  const automationJob = localLineStatus?.automation?.latestJob || null;
+  const automationRunning =
+    automationJob?.status === "queued" || automationJob?.status === "running";
+  const automationMode = automationJob?.result?.mode || "Not run yet";
   const dashboardCursorSummary = parseJsonObject(localLineStatus?.dashboard?.cursor?.summaryJson);
   const dashboardWarnings = Array.isArray(dashboardCursorSummary?.warnings)
     ? dashboardCursorSummary.warnings
@@ -2675,6 +2679,15 @@ export function AdminPanel({ onCatalogRefresh }) {
   const dashboardPushRunning =
     dashboardJob?.status === "queued" || dashboardJob?.status === "running";
   const localLineJobSections = [
+    {
+      key: "automation",
+      title: "Automation",
+      startedAt: automationJob?.startedAt || "",
+      content: renderLocalLinePullJobContent(
+        { data: automationJob },
+        "No Local Line automation has run yet."
+      )
+    },
     {
       key: "products",
       title: "Pull Products",
@@ -4998,6 +5011,18 @@ export function AdminPanel({ onCatalogRefresh }) {
                 <div className="small">{localLineStatusState.error}</div>
               ) : null}
               <div className="audit-summary-grid">
+                <div className="response-card">
+                  <div className="title">Automation</div>
+                  <div className="small">Schedule: 3:40 AM PT daily pull</div>
+                  <div className="small">Dashboard: 4:35 AM PT Monday publish</div>
+                  <div className="small">Latest mode: {automationMode}</div>
+                  <div className="small">Latest status: {automationJob?.status || "Never run"}</div>
+                  <div className="small">Last started: {automationJob?.startedAt || "Never"}</div>
+                  {automationJob?.error?.message ? (
+                    <div className="small">Error: {automationJob.error.message}</div>
+                  ) : null}
+                  {automationRunning ? <div className="small">Automation is running.</div> : null}
+                </div>
                 <div className="response-card">
                   <div className="title">Products</div>
                   <div className="small">Rows stored locally: {Number(localLineStatus?.products?.cachedProducts || 0)}</div>
