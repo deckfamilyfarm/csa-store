@@ -167,6 +167,17 @@ function normalizeAutoValue(valueType, value) {
   return value;
 }
 
+function getSheetColumnName(zeroBasedIndex) {
+  let index = Number(zeroBasedIndex) + 1;
+  let name = "";
+  while (index > 0) {
+    const remainder = (index - 1) % 26;
+    name = String.fromCharCode(65 + remainder) + name;
+    index = Math.floor((index - 1) / 26);
+  }
+  return name;
+}
+
 function buildSubscriberSnapshotKey(row) {
   const planNumber = String(row["Plan #"] || "").trim();
   if (planNumber) return `plan:${planNumber}`;
@@ -218,8 +229,15 @@ function getSnapCustomerKeySql(alias = "o") {
 }
 
 function getManualSourceValue(rowMap, rowLabel, weekColIdx) {
-  const row = rowMap[rowLabel] || [];
-  return row[weekColIdx] || "";
+  const labels = Array.isArray(rowLabel) ? rowLabel : [rowLabel];
+  for (const label of labels) {
+    const row = rowMap[label] || [];
+    const value = row[weekColIdx];
+    if (value !== null && typeof value !== "undefined" && String(value).trim() !== "") {
+      return value;
+    }
+  }
+  return "";
 }
 
 function getMinimumYmd(values = []) {
@@ -309,12 +327,6 @@ function buildDashboardRows(
   const getRetailSales = (week) => Number(weeklyKpiMap[week.start]?.totalSales || 0);
   const getPurchaseCost = (week) => Number(vendorWeeklyMap[week.start]?.purchaseCost || 0);
   const getGrossProfit = (week) => getRetailSales(week) - getPurchaseCost(week);
-  const getManualCurrency = (rowLabel, index) =>
-    parseCurrencyCell(getManualSourceValue(rowMap, rowLabel, index + 1));
-  const getExpenseTotal = (week, index) =>
-    getManualCurrency("$ Product Credits Given", index) +
-    Number(timesheetWeeklyMap[week.start]?.totalWages || 0) +
-    getManualCurrency("Other FFCSA operating costs Ops", index);
   const wageTaskRows = (Array.isArray(timesheetTaskLabels) ? timesheetTaskLabels : []).map(
     (taskLabel) => ({
       label: `Wages - ${taskLabel}`,
@@ -467,10 +479,16 @@ function buildDashboardRows(
       section: "EXPENSES",
       rows: [
         {
-          label: "$ Product Credits Given",
+          label: "$ Products Given",
           entry: "MANUAL",
           source: "Manual / TODO automation",
-          rowLabel: "$ Product Credits Given"
+          rowLabel: ["$ Products Given", "$ Product Credits Given"]
+        },
+        {
+          label: "Delivery Expenses",
+          entry: "MANUAL",
+          source: "Manual",
+          rowLabel: "Delivery Expenses"
         },
         ...wageTaskRows,
         {
@@ -493,10 +511,44 @@ function buildDashboardRows(
           }
         },
         {
-          label: "Other FFCSA operating costs Ops",
+          label: "Lease Charges",
           entry: "MANUAL",
           source: "Manual",
-          rowLabel: "Other FFCSA operating costs Ops"
+          rowLabel: "Lease Charges"
+        },
+        {
+          label: "Utilities",
+          entry: "MANUAL",
+          source: "Manual",
+          rowLabel: "Utilities"
+        },
+        {
+          label: "Other FFCSA operating costs",
+          entry: "MANUAL",
+          source: "Manual",
+          rowLabel: ["Other FFCSA operating costs", "Other FFCSA operating costs Ops"]
+        },
+        {
+          label: "Total Expenses",
+          entry: "AUTO",
+          source: "SUM($ Products Given, Delivery Expenses, Total Wages, Lease Charges, Utilities, Other FFCSA operating costs)",
+          valueType: "currency",
+          bold: true,
+          formula: ({ columnName, metricSheetRowsByLabel }) => {
+            const rowLabels = [
+              "$ Products Given",
+              "Delivery Expenses",
+              "Total Wages",
+              "Lease Charges",
+              "Utilities",
+              "Other FFCSA operating costs"
+            ];
+            const refs = rowLabels
+              .map((label) => metricSheetRowsByLabel.get(label))
+              .filter(Boolean)
+              .map((rowNumber) => `${columnName}${rowNumber}`);
+            return refs.length ? `=SUM(${refs.join(",")})` : "";
+          }
         }
       ]
     },
@@ -506,10 +558,16 @@ function buildDashboardRows(
         {
           label: "Net Profit Total",
           entry: "AUTO",
-          source: "Gross Profit Total - Expenses",
+          source: "Gross Profit Total - Total Expenses",
           valueType: "currency",
           bold: true,
-          auto: (w, index) => getGrossProfit(w) - getExpenseTotal(w, index)
+          formula: ({ columnName, metricSheetRowsByLabel }) => {
+            const grossProfitRow = metricSheetRowsByLabel.get("Gross Profit Total");
+            const totalExpensesRow = metricSheetRowsByLabel.get("Total Expenses");
+            return grossProfitRow && totalExpensesRow
+              ? `=${columnName}${grossProfitRow}-${columnName}${totalExpensesRow}`
+              : "";
+          }
         }
       ]
     }
@@ -518,6 +576,7 @@ function buildDashboardRows(
   const values = [];
   const metricRows = [];
   const sectionRows = [];
+  const metricSheetRowsByLabel = new Map();
   const now = new Date().toISOString().replace("T", " ").slice(0, 19);
   values.push([`FFCSA Dashboard Auto 2026`, `Updated ${now}`, "", "", ...weeks.map((w) => w.label)]);
   values.push(["Section", "Metric", "Entry Type", "Source", ...weeks.map((w) => w.label)]);
@@ -526,6 +585,8 @@ function buildDashboardRows(
     sectionRows.push(values.length);
     values.push([group.section, "", "", "", ...weeks.map(() => "")]);
     for (const row of group.rows) {
+      const sheetRowNumber = values.length + 1;
+      metricSheetRowsByLabel.set(row.label, sheetRowNumber);
       const nextRow = ["", row.label, row.entry, row.source];
       for (let index = 0; index < weeks.length; index += 1) {
         const week = weeks[index];
@@ -535,7 +596,14 @@ function buildDashboardRows(
           nextRow.push("");
           continue;
         }
-        if (row.entry === "AUTO") {
+        if (typeof row.formula === "function") {
+          nextRow.push(row.formula({
+            week,
+            weekIndex: index,
+            columnName: getSheetColumnName(index + 4),
+            metricSheetRowsByLabel
+          }));
+        } else if (row.entry === "AUTO") {
           nextRow.push(normalizeAutoValue(row.valueType, row.auto ? row.auto(week, index) : null));
         } else {
           nextRow.push(getManualSourceValue(rowMap, row.rowLabel || row.label, index + 1));
