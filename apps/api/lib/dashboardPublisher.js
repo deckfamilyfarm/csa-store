@@ -10,7 +10,7 @@ import { getLocalLineAccessToken, getLocalLineBaseUrl } from "../localLineAuth.j
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const repoRoot = path.resolve(__dirname, "../..");
+const repoRoot = path.resolve(__dirname, "../../..");
 const legacyEnvPath =
   process.env.LOCALLINE_DASHBOARD_ENV_PATH ||
   "/Users/jdeck/code/ffcsa_scripts/localline/.env";
