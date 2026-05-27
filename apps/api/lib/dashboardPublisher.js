@@ -57,6 +57,19 @@ const LOCAL_LINE_RETRY_ATTEMPTS = Math.max(
   1,
   Number.parseInt(process.env.LOCALLINE_FETCH_RETRY_ATTEMPTS || "2", 10) || 2
 );
+const PACK_WAGES_SALES_CHART_TITLE = "Pack Wages % and Retail Sales by Week";
+const PACK_WAGES_SALES_CHART_LEGACY_TITLES = ["Pack Wages vs Retail Sales", "Pack Wages by Week"];
+const PACK_WAGES_SALES_CHART_HEIGHT_PX = 420;
+const PACK_WAGES_SALES_CHART_WIDTH_PX = 900;
+const PACK_WAGES_SALES_CHART_MIN_WEEK_START = "2026-02-09";
+const DASHBOARD_WEEKLY_LEASE_CHARGES = 375;
+const DASHBOARD_WEEKLY_UTILITIES = 56;
+// TODO: Move fixed dashboard expense assumptions to dated config so weekly changes,
+// increases, and historical values can be handled without code edits.
+const DASHBOARD_FIXED_EXPENSE_NOTE =
+  "Hard-coded weekly value for now. TODO: move to dated config so weekly changes, increases, and historical values can be handled without code edits.";
+const DASHBOARD_MANUAL_DELIVERY_EXPENSE_NOTE =
+  "MANUAL row: dashboard publishing copies existing weekly values back by row label. TODO: keep this durable if row labels or weekly structure change.";
 
 function parseDashboardIdList(value) {
   return String(value || "")
@@ -327,7 +340,21 @@ function buildDashboardRows(
   const getRetailSales = (week) => Number(weeklyKpiMap[week.start]?.totalSales || 0);
   const getPurchaseCost = (week) => Number(vendorWeeklyMap[week.start]?.purchaseCost || 0);
   const getGrossProfit = (week) => getRetailSales(week) - getPurchaseCost(week);
-  const wageTaskRows = (Array.isArray(timesheetTaskLabels) ? timesheetTaskLabels : []).map(
+  const packWageTaskLabels = [
+    "Packout",
+    "Delivery",
+    "Dairy and Frozen Packing",
+    "Pick Ups"
+  ];
+  const packWageMetricLabels = packWageTaskLabels.map((taskLabel) => "Wages - " + taskLabel);
+  const packWageNote = "Attributes used: Wages - Packout; Wages - Delivery; Wages - Dairy and Frozen Packing; Wages - Pick Ups.";
+  const wageTaskLabels = [
+    ...new Set([
+      ...(Array.isArray(timesheetTaskLabels) ? timesheetTaskLabels : []),
+      ...packWageTaskLabels
+    ])
+  ];
+  const wageTaskRows = wageTaskLabels.map(
     (taskLabel) => ({
       label: `Wages - ${taskLabel}`,
       entry: "AUTO",
@@ -493,7 +520,7 @@ function buildDashboardRows(
           auto: (w) => Number(timesheetWeeklyMap[w.start]?.totalWages || 0)
         },
         {
-          label: "% Wages to Overall Sales",
+          label: "% Wages to Retail Sales",
           entry: "AUTO",
           source: "Timesheets total wages / dashboard retail sales",
           valueType: "percent",
@@ -505,6 +532,39 @@ function buildDashboardRows(
           }
         },
         {
+          label: "% Pack Wages to Retail Sales",
+          entry: "AUTO",
+          source: "Selected Timesheets task wages / dashboard retail sales",
+          valueType: "percent",
+          note: packWageNote,
+          formula: ({ columnName, metricSheetRowsByLabel }) => {
+            const retailSalesRow = metricSheetRowsByLabel.get("Retail Sales");
+            const refs = packWageMetricLabels
+              .map((label) => metricSheetRowsByLabel.get(label))
+              .filter(Boolean)
+              .map((rowNumber) => columnName + rowNumber);
+            return refs.length && retailSalesRow
+              ? `=IFERROR(SUM(${refs.join(",")})/${columnName}${retailSalesRow},"")`
+              : "";
+          }
+        },
+        {
+          label: "Lease Charges",
+          entry: "AUTO",
+          source: "Fixed weekly dashboard assumption",
+          valueType: "currency",
+          note: DASHBOARD_FIXED_EXPENSE_NOTE,
+          auto: () => DASHBOARD_WEEKLY_LEASE_CHARGES
+        },
+        {
+          label: "Utilities",
+          entry: "AUTO",
+          source: "Fixed weekly dashboard assumption",
+          valueType: "currency",
+          note: DASHBOARD_FIXED_EXPENSE_NOTE,
+          auto: () => DASHBOARD_WEEKLY_UTILITIES
+        },
+        {
           label: "$ Products Given",
           entry: "MANUAL",
           source: "Manual / TODO automation",
@@ -513,20 +573,9 @@ function buildDashboardRows(
         {
           label: "Delivery Expenses",
           entry: "MANUAL",
-          source: "Manual",
+          source: "Manual (copied from existing dashboard values by row label)",
+          note: DASHBOARD_MANUAL_DELIVERY_EXPENSE_NOTE,
           rowLabel: "Delivery Expenses"
-        },
-        {
-          label: "Lease Charges",
-          entry: "MANUAL",
-          source: "Manual",
-          rowLabel: "Lease Charges"
-        },
-        {
-          label: "Utilities",
-          entry: "MANUAL",
-          source: "Manual",
-          rowLabel: "Utilities"
         },
         {
           label: "Other FFCSA operating costs",
@@ -584,7 +633,7 @@ function buildDashboardRows(
   const sectionRows = [];
   const metricSheetRowsByLabel = new Map();
   const now = new Date().toISOString().replace("T", " ").slice(0, 19);
-  values.push([`FFCSA Dashboard Auto 2026`, `Updated ${now}`, "", "", ...weeks.map((w) => w.label)]);
+  values.push([`FFCSA Dashboard 2026`, `Updated ${now}`, "", "", ...weeks.map(() => "")]);
   values.push(["Section", "Metric", "Entry Type", "Source", ...weeks.map((w) => w.label)]);
 
   for (const group of layout) {
@@ -619,13 +668,40 @@ function buildDashboardRows(
         rowIndex: values.length,
         valueType: row.valueType || null,
         entry: row.entry,
-        bold: Boolean(row.bold)
+        bold: Boolean(row.bold),
+        note: row.note || null
       });
       values.push(nextRow);
     }
   }
 
-  return { values, metricRows, sectionRows };
+  let packWagesSalesChart = null;
+  const retailSalesRowNumber = metricSheetRowsByLabel.get("Retail Sales");
+  const packWagesRowNumber = metricSheetRowsByLabel.get("% Pack Wages to Retail Sales");
+  const weekStartColumnIndex = 4;
+  const chartWeekOffset = weeks.findIndex((week) => week.start >= PACK_WAGES_SALES_CHART_MIN_WEEK_START);
+  const chartStartColumnIndex = chartWeekOffset >= 0
+    ? weekStartColumnIndex + chartWeekOffset
+    : values[0]?.length || weekStartColumnIndex;
+  const weekEndColumnIndex = values[0]?.length || weekStartColumnIndex;
+
+  if (retailSalesRowNumber && packWagesRowNumber && weekEndColumnIndex > chartStartColumnIndex) {
+    const blankRow = ["", "", "", "", ...weeks.map(() => "")];
+    values.push(blankRow);
+
+    packWagesSalesChart = {
+      title: PACK_WAGES_SALES_CHART_TITLE,
+      weekLabelRowIndex: 1,
+      retailSalesRowIndex: retailSalesRowNumber - 1,
+      packWagesRowIndex: packWagesRowNumber - 1,
+      startColumnIndex: chartStartColumnIndex,
+      endColumnIndex: weekEndColumnIndex,
+      anchorRowIndex: values.length + 1,
+      anchorColumnIndex: 0
+    };
+  }
+
+  return { values, metricRows, sectionRows, packWagesSalesChart };
 }
 
 async function loadDashboardPublishAvailability() {
@@ -1451,15 +1527,18 @@ async function sheetsRequest(accessToken, method, url, body) {
   return response.json().catch(() => ({}));
 }
 
-async function getOrCreateSheetProperties(accessToken, spreadsheetId, title) {
+async function getOrCreateSheetMetadata(accessToken, spreadsheetId, title) {
   const meta = await sheetsRequest(
     accessToken,
     "GET",
-    `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?fields=sheets.properties`
+    `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?fields=sheets(properties,charts(chartId,spec/title))`
   );
   const match = (meta.sheets || []).find((sheet) => sheet?.properties?.title === title);
   if (match?.properties?.sheetId || match?.properties?.sheetId === 0) {
-    return match.properties;
+    return {
+      properties: match.properties,
+      charts: match.charts || []
+    };
   }
   const created = await sheetsRequest(
     accessToken,
@@ -1469,19 +1548,105 @@ async function getOrCreateSheetProperties(accessToken, spreadsheetId, title) {
       requests: [{ addSheet: { properties: { title } } }]
     }
   );
-  return created?.replies?.[0]?.addSheet?.properties || null;
+  return {
+    properties: created?.replies?.[0]?.addSheet?.properties || null,
+    charts: []
+  };
 }
 
-async function writeDashboardToSheet(accessToken, values, metricRows, sectionRows) {
-  const sheetProperties = await getOrCreateSheetProperties(
+function buildPackWagesSalesChartRequests(sheetId, chartConfig) {
+  const sourceRowRange = (rowIndex) => ({
+    sheetId,
+    startRowIndex: rowIndex,
+    endRowIndex: rowIndex + 1,
+    startColumnIndex: chartConfig.startColumnIndex,
+    endColumnIndex: chartConfig.endColumnIndex
+  });
+
+  return [
+    {
+      addChart: {
+        chart: {
+          spec: {
+            title: chartConfig.title,
+            basicChart: {
+              chartType: "COMBO",
+              legendPosition: "NO_LEGEND",
+              headerCount: 0,
+              axis: [
+                { position: "BOTTOM_AXIS", title: "Week" },
+                { position: "LEFT_AXIS", title: "% Pack Wages to Retail Sales" },
+                { position: "RIGHT_AXIS", title: "Retail Sales" }
+              ],
+              domains: [
+                {
+                  domain: {
+                    sourceRange: { sources: [sourceRowRange(chartConfig.weekLabelRowIndex)] }
+                  }
+                }
+              ],
+              series: [
+                {
+                  series: {
+                    sourceRange: { sources: [sourceRowRange(chartConfig.retailSalesRowIndex)] }
+                  },
+                  targetAxis: "RIGHT_AXIS",
+                  type: "COLUMN"
+                },
+                {
+                  series: {
+                    sourceRange: { sources: [sourceRowRange(chartConfig.packWagesRowIndex)] }
+                  },
+                  targetAxis: "LEFT_AXIS",
+                  type: "LINE",
+                  lineStyle: { type: "SOLID", width: 3 },
+                  pointStyle: { size: 5, shape: "CIRCLE" }
+                }
+              ]
+            }
+          },
+          position: {
+            overlayPosition: {
+              anchorCell: {
+                sheetId,
+                rowIndex: chartConfig.anchorRowIndex,
+                columnIndex: chartConfig.anchorColumnIndex
+              },
+              offsetXPixels: 0,
+              offsetYPixels: 0,
+              widthPixels: PACK_WAGES_SALES_CHART_WIDTH_PX,
+              heightPixels: PACK_WAGES_SALES_CHART_HEIGHT_PX
+            }
+          }
+        }
+      }
+    }
+  ];
+}
+
+async function writeDashboardToSheet(
+  accessToken,
+  values,
+  metricRows,
+  sectionRows,
+  packWagesSalesChart
+) {
+  const sheetMetadata = await getOrCreateSheetMetadata(
     accessToken,
     DASHBOARD_SHEET_ID,
     DASHBOARD_TARGET_TITLE
   );
+  const sheetProperties = sheetMetadata.properties;
   const sheetId = Number(sheetProperties?.sheetId);
   const maxCols = values[0]?.length || 1;
   const maxRows = values.length || 1;
-  const gridRowCount = Math.max(Number(sheetProperties?.gridProperties?.rowCount || 0), maxRows, 1);
+  const chartGridRowCount = packWagesSalesChart ? packWagesSalesChart.anchorRowIndex + 24 : 0;
+  const gridRowCount = Math.max(
+    Number(sheetProperties?.gridProperties?.rowCount || 0),
+    maxRows,
+    chartGridRowCount,
+    1
+  );
   const gridColumnCount = Math.max(Number(sheetProperties?.gridProperties?.columnCount || 0), maxCols, 1);
   const titleMergeEndCol = Math.min(4, maxCols);
 
@@ -1507,9 +1672,14 @@ async function writeDashboardToSheet(accessToken, values, metricRows, sectionRow
       updateSheetProperties: {
         properties: {
           sheetId,
-          gridProperties: { frozenRowCount: 2, frozenColumnCount: 4 }
+          gridProperties: {
+            frozenRowCount: 2,
+            frozenColumnCount: 4,
+            rowCount: gridRowCount,
+            columnCount: gridColumnCount
+          }
         },
-        fields: "gridProperties.frozenRowCount,gridProperties.frozenColumnCount"
+        fields: "gridProperties.frozenRowCount,gridProperties.frozenColumnCount,gridProperties.rowCount,gridProperties.columnCount"
       }
     },
     {
@@ -1533,6 +1703,14 @@ async function writeDashboardToSheet(accessToken, values, metricRows, sectionRow
       }
     }
   ];
+
+  requests.push({
+    repeatCell: {
+      range: { sheetId, startRowIndex: 0, endRowIndex: gridRowCount, startColumnIndex: 1, endColumnIndex: 2 },
+      cell: { note: "" },
+      fields: "note"
+    }
+  });
 
   if (titleMergeEndCol > 1) {
     requests.push({
@@ -1594,6 +1772,7 @@ async function writeDashboardToSheet(accessToken, values, metricRows, sectionRow
     });
   });
 
+
   metricRows.forEach((metric) => {
     requests.push({
       repeatCell: {
@@ -1608,6 +1787,16 @@ async function writeDashboardToSheet(accessToken, values, metricRows, sectionRow
         fields: "userEnteredFormat(backgroundColor,textFormat,horizontalAlignment)"
       }
     });
+
+    if (metric.note) {
+      requests.push({
+        repeatCell: {
+          range: { sheetId, startRowIndex: metric.rowIndex, endRowIndex: metric.rowIndex + 1, startColumnIndex: 1, endColumnIndex: 2 },
+          cell: { note: metric.note },
+          fields: "note"
+        }
+      });
+    }
 
     if (metric.bold) {
       requests.push({
@@ -1682,6 +1871,21 @@ async function writeDashboardToSheet(accessToken, values, metricRows, sectionRow
       fields: "pixelSize"
     }
   });
+
+  (sheetMetadata.charts || [])
+    .filter((chart) =>
+      [PACK_WAGES_SALES_CHART_TITLE, ...PACK_WAGES_SALES_CHART_LEGACY_TITLES]
+        .includes(chart?.spec?.title)
+    )
+    .forEach((chart) => {
+      if (Number.isFinite(Number(chart.chartId))) {
+        requests.push({ deleteEmbeddedObject: { objectId: Number(chart.chartId) } });
+      }
+    });
+
+  if (packWagesSalesChart) {
+    requests.push(...buildPackWagesSalesChartRequests(sheetId, packWagesSalesChart));
+  }
 
   await sheetsRequest(
     accessToken,
@@ -2275,7 +2479,7 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       buildTimesheetWeeklyMap(weeks)
     ]);
 
-    const { values, metricRows, sectionRows } = buildDashboardRows(
+    const { values, metricRows, sectionRows, packWagesSalesChart } = buildDashboardRows(
       weeks,
       rowMap,
       weeklyKpiMap,
@@ -2314,7 +2518,13 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
     });
 
     const accessToken = await getSheetsAccessToken();
-    await writeDashboardToSheet(accessToken, values, metricRows, sectionRows);
+    await writeDashboardToSheet(
+      accessToken,
+      values,
+      metricRows,
+      sectionRows,
+      packWagesSalesChart
+    );
 
     const finishedAt = new Date();
     const summary = {
