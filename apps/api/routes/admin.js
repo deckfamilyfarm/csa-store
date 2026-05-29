@@ -8154,16 +8154,42 @@ router.post("/products/bulk-update", requireAdminPermission(["inventory_admin", 
           .select()
           .from(productPricingProfiles)
           .where(eq(productPricingProfiles.productId, productId));
+        const existingProfileRow = existingProfile[0] || null;
+        const existingProfileOnSale =
+          existingProfileRow &&
+          existingProfileRow.onSale !== null &&
+          typeof existingProfileRow.onSale !== "undefined"
+            ? Number(existingProfileRow.onSale || 0)
+            : null;
+        const existingProfileSaleDiscount =
+          existingProfileRow &&
+          existingProfileRow.saleDiscount !== null &&
+          typeof existingProfileRow.saleDiscount !== "undefined"
+            ? Number(existingProfileRow.saleDiscount)
+            : null;
+        const profileSaleChanged =
+          syncPricingProfileSale &&
+          (
+            !existingProfileRow ||
+            existingProfileOnSale !== nextOnSale ||
+            (
+              existingProfileSaleDiscount === null || nextSaleDiscount === null
+                ? existingProfileSaleDiscount !== nextSaleDiscount
+                : Number(existingProfileSaleDiscount.toFixed(4)) !== Number(nextSaleDiscount.toFixed(4))
+            )
+          );
+        const shouldMarkSaleRemoteSyncPending =
+          syncPricingProfileSale && (saleChanged || profileSaleChanged);
 
         const profileUpdatePayload = {
           remoteSyncStatus: shouldQueueRemoteSync ? "pending" : undefined,
           remoteSyncMessage: shouldQueueRemoteSync
             ? "Local changes updated. Apply to remote store pending."
             : undefined,
-          updatedAt: shouldQueueRemoteSync || saleChanged ? new Date() : undefined
+          updatedAt: shouldQueueRemoteSync || saleChanged || profileSaleChanged ? new Date() : undefined
         };
 
-        if (syncPricingProfileSale && saleChanged) {
+        if (shouldMarkSaleRemoteSyncPending) {
           profileUpdatePayload.onSale = nextOnSale;
           profileUpdatePayload.saleDiscount = nextSaleDiscount;
           profileUpdatePayload.priceChangedAt = new Date();
