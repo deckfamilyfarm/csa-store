@@ -17,11 +17,13 @@ export function DeckPageHeader({
             alt="Deck Family Farm logo"
           />
         </a>
-        <div className="subscribe-header-utility">
-          <button className="subscribe-auth-link" type="button" onClick={onAuthAction}>
-            {authLabel}
-          </button>
-        </div>
+        {authLabel && onAuthAction ? (
+          <div className="subscribe-header-utility">
+            <button className="subscribe-auth-link" type="button" onClick={onAuthAction}>
+              {authLabel}
+            </button>
+          </div>
+        ) : null}
         <button
           className={`subscribe-mobile-menu-button${mobileMenuOpen ? " open" : ""}`}
           type="button"
@@ -34,16 +36,33 @@ export function DeckPageHeader({
           <span />
         </button>
         <nav className={`subscribe-nav${mobileMenuOpen ? " mobile-open" : ""}`}>
-          {navLinks.map((link) => (
-            <a
-              key={`${link.label}-${link.href}`}
-              className="subscribe-nav-single"
-              href={link.href}
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              {link.label}
-            </a>
-          ))}
+          {navLinks.map((link) =>
+            Array.isArray(link.children) && link.children.length > 0 ? (
+              <div key={link.label} className="subscribe-nav-group">
+                <span className="subscribe-nav-group-title">{link.label}</span>
+                <div className="subscribe-nav-group-links">
+                  {link.children.map((child) => (
+                    <a
+                      key={`${link.label}-${child.label}-${child.href}`}
+                      href={child.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {child.label}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <a
+                key={`${link.label}-${link.href}`}
+                className="subscribe-nav-single"
+                href={link.href}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {link.label}
+              </a>
+            )
+          )}
         </nav>
       </div>
     </header>

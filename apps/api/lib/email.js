@@ -1,4 +1,20 @@
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 import nodemailer from "nodemailer";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const SUBSCRIBE_ACCOUNT_SCREENSHOT_CID = "subscribe-account-menu-image";
+const SUBSCRIBE_PAYMENT_SCREENSHOT_CID = "subscribe-add-payment-image";
+const DEFAULT_SUBSCRIBE_ACCOUNT_SCREENSHOT_PATH = path.resolve(
+  __dirname,
+  "../assets/subscribe-account-menu.png"
+);
+const DEFAULT_SUBSCRIBE_PAYMENT_SCREENSHOT_PATH = path.resolve(
+  __dirname,
+  "../assets/subscribe-add-payment.png"
+);
 
 function escapeHtml(value) {
   return String(value || "")
@@ -103,12 +119,71 @@ function getSubscribeLeadBccAddress() {
 
 function buildSubscriptionRequestIntro() {
   return {
-    title: "One more step needed...",
-    body:
-      "In order to activate your Full Farm CSA Subscription, please create your account and add payment by clicking the LOGIN button below.",
-    footer:
-      "We will be reaching out shortly to confirm your subscription, but if you have any questions please don't hesitate to call us at 541-321-0925."
+    title: "Almost there! Please take these steps to complete your subscription:",
+    body: "To activate your Full Farm Subscription, please complete these steps:",
+    accountStep: "Create your account in our store:",
+    accountButtonLabel: "Create Store Account",
+    paymentStep: "Please add payment in the account menu:",
+    confirmationStep:
+      "Look for the subscription confirmation email within 24 hours with full description of how to place your first order.",
+    questions:
+      "Questions? If you have any questions please don't hesitate to call or text us at 541-321-0925.",
+    signoff: "Sincerely,\n\nFull Farm CSA"
   };
+}
+
+function getConfiguredAssetPath(envKey, fallbackPath) {
+  const configuredPath = process.env[envKey];
+  if (!configuredPath) return fallbackPath;
+  return path.isAbsolute(configuredPath)
+    ? configuredPath
+    : path.resolve(process.cwd(), configuredPath);
+}
+
+function buildSubscribeLeadAttachments() {
+  const imageConfigs = [
+    {
+      filename: "subscribe-account-menu.png",
+      path: getConfiguredAssetPath(
+        "SUBSCRIBE_LEAD_ACCOUNT_SCREENSHOT_PATH",
+        DEFAULT_SUBSCRIBE_ACCOUNT_SCREENSHOT_PATH
+      ),
+      cid: SUBSCRIBE_ACCOUNT_SCREENSHOT_CID
+    },
+    {
+      filename: "subscribe-add-payment.png",
+      path: getConfiguredAssetPath(
+        "SUBSCRIBE_LEAD_PAYMENT_SCREENSHOT_PATH",
+        DEFAULT_SUBSCRIBE_PAYMENT_SCREENSHOT_PATH
+      ),
+      cid: SUBSCRIBE_PAYMENT_SCREENSHOT_CID
+    }
+  ];
+
+  return imageConfigs
+    .filter((image) => image.path && fs.existsSync(image.path))
+    .map((image) => ({
+      ...image,
+      contentType: "image/png"
+    }));
+}
+
+function renderSubscribePaymentScreenshotsHtml(attachments = []) {
+  const images = attachments
+    .filter((attachment) =>
+      [SUBSCRIBE_ACCOUNT_SCREENSHOT_CID, SUBSCRIBE_PAYMENT_SCREENSHOT_CID].includes(attachment.cid)
+    )
+    .map((attachment) =>
+      [
+        "<td style=\"padding:0 10px 10px 0;vertical-align:top;\">",
+        `<img src="cid:${attachment.cid}" alt="Account payment step screenshot" style="display:block;max-width:245px;width:100%;height:auto;border:1px solid #e6e0d8;border-radius:8px;" />`,
+        "</td>"
+      ].join("")
+    )
+    .join("");
+
+  if (!images) return "";
+  return `<table role="presentation" style="border-collapse:collapse;margin:12px 0 0;"><tr>${images}</tr></table>`;
 }
 
 function buildSubscribeLeadFields(lead = {}, submittedAt) {
@@ -167,20 +242,31 @@ export async function sendSubscribeLeadFollowupEmail({ lead = {}, submittedAt })
   const fields = buildSubscribeLeadFields(lead, submittedAt);
   const submittedText = fields.map(([label, value]) => `${label}: ${displayValue(value)}`).join("\n");
   const submittedRows = renderSubmittedRows(fields);
+  const attachments = buildSubscribeLeadAttachments();
+  const paymentScreenshotsHtml = renderSubscribePaymentScreenshotsHtml(attachments);
 
   await transporter.sendMail({
     from,
     to,
     bcc: bcc || undefined,
-    subject: "New CSA subscription request received",
+    subject: "Almost there! Complete your Full Farm Subscription",
     text: [
       intro.title,
       "",
       intro.body,
       "",
-      `LOGIN: ${loginUrl}`,
+      `1. ${intro.accountStep}`,
       "",
-      intro.footer,
+      `${intro.accountButtonLabel}: ${loginUrl}`,
+      "or click on this link: " + loginUrl,
+      "",
+      "2. " + intro.paymentStep,
+      "",
+      "3. " + intro.confirmationStep,
+      "",
+      intro.questions,
+      "",
+      intro.signoff,
       "",
       "What you submitted...",
       "",
@@ -189,16 +275,30 @@ export async function sendSubscribeLeadFollowupEmail({ lead = {}, submittedAt })
     html: `
       <h2>${escapeHtml(intro.title)}</h2>
       <p>${escapeHtml(intro.body)}</p>
-      <p>
-        <a href="${escapeHtml(loginUrl)}" style="display:inline-block;padding:12px 18px;background:#233427;color:#ffffff;text-decoration:none;font-weight:bold;">
-          LOGIN
-        </a>
-      </p>
-      <p><a href="${escapeHtml(loginUrl)}">${escapeHtml(loginUrl)}</a></p>
-      <p>${escapeHtml(intro.footer)}</p>
+      <ol style="padding-left:22px;">
+        <li style="margin-bottom:18px;">
+          <p>${escapeHtml(intro.accountStep)}</p>
+          <p>
+            <a href="${escapeHtml(loginUrl)}" style="display:inline-block;padding:12px 18px;background:#233427;color:#ffffff;text-decoration:none;font-weight:bold;">
+              ${escapeHtml(intro.accountButtonLabel)}
+            </a>
+          </p>
+          <p>or click on this link: <a href="${escapeHtml(loginUrl)}">${escapeHtml(loginUrl)}</a></p>
+        </li>
+        <li style="margin-bottom:18px;">
+          <p>${escapeHtml(intro.paymentStep)}</p>
+          ${paymentScreenshotsHtml}
+        </li>
+        <li style="margin-bottom:18px;">
+          <p>${escapeHtml(intro.confirmationStep)}</p>
+        </li>
+      </ol>
+      <p>${escapeHtml(intro.questions)}</p>
+      <p style="white-space:pre-line;">${escapeHtml(intro.signoff)}</p>
       <h3>What you submitted...</h3>
       <table>${submittedRows}</table>
-    `
+    `,
+    attachments
   });
 
   return { sent: true };

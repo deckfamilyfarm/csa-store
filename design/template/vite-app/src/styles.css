@@ -407,15 +407,17 @@ img {
   position: relative;
 }
 
+.subscribe-nav-group-title,
 .subscribe-nav-single {
-  font-family: var(--serif);
-  font-size: 20px;
+  display: block;
+  font-family: "Tomarik Extrovert", var(--subscribe-serif);
+  font-size: 22px;
   font-weight: 600;
   font-synthesis: none;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.02em;
   text-transform: none;
   color: rgba(30, 45, 59, 0.9);
-  line-height: 1.05;
+  line-height: 0.95;
 }
 
 .subscribe-nav-group-links {
@@ -3855,6 +3857,7 @@ img {
     padding-bottom: 0;
   }
 
+  .subscribe-nav-group-title,
   .subscribe-nav-single {
     font-size: 19px;
     line-height: 1;

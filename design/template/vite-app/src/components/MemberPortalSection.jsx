@@ -677,7 +677,11 @@ export function MemberPortalSection({
 
   return (
     <div className="member-portal-shell" id="account">
-      <DeckPageHeader navLinks={portalNavLinks} authLabel="Log out" onAuthAction={onLogout} />
+      <DeckPageHeader
+        navLinks={portalNavLinks}
+        authLabel={MEMBER_PORTAL_LINK_ENABLED ? "Log out" : ""}
+        onAuthAction={MEMBER_PORTAL_LINK_ENABLED ? onLogout : null}
+      />
 
       <section className="section member-portal-section">
       <div className="container">

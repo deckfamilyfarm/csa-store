@@ -105,7 +105,7 @@ const FAQS = [
   {
     question: "How often do I have to order?",
     answer:
-      "One of the great things about FFCSA is the flexibility. You are welcome to place orders weekly, bi-weekly, or monthly."
+      "One of the great things about Full Farm is the flexibility. You are welcome to place orders weekly, bi-weekly, or monthly."
   },
   {
     question: "What happens if I don’t use all of my funds in one month?",
@@ -128,27 +128,27 @@ const FAQS = [
   {
     question: "Where can I find pasture-raised eggs and meat in Portland?",
     answer:
-      "Deck Family Farm and Full Farm CSA offer pasture-raised eggs, meat, raw dairy, and other nutrient-dense local foods for Portland-area members through Saturday pickup locations including Beaverton, Cully, Hollywood Farmers Market, Irvington, PSU Farmers Market, St. Johns Farmers Market, and Woodstock."
+      "Deck Family Farm and Full Farm offer pasture-raised eggs, meat, raw dairy, and other nutrient-dense local foods for Portland-area members through Saturday pickup locations including Beaverton, Cully, Hollywood Farmers Market, Irvington, PSU Farmers Market, St. Johns Farmers Market, and Woodstock."
   },
   {
     question: "Where can I find pasture-raised eggs and meat in Eugene or Springfield?",
     answer:
-      "Full Farm CSA serves Eugene, Springfield, and Junction City with Tuesday, Friday, and Saturday pickup options as well as home delivery in the Eugene, Springfield, and Junction City area. Members can shop Deck Family Farm staples and partner-farm foods in one place."
+      "Full Farm serves Eugene, Springfield, and Junction City with Tuesday, Friday, and Saturday pickup options as well as home delivery in the Eugene, Springfield, and Junction City area. Members can shop Deck Family Farm staples and partner-farm foods in one place."
   },
   {
     question: "Where can I find pasture-raised eggs and meat in Salem?",
     answer:
-      "Full Farm CSA offers a Salem Saturday pickup option for shoppers looking for Deck Family Farm pasture-raised eggs, meat, raw dairy, and other local farm foods."
+      "Full Farm offers a Salem Saturday pickup option for shoppers looking for Deck Family Farm pasture-raised eggs, meat, raw dairy, and other local farm foods."
   },
   {
     question: "Where can I get farm food delivered to my house?",
     answer:
-      "Full Farm CSA offers home delivery for qualifying addresses, with Tuesday delivery in Eugene, Springfield, and Junction City and Saturday delivery in Corvallis. The subscribe form can check your address and show whether you are inside the current delivery area."
+      "Full Farm offers home delivery for qualifying addresses, with Tuesday delivery in Eugene, Springfield, and Junction City and Saturday delivery in Corvallis. The subscribe form can check your address and show whether you are inside the current delivery area."
   },
   {
-    question: "Where can I join a CSA for nutrient-dense local food in Oregon?",
+    question: "Where can I join Full Farm for nutrient-dense local food in Oregon?",
     answer:
-      "You can join Full Farm CSA from Deck Family Farm on this page. Membership gives you access to pasture-raised eggs, meat, raw dairy, vegetables, pantry goods, and other hyper-local foods through pickup sites and home delivery."
+      "You can join Full Farm from Deck Family Farm on this page. Membership gives you access to pasture-raised eggs, meat, raw dairy, vegetables, pantry goods, and other hyper-local foods through pickup sites and home delivery."
   }
 ];
 
@@ -166,12 +166,12 @@ const DISCOVERY_CARDS = [
   {
     title: "Salem and Corvallis access",
     copy:
-      "Join Full Farm CSA for Salem and Corvallis access to pasture-raised eggs, meat, dairy, and weekly farm food pickup. Corvallis also has a Saturday home-delivery route."
+      "Join Full Farm for Salem and Corvallis access to pasture-raised eggs, meat, dairy, and weekly farm food pickup. Corvallis also has a Saturday home-delivery route."
   },
   {
     title: "Good diet options",
     copy:
-      "Members use Full Farm CSA for nutrient-dense staples like pasture-raised eggs, grass-fed and pasture-raised meats, raw dairy, vegetables, pantry items, and meal-building ingredients for whole-food diets."
+      "Members use Full Farm for nutrient-dense staples like pasture-raised eggs, grass-fed and pasture-raised meats, raw dairy, vegetables, pantry items, and meal-building ingredients for whole-food diets."
   }
 ];
 
@@ -322,23 +322,43 @@ export function SubscribePage({
     () => String(portalBaseUrl || subscriptionStoreUrl()).replace(/#.*$/, "").replace(/\/+$/, ""),
     [portalBaseUrl]
   );
-  const portalAccountUrl = useMemo(() => {
-    return `${portalBaseHref}#/account`;
-  }, [portalBaseHref]);
   const subscribeRouteUrl = useMemo(() => {
     return `${portalBaseHref}#/subscribe`;
   }, [portalBaseHref]);
-  const subscribeNavLinks = useMemo(() => {
-    const links = [
-      { label: "Home", href: "https://www.deckfamilyfarm.com/" },
-      { label: "Subscribe", href: subscribeRouteUrl }
-    ];
-    if (MEMBER_PORTAL_LINK_ENABLED) {
-      links.push({ label: "Member Portal", href: portalAccountUrl });
-    }
-    links.push({ label: "Shop", href: subscriptionStoreUrl() });
-    return links;
-  }, [portalAccountUrl, subscribeRouteUrl]);
+  const subscribeNavLinks = useMemo(
+    () => [
+      {
+        label: "Our Farm",
+        children: [
+          { label: "About", href: "https://www.deckfamilyfarm.com/about" },
+          { label: "Our Farmily", href: "https://www.deckfamilyfarm.com/our-farmily" },
+          { label: "Education", href: "https://www.deckfamilyfarm.com/education" },
+          { label: "Farm Dogs", href: "https://www.deckfamilyfarm.com/farm-dogs" }
+        ]
+      },
+      {
+        label: "Full Farm CSA",
+        children: [
+          { label: "Subscribe", href: subscribeRouteUrl },
+          { label: "Plans", href: "#plans" },
+          { label: "Locations", href: "#locations" },
+          { label: "Herdshare", href: "#herdshare" },
+          { label: "Vendors", href: "#vendors" },
+          { label: "Frequently Asked Questions", href: "#faqs" }
+        ]
+      },
+      { label: "Newsletter", href: "https://www.deckfamilyfarm.com/newsletter" },
+      { label: "Events", href: "https://www.deckfamilyfarm.com/events" },
+      {
+        label: "Shop",
+        children: [
+          { label: "CSA Shopping", href: subscriptionStoreUrl() },
+          { label: "Merchandise", href: "https://www.deckfamilyfarm.com/merchandise" }
+        ]
+      }
+    ],
+    [subscribeRouteUrl]
+  );
   const siteOptions = useMemo(
     () =>
       dropSites
@@ -398,9 +418,9 @@ export function SubscribePage({
   useEffect(() => {
     const canonicalUrl = window.location.href.split("#")[0];
     const title =
-      "Join Full Farm CSA | Pasture-Raised Eggs, Meat, Raw Dairy, Pickup & Home Delivery";
+      "Join Full Farm | Pasture-Raised Eggs, Meat, Raw Dairy, Pickup & Home Delivery";
     const description =
-      "Join Full Farm CSA from Deck Family Farm for pasture-raised eggs, meat, raw dairy, and nutrient-dense local food with pickup in Portland, Eugene, Salem, Corvallis, and home delivery in qualifying Oregon areas.";
+      "Join Full Farm from Deck Family Farm for pasture-raised eggs, meat, raw dairy, and nutrient-dense local food with pickup in Portland, Eugene, Salem, Corvallis, and home delivery in qualifying Oregon areas.";
     const faqEntities = allFaqs.map((faq) => ({
       "@type": "Question",
       name: faq.question,
@@ -416,7 +436,7 @@ export function SubscribePage({
       url: canonicalUrl,
       brand: {
         "@type": "Brand",
-        name: "Full Farm CSA"
+        name: "Full Farm"
       },
       areaServed: [
         "Portland, Oregon",
@@ -434,7 +454,7 @@ export function SubscribePage({
         "raw dairy",
         "grass-fed beef",
         "local farm food",
-        "CSA membership",
+        "Full Farm membership",
         "home delivery",
         "pickup sites"
       ]
@@ -442,7 +462,7 @@ export function SubscribePage({
     const serviceSchema = {
       "@context": "https://schema.org",
       "@type": "Service",
-      serviceType: "CSA membership, farm food pickup, and home delivery",
+      serviceType: "Full Farm membership, farm food pickup, and home delivery",
       provider: {
         "@type": "Organization",
         name: "Deck Family Farm"
@@ -456,7 +476,7 @@ export function SubscribePage({
         "Corvallis, Oregon"
       ],
       description:
-        "Full Farm CSA helps Oregon households buy pasture-raised eggs, meat, raw dairy, and other nutrient-dense local foods through neighborhood pickup sites and home delivery in qualifying areas.",
+        "Full Farm helps Oregon households buy pasture-raised eggs, meat, raw dairy, and other nutrient-dense local foods through neighborhood pickup sites and home delivery in qualifying areas.",
       offers: SUBSCRIBE_PLANS.filter((plan) => plan.value !== "guest").map((plan) => ({
         "@type": "Offer",
         name: plan.title,
@@ -620,8 +640,8 @@ export function SubscribePage({
     <div className="subscribe-page">
       <DeckPageHeader
         navLinks={subscribeNavLinks}
-        authLabel={isLoggedIn ? "Log out" : "Log in"}
-        onAuthAction={onAuthAction}
+        authLabel={MEMBER_PORTAL_LINK_ENABLED ? (isLoggedIn ? "Log out" : "Log in") : ""}
+        onAuthAction={MEMBER_PORTAL_LINK_ENABLED ? onAuthAction : null}
       />
 
       <main>
@@ -629,20 +649,20 @@ export function SubscribePage({
           <div className="container subscribe-hero-grid">
             <div className="subscribe-hero-copy">
               <div className="eyebrow">Deck Family Farm</div>
-              <h1 className="subscribe-title">Welcome to Full Farm CSA</h1>
+              <h1 className="subscribe-title">Welcome to Full Farm</h1>
               <p className="subscribe-lede subscribe-welcome-line">
                 We are happy you're here.
               </p>
               <figure className="subscribe-hero-image-card">
                 <img
                   src="/images/subscribe-products.jpg"
-                  alt="Full Farm CSA products arranged together"
+                  alt="Full Farm products arranged together"
                 />
               </figure>
               <p className="subscribe-lede">
-                The Full Farm Community Supported Agriculture (FFCSA) program provides essential
-                staples from Deck Family Farm and other hyper-local farms with shared growing
-                standards. Members can shop online for pickup at local Farmers markets, drop sites
+                Full Farm CSA, or Full Farm, provides essential staples from Deck Family Farm and
+                other hyper-local farms with shared growing standards. Members can shop online
+                for pickup at local Farmers markets, drop sites
                 and home delivery. Membership involves a scheduled monthly payment: 100% of your
                 monthly payment is store credit, with no hidden fees. Any unused balance rolls over
                 for future shopping!
@@ -1011,7 +1031,7 @@ export function SubscribePage({
                   </div>
 
                   <label className="filter-field">
-                    <span className="small">Where did you hear about Full Farm CSA?</span>
+                    <span className="small">Where did you hear about Full Farm?</span>
                     <input
                       className="input"
                       value={form.referralSource}
@@ -1079,30 +1099,6 @@ export function SubscribePage({
                 <article key={testimonial.author} className="card subscribe-quote-card">
                   <p>{testimonial.quote}</p>
                   <strong>{testimonial.author}</strong>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="section subscribe-discovery-section">
-          <div className="container">
-            <div className="subscribe-section-head subscribe-section-head-centered">
-              <div className="eyebrow">Find local food</div>
-              <h2 className="h2">
-                Where to find pasture-raised eggs, meat, CSA pickup, and home delivery
-              </h2>
-            </div>
-            <p className="lede subscribe-discovery-lede">
-              Deck Family Farm and Full Farm CSA help households in Portland, Eugene, Salem,
-              Corvallis, Springfield, and nearby areas find nutrient-dense local food with pickup
-              sites, farmers market access, and home delivery for qualifying addresses.
-            </p>
-            <div className="subscribe-discovery-grid">
-              {DISCOVERY_CARDS.map((card) => (
-                <article key={card.title} className="card subscribe-discovery-card">
-                  <h3>{card.title}</h3>
-                  <p>{card.copy}</p>
                 </article>
               ))}
             </div>
@@ -1210,13 +1206,13 @@ export function SubscribePage({
                 </div>
                 <p className="lede">
                   We have been milking dairy cows since 2006 and our raw cow milk, butter, sour
-                  cream, and cheeses have been a staple of our CSA since we began delivering CSA
-                  products in 2017. The herdshare agreement means that each member owns a portion of
+                  cream, and cheeses have been a staple of Full Farm since we began delivering Full
+                  Farm products in 2017. The herdshare agreement means that each member owns a portion of
                   a cow, and in turn, Creamy Cow, LLC performs a milking service (see agistment
                   agreement).
                 </p>
                 <p className="lede">
-                  Our $50 CSA membership fee includes financial support for the dairy herd, which
+                  Our $50 Full Farm membership fee includes financial support for the dairy herd, which
                   allows members to purchase milk produced by the herd. Value added dairy products
                   and bottling are charged a service fee.
                 </p>
@@ -1256,7 +1252,31 @@ export function SubscribePage({
           </div>
         </section>
 
-        <section className="section subscribe-partners-section">
+        <section className="section subscribe-discovery-section">
+          <div className="container">
+            <div className="subscribe-section-head subscribe-section-head-centered">
+              <div className="eyebrow">Find local food</div>
+              <h2 className="h2">
+                Where to find pasture-raised eggs, meat, pickup, and home delivery
+              </h2>
+            </div>
+            <p className="lede subscribe-discovery-lede">
+              Deck Family Farm and Full Farm help households in Portland, Eugene, Salem,
+              Corvallis, Springfield, and nearby areas find nutrient-dense local food with pickup
+              sites, farmers market access, and home delivery for qualifying addresses.
+            </p>
+            <div className="subscribe-discovery-grid">
+              {DISCOVERY_CARDS.map((card) => (
+                <article key={card.title} className="card subscribe-discovery-card">
+                  <h3>{card.title}</h3>
+                  <p>{card.copy}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="section subscribe-partners-section" id="vendors">
           <div className="container">
             <div className="subscribe-section-head">
               <div className="eyebrow">Meet Our Partners</div>
@@ -1369,7 +1389,7 @@ export function SubscribePage({
               <strong className="subscribe-footer-wordmark">Deck Family Farm</strong>
             </div>
             <div className="small">
-              Full Farm CSA is Deck Family Farm’s CSA membership program, featuring
+              Full Farm is Deck Family Farm’s membership program, featuring
               pasture-raised food from our farm and trusted local partners, with convenient
               neighborhood pickup sites and home delivery.
             </div>
