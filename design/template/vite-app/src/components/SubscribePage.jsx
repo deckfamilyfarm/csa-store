@@ -330,10 +330,10 @@ export function SubscribePage({
       {
         label: "Our Farm",
         children: [
-          { label: "About", href: "https://www.deckfamilyfarm.com/about" },
-          { label: "Our Farmily", href: "https://www.deckfamilyfarm.com/our-farmily" },
-          { label: "Education", href: "https://www.deckfamilyfarm.com/education" },
-          { label: "Farm Dogs", href: "https://www.deckfamilyfarm.com/farm-dogs" }
+          { label: "About", href: "https://www.deckfamilyfarm.com/the-farm" },
+          { label: "Our Farmily", href: "https://www.deckfamilyfarm.com/the-farmily" },
+          { label: "Education", href: "https://www.deckfamilyfarm.com/intern-program" },
+          { label: "Farm Dogs", href: "https://www.deckfamilyfarm.com/dogs" }
         ]
       },
       {
