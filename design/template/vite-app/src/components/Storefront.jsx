@@ -37,6 +37,7 @@ import { AdminPanel } from "./AdminPanel.jsx";
 import { MemberPortalSection } from "./MemberPortalSection.jsx";
 import { SeasonalHighlights } from "./SeasonalHighlights.jsx";
 import { SubscribePage } from "./SubscribePage.jsx";
+import { LiabilityReleasePage } from "./LiabilityReleasePage.jsx";
 
 function hasBackendAccess(user) {
   return (
@@ -58,6 +59,16 @@ function getExperienceMode() {
   const rawHash = window.location.hash.replace(/^#\/?/, "").trim().toLowerCase();
   if (rawHash === "subscribe") return "subscribe";
   return "store";
+}
+
+function getLiabilityReleaseSlug() {
+  if (typeof window === "undefined") return "";
+  const path = String(window.location.pathname || "").trim().toLowerCase();
+  const pathMatch = path.match(/^\/liability\/([^/?#]+)/);
+  if (pathMatch) return pathMatch[1];
+  const rawHash = window.location.hash.replace(/^#\/?/, "").trim().toLowerCase();
+  const hashMatch = rawHash.match(/^liability\/([^/?#]+)/);
+  return hashMatch ? hashMatch[1] : "";
 }
 
 function getStoreUrl() {
@@ -114,6 +125,7 @@ function writeCachedSubscribeDropSites(sites) {
 
 export function Storefront() {
   const experienceMode = getExperienceMode();
+  const initialLiabilitySlug = getLiabilityReleaseSlug();
   const [userToken, setUserToken] = useState(() => localStorage.getItem("userToken") || "");
   const [user, setUser] = useState(null);
   const [loginOpen, setLoginOpen] = useState(false);
@@ -135,7 +147,10 @@ export function Storefront() {
     submitting: false
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [view, setView] = useState(experienceMode === "subscribe" ? "subscribe" : "home");
+  const [view, setView] = useState(
+    initialLiabilitySlug ? "liability" : experienceMode === "subscribe" ? "subscribe" : "home"
+  );
+  const [liabilitySlug, setLiabilitySlug] = useState(initialLiabilitySlug);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -192,6 +207,12 @@ export function Storefront() {
 
   useEffect(() => {
     function syncView() {
+      const nextLiabilitySlug = getLiabilityReleaseSlug();
+      if (nextLiabilitySlug) {
+        setLiabilitySlug(nextLiabilitySlug);
+        setView("liability");
+        return;
+      }
       const route = getHashRoute();
       if (route === "admin") {
         setView("admin");
@@ -269,6 +290,7 @@ export function Storefront() {
 
   const isAccountView = view === "account";
   const isAdminView = view === "admin";
+  const isLiabilityView = view === "liability";
   const isResetPasswordView = view === "resetPassword";
   const showMemberCart = isMember && !isAdminView && !isResetPasswordView;
 
@@ -581,7 +603,7 @@ export function Storefront() {
   return (
     <div className="page">
       <main>
-        {experienceMode !== "subscribe" && view !== "subscribe" && !isAccountView ? (
+        {experienceMode !== "subscribe" && view !== "subscribe" && !isAccountView && !isLiabilityView ? (
           <div className="utility-bar">
             <div className="brand">
               <img src="/images/full-farm-csa-logo.png" alt={brand} />
@@ -617,6 +639,8 @@ export function Storefront() {
         ) : null}
         {isAdminView ? (
           <AdminPanel onCatalogRefresh={reloadCatalog} />
+        ) : isLiabilityView ? (
+          <LiabilityReleasePage slug={liabilitySlug} />
         ) : isResetPasswordView ? (
           <section className="section tight">
             <div className="container reset-password-panel">

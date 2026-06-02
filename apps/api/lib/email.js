@@ -117,6 +117,24 @@ function getSubscribeLeadBccAddress() {
   return [...new Set(addresses.map((value) => String(value || "").trim()).filter(Boolean))].join(",");
 }
 
+function getLiabilityReleaseNotifyAddress() {
+  return (
+    process.env.LIABILITY_RELEASE_NOTIFY_TO ||
+    process.env.SUBSCRIBE_LEAD_NOTIFY_TO ||
+    process.env.SUBSCRIBE_NOTIFY_TO ||
+    "fullfarmcsa@deckfamilyfarm.com"
+  );
+}
+
+function getPublicAppBaseUrl() {
+  return (
+    process.env.PUBLIC_APP_BASE_URL ||
+    process.env.FRONTEND_BASE_URL ||
+    process.env.PUBLIC_SUBSCRIBE_URL ||
+    "https://fullfarmcsa.deckfamilyfarm.com"
+  ).replace(/\/$/, "");
+}
+
 function buildSubscriptionRequestIntro() {
   return {
     title: "Almost there! Please take these steps to complete your subscription:",
@@ -209,7 +227,8 @@ function renderSubmittedRows(fields = []) {
   return fields
     .map(([label, value]) => {
       const displayed = displayValue(value);
-      const isAgreement = label === "Agreement PDF" && String(value || "").trim();
+      const isAgreement =
+        (label === "Agreement PDF" || label === "Signed PDF") && String(value || "").trim();
       const valueHtml = isAgreement
         ? `<a href="${escapeHtml(value)}">${escapeHtml(displayed)}</a>`
         : escapeHtml(displayed);
@@ -300,6 +319,76 @@ export async function sendSubscribeLeadFollowupEmail({ lead = {}, submittedAt })
     `,
     attachments
   });
+
+  return { sent: true };
+}
+
+export async function sendLiabilityReleaseEmails({ submission = {}, template = {} }) {
+  const transporter = createTransporter();
+  if (!transporter) {
+    console.warn("Liability release email skipped: email is not configured.");
+    return { sent: false, reason: "Email is not configured." };
+  }
+
+  const from = getSubscribeLeadFromAddress();
+  const notifyTo = String(getLiabilityReleaseNotifyAddress() || "").trim();
+  const signerTo = String(submission.signerEmail || "").trim();
+  const recordUrl = String(submission.recordUrl || "").trim();
+  const releaseTitle = template.title || submission.templateTitle || "Liability release";
+  const signedLabel = formatMaybeDate(submission.signedAt || submission.createdAt) || "Unknown";
+  const publicBaseUrl = getPublicAppBaseUrl();
+  const adminUrl = `${publicBaseUrl}/#/admin`;
+  const fields = [
+    ["Release", releaseTitle],
+    ["Template", `${submission.templateSlug || template.slug || ""}`],
+    ["Signer", submission.signerName],
+    ["Email", submission.signerEmail],
+    ["Phone", submission.signerPhone],
+    ["Signed", signedLabel],
+    ["Signed PDF", recordUrl]
+  ];
+  const submittedText = fields.map(([label, value]) => `${label}: ${displayValue(value)}`).join("\n");
+  const submittedRows = renderSubmittedRows(fields);
+
+  if (signerTo) {
+    await transporter.sendMail({
+      from,
+      to: signerTo,
+      subject: `Signed ${releaseTitle}`,
+      text: [
+        `Thank you for signing ${releaseTitle}.`,
+        "",
+        recordUrl ? `Signed PDF: ${recordUrl}` : "",
+        "",
+        "Deck Family Farm"
+      ].join("\n"),
+      html: `
+        <p>Thank you for signing ${escapeHtml(releaseTitle)}.</p>
+        ${recordUrl ? `<p><a href="${escapeHtml(recordUrl)}">Open your signed PDF</a></p>` : ""}
+        <p>Deck Family Farm</p>
+      `
+    });
+  }
+
+  if (notifyTo) {
+    await transporter.sendMail({
+      from,
+      to: notifyTo,
+      subject: `Liability release signed: ${releaseTitle}`,
+      text: [
+        "A liability release was signed.",
+        "",
+        submittedText,
+        "",
+        `Admin: ${adminUrl}`
+      ].join("\n"),
+      html: `
+        <p>A liability release was signed.</p>
+        <table>${submittedRows}</table>
+        <p><a href="${escapeHtml(adminUrl)}">Open admin panel</a></p>
+      `
+    });
+  }
 
   return { sent: true };
 }

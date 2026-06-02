@@ -166,6 +166,121 @@ export const reviews = mysqlTable("reviews", {
   updatedAt: datetime("updated_at")
 });
 
+export const liabilityReleaseTemplates = mysqlTable(
+  "liability_release_templates",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    slug: varchar("slug", { length: 128 }).notNull(),
+    title: varchar("title", { length: 255 }).notNull(),
+    description: text("description"),
+    bodyText: text("body_text"),
+    sourceUrl: varchar("source_url", { length: 2048 }),
+    status: varchar("status", { length: 32 }).default("draft"),
+    publicPath: varchar("public_path", { length: 255 }),
+    renewalMonths: int("renewal_months"),
+    requiresParticipants: tinyint("requires_participants").default(0),
+    allowDrawnSignature: tinyint("allow_drawn_signature").default(1),
+    currentVersionId: int("current_version_id"),
+    createdByUserId: int("created_by_user_id"),
+    updatedByUserId: int("updated_by_user_id"),
+    publishedAt: datetime("published_at"),
+    createdAt: datetime("created_at"),
+    updatedAt: datetime("updated_at")
+  },
+  (table) => ({
+    slugIdx: uniqueIndex("ux_liability_release_templates_slug").on(table.slug),
+    statusIdx: index("idx_liability_release_templates_status").on(table.status)
+  })
+);
+
+export const liabilityReleaseTemplateVersions = mysqlTable(
+  "liability_release_template_versions",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    templateId: int("template_id").notNull(),
+    versionNumber: int("version_number").notNull(),
+    slug: varchar("slug", { length: 128 }).notNull(),
+    title: varchar("title", { length: 255 }).notNull(),
+    description: text("description"),
+    bodyText: text("body_text"),
+    sourceUrl: varchar("source_url", { length: 2048 }),
+    publicPath: varchar("public_path", { length: 255 }),
+    renewalMonths: int("renewal_months"),
+    requiresParticipants: tinyint("requires_participants").default(0),
+    allowDrawnSignature: tinyint("allow_drawn_signature").default(1),
+    publishedByUserId: int("published_by_user_id"),
+    publishedAt: datetime("published_at"),
+    createdAt: datetime("created_at")
+  },
+  (table) => ({
+    templateIdx: index("idx_liability_release_versions_template").on(table.templateId),
+    slugIdx: index("idx_liability_release_versions_slug").on(table.slug)
+  })
+);
+
+export const liabilityReleaseImportBatches = mysqlTable("liability_release_import_batches", {
+  id: int("id").autoincrement().primaryKey(),
+  status: varchar("status", { length: 32 }).default("validated"),
+  originalFilename: varchar("original_filename", { length: 255 }),
+  fileCount: int("file_count").default(0),
+  importedCount: int("imported_count").default(0),
+  errorCount: int("error_count").default(0),
+  summaryJson: text("summary_json"),
+  createdByUserId: int("created_by_user_id"),
+  createdAt: datetime("created_at"),
+  updatedAt: datetime("updated_at")
+});
+
+export const liabilityReleaseSubmissions = mysqlTable(
+  "liability_release_submissions",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    templateId: int("template_id").notNull(),
+    templateVersionId: int("template_version_id").notNull(),
+    templateSlug: varchar("template_slug", { length: 128 }).notNull(),
+    templateTitle: varchar("template_title", { length: 255 }).notNull(),
+    status: varchar("status", { length: 32 }).default("signed"),
+    sourceType: varchar("source_type", { length: 64 }).default("public"),
+    sourceSubmissionId: varchar("source_submission_id", { length: 255 }),
+    importBatchId: int("import_batch_id"),
+    subscribeLeadId: int("subscribe_lead_id"),
+    memberUserId: int("member_user_id"),
+    signerName: varchar("signer_name", { length: 255 }).notNull(),
+    signerEmail: varchar("signer_email", { length: 255 }),
+    signerPhone: varchar("signer_phone", { length: 64 }),
+    signerAddressLine1: varchar("signer_address_line_1", { length: 255 }),
+    signerAddressLine2: varchar("signer_address_line_2", { length: 255 }),
+    signerCity: varchar("signer_city", { length: 255 }),
+    signerStateProvince: varchar("signer_state_province", { length: 255 }),
+    signerPostalCode: varchar("signer_postal_code", { length: 32 }),
+    participantJson: text("participant_json"),
+    signatureMode: varchar("signature_mode", { length: 32 }).default("typed"),
+    signatureHash: varchar("signature_hash", { length: 64 }),
+    acceptedAt: datetime("accepted_at"),
+    signedAt: datetime("signed_at"),
+    expiresAt: datetime("expires_at"),
+    sourceHost: varchar("source_host", { length: 255 }),
+    sourcePath: varchar("source_path", { length: 255 }),
+    documentUrl: varchar("document_url", { length: 2048 }),
+    recordUrl: varchar("record_url", { length: 2048 }),
+    storageKey: varchar("storage_key", { length: 1024 }),
+    notes: text("notes"),
+    adminNotes: text("admin_notes"),
+    rawJson: text("raw_json"),
+    createdAt: datetime("created_at"),
+    updatedAt: datetime("updated_at")
+  },
+  (table) => ({
+    templateIdx: index("idx_liability_release_submissions_template").on(table.templateId),
+    slugIdx: index("idx_liability_release_submissions_slug").on(table.templateSlug),
+    signerEmailIdx: index("idx_liability_release_submissions_email").on(table.signerEmail),
+    signedAtIdx: index("idx_liability_release_submissions_signed_at").on(table.signedAt),
+    sourceSubmissionIdx: index("idx_liability_release_submissions_source").on(
+      table.sourceSubmissionId
+    )
+  })
+);
+
 export const subscribeLeads = mysqlTable(
   "subscribe_leads",
   {

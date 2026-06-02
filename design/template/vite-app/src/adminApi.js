@@ -98,6 +98,22 @@ export async function adminDelete(path, token) {
   return response.json();
 }
 
+export async function adminUploadFiles(path, token, files = []) {
+  const form = new FormData();
+  files.forEach((file) => {
+    form.append("files", file);
+  });
+  const response = await fetch(`${base}/admin/${path}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+    body: form
+  });
+  if (!response.ok) await throwForError(response, "Admin upload failed");
+  return response.json();
+}
+
 export async function adminUploadImage(productId, token, file) {
   const form = new FormData();
   form.append("image", file);

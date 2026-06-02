@@ -4,9 +4,15 @@ import path from "path";
 import { fileURLToPath } from "url";
 import express from "express";
 import cors from "cors";
-import { ensureLocalLineSyncSchema, ensureSubscriptionPortalSchema, initDb } from "./db.js";
+import {
+  ensureLiabilityReleaseSchema,
+  ensureLocalLineSyncSchema,
+  ensureSubscriptionPortalSchema,
+  initDb
+} from "./db.js";
 import catalogRoutes from "./routes/catalog.js";
 import adminRoutes from "./routes/admin.js";
+import liabilityRoutes from "./routes/liability.js";
 import { ensureSeedAdmin } from "./scripts/seedAdmin.js";
 import { ensureSeedUser } from "./scripts/seedUser.js";
 import authRoutes from "./routes/auth.js";
@@ -49,6 +55,9 @@ ensureLocalLineSyncSchema().catch((err) => {
 ensureSubscriptionPortalSchema().catch((err) => {
   console.error("Subscription portal schema bootstrap failed:", err.message);
 });
+ensureLiabilityReleaseSchema().catch((err) => {
+  console.error("Liability release schema bootstrap failed:", err.message);
+});
 
 if (process.env.AUTO_SEED_ADMIN === "true") {
   ensureSeedAdmin().catch((err) => {
@@ -67,6 +76,7 @@ app.get("/api/health", (_req, res) => {
 });
 
 app.use("/api", catalogRoutes);
+app.use("/api/liability", liabilityRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/member", memberRoutes);
 app.use("/api/admin", adminRoutes);

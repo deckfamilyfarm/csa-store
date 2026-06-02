@@ -92,6 +92,30 @@ export async function submitSubscribeLead(payload) {
   return response.json();
 }
 
+export async function fetchLiabilityReleaseTemplate(slug) {
+  return fetchJsonGet(
+    `${base}/liability/templates/${encodeURIComponent(slug)}`,
+    "",
+    "Failed to load liability release"
+  );
+}
+
+export async function submitLiabilityRelease(slug, payload) {
+  const response = await fetch(`${base}/liability/sign/${encodeURIComponent(slug)}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload || {})
+  });
+
+  if (!response.ok) {
+    await throwForError(response, "Unable to submit liability release");
+  }
+
+  return response.json();
+}
+
 export async function fetchSubscribeAddressInsights(payload) {
   const response = await fetchWithTimeout(`${base}/subscribe/address-insights`, {
     method: "POST",

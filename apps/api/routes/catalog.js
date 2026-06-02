@@ -22,6 +22,7 @@ import {
   localLinePriceListEntries,
   localLinePackageMeta,
   dropSites,
+  liabilityReleaseSubmissions,
   packages,
   productMedia,
   productImages,
@@ -44,6 +45,7 @@ import { requireUser } from "../middleware/auth.js";
 import { computeProductPricingSnapshot } from "../lib/productPricing.js";
 import { issueUserToken } from "../lib/authTokens.js";
 import { sendSubscribeLeadFollowupEmail } from "../lib/email.js";
+import { createSignedLiabilityRelease } from "../lib/liabilityReleases.js";
 import {
   computeNextBillingDate,
   ensureMemberLedgerAccounts,
@@ -2068,15 +2070,23 @@ router.post("/subscribe", async (req, res) => {
     } catch (addressError) {
       console.warn("Subscribe lead address insights skipped:", addressError.message);
     }
-    const liabilityAgreementRecordUrl = await uploadSignedAgreementRecord({
-      signerName,
-      email,
-      submittedAt: now,
+    const liabilityReleaseSubmission = await createSignedLiabilityRelease({
+      slug: "product-liability",
+      payload: {
+        ...payload,
+        signerName,
+        signerEmail: email,
+        signerPhone: phone,
+        accepted: agreementAccepted,
+        signatureMode,
+        signatureDataUrl: payload.liabilityAgreementSignatureDataUrl
+      },
+      sourceType: "subscribe",
       sourceHost: sourceHostHeader,
       sourcePath,
-      signatureBuffer: signature?.buffer || null,
-      signatureMode
+      sendEmails: false
     });
+    const liabilityAgreementRecordUrl = liabilityReleaseSubmission.recordUrl;
 
     const subscribeInsert = await db.insert(subscribeLeads).values({
       status: "in_progress",
@@ -2193,6 +2203,17 @@ router.post("/subscribe", async (req, res) => {
           updatedAt: now
         })
         .where(eq(subscribeLeads.id, subscribeLeadId));
+    }
+
+    if (liabilityReleaseSubmission?.id && subscribeLeadId > 0) {
+      await db
+        .update(liabilityReleaseSubmissions)
+        .set({
+          subscribeLeadId,
+          memberUserId: activation?.userId || null,
+          updatedAt: now
+        })
+        .where(eq(liabilityReleaseSubmissions.id, liabilityReleaseSubmission.id));
     }
 
     const shouldRecordSubscriberEvent = Boolean(

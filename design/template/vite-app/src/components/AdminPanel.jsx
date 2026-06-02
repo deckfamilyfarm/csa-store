@@ -1,5 +1,6 @@
 ﻿import React, { useEffect, useRef, useState } from "react";
 import { AdminInventorySection } from "./AdminInventorySection.jsx";
+import { AdminLiabilityReleasesSection } from "./AdminLiabilityReleasesSection.jsx";
 import { AdminMarketingSection } from "./AdminMarketingSection.jsx";
 import { AdminManualSection } from "./AdminManualSection.jsx";
 import { AdminMembershipSection } from "./AdminMembershipSection.jsx";
@@ -51,6 +52,8 @@ function canAccessAdminSection(roleKeys, section) {
       return roleKeys.includes("membership_admin");
     case "subscriptions":
       return roleKeys.includes("membership_admin") || roleKeys.includes("member_admin");
+    case "liability":
+      return roleKeys.includes("liability_admin");
     case "marketing":
       return (
         roleKeys.includes("marketing_admin") ||
@@ -81,6 +84,7 @@ function getDefaultAdminSection(roleKeys = []) {
     "localPricelist",
     "inventory",
     "marketing",
+    "liability",
     "subscriptions",
     "membership",
     "dropSites",
@@ -2772,6 +2776,7 @@ export function AdminPanel({ onCatalogRefresh }) {
   const canManageMembership = hasRole(currentAdminRoles, "membership_admin");
   const canManageSubscriptions = canAccessAdminSection(currentAdminRoles, "subscriptions");
   const canManageMarketing = canAccessAdminSection(currentAdminRoles, "marketing");
+  const canManageLiability = canAccessAdminSection(currentAdminRoles, "liability");
   const canPullFromLocalLine = hasRole(currentAdminRoles, "localline_pull");
   const canPushToLocalLine = hasRole(currentAdminRoles, "localline_push");
   const canManageDropSites = hasRole(currentAdminRoles, "dropsite_admin");
@@ -3618,6 +3623,18 @@ export function AdminPanel({ onCatalogRefresh }) {
               type="button"
             >
               Marketing
+            </button>
+          ) : null}
+          {canManageLiability ? (
+            <button
+              className={`admin-nav-item ${activeSection === "liability" ? "active" : ""}`}
+              onClick={() => {
+                setActiveSection("liability");
+                closeProductEditor();
+              }}
+              type="button"
+            >
+              Liability Releases
             </button>
           ) : null}
           {canManageCoreAdmin ? (
@@ -5154,6 +5171,10 @@ export function AdminPanel({ onCatalogRefresh }) {
 
           {activeSection === "marketing" && canManageMarketing && (
             <AdminMarketingSection token={token} />
+          )}
+
+          {activeSection === "liability" && canManageLiability && (
+            <AdminLiabilityReleasesSection token={token} />
           )}
 
           {activeSection === "users" && canManageUsers && (

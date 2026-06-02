@@ -13,6 +13,7 @@ import {
   ensureAdminAccessSchema,
   ensureAdminPricelistIndexes,
   ensureLocalLineSyncSchema,
+  ensureLiabilityReleaseSchema,
   ensureProductPricingSchema,
   ensureVendorPricingSchema,
   getDb,
@@ -100,6 +101,15 @@ import {
   syncMemberLocalLineCredits,
   syncMemberLocalLinePurchaseDebits
 } from "../lib/memberPortalSync.js";
+import {
+  commitLegacyImport,
+  ensureDefaultLiabilityReleaseTemplates,
+  listLiabilityReleaseTemplates,
+  listSignedLiabilityReleases,
+  publishLiabilityReleaseTemplate,
+  upsertLiabilityReleaseTemplate,
+  validateLegacyImport
+} from "../lib/liabilityReleases.js";
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -110,6 +120,9 @@ router.use(async (_req, _res, next) => {
   });
   await ensureVendorPricingSchema().catch((error) => {
     console.warn("Vendor pricing schema bootstrap skipped:", error.message);
+  });
+  await ensureLiabilityReleaseSchema().catch((error) => {
+    console.warn("Liability release schema bootstrap skipped:", error.message);
   });
   next();
 });
@@ -2085,6 +2098,142 @@ router.get(
     } catch (error) {
       console.error("Subscription leads fetch failed:", error);
       res.status(500).json({ error: "Failed to load subscription leads." });
+    }
+  }
+);
+
+router.get(
+  "/liability/templates",
+  requireAdminPermission("liability_admin"),
+  async (_req, res) => {
+    try {
+      await ensureDefaultLiabilityReleaseTemplates();
+      const templates = await listLiabilityReleaseTemplates({ includeArchived: true });
+      res.json({ templates });
+    } catch (error) {
+      console.error("Liability templates fetch failed:", error);
+      res.status(500).json({ error: "Failed to load liability release templates." });
+    }
+  }
+);
+
+router.post(
+  "/liability/templates",
+  requireAdminPermission("liability_admin"),
+  async (req, res) => {
+    try {
+      const template = await upsertLiabilityReleaseTemplate(req.body || {}, {
+        userId: req.admin?.userId || req.admin?.adminId || null
+      });
+      res.json({ ok: true, template });
+    } catch (error) {
+      console.error("Liability template save failed:", error);
+      res.status(error.status || 500).json({
+        error: error?.message || "Failed to save liability release template."
+      });
+    }
+  }
+);
+
+router.put(
+  "/liability/templates/:id",
+  requireAdminPermission("liability_admin"),
+  async (req, res) => {
+    try {
+      const template = await upsertLiabilityReleaseTemplate(
+        { ...(req.body || {}), id: Number(req.params.id) },
+        { userId: req.admin?.userId || req.admin?.adminId || null }
+      );
+      res.json({ ok: true, template });
+    } catch (error) {
+      console.error("Liability template update failed:", error);
+      res.status(error.status || 500).json({
+        error: error?.message || "Failed to update liability release template."
+      });
+    }
+  }
+);
+
+router.post(
+  "/liability/templates/:id/publish",
+  requireAdminPermission("liability_admin"),
+  async (req, res) => {
+    try {
+      const result = await publishLiabilityReleaseTemplate(Number(req.params.id), {
+        userId: req.admin?.userId || req.admin?.adminId || null
+      });
+      res.json({ ok: true, ...result });
+    } catch (error) {
+      console.error("Liability template publish failed:", error);
+      res.status(error.status || 500).json({
+        error: error?.message || "Failed to publish liability release template."
+      });
+    }
+  }
+);
+
+router.get(
+  "/liability/releases",
+  requireAdminPermission("liability_admin"),
+  async (_req, res) => {
+    try {
+      const releases = await listSignedLiabilityReleases();
+      res.json({ releases });
+    } catch (error) {
+      console.error("Liability releases fetch failed:", error);
+      res.status(500).json({ error: "Failed to load signed liability releases." });
+    }
+  }
+);
+
+router.post(
+  "/liability/import/validate",
+  requireAdminPermission("liability_admin"),
+  upload.any(),
+  async (req, res) => {
+    try {
+      const result = await validateLegacyImport(req.files || []);
+      res.json({
+        ok: result.ok,
+        errors: result.errors || [],
+        rowCount: result.rows?.length || 0,
+        fileCount: result.fileCount || 0,
+        rows: (result.rows || []).map((row) => ({
+          rowNumber: row.rowNumber,
+          templateSlug: row.templateSlug,
+          signerName: row.signerName,
+          signedAt: row.signedAt,
+          pdfFilename: row.pdfFilename,
+          signatureUrl: row.signatureUrl,
+          errors: row.rowErrors || []
+        }))
+      });
+    } catch (error) {
+      console.error("Liability legacy import validation failed:", error);
+      res.status(error.status || 500).json({
+        error: error?.message || "Failed to validate legacy import.",
+        details: error.details || []
+      });
+    }
+  }
+);
+
+router.post(
+  "/liability/import",
+  requireAdminPermission("liability_admin"),
+  upload.any(),
+  async (req, res) => {
+    try {
+      const result = await commitLegacyImport(req.files || [], {
+        userId: req.admin?.userId || req.admin?.adminId || null
+      });
+      res.json(result);
+    } catch (error) {
+      console.error("Liability legacy import failed:", error);
+      res.status(error.status || 500).json({
+        error: error?.message || "Failed to import legacy releases.",
+        details: error.details || []
+      });
     }
   }
 );

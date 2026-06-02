@@ -325,6 +325,19 @@ export function SubscribePage({
   const subscribeRouteUrl = useMemo(() => {
     return `${portalBaseHref}#/subscribe`;
   }, [portalBaseHref]);
+  const visitorLiabilityReleaseUrl = useMemo(() => {
+    try {
+      const baseOrigin =
+        typeof window !== "undefined" ? window.location.origin : "https://fullfarmcsa.deckfamilyfarm.com";
+      const url = new URL(portalBaseHref || baseOrigin, baseOrigin);
+      url.pathname = "/liability/visitor";
+      url.search = "";
+      url.hash = "";
+      return url.toString();
+    } catch (_error) {
+      return "/liability/visitor";
+    }
+  }, [portalBaseHref]);
   const subscribeNavLinks = useMemo(
     () => [
       {
@@ -1405,6 +1418,12 @@ export function SubscribePage({
             </div>
           </div>
           <div className="subscribe-footer-links">
+            <a className="subscribe-review-link" href={visitorLiabilityReleaseUrl}>
+              <span className="subscribe-review-link-star" aria-hidden="true">
+                !
+              </span>
+              <span>Visitor Liability Release</span>
+            </a>
             <a
               className="subscribe-review-link"
               href="https://app.goodreviews.io/mode?type=link&grid=GRI_ZN9UOZ3YIM5"
