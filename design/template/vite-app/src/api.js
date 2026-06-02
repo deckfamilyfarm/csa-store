@@ -76,6 +76,27 @@ export async function fetchDropSites() {
   return fetchJsonGet(`${base}/drop-sites`, "", "Failed to load drop sites");
 }
 
+export async function fetchDropSitePerformance(month = "") {
+  const url = new URL(`${base}/dropsites/performance`, window.location.origin);
+  if (month) {
+    url.searchParams.set("month", month);
+  }
+  return fetchJsonGet(url.toString(), "", "Failed to load drop-site performance");
+}
+
+export async function submitDropSiteHostInterest(formData) {
+  const response = await fetch(`${base}/dropsites/host-interest`, {
+    method: "POST",
+    body: formData
+  });
+
+  if (!response.ok) {
+    await throwForError(response, "Unable to submit drop-site host interest");
+  }
+
+  return response.json();
+}
+
 export async function submitSubscribeLead(payload) {
   const response = await fetch(`${base}/subscribe`, {
     method: "POST",

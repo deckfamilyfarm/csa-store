@@ -1,6 +1,7 @@
 import express from "express";
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
+import multer from "multer";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import {
@@ -9,6 +10,7 @@ import {
   ensureSubscriptionPortalSchema,
   ensureSubscriberCaptureSchema,
   getDb,
+  getPool,
   isMissingTableError
 } from "../db.js";
 import { and, eq, inArray } from "drizzle-orm";
@@ -44,8 +46,12 @@ import {
 import { requireUser } from "../middleware/auth.js";
 import { computeProductPricingSnapshot } from "../lib/productPricing.js";
 import { issueUserToken } from "../lib/authTokens.js";
-import { sendSubscribeLeadFollowupEmail } from "../lib/email.js";
+import {
+  sendDropSiteHostInterestEmail,
+  sendSubscribeLeadFollowupEmail
+} from "../lib/email.js";
 import { createSignedLiabilityRelease } from "../lib/liabilityReleases.js";
+import { buildDropSitePerformancePayload } from "../lib/dropSitePerformance.js";
 import {
   computeNextBillingDate,
   ensureMemberLedgerAccounts,
@@ -56,6 +62,13 @@ import {
 } from "../lib/memberPortal.js";
 
 const router = express.Router();
+const dropSiteHostUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    files: 4,
+    fileSize: 4 * 1024 * 1024
+  }
+});
 
 function parsePriceListId(value) {
   const numeric = Number(value);
@@ -1078,6 +1091,156 @@ async function uploadSignedAgreementRecord({
   );
   return buildPublicUrl(key);
 }
+
+const dropSiteHostInterestAttempts = new Map();
+
+function getRequestIp(req) {
+  return String(
+    req.headers?.["x-forwarded-for"] ||
+      req.ip ||
+      req.socket?.remoteAddress ||
+      "unknown"
+  ).split(",")[0].trim();
+}
+
+function isDropSiteHostInterestRateLimited(req) {
+  const key = getRequestIp(req);
+  const now = Date.now();
+  const windowMs = 10 * 60 * 1000;
+  const attempts = (dropSiteHostInterestAttempts.get(key) || []).filter((timestamp) => now - timestamp < windowMs);
+  attempts.push(now);
+  dropSiteHostInterestAttempts.set(key, attempts);
+  return attempts.length > 3;
+}
+
+function handleDropSiteHostUpload(req, res, next) {
+  dropSiteHostUpload.array("photos", 4)(req, res, (error) => {
+    if (!error) {
+      next();
+      return;
+    }
+    const isLimitError = error?.code === "LIMIT_FILE_SIZE" || error?.code === "LIMIT_FILE_COUNT";
+    res.status(400).json({
+      error: isLimitError
+        ? "Upload up to 4 photos, with each photo 4 MB or smaller."
+        : error?.message || "Unable to upload photos."
+    });
+  });
+}
+
+function isAllowedDropSiteHostImage(file = {}) {
+  const mime = String(file.mimetype || "").toLowerCase();
+  const name = String(file.originalname || "").toLowerCase();
+  const allowedMimes = new Set([
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "image/heic",
+    "image/heif"
+  ]);
+  if (allowedMimes.has(mime)) return true;
+  if (mime === "application/octet-stream" && /\.(heic|heif)$/i.test(name)) return true;
+  return false;
+}
+
+function normalizeDropSiteHostInterestPayload(body = {}) {
+  return {
+    name: cleanString(body.name, 255),
+    email: cleanString(body.email, 255).toLowerCase(),
+    phone: cleanString(body.phone, 80),
+    memberStatus: cleanString(body.memberStatus, 80),
+    address: cleanString(body.address, 500),
+    city: cleanString(body.city, 120),
+    stateProvince: cleanString(body.stateProvince, 80),
+    postalCode: cleanString(body.postalCode, 40),
+    availability: cleanString(body.availability, 500),
+    parking: cleanString(body.parking, 500),
+    streetAccess: cleanString(body.streetAccess, 500),
+    vanAccess: cleanString(body.vanAccess, 500),
+    stairs: cleanString(body.stairs, 500),
+    roomNearHouse: cleanString(body.roomNearHouse, 500),
+    shade: cleanString(body.shade, 500),
+    secureLocation: cleanString(body.secureLocation, 500),
+    behindGate: cleanString(body.behindGate, 500),
+    toteStorage: cleanString(body.toteStorage, 500),
+    neighborConcerns: cleanString(body.neighborConcerns, 500),
+    notes: cleanString(body.notes, 2000),
+    referralName: cleanString(body.referralName, 255),
+    sourceHost: cleanString(body.sourceHost, 255),
+    sourcePath: cleanString(body.sourcePath, 255),
+    queryString: cleanString(body.queryString, 1000)
+  };
+}
+
+router.get("/dropsites/performance", async (req, res) => {
+  try {
+    await ensureLocalLineSyncSchema().catch((error) => {
+      console.warn("Local Line schema bootstrap skipped for /dropsites/performance:", error.message);
+    });
+    const payload = await buildDropSitePerformancePayload({
+      pool: getPool(),
+      requestedMonth: String(req.query?.month || "").trim(),
+      includeHostContact: false,
+      publicOnly: true,
+      allowTrend: false
+    });
+    res.json(payload);
+  } catch (error) {
+    console.error("Public drop-site performance load failed:", error);
+    res.status(500).json({ error: error?.message || "Unable to load drop-site performance." });
+  }
+});
+
+router.post("/dropsites/host-interest", handleDropSiteHostUpload, async (req, res) => {
+  try {
+    if (String(req.body?.website || req.body?.company || "").trim()) {
+      res.json({ ok: true });
+      return;
+    }
+
+    if (isDropSiteHostInterestRateLimited(req)) {
+      res.status(429).json({ error: "Too many submissions. Please try again later." });
+      return;
+    }
+
+    const payload = normalizeDropSiteHostInterestPayload(req.body || {});
+    const requiredErrors = [];
+    if (!payload.name) requiredErrors.push("Name is required.");
+    if (!payload.email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(payload.email)) {
+      requiredErrors.push("A valid email is required.");
+    }
+    if (!payload.address) requiredErrors.push("Proposed address is required.");
+
+    const files = Array.isArray(req.files) ? req.files : [];
+    const invalidFile = files.find((file) => !isAllowedDropSiteHostImage(file));
+    if (invalidFile) {
+      requiredErrors.push("Photos must be JPEG, PNG, WebP, HEIC, or HEIF images.");
+    }
+
+    if (requiredErrors.length) {
+      res.status(400).json({ error: requiredErrors.join(" ") });
+      return;
+    }
+
+    const submittedAt = new Date();
+    const result = await sendDropSiteHostInterestEmail({
+      payload,
+      photos: files,
+      submittedAt
+    });
+
+    res.json({
+      ok: true,
+      emailSent: Boolean(result?.sent),
+      message: result?.sent
+        ? "Drop-site host interest submitted."
+        : "Drop-site host interest received, but email is not configured."
+    });
+  } catch (error) {
+    console.error("Drop-site host interest submission failed:", error);
+    res.status(500).json({ error: error?.message || "Unable to submit drop-site host interest." });
+  }
+});
 
 router.get("/catalog", async (_req, res) => {
   try {

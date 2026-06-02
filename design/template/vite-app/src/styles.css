@@ -1426,6 +1426,218 @@ img {
   border-color: rgba(255, 244, 215, 1);
 }
 
+.dropsites-page {
+  background: #fbfaf6;
+}
+
+.dropsites-hero {
+  padding: 42px 0 54px;
+  background: #556b4d;
+}
+
+.dropsites-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 520px);
+  gap: 34px;
+  align-items: center;
+}
+
+.dropsites-hero-copy {
+  color: #fff;
+  max-width: 720px;
+}
+
+.dropsites-title {
+  font-family: var(--subscribe-serif);
+  font-size: 64px;
+  line-height: 0.95;
+  margin: 12px 0 18px;
+  max-width: 12ch;
+  color: #fff;
+}
+
+.dropsites-lede {
+  color: rgba(255, 255, 255, 0.94);
+  font-size: 19px;
+  line-height: 1.7;
+  max-width: 58ch;
+  margin: 0 0 22px;
+}
+
+.dropsites-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.dropsites-hero-media {
+  margin: 0;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 18px 38px rgba(31, 27, 23, 0.18);
+  background: #fff;
+}
+
+.dropsites-hero-media img {
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.dropsites-info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.dropsite-info-panel,
+.dropsite-resource-card {
+  border: 1px solid rgba(31, 27, 23, 0.12);
+  border-radius: 8px;
+  background: #fff;
+  padding: 24px;
+  box-shadow: 0 10px 24px rgba(31, 27, 23, 0.07);
+}
+
+.dropsite-info-panel .h2 {
+  margin-bottom: 12px;
+}
+
+.dropsite-check-list {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  line-height: 1.55;
+}
+
+.dropsites-tools-section {
+  background: #eef1ea;
+}
+
+.dropsites-resource-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.dropsite-resource-card h3 {
+  margin: 0 0 10px;
+  font-family: var(--subscribe-serif);
+  font-size: 26px;
+  color: var(--navy);
+}
+
+.dropsite-resource-card p {
+  margin: 0 0 16px;
+  line-height: 1.55;
+}
+
+.dropsite-referral-tool {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dropsites-metrics-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 18px 0;
+}
+
+.dropsite-metrics-table-shell {
+  overflow-x: auto;
+  border: 1px solid rgba(31, 27, 23, 0.12);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.dropsite-metrics-table {
+  width: 100%;
+  min-width: 820px;
+  border-collapse: collapse;
+}
+
+.dropsite-metrics-table th,
+.dropsite-metrics-table td {
+  text-align: left;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(31, 27, 23, 0.08);
+  vertical-align: top;
+}
+
+.dropsite-metrics-table th {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--field);
+  background: #f6f1e7;
+}
+
+.dropsite-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.dropsite-status.good {
+  color: #1f4d31;
+  background: #dcebdc;
+}
+
+.dropsite-status.bad {
+  color: #7a2d25;
+  background: #f3ded8;
+}
+
+.dropsites-apply-section {
+  background: #fff;
+}
+
+.dropsites-apply-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(520px, 1.2fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.dropsites-apply-copy {
+  position: sticky;
+  top: 140px;
+}
+
+.dropsite-application-form {
+  border-radius: 8px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 14px 34px rgba(31, 27, 23, 0.1);
+}
+
+.dropsite-honeypot {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.subscribe-success-message {
+  color: #1f4d31;
+  font-weight: 700;
+}
+
 .card.pad {
   padding: 24px;
 }
@@ -3826,8 +4038,16 @@ img {
   .subscribe-proof-grid,
   .subscribe-plan-grid,
   .subscribe-form-grid,
-  .subscribe-form-grid-3 {
+  .subscribe-form-grid-3,
+  .dropsites-hero-grid,
+  .dropsites-info-grid,
+  .dropsites-resource-grid,
+  .dropsites-apply-grid {
     grid-template-columns: 1fr;
+  }
+
+  .dropsites-apply-copy {
+    position: static;
   }
 
   .subscribe-herdshare-grid {
@@ -4020,6 +4240,29 @@ img {
   .subscribe-form-card {
     padding: 18px;
     border-radius: 18px;
+  }
+
+  .dropsites-title {
+    font-size: 40px;
+    max-width: 14ch;
+  }
+
+  .dropsites-lede {
+    font-size: 16px;
+  }
+
+  .dropsites-hero {
+    padding: 28px 0 36px;
+  }
+
+  .dropsite-info-panel,
+  .dropsite-resource-card,
+  .dropsite-application-form {
+    padding: 18px;
+  }
+
+  .dropsites-metrics-controls {
+    align-items: stretch;
   }
 
   .subscribe-page .button-row {

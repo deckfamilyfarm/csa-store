@@ -1,0 +1,504 @@
+import React, { useEffect, useMemo, useState } from "react";
+import { fetchDropSitePerformance, submitDropSiteHostInterest } from "../api.js";
+import { DeckPageHeader } from "./DeckPageHeader.jsx";
+
+const INITIAL_FORM = {
+  name: "",
+  email: "",
+  phone: "",
+  memberStatus: "Current FFCSA member",
+  address: "",
+  city: "",
+  stateProvince: "OR",
+  postalCode: "",
+  availability: "",
+  parking: "",
+  streetAccess: "",
+  vanAccess: "",
+  stairs: "",
+  roomNearHouse: "",
+  shade: "",
+  secureLocation: "",
+  behindGate: "",
+  toteStorage: "",
+  neighborConcerns: "",
+  referralName: "",
+  notes: "",
+  website: ""
+};
+
+function ensureMetaTag(name, content, attr = "name") {
+  if (typeof document === "undefined") return;
+  let tag = document.querySelector(`meta[${attr}="${name}"]`);
+  if (!tag) {
+    tag = document.createElement("meta");
+    tag.setAttribute(attr, name);
+    document.head.appendChild(tag);
+  }
+  tag.setAttribute("content", content);
+}
+
+function ensureCanonicalLink(url) {
+  if (typeof document === "undefined") return;
+  let link = document.querySelector('link[rel="canonical"]');
+  if (!link) {
+    link = document.createElement("link");
+    link.setAttribute("rel", "canonical");
+    document.head.appendChild(link);
+  }
+  link.setAttribute("href", url);
+}
+
+function formatMonthLabel(value) {
+  const match = String(value || "").match(/^(\d{4})-(\d{2})$/);
+  if (!match) return value || "Current month";
+  const date = new Date(Number(match[1]), Number(match[2]) - 1, 1);
+  return date.toLocaleDateString(undefined, { month: "long", year: "numeric" });
+}
+
+function formatAverage(value) {
+  const numeric = Number(value || 0);
+  return Number.isFinite(numeric) ? numeric.toFixed(2) : "0.00";
+}
+
+function getDropsitesCanonicalUrl() {
+  if (typeof window === "undefined") return "https://dropsites.deckfamilyfarm.com/";
+  const host = String(window.location.host || "").toLowerCase();
+  if (host.includes("localhost") || host.includes("127.0.0.1")) {
+    return `${window.location.origin}/dropsites`;
+  }
+  return "https://dropsites.deckfamilyfarm.com/";
+}
+
+function getSubscribeUrl(referralName = "") {
+  const params = new URLSearchParams({
+    utm_source: "dropsite_host",
+    utm_medium: "referral",
+    utm_campaign: "dropsite_referral"
+  });
+  const label = String(referralName || "").trim();
+  if (label) {
+    params.set("utm_content", label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""));
+  }
+  return `https://subscribe.deckfamilyfarm.com/?${params.toString()}`;
+}
+
+function MetricStatus({ row }) {
+  if (row.transitionCreditEligible) {
+    return <span className="dropsite-status good">Credit eligible</span>;
+  }
+  return <span className="dropsite-status bad">Below credit threshold</span>;
+}
+
+export function DropsitesPage() {
+  const [metrics, setMetrics] = useState(null);
+  const [selectedMonth, setSelectedMonth] = useState("");
+  const [metricsError, setMetricsError] = useState("");
+  const [form, setForm] = useState(INITIAL_FORM);
+  const [photos, setPhotos] = useState([]);
+  const [status, setStatus] = useState({ submitting: false, message: "", error: "" });
+
+  useEffect(() => {
+    const title = "Drop Site Hosts | Deck Family Farm";
+    const description =
+      "Resources, host expectations, monthly performance summaries, and drop-site host applications for Full Farm CSA pickup sites.";
+    const canonicalUrl = getDropsitesCanonicalUrl();
+    document.title = title;
+    ensureMetaTag("description", description);
+    ensureMetaTag("robots", "index,follow,max-image-preview:large");
+    ensureMetaTag("og:title", title, "property");
+    ensureMetaTag("og:description", description, "property");
+    ensureMetaTag("og:type", "website", "property");
+    ensureMetaTag("og:url", canonicalUrl, "property");
+    ensureCanonicalLink(canonicalUrl);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchDropSitePerformance(selectedMonth)
+      .then((data) => {
+        if (cancelled) return;
+        setMetrics(data);
+        setMetricsError("");
+        if (!selectedMonth && data?.performance?.selectedMonth) {
+          setSelectedMonth(data.performance.selectedMonth);
+        }
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        setMetricsError(error?.message || "Unable to load drop-site performance.");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedMonth]);
+
+  const navLinks = useMemo(
+    () => [
+      { label: "Overview", href: "#overview" },
+      { label: "Host Credits", href: "#credits" },
+      { label: "Resources", href: "#resources" },
+      { label: "Metrics", href: "#metrics" },
+      { label: "Apply", href: "#apply" }
+    ],
+    []
+  );
+
+  const referralUrl = useMemo(() => getSubscribeUrl(form.referralName || form.name), [form.name, form.referralName]);
+  const performance = metrics?.performance || {};
+  const metricRows = performance.rankedSites || [];
+
+  function updateField(key, value) {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    setStatus({ submitting: true, message: "", error: "" });
+    try {
+      const formData = new FormData();
+      Object.entries(form).forEach(([key, value]) => {
+        formData.append(key, value);
+      });
+      formData.append("sourceHost", window.location.host);
+      formData.append("sourcePath", window.location.pathname);
+      formData.append("queryString", window.location.search);
+      photos.slice(0, 4).forEach((file) => {
+        formData.append("photos", file);
+      });
+      await submitDropSiteHostInterest(formData);
+      setStatus({
+        submitting: false,
+        message: "Thanks. Your drop-site host information has been sent to the CSA team.",
+        error: ""
+      });
+      setForm(INITIAL_FORM);
+      setPhotos([]);
+    } catch (error) {
+      setStatus({
+        submitting: false,
+        message: "",
+        error: error?.message || "Unable to submit your drop-site host information."
+      });
+    }
+  }
+
+  return (
+    <div className="subscribe-page dropsites-page">
+      <DeckPageHeader navLinks={navLinks} />
+
+      <section className="dropsites-hero" id="overview">
+        <div className="container dropsites-hero-grid">
+          <div className="dropsites-hero-copy">
+            <div className="eyebrow">Full Farm CSA Drop Sites</div>
+            <h1 className="dropsites-title">Drop site hosts keep local food moving.</h1>
+            <p className="dropsites-lede">
+              Hosts offer a simple, covered pickup location for members, help with rare missed pickups,
+              and make Full Farm CSA easier for neighbors to join.
+            </p>
+            <div className="dropsites-hero-actions">
+              <a className="button" href="#apply">Become a host</a>
+              <a className="button alt" href="#resources">Host resources</a>
+            </div>
+          </div>
+          <figure className="dropsites-hero-media">
+            <img src="/images/subscribe-map.avif" alt="Full Farm CSA drop-site map" />
+          </figure>
+        </div>
+      </section>
+
+      <section className="section dropsites-requirements-section">
+        <div className="container dropsites-info-grid">
+          <article className="dropsite-info-panel">
+            <div className="eyebrow">Responsibilities</div>
+            <h2 className="h2">When a member misses pickup</h2>
+            <ul className="dropsite-check-list">
+              <li>Call the member, or email the CSA team, to find out why the order was not picked up.</li>
+              <li>Store the product during an emergency delay.</li>
+              <li>Manage the product until the farm can pick it up when it needs to come back.</li>
+              <li>Store totes and coolers until they are picked up the following week.</li>
+            </ul>
+          </article>
+          <article className="dropsite-info-panel" id="credits">
+            <div className="eyebrow">Benefits</div>
+            <h2 className="h2">Host credits and referral credit</h2>
+            <ul className="dropsite-check-list">
+              <li>If neither the member nor farm can pick up product while it is fresh, it can go to the host.</li>
+              <li>Qualifying sites receive a $50 monthly host credit.</li>
+              <li>Hosts can receive a $25 credit for each new member signup credited to their referral link.</li>
+            </ul>
+          </article>
+          <article className="dropsite-info-panel">
+            <div className="eyebrow">Home Requirements</div>
+            <h2 className="h2">Easy access matters</h2>
+            <ul className="dropsite-check-list">
+              <li>No stairs and easy van access.</li>
+              <li>Friendly neighbors and a reliable pickup area.</li>
+              <li>A covered and shaded place for orders.</li>
+              <li>Current FFCSA membership with an active subscription.</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section className="section dropsites-tools-section" id="resources">
+        <div className="container">
+          <div className="subscribe-section-head">
+            <div className="eyebrow">Tools</div>
+            <h2 className="h2">Resources for hosts</h2>
+            <p className="lede">
+              Use these materials for pickup-day communication, neighbor outreach, and sharing the CSA with people nearby.
+            </p>
+          </div>
+          <div className="dropsites-resource-grid">
+            <article className="dropsite-resource-card">
+              <h3>Missed-pickup checklist</h3>
+              <p>Confirm the order is still on site, contact the member, and let the CSA team know if product needs to be held or returned.</p>
+            </article>
+            <article className="dropsite-resource-card">
+              <h3>Cooler and tote storage</h3>
+              <p>Keep totes and coolers in a safe spot until the following delivery week, when the farm picks them up.</p>
+            </article>
+            <article className="dropsite-resource-card">
+              <h3>Media kit</h3>
+              <p>Share your referral link with neighbors and nearby friends. New member signups credited to your link can earn host credit.</p>
+              <div className="dropsite-referral-tool">
+                <label className="filter-field">
+                  <span className="small">Host or site name for the link</span>
+                  <input
+                    className="input"
+                    value={form.referralName}
+                    onChange={(event) => updateField("referralName", event.target.value)}
+                    placeholder="Example: Friendly Street"
+                  />
+                </label>
+                <input className="input" readOnly value={referralUrl} onFocus={(event) => event.target.select()} />
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section className="section dropsites-metrics-section" id="metrics">
+        <div className="container">
+          <div className="subscribe-section-head">
+            <div className="eyebrow">Performance</div>
+            <h2 className="h2">Monthly public drop-site summary</h2>
+            <p className="lede">
+              Starting July 1, 2026, host credit qualification uses the average number of orders per active
+              scheduled drop week plus the number of members who picked up during the month. August 2026 credits
+              use the combined monthly threshold, with legacy counts shown during the transition.
+            </p>
+          </div>
+          <div className="dropsite-metrics-controls">
+            <label className="filter-field">
+              <span className="small">Month</span>
+              <select
+                className="select"
+                value={selectedMonth || performance.selectedMonth || ""}
+                onChange={(event) => setSelectedMonth(event.target.value)}
+              >
+                {!(performance.months || []).length ? <option value="">No order months yet</option> : null}
+                {(performance.months || []).map((value) => (
+                  <option key={`dropsite-public-month-${value}`} value={value}>
+                    {formatMonthLabel(value)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <div className="small">
+              Credit threshold: {performance.thresholdLabel || "more than 2"} orders per active drop week and at least{" "}
+              {performance.legacyMonthlyUniqueThreshold || 5} members picked up during the month.
+            </div>
+          </div>
+          {metricsError ? <div className="small subscribe-error">{metricsError}</div> : null}
+          <div className="dropsite-metrics-table-shell">
+            <table className="dropsite-metrics-table">
+              <thead>
+                <tr>
+                  <th>Drop site</th>
+                  <th>Area</th>
+                  <th>Orders</th>
+                  <th>Active weeks</th>
+                  <th>Avg/week</th>
+                  <th>Members picked up</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {metricRows.map((row) => (
+                  <tr key={`public-dropsite-metric-${row.id}`}>
+                    <td>{row.name}</td>
+                    <td>{row.area || "Local pickup area"}</td>
+                    <td>{Number(row.orderCount || 0)}</td>
+                    <td>{Number(row.activeDropWeeks || 0)}</td>
+                    <td>{formatAverage(row.averageOrdersPerActiveDropWeek)}</td>
+                    <td>{Number(row.legacyMonthlyUniqueCustomers || 0)}</td>
+                    <td><MetricStatus row={row} /></td>
+                  </tr>
+                ))}
+                {!metricRows.length ? (
+                  <tr>
+                    <td colSpan="7">No public drop-site performance data is available for this month yet.</td>
+                  </tr>
+                ) : null}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section className="section dropsites-apply-section" id="apply">
+        <div className="container dropsites-apply-grid">
+          <div className="dropsites-apply-copy">
+            <div className="eyebrow">Become A Drop Site</div>
+            <h2 className="h2">Tell us about your pickup location</h2>
+            <p className="lede">
+              Send the CSA team the details we need to evaluate access, parking, shade, secure storage, and delivery logistics.
+            </p>
+          </div>
+          <form className="dropsite-application-form card" onSubmit={handleSubmit}>
+            <input
+              className="dropsite-honeypot"
+              tabIndex="-1"
+              autoComplete="off"
+              value={form.website}
+              onChange={(event) => updateField("website", event.target.value)}
+              name="website"
+            />
+            <div className="subscribe-form-grid">
+              <label className="filter-field">
+                <span className="small">Name</span>
+                <input className="input" required value={form.name} onChange={(event) => updateField("name", event.target.value)} />
+              </label>
+              <label className="filter-field">
+                <span className="small">Email</span>
+                <input className="input" required type="email" value={form.email} onChange={(event) => updateField("email", event.target.value)} />
+              </label>
+              <label className="filter-field">
+                <span className="small">Phone</span>
+                <input className="input" value={form.phone} onChange={(event) => updateField("phone", event.target.value)} />
+              </label>
+              <label className="filter-field">
+                <span className="small">FFCSA membership</span>
+                <select className="select" value={form.memberStatus} onChange={(event) => updateField("memberStatus", event.target.value)}>
+                  <option>Current FFCSA member</option>
+                  <option>Planning to become a member</option>
+                  <option>Not currently a member</option>
+                </select>
+              </label>
+            </div>
+            <label className="filter-field">
+              <span className="small">Proposed address</span>
+              <input className="input" required value={form.address} onChange={(event) => updateField("address", event.target.value)} />
+            </label>
+            <div className="subscribe-form-grid subscribe-form-grid-3">
+              <label className="filter-field">
+                <span className="small">City</span>
+                <input className="input" value={form.city} onChange={(event) => updateField("city", event.target.value)} />
+              </label>
+              <label className="filter-field">
+                <span className="small">State</span>
+                <input className="input" value={form.stateProvince} onChange={(event) => updateField("stateProvince", event.target.value)} />
+              </label>
+              <label className="filter-field">
+                <span className="small">ZIP</span>
+                <input className="input" value={form.postalCode} onChange={(event) => updateField("postalCode", event.target.value)} />
+              </label>
+            </div>
+            <div className="subscribe-form-grid">
+              <label className="filter-field">
+                <span className="small">Pickup-day availability</span>
+                <textarea className="textarea" value={form.availability} onChange={(event) => updateField("availability", event.target.value)} />
+              </label>
+              <label className="filter-field">
+                <span className="small">Parking and street access</span>
+                <textarea className="textarea" value={form.parking} onChange={(event) => updateField("parking", event.target.value)} />
+              </label>
+              <label className="filter-field">
+                <span className="small">Street parking or driveway access</span>
+                <textarea className="textarea" value={form.streetAccess} onChange={(event) => updateField("streetAccess", event.target.value)} />
+              </label>
+              <label className="filter-field">
+                <span className="small">Van access and stairs</span>
+                <textarea className="textarea" value={form.vanAccess} onChange={(event) => updateField("vanAccess", event.target.value)} />
+              </label>
+              <label className="filter-field">
+                <span className="small">Stairs or grade changes</span>
+                <textarea className="textarea" value={form.stairs} onChange={(event) => updateField("stairs", event.target.value)} />
+              </label>
+              <label className="filter-field">
+                <span className="small">Covered/shaded area</span>
+                <textarea className="textarea" value={form.shade} onChange={(event) => updateField("shade", event.target.value)} />
+              </label>
+              <label className="filter-field">
+                <span className="small">Secure location or gate</span>
+                <textarea className="textarea" value={form.secureLocation} onChange={(event) => updateField("secureLocation", event.target.value)} />
+              </label>
+              <label className="filter-field">
+                <span className="small">Behind gate or restricted access</span>
+                <textarea className="textarea" value={form.behindGate} onChange={(event) => updateField("behindGate", event.target.value)} />
+              </label>
+              <label className="filter-field">
+                <span className="small">Room near house</span>
+                <textarea className="textarea" value={form.roomNearHouse} onChange={(event) => updateField("roomNearHouse", event.target.value)} />
+              </label>
+              <label className="filter-field">
+                <span className="small">Tote/cooler storage</span>
+                <textarea className="textarea" value={form.toteStorage} onChange={(event) => updateField("toteStorage", event.target.value)} />
+              </label>
+              <label className="filter-field">
+                <span className="small">Neighbor or HOA concerns</span>
+                <textarea className="textarea" value={form.neighborConcerns} onChange={(event) => updateField("neighborConcerns", event.target.value)} />
+              </label>
+            </div>
+            <label className="filter-field">
+              <span className="small">Additional notes</span>
+              <textarea className="textarea" value={form.notes} onChange={(event) => updateField("notes", event.target.value)} />
+            </label>
+            <label className="filter-field">
+              <span className="small">Photos of access, parking, shade, or pickup area</span>
+              <input
+                className="input"
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
+                multiple
+                onChange={(event) => setPhotos(Array.from(event.target.files || []).slice(0, 4))}
+              />
+            </label>
+            {photos.length ? <div className="small">{photos.length} photo{photos.length === 1 ? "" : "s"} selected.</div> : null}
+            {status.error ? <div className="small subscribe-error">{status.error}</div> : null}
+            {status.message ? <div className="small subscribe-success-message">{status.message}</div> : null}
+            <button className="button" type="submit" disabled={status.submitting}>
+              {status.submitting ? "Sending..." : "Send host information"}
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <footer className="subscribe-footer">
+        <div className="container subscribe-footer-row">
+          <div className="subscribe-footer-brand">
+            <div className="subscribe-footer-brand-top">
+              <img className="subscribe-footer-logo" src="/images/subscribe-footer-logo.avif" alt="Deck Family Farm icon logo" />
+              <strong className="subscribe-footer-wordmark">Deck Family Farm</strong>
+            </div>
+            <div className="small">Drop-site resources for Full Farm CSA hosts and neighbors.</div>
+          </div>
+          <div className="subscribe-footer-contact">
+            <div>25362 High Pass Road</div>
+            <div>Junction City, OR 97448</div>
+            <div><a href="tel:15413210925">541-321-0925</a></div>
+            <div><a href="mailto:fullfarmcsa@deckfamilyfarm.com">fullfarmcsa@deckfamilyfarm.com</a></div>
+          </div>
+          <div className="subscribe-footer-links">
+            <a className="subscribe-review-link" href="https://subscribe.deckfamilyfarm.com/">
+              <span className="subscribe-review-link-star" aria-hidden="true">+</span>
+              <span>Subscribe</span>
+            </a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}

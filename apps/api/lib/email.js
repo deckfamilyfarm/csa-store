@@ -126,6 +126,16 @@ function getLiabilityReleaseNotifyAddress() {
   );
 }
 
+function getDropSiteHostNotifyAddress() {
+  return (
+    process.env.DROPSITE_HOST_NOTIFY_TO ||
+    process.env.DROP_SITE_HOST_NOTIFY_TO ||
+    process.env.SUBSCRIBE_LEAD_NOTIFY_TO ||
+    process.env.SUBSCRIBE_NOTIFY_TO ||
+    "fullfarmcsa@deckfamilyfarm.com"
+  );
+}
+
 function getPublicAppBaseUrl() {
   return (
     process.env.PUBLIC_APP_BASE_URL ||
@@ -389,6 +399,86 @@ export async function sendLiabilityReleaseEmails({ submission = {}, template = {
       `
     });
   }
+
+  return { sent: true };
+}
+
+function sanitizeAttachmentName(value, index) {
+  const cleaned = String(value || "")
+    .replace(/[/\\?%*:|"<>]/g, "-")
+    .replace(/\s+/g, " ")
+    .trim();
+  return cleaned || `dropsite-photo-${index + 1}`;
+}
+
+export async function sendDropSiteHostInterestEmail({ payload = {}, photos = [], submittedAt }) {
+  const transporter = createTransporter();
+  if (!transporter) {
+    console.warn("Drop-site host interest email skipped: email is not configured.");
+    return { sent: false, reason: "Email is not configured." };
+  }
+
+  const from = getSubscribeLeadFromAddress();
+  const notifyTo = String(getDropSiteHostNotifyAddress() || "").trim();
+  if (!notifyTo) {
+    return { sent: false, reason: "Drop-site notification recipient is not configured." };
+  }
+
+  const submittedLabel = formatMaybeDate(submittedAt) || "Unknown";
+  const address = [
+    payload.address,
+    [payload.city, payload.stateProvince, payload.postalCode].filter(Boolean).join(", ")
+  ].map((value) => String(value || "").trim()).filter(Boolean).join("\n");
+  const fields = [
+    ["Submitted", submittedLabel],
+    ["Name", payload.name],
+    ["Email", payload.email],
+    ["Phone", payload.phone],
+    ["Current FFCSA member", payload.memberStatus],
+    ["Proposed address", address],
+    ["Availability", payload.availability],
+    ["Parking", payload.parking],
+    ["Street access", payload.streetAccess],
+    ["Van access", payload.vanAccess],
+    ["Stairs", payload.stairs],
+    ["Room near house", payload.roomNearHouse],
+    ["Covered/shaded area", payload.shade],
+    ["Secure location", payload.secureLocation],
+    ["Behind gate", payload.behindGate],
+    ["Tote/cooler storage", payload.toteStorage],
+    ["Neighbor/HOA concerns", payload.neighborConcerns],
+    ["Referral name/link label", payload.referralName],
+    ["Source", [payload.sourceHost, payload.sourcePath].filter(Boolean).join("")],
+    ["Query string", payload.queryString],
+    ["Notes", payload.notes]
+  ];
+  const submittedText = fields.map(([label, value]) => `${label}: ${displayValue(value)}`).join("\n");
+  const submittedRows = renderSubmittedRows(fields);
+  const attachments = (Array.isArray(photos) ? photos : []).map((file, index) => ({
+    filename: sanitizeAttachmentName(file.originalname, index),
+    content: file.buffer,
+    contentType: file.mimetype || "application/octet-stream"
+  }));
+
+  await transporter.sendMail({
+    from,
+    to: notifyTo,
+    replyTo: payload.email || undefined,
+    subject: `New drop-site host interest: ${displayValue(payload.name, "Unknown")}`,
+    text: [
+      "A new drop-site host interest form was submitted.",
+      "",
+      submittedText,
+      "",
+      attachments.length ? `${attachments.length} photo attachment(s) included.` : "No photos attached."
+    ].join("\n"),
+    html: `
+      <p>A new drop-site host interest form was submitted.</p>
+      <table>${submittedRows}</table>
+      <p>${attachments.length ? `${attachments.length} photo attachment(s) included.` : "No photos attached."}</p>
+    `,
+    attachments
+  });
 
   return { sent: true };
 }

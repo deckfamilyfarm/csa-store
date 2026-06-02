@@ -38,6 +38,7 @@ import { MemberPortalSection } from "./MemberPortalSection.jsx";
 import { SeasonalHighlights } from "./SeasonalHighlights.jsx";
 import { SubscribePage } from "./SubscribePage.jsx";
 import { LiabilityReleasePage } from "./LiabilityReleasePage.jsx";
+import { DropsitesPage } from "./DropsitesPage.jsx";
 
 function hasBackendAccess(user) {
   return (
@@ -52,12 +53,16 @@ function getExperienceMode() {
   const url = new URL(window.location.href);
   const queryMode = String(url.searchParams.get("experience") || "").trim().toLowerCase();
   if (queryMode === "subscribe") return "subscribe";
+  if (queryMode === "dropsites") return "dropsites";
   const host = String(window.location.host || "").trim().toLowerCase();
   if (host.startsWith("subscribe.")) return "subscribe";
+  if (host.startsWith("dropsites.")) return "dropsites";
   const path = String(window.location.pathname || "").trim().toLowerCase();
   if (path === "/subscribe" || path.startsWith("/subscribe/")) return "subscribe";
+  if (path === "/dropsites" || path.startsWith("/dropsites/")) return "dropsites";
   const rawHash = window.location.hash.replace(/^#\/?/, "").trim().toLowerCase();
   if (rawHash === "subscribe") return "subscribe";
+  if (rawHash === "dropsites") return "dropsites";
   return "store";
 }
 
@@ -78,6 +83,9 @@ function getStoreUrl() {
     if (host.includes("localhost") || host.includes("127.0.0.1")) {
       return window.location.origin;
     }
+    return "https://fullfarmcsa.deckfamilyfarm.com/";
+  }
+  if (getExperienceMode() === "dropsites") {
     return "https://fullfarmcsa.deckfamilyfarm.com/";
   }
   if (host.startsWith("store.")) return window.location.origin;
@@ -148,7 +156,13 @@ export function Storefront() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [view, setView] = useState(
-    initialLiabilitySlug ? "liability" : experienceMode === "subscribe" ? "subscribe" : "home"
+    initialLiabilitySlug
+      ? "liability"
+      : experienceMode === "subscribe"
+        ? "subscribe"
+        : experienceMode === "dropsites"
+          ? "dropsites"
+          : "home"
   );
   const [liabilitySlug, setLiabilitySlug] = useState(initialLiabilitySlug);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -198,7 +212,8 @@ export function Storefront() {
       route === "account" ||
       route === "home" ||
       route === "reset-password" ||
-      route === "subscribe"
+      route === "subscribe" ||
+      route === "dropsites"
     ) {
       return route;
     }
@@ -234,7 +249,17 @@ export function Storefront() {
         setView("subscribe");
         return;
       }
-      setView(experienceMode === "subscribe" ? "subscribe" : "home");
+      if (route === "dropsites") {
+        setView("dropsites");
+        return;
+      }
+      setView(
+        experienceMode === "subscribe"
+          ? "subscribe"
+          : experienceMode === "dropsites"
+            ? "dropsites"
+            : "home"
+      );
     }
 
     syncView();
@@ -292,6 +317,7 @@ export function Storefront() {
   const isAdminView = view === "admin";
   const isLiabilityView = view === "liability";
   const isResetPasswordView = view === "resetPassword";
+  const isDropsitesView = view === "dropsites" || experienceMode === "dropsites";
   const showMemberCart = isMember && !isAdminView && !isResetPasswordView;
 
   useEffect(() => {
@@ -603,7 +629,7 @@ export function Storefront() {
   return (
     <div className="page">
       <main>
-        {experienceMode !== "subscribe" && view !== "subscribe" && !isAccountView && !isLiabilityView ? (
+        {experienceMode !== "subscribe" && experienceMode !== "dropsites" && view !== "subscribe" && !isAccountView && !isLiabilityView && !isDropsitesView ? (
           <div className="utility-bar">
             <div className="brand">
               <img src="/images/full-farm-csa-logo.png" alt={brand} />
@@ -641,6 +667,8 @@ export function Storefront() {
           <AdminPanel onCatalogRefresh={reloadCatalog} />
         ) : isLiabilityView ? (
           <LiabilityReleasePage slug={liabilitySlug} />
+        ) : isDropsitesView ? (
+          <DropsitesPage />
         ) : isResetPasswordView ? (
           <section className="section tight">
             <div className="container reset-password-panel">
