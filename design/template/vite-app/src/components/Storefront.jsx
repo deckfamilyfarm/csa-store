@@ -930,7 +930,7 @@ export function Storefront() {
         </div>
       )}
 
-      {experienceMode !== "subscribe" && !isAccountView && !isAdminView ? (
+      {experienceMode !== "subscribe" && !isDropsitesView && !isAccountView && !isAdminView ? (
         <FooterSection brand={brand} />
       ) : null}
 

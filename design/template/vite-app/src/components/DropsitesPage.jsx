@@ -193,8 +193,9 @@ export function DropsitesPage() {
             <div className="eyebrow">Full Farm CSA Drop Sites</div>
             <h1 className="dropsites-title">Drop site hosts keep local food moving.</h1>
             <p className="dropsites-lede">
-              Hosts offer a simple, covered pickup location for members, help with rare missed pickups,
-              and make Full Farm CSA easier for neighbors to join.
+              Small farms need drop site hosts to help sell direct to consumer, spread the word,
+              help people eat healthy local food, and grow regenerative agriculture. Hosts offer
+              a simple, covered pickup location for members and help with rare missed pickups.
             </p>
             <div className="dropsites-hero-actions">
               <a className="button" href="#apply">Become a host</a>
@@ -212,18 +213,18 @@ export function DropsitesPage() {
           <article className="dropsite-info-panel">
             <div className="eyebrow">Responsibilities</div>
             <h2 className="h2">When a member misses pickup</h2>
-            <ul className="dropsite-check-list">
+            <ol className="dropsite-check-list">
               <li>Call the member, or email the CSA team, to find out why the order was not picked up.</li>
-              <li>Store the product during an emergency delay.</li>
+              <li>Store the product during an emergency delay, and keep totes and coolers safe until the following week.</li>
               <li>Manage the product until the farm can pick it up when it needs to come back.</li>
-              <li>Store totes and coolers until they are picked up the following week.</li>
-            </ul>
+            </ol>
           </article>
           <article className="dropsite-info-panel" id="credits">
             <div className="eyebrow">Benefits</div>
-            <h2 className="h2">Host credits and referral credit</h2>
+            <h2 className="h2">Host credits, referral credit, and free delivery</h2>
             <ul className="dropsite-check-list">
               <li>If neither the member nor farm can pick up product while it is fresh, it can go to the host.</li>
+              <li>Hosts receive free delivery for their own CSA orders.</li>
               <li>Qualifying sites receive a $50 monthly host credit.</li>
               <li>Hosts can receive a $25 credit for each new member signup credited to their referral link.</li>
             </ul>
@@ -245,7 +246,7 @@ export function DropsitesPage() {
         <div className="container">
           <div className="subscribe-section-head">
             <div className="eyebrow">Tools</div>
-            <h2 className="h2">Resources for hosts</h2>
+            <h2 className="h2">Host Resources and Responsibilities: How to manage your site and resources for sharing with your community.</h2>
             <p className="lede">
               Use these materials for pickup-day communication, neighbor outreach, and sharing the CSA with people nearby.
             </p>
@@ -285,9 +286,8 @@ export function DropsitesPage() {
             <div className="eyebrow">Performance</div>
             <h2 className="h2">Monthly public drop-site summary</h2>
             <p className="lede">
-              Starting July 1, 2026, host credit qualification uses the average number of orders per active
-              scheduled drop week plus the number of members who picked up during the month. August 2026 credits
-              use the combined monthly threshold, with legacy counts shown during the transition.
+              Host credit is the food credit hosts receive for hosting a drop site. A site qualifies by
+              averaging 3 or more drops per week OR more than 5 pickups per week.
             </p>
           </div>
           <div className="dropsite-metrics-controls">
@@ -307,8 +307,7 @@ export function DropsitesPage() {
               </select>
             </label>
             <div className="small">
-              Credit threshold: {performance.thresholdLabel || "more than 2"} orders per active drop week and at least{" "}
-              {performance.legacyMonthlyUniqueThreshold || 5} members picked up during the month.
+              Credit threshold: 3 or more drops per week OR more than 5 pickups per week.
             </div>
           </div>
           {metricsError ? <div className="small subscribe-error">{metricsError}</div> : null}
