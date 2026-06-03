@@ -102,6 +102,24 @@ function getFulfillmentSiteNameSql(orderAlias = "o", dropSiteAlias = "ds") {
   return `COALESCE(NULLIF(TRIM(${orderAlias}.fulfillment_strategy_name), ''), ${getJsonTrimmedStringSql(orderAlias, "$.fulfillment.fulfillment_strategy_name")}, NULLIF(TRIM(${dropSiteAlias}.name), ''), 'Unassigned')`;
 }
 
+function normalizeDropSiteReportingName(value) {
+  const cleaned = String(value || "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!cleaned || cleaned.toLowerCase() === "unassigned") return "";
+  return cleaned;
+}
+
+function getDropSitePerformanceKey({ name, strategyId } = {}) {
+  const normalizedName = normalizeDropSiteReportingName(name);
+  if (normalizedName) return `name:${normalizedName.toLowerCase()}`;
+
+  const numericStrategyId = Number(strategyId || 0);
+  if (numericStrategyId > 0) return `id:${numericStrategyId}`;
+
+  return "name:unassigned";
+}
+
 function getDefaultDropSitePerformanceMonth(monthKeys = [], referenceDate = new Date()) {
   const availableMonths = monthKeys.filter(Boolean);
   if (!availableMonths.length) return "";
@@ -691,11 +709,12 @@ export async function buildDropSitePerformancePayload({
 
     const orderGroupsByKeyMonth = new Map();
     for (const row of orderRows) {
-      const siteName = String(row.fulfillmentSiteName || "Unassigned").trim();
       const fulfillmentDate = toDateOrNull(row.fulfillmentDate);
-      const strategyId = Number(row.fulfillmentStrategyId || 0);
       const monthKey = formatMonthKey(fulfillmentDate);
-      const siteKey = strategyId > 0 ? `id:${strategyId}` : `name:${siteName}`;
+      const siteKey = getDropSitePerformanceKey({
+        name: row.fulfillmentSiteName,
+        strategyId: row.fulfillmentStrategyId
+      });
       const bucketKey = `${siteKey}|${monthKey}`;
       const existing = orderGroupsByKeyMonth.get(bucketKey) || [];
       existing.push({
@@ -709,8 +728,10 @@ export async function buildDropSitePerformancePayload({
 
     rankedSites = performanceSites
       .map((site) => {
-        const strategyId = Number(site.localLineFulfillmentStrategyId || 0);
-        const siteKey = strategyId > 0 ? `id:${strategyId}` : `name:${site.name}`;
+        const siteKey = getDropSitePerformanceKey({
+          name: site.name,
+          strategyId: site.localLineFulfillmentStrategyId
+        });
         const trendSeries = isTrendMode
           ? trendWeeks
               .map((week) => {
