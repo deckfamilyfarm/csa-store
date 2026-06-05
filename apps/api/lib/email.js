@@ -226,6 +226,8 @@ function buildSubscribeLeadFields(lead = {}, submittedAt) {
     ["Address", address],
     ["Selected plan", lead.selectedPlanLabel || lead.selectedPlan],
     ["Preferred pickup / delivery", lead.selectedDropSite],
+    ["SNAP/EBT card", lead.hasCurrentSnapEbtCard ? "Yes" : "No"],
+    ["Farm employee", lead.isFarmEmployee ? "Yes" : "No"],
     ["Referral source", lead.referralSource],
     ["Notes", lead.notes],
     ["Agreement signer", lead.liabilityAgreementSignerName],

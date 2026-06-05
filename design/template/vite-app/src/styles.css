@@ -1105,6 +1105,27 @@ img {
   font-size: 12px;
 }
 
+.subscribe-option-checklist {
+  display: grid;
+  gap: 10px;
+}
+
+.subscribe-option-check {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  padding: 12px;
+  border: 1px solid rgba(31, 27, 23, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
+  line-height: 1.45;
+}
+
+.subscribe-option-check input {
+  margin-top: 3px;
+}
+
 .subscribe-drop-site-groups {
   display: grid;
   gap: 18px;

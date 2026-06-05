@@ -66,6 +66,8 @@ const SUBSCRIBER_CAPTURE_TABLE_STATEMENTS = [
       selected_plan VARCHAR(64),
       selected_plan_label VARCHAR(255),
       selected_drop_site VARCHAR(255),
+      has_current_snap_ebt_card TINYINT(1) DEFAULT 0,
+      is_farm_employee TINYINT(1) DEFAULT 0,
       notes TEXT,
       admin_notes TEXT,
       liability_agreement_accepted TINYINT(1) DEFAULT 0,
@@ -134,6 +136,16 @@ const SUBSCRIBER_CAPTURE_COLUMN_STATEMENTS = [
     tableName: "subscribe_leads",
     columnName: "admin_notes",
     definition: "admin_notes TEXT"
+  },
+  {
+    tableName: "subscribe_leads",
+    columnName: "has_current_snap_ebt_card",
+    definition: "has_current_snap_ebt_card TINYINT(1) DEFAULT 0"
+  },
+  {
+    tableName: "subscribe_leads",
+    columnName: "is_farm_employee",
+    definition: "is_farm_employee TINYINT(1) DEFAULT 0"
   },
   {
     tableName: "subscribe_leads",

@@ -147,6 +147,14 @@ function cleanOptionalUrl(value) {
   return cleanOptionalString(value, 2048);
 }
 
+function toBooleanFlag(value) {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") return value !== 0;
+  const normalized = String(value ?? "").trim().toLowerCase();
+  if (!normalized) return false;
+  return ["1", "true", "yes", "on"].includes(normalized);
+}
+
 function isEnvEnabled(value) {
   return ["1", "true", "yes", "on"].includes(String(value || "").trim().toLowerCase());
 }
@@ -2172,6 +2180,8 @@ router.post("/subscribe", async (req, res) => {
         : null;
     const submittedPlanKey = cleanString(payload.selectedPlan, 64);
     const selectedPlan = normalizePlanKey(submittedPlanKey);
+    const hasCurrentSnapEbtCard = toBooleanFlag(payload.hasCurrentSnapEbtCard);
+    const isFarmEmployee = toBooleanFlag(payload.isFarmEmployee);
     const agreementAccepted = Boolean(payload.liabilityAgreementAccepted);
     const signatureMode =
       String(payload.liabilityAgreementSignatureMode || "typed").trim().toLowerCase() === "draw"
@@ -2281,6 +2291,8 @@ router.post("/subscribe", async (req, res) => {
       selectedPlanLabel: cleanOptionalString(payload.selectedPlanLabel, 255),
       desiredBillingDayOfMonth,
       selectedDropSite: cleanOptionalString(payload.selectedDropSite, 255),
+      hasCurrentSnapEbtCard: hasCurrentSnapEbtCard ? 1 : 0,
+      isFarmEmployee: isFarmEmployee ? 1 : 0,
       notes: cleanOptionalText(payload.notes),
       liabilityAgreementAccepted: 1,
       liabilityAgreementSignerName: cleanOptionalString(signerName, 255),
@@ -2349,6 +2361,8 @@ router.post("/subscribe", async (req, res) => {
         referralSource: payload.referralSource,
         selectedPlan,
         selectedDropSite: payload.selectedDropSite,
+        hasCurrentSnapEbtCard,
+        isFarmEmployee,
         notes: payload.notes,
         sourceHost: sourceHostHeader,
         sourcePath,
@@ -2462,6 +2476,8 @@ router.post("/subscribe", async (req, res) => {
       selectedPlanLabel: payload.selectedPlanLabel,
       desiredBillingDayOfMonth,
       selectedDropSite: payload.selectedDropSite,
+      hasCurrentSnapEbtCard,
+      isFarmEmployee,
       referralSource: payload.referralSource,
       notes: payload.notes,
       liabilityAgreementSignerName: signerName,

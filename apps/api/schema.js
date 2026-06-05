@@ -311,6 +311,8 @@ export const subscribeLeads = mysqlTable(
     selectedPlan: varchar("selected_plan", { length: 64 }),
     selectedPlanLabel: varchar("selected_plan_label", { length: 255 }),
     selectedDropSite: varchar("selected_drop_site", { length: 255 }),
+    hasCurrentSnapEbtCard: tinyint("has_current_snap_ebt_card").default(0),
+    isFarmEmployee: tinyint("is_farm_employee").default(0),
     notes: text("notes"),
     adminNotes: text("admin_notes"),
     liabilityAgreementAccepted: tinyint("liability_agreement_accepted").default(0),

@@ -245,6 +245,8 @@ function buildInitialForm(dropSites = []) {
     selectedPlan: "forager",
     billingDayOfMonth: 1,
     selectedDropSite: "",
+    hasCurrentSnapEbtCard: false,
+    isFarmEmployee: false,
     notes: "",
     liabilityAgreementAccepted: false,
     liabilityAgreementSignerName: "",
@@ -1049,6 +1051,31 @@ export function SubscribePage({
                           </option>
                         ))}
                       </select>
+                    </label>
+                  </div>
+
+                  <div className="subscribe-option-checklist">
+                    <label className="subscribe-option-check">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(form.hasCurrentSnapEbtCard)}
+                        onChange={(event) =>
+                          updateField("hasCurrentSnapEbtCard", event.target.checked)
+                        }
+                      />
+                      <span>
+                        I have a current SNAP/EBT card from USDA.gov and would like to use it for
+                        this subscription. DO NOT CLICK THIS BOX IF YOU DO NOT HAVE A CURRENT EBT
+                        CARD.
+                      </span>
+                    </label>
+                    <label className="subscribe-option-check">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(form.isFarmEmployee)}
+                        onChange={(event) => updateField("isFarmEmployee", event.target.checked)}
+                      />
+                      <span>I am an employee of Deck Family Farm, Full Farm CSA, or Creamy Cow LLC.</span>
                     </label>
                   </div>
 
