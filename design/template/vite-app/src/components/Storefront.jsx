@@ -297,12 +297,13 @@ export function Storefront() {
       .then((data) => {
         setUser(data.user || null);
         const route = getHashRoute();
+        const isStandaloneExperience = experienceMode === "subscribe" || experienceMode === "dropsites";
         if (hasBackendAccess(data.user)) {
           localStorage.setItem("adminToken", userToken);
-          if (!route && experienceMode !== "subscribe") {
+          if (!route && !isStandaloneExperience) {
             window.location.hash = "#/admin";
           }
-        } else if (!route && experienceMode !== "subscribe") {
+        } else if (!route && !isStandaloneExperience) {
           window.location.hash = "#/subscribe";
         }
       })

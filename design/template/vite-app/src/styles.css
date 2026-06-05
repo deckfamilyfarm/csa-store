@@ -1111,6 +1111,35 @@ img {
   margin-top: 20px;
 }
 
+.subscribe-drop-site-host-callout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 22px;
+  padding: 22px;
+  border: 1px solid rgba(31, 27, 23, 0.12);
+  border-radius: 8px;
+  background: #eef1ea;
+  text-align: left;
+}
+
+.subscribe-drop-site-host-callout h3 {
+  margin: 0 0 8px;
+  font-family: var(--subscribe-serif);
+  font-size: 28px;
+  color: var(--navy);
+}
+
+.subscribe-drop-site-host-callout .lede {
+  margin: 0;
+  max-width: 68ch;
+}
+
+.subscribe-drop-site-host-callout .button {
+  flex: 0 0 auto;
+}
+
 .subscribe-drop-site-table-card {
   padding: 22px 22px 18px;
   border-radius: 24px;
@@ -1427,6 +1456,7 @@ img {
 }
 
 .dropsites-page {
+  --dropsites-metrics-sticky-top: 132px;
   background: #fbfaf6;
 }
 
@@ -1542,16 +1572,24 @@ img {
 }
 
 .dropsites-metrics-controls {
+  position: sticky;
+  top: var(--dropsites-metrics-sticky-top);
+  z-index: 15;
   display: flex;
   flex-wrap: wrap;
   align-items: end;
   justify-content: space-between;
   gap: 16px;
-  margin: 18px 0;
+  margin: 18px 0 0;
+  padding: 12px 0;
+  background: rgba(251, 250, 246, 0.98);
+  box-shadow: 0 1px 0 rgba(31, 27, 23, 0.08);
 }
 
 .dropsite-metrics-table-shell {
-  overflow-x: auto;
+  max-height: min(68vh, 720px);
+  overflow: auto;
+  overscroll-behavior: contain;
   border: 1px solid rgba(31, 27, 23, 0.12);
   border-radius: 8px;
   background: #fff;
@@ -1560,7 +1598,8 @@ img {
 .dropsite-metrics-table {
   width: 100%;
   min-width: 820px;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 .dropsite-metrics-table th,
@@ -1572,11 +1611,15 @@ img {
 }
 
 .dropsite-metrics-table th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--field);
   background: #f6f1e7;
+  box-shadow: 0 1px 0 rgba(31, 27, 23, 0.1);
 }
 
 .dropsite-status {
@@ -4006,6 +4049,10 @@ img {
 }
 
 @media (max-width: 900px) {
+  .dropsites-page {
+    --dropsites-metrics-sticky-top: 174px;
+  }
+
   .subscribe-header-row,
   .subscribe-footer-row {
     flex-direction: column;
@@ -4100,6 +4147,10 @@ img {
 }
 
 @media (max-width: 640px) {
+  .dropsites-page {
+    --dropsites-metrics-sticky-top: 0px;
+  }
+
   .container {
     width: min(1160px, calc(100vw - 24px));
   }
@@ -4263,6 +4314,16 @@ img {
 
   .dropsites-metrics-controls {
     align-items: stretch;
+  }
+
+  .subscribe-drop-site-host-callout {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .subscribe-drop-site-host-callout .button {
+    width: 100%;
+    justify-content: center;
   }
 
   .subscribe-page .button-row {

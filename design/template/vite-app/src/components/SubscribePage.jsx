@@ -12,6 +12,15 @@ const DELIVERY_MAP_URL =
 const LIABILITY_AGREEMENT_URL =
   "https://docs.google.com/document/d/1VFMc4euofQ1S1kjtd6jZI46uxo6YKft9cufT6Q3-nrc/edit?tab=t.0";
 
+function getDropsitesHostUrl() {
+  if (typeof window === "undefined") return "https://dropsites.deckfamilyfarm.com/";
+  const host = String(window.location.host || "").toLowerCase();
+  if (host.includes("localhost") || host.includes("127.0.0.1")) {
+    return "/dropsites";
+  }
+  return "https://dropsites.deckfamilyfarm.com/";
+}
+
 const SUBSCRIBE_PLANS = [
   {
     value: "guest",
@@ -1198,6 +1207,24 @@ export function SubscribePage({
                 orderWindow="order window Monday through Wednesday"
                 sites={saturdayDropSites}
               />
+            </div>
+            <div className="subscribe-drop-site-host-callout">
+              <div>
+                <h3>Want to become a drop site?</h3>
+                <p className="lede">
+                  The drop-site host page explains host responsibilities, monthly host credit
+                  criteria, pickup resources, performance summaries, and the form to tell us about
+                  your proposed pickup location.
+                </p>
+              </div>
+              <a
+                className="button alt"
+                href={getDropsitesHostUrl()}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Visit drop-site host page
+              </a>
             </div>
           </div>
         </section>

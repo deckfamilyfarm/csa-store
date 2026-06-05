@@ -287,7 +287,7 @@ export function DropsitesPage() {
             <h2 className="h2">Monthly public drop-site summary</h2>
             <p className="lede">
               Host credit is the food credit hosts receive for hosting a drop site. A site qualifies by
-              averaging 3 or more drops per week OR more than 5 pickups per week.
+              averaging 3 or more drops per week OR more than 5 pickups per month.
             </p>
           </div>
           <div className="dropsite-metrics-controls">
@@ -307,7 +307,7 @@ export function DropsitesPage() {
               </select>
             </label>
             <div className="small">
-              Credit threshold: 3 or more drops per week OR more than 5 pickups per week.
+              Credit threshold: 3 or more drops per week OR more than 5 pickups per month.
             </div>
           </div>
           {metricsError ? <div className="small subscribe-error">{metricsError}</div> : null}

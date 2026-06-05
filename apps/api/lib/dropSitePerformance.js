@@ -487,7 +487,7 @@ function buildSeriesEntry({ site, rows = [], rangeStart, rangeEnd, monthKey = ""
     activeDropWeeks > 0 ? Number((orderCount / activeDropWeeks).toFixed(2)) : 0;
   const legacyMonthlyUniqueCustomers = computeLegacyUniqueCustomerCount(rows);
   const weeklyCreditEligible = averageOrdersPerActiveDropWeek > WEEKLY_CREDIT_THRESHOLD;
-  const legacyCreditEligible = legacyMonthlyUniqueCustomers >= LEGACY_MONTHLY_UNIQUE_THRESHOLD;
+  const legacyCreditEligible = legacyMonthlyUniqueCustomers > LEGACY_MONTHLY_UNIQUE_THRESHOLD;
 
   return {
     ...(weekStart ? { weekStart } : {}),
@@ -806,7 +806,7 @@ export async function buildDropSitePerformancePayload({
           ? latestAverageOrdersPerActiveDropWeek
           : averageOrdersPerActiveDropWeek;
         const weeklyCreditEligible = primaryAverage > WEEKLY_CREDIT_THRESHOLD;
-        const legacyCreditEligible = legacyMonthlyUniqueCustomers >= LEGACY_MONTHLY_UNIQUE_THRESHOLD;
+        const legacyCreditEligible = legacyMonthlyUniqueCustomers > LEGACY_MONTHLY_UNIQUE_THRESHOLD;
         const detailSeries = trendSeries
           .flatMap((entry) => Array.isArray(entry.detailPoints) ? entry.detailPoints : [])
           .sort((left, right) => String(left.date || "").localeCompare(String(right.date || "")));

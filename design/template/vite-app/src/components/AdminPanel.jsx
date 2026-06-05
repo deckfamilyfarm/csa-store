@@ -4721,7 +4721,7 @@ export function AdminPanel({ onCatalogRefresh }) {
                 <div className="title">Host Credit Performance</div>
                 <div className="small">
                   Hosts qualify when active scheduled drops average {dropSitePerformance?.thresholdLabel || "more than 2"} orders per week
-                  and at least {Number(dropSitePerformance?.legacyMonthlyUniqueThreshold || 5)} members pick up during the month.
+                  and more than {Number(dropSitePerformance?.legacyMonthlyUniqueThreshold || 5)} members pick up during the month.
                   Green is over {Number(dropSitePerformance?.strongAverage || 5).toFixed(0)}, orange is above the credit threshold to
                   {Number(dropSitePerformance?.strongAverage || 5).toFixed(0)}, and red is at or under the weekly threshold.
                 </div>
