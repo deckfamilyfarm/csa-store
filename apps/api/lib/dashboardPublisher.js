@@ -163,6 +163,15 @@ function toYmdFromSheetWeekLabel(value) {
   return `${year}-${month}-${day}`;
 }
 
+function formatDashboardWeekLabel(ymd) {
+  const date = parseYmd(ymd);
+  if (!date) return String(ymd || "");
+  const month = date.getUTCMonth() + 1;
+  const day = date.getUTCDate();
+  const year = String(date.getUTCFullYear()).slice(-2);
+  return `${month}/${day}/${year}`;
+}
+
 function stringifyJson(value) {
   if (value === null || typeof value === "undefined") return null;
   try {
@@ -239,6 +248,34 @@ function getSnapCustomerKeySql(alias = "o") {
     WHEN TRIM(COALESCE(${alias}.customer_name, '')) <> '' THEN CONCAT('name:', LOWER(TRIM(${alias}.customer_name)))
     ELSE NULL
   END`;
+}
+
+function getDashboardSubscriptionPredicate(alias = "") {
+  const prefix = alias ? `${alias}.` : "";
+  return `(
+    LOWER(COALESCE(${prefix}category_name, '')) = 'membership'
+    OR LOWER(COALESCE(${prefix}fulfillment_name, '')) LIKE '%membership purchase%'
+  )`;
+}
+
+function getDashboardRetailSalesPredicate(alias = "") {
+  return `NOT ${getDashboardSubscriptionPredicate(alias)}`;
+}
+
+function getDashboardSubscriptionCreditGivenExpression(alias = "") {
+  const prefix = alias ? `${alias}.` : "";
+  const planName = `LOWER(CONCAT_WS(' ', ${prefix}product_name, ${prefix}package_name))`;
+  const quantity = `CASE WHEN COALESCE(${prefix}quantity, 0) > 0 THEN ${prefix}quantity ELSE 1 END`;
+  return `(
+    ${quantity} *
+    CASE
+      WHEN ${planName} LIKE '%harvester%' THEN 500
+      WHEN ${planName} LIKE '%grazer%' THEN 300
+      WHEN ${planName} LIKE '%forager%' THEN 200
+      WHEN ${planName} LIKE '%economy%' THEN 120
+      ELSE COALESCE(${prefix}retail_amount, 0)
+    END
+  )`;
 }
 
 function getManualSourceValue(rowMap, rowLabel, weekColIdx) {
@@ -442,6 +479,27 @@ function buildDashboardRows(
             if (!average) return null;
             return ((sales - average) / average) * 100;
           }
+        },
+        {
+          label: "Subscription Income",
+          entry: "AUTO",
+          source: "Paid Membership / membership purchase rows excluded from Retail Sales",
+          valueType: "currency",
+          auto: (w) => Number(weeklyKpiMap[w.start]?.subscriptionIncome)
+        },
+        {
+          label: "Subscription Credit Given",
+          entry: "AUTO",
+          source: "Membership plan credit value from paid membership purchase rows",
+          valueType: "currency",
+          auto: (w) => Number(weeklyKpiMap[w.start]?.subscriptionCreditGiven)
+        },
+        {
+          label: "Subscription Credit Used",
+          entry: "AUTO",
+          source: "Local Line order payment.store_credit_amount",
+          valueType: "currency",
+          auto: (w) => Number(weeklyKpiMap[w.start]?.subscriptionCreditUsed)
         },
         {
           label: "Retail Sales",
@@ -920,6 +978,37 @@ function extractWeeksFromSource(rows) {
   return weeks;
 }
 
+function extendWeeksThroughPublishableWeek(weeks, publishableThroughWeekStart) {
+  const sourceWeeks = Array.isArray(weeks) ? weeks : [];
+  if (!sourceWeeks.length || !publishableThroughWeekStart) {
+    return { weeks: sourceWeeks, addedWeeks: [] };
+  }
+
+  const knownStarts = new Set(sourceWeeks.map((week) => week.start).filter(Boolean));
+  const lastSourceWeekStart = sourceWeeks[sourceWeeks.length - 1]?.start;
+  let nextWeekStart = addDaysYmd(lastSourceWeekStart, 7);
+  const addedWeeks = [];
+
+  while (
+    nextWeekStart &&
+    String(nextWeekStart) <= String(publishableThroughWeekStart)
+  ) {
+    if (!knownStarts.has(nextWeekStart)) {
+      const addedWeek = {
+        label: formatDashboardWeekLabel(nextWeekStart),
+        start: nextWeekStart,
+        end: addDaysYmd(nextWeekStart, 6),
+        generated: true
+      };
+      addedWeeks.push(addedWeek);
+      knownStarts.add(nextWeekStart);
+    }
+    nextWeekStart = addDaysYmd(nextWeekStart, 7);
+  }
+
+  return { weeks: [...sourceWeeks, ...addedWeeks], addedWeeks };
+}
+
 function buildInClause(values = []) {
   return values.map(() => "?").join(", ");
 }
@@ -929,8 +1018,9 @@ async function loadWeeklyOrderMetrics(weeks) {
   const weekKeys = weeks.map((week) => week.start).filter(Boolean);
   if (!weekKeys.length) return {};
 
-  const membershipExclusion =
-    "NOT (LOWER(COALESCE(category_name, '')) = 'membership' OR LOWER(COALESCE(fulfillment_name, '')) LIKE '%membership purchase%')";
+  const retailSalesPredicate = getDashboardRetailSalesPredicate();
+  const subscriptionPredicate = getDashboardSubscriptionPredicate();
+  const subscriptionCreditGivenExpression = getDashboardSubscriptionCreditGivenExpression();
   const weekSql = buildInClause(weekKeys);
 
   const [orderRows] = await pool.query(
@@ -948,7 +1038,7 @@ async function loadWeeklyOrderMetrics(weeks) {
         FROM local_line_order_reporting_entries
         WHERE order_status = 'OPEN'
           AND payment_status = 'PAID'
-          AND ${membershipExclusion}
+          AND ${retailSalesPredicate}
           AND week_start IN (${weekSql})
         GROUP BY week_start, local_line_order_id
       ) reporting_orders
@@ -973,7 +1063,7 @@ async function loadWeeklyOrderMetrics(weeks) {
       FROM local_line_order_reporting_entries
       WHERE order_status = 'OPEN'
         AND payment_status = 'PAID'
-        AND ${membershipExclusion}
+        AND ${retailSalesPredicate}
         AND week_start IN (${weekSql})
       GROUP BY week_start
     `,
@@ -992,17 +1082,59 @@ async function loadWeeklyOrderMetrics(weeks) {
         ON orders.local_line_order_id = reporting_entries.local_line_order_id
       WHERE reporting_entries.order_status = 'OPEN'
         AND reporting_entries.payment_status = 'PAID'
-        AND NOT (
-          LOWER(COALESCE(reporting_entries.category_name, '')) = 'membership'
-          OR LOWER(COALESCE(reporting_entries.fulfillment_name, '')) LIKE '%membership purchase%'
-        )
+        AND ${getDashboardRetailSalesPredicate("reporting_entries")}
         AND reporting_entries.week_start IN (${weekSql})
+    `,
+    weekKeys
+  );
+  const [subscriptionRows] = await pool.query(
+    `
+      SELECT
+        week_start AS weekKey,
+        COALESCE(SUM(retail_amount), 0) AS subscriptionIncome,
+        COALESCE(SUM(${subscriptionCreditGivenExpression}), 0) AS subscriptionCreditGiven
+      FROM local_line_order_reporting_entries
+      WHERE order_status = 'OPEN'
+        AND payment_status = 'PAID'
+        AND ${subscriptionPredicate}
+        AND week_start IN (${weekSql})
+      GROUP BY week_start
+    `,
+    weekKeys
+  );
+  const [subscriptionCreditUsedRows] = await pool.query(
+    `
+      SELECT
+        order_credits.weekKey,
+        COALESCE(SUM(order_credits.storeCreditAmount), 0) AS subscriptionCreditUsed
+      FROM (
+        SELECT
+          DATE_FORMAT(
+            DATE_SUB(
+              DATE(COALESCE(fulfillment_date, created_at_remote)),
+              INTERVAL WEEKDAY(DATE(COALESCE(fulfillment_date, created_at_remote))) DAY
+            ),
+            '%Y-%m-%d'
+          ) AS weekKey,
+          CAST(JSON_UNQUOTE(JSON_EXTRACT(raw_json, '$.payment.store_credit_amount')) AS DECIMAL(10, 2)) AS storeCreditAmount
+        FROM local_line_orders
+        WHERE status = 'OPEN'
+          AND payment_status = 'PAID'
+          AND COALESCE(fulfillment_date, created_at_remote) IS NOT NULL
+      ) order_credits
+      WHERE order_credits.weekKey IN (${weekSql})
+        AND order_credits.storeCreditAmount > 0
+      GROUP BY order_credits.weekKey
     `,
     weekKeys
   );
 
   const orderMap = new Map(orderRows.map((row) => [String(row.weekKey), row]));
   const reportingMap = new Map(reportingRows.map((row) => [String(row.weekKey), row]));
+  const subscriptionMap = new Map(subscriptionRows.map((row) => [String(row.weekKey), row]));
+  const subscriptionCreditUsedMap = new Map(
+    subscriptionCreditUsedRows.map((row) => [String(row.weekKey), row])
+  );
   const averageOrderAmountMap = new Map();
   const orderTotalsByWeekAndOrder = new Map();
 
@@ -1044,6 +1176,8 @@ async function loadWeeklyOrderMetrics(weeks) {
   weekKeys.forEach((weekKey) => {
     const orderRow = orderMap.get(weekKey);
     const reportingRow = reportingMap.get(weekKey);
+    const subscriptionRow = subscriptionMap.get(weekKey);
+    const subscriptionCreditUsedRow = subscriptionCreditUsedMap.get(weekKey);
     const averageOrderSummary = averageOrderAmountMap.get(weekKey);
     const numOrders = Number(orderRow?.orderCount || 0);
     const numGuestOrders = Number(orderRow?.guestOrderCount || 0);
@@ -1057,6 +1191,13 @@ async function loadWeeklyOrderMetrics(weeks) {
         averageOrderSummary?.count
           ? Number((averageOrderSummary.total / averageOrderSummary.count).toFixed(2))
           : Number(Number(orderRow?.averageOrderAmount || 0).toFixed(2)),
+      subscriptionIncome: Number(Number(subscriptionRow?.subscriptionIncome || 0).toFixed(2)),
+      subscriptionCreditGiven: Number(
+        Number(subscriptionRow?.subscriptionCreditGiven || 0).toFixed(2)
+      ),
+      subscriptionCreditUsed: Number(
+        Number(subscriptionCreditUsedRow?.subscriptionCreditUsed || 0).toFixed(2)
+      ),
       totalSales: Number(Number(reportingRow?.retailAmount || 0).toFixed(2))
     };
   });
@@ -1068,8 +1209,7 @@ async function loadVendorWeeklyMap(weeks) {
   const pool = getPool();
   const weekKeys = weeks.map((week) => week.start).filter(Boolean);
   if (!weekKeys.length) return {};
-  const membershipExclusion =
-    "NOT (LOWER(COALESCE(category_name, '')) = 'membership' OR LOWER(COALESCE(fulfillment_name, '')) LIKE '%membership purchase%')";
+  const retailSalesPredicate = getDashboardRetailSalesPredicate();
 
   const [rows] = await pool.query(
     `
@@ -1080,7 +1220,7 @@ async function loadVendorWeeklyMap(weeks) {
       FROM local_line_order_reporting_entries
       WHERE order_status = 'OPEN'
         AND payment_status = 'PAID'
-        AND ${membershipExclusion}
+        AND ${retailSalesPredicate}
         AND week_start IN (${buildInClause(weekKeys)})
       GROUP BY week_start
     `,
@@ -2411,12 +2551,16 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
     });
 
     const sourceRows = await fetchSourceSheetRows();
-    const weeks = extractWeeksFromSource(sourceRows);
-    if (!weeks.length) {
+    const sourceWeeks = extractWeeksFromSource(sourceRows);
+    if (!sourceWeeks.length) {
       throw new Error("No dashboard week columns found in the source sheet.");
     }
     const rowMap = mapRowsByLabel(sourceRows.slice(2));
     const availability = await loadDashboardPublishAvailability();
+    const { weeks, addedWeeks } = extendWeeksThroughPublishableWeek(
+      sourceWeeks,
+      availability.publishableThroughWeekStart
+    );
     const publishableWeekStarts = new Set(
       weeks
         .filter(
@@ -2461,7 +2605,9 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       total: weeks.length,
       message: warningSkippedWeeks.length
         ? `Loaded ${weeks.length} dashboard weeks; ${warningSkippedWeeks.length} completed week columns are still blank pending local data`
-        : `Loaded ${weeks.length} dashboard weeks`
+        : addedWeeks.length
+          ? `Loaded ${sourceWeeks.length} source weeks and auto-added ${addedWeeks.length} week columns`
+          : `Loaded ${weeks.length} dashboard weeks`
     });
 
     reportProgress({
@@ -2532,14 +2678,21 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       targetTitle: DASHBOARD_TARGET_TITLE,
       sourceGid: DASHBOARD_SOURCE_GID,
       weekCount: weeks.length,
+      sourceWeekCount: sourceWeeks.length,
+      autoAddedWeekCount: addedWeeks.length,
+      autoAddedWeeks: addedWeeks.map((week) => ({
+        label: week.label,
+        start: week.start,
+        end: week.end
+      })),
       publishableWeekCount: publishableWeekStarts.size,
       rowCount: values.length,
       latestWeekStart: availability.publishableThroughWeekStart || null,
       latestWeekEnd: availability.publishableThroughWeekStart
         ? addDaysYmd(availability.publishableThroughWeekStart, 6)
         : null,
-      latestSourceWeekStart: weeks[weeks.length - 1]?.start || null,
-      latestSourceWeekEnd: weeks[weeks.length - 1]?.end || null,
+      latestSourceWeekStart: sourceWeeks[sourceWeeks.length - 1]?.start || null,
+      latestSourceWeekEnd: sourceWeeks[sourceWeeks.length - 1]?.end || null,
       skippedWeeks: skippedWeeks.map((week) => ({
         label: week.label,
         start: week.start,

@@ -1,6 +1,7 @@
 import express from "express";
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
+import multer from "multer";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import {
@@ -9,6 +10,7 @@ import {
   ensureSubscriptionPortalSchema,
   ensureSubscriberCaptureSchema,
   getDb,
+  getPool,
   isMissingTableError
 } from "../db.js";
 import { and, eq, inArray } from "drizzle-orm";
@@ -43,7 +45,10 @@ import {
 import { requireUser } from "../middleware/auth.js";
 import { computeProductPricingSnapshot } from "../lib/productPricing.js";
 import { issueUserToken } from "../lib/authTokens.js";
-import { sendSubscribeLeadFollowupEmail } from "../lib/email.js";
+import {
+  sendDropSiteHostInterestEmail,
+  sendSubscribeLeadFollowupEmail
+} from "../lib/email.js";
 import {
   computeNextBillingDate,
   ensureMemberLedgerAccounts,
@@ -54,6 +59,13 @@ import {
 } from "../lib/memberPortal.js";
 
 const router = express.Router();
+const dropSiteHostUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    files: 4,
+    fileSize: 8 * 1024 * 1024
+  }
+});
 
 function parsePriceListId(value) {
   const numeric = Number(value);
@@ -130,6 +142,141 @@ function cleanOptionalText(value) {
 
 function cleanOptionalUrl(value) {
   return cleanOptionalString(value, 2048);
+}
+
+function toDateOrNull(value) {
+  if (!value) return null;
+  if (typeof value === "string") {
+    const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (match) {
+      const date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+      return Number.isNaN(date.getTime()) ? null : date;
+    }
+  }
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function startOfDay(date) {
+  const copy = new Date(date);
+  copy.setHours(0, 0, 0, 0);
+  return copy;
+}
+
+function formatMonthKey(value) {
+  const date = toDateOrNull(value);
+  if (!date) return "";
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function parseMonthKey(value) {
+  const match = String(value || "").match(/^(\d{4})-(\d{2})$/);
+  if (!match) return null;
+  const year = Number(match[1]);
+  const monthIndex = Number(match[2]) - 1;
+  if (!Number.isFinite(year) || !Number.isFinite(monthIndex) || monthIndex < 0 || monthIndex > 11) {
+    return null;
+  }
+  return {
+    key: `${year}-${String(monthIndex + 1).padStart(2, "0")}`,
+    start: new Date(year, monthIndex, 1),
+    end: new Date(year, monthIndex + 1, 1)
+  };
+}
+
+function parseJsonValue(value, fallback = null) {
+  if (!value) return fallback;
+  try {
+    return typeof value === "string" ? JSON.parse(value) : value;
+  } catch (_error) {
+    return fallback;
+  }
+}
+
+function getDefaultDropSitePerformanceMonth(monthKeys = [], referenceDate = new Date()) {
+  const availableMonths = monthKeys.filter(Boolean);
+  if (!availableMonths.length) return "";
+
+  const today = toDateOrNull(referenceDate) || new Date();
+  const currentMonthKey = formatMonthKey(today);
+  const priorMonthKey = formatMonthKey(new Date(today.getFullYear(), today.getMonth() - 1, 1));
+
+  if (today.getDate() >= 25 && availableMonths.includes(currentMonthKey)) {
+    return currentMonthKey;
+  }
+  if (availableMonths.includes(priorMonthKey)) {
+    return priorMonthKey;
+  }
+  if (availableMonths.includes(currentMonthKey)) {
+    return currentMonthKey;
+  }
+  return availableMonths[0] || "";
+}
+
+function buildMonthKeysBetween(minValue, maxValue) {
+  const minDate = toDateOrNull(minValue);
+  const maxDate = toDateOrNull(maxValue);
+  if (!minDate || !maxDate || minDate > maxDate) return [];
+
+  const keys = [];
+  const cursor = new Date(maxDate.getFullYear(), maxDate.getMonth(), 1);
+  const minMonth = new Date(minDate.getFullYear(), minDate.getMonth(), 1);
+  while (cursor >= minMonth) {
+    keys.push(formatMonthKey(cursor));
+    cursor.setMonth(cursor.getMonth() - 1);
+  }
+  return keys;
+}
+
+function isMembershipPurchaseDropSite(site = {}) {
+  const name = String(site?.name || "").trim().toLowerCase();
+  if (name.includes("membership purchase")) return true;
+
+  const raw = parseJsonValue(site?.rawJson || site?.raw_json, {});
+  const formattedAddress = String(
+    raw?.address?.formatted_address ||
+      raw?.address?.street_address ||
+      site?.address ||
+      ""
+  ).trim().toLowerCase();
+  const instructions = String(
+    raw?.availability?.instructions ||
+      site?.instructions ||
+      ""
+  ).trim().toLowerCase();
+
+  return (
+    formattedAddress.includes("online delivery") &&
+    instructions.includes("subscribing to a full farm csa membership")
+  );
+}
+
+function getDropSiteArea(site = {}) {
+  const raw = parseJsonValue(site?.rawJson || site?.raw_json, {});
+  return (
+    cleanOptionalString(raw?.address?.city || raw?.address?.locality, 128) ||
+    cleanOptionalString(site.city, 128) ||
+    cleanOptionalString(site.dayOfWeek, 128) ||
+    "Local pickup area"
+  );
+}
+
+function normalizeDropSiteMetricKey(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ");
+}
+
+async function queryWithConnectionRetry(pool, sql, params = []) {
+  try {
+    return await pool.query(sql, params);
+  } catch (error) {
+    if (["PROTOCOL_CONNECTION_LOST", "ECONNRESET", "ETIMEDOUT"].includes(error?.code)) {
+      return pool.query(sql, params);
+    }
+    throw error;
+  }
 }
 
 function isEnvEnabled(value) {
@@ -1531,6 +1678,240 @@ router.get("/drop-sites", async (_req, res) => {
     res.status(500).json({ error: "Failed to load drop sites" });
   }
 });
+
+router.get("/dropsites/performance", async (req, res) => {
+  try {
+    await ensureLocalLineSyncSchema().catch((error) => {
+      console.warn("Local Line schema bootstrap skipped for /dropsites/performance:", error.message);
+    });
+
+    const pool = getPool();
+    const requestedMonth = String(req.query?.month || "").trim();
+    const completedFulfillmentCutoff = startOfDay(new Date());
+
+    const [siteRows] = await queryWithConnectionRetry(
+      pool,
+      `
+        SELECT
+          id,
+          name,
+          address,
+          day_of_week AS dayOfWeek,
+          active,
+          local_line_fulfillment_strategy_id AS localLineFulfillmentStrategyId,
+          instructions,
+          address_json AS addressJson,
+          availability_json AS availabilityJson,
+          raw_json AS rawJson
+        FROM drop_sites
+        WHERE active = 1
+        ORDER BY name ASC
+      `
+    );
+
+    const visibleDropSites = siteRows
+      .filter((site) => !isMembershipPurchaseDropSite(site))
+      .map((site) => ({
+        ...site,
+        active: Boolean(site.active),
+        area: getDropSiteArea(site)
+      }));
+
+    let [monthRows] = await queryWithConnectionRetry(
+      pool,
+      `
+        SELECT month_key AS value
+        FROM local_line_order_reporting_months
+        WHERE status = 'completed'
+        ORDER BY month_key DESC
+      `
+    );
+    if (!monthRows.length) {
+      const [orderDateRangeRows] = await queryWithConnectionRetry(
+        pool,
+        `
+          SELECT
+            MIN(fulfillment_date) AS minFulfillmentDate,
+            MAX(fulfillment_date) AS maxFulfillmentDate
+          FROM local_line_orders
+          WHERE fulfillment_date IS NOT NULL
+            AND fulfillment_date < ?
+        `,
+        [completedFulfillmentCutoff]
+      );
+      monthRows = buildMonthKeysBetween(
+        orderDateRangeRows?.[0]?.minFulfillmentDate,
+        orderDateRangeRows?.[0]?.maxFulfillmentDate
+      ).map((value) => ({ value }));
+    }
+    const performanceMonths = monthRows.map((row) => row.value).filter(Boolean);
+    const selectedMonth = performanceMonths.includes(requestedMonth)
+      ? requestedMonth
+      : getDefaultDropSitePerformanceMonth(performanceMonths, completedFulfillmentCutoff);
+
+    let metricsBySiteKey = new Map();
+    if (selectedMonth) {
+      let [metricRows] = await queryWithConnectionRetry(
+        pool,
+        `
+          SELECT
+            NULL AS fulfillmentStrategyId,
+            COALESCE(NULLIF(TRIM(fulfillment_name), ''), 'Unassigned') AS fulfillmentSiteName,
+            COUNT(DISTINCT local_line_order_id) AS orderCount,
+            COUNT(DISTINCT fulfillment_date) AS activeDropWeeks,
+            COUNT(DISTINCT NULLIF(TRIM(customer_name), '')) AS uniqueCustomerCount
+          FROM local_line_order_reporting_entries
+          WHERE fulfillment_month = ?
+          GROUP BY fulfillmentSiteName
+        `,
+        [selectedMonth]
+      );
+      if (!metricRows.length) {
+        const selectedMonthRange = parseMonthKey(selectedMonth);
+        if (selectedMonthRange) {
+          [metricRows] = await queryWithConnectionRetry(
+            pool,
+            `
+              SELECT
+                o.fulfillment_strategy_id AS fulfillmentStrategyId,
+                COALESCE(NULLIF(TRIM(o.fulfillment_strategy_name), ''), NULLIF(TRIM(ds.name), ''), 'Unassigned') AS fulfillmentSiteName,
+                COUNT(DISTINCT o.local_line_order_id) AS orderCount,
+                COUNT(DISTINCT DATE(o.fulfillment_date)) AS activeDropWeeks,
+                COUNT(DISTINCT COALESCE(CAST(o.customer_id AS CHAR), NULLIF(TRIM(o.customer_name), ''))) AS uniqueCustomerCount
+              FROM local_line_orders o
+              LEFT JOIN drop_sites ds
+                ON ds.local_line_fulfillment_strategy_id = o.fulfillment_strategy_id
+              WHERE o.fulfillment_date IS NOT NULL
+                AND o.fulfillment_date >= ?
+                AND o.fulfillment_date < ?
+                AND o.fulfillment_date < ?
+              GROUP BY o.fulfillment_strategy_id, fulfillmentSiteName
+            `,
+            [selectedMonthRange.start, selectedMonthRange.end, completedFulfillmentCutoff]
+          );
+        }
+      }
+
+      metricsBySiteKey = metricRows.reduce((map, row) => {
+        const strategyId = Number(row.fulfillmentStrategyId || 0);
+        const siteName = String(row.fulfillmentSiteName || "Unassigned").trim();
+        if (strategyId > 0) {
+          map.set(`id:${strategyId}`, row);
+        }
+        map.set(`name:${normalizeDropSiteMetricKey(siteName)}`, row);
+        return map;
+      }, new Map());
+    }
+
+    const rankedSites = visibleDropSites
+      .map((site) => {
+        const strategyId = Number(site.localLineFulfillmentStrategyId || 0);
+        const metrics =
+          (strategyId > 0 ? metricsBySiteKey.get(`id:${strategyId}`) : null) ||
+          metricsBySiteKey.get(`name:${normalizeDropSiteMetricKey(site.name)}`) ||
+          {};
+        const orderCount = Number(metrics.orderCount || 0);
+        const activeDropWeeks = Number(metrics.activeDropWeeks || 0);
+        const averageOrdersPerActiveDropWeek =
+          activeDropWeeks > 0 ? Number((orderCount / activeDropWeeks).toFixed(2)) : 0;
+        const legacyMonthlyUniqueCustomers = Number(metrics.uniqueCustomerCount || 0);
+        const transitionCreditEligible =
+          averageOrdersPerActiveDropWeek >= 3 || legacyMonthlyUniqueCustomers > 5 || orderCount > 5;
+
+        return {
+          id: site.id,
+          name: site.name,
+          area: site.area,
+          orderCount,
+          activeDropWeeks,
+          scheduledDrops: activeDropWeeks,
+          averageOrdersPerActiveDropWeek,
+          averageWeeklyOrders: averageOrdersPerActiveDropWeek,
+          legacyMonthlyUniqueCustomers,
+          transitionCreditEligible
+        };
+      })
+      .sort((left, right) => {
+        if (right.averageOrdersPerActiveDropWeek !== left.averageOrdersPerActiveDropWeek) {
+          return right.averageOrdersPerActiveDropWeek - left.averageOrdersPerActiveDropWeek;
+        }
+        if (right.orderCount !== left.orderCount) {
+          return right.orderCount - left.orderCount;
+        }
+        return String(left.name || "").localeCompare(String(right.name || ""));
+      });
+
+    res.json({
+      performance: {
+        mode: "month",
+        selectedMonth,
+        months: performanceMonths,
+        thresholdAverage: 3,
+        rankedSites
+      }
+    });
+  } catch (error) {
+    console.error("Drop-site performance error:", error);
+    res.status(500).json({ error: "Failed to load drop-site performance" });
+  }
+});
+
+router.post(
+  "/dropsites/host-interest",
+  dropSiteHostUpload.array("photos", 4),
+  async (req, res) => {
+    try {
+      const payload = req.body || {};
+      if (cleanString(payload.website)) {
+        return res.json({ ok: true });
+      }
+
+      const name = cleanString(payload.name);
+      const email = cleanString(payload.email);
+      const address = cleanString(payload.address);
+      const errors = [];
+      if (!name) errors.push("Name is required.");
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) errors.push("A valid email is required.");
+      if (!address) errors.push("Proposed address is required.");
+      if (errors.length) {
+        return res.status(400).json({ error: errors.join(" ") });
+      }
+
+      const submittedAt = new Date();
+      const normalizedPayload = {
+        name,
+        email,
+        phone: cleanOptionalString(payload.phone, 64),
+        memberStatus: cleanOptionalString(payload.memberStatus, 128),
+        address,
+        city: cleanOptionalString(payload.city, 128),
+        stateProvince: cleanOptionalString(payload.stateProvince, 64),
+        postalCode: cleanOptionalString(payload.postalCode, 32),
+        availability: cleanOptionalText(payload.availability),
+        parking: cleanOptionalText(payload.parking),
+        stairs: cleanOptionalText(payload.stairs),
+        secureLocation: cleanOptionalText(payload.secureLocation),
+        toteStorage: cleanOptionalText(payload.toteStorage),
+        neighborConcerns: cleanOptionalText(payload.neighborConcerns),
+        notes: cleanOptionalText(payload.notes),
+        sourceHost: cleanOptionalString(payload.sourceHost || req.get("host"), 255),
+        sourcePath: cleanOptionalString(payload.sourcePath, 255),
+        queryString: cleanOptionalString(payload.queryString, 1024)
+      };
+
+      const emailResult = await sendDropSiteHostInterestEmail({
+        payload: normalizedPayload,
+        photos: req.files || [],
+        submittedAt
+      });
+
+      res.json({ ok: true, emailSent: Boolean(emailResult?.sent) });
+    } catch (error) {
+      console.error("Drop-site host interest error:", error);
+      res.status(500).json({ error: "Unable to submit drop-site host interest" });
+    }
+  }
+);
 
 router.get("/marketing/utm-format", (req, res) => {
   const baseUrl = `${req.protocol}://${req.get("host") || ""}`;

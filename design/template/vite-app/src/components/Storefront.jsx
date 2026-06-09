@@ -37,6 +37,7 @@ import { AdminPanel } from "./AdminPanel.jsx";
 import { MemberPortalSection } from "./MemberPortalSection.jsx";
 import { SeasonalHighlights } from "./SeasonalHighlights.jsx";
 import { SubscribePage } from "./SubscribePage.jsx";
+import { DropSitesPage } from "./DropSitesPage.jsx";
 
 function hasBackendAccess(user) {
   return (
@@ -51,12 +52,16 @@ function getExperienceMode() {
   const url = new URL(window.location.href);
   const queryMode = String(url.searchParams.get("experience") || "").trim().toLowerCase();
   if (queryMode === "subscribe") return "subscribe";
+  if (queryMode === "dropsites") return "dropsites";
   const host = String(window.location.host || "").trim().toLowerCase();
   if (host.startsWith("subscribe.")) return "subscribe";
+  if (host.startsWith("dropsites.")) return "dropsites";
   const path = String(window.location.pathname || "").trim().toLowerCase();
   if (path === "/subscribe" || path.startsWith("/subscribe/")) return "subscribe";
+  if (path === "/dropsites" || path.startsWith("/dropsites/")) return "dropsites";
   const rawHash = window.location.hash.replace(/^#\/?/, "").trim().toLowerCase();
   if (rawHash === "subscribe") return "subscribe";
+  if (rawHash === "dropsites") return "dropsites";
   return "store";
 }
 
@@ -67,6 +72,9 @@ function getStoreUrl() {
     if (host.includes("localhost") || host.includes("127.0.0.1")) {
       return window.location.origin;
     }
+    return "https://fullfarmcsa.deckfamilyfarm.com/";
+  }
+  if (getExperienceMode() === "dropsites") {
     return "https://fullfarmcsa.deckfamilyfarm.com/";
   }
   if (host.startsWith("store.")) return window.location.origin;
@@ -114,6 +122,7 @@ function writeCachedSubscribeDropSites(sites) {
 
 export function Storefront() {
   const experienceMode = getExperienceMode();
+  const isStandaloneExperience = experienceMode === "subscribe" || experienceMode === "dropsites";
   const [userToken, setUserToken] = useState(() => localStorage.getItem("userToken") || "");
   const [user, setUser] = useState(null);
   const [loginOpen, setLoginOpen] = useState(false);
@@ -135,7 +144,9 @@ export function Storefront() {
     submitting: false
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [view, setView] = useState(experienceMode === "subscribe" ? "subscribe" : "home");
+  const [view, setView] = useState(
+    experienceMode === "subscribe" ? "subscribe" : experienceMode === "dropsites" ? "dropsites" : "home"
+  );
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -183,7 +194,8 @@ export function Storefront() {
       route === "account" ||
       route === "home" ||
       route === "reset-password" ||
-      route === "subscribe"
+      route === "subscribe" ||
+      route === "dropsites"
     ) {
       return route;
     }
@@ -213,7 +225,11 @@ export function Storefront() {
         setView("subscribe");
         return;
       }
-      setView(experienceMode === "subscribe" ? "subscribe" : "home");
+      if (route === "dropsites") {
+        setView("dropsites");
+        return;
+      }
+      setView(experienceMode === "subscribe" ? "subscribe" : experienceMode === "dropsites" ? "dropsites" : "home");
     }
 
     syncView();
@@ -253,10 +269,10 @@ export function Storefront() {
         const route = getHashRoute();
         if (hasBackendAccess(data.user)) {
           localStorage.setItem("adminToken", userToken);
-          if (!route && experienceMode !== "subscribe") {
+          if (!route && !isStandaloneExperience) {
             window.location.hash = "#/admin";
           }
-        } else if (!route && experienceMode !== "subscribe") {
+        } else if (!route && !isStandaloneExperience) {
           window.location.hash = "#/subscribe";
         }
       })
@@ -265,7 +281,7 @@ export function Storefront() {
         setUserToken("");
         setUser(null);
       });
-  }, [userToken, experienceMode]);
+  }, [userToken, experienceMode, isStandaloneExperience]);
 
   const isAccountView = view === "account";
   const isAdminView = view === "admin";
@@ -581,7 +597,7 @@ export function Storefront() {
   return (
     <div className="page">
       <main>
-        {experienceMode !== "subscribe" && view !== "subscribe" && !isAccountView ? (
+        {!isStandaloneExperience && view !== "subscribe" && view !== "dropsites" && !isAccountView ? (
           <div className="utility-bar">
             <div className="brand">
               <img src="/images/full-farm-csa-logo.png" alt={brand} />
@@ -652,6 +668,8 @@ export function Storefront() {
               </form>
             </div>
           </section>
+        ) : view === "dropsites" || experienceMode === "dropsites" ? (
+          <DropSitesPage />
         ) : isAccountView ? (
           isMember ? (
             <MemberPortalSection
@@ -878,7 +896,7 @@ export function Storefront() {
         </div>
       )}
 
-      {experienceMode !== "subscribe" && !isAccountView && !isAdminView ? (
+      {!isStandaloneExperience && view !== "dropsites" && !isAccountView && !isAdminView ? (
         <FooterSection brand={brand} />
       ) : null}
 

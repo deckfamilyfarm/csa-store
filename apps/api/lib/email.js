@@ -223,6 +223,86 @@ function renderSubmittedRows(fields = []) {
     .join("");
 }
 
+function getDropSiteHostInterestRecipient() {
+  return (
+    process.env.DROPSITE_HOST_INTEREST_TO ||
+    process.env.SUBSCRIBE_LEAD_NOTIFY_TO ||
+    process.env.SUBSCRIBE_NOTIFY_TO ||
+    "fullfarmcsa@deckfamilyfarm.com"
+  );
+}
+
+function buildDropSiteHostInterestFields(payload = {}, submittedAt) {
+  const submittedLabel = formatMaybeDate(submittedAt) || "Unknown";
+  return [
+    ["Submitted", submittedLabel],
+    ["Name", payload.name],
+    ["Email", payload.email],
+    ["Phone", payload.phone],
+    ["Membership", payload.memberStatus],
+    ["Proposed address", payload.address],
+    ["City", payload.city],
+    ["State", payload.stateProvince],
+    ["ZIP", payload.postalCode],
+    ["Pickup-day availability", payload.availability],
+    ["Parking and street access", payload.parking],
+    ["Stairs or grade changes", payload.stairs],
+    ["Secure location or gate", payload.secureLocation],
+    ["Tote/cooler storage", payload.toteStorage],
+    ["Neighbor or HOA concerns", payload.neighborConcerns],
+    ["Referral name", payload.referralName],
+    ["Additional notes", payload.notes],
+    ["Source host", payload.sourceHost],
+    ["Source path", payload.sourcePath],
+    ["Query string", payload.queryString]
+  ];
+}
+
+export async function sendDropSiteHostInterestEmail({
+  payload = {},
+  photos = [],
+  submittedAt = new Date()
+}) {
+  const transporter = createTransporter();
+  if (!transporter) {
+    console.warn("Drop-site host interest email skipped: email is not configured.");
+    return { sent: false, reason: "Email is not configured." };
+  }
+
+  const from = getSubscribeLeadFromAddress();
+  const to = String(getDropSiteHostInterestRecipient() || "").trim();
+  if (!to) {
+    return { sent: false, reason: "Drop-site host recipient is not configured." };
+  }
+
+  const fields = buildDropSiteHostInterestFields(payload, submittedAt);
+  const submittedText = fields.map(([label, value]) => `${label}: ${displayValue(value)}`).join("\n");
+  const submittedRows = renderSubmittedRows(fields);
+  const replyTo = String(payload.email || "").trim();
+  const attachments = (photos || []).slice(0, 4).map((photo, index) => ({
+    filename: photo.originalname || `drop-site-photo-${index + 1}`,
+    content: photo.buffer,
+    contentType: photo.mimetype || "application/octet-stream"
+  }));
+
+  await transporter.sendMail({
+    from,
+    to,
+    replyTo: replyTo || undefined,
+    subject: `Drop-site host interest: ${displayValue(payload.name, "New host")}`,
+    text: ["New drop-site host information was submitted.", "", submittedText].join("\n"),
+    html: `
+      <p>New drop-site host information was submitted.</p>
+      <table role="presentation" style="border-collapse:collapse;">
+        ${submittedRows}
+      </table>
+    `,
+    attachments
+  });
+
+  return { sent: true };
+}
+
 export async function sendSubscribeLeadFollowupEmail({ lead = {}, submittedAt }) {
   const transporter = createTransporter();
   if (!transporter) {
