@@ -31,10 +31,10 @@ Schema notes
 - `Average Order Amount` uses the orders export `Order Total` value, not the order detail API
   `total`, because the API total can be reduced to zero by store credits. By default it uses
   the legacy KPI price lists `2966,2718,3124`; override with `DASHBOARD_ORDER_PRICE_LIST_IDS`.
-- `SNAP subscribers` on the dashboard are derived, not copied from the subscription export:
-  they are counted as distinct customers on a SNAP pricelist order within the trailing 5 weeks
-  ending on that snapshot week. They are added into `Total Subscribers`, but they are not used
-  for `New Subscribers` or `Exiting Subscribers`.
+- `SNAP subscribers` on the dashboard are counted from current Local Line SNAP price-list
+  membership (`LL_PRICE_LIST_SNAP_ID`, or `DASHBOARD_SNAP_PRICE_LIST_ID` when set). They
+  are added into `Total Subscribers`, but they are not used for `New Subscribers` or
+  `Exiting Subscribers`.
 
 Endpoints
 - GET /api/health

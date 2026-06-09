@@ -53,6 +53,10 @@ const DASHBOARD_ORDER_PRICE_LIST_IDS = parseDashboardIdList(
       getDashboardEnv("LL_PRICE_LIST_GUEST_ID", "3124")
     ].join(",")
 );
+const DASHBOARD_SNAP_PRICE_LIST_ID = Number(
+  getDashboardEnv("DASHBOARD_SNAP_PRICE_LIST_ID") ||
+    getDashboardEnv("LL_PRICE_LIST_SNAP_ID")
+);
 const LOCAL_LINE_RETRY_ATTEMPTS = Math.max(
   1,
   Number.parseInt(process.env.LOCALLINE_FETCH_RETRY_ATTEMPTS || "2", 10) || 2
@@ -242,12 +246,43 @@ function isFeedAFriendAmount(amount) {
   return [100, 150, 250].includes(Number(amount));
 }
 
-function getSnapCustomerKeySql(alias = "o") {
-  return `CASE
-    WHEN ${alias}.customer_id IS NOT NULL THEN CONCAT('id:', ${alias}.customer_id)
-    WHEN TRIM(COALESCE(${alias}.customer_name, '')) <> '' THEN CONCAT('name:', LOWER(TRIM(${alias}.customer_name)))
-    ELSE NULL
-  END`;
+function isSnapSubscriberSnapshotRow(row = {}) {
+  return [
+    row["Fulfillment Name"],
+    row["Price List"],
+    row["Plan"],
+    row["Plan Name"],
+    row["Subscription"],
+    row["Subscription Name"],
+    row.Tags
+  ]
+    .map((value) => String(value || "").toLowerCase())
+    .some((value) => value.includes("snap"));
+}
+
+function getSnapPriceListId() {
+  return Number.isFinite(DASHBOARD_SNAP_PRICE_LIST_ID) && DASHBOARD_SNAP_PRICE_LIST_ID > 0
+    ? DASHBOARD_SNAP_PRICE_LIST_ID
+    : null;
+}
+
+function getPriceListMemberCustomerKey(member = {}) {
+  const customer = member.customer || {};
+  const customerId = member.customer_id ?? customer.id;
+  if (customerId !== null && typeof customerId !== "undefined" && String(customerId).trim()) {
+    return `id:${String(customerId).trim()}`;
+  }
+  const email = String(customer.email || "").trim().toLowerCase();
+  if (email) return `email:${email}`;
+  const name = [customer.first_name, customer.last_name]
+    .map((part) => String(part || "").trim().toLowerCase())
+    .filter(Boolean)
+    .join(" ");
+  if (name) return `name:${name}`;
+  const membershipId = member.id;
+  return membershipId !== null && typeof membershipId !== "undefined"
+    ? `membership:${String(membershipId).trim()}`
+    : null;
 }
 
 function getDashboardSubscriptionPredicate(alias = "") {
@@ -278,16 +313,99 @@ function getDashboardSubscriptionCreditGivenExpression(alias = "") {
   )`;
 }
 
-function getManualSourceValue(rowMap, rowLabel, weekColIdx) {
+function setManualValue(manualValueMap, rowLabel, weekStart, value, { overwrite = false } = {}) {
+  const label = String(rowLabel || "").trim();
+  const weekKey = String(weekStart || "").trim();
+  if (!label || !weekKey) return;
+  if (value === null || typeof value === "undefined" || String(value).trim() === "") return;
+  const rowValues = manualValueMap.get(label) || new Map();
+  if (overwrite || !rowValues.has(weekKey)) {
+    rowValues.set(weekKey, value);
+  }
+  manualValueMap.set(label, rowValues);
+}
+
+function getManualSourceValue(manualValueMap, rowLabel, weekStart) {
   const labels = Array.isArray(rowLabel) ? rowLabel : [rowLabel];
   for (const label of labels) {
-    const row = rowMap[label] || [];
-    const value = row[weekColIdx];
+    const rowValues = manualValueMap.get(String(label || "").trim()) || new Map();
+    const value = rowValues.get(String(weekStart || "").trim());
     if (value !== null && typeof value !== "undefined" && String(value).trim() !== "") {
       return value;
     }
   }
   return "";
+}
+
+function buildManualValueMapFromSourceRows(rows = [], weeks = []) {
+  const manualValueMap = new Map();
+  rows.slice(2).forEach((row) => {
+    const label = String(row?.[0] || "").trim();
+    if (!label) return;
+    weeks.forEach((week, index) => {
+      setManualValue(manualValueMap, label, week.start, row[index + 1]);
+    });
+  });
+  return manualValueMap;
+}
+
+function buildManualValueMapFromGeneratedRows(rows = []) {
+  const manualValueMap = new Map();
+  const headerIndex = rows.findIndex((row) => {
+    const metric = String(row?.[1] || "").trim().toLowerCase();
+    const source = String(row?.[3] || "").trim().toLowerCase();
+    return metric === "metric" && source.includes("source");
+  });
+  if (headerIndex < 0) return manualValueMap;
+
+  const header = rows[headerIndex] || [];
+  const weekColumns = [];
+  for (let columnIndex = 4; columnIndex < header.length; columnIndex += 1) {
+    const weekStart = toYmdFromSheetWeekLabel(header[columnIndex]);
+    if (weekStart) weekColumns.push({ columnIndex, weekStart });
+  }
+
+  rows.slice(headerIndex + 1).forEach((row) => {
+    const label = String(row?.[1] || "").trim();
+    if (!label) return;
+    weekColumns.forEach(({ columnIndex, weekStart }) => {
+      setManualValue(manualValueMap, label, weekStart, row[columnIndex], { overwrite: true });
+    });
+  });
+  return manualValueMap;
+}
+
+function mergeManualValueMaps(...maps) {
+  const merged = new Map();
+  maps.forEach((manualValueMap, index) => {
+    const overwrite = index > 0;
+    for (const [label, rowValues] of manualValueMap.entries()) {
+      for (const [weekStart, value] of rowValues.entries()) {
+        setManualValue(merged, label, weekStart, value, { overwrite });
+      }
+    }
+  });
+  return merged;
+}
+
+function buildMetricMethodologyNote(row) {
+  const notes = [];
+  if (row.methodology) {
+    notes.push(row.methodology);
+  } else if (row.entry === "MANUAL") {
+    const labels = Array.isArray(row.rowLabel)
+      ? row.rowLabel.join(" / ")
+      : row.rowLabel || row.label;
+    notes.push(
+      `Manual value copied by matching "${labels}" for the same week; dashboard publish checks the generated dashboard tab first, then falls back to the source dashboard tab.`
+    );
+  } else if (typeof row.formula === "function") {
+    notes.push(`Calculated in Google Sheets from dashboard rows: ${row.source}.`);
+  } else if (row.entry === "AUTO") {
+    notes.push(`Automatically calculated from ${row.source}.`);
+  }
+  if (row.note) notes.push(row.note);
+  return notes.filter(Boolean).join("\n\n") || null;
 }
 
 function getMinimumYmd(values = []) {
@@ -364,7 +482,7 @@ function buildYearlyAverageMap(weeks, weeklyKpiMap, metricKey) {
 
 function buildDashboardRows(
   weeks,
-  rowMap,
+  manualValueMap,
   weeklyKpiMap,
   vendorWeeklyMap,
   timesheetWeeklyMap,
@@ -443,14 +561,16 @@ function buildDashboardRows(
         {
           label: "SNAP subscribers",
           entry: "AUTO",
-          source: "SNAP pricelist orders in trailing 5 weeks",
+          source: "Local Line SNAP price-list members",
+          methodology: "Counts distinct customers currently assigned to the Local Line SNAP price list. The SNAP price list is read from LL_PRICE_LIST_SNAP_ID, or DASHBOARD_SNAP_PRICE_LIST_ID when set, and refreshed during subscriber sync and dashboard publish.",
           valueType: "int",
           auto: (w) => Number(subscriberWeeklyMap[w.start]?.snapSubscribers)
         },
         {
           label: "Total Subscribers",
           entry: "AUTO",
-          source: "Subscriber export active as of week end + SNAP",
+          source: "Subscriber export active as of week end + Local Line SNAP price-list members",
+          methodology: "Adds active subscribers from the Local Line subscription snapshot for the week end to the current Local Line SNAP price-list member count.",
           valueType: "int",
           auto: (w) => Number(subscriberWeeklyMap[w.start]?.totalSubscribers)
         },
@@ -719,7 +839,7 @@ function buildDashboardRows(
         } else if (row.entry === "AUTO") {
           nextRow.push(normalizeAutoValue(row.valueType, row.auto ? row.auto(week, index) : null));
         } else {
-          nextRow.push(getManualSourceValue(rowMap, row.rowLabel || row.label, index + 1));
+          nextRow.push(getManualSourceValue(manualValueMap, row.rowLabel || row.label, week.start));
         }
       }
       metricRows.push({
@@ -727,7 +847,7 @@ function buildDashboardRows(
         valueType: row.valueType || null,
         entry: row.entry,
         bold: Boolean(row.bold),
-        note: row.note || null
+        note: buildMetricMethodologyNote(row)
       });
       values.push(nextRow);
     }
@@ -897,6 +1017,45 @@ async function downloadBinaryFile(url, accessToken) {
   return Buffer.from(await response.arrayBuffer());
 }
 
+function buildLocalLineApiUrl(pathOrUrl) {
+  const value = String(pathOrUrl || "");
+  if (/^https?:\/\//i.test(value)) return value;
+  return `${getLocalLineBaseUrl()}${value.replace(/^\/+/, "")}`;
+}
+
+async function downloadLocalLineJson(pathOrUrl, accessToken, label = "Local Line JSON download") {
+  const response = await fetchWithRetry(
+    buildLocalLineApiUrl(pathOrUrl),
+    { headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined },
+    label
+  );
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`${label} failed: ${response.status} ${body}`);
+  }
+  return response.json();
+}
+
+async function fetchAllLocalLineResults(pathOrUrl, accessToken, label) {
+  const results = [];
+  let nextUrl = pathOrUrl;
+  while (nextUrl) {
+    const payload = await downloadLocalLineJson(nextUrl, accessToken, label);
+    if (Array.isArray(payload)) {
+      results.push(...payload);
+      break;
+    }
+    if (Array.isArray(payload?.results)) {
+      results.push(...payload.results);
+      nextUrl = payload.next || null;
+    } else {
+      results.push(payload);
+      break;
+    }
+  }
+  return results;
+}
+
 function parseRowsFromBuffer(buffer) {
   const workbook = xlsx.read(buffer, { type: "buffer" });
   const firstSheetName = workbook.SheetNames?.[0];
@@ -912,6 +1071,7 @@ function getSnapshotWeekEndFromFilename(filePath) {
 
 function getSubscriberSnapshotSummary(rows = []) {
   let activeSubscribers = 0;
+  let snapSubscribers = 0;
   let projectedMonthlyRevenue = 0;
   let skippedSubscribers = 0;
   let feedAFriendSubscribers = 0;
@@ -919,6 +1079,9 @@ function getSubscriberSnapshotSummary(rows = []) {
   rows.forEach((row) => {
     if (String(row.Status || "").trim().toLowerCase() !== "active") return;
     activeSubscribers += 1;
+    if (isSnapSubscriberSnapshotRow(row)) {
+      snapSubscribers += 1;
+    }
     const total = parseCurrencyCell(row.Total);
     projectedMonthlyRevenue += total;
     if (String(row["Next Fulfillment Status"] || "").trim().toLowerCase() === "skipped") {
@@ -931,21 +1094,70 @@ function getSubscriberSnapshotSummary(rows = []) {
 
   return {
     activeSubscribers,
+    snapSubscribers,
     projectedMonthlyRevenue: Number(projectedMonthlyRevenue.toFixed(2)),
     skippedSubscribers,
     feedAFriendSubscribers
   };
 }
 
-function mapRowsByLabel(rows) {
-  const map = {};
-  rows.forEach((row) => {
-    const label = String(row?.[0] || "").trim();
-    if (label) {
-      map[label] = row;
-    }
+async function loadCurrentSnapPriceListMemberSummary() {
+  const snapPriceListId = getSnapPriceListId();
+  if (!snapPriceListId) {
+    throw new Error("LL_PRICE_LIST_SNAP_ID or DASHBOARD_SNAP_PRICE_LIST_ID must be set to count SNAP subscribers.");
+  }
+
+  const accessToken = await getLocalLineAccessToken();
+  const members = await fetchAllLocalLineResults(
+    `price-lists/${snapPriceListId}/members/?page_size=250`,
+    accessToken,
+    "Local Line SNAP price-list members"
+  );
+  const customerKeys = new Set();
+  members.forEach((member) => {
+    const key = getPriceListMemberCustomerKey(member);
+    if (key) customerKeys.add(key);
   });
-  return map;
+
+  return {
+    snapPriceListId,
+    snapSubscriberCount: customerKeys.size
+  };
+}
+
+async function updateSnapshotRunSnapSubscriberCount(connection, snapshotWeekEnd, snapSubscriberCount) {
+  await connection.query(
+    `
+      UPDATE local_line_subscription_snapshot_runs
+      SET snap_subscriber_count = ?,
+          updated_at = ?
+      WHERE snapshot_week_end = ?
+    `,
+    [snapSubscriberCount, new Date(), snapshotWeekEnd]
+  );
+}
+
+async function refreshLatestSnapshotSnapSubscriberCount(connection) {
+  const [rows] = await connection.query(
+    `
+      SELECT MAX(snapshot_week_end) AS snapshotWeekEnd
+      FROM local_line_subscription_snapshot_runs
+    `
+  );
+  const snapshotWeekEnd = rows?.[0]?.snapshotWeekEnd ? String(rows[0].snapshotWeekEnd) : null;
+  if (!snapshotWeekEnd) return null;
+
+  const snapSummary = await loadCurrentSnapPriceListMemberSummary();
+  await updateSnapshotRunSnapSubscriberCount(
+    connection,
+    snapshotWeekEnd,
+    snapSummary.snapSubscriberCount
+  );
+
+  return {
+    snapshotWeekEnd,
+    ...snapSummary
+  };
 }
 
 async function fetchSourceSheetRows() {
@@ -959,6 +1171,23 @@ async function fetchSourceSheetRows() {
   const workbook = xlsx.read(text, { type: "string" });
   const worksheet = workbook.Sheets[workbook.SheetNames?.[0]];
   return xlsx.utils.sheet_to_json(worksheet, { header: 1, raw: false, defval: "" });
+}
+
+async function fetchSheetRowsByTitle(accessToken, title) {
+  const metadata = await sheetsRequest(
+    accessToken,
+    "GET",
+    `https://sheets.googleapis.com/v4/spreadsheets/${DASHBOARD_SHEET_ID}?fields=sheets(properties(title))`
+  );
+  const exists = (metadata.sheets || []).some((sheet) => sheet?.properties?.title === title);
+  if (!exists) return [];
+
+  const payload = await sheetsRequest(
+    accessToken,
+    "GET",
+    `https://sheets.googleapis.com/v4/spreadsheets/${DASHBOARD_SHEET_ID}/values/${encodeURIComponent(`${title}!A:ZZ`)}?valueRenderOption=FORMULA`
+  );
+  return Array.isArray(payload?.values) ? payload.values : [];
 }
 
 function extractWeeksFromSource(rows) {
@@ -1236,31 +1465,6 @@ async function loadVendorWeeklyMap(weeks) {
       }
     ])
   );
-}
-
-async function loadSnapSubscriberCounts(weekEnds = []) {
-  const uniqueWeekEnds = [...new Set((weekEnds || []).filter(Boolean))];
-  if (!uniqueWeekEnds.length) return {};
-  const pool = getPool();
-  const counts = {};
-
-  for (const weekEnd of uniqueWeekEnds) {
-    const [rows] = await pool.query(
-      `
-        SELECT
-          COUNT(DISTINCT ${getSnapCustomerKeySql("o")}) AS snapSubscriberCount
-        FROM local_line_orders o
-        WHERE o.status = 'OPEN'
-          AND o.payment_status = 'PAID'
-          AND LOWER(COALESCE(o.price_list_name, '')) LIKE '%snap%'
-          AND COALESCE(DATE(o.fulfillment_date), DATE(o.created_at_remote)) BETWEEN DATE_SUB(?, INTERVAL 34 DAY) AND ?
-      `,
-      [weekEnd, weekEnd]
-    );
-    counts[weekEnd] = Number(rows?.[0]?.snapSubscriberCount || 0);
-  }
-
-  return counts;
 }
 
 async function buildSubscriberWeeklyMap(weeks) {
@@ -1846,7 +2050,7 @@ async function writeDashboardToSheet(
 
   requests.push({
     repeatCell: {
-      range: { sheetId, startRowIndex: 0, endRowIndex: gridRowCount, startColumnIndex: 1, endColumnIndex: 2 },
+      range: { sheetId, startRowIndex: 0, endRowIndex: gridRowCount, startColumnIndex: 1, endColumnIndex: 4 },
       cell: { note: "" },
       fields: "note"
     }
@@ -1931,7 +2135,7 @@ async function writeDashboardToSheet(
     if (metric.note) {
       requests.push({
         repeatCell: {
-          range: { sheetId, startRowIndex: metric.rowIndex, endRowIndex: metric.rowIndex + 1, startColumnIndex: 1, endColumnIndex: 2 },
+          range: { sheetId, startRowIndex: metric.rowIndex, endRowIndex: metric.rowIndex + 1, startColumnIndex: 3, endColumnIndex: 4 },
           cell: { note: metric.note },
           fields: "note"
         }
@@ -2104,8 +2308,8 @@ export async function syncLocalLineSubscriberSnapshotCache({
   const buffer = await downloadBinaryFile(`${getLocalLineBaseUrl()}order-subscriptions/export/`, accessToken);
   const rows = parseRowsFromBuffer(buffer);
   const summary = getSubscriberSnapshotSummary(rows);
-  const snapCounts = await loadSnapSubscriberCounts([effectiveWeekEnd]);
-  const snapSubscriberCount = Number(snapCounts[effectiveWeekEnd] || 0);
+  const snapSummary = await loadCurrentSnapPriceListMemberSummary();
+  const snapSubscriberCount = snapSummary.snapSubscriberCount;
   const pool = getPool();
   const connection = await pool.getConnection();
   const now = new Date();
@@ -2242,6 +2446,7 @@ export async function syncLocalLineSubscriberSnapshotCache({
         snapshotWeekEnd: effectiveWeekEnd,
         rowCount: preparedRows.length,
         snapSubscriberCount,
+        snapPriceListId: snapSummary.snapPriceListId,
         ...summary
       }),
       updatedAt: now
@@ -2339,8 +2544,7 @@ export async function importLocalLineSubscriberHistory({
       const buffer = fs.readFileSync(filePath);
       const rows = parseRowsFromBuffer(buffer);
       const summary = getSubscriberSnapshotSummary(rows);
-      const snapCounts = await loadSnapSubscriberCounts([snapshotWeekEnd]);
-      const snapSubscriberCount = Number(snapCounts[snapshotWeekEnd] || 0);
+      const snapSubscriberCount = Number(summary.snapSubscribers || 0);
       const now = new Date();
 
       reportProgress({
@@ -2555,7 +2759,12 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
     if (!sourceWeeks.length) {
       throw new Error("No dashboard week columns found in the source sheet.");
     }
-    const rowMap = mapRowsByLabel(sourceRows.slice(2));
+    const accessToken = await getSheetsAccessToken();
+    const targetRows = await fetchSheetRowsByTitle(accessToken, DASHBOARD_TARGET_TITLE);
+    const manualValueMap = mergeManualValueMaps(
+      buildManualValueMapFromSourceRows(sourceRows, sourceWeeks),
+      buildManualValueMapFromGeneratedRows(targetRows)
+    );
     const availability = await loadDashboardPublishAvailability();
     const { weeks, addedWeeks } = extendWeeksThroughPublishableWeek(
       sourceWeeks,
@@ -2596,6 +2805,14 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       );
     }
 
+    try {
+      await refreshLatestSnapshotSnapSubscriberCount(connection);
+    } catch (error) {
+      dashboardWarnings.push(
+        `Could not refresh SNAP price-list member count; using cached value. ${error?.message || error}`
+      );
+    }
+
     reportProgress({
       phaseKey: "prepare",
       phaseLabel: "Prepare Dashboard",
@@ -2627,7 +2844,7 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
 
     const { values, metricRows, sectionRows, packWagesSalesChart } = buildDashboardRows(
       weeks,
-      rowMap,
+      manualValueMap,
       weeklyKpiMap,
       vendorWeeklyMap,
       timesheetResult.map || {},
@@ -2663,7 +2880,6 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       message: `Writing ${DASHBOARD_TARGET_TITLE} to Google Sheets`
     });
 
-    const accessToken = await getSheetsAccessToken();
     await writeDashboardToSheet(
       accessToken,
       values,
