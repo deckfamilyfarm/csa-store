@@ -5,7 +5,7 @@ import { DeckPageHeader } from "./DeckPageHeader.jsx";
 const MEDIA_KIT_URL =
   "https://docs.google.com/document/d/16iVw310-q0OGkJhWaXyO4Tp7WLEtU8Sf/edit";
 
-const DEFAULT_FORM = {
+const INITIAL_FORM = {
   name: "",
   email: "",
   phone: "",
@@ -24,18 +24,18 @@ const DEFAULT_FORM = {
   website: ""
 };
 
-function setMeta(name, content, attribute = "name") {
+function ensureMetaTag(name, content, attr = "name") {
   if (typeof document === "undefined") return;
-  let meta = document.querySelector(`meta[${attribute}="${name}"]`);
-  if (!meta) {
-    meta = document.createElement("meta");
-    meta.setAttribute(attribute, name);
-    document.head.appendChild(meta);
+  let tag = document.querySelector(`meta[${attr}="${name}"]`);
+  if (!tag) {
+    tag = document.createElement("meta");
+    tag.setAttribute(attr, name);
+    document.head.appendChild(tag);
   }
-  meta.setAttribute("content", content);
+  tag.setAttribute("content", content);
 }
 
-function setCanonical(url) {
+function ensureCanonicalLink(url) {
   if (typeof document === "undefined") return;
   let link = document.querySelector('link[rel="canonical"]');
   if (!link) {
@@ -46,13 +46,11 @@ function setCanonical(url) {
   link.setAttribute("href", url);
 }
 
-function formatMonth(value) {
+function formatMonthLabel(value) {
   const match = String(value || "").match(/^(\d{4})-(\d{2})$/);
   if (!match) return value || "Current month";
-  return new Date(Number(match[1]), Number(match[2]) - 1, 1).toLocaleDateString(undefined, {
-    month: "long",
-    year: "numeric"
-  });
+  const date = new Date(Number(match[1]), Number(match[2]) - 1, 1);
+  return date.toLocaleDateString(undefined, { month: "long", year: "numeric" });
 }
 
 function formatAverage(value) {
@@ -60,7 +58,7 @@ function formatAverage(value) {
   return Number.isFinite(numeric) ? numeric.toFixed(2) : "0.00";
 }
 
-function getDropSitesUrl() {
+function getDropsitesCanonicalUrl() {
   if (typeof window === "undefined") return "https://dropsites.deckfamilyfarm.com/";
   const host = String(window.location.host || "").toLowerCase();
   if (host.includes("localhost") || host.includes("127.0.0.1")) {
@@ -69,19 +67,18 @@ function getDropSitesUrl() {
   return "https://dropsites.deckfamilyfarm.com/";
 }
 
-function DropSiteStatus({ row }) {
-  return row?.transitionCreditEligible ? (
-    <span className="dropsite-status good">Credit eligible</span>
-  ) : (
-    <span className="dropsite-status bad">Below credit threshold</span>
-  );
+function MetricStatus({ row }) {
+  if (row.transitionCreditEligible) {
+    return <span className="dropsite-status good">Credit eligible</span>;
+  }
+  return <span className="dropsite-status bad">Below credit threshold</span>;
 }
 
-export function DropSitesPage() {
-  const [data, setData] = useState(null);
-  const [month, setMonth] = useState("");
-  const [loadError, setLoadError] = useState("");
-  const [form, setForm] = useState(DEFAULT_FORM);
+export function DropsitesPage() {
+  const [metrics, setMetrics] = useState(null);
+  const [selectedMonth, setSelectedMonth] = useState("");
+  const [metricsError, setMetricsError] = useState("");
+  const [form, setForm] = useState(INITIAL_FORM);
   const [photos, setPhotos] = useState([]);
   const [status, setStatus] = useState({ submitting: false, message: "", error: "" });
 
@@ -89,37 +86,36 @@ export function DropSitesPage() {
     const title = "Drop Site Hosts | Deck Family Farm";
     const description =
       "Resources, host expectations, monthly performance summaries, and drop-site host applications for Full Farm pickup sites.";
-    const url = getDropSitesUrl();
+    const canonicalUrl = getDropsitesCanonicalUrl();
     document.title = title;
-    setMeta("description", description);
-    setMeta("robots", "index,follow,max-image-preview:large");
-    setMeta("og:title", title, "property");
-    setMeta("og:description", description, "property");
-    setMeta("og:type", "website", "property");
-    setMeta("og:url", url, "property");
-    setCanonical(url);
+    ensureMetaTag("description", description);
+    ensureMetaTag("robots", "index,follow,max-image-preview:large");
+    ensureMetaTag("og:title", title, "property");
+    ensureMetaTag("og:description", description, "property");
+    ensureMetaTag("og:type", "website", "property");
+    ensureMetaTag("og:url", canonicalUrl, "property");
+    ensureCanonicalLink(canonicalUrl);
   }, []);
 
   useEffect(() => {
     let cancelled = false;
-    fetchDropSitePerformance(month)
-      .then((nextData) => {
+    fetchDropSitePerformance(selectedMonth)
+      .then((data) => {
         if (cancelled) return;
-        setData(nextData);
-        setLoadError("");
-        if (!month && nextData?.performance?.selectedMonth) {
-          setMonth(nextData.performance.selectedMonth);
+        setMetrics(data);
+        setMetricsError("");
+        if (!selectedMonth && data?.performance?.selectedMonth) {
+          setSelectedMonth(data.performance.selectedMonth);
         }
       })
       .catch((error) => {
-        if (!cancelled) {
-          setLoadError(error?.message || "Unable to load drop-site performance.");
-        }
+        if (cancelled) return;
+        setMetricsError(error?.message || "Unable to load drop-site performance.");
       });
     return () => {
       cancelled = true;
     };
-  }, [month]);
+  }, [selectedMonth]);
 
   const navLinks = useMemo(
     () => [
@@ -132,34 +128,34 @@ export function DropSitesPage() {
     []
   );
 
-  const performance = data?.performance || {};
-  const rankedSites = performance.rankedSites || [];
+  const performance = metrics?.performance || {};
+  const metricRows = performance.rankedSites || [];
 
   function updateField(key, value) {
-    setForm((current) => ({ ...current, [key]: value }));
+    setForm((prev) => ({ ...prev, [key]: value }));
   }
 
   async function handleSubmit(event) {
     event.preventDefault();
     setStatus({ submitting: true, message: "", error: "" });
     try {
-      const payload = new FormData();
+      const formData = new FormData();
       Object.entries(form).forEach(([key, value]) => {
-        payload.append(key, value);
+        formData.append(key, value);
       });
-      payload.append("sourceHost", window.location.host);
-      payload.append("sourcePath", window.location.pathname);
-      payload.append("queryString", window.location.search);
-      photos.slice(0, 4).forEach((photo) => {
-        payload.append("photos", photo);
+      formData.append("sourceHost", window.location.host);
+      formData.append("sourcePath", window.location.pathname);
+      formData.append("queryString", window.location.search);
+      photos.slice(0, 4).forEach((file) => {
+        formData.append("photos", file);
       });
-      await submitDropSiteHostInterest(payload);
+      await submitDropSiteHostInterest(formData);
       setStatus({
         submitting: false,
         message: "Thanks. Your drop-site host information has been sent to the farm team.",
         error: ""
       });
-      setForm(DEFAULT_FORM);
+      setForm(INITIAL_FORM);
       setPhotos([]);
     } catch (error) {
       setStatus({
@@ -180,10 +176,9 @@ export function DropSitesPage() {
             <div className="eyebrow">Full Farm Drop Sites</div>
             <h1 className="dropsites-title">Drop site hosts keep local food moving.</h1>
             <p className="dropsites-lede">
-              Small farms need drop site hosts to help sell direct to consumer, spread the
-              word, help people eat healthy local food, and grow regenerative agriculture.
-              Hosts offer a simple pickup location for members and help with rare missed
-              pickups.
+              Small farms need drop site hosts to help sell direct to consumer, spread the word,
+              help people eat healthy local food, and grow regenerative agriculture. Hosts offer
+              a simple, covered pickup location for members and help with rare missed pickups.
             </p>
             <div className="dropsites-hero-actions">
               <a className="button" href="#apply">Become a host</a>
@@ -236,8 +231,7 @@ export function DropSitesPage() {
             <div className="eyebrow">Tools</div>
             <h2 className="h2">Host Resources and Responsibilities</h2>
             <p className="lede dropsites-resources-lede">
-              Use these materials to manage your site, handle pickup-day communication,
-              and share Full Farm resources with your community.
+              Use these materials to manage your site, handle pickup-day communication, and share Full Farm resources with your community.
             </p>
           </div>
           <div className="dropsites-resource-grid">
@@ -251,16 +245,11 @@ export function DropSitesPage() {
             </article>
             <article className="dropsite-resource-card">
               <h3>Cooler and tote storage</h3>
-              <p>
-                Keep totes and coolers in a safe spot until the following delivery week,
-                when the farm picks them up.
-              </p>
+              <p>Keep totes and coolers in a safe spot until the following delivery week, when the farm picks them up.</p>
             </article>
             <article className="dropsite-resource-card">
               <h3>Media Kit</h3>
-              <p>
-                Use the media kit to share Full Farm with neighbors and nearby friends.
-              </p>
+              <p>Use the media kit to share Full Farm with neighbors and nearby friends.</p>
               <a className="button alt" href={MEDIA_KIT_URL} target="_blank" rel="noreferrer">
                 Open media kit
               </a>
@@ -275,8 +264,7 @@ export function DropSitesPage() {
             <div className="eyebrow">Performance</div>
             <h2 className="h2">Monthly public drop-site summary</h2>
             <p className="lede dropsites-metrics-lede">
-              Host credit is the food credit hosts receive for hosting a drop site. A site
-              qualifies by averaging 3 or more drops per week OR more than 5 pickups per month.
+              Host credit is the food credit hosts receive for hosting a drop site. A site qualifies by averaging 3 or more drops per week OR more than 5 pickups per month.
             </p>
           </div>
           <div className="dropsites-metrics-controls">
@@ -284,15 +272,13 @@ export function DropSitesPage() {
               <span className="small">Month</span>
               <select
                 className="select"
-                value={month || performance.selectedMonth || ""}
-                onChange={(event) => setMonth(event.target.value)}
+                value={selectedMonth || performance.selectedMonth || ""}
+                onChange={(event) => setSelectedMonth(event.target.value)}
               >
-                {(performance.months || []).length ? null : (
-                  <option value="">No order months yet</option>
-                )}
+                {!(performance.months || []).length ? <option value="">No order months yet</option> : null}
                 {(performance.months || []).map((value) => (
-                  <option value={value} key={`dropsite-public-month-${value}`}>
-                    {formatMonth(value)}
+                  <option key={`dropsite-public-month-${value}`} value={value}>
+                    {formatMonthLabel(value)}
                   </option>
                 ))}
               </select>
@@ -301,7 +287,7 @@ export function DropSitesPage() {
               Credit threshold: 3 or more drops per week OR more than 5 pickups per month.
             </div>
           </div>
-          {loadError ? <div className="small subscribe-error">{loadError}</div> : null}
+          {metricsError ? <div className="small subscribe-error">{metricsError}</div> : null}
           <div className="dropsite-metrics-table-shell">
             <table className="dropsite-metrics-table">
               <thead>
@@ -316,22 +302,22 @@ export function DropSitesPage() {
                 </tr>
               </thead>
               <tbody>
-                {rankedSites.map((site) => (
-                  <tr key={`public-dropsite-metric-${site.id}`}>
-                    <td>{site.name}</td>
-                    <td>{site.area || "Local pickup area"}</td>
-                    <td>{Number(site.orderCount || 0)}</td>
-                    <td>{Number(site.activeDropWeeks || site.scheduledDrops || 0)}</td>
-                    <td>{formatAverage(site.averageOrdersPerActiveDropWeek || site.averageWeeklyOrders)}</td>
-                    <td>{Number(site.legacyMonthlyUniqueCustomers || 0)}</td>
-                    <td><DropSiteStatus row={site} /></td>
+                {metricRows.map((row) => (
+                  <tr key={`public-dropsite-metric-${row.id}`}>
+                    <td>{row.name}</td>
+                    <td>{row.area || "Local pickup area"}</td>
+                    <td>{Number(row.orderCount || 0)}</td>
+                    <td>{Number(row.activeDropWeeks || 0)}</td>
+                    <td>{formatAverage(row.averageOrdersPerActiveDropWeek)}</td>
+                    <td>{Number(row.legacyMonthlyUniqueCustomers || 0)}</td>
+                    <td><MetricStatus row={row} /></td>
                   </tr>
                 ))}
-                {rankedSites.length ? null : (
+                {!metricRows.length ? (
                   <tr>
                     <td colSpan="7">No public drop-site performance data is available for this month yet.</td>
                   </tr>
-                )}
+                ) : null}
               </tbody>
             </table>
           </div>
@@ -344,9 +330,7 @@ export function DropSitesPage() {
             <h2 className="h2">Become a Drop Site Host</h2>
             <h3>Tell Us About Your Pickup Location</h3>
             <p className="lede">
-              Drop sites help connect local families with food from local farms. Use this
-              form to tell us about your location. Our farm team will review access,
-              parking, storage options, and delivery logistics.
+              Drop sites help connect local families with food from local farms. Use this form to tell us about your location. Our farm team will review access, parking, storage options, and delivery logistics.
             </p>
             <h3>Why Become a Drop Site Host?</h3>
             <ul className="dropsite-check-list">
@@ -356,8 +340,7 @@ export function DropSitesPage() {
               <li>Receive free delivery and potential host rewards.</li>
             </ul>
             <p className="lede">
-              Hosting a drop site is a simple way to support local farms, connect your
-              community with good food, and help grow a stronger regional food network.
+              Hosting a drop site is a simple way to support local farms, connect your community with good food, and help grow a stronger regional food network.
             </p>
           </div>
           <form className="dropsite-application-form card" onSubmit={handleSubmit}>
@@ -372,38 +355,19 @@ export function DropSitesPage() {
             <div className="subscribe-form-grid">
               <label className="filter-field">
                 <span className="small">Name</span>
-                <input
-                  className="input"
-                  required
-                  value={form.name}
-                  onChange={(event) => updateField("name", event.target.value)}
-                />
+                <input className="input" required value={form.name} onChange={(event) => updateField("name", event.target.value)} />
               </label>
               <label className="filter-field">
                 <span className="small">Email</span>
-                <input
-                  className="input"
-                  required
-                  type="email"
-                  value={form.email}
-                  onChange={(event) => updateField("email", event.target.value)}
-                />
+                <input className="input" required type="email" value={form.email} onChange={(event) => updateField("email", event.target.value)} />
               </label>
               <label className="filter-field">
                 <span className="small">Phone</span>
-                <input
-                  className="input"
-                  value={form.phone}
-                  onChange={(event) => updateField("phone", event.target.value)}
-                />
+                <input className="input" value={form.phone} onChange={(event) => updateField("phone", event.target.value)} />
               </label>
               <label className="filter-field">
                 <span className="small">Membership</span>
-                <select
-                  className="select"
-                  value={form.memberStatus}
-                  onChange={(event) => updateField("memberStatus", event.target.value)}
-                >
+                <select className="select" value={form.memberStatus} onChange={(event) => updateField("memberStatus", event.target.value)}>
                   <option>Current member</option>
                   <option>Planning to become a member</option>
                   <option>Not currently a member</option>
@@ -412,97 +376,52 @@ export function DropSitesPage() {
             </div>
             <label className="filter-field">
               <span className="small">Proposed address</span>
-              <input
-                className="input"
-                required
-                value={form.address}
-                onChange={(event) => updateField("address", event.target.value)}
-              />
+              <input className="input" required value={form.address} onChange={(event) => updateField("address", event.target.value)} />
             </label>
             <div className="subscribe-form-grid subscribe-form-grid-3">
               <label className="filter-field">
                 <span className="small">City</span>
-                <input
-                  className="input"
-                  value={form.city}
-                  onChange={(event) => updateField("city", event.target.value)}
-                />
+                <input className="input" value={form.city} onChange={(event) => updateField("city", event.target.value)} />
               </label>
               <label className="filter-field">
                 <span className="small">State</span>
-                <input
-                  className="input"
-                  value={form.stateProvince}
-                  onChange={(event) => updateField("stateProvince", event.target.value)}
-                />
+                <input className="input" value={form.stateProvince} onChange={(event) => updateField("stateProvince", event.target.value)} />
               </label>
               <label className="filter-field">
                 <span className="small">ZIP</span>
-                <input
-                  className="input"
-                  value={form.postalCode}
-                  onChange={(event) => updateField("postalCode", event.target.value)}
-                />
+                <input className="input" value={form.postalCode} onChange={(event) => updateField("postalCode", event.target.value)} />
               </label>
             </div>
             <div className="dropsite-form-section-title">Tell us about your site:</div>
             <div className="subscribe-form-grid">
               <label className="filter-field">
                 <span className="small">Pickup-day availability</span>
-                <textarea
-                  className="textarea"
-                  value={form.availability}
-                  onChange={(event) => updateField("availability", event.target.value)}
-                />
+                <textarea className="textarea" value={form.availability} onChange={(event) => updateField("availability", event.target.value)} />
               </label>
               <label className="filter-field">
                 <span className="small">Parking and street access</span>
-                <textarea
-                  className="textarea"
-                  value={form.parking}
-                  onChange={(event) => updateField("parking", event.target.value)}
-                />
+                <textarea className="textarea" value={form.parking} onChange={(event) => updateField("parking", event.target.value)} />
               </label>
               <label className="filter-field">
                 <span className="small">Stairs or grade changes</span>
-                <textarea
-                  className="textarea"
-                  value={form.stairs}
-                  onChange={(event) => updateField("stairs", event.target.value)}
-                />
+                <textarea className="textarea" value={form.stairs} onChange={(event) => updateField("stairs", event.target.value)} />
               </label>
               <label className="filter-field">
                 <span className="small">Secure location or gate?</span>
-                <textarea
-                  className="textarea"
-                  value={form.secureLocation}
-                  onChange={(event) => updateField("secureLocation", event.target.value)}
-                />
+                <textarea className="textarea" value={form.secureLocation} onChange={(event) => updateField("secureLocation", event.target.value)} />
               </label>
               <label className="filter-field">
                 <span className="small">Tote/cooler storage</span>
-                <textarea
-                  className="textarea"
-                  value={form.toteStorage}
-                  onChange={(event) => updateField("toteStorage", event.target.value)}
-                />
+                <textarea className="textarea" value={form.toteStorage} onChange={(event) => updateField("toteStorage", event.target.value)} />
               </label>
               <label className="filter-field">
                 <span className="small">Neighbor or HOA concerns</span>
-                <textarea
-                  className="textarea"
-                  value={form.neighborConcerns}
-                  onChange={(event) => updateField("neighborConcerns", event.target.value)}
-                />
+                <textarea className="textarea" value={form.neighborConcerns} onChange={(event) => updateField("neighborConcerns", event.target.value)} />
               </label>
             </div>
             <label className="filter-field">
               <span className="small">Additional notes</span>
-              <textarea
-                className="textarea"
-                value={form.notes}
-                onChange={(event) => updateField("notes", event.target.value)}
-              />
+              <textarea className="textarea" value={form.notes} onChange={(event) => updateField("notes", event.target.value)} />
             </label>
             <label className="filter-field">
               <span className="small">Photos of access, parking, or pickup area</span>
@@ -514,15 +433,9 @@ export function DropSitesPage() {
                 onChange={(event) => setPhotos(Array.from(event.target.files || []).slice(0, 4))}
               />
             </label>
-            {photos.length ? (
-              <div className="small">
-                {photos.length} photo{photos.length === 1 ? "" : "s"} selected.
-              </div>
-            ) : null}
+            {photos.length ? <div className="small">{photos.length} photo{photos.length === 1 ? "" : "s"} selected.</div> : null}
             {status.error ? <div className="small subscribe-error">{status.error}</div> : null}
-            {status.message ? (
-              <div className="small subscribe-success-message">{status.message}</div>
-            ) : null}
+            {status.message ? <div className="small subscribe-success-message">{status.message}</div> : null}
             <button className="button" type="submit" disabled={status.submitting}>
               {status.submitting ? "Sending..." : "Send host information"}
             </button>
@@ -534,11 +447,7 @@ export function DropSitesPage() {
         <div className="container subscribe-footer-row">
           <div className="subscribe-footer-brand">
             <div className="subscribe-footer-brand-top">
-              <img
-                className="subscribe-footer-logo"
-                src="/images/subscribe-footer-logo.avif"
-                alt="Deck Family Farm icon logo"
-              />
+              <img className="subscribe-footer-logo" src="/images/subscribe-footer-logo.avif" alt="Deck Family Farm icon logo" />
               <strong className="subscribe-footer-wordmark">Deck Family Farm</strong>
             </div>
             <div className="small">Drop-site resources for Full Farm hosts and neighbors.</div>

@@ -1,5 +1,6 @@
 ﻿import React, { useEffect, useRef, useState } from "react";
 import { AdminInventorySection } from "./AdminInventorySection.jsx";
+import { AdminLiabilityReleasesSection } from "./AdminLiabilityReleasesSection.jsx";
 import { AdminMarketingSection } from "./AdminMarketingSection.jsx";
 import { AdminManualSection } from "./AdminManualSection.jsx";
 import { AdminMembershipSection } from "./AdminMembershipSection.jsx";
@@ -51,6 +52,8 @@ function canAccessAdminSection(roleKeys, section) {
       return roleKeys.includes("membership_admin");
     case "subscriptions":
       return roleKeys.includes("membership_admin") || roleKeys.includes("member_admin");
+    case "liability":
+      return roleKeys.includes("liability_admin");
     case "marketing":
       return (
         roleKeys.includes("marketing_admin") ||
@@ -81,6 +84,7 @@ function getDefaultAdminSection(roleKeys = []) {
     "localPricelist",
     "inventory",
     "marketing",
+    "liability",
     "subscriptions",
     "membership",
     "dropSites",
@@ -198,7 +202,7 @@ function formatDeliveryCount(count) {
 function getDropSitePerformanceTier(value) {
   const numeric = Number(value) || 0;
   if (numeric > 5) return "good";
-  if (numeric >= 4) return "warn";
+  if (numeric > 2) return "warn";
   return "bad";
 }
 
@@ -586,7 +590,7 @@ export function AdminPanel({ onCatalogRefresh }) {
   const [dropSitePerformance, setDropSitePerformance] = useState({
     selectedMonth: "",
     months: [],
-    thresholdAverage: 4,
+    thresholdAverage: 2,
     strongAverage: 5,
     rankedSites: []
   });
@@ -798,7 +802,7 @@ export function AdminPanel({ onCatalogRefresh }) {
         dropSiteData.performance || {
           selectedMonth: "",
           months: [],
-          thresholdAverage: 4,
+          thresholdAverage: 2,
           strongAverage: 5,
           rankedSites: []
         }
@@ -930,7 +934,7 @@ export function AdminPanel({ onCatalogRefresh }) {
       setDropSitePerformance({
         selectedMonth: "",
         months: [],
-        thresholdAverage: 4,
+        thresholdAverage: 2,
         strongAverage: 5,
         rankedSites: []
       });
@@ -2772,6 +2776,7 @@ export function AdminPanel({ onCatalogRefresh }) {
   const canManageMembership = hasRole(currentAdminRoles, "membership_admin");
   const canManageSubscriptions = canAccessAdminSection(currentAdminRoles, "subscriptions");
   const canManageMarketing = canAccessAdminSection(currentAdminRoles, "marketing");
+  const canManageLiability = canAccessAdminSection(currentAdminRoles, "liability");
   const canPullFromLocalLine = hasRole(currentAdminRoles, "localline_pull");
   const canPushToLocalLine = hasRole(currentAdminRoles, "localline_push");
   const canManageDropSites = hasRole(currentAdminRoles, "dropsite_admin");
@@ -3618,6 +3623,18 @@ export function AdminPanel({ onCatalogRefresh }) {
               type="button"
             >
               Marketing
+            </button>
+          ) : null}
+          {canManageLiability ? (
+            <button
+              className={`admin-nav-item ${activeSection === "liability" ? "active" : ""}`}
+              onClick={() => {
+                setActiveSection("liability");
+                closeProductEditor();
+              }}
+              type="button"
+            >
+              Liability Releases
             </button>
           ) : null}
           {canManageCoreAdmin ? (
@@ -4703,10 +4720,10 @@ export function AdminPanel({ onCatalogRefresh }) {
               <div className="response-card drop-site-performance-card">
                 <div className="title">Host Credit Performance</div>
                 <div className="small">
-                  Hosts should average at least {Number(dropSitePerformance?.thresholdAverage || 4).toFixed(0)} orders per
-                  scheduled drop week. Green is over {Number(dropSitePerformance?.strongAverage || 5).toFixed(0)},
-                  orange is {Number(dropSitePerformance?.thresholdAverage || 4).toFixed(0)} to {Number(dropSitePerformance?.strongAverage || 5).toFixed(0)},
-                  and red is under {Number(dropSitePerformance?.thresholdAverage || 4).toFixed(0)}.
+                  Hosts qualify when active scheduled drops average {dropSitePerformance?.thresholdLabel || "more than 2"} orders per week
+                  and more than {Number(dropSitePerformance?.legacyMonthlyUniqueThreshold || 5)} members pick up during the month.
+                  Green is over {Number(dropSitePerformance?.strongAverage || 5).toFixed(0)}, orange is above the credit threshold to
+                  {Number(dropSitePerformance?.strongAverage || 5).toFixed(0)}, and red is at or under the weekly threshold.
                 </div>
                 <div className="pricelist-toolbar-actions drop-site-performance-controls">
                   <label className="filter-field pricelist-page-size">
@@ -4776,6 +4793,10 @@ export function AdminPanel({ onCatalogRefresh }) {
                       site,
                       countZeroOrderPeriods
                     );
+                    const displayCreditEligible = displayAverage > Number(dropSitePerformance?.thresholdAverage || 2);
+                    const legacyUniqueCustomers = Number(site.legacyMonthlyUniqueCustomers || 0);
+                    const legacyCreditEligible = Boolean(site.legacyCreditEligible);
+                    const combinedCreditEligible = displayCreditEligible && legacyCreditEligible;
                     const displayTrendSeries = getDisplayedDropSitePoints(
                       site.trendSeries || [],
                       countZeroOrderPeriods
@@ -4794,6 +4815,13 @@ export function AdminPanel({ onCatalogRefresh }) {
                             {displayAverage.toFixed(2)} avg/week
                             {dropSiteTrendMode ? " (6 mo avg)" : ""}
                           </div>
+                          <div className="small">
+                            New weekly metric: {displayCreditEligible ? "qualifies" : "below threshold"}
+                            {dropSiteTrendMode ? "" : ` · Members picked up: ${legacyUniqueCustomers} (${legacyCreditEligible ? "qualifies" : "below threshold"})`}
+                          </div>
+                          {!dropSiteTrendMode ? (
+                            <div className="small">Host credit: {combinedCreditEligible ? "qualifies" : "below combined threshold"}</div>
+                          ) : null}
                           {site.derivedHostContact?.name || site.derivedHostContact?.phone ? (
                             <div className="small">
                               Derived Contact: {[site.derivedHostContact?.name, site.derivedHostContact?.phone]
@@ -4853,9 +4881,9 @@ export function AdminPanel({ onCatalogRefresh }) {
                                 className={`drop-site-performance-bar ${displayPerformanceTier || "bad"}`}
                                 style={{ width: `${widthPercent}%` }}
                               />
-                              {displayPerformanceTier === "bad" ? (
+                              {!combinedCreditEligible ? (
                                 <span className="drop-site-performance-warning">
-                                  does not qualify for drop site host credit this month
+                                  below host-credit threshold
                                 </span>
                               ) : null}
                             </button>
@@ -5154,6 +5182,10 @@ export function AdminPanel({ onCatalogRefresh }) {
 
           {activeSection === "marketing" && canManageMarketing && (
             <AdminMarketingSection token={token} />
+          )}
+
+          {activeSection === "liability" && canManageLiability && (
+            <AdminLiabilityReleasesSection token={token} />
           )}
 
           {activeSection === "users" && canManageUsers && (

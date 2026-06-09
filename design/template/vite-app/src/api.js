@@ -84,10 +84,10 @@ export async function fetchDropSitePerformance(month = "") {
   return fetchJsonGet(url.toString(), "", "Failed to load drop-site performance");
 }
 
-export async function submitDropSiteHostInterest(payload) {
+export async function submitDropSiteHostInterest(formData) {
   const response = await fetch(`${base}/dropsites/host-interest`, {
     method: "POST",
-    body: payload
+    body: formData
   });
 
   if (!response.ok) {
@@ -108,6 +108,30 @@ export async function submitSubscribeLead(payload) {
 
   if (!response.ok) {
     await throwForError(response, "Unable to submit subscribe request");
+  }
+
+  return response.json();
+}
+
+export async function fetchLiabilityReleaseTemplate(slug) {
+  return fetchJsonGet(
+    `${base}/liability/templates/${encodeURIComponent(slug)}`,
+    "",
+    "Failed to load liability release"
+  );
+}
+
+export async function submitLiabilityRelease(slug, payload) {
+  const response = await fetch(`${base}/liability/sign/${encodeURIComponent(slug)}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload || {})
+  });
+
+  if (!response.ok) {
+    await throwForError(response, "Unable to submit liability release");
   }
 
   return response.json();

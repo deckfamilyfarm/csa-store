@@ -961,6 +961,106 @@ img {
   cursor: crosshair;
 }
 
+.liability-page {
+  max-width: 960px;
+}
+
+.liability-agreement-text {
+  margin: 24px 0;
+  padding: 20px;
+  border: 1px solid rgba(40, 34, 28, 0.14);
+  background: rgba(255, 252, 245, 0.76);
+  max-height: 520px;
+  overflow: auto;
+}
+
+.liability-agreement-text p {
+  margin: 0 0 14px;
+  line-height: 1.55;
+}
+
+.liability-form h2 {
+  margin: 22px 0 8px;
+  font-size: 1.15rem;
+}
+
+.liability-participants,
+.liability-signature-section {
+  margin-top: 18px;
+}
+
+.liability-participant-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.2fr) minmax(140px, 0.8fr) minmax(130px, 0.7fr) auto auto;
+  gap: 10px;
+  align-items: end;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(40, 34, 28, 0.12);
+}
+
+.compact-check {
+  margin: 0;
+  align-items: center;
+}
+
+.liability-signature-mode {
+  margin-bottom: 10px;
+}
+
+.liability-signature-pad {
+  display: block;
+  width: 100%;
+  max-width: 620px;
+  height: 180px;
+  border: 1px solid rgba(40, 34, 28, 0.22);
+  background: #fffdf8;
+  touch-action: none;
+}
+
+.liability-admin-grid {
+  display: grid;
+  grid-template-columns: minmax(340px, 0.9fr) minmax(420px, 1.1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.admin-detail-panel {
+  border: 1px solid rgba(40, 34, 28, 0.14);
+  padding: 16px;
+  background: rgba(255, 252, 245, 0.72);
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.liability-pdf-preview {
+  width: 100%;
+  min-height: 520px;
+  border: 1px solid rgba(40, 34, 28, 0.16);
+  background: #fff;
+}
+
+.liability-template-textarea {
+  min-height: 360px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+
+@media (max-width: 900px) {
+  .liability-admin-grid,
+  .liability-participant-row,
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .liability-signature-pad {
+    max-width: 100%;
+  }
+}
+
 .subscribe-location-copy h3,
 .subscribe-drop-site-group h3 {
   font-family: var(--subscribe-serif);
@@ -1005,10 +1105,60 @@ img {
   font-size: 12px;
 }
 
+.subscribe-option-checklist {
+  display: grid;
+  gap: 10px;
+}
+
+.subscribe-option-check {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  padding: 12px;
+  border: 1px solid rgba(31, 27, 23, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
+  line-height: 1.45;
+}
+
+.subscribe-option-check input {
+  margin-top: 3px;
+}
+
 .subscribe-drop-site-groups {
   display: grid;
   gap: 18px;
   margin-top: 20px;
+}
+
+.subscribe-drop-site-host-callout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 22px;
+  padding: 22px;
+  border: 1px solid rgba(31, 27, 23, 0.12);
+  border-radius: 8px;
+  background: #eef1ea;
+  text-align: left;
+}
+
+.subscribe-drop-site-host-callout h3 {
+  margin: 0 0 8px;
+  font-family: var(--subscribe-serif);
+  font-size: 28px;
+  color: var(--navy);
+}
+
+.subscribe-drop-site-host-callout .lede {
+  margin: 0;
+  max-width: 68ch;
+}
+
+.subscribe-drop-site-host-callout .button {
+  flex: 0 0 auto;
 }
 
 .subscribe-drop-site-table-card {
@@ -1324,6 +1474,232 @@ img {
 .subscribe-review-link:hover .subscribe-review-link-star {
   color: rgba(255, 244, 215, 1);
   border-color: rgba(255, 244, 215, 1);
+}
+
+.dropsites-page {
+  --dropsites-metrics-sticky-top: 132px;
+  background: #fbfaf6;
+}
+
+.dropsites-hero {
+  padding: 42px 0 54px;
+  background: #556b4d;
+}
+
+.dropsites-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 520px);
+  gap: 34px;
+  align-items: center;
+}
+
+.dropsites-hero-copy {
+  color: #fff;
+  max-width: 720px;
+}
+
+.dropsites-title {
+  font-family: var(--subscribe-serif);
+  font-size: 64px;
+  line-height: 0.95;
+  margin: 12px 0 18px;
+  max-width: 12ch;
+  color: #fff;
+}
+
+.dropsites-lede {
+  color: rgba(255, 255, 255, 0.94);
+  font-size: 19px;
+  line-height: 1.7;
+  max-width: 58ch;
+  margin: 0 0 22px;
+}
+
+.dropsites-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.dropsites-hero-media {
+  margin: 0;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 18px 38px rgba(31, 27, 23, 0.18);
+  background: #fff;
+}
+
+.dropsites-hero-media img {
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.dropsites-info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.dropsite-info-panel,
+.dropsite-resource-card {
+  border: 1px solid rgba(31, 27, 23, 0.12);
+  border-radius: 8px;
+  background: #fff;
+  padding: 24px;
+  box-shadow: 0 10px 24px rgba(31, 27, 23, 0.07);
+}
+
+.dropsite-info-panel .h2 {
+  margin-bottom: 12px;
+}
+
+.dropsite-check-list {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  line-height: 1.55;
+}
+
+.dropsites-tools-section {
+  background: #eef1ea;
+}
+
+.dropsites-resource-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.dropsite-resource-card h3 {
+  margin: 0 0 10px;
+  font-family: var(--subscribe-serif);
+  font-size: 26px;
+  color: var(--navy);
+}
+
+.dropsite-resource-card p {
+  margin: 0 0 16px;
+  line-height: 1.55;
+}
+
+.dropsite-referral-tool {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dropsites-metrics-controls {
+  position: sticky;
+  top: var(--dropsites-metrics-sticky-top);
+  z-index: 15;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 18px 0 0;
+  padding: 12px 0;
+  background: rgba(251, 250, 246, 0.98);
+  box-shadow: 0 1px 0 rgba(31, 27, 23, 0.08);
+}
+
+.dropsite-metrics-table-shell {
+  max-height: min(68vh, 720px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid rgba(31, 27, 23, 0.12);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.dropsite-metrics-table {
+  width: 100%;
+  min-width: 820px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.dropsite-metrics-table th,
+.dropsite-metrics-table td {
+  text-align: left;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(31, 27, 23, 0.08);
+  vertical-align: top;
+}
+
+.dropsite-metrics-table th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--field);
+  background: #f6f1e7;
+  box-shadow: 0 1px 0 rgba(31, 27, 23, 0.1);
+}
+
+.dropsite-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.dropsite-status.good {
+  color: #1f4d31;
+  background: #dcebdc;
+}
+
+.dropsite-status.bad {
+  color: #7a2d25;
+  background: #f3ded8;
+}
+
+.dropsites-apply-section {
+  background: #fff;
+}
+
+.dropsites-apply-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(520px, 1.2fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.dropsites-apply-copy {
+  position: sticky;
+  top: 140px;
+}
+
+.dropsite-application-form {
+  border-radius: 8px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 14px 34px rgba(31, 27, 23, 0.1);
+}
+
+.dropsite-honeypot {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.subscribe-success-message {
+  color: #1f4d31;
+  font-weight: 700;
 }
 
 .card.pad {
@@ -3694,6 +4070,10 @@ img {
 }
 
 @media (max-width: 900px) {
+  .dropsites-page {
+    --dropsites-metrics-sticky-top: 174px;
+  }
+
   .subscribe-header-row,
   .subscribe-footer-row {
     flex-direction: column;
@@ -3726,8 +4106,16 @@ img {
   .subscribe-proof-grid,
   .subscribe-plan-grid,
   .subscribe-form-grid,
-  .subscribe-form-grid-3 {
+  .subscribe-form-grid-3,
+  .dropsites-hero-grid,
+  .dropsites-info-grid,
+  .dropsites-resource-grid,
+  .dropsites-apply-grid {
     grid-template-columns: 1fr;
+  }
+
+  .dropsites-apply-copy {
+    position: static;
   }
 
   .subscribe-herdshare-grid {
@@ -3780,6 +4168,10 @@ img {
 }
 
 @media (max-width: 640px) {
+  .dropsites-page {
+    --dropsites-metrics-sticky-top: 0px;
+  }
+
   .container {
     width: min(1160px, calc(100vw - 24px));
   }
@@ -3920,6 +4312,39 @@ img {
   .subscribe-form-card {
     padding: 18px;
     border-radius: 18px;
+  }
+
+  .dropsites-title {
+    font-size: 40px;
+    max-width: 14ch;
+  }
+
+  .dropsites-lede {
+    font-size: 16px;
+  }
+
+  .dropsites-hero {
+    padding: 28px 0 36px;
+  }
+
+  .dropsite-info-panel,
+  .dropsite-resource-card,
+  .dropsite-application-form {
+    padding: 18px;
+  }
+
+  .dropsites-metrics-controls {
+    align-items: stretch;
+  }
+
+  .subscribe-drop-site-host-callout {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .subscribe-drop-site-host-callout .button {
+    width: 100%;
+    justify-content: center;
   }
 
   .subscribe-page .button-row {

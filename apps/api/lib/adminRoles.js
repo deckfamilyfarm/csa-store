@@ -50,6 +50,11 @@ export const ADMIN_ROLE_DEFINITIONS = [
     description: "Manage storefront members and member records."
   },
   {
+    key: "liability_admin",
+    label: "Liability Releases",
+    description: "Manage liability release templates, signed releases, and legacy imports."
+  },
+  {
     key: "marketing_admin",
     label: "Marketing Admin",
     description: "Full access to campaign tracking, attribution, and marketing reporting."

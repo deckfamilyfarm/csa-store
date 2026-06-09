@@ -13,6 +13,7 @@ import {
   ensureAdminAccessSchema,
   ensureAdminPricelistIndexes,
   ensureLocalLineSyncSchema,
+  ensureLiabilityReleaseSchema,
   ensureProductPricingSchema,
   ensureVendorPricingSchema,
   getDb,
@@ -100,6 +101,16 @@ import {
   syncMemberLocalLineCredits,
   syncMemberLocalLinePurchaseDebits
 } from "../lib/memberPortalSync.js";
+import {
+  commitLegacyImport,
+  ensureDefaultLiabilityReleaseTemplates,
+  listLiabilityReleaseTemplates,
+  listSignedLiabilityReleases,
+  publishLiabilityReleaseTemplate,
+  upsertLiabilityReleaseTemplate,
+  validateLegacyImport
+} from "../lib/liabilityReleases.js";
+import { buildDropSitePerformancePayload } from "../lib/dropSitePerformance.js";
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -110,6 +121,9 @@ router.use(async (_req, _res, next) => {
   });
   await ensureVendorPricingSchema().catch((error) => {
     console.warn("Vendor pricing schema bootstrap skipped:", error.message);
+  });
+  await ensureLiabilityReleaseSchema().catch((error) => {
+    console.warn("Liability release schema bootstrap skipped:", error.message);
   });
   next();
 });
@@ -2085,6 +2099,142 @@ router.get(
     } catch (error) {
       console.error("Subscription leads fetch failed:", error);
       res.status(500).json({ error: "Failed to load subscription leads." });
+    }
+  }
+);
+
+router.get(
+  "/liability/templates",
+  requireAdminPermission("liability_admin"),
+  async (_req, res) => {
+    try {
+      await ensureDefaultLiabilityReleaseTemplates();
+      const templates = await listLiabilityReleaseTemplates({ includeArchived: true });
+      res.json({ templates });
+    } catch (error) {
+      console.error("Liability templates fetch failed:", error);
+      res.status(500).json({ error: "Failed to load liability release templates." });
+    }
+  }
+);
+
+router.post(
+  "/liability/templates",
+  requireAdminPermission("liability_admin"),
+  async (req, res) => {
+    try {
+      const template = await upsertLiabilityReleaseTemplate(req.body || {}, {
+        userId: req.admin?.userId || req.admin?.adminId || null
+      });
+      res.json({ ok: true, template });
+    } catch (error) {
+      console.error("Liability template save failed:", error);
+      res.status(error.status || 500).json({
+        error: error?.message || "Failed to save liability release template."
+      });
+    }
+  }
+);
+
+router.put(
+  "/liability/templates/:id",
+  requireAdminPermission("liability_admin"),
+  async (req, res) => {
+    try {
+      const template = await upsertLiabilityReleaseTemplate(
+        { ...(req.body || {}), id: Number(req.params.id) },
+        { userId: req.admin?.userId || req.admin?.adminId || null }
+      );
+      res.json({ ok: true, template });
+    } catch (error) {
+      console.error("Liability template update failed:", error);
+      res.status(error.status || 500).json({
+        error: error?.message || "Failed to update liability release template."
+      });
+    }
+  }
+);
+
+router.post(
+  "/liability/templates/:id/publish",
+  requireAdminPermission("liability_admin"),
+  async (req, res) => {
+    try {
+      const result = await publishLiabilityReleaseTemplate(Number(req.params.id), {
+        userId: req.admin?.userId || req.admin?.adminId || null
+      });
+      res.json({ ok: true, ...result });
+    } catch (error) {
+      console.error("Liability template publish failed:", error);
+      res.status(error.status || 500).json({
+        error: error?.message || "Failed to publish liability release template."
+      });
+    }
+  }
+);
+
+router.get(
+  "/liability/releases",
+  requireAdminPermission("liability_admin"),
+  async (_req, res) => {
+    try {
+      const releases = await listSignedLiabilityReleases();
+      res.json({ releases });
+    } catch (error) {
+      console.error("Liability releases fetch failed:", error);
+      res.status(500).json({ error: "Failed to load signed liability releases." });
+    }
+  }
+);
+
+router.post(
+  "/liability/import/validate",
+  requireAdminPermission("liability_admin"),
+  upload.any(),
+  async (req, res) => {
+    try {
+      const result = await validateLegacyImport(req.files || []);
+      res.json({
+        ok: result.ok,
+        errors: result.errors || [],
+        rowCount: result.rows?.length || 0,
+        fileCount: result.fileCount || 0,
+        rows: (result.rows || []).map((row) => ({
+          rowNumber: row.rowNumber,
+          templateSlug: row.templateSlug,
+          signerName: row.signerName,
+          signedAt: row.signedAt,
+          pdfFilename: row.pdfFilename,
+          signatureUrl: row.signatureUrl,
+          errors: row.rowErrors || []
+        }))
+      });
+    } catch (error) {
+      console.error("Liability legacy import validation failed:", error);
+      res.status(error.status || 500).json({
+        error: error?.message || "Failed to validate legacy import.",
+        details: error.details || []
+      });
+    }
+  }
+);
+
+router.post(
+  "/liability/import",
+  requireAdminPermission("liability_admin"),
+  upload.any(),
+  async (req, res) => {
+    try {
+      const result = await commitLegacyImport(req.files || [], {
+        userId: req.admin?.userId || req.admin?.adminId || null
+      });
+      res.json(result);
+    } catch (error) {
+      console.error("Liability legacy import failed:", error);
+      res.status(error.status || 500).json({
+        error: error?.message || "Failed to import legacy releases.",
+        details: error.details || []
+      });
     }
   }
 );
@@ -5826,283 +5976,19 @@ router.get("/drop-sites", requireAdmin, async (_req, res) => {
   await ensureLocalLineSyncSchema().catch((error) => {
     console.warn("Local Line schema bootstrap skipped for /admin/drop-sites:", error.message);
   });
-  const pool = getPool();
-  const requestedMonth = String(_req.query?.month || "").trim();
-  const completedFulfillmentCutoff = startOfDay(new Date());
-  const completedWeekCutoff = startOfWeek(completedFulfillmentCutoff);
-  const latestCompletedWeekStart = addDays(completedWeekCutoff, -7);
-  const fulfillmentDateSql = getFulfillmentDateSql("o");
-  const fulfillmentStrategyIdSql = getFulfillmentStrategyIdSql("o");
-  const fulfillmentSiteSql = getFulfillmentSiteNameSql("o", "ds");
-
-  const [siteRows] = await pool.query(
-    `
-      SELECT
-        id,
-        name,
-        address,
-        day_of_week AS dayOfWeek,
-        open_time AS openTime,
-        close_time AS closeTime,
-        active,
-        source,
-        local_line_fulfillment_strategy_id AS localLineFulfillmentStrategyId,
-        type,
-        fulfillment_type AS fulfillmentType,
-        timezone,
-        latitude,
-        longitude,
-        instructions,
-        address_json AS addressJson,
-        availability_json AS availabilityJson,
-        price_lists_json AS priceListsJson,
-        raw_json AS rawJson,
-        created_at AS createdAt,
-        updated_at AS updatedAt,
-        last_synced_at AS lastSyncedAt
-      FROM drop_sites
-      ORDER BY active DESC, name ASC
-    `
-  );
-
-  const normalizedSites = siteRows.map((row) => ({
-    ...row,
-    active: Boolean(row.active),
-    isOnlineOnlyMembership: isMembershipPurchaseDropSite(row),
-    derivedHostContact: extractDropSiteHostContact(row)
-  }));
-
-  const visibleDropSites = normalizedSites.filter((site) => !site.isOnlineOnlyMembership);
-
-  const [monthRows] = await pool.query(
-    `
-      SELECT DISTINCT DATE_FORMAT(${fulfillmentDateSql}, '%Y-%m') AS value
-      FROM local_line_orders o
-      WHERE ${fulfillmentDateSql} IS NOT NULL
-        AND ${fulfillmentDateSql} < ?
-      ORDER BY value DESC
-    `,
-    [completedFulfillmentCutoff]
-  );
-  const performanceMonths = monthRows.map((row) => row.value).filter(Boolean);
-  const trendModeKey = "__trend6__";
-  const isTrendMode = requestedMonth === trendModeKey && performanceMonths.length > 0;
-  const defaultSelectedMonth = getDefaultDropSitePerformanceMonth(
-    performanceMonths,
-    completedFulfillmentCutoff
-  );
-  const selectedMonth =
-    !isTrendMode && performanceMonths.includes(requestedMonth)
-      ? requestedMonth
-      : defaultSelectedMonth;
-  const trendMonths = isTrendMode ? performanceMonths.slice(0, 6).reverse() : [];
-  const trendWeeks = [];
-  if (isTrendMode && trendMonths.length) {
-    const earliestMonth = parseMonthKey(trendMonths[0]);
-    const latestMonth = parseMonthKey(trendMonths[trendMonths.length - 1]);
-    if (earliestMonth && latestMonth) {
-      let currentWeekStart = startOfWeek(earliestMonth.start);
-      while (currentWeekStart < latestMonth.end) {
-        if (currentWeekStart <= latestCompletedWeekStart) {
-          trendWeeks.push({
-            weekStart: formatDateKey(currentWeekStart),
-            month: formatMonthKey(currentWeekStart)
-          });
-        }
-        currentWeekStart = addDays(currentWeekStart, 7);
-      }
-    }
+  try {
+    const payload = await buildDropSitePerformancePayload({
+      pool: getPool(),
+      requestedMonth: String(_req.query?.month || "").trim(),
+      includeHostContact: true,
+      publicOnly: false,
+      allowTrend: true
+    });
+    res.json(payload);
+  } catch (error) {
+    console.error("Drop-site performance load failed:", error);
+    res.status(500).json({ error: error?.message || "Unable to load drop-site performance." });
   }
-  const monthsForData = isTrendMode
-    ? performanceMonths.slice(0, 6)
-    : [selectedMonth].filter(Boolean);
-
-  let rankedSites = [];
-  if (monthsForData.length) {
-    const monthPlaceholders = monthsForData.map(() => "?").join(", ");
-    const [orderRows] = await pool.query(
-      `
-        SELECT
-          ${fulfillmentStrategyIdSql} AS fulfillmentStrategyId,
-          ${fulfillmentSiteSql} AS fulfillmentSiteName,
-          ${fulfillmentDateSql} AS fulfillmentDate
-        FROM local_line_orders o
-        LEFT JOIN drop_sites ds
-          ON ds.local_line_fulfillment_strategy_id = ${fulfillmentStrategyIdSql}
-        WHERE ${fulfillmentDateSql} IS NOT NULL
-          AND ${fulfillmentDateSql} < ?
-          AND DATE_FORMAT(${fulfillmentDateSql}, '%Y-%m') IN (${monthPlaceholders})
-      `,
-      [completedFulfillmentCutoff, ...monthsForData]
-    );
-
-    const orderGroupsByKeyMonth = new Map();
-
-    for (const row of orderRows) {
-      const siteName = String(row.fulfillmentSiteName || "Unassigned").trim();
-      const fulfillmentDate = toDateOrNull(row.fulfillmentDate);
-      const strategyId = Number(row.fulfillmentStrategyId || 0);
-      const monthKey = formatMonthKey(fulfillmentDate);
-      const siteKey = strategyId > 0 ? `id:${strategyId}` : `name:${siteName}`;
-      const bucketKey = `${siteKey}|${monthKey}`;
-      const existing = orderGroupsByKeyMonth.get(bucketKey) || [];
-      existing.push({ fulfillmentDate });
-      orderGroupsByKeyMonth.set(bucketKey, existing);
-    }
-
-    rankedSites = visibleDropSites
-      .map((site) => {
-        const strategyId = Number(site.localLineFulfillmentStrategyId || 0);
-        const siteKey = strategyId > 0 ? `id:${strategyId}` : `name:${site.name}`;
-        const trendSeries = isTrendMode
-          ? trendWeeks
-              .map((week) => {
-              const weekStart = toDateOrNull(week.weekStart);
-              const weekEnd = addDays(weekStart, 7);
-              const monthKey = formatMonthKey(weekStart);
-              const groupedRows = orderGroupsByKeyMonth.get(`${siteKey}|${monthKey}`) || [];
-              const fulfillmentDates = groupedRows
-                .map((row) => row.fulfillmentDate)
-                .filter((value) => isDateInRange(value, weekStart, weekEnd));
-              const orderCountByDate = fulfillmentDates.reduce((map, dateValue) => {
-                const key = formatDateKey(dateValue);
-                if (!key) return map;
-                map.set(key, Number(map.get(key) || 0) + 1);
-                return map;
-              }, new Map());
-              const scheduledDateKeys = getDropSiteScheduledDateKeysForRange(
-                site,
-                weekStart,
-                weekEnd,
-                fulfillmentDates
-              );
-              const detailPoints = scheduledDateKeys.map((dateKey) => ({
-                date: dateKey,
-                orderCount: Number(orderCountByDate.get(dateKey) || 0)
-              }));
-              const orderCount = detailPoints.reduce((sum, point) => sum + Number(point.orderCount || 0), 0);
-              const scheduledDrops = detailPoints.length;
-              const averageWeeklyOrders =
-                scheduledDrops > 0 ? Number((orderCount / scheduledDrops).toFixed(2)) : 0;
-              return {
-                weekStart: week.weekStart,
-                month: week.month,
-                orderCount,
-                scheduledDrops,
-                averageWeeklyOrders,
-                detailPoints,
-                performanceTier: getDropSitePerformanceTier(averageWeeklyOrders)
-              };
-            })
-              .filter((entry) => {
-                const weekStart = toDateOrNull(entry.weekStart);
-                return weekStart instanceof Date && weekStart <= latestCompletedWeekStart;
-              })
-          : monthsForData.map((monthKey) => {
-              const groupedRows = orderGroupsByKeyMonth.get(`${siteKey}|${monthKey}`) || [];
-              const fulfillmentDates = groupedRows.map((row) => row.fulfillmentDate).filter(Boolean);
-              const orderCountByDate = fulfillmentDates.reduce((map, dateValue) => {
-                const key = formatDateKey(dateValue);
-                if (!key) return map;
-                map.set(key, Number(map.get(key) || 0) + 1);
-                return map;
-              }, new Map());
-              const monthInfo = parseMonthKey(monthKey);
-              const rangeEnd =
-                monthInfo && monthInfo.end > completedFulfillmentCutoff
-                  ? completedFulfillmentCutoff
-                  : monthInfo?.end || null;
-              const detailPoints =
-                monthInfo && rangeEnd && rangeEnd > monthInfo.start
-                  ? getDropSiteScheduledDateKeysForRange(
-                      site,
-                      monthInfo.start,
-                      rangeEnd,
-                      fulfillmentDates
-                    ).map((dateKey) => ({
-                      date: dateKey,
-                      orderCount: Number(orderCountByDate.get(dateKey) || 0)
-                    }))
-                  : [];
-              const orderCount = detailPoints.reduce((sum, point) => sum + Number(point.orderCount || 0), 0);
-              const scheduledDrops = detailPoints.length;
-              const averageWeeklyOrders =
-                scheduledDrops > 0 ? Number((orderCount / scheduledDrops).toFixed(2)) : 0;
-              return {
-                month: monthKey,
-                orderCount,
-                scheduledDrops,
-                averageWeeklyOrders,
-                detailPoints,
-                performanceTier: getDropSitePerformanceTier(averageWeeklyOrders)
-              };
-            });
-
-        const totalOrderCount = trendSeries.reduce((sum, entry) => sum + Number(entry.orderCount || 0), 0);
-        const totalScheduledDrops = trendSeries.reduce((sum, entry) => sum + Number(entry.scheduledDrops || 0), 0);
-        const averageWeeklyOrders =
-          totalScheduledDrops > 0
-            ? Number((totalOrderCount / totalScheduledDrops).toFixed(2))
-            : 0;
-        const latestAverageWeeklyOrders = Number(
-          trendSeries[trendSeries.length - 1]?.averageWeeklyOrders || 0
-        );
-        const detailSeries = trendSeries
-          .flatMap((entry) => Array.isArray(entry.detailPoints) ? entry.detailPoints : [])
-          .sort((left, right) => String(left.date || "").localeCompare(String(right.date || "")));
-
-        return {
-          id: site.id,
-          name: site.name,
-          source: site.source,
-          active: site.active,
-          localLineFulfillmentStrategyId: site.localLineFulfillmentStrategyId,
-          derivedHostContact: site.derivedHostContact || null,
-          orderCount: totalOrderCount,
-          scheduledDrops: totalScheduledDrops,
-          averageWeeklyOrders,
-          latestAverageWeeklyOrders,
-          thresholdMet: (isTrendMode ? latestAverageWeeklyOrders : averageWeeklyOrders) >= 4,
-          performanceTier: getDropSitePerformanceTier(
-            isTrendMode ? latestAverageWeeklyOrders : averageWeeklyOrders
-          ),
-          trendSeries,
-          detailSeries
-        };
-      })
-      .sort((left, right) => {
-        const leftSortValue = isTrendMode
-          ? Number(left.latestAverageWeeklyOrders || 0)
-          : Number(left.averageWeeklyOrders || 0);
-        const rightSortValue = isTrendMode
-          ? Number(right.latestAverageWeeklyOrders || 0)
-          : Number(right.averageWeeklyOrders || 0);
-        if (rightSortValue !== leftSortValue) {
-          return rightSortValue - leftSortValue;
-        }
-        if (right.averageWeeklyOrders !== left.averageWeeklyOrders) {
-          return right.averageWeeklyOrders - left.averageWeeklyOrders;
-        }
-        if (right.orderCount !== left.orderCount) {
-          return right.orderCount - left.orderCount;
-        }
-        return String(left.name || "").localeCompare(String(right.name || ""));
-      });
-  }
-
-  res.json({
-    dropSites: visibleDropSites,
-    performance: {
-      mode: isTrendMode ? "trend6" : "month",
-      selectedMonth: isTrendMode ? trendModeKey : selectedMonth,
-      months: performanceMonths,
-      trendMonths,
-      trendWeeks,
-      thresholdAverage: 4,
-      strongAverage: 5,
-      rankedSites
-    }
-  });
 });
 
 router.get("/localline/pull-jobs", requireAdmin, async (_req, res) => {

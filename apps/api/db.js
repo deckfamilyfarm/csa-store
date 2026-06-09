@@ -14,6 +14,7 @@ let productPricingSchemaPromise;
 let subscriberCaptureSchemaPromise;
 let marketingSchemaPromise;
 let subscriptionPortalSchemaPromise;
+let liabilityReleaseSchemaPromise;
 
 const SOURCE_PRICING_VENDOR_FACTOR_DEFAULT = 0.5412;
 
@@ -65,6 +66,8 @@ const SUBSCRIBER_CAPTURE_TABLE_STATEMENTS = [
       selected_plan VARCHAR(64),
       selected_plan_label VARCHAR(255),
       selected_drop_site VARCHAR(255),
+      has_current_snap_ebt_card TINYINT(1) DEFAULT 0,
+      is_farm_employee TINYINT(1) DEFAULT 0,
       notes TEXT,
       admin_notes TEXT,
       liability_agreement_accepted TINYINT(1) DEFAULT 0,
@@ -133,6 +136,16 @@ const SUBSCRIBER_CAPTURE_COLUMN_STATEMENTS = [
     tableName: "subscribe_leads",
     columnName: "admin_notes",
     definition: "admin_notes TEXT"
+  },
+  {
+    tableName: "subscribe_leads",
+    columnName: "has_current_snap_ebt_card",
+    definition: "has_current_snap_ebt_card TINYINT(1) DEFAULT 0"
+  },
+  {
+    tableName: "subscribe_leads",
+    columnName: "is_farm_employee",
+    definition: "is_farm_employee TINYINT(1) DEFAULT 0"
   },
   {
     tableName: "subscribe_leads",
@@ -769,6 +782,152 @@ const MARKETING_INDEX_STATEMENTS = [
     tableName: "marketing_recommendations",
     indexName: "idx_marketing_recommendations_status",
     columns: "status"
+  }
+];
+
+const LIABILITY_RELEASE_TABLE_STATEMENTS = [
+  `
+    CREATE TABLE IF NOT EXISTS liability_release_templates (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      slug VARCHAR(128) NOT NULL,
+      title VARCHAR(255) NOT NULL,
+      description TEXT,
+      body_text TEXT,
+      source_url VARCHAR(2048),
+      status VARCHAR(32) DEFAULT 'draft',
+      public_path VARCHAR(255),
+      renewal_months INT,
+      requires_participants TINYINT(1) DEFAULT 0,
+      allow_drawn_signature TINYINT(1) DEFAULT 1,
+      current_version_id INT,
+      created_by_user_id INT,
+      updated_by_user_id INT,
+      published_at DATETIME,
+      created_at DATETIME,
+      updated_at DATETIME,
+      UNIQUE KEY ux_liability_release_templates_slug (slug)
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS liability_release_template_versions (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      template_id INT NOT NULL,
+      version_number INT NOT NULL,
+      slug VARCHAR(128) NOT NULL,
+      title VARCHAR(255) NOT NULL,
+      description TEXT,
+      body_text TEXT,
+      source_url VARCHAR(2048),
+      public_path VARCHAR(255),
+      renewal_months INT,
+      requires_participants TINYINT(1) DEFAULT 0,
+      allow_drawn_signature TINYINT(1) DEFAULT 1,
+      published_by_user_id INT,
+      published_at DATETIME,
+      created_at DATETIME
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS liability_release_import_batches (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      status VARCHAR(32) DEFAULT 'validated',
+      original_filename VARCHAR(255),
+      file_count INT DEFAULT 0,
+      imported_count INT DEFAULT 0,
+      error_count INT DEFAULT 0,
+      summary_json TEXT,
+      created_by_user_id INT,
+      created_at DATETIME,
+      updated_at DATETIME
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS liability_release_submissions (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      template_id INT NOT NULL,
+      template_version_id INT NOT NULL,
+      template_slug VARCHAR(128) NOT NULL,
+      template_title VARCHAR(255) NOT NULL,
+      status VARCHAR(32) DEFAULT 'signed',
+      source_type VARCHAR(64) DEFAULT 'public',
+      source_submission_id VARCHAR(255),
+      import_batch_id INT,
+      subscribe_lead_id INT,
+      member_user_id INT,
+      signer_name VARCHAR(255) NOT NULL,
+      signer_email VARCHAR(255),
+      signer_phone VARCHAR(64),
+      signer_address_line_1 VARCHAR(255),
+      signer_address_line_2 VARCHAR(255),
+      signer_city VARCHAR(255),
+      signer_state_province VARCHAR(255),
+      signer_postal_code VARCHAR(32),
+      participant_json TEXT,
+      signature_mode VARCHAR(32) DEFAULT 'typed',
+      signature_hash VARCHAR(64),
+      accepted_at DATETIME,
+      signed_at DATETIME,
+      expires_at DATETIME,
+      source_host VARCHAR(255),
+      source_path VARCHAR(255),
+      document_url VARCHAR(2048),
+      record_url VARCHAR(2048),
+      storage_key VARCHAR(1024),
+      notes TEXT,
+      admin_notes TEXT,
+      raw_json TEXT,
+      created_at DATETIME,
+      updated_at DATETIME
+    )
+  `
+];
+
+const LIABILITY_RELEASE_INDEX_STATEMENTS = [
+  {
+    tableName: "liability_release_templates",
+    indexName: "idx_liability_release_templates_status",
+    columns: "status"
+  },
+  {
+    tableName: "liability_release_template_versions",
+    indexName: "idx_liability_release_versions_template",
+    columns: "template_id"
+  },
+  {
+    tableName: "liability_release_template_versions",
+    indexName: "idx_liability_release_versions_slug",
+    columns: "slug"
+  },
+  {
+    tableName: "liability_release_template_versions",
+    indexName: "ux_liability_release_versions_template_number",
+    columns: "template_id, version_number",
+    unique: true
+  },
+  {
+    tableName: "liability_release_submissions",
+    indexName: "idx_liability_release_submissions_template",
+    columns: "template_id"
+  },
+  {
+    tableName: "liability_release_submissions",
+    indexName: "idx_liability_release_submissions_slug",
+    columns: "template_slug"
+  },
+  {
+    tableName: "liability_release_submissions",
+    indexName: "idx_liability_release_submissions_email",
+    columns: "signer_email"
+  },
+  {
+    tableName: "liability_release_submissions",
+    indexName: "idx_liability_release_submissions_signed_at",
+    columns: "signed_at"
+  },
+  {
+    tableName: "liability_release_submissions",
+    indexName: "idx_liability_release_submissions_source",
+    columns: "source_submission_id"
   }
 ];
 
@@ -2117,6 +2276,26 @@ async function runSubscriptionPortalSchemaBootstrap(connection) {
   }
 }
 
+async function runLiabilityReleaseSchemaBootstrap(connection) {
+  for (const statement of LIABILITY_RELEASE_TABLE_STATEMENTS) {
+    await connection.query(statement);
+  }
+
+  for (const indexDefinition of LIABILITY_RELEASE_INDEX_STATEMENTS) {
+    const exists = await indexExists(
+      connection,
+      indexDefinition.tableName,
+      indexDefinition.indexName
+    );
+    if (exists) continue;
+
+    const uniqueClause = indexDefinition.unique ? "UNIQUE " : "";
+    await connection.query(
+      `CREATE ${uniqueClause}INDEX ${indexDefinition.indexName} ON ${indexDefinition.tableName} (${indexDefinition.columns})`
+    );
+  }
+}
+
 export function initDb() {
   if (db) return db;
 
@@ -2261,6 +2440,22 @@ export async function ensureSubscriptionPortalSchema(connection = getPool()) {
   }
 
   return runSubscriptionPortalSchemaBootstrap(connection);
+}
+
+export async function ensureLiabilityReleaseSchema(connection = getPool()) {
+  if (connection === getPool()) {
+    if (!liabilityReleaseSchemaPromise) {
+      liabilityReleaseSchemaPromise = runLiabilityReleaseSchemaBootstrap(connection).catch(
+        (error) => {
+          liabilityReleaseSchemaPromise = null;
+          throw error;
+        }
+      );
+    }
+    return liabilityReleaseSchemaPromise;
+  }
+
+  return runLiabilityReleaseSchemaBootstrap(connection);
 }
 
 export function isMissingTableError(error, tableName = "") {

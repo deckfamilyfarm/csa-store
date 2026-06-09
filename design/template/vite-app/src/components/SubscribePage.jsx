@@ -12,6 +12,15 @@ const DELIVERY_MAP_URL =
 const LIABILITY_AGREEMENT_URL =
   "https://docs.google.com/document/d/1VFMc4euofQ1S1kjtd6jZI46uxo6YKft9cufT6Q3-nrc/edit?tab=t.0";
 
+function getDropsitesHostUrl() {
+  if (typeof window === "undefined") return "https://dropsites.deckfamilyfarm.com/";
+  const host = String(window.location.host || "").toLowerCase();
+  if (host.includes("localhost") || host.includes("127.0.0.1")) {
+    return "/dropsites";
+  }
+  return "https://dropsites.deckfamilyfarm.com/";
+}
+
 const SUBSCRIBE_PLANS = [
   {
     value: "guest",
@@ -236,6 +245,8 @@ function buildInitialForm(dropSites = []) {
     selectedPlan: "forager",
     billingDayOfMonth: 1,
     selectedDropSite: "",
+    hasCurrentSnapEbtCard: false,
+    isFarmEmployee: false,
     notes: "",
     liabilityAgreementAccepted: false,
     liabilityAgreementSignerName: "",
@@ -325,15 +336,28 @@ export function SubscribePage({
   const subscribeRouteUrl = useMemo(() => {
     return `${portalBaseHref}#/subscribe`;
   }, [portalBaseHref]);
+  const visitorLiabilityReleaseUrl = useMemo(() => {
+    try {
+      const baseOrigin =
+        typeof window !== "undefined" ? window.location.origin : "https://fullfarmcsa.deckfamilyfarm.com";
+      const url = new URL(portalBaseHref || baseOrigin, baseOrigin);
+      url.pathname = "/liability/visitor";
+      url.search = "";
+      url.hash = "";
+      return url.toString();
+    } catch (_error) {
+      return "/liability/visitor";
+    }
+  }, [portalBaseHref]);
   const subscribeNavLinks = useMemo(
     () => [
       {
         label: "Our Farm",
         children: [
-          { label: "About", href: "https://www.deckfamilyfarm.com/about" },
-          { label: "Our Farmily", href: "https://www.deckfamilyfarm.com/our-farmily" },
-          { label: "Education", href: "https://www.deckfamilyfarm.com/education" },
-          { label: "Farm Dogs", href: "https://www.deckfamilyfarm.com/farm-dogs" }
+          { label: "About", href: "https://www.deckfamilyfarm.com/the-farm" },
+          { label: "Our Farmily", href: "https://www.deckfamilyfarm.com/the-farmily" },
+          { label: "Education", href: "https://www.deckfamilyfarm.com/intern-program" },
+          { label: "Farm Dogs", href: "https://www.deckfamilyfarm.com/dogs" }
         ]
       },
       {
@@ -1030,6 +1054,31 @@ export function SubscribePage({
                     </label>
                   </div>
 
+                  <div className="subscribe-option-checklist">
+                    <label className="subscribe-option-check">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(form.hasCurrentSnapEbtCard)}
+                        onChange={(event) =>
+                          updateField("hasCurrentSnapEbtCard", event.target.checked)
+                        }
+                      />
+                      <span>
+                        I have a current SNAP/EBT card from USDA.gov and would like to use it for
+                        this subscription. DO NOT CLICK THIS BOX IF YOU DO NOT HAVE A CURRENT EBT
+                        CARD.
+                      </span>
+                    </label>
+                    <label className="subscribe-option-check">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(form.isFarmEmployee)}
+                        onChange={(event) => updateField("isFarmEmployee", event.target.checked)}
+                      />
+                      <span>I am an employee of Deck Family Farm, Full Farm CSA, or Creamy Cow LLC.</span>
+                    </label>
+                  </div>
+
                   <label className="filter-field">
                     <span className="small">Where did you hear about Full Farm?</span>
                     <input
@@ -1185,6 +1234,24 @@ export function SubscribePage({
                 orderWindow="order window Monday through Wednesday"
                 sites={saturdayDropSites}
               />
+            </div>
+            <div className="subscribe-drop-site-host-callout">
+              <div>
+                <h3>Want to become a drop site?</h3>
+                <p className="lede">
+                  The drop-site host page explains host responsibilities, monthly host credit
+                  criteria, pickup resources, performance summaries, and the form to tell us about
+                  your proposed pickup location.
+                </p>
+              </div>
+              <a
+                className="button alt"
+                href={getDropsitesHostUrl()}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Visit drop-site host page
+              </a>
             </div>
           </div>
         </section>
@@ -1405,6 +1472,12 @@ export function SubscribePage({
             </div>
           </div>
           <div className="subscribe-footer-links">
+            <a className="subscribe-review-link" href={visitorLiabilityReleaseUrl}>
+              <span className="subscribe-review-link-star" aria-hidden="true">
+                !
+              </span>
+              <span>Visitor Liability Release</span>
+            </a>
             <a
               className="subscribe-review-link"
               href="https://app.goodreviews.io/mode?type=link&grid=GRI_ZN9UOZ3YIM5"

@@ -87,6 +87,15 @@ function AgreementCell({ href }) {
   );
 }
 
+function LeadFlags({ lead = {} }) {
+  const flags = [
+    lead.hasCurrentSnapEbtCard ? "SNAP/EBT" : "",
+    lead.isFarmEmployee ? "Employee" : ""
+  ].filter(Boolean);
+  if (!flags.length) return <span className="small">—</span>;
+  return <span className="subscription-leads-cell-text">{flags.join(", ")}</span>;
+}
+
 export function AdminSubscriptionLeadsSection({ token }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -413,6 +422,7 @@ export function AdminSubscriptionLeadsSection({ token }) {
                 <th>Email</th>
                 <th>Plan</th>
                 <th>Drop Site</th>
+                <th>Flags</th>
                 <th>Agreement</th>
                 <th>Status</th>
                 <th>Notes</th>
@@ -459,6 +469,16 @@ export function AdminSubscriptionLeadsSection({ token }) {
                       <span className="subscription-leads-cell-text">
                         {truncateText(lead.selectedDropSite, 32)}
                       </span>
+                    </td>
+                    <td
+                      title={[
+                        lead.hasCurrentSnapEbtCard ? "Has current SNAP/EBT card" : "",
+                        lead.isFarmEmployee ? "Farm employee" : ""
+                      ]
+                        .filter(Boolean)
+                        .join(", ") || "—"}
+                    >
+                      <LeadFlags lead={lead} />
                     </td>
                     <td>
                       <AgreementCell href={lead.liabilityAgreementRecordUrl} />
@@ -611,6 +631,14 @@ export function AdminSubscriptionLeadsSection({ token }) {
               />
               <DetailRow label="Plan" value={modalLead.selectedPlanLabel || modalLead.selectedPlan} />
               <DetailRow label="Drop Site" value={modalLead.selectedDropSite} />
+              <DetailRow
+                label="SNAP/EBT Card"
+                value={modalLead.hasCurrentSnapEbtCard ? "Yes" : "No"}
+              />
+              <DetailRow
+                label="Farm Employee"
+                value={modalLead.isFarmEmployee ? "Yes" : "No"}
+              />
               <DetailRow label="Referral Source" value={modalLead.referralSource} />
               <DetailRow label="UTM Source" value={modalLead.utmSource} />
               <DetailRow label="UTM Medium" value={modalLead.utmMedium} />
