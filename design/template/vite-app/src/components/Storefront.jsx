@@ -29,6 +29,7 @@ import { DeliverySection } from "./DeliverySection.jsx";
 import { FooterSection } from "./FooterSection.jsx";
 import { HerdshareBanner } from "./HerdshareBanner.jsx";
 import { HeroSection } from "./HeroSection.jsx";
+import { HomeLandingPage } from "./HomeLandingPage.jsx";
 import { PlanChooser } from "./PlanChooser.jsx";
 import { ProductDetailSection } from "./ProductDetailSection.jsx";
 import { ProductGrid } from "./ProductGrid.jsx";
@@ -246,8 +247,12 @@ export function Storefront() {
         setView("account");
         return;
       }
-      if (route === "subscribe" || route === "home") {
+      if (route === "subscribe") {
         setView("subscribe");
+        return;
+      }
+      if (route === "home") {
+        setView(experienceMode === "subscribe" ? "subscribe" : "home");
         return;
       }
       if (route === "dropsites") {
@@ -320,6 +325,7 @@ export function Storefront() {
   const isLiabilityView = view === "liability";
   const isResetPasswordView = view === "resetPassword";
   const isDropsitesView = view === "dropsites" || experienceMode === "dropsites";
+  const isPublicHomeView = experienceMode === "store" && view === "home" && !isMember;
   const showMemberCart = isMember && !isAdminView && !isResetPasswordView;
 
   useEffect(() => {
@@ -631,7 +637,7 @@ export function Storefront() {
   return (
     <div className="page">
       <main>
-        {experienceMode !== "subscribe" && experienceMode !== "dropsites" && view !== "subscribe" && !isAccountView && !isLiabilityView && !isDropsitesView ? (
+        {experienceMode !== "subscribe" && experienceMode !== "dropsites" && view !== "subscribe" && !isAccountView && !isLiabilityView && !isDropsitesView && !isPublicHomeView ? (
           <div className="utility-bar">
             <div className="brand">
               <img src="/images/full-farm-csa-logo.png" alt={brand} />
@@ -727,6 +733,17 @@ export function Storefront() {
           ) : (
             <AccountPanelSection accountPanel={accountPanel} dropSite={dropSite} />
           )
+        ) : isPublicHomeView ? (
+          <HomeLandingPage
+            catalog={catalog}
+            catalogError={catalogError}
+            getPrice={getDisplayPrice}
+            onSelectProduct={(product) => setSelectedProduct(product)}
+            isLoggedIn={isMember}
+            isAdmin={isAdmin}
+            onAuthAction={() => (isMember ? handleLogout() : setLoginOpen(true))}
+            subscribeUrl={`${subscribeAppUrl}#/subscribe`}
+          />
         ) : experienceMode === "subscribe" || view === "subscribe" ? (
           <SubscribePage
             dropSites={subscribeDropSites}
@@ -932,7 +949,7 @@ export function Storefront() {
         </div>
       )}
 
-      {experienceMode !== "subscribe" && !isDropsitesView && !isAccountView && !isAdminView ? (
+      {experienceMode !== "subscribe" && !isDropsitesView && !isAccountView && !isAdminView && !isPublicHomeView ? (
         <FooterSection brand={brand} />
       ) : null}
 

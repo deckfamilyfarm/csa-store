@@ -60,6 +60,15 @@ function formatAverage(value) {
   return Number.isFinite(numeric) ? numeric.toFixed(2) : "0.00";
 }
 
+function shouldShowPublicDropSiteMetric(row) {
+  const title = String(row?.title || row?.name || "").toLowerCase();
+  return !(
+    title.includes("farmers market") ||
+    title.includes("lcfm") ||
+    title.includes("snap")
+  );
+}
+
 function getDropsitesCanonicalUrl() {
   if (typeof window === "undefined") return "https://dropsites.deckfamilyfarm.com/";
   const host = String(window.location.host || "").toLowerCase();
@@ -132,7 +141,7 @@ export function DropsitesPage() {
   );
 
   const performance = metrics?.performance || {};
-  const metricRows = performance.rankedSites || [];
+  const metricRows = (performance.rankedSites || []).filter(shouldShowPublicDropSiteMetric);
 
   function updateField(key, value) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -266,7 +275,7 @@ export function DropsitesPage() {
           <div className="subscribe-section-head">
             <div className="eyebrow">Performance</div>
             <div className="dropsites-metrics-title-row">
-              <h2 className="h2">Monthly public drop-site summary</h2>
+              <h2 className="h2">Monthly drop-site summary</h2>
               <span className={`dropsite-info-control ${hostCreditInfoOpen ? "open" : ""}`}>
                 <button
                   className="dropsite-info-button"
