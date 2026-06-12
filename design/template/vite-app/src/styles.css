@@ -1618,7 +1618,7 @@ img {
 
 .dropsite-metrics-table {
   width: 100%;
-  min-width: 820px;
+  min-width: 740px;
   border-collapse: separate;
   border-spacing: 0;
 }
@@ -4767,6 +4767,70 @@ img {
   box-shadow: 0 1px rgba(31, 27, 23, 0.08);
 }
 
+.dropsites-metrics-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dropsite-info-control {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.dropsite-info-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid rgba(31, 27, 23, 0.3);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--field);
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.dropsite-info-button:hover,
+.dropsite-info-button:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+  outline: none;
+}
+
+.dropsite-info-bubble {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 20;
+  width: min(360px, calc(100vw - 40px));
+  padding: 12px 14px;
+  border: 1px solid rgba(31, 27, 23, 0.14);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 16px 34px rgba(31, 27, 23, 0.18);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.45;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: opacity 140ms ease, transform 140ms ease;
+}
+
+.dropsite-info-control:hover .dropsite-info-bubble,
+.dropsite-info-control:focus-within .dropsite-info-bubble,
+.dropsite-info-control.open .dropsite-info-bubble {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
 .dropsite-metrics-table-shell {
   max-height: min(68vh, 720px);
   overflow: auto;
@@ -4778,7 +4842,7 @@ img {
 
 .dropsite-metrics-table {
   width: 100%;
-  min-width: 820px;
+  min-width: 740px;
   border-collapse: separate;
   border-spacing: 0;
 }

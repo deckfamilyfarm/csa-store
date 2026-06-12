@@ -4,6 +4,8 @@ import { DeckPageHeader } from "./DeckPageHeader.jsx";
 
 const MEDIA_KIT_URL =
   "https://docs.google.com/document/d/16iVw310-q0OGkJhWaXyO4Tp7WLEtU8Sf/edit";
+const HOST_CREDIT_INFO =
+  "Host credit is the food credit hosts receive for hosting a drop site. A site qualifies by averaging 3 or more drops per week OR more than 5 pickups per month. We count all guest and member orders per drop site.";
 
 const INITIAL_FORM = {
   name: "",
@@ -78,6 +80,7 @@ export function DropsitesPage() {
   const [metrics, setMetrics] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState("");
   const [metricsError, setMetricsError] = useState("");
+  const [hostCreditInfoOpen, setHostCreditInfoOpen] = useState(false);
   const [form, setForm] = useState(INITIAL_FORM);
   const [photos, setPhotos] = useState([]);
   const [status, setStatus] = useState({ submitting: false, message: "", error: "" });
@@ -262,10 +265,24 @@ export function DropsitesPage() {
         <div className="container">
           <div className="subscribe-section-head">
             <div className="eyebrow">Performance</div>
-            <h2 className="h2">Monthly public drop-site summary</h2>
-            <p className="lede dropsites-metrics-lede">
-              Host credit is the food credit hosts receive for hosting a drop site. A site qualifies by averaging 3 or more drops per week OR more than 5 pickups per month.
-            </p>
+            <div className="dropsites-metrics-title-row">
+              <h2 className="h2">Monthly public drop-site summary</h2>
+              <span className={`dropsite-info-control ${hostCreditInfoOpen ? "open" : ""}`}>
+                <button
+                  className="dropsite-info-button"
+                  type="button"
+                  aria-label="Host credit methodology"
+                  aria-expanded={hostCreditInfoOpen}
+                  onClick={() => setHostCreditInfoOpen((open) => !open)}
+                  onBlur={() => setHostCreditInfoOpen(false)}
+                >
+                  i
+                </button>
+                <span className="dropsite-info-bubble" role="tooltip">
+                  {HOST_CREDIT_INFO}
+                </span>
+              </span>
+            </div>
           </div>
           <div className="dropsites-metrics-controls">
             <label className="filter-field">
@@ -283,9 +300,6 @@ export function DropsitesPage() {
                 ))}
               </select>
             </label>
-            <div className="small">
-              Credit threshold: 3 or more drops per week OR more than 5 pickups per month.
-            </div>
           </div>
           {metricsError ? <div className="small subscribe-error">{metricsError}</div> : null}
           <div className="dropsite-metrics-table-shell">
@@ -295,8 +309,7 @@ export function DropsitesPage() {
                   <th>Drop site</th>
                   <th>Area</th>
                   <th>Orders</th>
-                  <th>Active weeks</th>
-                  <th>Avg/week</th>
+                  <th>Avg orders/week</th>
                   <th>Members picked up</th>
                   <th>Status</th>
                 </tr>
@@ -307,7 +320,6 @@ export function DropsitesPage() {
                     <td>{row.name}</td>
                     <td>{row.area || "Local pickup area"}</td>
                     <td>{Number(row.orderCount || 0)}</td>
-                    <td>{Number(row.activeDropWeeks || 0)}</td>
                     <td>{formatAverage(row.averageOrdersPerActiveDropWeek)}</td>
                     <td>{Number(row.legacyMonthlyUniqueCustomers || 0)}</td>
                     <td><MetricStatus row={row} /></td>
@@ -315,7 +327,7 @@ export function DropsitesPage() {
                 ))}
                 {!metricRows.length ? (
                   <tr>
-                    <td colSpan="7">No public drop-site performance data is available for this month yet.</td>
+                    <td colSpan="6">No public drop-site performance data is available for this month yet.</td>
                   </tr>
                 ) : null}
               </tbody>
