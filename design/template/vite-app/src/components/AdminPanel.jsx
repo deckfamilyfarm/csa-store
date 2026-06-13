@@ -1,4 +1,5 @@
 ﻿import React, { useEffect, useRef, useState } from "react";
+import { AdminContentSection } from "./AdminContentSection.jsx";
 import { AdminInventorySection } from "./AdminInventorySection.jsx";
 import { AdminLiabilityReleasesSection } from "./AdminLiabilityReleasesSection.jsx";
 import { AdminMarketingSection } from "./AdminMarketingSection.jsx";
@@ -35,7 +36,7 @@ function canAccessAdminSection(roleKeys, section) {
     case "localLine":
       return roleKeys.includes("localline_pull") || roleKeys.includes("dropsite_admin");
     case "orders":
-      return Array.isArray(roleKeys) && roleKeys.length > 0;
+      return Array.isArray(roleKeys) && roleKeys.some((roleKey) => roleKey !== "content_editor");
     case "pricelist":
       return (
         roleKeys.includes("pricing_admin") ||
@@ -60,6 +61,8 @@ function canAccessAdminSection(roleKeys, section) {
         roleKeys.includes("campaign_manager") ||
         roleKeys.includes("analytics_viewer")
       );
+    case "content":
+      return roleKeys.includes("content_editor") || roleKeys.includes("marketing_admin");
     case "dropSites":
       return roleKeys.includes("dropsite_admin");
     case "reviews":
@@ -83,6 +86,7 @@ function getDefaultAdminSection(roleKeys = []) {
     "pricelist",
     "localPricelist",
     "inventory",
+    "content",
     "marketing",
     "liability",
     "subscriptions",
@@ -554,7 +558,7 @@ function stripHtmlPreview(value) {
 const LOCAL_PRICELIST_PAGE_SIZE = 50;
 const LOCAL_PRICELIST_SEARCH_DEBOUNCE_MS = 250;
 
-export function AdminPanel({ onCatalogRefresh }) {
+export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
   const [token, setToken] = useState(() => localStorage.getItem("adminToken") || "");
   const [currentAdmin, setCurrentAdmin] = useState(null);
   const [loginState, setLoginState] = useState({ username: "", password: "", error: "" });
@@ -2775,6 +2779,7 @@ export function AdminPanel({ onCatalogRefresh }) {
   const canManageInventory = hasRole(currentAdminRoles, "inventory_admin");
   const canManageMembership = hasRole(currentAdminRoles, "membership_admin");
   const canManageSubscriptions = canAccessAdminSection(currentAdminRoles, "subscriptions");
+  const canManageContent = canAccessAdminSection(currentAdminRoles, "content");
   const canManageMarketing = canAccessAdminSection(currentAdminRoles, "marketing");
   const canManageLiability = canAccessAdminSection(currentAdminRoles, "liability");
   const canPullFromLocalLine = hasRole(currentAdminRoles, "localline_pull");
@@ -3611,6 +3616,18 @@ export function AdminPanel({ onCatalogRefresh }) {
               type="button"
             >
               Subscriptions
+            </button>
+          ) : null}
+          {canManageContent ? (
+            <button
+              className={`admin-nav-item ${activeSection === "content" ? "active" : ""}`}
+              onClick={() => {
+                setActiveSection("content");
+                closeProductEditor();
+              }}
+              type="button"
+            >
+              Content
             </button>
           ) : null}
           {canManageMarketing ? (
@@ -5178,6 +5195,13 @@ export function AdminPanel({ onCatalogRefresh }) {
 
           {activeSection === "subscriptions" && canManageSubscriptions && (
             <AdminSubscriptionLeadsSection token={token} />
+          )}
+
+          {activeSection === "content" && canManageContent && (
+            <AdminContentSection
+              token={token}
+              onSiteContentRefresh={onSiteContentRefresh}
+            />
           )}
 
           {activeSection === "marketing" && canManageMarketing && (

@@ -7,6 +7,7 @@ import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import {
   ensureLocalLineSyncSchema,
   ensureMarketingSchema,
+  ensureSiteContentSchema,
   ensureSubscriptionPortalSchema,
   ensureSubscriberCaptureSchema,
   getDb,
@@ -38,6 +39,7 @@ import {
   productTags,
   recipes,
   reviews,
+  siteContentBlocks,
   subscriptionSettings,
   tags,
   users,
@@ -69,6 +71,20 @@ const dropSiteHostUpload = multer({
     fileSize: 8 * 1024 * 1024
   }
 });
+
+function serializeSiteContentBlock(row) {
+  return {
+    id: row.id,
+    page: row.page,
+    section: row.section,
+    field: row.field,
+    label: row.label || "",
+    value: row.value || "",
+    inputType: row.inputType || "textarea",
+    sortOrder: Number(row.sortOrder || 0),
+    updatedAt: row.updatedAt || null
+  };
+}
 
 function parsePriceListId(value) {
   const numeric = Number(value);
@@ -1173,6 +1189,25 @@ function normalizeDropSiteHostInterestPayload(body = {}) {
     queryString: cleanString(body.queryString, 1000)
   };
 }
+
+router.get("/site-content", async (_req, res) => {
+  try {
+    await ensureSiteContentSchema();
+    const rows = await getDb().select().from(siteContentBlocks);
+    const content = rows
+      .map(serializeSiteContentBlock)
+      .sort((left, right) => {
+        if (left.page !== right.page) return left.page.localeCompare(right.page);
+        if (left.sortOrder !== right.sortOrder) return left.sortOrder - right.sortOrder;
+        if (left.section !== right.section) return left.section.localeCompare(right.section);
+        return left.field.localeCompare(right.field);
+      });
+    res.json({ content });
+  } catch (error) {
+    console.error("Failed to load site content:", error);
+    res.status(500).json({ error: "Failed to load site content." });
+  }
+});
 
 router.get("/dropsites/performance", async (req, res) => {
   try {

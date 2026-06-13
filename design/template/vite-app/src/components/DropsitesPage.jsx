@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { fetchDropSitePerformance, submitDropSiteHostInterest } from "../api.js";
+import { getSiteContentValue } from "../siteContent.js";
 import { DeckPageHeader } from "./DeckPageHeader.jsx";
 
 const MEDIA_KIT_URL =
   "https://docs.google.com/document/d/16iVw310-q0OGkJhWaXyO4Tp7WLEtU8Sf/edit";
 const HOST_CREDIT_INFO =
-  "Host credit is the food credit hosts receive for hosting a drop site. A site qualifies by averaging 3 or more drops per week OR more than 5 pickups per month. We count all guest and member orders per drop site.";
+  "Host credit is the food credit hosts receive for hosting a drop site. A site qualifies by averaging 3 or more orders per active drop week OR more than 5 unique customers in the month. We count guest and member orders per drop site.";
 
 const INITIAL_FORM = {
   name: "",
@@ -85,7 +86,7 @@ function MetricStatus({ row }) {
   return <span className="dropsite-status bad">Below credit threshold</span>;
 }
 
-export function DropsitesPage() {
+export function DropsitesPage({ siteContent = {} }) {
   const [metrics, setMetrics] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState("");
   const [metricsError, setMetricsError] = useState("");
@@ -93,11 +94,19 @@ export function DropsitesPage() {
   const [form, setForm] = useState(INITIAL_FORM);
   const [photos, setPhotos] = useState([]);
   const [status, setStatus] = useState({ submitting: false, message: "", error: "" });
+  const copy = (section, field, fallback) =>
+    getSiteContentValue(siteContent, "dropsites", section, field, fallback);
+  const heroTitle = copy("hero", "title", "Nourish your neighborhood.");
+  const heroBody = copy(
+    "hero",
+    "body",
+    "Drop site hosts make farm-fresh, locally grown food accessible to more people while supporting regenerative agriculture right in your backyard. By offering a simple pickup spot and helping spread the word, you become an essential link in building a healthier, more sustainable food system. The more local hosts we have, the more affordable and accessible that food becomes for everyone."
+  );
+  const hostCreditInfo = copy("metrics", "hostCreditInfo", HOST_CREDIT_INFO);
 
   useEffect(() => {
     const title = "Drop Site Hosts | Deck Family Farm";
-    const description =
-      "Resources, host expectations, monthly performance summaries, and drop-site host applications for Full Farm pickup sites.";
+    const description = heroBody;
     const canonicalUrl = getDropsitesCanonicalUrl();
     document.title = title;
     ensureMetaTag("description", description);
@@ -107,7 +116,7 @@ export function DropsitesPage() {
     ensureMetaTag("og:type", "website", "property");
     ensureMetaTag("og:url", canonicalUrl, "property");
     ensureCanonicalLink(canonicalUrl);
-  }, []);
+  }, [heroBody]);
 
   useEffect(() => {
     let cancelled = false;
@@ -185,12 +194,10 @@ export function DropsitesPage() {
       <section className="dropsites-hero" id="overview">
         <div className="container dropsites-hero-grid">
           <div className="dropsites-hero-copy">
-            <div className="eyebrow">Full Farm Drop Sites</div>
-            <h1 className="dropsites-title">Drop site hosts keep local food moving.</h1>
+            <div className="eyebrow">{copy("hero", "eyebrow", "Full Farm Drop Sites")}</div>
+            <h1 className="dropsites-title">{heroTitle}</h1>
             <p className="dropsites-lede">
-              Small farms need drop site hosts to help sell direct to consumer, spread the word,
-              help people eat healthy local food, and grow regenerative agriculture. Hosts offer
-              a simple, covered pickup location for members and help with rare missed pickups.
+              {heroBody}
             </p>
             <div className="dropsites-hero-actions">
               <a className="button" href="#apply">Become a host</a>
@@ -241,9 +248,15 @@ export function DropsitesPage() {
         <div className="container">
           <div className="subscribe-section-head">
             <div className="eyebrow">Tools</div>
-            <h2 className="h2">Host Resources and Responsibilities</h2>
+            <h2 className="h2">
+              {copy("resources", "title", "Host Resources and Responsibilities")}
+            </h2>
             <p className="lede dropsites-resources-lede">
-              Use these materials to manage your site, handle pickup-day communication, and share Full Farm resources with your community.
+              {copy(
+                "resources",
+                "body",
+                "Use these materials to manage your site, handle pickup-day communication, and share Full Farm resources with your community."
+              )}
             </p>
           </div>
           <div className="dropsites-resource-grid">
@@ -288,7 +301,7 @@ export function DropsitesPage() {
                   i
                 </button>
                 <span className="dropsite-info-bubble" role="tooltip">
-                  {HOST_CREDIT_INFO}
+                  {hostCreditInfo}
                 </span>
               </span>
             </div>
@@ -319,7 +332,7 @@ export function DropsitesPage() {
                   <th>Area</th>
                   <th>Orders</th>
                   <th>Avg orders/week</th>
-                  <th>Members picked up</th>
+                  <th>Unique customers</th>
                   <th>Status</th>
                 </tr>
               </thead>
@@ -348,12 +361,16 @@ export function DropsitesPage() {
       <section className="section dropsites-apply-section" id="apply">
         <div className="container dropsites-apply-grid">
           <div className="dropsites-apply-copy">
-            <h2 className="h2">Become a Drop Site Host</h2>
-            <h3>Tell Us About Your Pickup Location</h3>
+            <h2 className="h2">{copy("apply", "title", "Become a Drop Site Host")}</h2>
+            <h3>{copy("apply", "introTitle", "Tell Us About Your Pickup Location")}</h3>
             <p className="lede">
-              Drop sites help connect local families with food from local farms. Use this form to tell us about your location. Our farm team will review access, parking, storage options, and delivery logistics.
+              {copy(
+                "apply",
+                "introBody",
+                "Drop sites help connect local families with food from local farms. Use this form to tell us about your location. Our farm team will review access, parking, storage options, and delivery logistics."
+              )}
             </p>
-            <h3>Why Become a Drop Site Host?</h3>
+            <h3>{copy("apply", "whyTitle", "Why Become a Drop Site Host?")}</h3>
             <ul className="dropsite-check-list">
               <li>Help strengthen local agriculture and expand access to farm-fresh food.</li>
               <li>Build food security and support a more resilient local food system.</li>
@@ -361,7 +378,11 @@ export function DropsitesPage() {
               <li>Receive free delivery and potential host rewards.</li>
             </ul>
             <p className="lede">
-              Hosting a drop site is a simple way to support local farms, connect your community with good food, and help grow a stronger regional food network.
+              {copy(
+                "apply",
+                "closingBody",
+                "Hosting a drop site is a simple way to support local farms, connect your community with good food, and help grow a stronger regional food network."
+              )}
             </p>
           </div>
           <form className="dropsite-application-form card" onSubmit={handleSubmit}>

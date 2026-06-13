@@ -17,12 +17,14 @@ import {
   fetchDropSites,
   fetchMe,
   fetchMyReviews,
+  fetchSiteContent,
   requestPasswordReset,
   resetPasswordWithToken,
   submitReview,
   updateReview,
   userLogin
 } from "../api.js";
+import { buildSiteContentLookup } from "../siteContent.js";
 import { AccountPanelSection } from "./AccountPanelSection.jsx";
 import { CsaPlansSection } from "./CsaPlansSection.jsx";
 import { DeliverySection } from "./DeliverySection.jsx";
@@ -180,6 +182,7 @@ export function Storefront() {
     dropSites: experienceMode === "subscribe" ? readCachedSubscribeDropSites() : []
   });
   const [catalogError, setCatalogError] = useState("");
+  const [siteContentRows, setSiteContentRows] = useState([]);
   const productGridRef = useRef(null);
   const categoryRef = useRef(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -190,6 +193,10 @@ export function Storefront() {
   const [reviewStatus, setReviewStatus] = useState({ message: "", error: "" });
   const [userReviews, setUserReviews] = useState([]);
   const [editingReviewId, setEditingReviewId] = useState(null);
+  const siteContent = useMemo(
+    () => buildSiteContentLookup(siteContentRows),
+    [siteContentRows]
+  );
 
   async function reloadCatalog() {
     const data = await fetchCatalog();
@@ -203,6 +210,15 @@ export function Storefront() {
     });
     setCatalogError("");
     setSelectedCategory((current) => current || "");
+  }
+
+  async function reloadSiteContent() {
+    try {
+      const data = await fetchSiteContent();
+      setSiteContentRows(data?.content || []);
+    } catch (_error) {
+      setSiteContentRows([]);
+    }
   }
 
   function getHashRoute() {
@@ -279,6 +295,10 @@ export function Storefront() {
         console.error(err);
         setCatalogError("Unable to load catalog.");
       });
+  }, []);
+
+  useEffect(() => {
+    reloadSiteContent();
   }, []);
 
   useEffect(() => {
@@ -672,11 +692,11 @@ export function Storefront() {
           </div>
         ) : null}
         {isAdminView ? (
-          <AdminPanel onCatalogRefresh={reloadCatalog} />
+          <AdminPanel onCatalogRefresh={reloadCatalog} onSiteContentRefresh={reloadSiteContent} />
         ) : isLiabilityView ? (
           <LiabilityReleasePage slug={liabilitySlug} />
         ) : isDropsitesView ? (
-          <DropsitesPage />
+          <DropsitesPage siteContent={siteContent} />
         ) : isResetPasswordView ? (
           <section className="section tight">
             <div className="container reset-password-panel">
@@ -729,6 +749,7 @@ export function Storefront() {
               portalBaseUrl={subscribeAppUrl}
               isLoggedIn={isMember}
               onAuthAction={() => (isMember ? handleLogout() : setLoginOpen(true))}
+              siteContent={siteContent}
             />
           ) : (
             <AccountPanelSection accountPanel={accountPanel} dropSite={dropSite} />
@@ -743,6 +764,7 @@ export function Storefront() {
             isAdmin={isAdmin}
             onAuthAction={() => (isMember ? handleLogout() : setLoginOpen(true))}
             subscribeUrl={`${subscribeAppUrl}#/subscribe`}
+            siteContent={siteContent}
           />
         ) : experienceMode === "subscribe" || view === "subscribe" ? (
           <SubscribePage
@@ -750,6 +772,7 @@ export function Storefront() {
             portalBaseUrl={subscribeAppUrl}
             isLoggedIn={isMember}
             onAuthAction={() => (isMember ? handleLogout() : setLoginOpen(true))}
+            siteContent={siteContent}
           />
         ) : (
           <>

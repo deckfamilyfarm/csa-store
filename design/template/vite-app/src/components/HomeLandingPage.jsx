@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { getSiteContentValue } from "../siteContent.js";
 import { DeckPageHeader } from "./DeckPageHeader.jsx";
 import { SubscribeFooter } from "./SubscribeFooter.jsx";
 
@@ -27,6 +28,15 @@ function matchesTerms(product, terms) {
   return terms.some((term) => text.includes(term));
 }
 
+function escapeRegexTerm(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function matchesWholeTerms(product, terms) {
+  const text = searchableProductText(product);
+  return terms.some((term) => new RegExp(`\\b${escapeRegexTerm(term)}\\b`, "i").test(text));
+}
+
 function normalizeCategoryName(value) {
   return cleanText(value, 255).toLowerCase();
 }
@@ -52,10 +62,10 @@ function buildVisitorLiabilityReleaseUrl() {
 
 function productImage(product, fallback = DEFAULT_PRODUCT_IMAGE) {
   return (
-    product?.thumbnailUrl ||
     product?.imageUrl ||
-    product?.images?.find((image) => image?.thumbnailUrl)?.thumbnailUrl ||
     product?.images?.find((image) => image?.url)?.url ||
+    product?.thumbnailUrl ||
+    product?.images?.find((image) => image?.thumbnailUrl)?.thumbnailUrl ||
     fallback
   );
 }
@@ -102,7 +112,8 @@ export function HomeLandingPage({
   isLoggedIn = false,
   isAdmin = false,
   onAuthAction = null,
-  subscribeUrl = "#/subscribe"
+  subscribeUrl = "#/subscribe",
+  siteContent = {}
 }) {
   const products = useMemo(
     () => uniqueProducts((catalog?.products || []).filter((product) => product?.name)),
@@ -148,7 +159,13 @@ export function HomeLandingPage({
 
   const [activeGroup, setActiveGroupId] = useActiveGroup(groups);
 
+  const sideProducts = useMemo(
+    () => products.filter((product) => matchesWholeTerms(product, ["side", "deposit"])).slice(0, 6),
+    [products]
+  );
+
   const boxProducts = useMemo(() => {
+    const sideProductKeys = new Set(sideProducts.map((product) => String(product.id || product.name)));
     const boxGroup = groups.find((group) =>
       normalizeCategoryName(group.title).includes("bundle") ||
       normalizeCategoryName(group.title).includes("special")
@@ -156,8 +173,10 @@ export function HomeLandingPage({
     const directMatches = products.filter((product) =>
       matchesTerms(product, ["box", "bundle", "variety pack", "special"])
     );
-    return uniqueProducts([...(boxGroup?.products || []), ...directMatches]).slice(0, 5);
-  }, [groups, products]);
+    return uniqueProducts([...(boxGroup?.products || []), ...directMatches])
+      .filter((product) => !sideProductKeys.has(String(product.id || product.name)))
+      .slice(0, 5);
+  }, [groups, products, sideProducts]);
 
   const boxLead = boxProducts[0] || null;
   const vendorCount = catalog?.vendors?.length || 0;
@@ -192,6 +211,7 @@ export function HomeLandingPage({
         label: "Shop",
         children: [
           { label: "CSA Shopping", href: "#shop" },
+          { label: "Sides", href: "#sides" },
           { label: "Merchandise", href: "https://www.deckfamilyfarm.com/merchandise" }
         ]
       }
@@ -200,6 +220,8 @@ export function HomeLandingPage({
   );
 
   const authLabel = isLoggedIn ? (isAdmin ? "Admin" : "Account") : "Log in";
+  const copy = (section, field, fallback) =>
+    getSiteContentValue(siteContent, "home", section, field, fallback);
 
   return (
     <div className="subscribe-page home-landing-page">
@@ -211,19 +233,22 @@ export function HomeLandingPage({
 
       <section className="home-store-hero">
         <div className="container home-store-hero-content">
-          <div className="home-draft-label">DRAFT STORE</div>
-          <div className="eyebrow">Deck Family Farm</div>
-          <h1 className="home-store-title">Full Farm Direct</h1>
+          <div className="home-draft-label">{copy("hero", "draftLabel", "DRAFT STORE")}</div>
+          <div className="eyebrow">{copy("hero", "eyebrow", "Deck Family Farm")}</div>
+          <h1 className="home-store-title">{copy("hero", "title", "Full Farm Direct")}</h1>
           <p className="home-store-lede">
-            Shop pasture-raised meat, raw dairy, seasonal produce, pantry staples, and partner-farm
-            foods in one weekly catalog.
+            {copy(
+              "hero",
+              "body",
+              "Shop pasture-raised meat, raw dairy, seasonal produce, pantry staples, and partner-farm foods in one weekly catalog."
+            )}
           </p>
           <div className="home-store-actions">
             <a className="button" href="#shop">
-              Shop the catalog
+              {copy("hero", "primaryButton", "Shop the catalog")}
             </a>
             <a className="button home-store-hero-button-alt" href="#boxes">
-              Build a box
+              {copy("hero", "secondaryButton", "Build a box")}
             </a>
           </div>
         </div>
@@ -241,12 +266,15 @@ export function HomeLandingPage({
         <div className="container">
           <div className="home-section-head">
             <div>
-              <div className="eyebrow">Live catalog</div>
-              <h2 className="h2">Shop by how you cook.</h2>
+              <div className="eyebrow">{copy("shop", "eyebrow", "Live catalog")}</div>
+              <h2 className="h2">{copy("shop", "title", "Shop by how you cook.")}</h2>
             </div>
             <p>
-              Start with a box, choose a store category, or scan the week's staples from local farms and
-              producers.
+              {copy(
+                "shop",
+                "body",
+                "Start with a box, choose a store category, or scan the week's staples from local farms and producers."
+              )}
             </p>
           </div>
 
@@ -313,12 +341,15 @@ export function HomeLandingPage({
         <div className="container">
           <div className="home-section-head">
             <div>
-              <div className="eyebrow">Box design</div>
-              <h2 className="h2">Build a week around one box.</h2>
+              <div className="eyebrow">{copy("boxes", "eyebrow", "Box design")}</div>
+              <h2 className="h2">{copy("boxes", "title", "Build a week around one box.")}</h2>
             </div>
             <p>
-              A simple shopping path for members who want meals planned from farm staples without
-              sorting the entire catalog.
+              {copy(
+                "boxes",
+                "body",
+                "A simple shopping path for members who want meals planned from farm staples without sorting the entire catalog."
+              )}
             </p>
           </div>
 
@@ -353,17 +384,69 @@ export function HomeLandingPage({
         </div>
       </section>
 
+      {sideProducts.length ? (
+        <section className="home-store-section home-side-section" id="sides">
+          <div className="container">
+            <div className="home-side-layout">
+              <div className="home-side-copy">
+                <div className="eyebrow">{copy("sides", "eyebrow", "Sides and deposits")}</div>
+                <h2 className="h2">{copy("sides", "title", "Fill your freezer from one animal.")}</h2>
+                <p>
+                  {copy(
+                    "sides",
+                    "body",
+                    "Sides are for customers who want value, a deeper connection to the farm, and a freezer full of meat from a single animal. These purchases are about participating in the farm, using more of the animal, and planning meals over months rather than a single week."
+                  )}
+                </p>
+                <p>
+                  {copy(
+                    "sides",
+                    "body2",
+                    "Raised and slaughtered on site, sides and deposits fit households that want to stock up directly and eat with a clearer sense of where their food came from."
+                  )}
+                </p>
+              </div>
+              <div className="home-side-grid" aria-label="Side and deposit products">
+                {sideProducts.map((product) => (
+                  <button
+                    key={product.id || product.name}
+                    className="home-side-card"
+                    type="button"
+                    onClick={() => onSelectProduct?.(product)}
+                  >
+                    <span className="home-side-card-image">
+                      <img src={productImage(product, DEFAULT_PRODUCT_IMAGE)} alt={product.name} loading="lazy" />
+                    </span>
+                    <span>
+                      <span className="home-product-meta">{product.category || "Side"}</span>
+                      <strong>{product.name}</strong>
+                      <span className="home-product-copy">
+                        {cleanText(product.description || product.vendor || product.category, 120)}
+                      </span>
+                      <span className="home-product-price">{displayPrice(product, getPrice)}</span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
       <section className="home-store-section home-pickup-section" id="pickup">
         <div className="container home-pickup-grid">
           <div>
-            <div className="eyebrow">Pickup and delivery</div>
-            <h2 className="h2">Choose the rhythm that fits your household.</h2>
+            <div className="eyebrow">{copy("pickup", "eyebrow", "Pickup and delivery")}</div>
+            <h2 className="h2">{copy("pickup", "title", "Choose the rhythm that fits your household.")}</h2>
             <p>
-              Members can order around their schedule, use pickup sites, and keep monthly food
-              credit rolling forward for future shopping.
+              {copy(
+                "pickup",
+                "body",
+                "Members can order around their schedule, use pickup sites, and keep monthly food credit rolling forward for future shopping."
+              )}
             </p>
             <a className="button" href={subscribeUrl}>
-              Become a member
+              {copy("pickup", "button", "Become a member")}
             </a>
           </div>
 

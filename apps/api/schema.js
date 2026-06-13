@@ -580,6 +580,31 @@ export const marketingContentPosts = mysqlTable(
   })
 );
 
+export const siteContentBlocks = mysqlTable(
+  "site_content_blocks",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    page: varchar("page", { length: 64 }).notNull(),
+    section: varchar("section", { length: 128 }).notNull(),
+    field: varchar("field", { length: 128 }).notNull(),
+    label: varchar("label", { length: 255 }),
+    value: text("value"),
+    inputType: varchar("input_type", { length: 32 }).default("textarea"),
+    sortOrder: int("sort_order").default(0),
+    updatedByUserId: int("updated_by_user_id"),
+    createdAt: datetime("created_at"),
+    updatedAt: datetime("updated_at")
+  },
+  (table) => ({
+    contentKeyIdx: uniqueIndex("ux_site_content_key").on(
+      table.page,
+      table.section,
+      table.field
+    ),
+    pageIdx: index("idx_site_content_page").on(table.page)
+  })
+);
+
 export const marketingUtmLinks = mysqlTable(
   "marketing_utm_links",
   {

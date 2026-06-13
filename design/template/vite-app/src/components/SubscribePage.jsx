@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { fetchSubscribeAddressInsights, submitSubscribeLead } from "../api.js";
+import { getSiteContentValue } from "../siteContent.js";
 import { SUBSCRIBE_PARTNERS } from "../data/subscribePartners.js";
 import {
   MEMBER_PORTAL_LINK_ENABLED,
@@ -327,7 +328,8 @@ export function SubscribePage({
   dropSites = [],
   portalBaseUrl,
   isLoggedIn = false,
-  onAuthAction = null
+  onAuthAction = null,
+  siteContent = {}
 }) {
   const allFaqs = useMemo(() => FAQS, []);
   const portalBaseHref = useMemo(
@@ -439,6 +441,8 @@ export function SubscribePage({
   const [checkingAddress, setCheckingAddress] = useState(false);
   const formStatusRef = useRef(null);
   const formCardRef = useRef(null);
+  const copy = (section, field, fallback) =>
+    getSiteContentValue(siteContent, "subscribe", section, field, fallback);
 
   useEffect(() => {
     const canonicalUrl = window.location.href.split("#")[0];
@@ -673,10 +677,10 @@ export function SubscribePage({
         <section className="subscribe-hero">
           <div className="container subscribe-hero-grid">
             <div className="subscribe-hero-copy">
-              <div className="eyebrow">Deck Family Farm</div>
-              <h1 className="subscribe-title">Welcome to Full Farm</h1>
+              <div className="eyebrow">{copy("hero", "eyebrow", "Deck Family Farm")}</div>
+              <h1 className="subscribe-title">{copy("hero", "title", "Welcome to Full Farm")}</h1>
               <p className="subscribe-lede subscribe-welcome-line">
-                We are happy you're here.
+                {copy("hero", "welcomeLine", "We are happy you're here.")}
               </p>
               <figure className="subscribe-hero-image-card">
                 <img
@@ -685,16 +689,18 @@ export function SubscribePage({
                 />
               </figure>
               <p className="subscribe-lede">
-                Full Farm CSA, or Full Farm, provides essential staples from Deck Family Farm and
-                other hyper-local farms with shared growing standards. Members can shop online
-                for pickup at local Farmers markets, drop sites
-                and home delivery. Membership involves a scheduled monthly payment: 100% of your
-                monthly payment is store credit, with no hidden fees. Any unused balance rolls over
-                for future shopping!
+                {copy(
+                  "hero",
+                  "body",
+                  "Full Farm provides essential staples from Deck Family Farm and other hyper-local farms with shared growing standards. Members can shop online for pickup at local farmers markets, drop sites, and home delivery. Membership involves a scheduled monthly payment: 100% of your monthly payment is store credit, with no hidden fees. Any unused balance rolls over for future shopping!"
+                )}
               </p>
               <p className="subscribe-lede">
-                We charge a one-time membership fee of $50 which includes Herdshare Agreement and
-                access to raw dairy products.
+                {copy(
+                  "hero",
+                  "feeBody",
+                  "We charge a one-time membership fee of $50 which includes Herdshare Agreement and access to raw dairy products."
+                )}
               </p>
               <p className="subscribe-lede">
                 Read our <a href="#faqs">FAQs</a> at the bottom of this page to learn more.
@@ -727,7 +733,11 @@ export function SubscribePage({
                   <div className="eyebrow">Get started</div>
                   <h2 className="h2">Personal information</h2>
                   <p className="small">
-                    First, give us your name, email, phone number, address, and preferred plan.
+                    {copy(
+                      "form",
+                      "introBody",
+                      "First, give us your name, email, phone number, address, and preferred plan."
+                    )}
                   </p>
                 </>
               ) : null}

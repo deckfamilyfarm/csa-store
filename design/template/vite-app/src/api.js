@@ -72,6 +72,10 @@ export async function fetchCatalog() {
   return fetchJsonGet(`${base}/catalog`, "", "Failed to load catalog");
 }
 
+export async function fetchSiteContent() {
+  return fetchJsonGet(`${base}/site-content`, "", "Failed to load site content");
+}
+
 export async function fetchDropSites() {
   return fetchJsonGet(`${base}/drop-sites`, "", "Failed to load drop sites");
 }

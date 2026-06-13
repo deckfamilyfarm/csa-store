@@ -9,6 +9,7 @@ import { DeleteObjectCommand, S3Client, PutObjectCommand } from "@aws-sdk/client
 import {
   ensureMarketingSchema,
   ensureSubscriberCaptureSchema,
+  ensureSiteContentSchema,
   ensureSubscriptionPortalSchema,
   ensureAdminAccessSchema,
   ensureAdminPricelistIndexes,
@@ -43,6 +44,7 @@ import {
   productSales,
   recipes,
   reviews,
+  siteContentBlocks,
   subscribeLeads,
   tags,
   users,
@@ -114,6 +116,26 @@ import { buildDropSitePerformancePayload } from "../lib/dropSitePerformance.js";
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
+const CONTENT_EDITOR_ROLES = ["content_editor", "marketing_admin"];
+const ORDER_VIEW_ROLES = ADMIN_ROLE_DEFINITIONS.map((role) => role.key).filter(
+  (roleKey) => roleKey !== "content_editor"
+);
+
+function serializeSiteContentBlock(row) {
+  return {
+    id: row.id,
+    page: row.page,
+    section: row.section,
+    field: row.field,
+    label: row.label || "",
+    value: row.value || "",
+    inputType: row.inputType || "textarea",
+    sortOrder: Number(row.sortOrder || 0),
+    updatedByUserId: row.updatedByUserId || null,
+    updatedAt: row.updatedAt || null,
+    createdAt: row.createdAt || null
+  };
+}
 
 router.use(async (_req, _res, next) => {
   await ensureProductPricingSchema().catch((error) => {
@@ -124,6 +146,9 @@ router.use(async (_req, _res, next) => {
   });
   await ensureLiabilityReleaseSchema().catch((error) => {
     console.warn("Liability release schema bootstrap skipped:", error.message);
+  });
+  await ensureSiteContentSchema().catch((error) => {
+    console.warn("Site content schema bootstrap skipped:", error.message);
   });
   next();
 });
@@ -2898,6 +2923,81 @@ router.put(
     } catch (error) {
       console.error("Marketing UTM link update failed:", error);
       res.status(500).json({ error: "Failed to update marketing tracked link." });
+    }
+  }
+);
+
+router.get(
+  "/site-content",
+  requireAdminPermission(CONTENT_EDITOR_ROLES),
+  async (_req, res) => {
+    try {
+      await ensureSiteContentSchema();
+      const rows = await getDb().select().from(siteContentBlocks);
+      const content = rows
+        .map(serializeSiteContentBlock)
+        .sort((left, right) => {
+          if (left.page !== right.page) return left.page.localeCompare(right.page);
+          if (left.sortOrder !== right.sortOrder) return left.sortOrder - right.sortOrder;
+          if (left.section !== right.section) return left.section.localeCompare(right.section);
+          return left.field.localeCompare(right.field);
+        });
+      res.json({ content });
+    } catch (error) {
+      console.error("Failed to load site content:", error);
+      res.status(500).json({ error: "Failed to load site content." });
+    }
+  }
+);
+
+router.put(
+  "/site-content/:id",
+  requireAdminPermission(CONTENT_EDITOR_ROLES),
+  async (req, res) => {
+    try {
+      await ensureSiteContentSchema();
+      const blockId = Number(req.params.id);
+      if (!Number.isFinite(blockId)) {
+        return res.status(400).json({ error: "Invalid content block id." });
+      }
+
+      const payload = req.body || {};
+      if (!Object.prototype.hasOwnProperty.call(payload, "value")) {
+        return res.status(400).json({ error: "Content value is required." });
+      }
+
+      const value = String(payload.value ?? "");
+      if (value.length > 20000) {
+        return res.status(400).json({ error: "Content value is too long." });
+      }
+
+      const db = getDb();
+      const existingRows = await db
+        .select()
+        .from(siteContentBlocks)
+        .where(eq(siteContentBlocks.id, blockId));
+      if (!existingRows.length) {
+        return res.status(404).json({ error: "Content block not found." });
+      }
+
+      const now = new Date();
+      await db
+        .update(siteContentBlocks)
+        .set({
+          value,
+          updatedByUserId: Number(req.admin?.userId || req.admin?.adminId) || null,
+          updatedAt: now
+        })
+        .where(eq(siteContentBlocks.id, blockId));
+
+      const updatedRows = await db
+        .select()
+        .from(siteContentBlocks)
+        .where(eq(siteContentBlocks.id, blockId));
+      res.json({ contentBlock: serializeSiteContentBlock(updatedRows[0]) });
+    } catch (error) {
+      console.error("Failed to update site content:", error);
+      res.status(500).json({ error: "Failed to update site content." });
     }
   }
 );
@@ -6824,7 +6924,7 @@ function buildOrdersPaymentStatusClause(paymentStatus = "", orderAlias = "o") {
   return `${orderAlias}.payment_status = ?`;
 }
 
-router.get("/orders", requireAdmin, async (req, res) => {
+router.get("/orders", requireAdminPermission(ORDER_VIEW_ROLES), async (req, res) => {
   await ensureLocalLineSyncSchema().catch((error) => {
     console.warn("Local Line schema bootstrap skipped for /admin/orders:", error.message);
   });
@@ -7256,7 +7356,7 @@ router.get("/orders", requireAdmin, async (req, res) => {
   });
 });
 
-router.get("/orders/:id", requireAdmin, async (req, res) => {
+router.get("/orders/:id", requireAdminPermission(ORDER_VIEW_ROLES), async (req, res) => {
   await ensureLocalLineSyncSchema().catch((error) => {
     console.warn("Local Line schema bootstrap skipped for /admin/orders/:id:", error.message);
   });

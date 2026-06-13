@@ -67,7 +67,7 @@ export const ADMIN_ROLE_DEFINITIONS = [
   {
     key: "content_editor",
     label: "Content Editor",
-    description: "Manage marketing content records and message metadata."
+    description: "Edit public site copy for the home, subscribe, and drop-site pages."
   },
   {
     key: "ad_spend_approver",

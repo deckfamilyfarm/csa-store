@@ -12,6 +12,7 @@ let adminPricelistIndexesPromise;
 let vendorPricingSchemaPromise;
 let productPricingSchemaPromise;
 let subscriberCaptureSchemaPromise;
+let siteContentSchemaPromise;
 let marketingSchemaPromise;
 let subscriptionPortalSchemaPromise;
 let liabilityReleaseSchemaPromise;
@@ -251,6 +252,387 @@ const SUBSCRIBER_CAPTURE_COLUMN_STATEMENTS = [
     tableName: "subscribe_leads",
     columnName: "target_drop_site_id",
     definition: "target_drop_site_id INT"
+  }
+];
+
+const SITE_CONTENT_TABLE_STATEMENTS = [
+  `
+    CREATE TABLE IF NOT EXISTS site_content_blocks (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      page VARCHAR(64) NOT NULL,
+      section VARCHAR(128) NOT NULL,
+      field VARCHAR(128) NOT NULL,
+      label VARCHAR(255),
+      value TEXT,
+      input_type VARCHAR(32) DEFAULT 'textarea',
+      sort_order INT DEFAULT 0,
+      updated_by_user_id INT,
+      created_at DATETIME,
+      updated_at DATETIME
+    )
+  `
+];
+
+const SITE_CONTENT_INDEX_STATEMENTS = [
+  {
+    tableName: "site_content_blocks",
+    indexName: "ux_site_content_key",
+    columns: "page, section, field",
+    unique: true
+  },
+  {
+    tableName: "site_content_blocks",
+    indexName: "idx_site_content_page",
+    columns: "page"
+  }
+];
+
+const SITE_CONTENT_BLOCK_DEFAULTS = [
+  {
+    page: "home",
+    section: "hero",
+    field: "draftLabel",
+    label: "Draft banner",
+    value: "DRAFT STORE",
+    inputType: "text",
+    sortOrder: 10
+  },
+  {
+    page: "home",
+    section: "hero",
+    field: "eyebrow",
+    label: "Hero eyebrow",
+    value: "Deck Family Farm",
+    inputType: "text",
+    sortOrder: 20
+  },
+  {
+    page: "home",
+    section: "hero",
+    field: "title",
+    label: "Hero title",
+    value: "Full Farm Direct",
+    inputType: "text",
+    sortOrder: 30
+  },
+  {
+    page: "home",
+    section: "hero",
+    field: "body",
+    label: "Hero body",
+    value:
+      "Shop pasture-raised meat, raw dairy, seasonal produce, pantry staples, and partner-farm foods in one weekly catalog.",
+    inputType: "textarea",
+    sortOrder: 40
+  },
+  {
+    page: "home",
+    section: "hero",
+    field: "primaryButton",
+    label: "Primary button",
+    value: "Shop the catalog",
+    inputType: "text",
+    sortOrder: 50
+  },
+  {
+    page: "home",
+    section: "hero",
+    field: "secondaryButton",
+    label: "Secondary button",
+    value: "Build a box",
+    inputType: "text",
+    sortOrder: 60
+  },
+  {
+    page: "home",
+    section: "shop",
+    field: "eyebrow",
+    label: "Shop eyebrow",
+    value: "Live catalog",
+    inputType: "text",
+    sortOrder: 110
+  },
+  {
+    page: "home",
+    section: "shop",
+    field: "title",
+    label: "Shop title",
+    value: "Shop by how you cook.",
+    inputType: "text",
+    sortOrder: 120
+  },
+  {
+    page: "home",
+    section: "shop",
+    field: "body",
+    label: "Shop body",
+    value:
+      "Start with a box, choose a store category, or scan the week's staples from local farms and producers.",
+    inputType: "textarea",
+    sortOrder: 130
+  },
+  {
+    page: "home",
+    section: "boxes",
+    field: "eyebrow",
+    label: "Boxes eyebrow",
+    value: "Box design",
+    inputType: "text",
+    sortOrder: 210
+  },
+  {
+    page: "home",
+    section: "boxes",
+    field: "title",
+    label: "Boxes title",
+    value: "Build a week around one box.",
+    inputType: "text",
+    sortOrder: 220
+  },
+  {
+    page: "home",
+    section: "boxes",
+    field: "body",
+    label: "Boxes body",
+    value:
+      "A simple shopping path for members who want meals planned from farm staples without sorting the entire catalog.",
+    inputType: "textarea",
+    sortOrder: 230
+  },
+  {
+    page: "home",
+    section: "sides",
+    field: "eyebrow",
+    label: "Sides eyebrow",
+    value: "Sides and deposits",
+    inputType: "text",
+    sortOrder: 310
+  },
+  {
+    page: "home",
+    section: "sides",
+    field: "title",
+    label: "Sides title",
+    value: "Fill your freezer from one animal.",
+    inputType: "text",
+    sortOrder: 320
+  },
+  {
+    page: "home",
+    section: "sides",
+    field: "body",
+    label: "Sides body",
+    value:
+      "Sides are for customers who want value, a deeper connection to the farm, and a freezer full of meat from a single animal. These purchases are about participating in the farm, using more of the animal, and planning meals over months rather than a single week.",
+    inputType: "textarea",
+    sortOrder: 330
+  },
+  {
+    page: "home",
+    section: "sides",
+    field: "body2",
+    label: "Sides second paragraph",
+    value:
+      "Raised and slaughtered on site, sides and deposits fit households that want to stock up directly and eat with a clearer sense of where their food came from.",
+    inputType: "textarea",
+    sortOrder: 340
+  },
+  {
+    page: "home",
+    section: "pickup",
+    field: "eyebrow",
+    label: "Pickup eyebrow",
+    value: "Pickup and delivery",
+    inputType: "text",
+    sortOrder: 410
+  },
+  {
+    page: "home",
+    section: "pickup",
+    field: "title",
+    label: "Pickup title",
+    value: "Choose the rhythm that fits your household.",
+    inputType: "text",
+    sortOrder: 420
+  },
+  {
+    page: "home",
+    section: "pickup",
+    field: "body",
+    label: "Pickup body",
+    value:
+      "Members can order around their schedule, use pickup sites, and keep monthly food credit rolling forward for future shopping.",
+    inputType: "textarea",
+    sortOrder: 430
+  },
+  {
+    page: "home",
+    section: "pickup",
+    field: "button",
+    label: "Pickup button",
+    value: "Become a member",
+    inputType: "text",
+    sortOrder: 440
+  },
+  {
+    page: "dropsites",
+    section: "hero",
+    field: "eyebrow",
+    label: "Hero eyebrow",
+    value: "Full Farm Drop Sites",
+    inputType: "text",
+    sortOrder: 510
+  },
+  {
+    page: "dropsites",
+    section: "hero",
+    field: "title",
+    label: "Hero title",
+    value: "Nourish your neighborhood.",
+    inputType: "text",
+    sortOrder: 520
+  },
+  {
+    page: "dropsites",
+    section: "hero",
+    field: "body",
+    label: "Hero body",
+    value:
+      "Drop site hosts make farm-fresh, locally grown food accessible to more people while supporting regenerative agriculture right in your backyard. By offering a simple pickup spot and helping spread the word, you become an essential link in building a healthier, more sustainable food system. The more local hosts we have, the more affordable and accessible that food becomes for everyone.",
+    inputType: "textarea",
+    sortOrder: 530
+  },
+  {
+    page: "dropsites",
+    section: "resources",
+    field: "title",
+    label: "Resources title",
+    value: "Host Resources and Responsibilities",
+    inputType: "text",
+    sortOrder: 610
+  },
+  {
+    page: "dropsites",
+    section: "resources",
+    field: "body",
+    label: "Resources body",
+    value:
+      "Use these materials to manage your site, handle pickup-day communication, and share Full Farm resources with your community.",
+    inputType: "textarea",
+    sortOrder: 620
+  },
+  {
+    page: "dropsites",
+    section: "metrics",
+    field: "hostCreditInfo",
+    label: "Host credit info bubble",
+    value:
+      "Host credit is the food credit hosts receive for hosting a drop site. A site qualifies by averaging 3 or more orders per active drop week OR more than 5 unique customers in the month. We count guest and member orders per drop site.",
+    inputType: "textarea",
+    sortOrder: 710
+  },
+  {
+    page: "dropsites",
+    section: "apply",
+    field: "title",
+    label: "Application title",
+    value: "Become a Drop Site Host",
+    inputType: "text",
+    sortOrder: 810
+  },
+  {
+    page: "dropsites",
+    section: "apply",
+    field: "introTitle",
+    label: "Application intro title",
+    value: "Tell Us About Your Pickup Location",
+    inputType: "text",
+    sortOrder: 820
+  },
+  {
+    page: "dropsites",
+    section: "apply",
+    field: "introBody",
+    label: "Application intro body",
+    value:
+      "Drop sites help connect local families with food from local farms. Use this form to tell us about your location. Our farm team will review access, parking, storage options, and delivery logistics.",
+    inputType: "textarea",
+    sortOrder: 830
+  },
+  {
+    page: "dropsites",
+    section: "apply",
+    field: "whyTitle",
+    label: "Why host title",
+    value: "Why Become a Drop Site Host?",
+    inputType: "text",
+    sortOrder: 840
+  },
+  {
+    page: "dropsites",
+    section: "apply",
+    field: "closingBody",
+    label: "Application closing body",
+    value:
+      "Hosting a drop site is a simple way to support local farms, connect your community with good food, and help grow a stronger regional food network.",
+    inputType: "textarea",
+    sortOrder: 850
+  },
+  {
+    page: "subscribe",
+    section: "hero",
+    field: "eyebrow",
+    label: "Hero eyebrow",
+    value: "Deck Family Farm",
+    inputType: "text",
+    sortOrder: 910
+  },
+  {
+    page: "subscribe",
+    section: "hero",
+    field: "title",
+    label: "Hero title",
+    value: "Welcome to Full Farm",
+    inputType: "text",
+    sortOrder: 920
+  },
+  {
+    page: "subscribe",
+    section: "hero",
+    field: "welcomeLine",
+    label: "Welcome line",
+    value: "We are happy you're here.",
+    inputType: "text",
+    sortOrder: 930
+  },
+  {
+    page: "subscribe",
+    section: "hero",
+    field: "body",
+    label: "Hero body",
+    value:
+      "Full Farm provides essential staples from Deck Family Farm and other hyper-local farms with shared growing standards. Members can shop online for pickup at local farmers markets, drop sites, and home delivery. Membership involves a scheduled monthly payment: 100% of your monthly payment is store credit, with no hidden fees. Any unused balance rolls over for future shopping!",
+    inputType: "textarea",
+    sortOrder: 940
+  },
+  {
+    page: "subscribe",
+    section: "hero",
+    field: "feeBody",
+    label: "Membership fee body",
+    value:
+      "We charge a one-time membership fee of $50 which includes Herdshare Agreement and access to raw dairy products.",
+    inputType: "textarea",
+    sortOrder: 950
+  },
+  {
+    page: "subscribe",
+    section: "form",
+    field: "introBody",
+    label: "Form intro body",
+    value: "First, give us your name, email, phone number, address, and preferred plan.",
+    inputType: "textarea",
+    sortOrder: 1010
   }
 ];
 
@@ -2145,6 +2527,56 @@ async function runSubscriberCaptureSchemaBootstrap(connection) {
   }
 }
 
+async function runSiteContentSchemaBootstrap(connection) {
+  for (const statement of SITE_CONTENT_TABLE_STATEMENTS) {
+    await connection.query(statement);
+  }
+
+  for (const indexDefinition of SITE_CONTENT_INDEX_STATEMENTS) {
+    const exists = await indexExists(
+      connection,
+      indexDefinition.tableName,
+      indexDefinition.indexName
+    );
+    if (exists) continue;
+
+    const uniqueClause = indexDefinition.unique ? "UNIQUE " : "";
+    await connection.query(
+      `CREATE ${uniqueClause}INDEX ${indexDefinition.indexName} ON ${indexDefinition.tableName} (${indexDefinition.columns})`
+    );
+  }
+
+  const now = new Date();
+  for (const block of SITE_CONTENT_BLOCK_DEFAULTS) {
+    await connection.query(
+      `
+        INSERT IGNORE INTO site_content_blocks (
+          page,
+          section,
+          field,
+          label,
+          value,
+          input_type,
+          sort_order,
+          created_at,
+          updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `,
+      [
+        block.page,
+        block.section,
+        block.field,
+        block.label,
+        block.value,
+        block.inputType,
+        block.sortOrder,
+        now,
+        now
+      ]
+    );
+  }
+}
+
 async function runMarketingSchemaBootstrap(connection) {
   for (const statement of MARKETING_TABLE_STATEMENTS) {
     await connection.query(statement);
@@ -2410,6 +2842,20 @@ export async function ensureSubscriberCaptureSchema(connection = getPool()) {
   }
 
   return runSubscriberCaptureSchemaBootstrap(connection);
+}
+
+export async function ensureSiteContentSchema(connection = getPool()) {
+  if (connection === getPool()) {
+    if (!siteContentSchemaPromise) {
+      siteContentSchemaPromise = runSiteContentSchemaBootstrap(connection).catch((error) => {
+        siteContentSchemaPromise = null;
+        throw error;
+      });
+    }
+    return siteContentSchemaPromise;
+  }
+
+  return runSiteContentSchemaBootstrap(connection);
 }
 
 export async function ensureMarketingSchema(connection = getPool()) {
