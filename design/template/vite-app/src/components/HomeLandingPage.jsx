@@ -205,7 +205,7 @@ export function HomeLandingPage({
           { label: "Frequently Asked Questions", href: subscribeUrl }
         ]
       },
-      { label: "Newsletter", href: "https://www.deckfamilyfarm.com/newsletter" },
+      { label: "Newsletter", href: "https://www.deckfamilyfarm.com/blog" },
       { label: "Events", href: "https://www.deckfamilyfarm.com/events" },
       {
         label: "Shop",

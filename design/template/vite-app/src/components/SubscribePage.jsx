@@ -8,20 +8,16 @@ import {
 } from "../portalFeatureFlags.js";
 import { DeckPageHeader } from "./DeckPageHeader.jsx";
 import { SubscribeFooter } from "./SubscribeFooter.jsx";
+import {
+  buildSubscribeNavLinks,
+  getDropsitesHostUrl,
+  subscriptionStoreUrl
+} from "./subscribeNavigation.js";
 
 const DELIVERY_MAP_URL =
   "https://berkeleymapper.berkeley.edu/index.html?tabfile=https://raw.githubusercontent.com/jdeck88/ffcsa_scripts/refs/heads/main/localline/data/delivery_data.tsv&configfile=https://raw.githubusercontent.com/jdeck88/ffcsa_scripts/refs/heads/main/dropsite_maps/dropsites2.xml&pointDisplay=markers&hideLegendItems=true";
 const LIABILITY_AGREEMENT_URL =
   "https://docs.google.com/document/d/1VFMc4euofQ1S1kjtd6jZI46uxo6YKft9cufT6Q3-nrc/edit?tab=t.0";
-
-function getDropsitesHostUrl() {
-  if (typeof window === "undefined") return "https://dropsites.deckfamilyfarm.com/";
-  const host = String(window.location.host || "").toLowerCase();
-  if (host.includes("localhost") || host.includes("127.0.0.1")) {
-    return "/dropsites";
-  }
-  return "https://dropsites.deckfamilyfarm.com/";
-}
 
 const SUBSCRIBE_PLANS = [
   {
@@ -225,10 +221,6 @@ function storeUrlFallback() {
   return "https://fullfarmcsa.deckfamilyfarm.com/";
 }
 
-function subscriptionStoreUrl() {
-  return "https://fullfarmcsa.deckfamilyfarm.com/";
-}
-
 function buildInitialForm(dropSites = []) {
   return {
     firstName: "",
@@ -336,9 +328,6 @@ export function SubscribePage({
     () => String(portalBaseUrl || subscriptionStoreUrl()).replace(/#.*$/, "").replace(/\/+$/, ""),
     [portalBaseUrl]
   );
-  const subscribeRouteUrl = useMemo(() => {
-    return `${portalBaseHref}#/subscribe`;
-  }, [portalBaseHref]);
   const visitorLiabilityReleaseUrl = useMemo(() => {
     try {
       const baseOrigin =
@@ -353,38 +342,8 @@ export function SubscribePage({
     }
   }, [portalBaseHref]);
   const subscribeNavLinks = useMemo(
-    () => [
-      {
-        label: "Our Farm",
-        children: [
-          { label: "About", href: "https://www.deckfamilyfarm.com/the-farm" },
-          { label: "Our Farmily", href: "https://www.deckfamilyfarm.com/the-farmily" },
-          { label: "Education", href: "https://www.deckfamilyfarm.com/intern-program" },
-          { label: "Farm Dogs", href: "https://www.deckfamilyfarm.com/dogs" }
-        ]
-      },
-      {
-        label: "Full Farm CSA",
-        children: [
-          { label: "Subscribe", href: subscribeRouteUrl },
-          { label: "Plans", href: "#plans" },
-          { label: "Locations", href: "#locations" },
-          { label: "Herdshare", href: "#herdshare" },
-          { label: "Vendors", href: "#vendors" },
-          { label: "Frequently Asked Questions", href: "#faqs" }
-        ]
-      },
-      { label: "Newsletter", href: "https://www.deckfamilyfarm.com/newsletter" },
-      { label: "Events", href: "https://www.deckfamilyfarm.com/events" },
-      {
-        label: "Shop",
-        children: [
-          { label: "CSA Shopping", href: subscriptionStoreUrl() },
-          { label: "Merchandise", href: "https://www.deckfamilyfarm.com/merchandise" }
-        ]
-      }
-    ],
-    [subscribeRouteUrl]
+    () => buildSubscribeNavLinks(),
+    []
   );
   const siteOptions = useMemo(
     () =>
