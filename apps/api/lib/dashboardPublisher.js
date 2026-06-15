@@ -337,6 +337,13 @@ function getManualSourceValue(manualValueMap, rowLabel, weekStart) {
   return "";
 }
 
+function normalizeManualMetricLabel(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ");
+}
+
 function buildManualValueMapFromSourceRows(rows = [], weeks = []) {
   const manualValueMap = new Map();
   rows.slice(2).forEach((row) => {
@@ -347,6 +354,58 @@ function buildManualValueMapFromSourceRows(rows = [], weeks = []) {
     });
   });
   return manualValueMap;
+}
+
+function buildCustomManualRowsFromGeneratedRows(rows = []) {
+  const headerIndex = rows.findIndex((row) => {
+    const metric = String(row?.[1] || "").trim().toLowerCase();
+    const source = String(row?.[3] || "").trim().toLowerCase();
+    return metric === "metric" && source.includes("source");
+  });
+  if (headerIndex < 0) return [];
+
+  const header = rows[headerIndex] || [];
+  const weekColumnIndexes = [];
+  for (let columnIndex = 4; columnIndex < header.length; columnIndex += 1) {
+    if (toYmdFromSheetWeekLabel(header[columnIndex])) weekColumnIndexes.push(columnIndex);
+  }
+
+  const customRows = [];
+  const seen = new Set();
+  let currentSection = "";
+  rows.slice(headerIndex + 1).forEach((row) => {
+    const section = String(row?.[0] || "").trim();
+    const label = String(row?.[1] || "").trim();
+    const entry = String(row?.[2] || "").trim().toUpperCase();
+    const source = String(row?.[3] || "").trim();
+
+    if (section && !label) {
+      currentSection = section;
+      return;
+    }
+    if (!label) return;
+
+    const hasWeekValue = weekColumnIndexes.some((columnIndex) => {
+      const value = row[columnIndex];
+      return value !== null && typeof value !== "undefined" && String(value).trim() !== "";
+    });
+    if (entry === "AUTO") return;
+    if (entry !== "MANUAL" && !hasWeekValue) return;
+
+    const normalizedLabel = normalizeManualMetricLabel(label);
+    if (!normalizedLabel || seen.has(normalizedLabel)) return;
+    seen.add(normalizedLabel);
+
+    customRows.push({
+      section: currentSection || "MANUAL ENTRIES",
+      label,
+      entry: "MANUAL",
+      source: source || "Manual entry preserved from dashboard",
+      rowLabel: label
+    });
+  });
+
+  return customRows;
 }
 
 function buildManualValueMapFromGeneratedRows(rows = []) {
@@ -480,6 +539,48 @@ function buildYearlyAverageMap(weeks, weeklyKpiMap, metricKey) {
   );
 }
 
+function addCustomManualRowsToLayout(layout, customManualRows = []) {
+  if (!customManualRows.length) return layout;
+
+  const builtInLabels = new Set();
+  layout.forEach((group) => {
+    (group.rows || []).forEach((row) => {
+      builtInLabels.add(normalizeManualMetricLabel(row.label));
+      const rowLabels = Array.isArray(row.rowLabel) ? row.rowLabel : [row.rowLabel];
+      rowLabels.forEach((label) => {
+        if (label) builtInLabels.add(normalizeManualMetricLabel(label));
+      });
+    });
+  });
+
+  const additionsBySection = new Map();
+  customManualRows.forEach((row) => {
+    const normalizedLabel = normalizeManualMetricLabel(row.label);
+    if (!normalizedLabel || builtInLabels.has(normalizedLabel)) return;
+    const section = String(row.section || "MANUAL ENTRIES").trim() || "MANUAL ENTRIES";
+    const rows = additionsBySection.get(section) || [];
+    rows.push(row);
+    additionsBySection.set(section, rows);
+    builtInLabels.add(normalizedLabel);
+  });
+
+  if (!additionsBySection.size) return layout;
+
+  const nextLayout = layout.map((group) => {
+    const additions = additionsBySection.get(group.section) || [];
+    additionsBySection.delete(group.section);
+    return additions.length
+      ? { ...group, rows: [...(group.rows || []), ...additions] }
+      : group;
+  });
+
+  for (const [section, rows] of additionsBySection.entries()) {
+    nextLayout.push({ section, rows });
+  }
+
+  return nextLayout;
+}
+
 function buildDashboardRows(
   weeks,
   manualValueMap,
@@ -488,7 +589,8 @@ function buildDashboardRows(
   timesheetWeeklyMap,
   timesheetTaskLabels,
   subscriberWeeklyMap,
-  publishableWeekStarts = null
+  publishableWeekStarts = null,
+  customManualRows = []
 ) {
   const yearlyAverageOrdersByYear = buildYearlyAverageMap(weeks, weeklyKpiMap, "numOrders");
   const yearlyAverageSalesByYear = buildYearlyAverageMap(weeks, weeklyKpiMap, "totalSales");
@@ -806,6 +908,7 @@ function buildDashboardRows(
     }
   ];
 
+  const resolvedLayout = addCustomManualRowsToLayout(layout, customManualRows);
   const values = [];
   const metricRows = [];
   const sectionRows = [];
@@ -814,7 +917,7 @@ function buildDashboardRows(
   values.push([`FFCSA Dashboard 2026`, `Updated ${now}`, "", "", ...weeks.map(() => "")]);
   values.push(["Section", "Metric", "Entry Type", "Source", ...weeks.map((w) => w.label)]);
 
-  for (const group of layout) {
+  for (const group of resolvedLayout) {
     sectionRows.push(values.length);
     values.push([group.section, "", "", "", ...weeks.map(() => "")]);
     for (const row of group.rows) {
@@ -2765,6 +2868,7 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       buildManualValueMapFromSourceRows(sourceRows, sourceWeeks),
       buildManualValueMapFromGeneratedRows(targetRows)
     );
+    const customManualRows = buildCustomManualRowsFromGeneratedRows(targetRows);
     const availability = await loadDashboardPublishAvailability();
     const { weeks, addedWeeks } = extendWeeksThroughPublishableWeek(
       sourceWeeks,
@@ -2850,7 +2954,8 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       timesheetResult.map || {},
       timesheetResult.taskLabels || [],
       subscriberWeeklyMap,
-      publishableWeekStarts
+      publishableWeekStarts,
+      customManualRows
     );
 
     const missingSubscriberWeeks = weeks
