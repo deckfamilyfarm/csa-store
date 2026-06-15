@@ -7,8 +7,10 @@ import { users } from "../schema.js";
 import { requireUser } from "../middleware/auth.js";
 import { resetPasswordWithToken, sendPasswordResetForUser } from "../lib/passwordReset.js";
 import {
+  authenticateLocalAdminWithTimesheets,
   authenticateLocalAdminWithTimesheetsAccessToken,
-  issueAdminToken
+  issueAdminToken,
+  shouldUseTimesheetsAdminAuth
 } from "../lib/timesheetsAuth.js";
 
 const router = express.Router();
@@ -56,6 +58,52 @@ function buildAdminLaunchRedirect(returnTo, token) {
   return `${path}?${params.toString()}`;
 }
 
+function issueUserLoginToken(user, adminRoles = []) {
+  return jwt.sign(
+    { userId: user.id, role: user.role, adminRoles },
+    process.env.JWT_SECRET || "dev-secret",
+    { expiresIn: "30d" }
+  );
+}
+
+function buildLoginResponse(user, adminRoles = []) {
+  return {
+    token: issueUserLoginToken(user, adminRoles),
+    user: {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      adminRoles
+    }
+  };
+}
+
+async function authenticateLocalUserWithPassword(username, password) {
+  const db = getDb();
+  const rows = await db.select().from(users).where(eq(users.username, username));
+  if (!rows.length) {
+    const error = new Error("Invalid credentials");
+    error.status = 401;
+    throw error;
+  }
+  if (rows[0].active === 0) {
+    const error = new Error("User is inactive");
+    error.status = 403;
+    throw error;
+  }
+
+  const valid = await bcrypt.compare(password, rows[0].passwordHash);
+  if (!valid) {
+    const error = new Error("Invalid credentials");
+    error.status = 401;
+    throw error;
+  }
+
+  return rows[0];
+}
+
 router.post("/login", async (req, res) => {
   try {
     const username = String(req.body?.username || req.body?.email || "").trim();
@@ -64,45 +112,26 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ error: "Missing credentials" });
     }
 
-    const db = getDb();
     await ensureAdminAccessSchema().catch((error) => {
       console.warn("Admin access schema bootstrap skipped for /auth/login:", error.message);
     });
-    const rows = await db.select().from(users).where(eq(users.username, username));
-    if (!rows.length) {
-      return res.status(401).json({ error: "Invalid credentials" });
-    }
-    if (rows[0].active === 0) {
-      return res.status(403).json({ error: "User is inactive" });
-    }
 
-    const valid = await bcrypt.compare(password, rows[0].passwordHash);
-    if (!valid) {
-      return res.status(401).json({ error: "Invalid credentials" });
-    }
-
-    const adminRoles = await loadAdminRoleKeysForUser(Number(rows[0].id)).catch(() => []);
-
-    const token = jwt.sign(
-      { userId: rows[0].id, role: rows[0].role, adminRoles },
-      process.env.JWT_SECRET || "dev-secret",
-      {
-        expiresIn: "30d"
+    let user;
+    try {
+      user = await authenticateLocalUserWithPassword(username, password);
+    } catch (localError) {
+      if (localError.status !== 401 || !shouldUseTimesheetsAdminAuth()) {
+        throw localError;
       }
-    );
+      user = (await authenticateLocalAdminWithTimesheets(username, password)).user;
+    }
 
-    return res.json({
-      token,
-      user: {
-        id: rows[0].id,
-        username: rows[0].username,
-        email: rows[0].email,
-        name: rows[0].name,
-        role: rows[0].role,
-        adminRoles
-      }
-    });
+    const adminRoles = await loadAdminRoleKeysForUser(Number(user.id)).catch(() => []);
+    return res.json(buildLoginResponse(user, adminRoles));
   } catch (error) {
+    if (error.status && error.status < 500) {
+      return res.status(error.status).json({ error: error.message || "Invalid credentials" });
+    }
     console.error("Auth login failed:", error.message);
     return res.status(500).json({ error: "Server login error" });
   }
