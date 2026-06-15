@@ -928,7 +928,7 @@ function buildDashboardRows(
         const week = weeks[index];
         const weekIsPublishable =
           !publishableWeekStarts || publishableWeekStarts.has(week.start);
-        if (!weekIsPublishable) {
+        if (!weekIsPublishable && row.entry !== "MANUAL") {
           nextRow.push("");
           continue;
         }
@@ -1308,6 +1308,45 @@ function extractWeeksFromSource(rows) {
     });
   }
   return weeks;
+}
+
+function extractWeeksFromGeneratedRows(rows = []) {
+  const headerIndex = rows.findIndex((row) => {
+    const metric = String(row?.[1] || "").trim().toLowerCase();
+    const source = String(row?.[3] || "").trim().toLowerCase();
+    return metric === "metric" && source.includes("source");
+  });
+  if (headerIndex < 0) return [];
+
+  const header = rows[headerIndex] || [];
+  const weeks = [];
+  for (let index = 4; index < header.length; index += 1) {
+    const label = String(header[index] || "").trim();
+    if (!label) continue;
+    const start = toYmdFromSheetWeekLabel(label);
+    if (!start) continue;
+    weeks.push({
+      label,
+      start,
+      end: addDaysYmd(start, 6)
+    });
+  }
+  return weeks;
+}
+
+function mergeDashboardWeeks(...weekLists) {
+  const byStart = new Map();
+  weekLists.forEach((weekList) => {
+    (Array.isArray(weekList) ? weekList : []).forEach((week) => {
+      const start = String(week?.start || "").trim();
+      if (!start) return;
+      const existing = byStart.get(start);
+      byStart.set(start, existing ? { ...week, ...existing } : week);
+    });
+  });
+  return Array.from(byStart.values()).sort((left, right) =>
+    String(left.start || "").localeCompare(String(right.start || ""))
+  );
 }
 
 function extendWeeksThroughPublishableWeek(weeks, publishableThroughWeekStart) {
@@ -2864,14 +2903,16 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
     }
     const accessToken = await getSheetsAccessToken();
     const targetRows = await fetchSheetRowsByTitle(accessToken, DASHBOARD_TARGET_TITLE);
+    const targetWeeks = extractWeeksFromGeneratedRows(targetRows);
     const manualValueMap = mergeManualValueMaps(
       buildManualValueMapFromSourceRows(sourceRows, sourceWeeks),
       buildManualValueMapFromGeneratedRows(targetRows)
     );
     const customManualRows = buildCustomManualRowsFromGeneratedRows(targetRows);
     const availability = await loadDashboardPublishAvailability();
+    const dashboardWeeks = mergeDashboardWeeks(sourceWeeks, targetWeeks);
     const { weeks, addedWeeks } = extendWeeksThroughPublishableWeek(
-      sourceWeeks,
+      dashboardWeeks,
       availability.publishableThroughWeekStart
     );
     const publishableWeekStarts = new Set(
@@ -3000,6 +3041,7 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       sourceGid: DASHBOARD_SOURCE_GID,
       weekCount: weeks.length,
       sourceWeekCount: sourceWeeks.length,
+      existingTargetWeekCount: targetWeeks.length,
       autoAddedWeekCount: addedWeeks.length,
       autoAddedWeeks: addedWeeks.map((week) => ({
         label: week.label,
