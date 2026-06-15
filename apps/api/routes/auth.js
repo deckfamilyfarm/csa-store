@@ -6,6 +6,10 @@ import { ensureAdminAccessSchema, getDb, getPool } from "../db.js";
 import { users } from "../schema.js";
 import { requireUser } from "../middleware/auth.js";
 import { resetPasswordWithToken, sendPasswordResetForUser } from "../lib/passwordReset.js";
+import {
+  authenticateLocalAdminWithTimesheetsAccessToken,
+  issueAdminToken
+} from "../lib/timesheetsAuth.js";
 
 const router = express.Router();
 
@@ -23,6 +27,33 @@ async function loadAdminRoleKeysForUser(userId) {
     [Number(userId)]
   );
   return rows.map((row) => row.roleKey).filter(Boolean);
+}
+
+function launchOriginAllowed(req) {
+  const allowedOrigins = String(process.env.TIMESHEETS_LAUNCH_ALLOWED_ORIGINS || "")
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean);
+  if (!allowedOrigins.length) return true;
+  const origin = String(req.headers.origin || "").trim();
+  if (!origin) return true;
+  return allowedOrigins.includes(origin);
+}
+
+function sanitizeAdminReturnTo(value) {
+  const raw = String(value || "").trim();
+  if (raw === "#/admin") return "/#/admin";
+  if (raw.startsWith("#/admin?")) return `/${raw}`;
+  if (raw === "/#/admin" || raw.startsWith("/#/admin?")) return raw;
+  return "/#/admin";
+}
+
+function buildAdminLaunchRedirect(returnTo, token) {
+  const safeReturnTo = sanitizeAdminReturnTo(returnTo);
+  const [path, query = ""] = safeReturnTo.split("?");
+  const params = new URLSearchParams(query);
+  params.set("adminToken", token);
+  return `${path}?${params.toString()}`;
 }
 
 router.post("/login", async (req, res) => {
@@ -74,6 +105,33 @@ router.post("/login", async (req, res) => {
   } catch (error) {
     console.error("Auth login failed:", error.message);
     return res.status(500).json({ error: "Server login error" });
+  }
+});
+
+router.post("/timesheets-launch", async (req, res) => {
+  if (!launchOriginAllowed(req)) {
+    return res.status(403).json({ error: "Timesheets launch origin is not allowed." });
+  }
+
+  const accessToken = String(req.body?.access_token || req.body?.accessToken || "").trim();
+  if (!accessToken) {
+    return res.redirect(303, "/#/admin");
+  }
+
+  try {
+    await ensureAdminAccessSchema();
+    const { user } = await authenticateLocalAdminWithTimesheetsAccessToken(accessToken);
+    const adminRoles = await loadAdminRoleKeysForUser(Number(user.id));
+    const hasLegacyAdminRole = user.role === "administrator" || user.role === "admin";
+    if (!hasLegacyAdminRole && !adminRoles.length) {
+      return res.redirect(303, "/#/admin");
+    }
+
+    const token = issueAdminToken(user, adminRoles);
+    return res.redirect(303, buildAdminLaunchRedirect(req.body?.return_to, token));
+  } catch (error) {
+    console.warn("Timesheets launch failed:", error.message);
+    return res.redirect(303, "/#/admin");
   }
 });
 

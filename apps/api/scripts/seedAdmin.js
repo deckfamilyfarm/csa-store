@@ -11,8 +11,9 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
 
 export async function ensureSeedAdmin() {
-  const username = process.env.ADMIN_USER || "admin";
-  const email = process.env.ADMIN_EMAIL || (username.includes("@") ? username : null);
+  const username = process.env.ADMIN_USER || "deck.john";
+  const email = process.env.ADMIN_EMAIL || "jdeck88@gmail.com";
+  const name = process.env.ADMIN_NAME || "John Deck";
   const password = process.env.ADMIN_PASS || "admin2004";
 
   const db = getDb();
@@ -20,6 +21,15 @@ export async function ensureSeedAdmin() {
   const existing = await db.select().from(users).where(eq(users.username, username));
 
   if (existing.length > 0) {
+    await getPool().query(
+      `
+        INSERT IGNORE INTO admin_user_roles (user_id, role_id, created_at)
+        SELECT ?, id, ?
+        FROM admin_roles
+        WHERE role_key = 'admin'
+      `,
+      [existing[0].id, new Date()]
+    );
     return;
   }
 
@@ -45,9 +55,21 @@ export async function ensureSeedAdmin() {
     email,
     passwordHash: hash,
     role: "administrator",
+    name,
     createdAt: new Date(),
     updatedAt: new Date()
   });
+
+  await getPool().query(
+    `
+      INSERT IGNORE INTO admin_user_roles (user_id, role_id, created_at)
+      SELECT u.id, r.id, ?
+      FROM users u
+      JOIN admin_roles r ON r.role_key = 'admin'
+      WHERE u.username = ?
+    `,
+    [new Date(), username]
+  );
 }
 
 const isDirectRun = process.argv[1] && process.argv[1].endsWith("seedAdmin.js");

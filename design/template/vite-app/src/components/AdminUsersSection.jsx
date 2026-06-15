@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { adminGet, adminPost, adminPut } from "../adminApi.js";
-import { changePassword } from "../api.js";
 
 const EMPTY_NEW_USER = {
   username: "",
   email: "",
   name: "",
   active: true,
+  timesheetsUserId: "",
+  timesheetsEmployeeId: "",
   adminRoles: ["local_pricelist_admin"]
 };
 
@@ -17,6 +18,8 @@ function normalizeUserDraft(user) {
     email: user.email || "",
     name: user.name || "",
     active: user.active !== false,
+    timesheetsUserId: user.timesheetsUserId || "",
+    timesheetsEmployeeId: user.timesheetsEmployeeId || "",
     adminRoles: Array.isArray(user.adminRoles) ? user.adminRoles : []
   };
 }
@@ -57,15 +60,28 @@ function toggleAdminAwareRole(roleKeys, roleKey, roles) {
   return toggleRole([...current], roleKey);
 }
 
-function isEmailAddress(value) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim());
-}
-
 function formatResetExpiry(value) {
   if (!value) return "";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "";
   return date.toLocaleString();
+}
+
+function formatSyncSummary(summary = {}) {
+  const parts = [
+    `total ${summary.total || 0}`,
+    `linked ${summary.linked || 0}`,
+    `matches ${summary.match || 0}`,
+    `ambiguous ${summary.ambiguous || 0}`,
+    `missing ${summary.no_match || 0}`
+  ];
+  return parts.join(" | ");
+}
+
+function formatTimesheetsMatch(item) {
+  const user = item?.proposed;
+  if (!user) return "";
+  return [user.username, user.name, user.employeeId].filter(Boolean).join(" | ");
 }
 
 export function AdminUsersSection({ token, currentAdmin }) {
@@ -74,17 +90,11 @@ export function AdminUsersSection({ token, currentAdmin }) {
   const [drafts, setDrafts] = useState({});
   const [newUser, setNewUser] = useState(EMPTY_NEW_USER);
   const [showCreateUser, setShowCreateUser] = useState(false);
-  const [showChangePassword, setShowChangePassword] = useState(false);
-  const [passwordDraft, setPasswordDraft] = useState({
-    currentPassword: "",
-    password: "",
-    confirm: ""
-  });
   const [loading, setLoading] = useState(false);
   const [savingUserId, setSavingUserId] = useState(null);
-  const [resettingUserId, setResettingUserId] = useState(null);
-  const [changingPassword, setChangingPassword] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [syncingTimesheets, setSyncingTimesheets] = useState(false);
+  const [syncPreview, setSyncPreview] = useState(null);
   const [message, setMessage] = useState("");
 
   async function loadUsers() {
@@ -133,6 +143,8 @@ export function AdminUsersSection({ token, currentAdmin }) {
         email: draft.email,
         name: draft.name,
         active: draft.active,
+        timesheetsUserId: draft.timesheetsUserId,
+        timesheetsEmployeeId: draft.timesheetsEmployeeId,
         adminRoles: draft.adminRoles
       });
       setMessage("Admin user saved.");
@@ -154,8 +166,8 @@ export function AdminUsersSection({ token, currentAdmin }) {
       setShowCreateUser(false);
       setMessage(
         response.emailSent === false
-          ? `Admin user added, but password email was not sent: ${response.emailReason || "email is not configured."}`
-          : `Admin user added and password setup email sent. Expires ${formatResetExpiry(response.expiresAt)}. Only the newest password email link will work.`
+          ? `Admin user added. ${response.emailReason || "Link a Timesheets login before they can sign in."}`
+          : `Admin user added and password setup email sent. Expires ${formatResetExpiry(response.expiresAt)}.`
       );
       await loadUsers();
     } catch (error) {
@@ -165,41 +177,32 @@ export function AdminUsersSection({ token, currentAdmin }) {
     }
   }
 
-  async function sendResetPassword(user) {
-    setResettingUserId(user.id);
+  async function previewTimesheetsSync() {
+    setSyncingTimesheets(true);
     setMessage("");
     try {
-      const response = await adminPost(`admin-users/${user.id}/reset-password`, token, {});
-      setMessage(
-        response.emailSent === false
-          ? `Password reset was created, but email was not sent: ${response.emailReason || "email is not configured."}`
-          : `Password reset email sent to ${user.email}. Expires ${formatResetExpiry(response.expiresAt)}. Only the newest password email link will work.`
-      );
+      const response = await adminGet("admin-users/timesheets-sync", token);
+      setSyncPreview(response);
+      setMessage(`Timesheets sync preview loaded: ${formatSyncSummary(response.summary)}.`);
     } catch (error) {
-      setMessage(error?.message || "Failed to send password reset email.");
+      setMessage(error?.message || "Failed to preview Timesheets sync.");
     } finally {
-      setResettingUserId(null);
+      setSyncingTimesheets(false);
     }
   }
 
-  async function submitChangePassword(event) {
-    event.preventDefault();
+  async function applyTimesheetsSync() {
+    setSyncingTimesheets(true);
     setMessage("");
-    if (passwordDraft.password !== passwordDraft.confirm) {
-      setMessage("New password and confirmation do not match.");
-      return;
-    }
-
-    setChangingPassword(true);
     try {
-      await changePassword(token, passwordDraft.currentPassword, passwordDraft.password);
-      setPasswordDraft({ currentPassword: "", password: "", confirm: "" });
-      setShowChangePassword(false);
-      setMessage("Your password was changed.");
+      const response = await adminPost("admin-users/timesheets-sync", token, { dryRun: false });
+      setSyncPreview(response);
+      setMessage(`Applied ${response.appliedCount || 0} Timesheets user links.`);
+      await loadUsers();
     } catch (error) {
-      setMessage(error?.message || "Failed to change password.");
+      setMessage(error?.message || "Failed to apply Timesheets sync.");
     } finally {
-      setChangingPassword(false);
+      setSyncingTimesheets(false);
     }
   }
 
@@ -215,10 +218,38 @@ export function AdminUsersSection({ token, currentAdmin }) {
         <button className="button" type="button" onClick={() => setShowCreateUser(true)}>
           Add User
         </button>
-        <button className="button alt" type="button" onClick={() => setShowChangePassword(true)}>
-          Change My Password
+        <button className="button alt" type="button" onClick={previewTimesheetsSync} disabled={syncingTimesheets}>
+          Preview Timesheets Sync
+        </button>
+        <button className="button alt" type="button" onClick={applyTimesheetsSync} disabled={syncingTimesheets}>
+          Apply Exact Timesheets Matches
         </button>
       </div>
+
+      {syncPreview ? (
+        <div className="admin-table-shell">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>CSA User</th>
+                <th>Status</th>
+                <th>Method</th>
+                <th>Timesheets Match</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(syncPreview.items || []).map((item) => (
+                <tr key={`timesheets-sync-${item.userId}`}>
+                  <td>{item.username}</td>
+                  <td>{item.status}</td>
+                  <td>{item.matchMethod || ""}</td>
+                  <td>{formatTimesheetsMatch(item)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : null}
 
       {showCreateUser ? (
         <div className="modal-backdrop" onClick={() => setShowCreateUser(false)}>
@@ -246,7 +277,7 @@ export function AdminUsersSection({ token, currentAdmin }) {
                     />
                   </label>
                   <label className="filter-field">
-                    <span className="small">Password reset email</span>
+                    <span className="small">Contact email</span>
                     <input
                       className="input"
                       type="email"
@@ -263,6 +294,26 @@ export function AdminUsersSection({ token, currentAdmin }) {
                       value={newUser.name}
                       onChange={(event) =>
                         setNewUser((prev) => ({ ...prev, name: event.target.value }))
+                      }
+                    />
+                  </label>
+                  <label className="filter-field">
+                    <span className="small">Timesheets user ID</span>
+                    <input
+                      className="input"
+                      value={newUser.timesheetsUserId}
+                      onChange={(event) =>
+                        setNewUser((prev) => ({ ...prev, timesheetsUserId: event.target.value }))
+                      }
+                    />
+                  </label>
+                  <label className="filter-field">
+                    <span className="small">Timesheets employee ID</span>
+                    <input
+                      className="input"
+                      value={newUser.timesheetsEmployeeId}
+                      onChange={(event) =>
+                        setNewUser((prev) => ({ ...prev, timesheetsEmployeeId: event.target.value }))
                       }
                     />
                   </label>
@@ -307,72 +358,11 @@ export function AdminUsersSection({ token, currentAdmin }) {
         </div>
       ) : null}
 
-      {showChangePassword ? (
-        <div className="modal-backdrop" onClick={() => setShowChangePassword(false)}>
-          <div className="modal modal-small" onClick={(event) => event.stopPropagation()}>
-            <button
-              className="modal-close"
-              type="button"
-              onClick={() => setShowChangePassword(false)}
-            >
-              Close
-            </button>
-            <div className="modal-body single">
-              <div>
-                <div className="eyebrow">Credentials</div>
-                <h2 className="h2">Change My Password</h2>
-                <form className="admin-form" onSubmit={submitChangePassword}>
-                  <label className="filter-field">
-                    <span className="small">Current password</span>
-                    <input
-                      className="input"
-                      type="password"
-                      value={passwordDraft.currentPassword}
-                      onChange={(event) =>
-                        setPasswordDraft((prev) => ({
-                          ...prev,
-                          currentPassword: event.target.value
-                        }))
-                      }
-                    />
-                  </label>
-                  <label className="filter-field">
-                    <span className="small">New password</span>
-                    <input
-                      className="input"
-                      type="password"
-                      value={passwordDraft.password}
-                      onChange={(event) =>
-                        setPasswordDraft((prev) => ({ ...prev, password: event.target.value }))
-                      }
-                    />
-                  </label>
-                  <label className="filter-field">
-                    <span className="small">Confirm new password</span>
-                    <input
-                      className="input"
-                      type="password"
-                      value={passwordDraft.confirm}
-                      onChange={(event) =>
-                        setPasswordDraft((prev) => ({ ...prev, confirm: event.target.value }))
-                      }
-                    />
-                  </label>
-                  <button className="button" type="submit" disabled={changingPassword}>
-                    {changingPassword ? "Changing..." : "Change Password"}
-                  </button>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : null}
-
       <div className="admin-table-shell admin-users-table-shell">
         <table className="admin-table admin-users-table">
           <thead>
             <tr>
-              <th>Credentials</th>
+              <th>User & Timesheets</th>
               <th>Active</th>
               <th>Roles</th>
               <th>Actions</th>
@@ -382,9 +372,6 @@ export function AdminUsersSection({ token, currentAdmin }) {
             {users.map((user) => {
               const draft = drafts[user.id] || normalizeUserDraft(user);
               const isCurrentUser = Number(user.id) === currentAdminId;
-              const canReceiveResetEmail = isEmailAddress(draft.email);
-              const hasUnsavedCredentialChanges =
-                draft.username !== (user.username || "") || draft.email !== (user.email || "");
               return (
                 <tr key={`admin-user-${user.id}`}>
                   <td>
@@ -394,7 +381,7 @@ export function AdminUsersSection({ token, currentAdmin }) {
                         {isCurrentUser ? <span className="admin-user-you-badge">You</span> : null}
                       </div>
                       <label className="admin-user-field-label">
-                        <span>Username</span>
+                        <span>CSA username</span>
                         <input
                           className="input"
                           value={draft.username}
@@ -404,7 +391,7 @@ export function AdminUsersSection({ token, currentAdmin }) {
                         />
                       </label>
                       <label className="admin-user-field-label">
-                        <span>Password reset email</span>
+                        <span>Contact email</span>
                         <input
                           className="input"
                           type="email"
@@ -412,21 +399,32 @@ export function AdminUsersSection({ token, currentAdmin }) {
                           onChange={(event) => updateDraft(user.id, { email: event.target.value })}
                         />
                       </label>
-                      {!canReceiveResetEmail ? (
-                        <div className="admin-user-warning">
-                          Enter a real password reset email before sending reset links.
-                        </div>
-                      ) : hasUnsavedCredentialChanges ? (
-                        <div className="admin-user-warning">
-                          Save username/email changes before sending reset links.
-                        </div>
-                      ) : null}
                       <label className="admin-user-field-label">
                         <span>Name</span>
                         <input
                           className="input"
                           value={draft.name}
                           onChange={(event) => updateDraft(user.id, { name: event.target.value })}
+                        />
+                      </label>
+                      <label className="admin-user-field-label">
+                        <span>Timesheets user ID</span>
+                        <input
+                          className="input"
+                          value={draft.timesheetsUserId}
+                          onChange={(event) =>
+                            updateDraft(user.id, { timesheetsUserId: event.target.value })
+                          }
+                        />
+                      </label>
+                      <label className="admin-user-field-label">
+                        <span>Timesheets employee ID</span>
+                        <input
+                          className="input"
+                          value={draft.timesheetsEmployeeId}
+                          onChange={(event) =>
+                            updateDraft(user.id, { timesheetsEmployeeId: event.target.value })
+                          }
                         />
                       </label>
                     </div>
@@ -462,31 +460,6 @@ export function AdminUsersSection({ token, currentAdmin }) {
                   </td>
                   <td>
                     <div className="admin-user-actions">
-                      <button
-                        className="button alt"
-                        type="button"
-                        disabled={
-                          resettingUserId === user.id ||
-                          !canReceiveResetEmail ||
-                          hasUnsavedCredentialChanges
-                        }
-                        onClick={() => sendResetPassword(user)}
-                      >
-                        {resettingUserId === user.id
-                          ? "Sending..."
-                          : isCurrentUser
-                            ? "Email Me Reset Link"
-                            : "Send Password Reset Email"}
-                      </button>
-                      {isCurrentUser ? (
-                        <button
-                          className="button alt"
-                          type="button"
-                          onClick={() => setShowChangePassword(true)}
-                        >
-                          Change Password Here
-                        </button>
-                      ) : null}
                       <button
                         className="button alt"
                         type="button"

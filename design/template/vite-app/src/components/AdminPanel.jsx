@@ -2597,7 +2597,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
           <form className="admin-form" onSubmit={handleLogin}>
             <input
               className="input"
-              placeholder="Admin username"
+              placeholder="Timesheets username"
               autoComplete="username"
               value={loginState.username}
               onChange={(event) =>
@@ -2617,9 +2617,6 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
             {loginState.error && <div className="small">{loginState.error}</div>}
             <button className="button" type="submit">
               Sign in
-            </button>
-            <button className="button alt" type="button" onClick={() => setLoginMode("forgot")}>
-              Forgot password
             </button>
           </form>
         )}

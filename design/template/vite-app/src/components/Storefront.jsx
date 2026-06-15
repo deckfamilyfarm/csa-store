@@ -238,6 +238,24 @@ export function Storefront() {
     return null;
   }
 
+  function consumeAdminLaunchToken() {
+    const query = window.location.hash.split("?")[1] || "";
+    if (!query) return;
+    const params = new URLSearchParams(query);
+    const adminToken = params.get("adminToken") || "";
+    if (!adminToken) return;
+
+    localStorage.setItem("adminToken", adminToken);
+    params.delete("adminToken");
+    const nextQuery = params.toString();
+    const nextHash = `#/admin${nextQuery ? `?${nextQuery}` : ""}`;
+    window.history.replaceState(
+      null,
+      "",
+      `${window.location.pathname}${window.location.search}${nextHash}`
+    );
+  }
+
   useEffect(() => {
     function syncView() {
       const nextLiabilitySlug = getLiabilityReleaseSlug();
@@ -248,6 +266,7 @@ export function Storefront() {
       }
       const route = getHashRoute();
       if (route === "admin") {
+        consumeAdminLaunchToken();
         setView("admin");
         return;
       }

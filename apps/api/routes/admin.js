@@ -1,7 +1,6 @@
 import express from "express";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
-import jwt from "jsonwebtoken";
 import multer from "multer";
 import sharp from "sharp";
 import xlsx from "xlsx";
@@ -82,6 +81,15 @@ import {
   isSourcePricingVendor
 } from "../lib/productPricing.js";
 import { hasAdminPermission } from "../lib/adminRoles.js";
+import {
+  authenticateLocalAdminWithTimesheets,
+  issueAdminToken,
+  shouldUseTimesheetsAdminAuth
+} from "../lib/timesheetsAuth.js";
+import {
+  applyTimesheetsUserSync,
+  previewTimesheetsUserSync
+} from "../lib/timesheetsUserSync.js";
 import { runLocalLineAudit } from "../scripts/auditLocalLineSync.js";
 import {
   exportMasterPricelist,
@@ -1978,6 +1986,30 @@ async function assertAdminRoleChangeSafe(userId, active, roleKeys) {
   }
 }
 
+async function authenticateLocalAdminWithPassword(username, password) {
+  const db = getDb();
+  const rows = await db.select().from(users).where(eq(users.username, username));
+  if (!rows.length) {
+    const error = new Error("Invalid credentials");
+    error.status = 401;
+    throw error;
+  }
+  if (rows[0].active === 0) {
+    const error = new Error("User is inactive");
+    error.status = 403;
+    throw error;
+  }
+
+  const valid = await bcrypt.compare(password, rows[0].passwordHash);
+  if (!valid) {
+    const error = new Error("Invalid credentials");
+    error.status = 401;
+    throw error;
+  }
+
+  return rows[0];
+}
+
 router.post("/login", async (req, res) => {
   try {
     const username = String(req.body?.username || "").trim();
@@ -1986,49 +2018,38 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ error: "Missing credentials" });
     }
 
-    const db = getDb();
     await ensureAdminAccessSchema().catch((error) => {
       console.warn("Admin access schema bootstrap skipped for /admin/login:", error.message);
     });
-    const rows = await db.select().from(users).where(eq(users.username, username));
-    if (!rows.length) {
-      return res.status(401).json({ error: "Invalid credentials" });
-    }
-    if (rows[0].active === 0) {
-      return res.status(403).json({ error: "User is inactive" });
-    }
+    const user = shouldUseTimesheetsAdminAuth()
+      ? (await authenticateLocalAdminWithTimesheets(username, password)).user
+      : await authenticateLocalAdminWithPassword(username, password);
 
-    const valid = await bcrypt.compare(password, rows[0].passwordHash);
-    if (!valid) {
-      return res.status(401).json({ error: "Invalid credentials" });
-    }
-
-    const adminRoles = await loadAdminRoleKeysForUser(Number(rows[0].id));
-    const hasLegacyAdminRole = rows[0].role === "administrator" || rows[0].role === "admin";
+    const adminRoles = await loadAdminRoleKeysForUser(Number(user.id));
+    const hasLegacyAdminRole = user.role === "administrator" || user.role === "admin";
     if (!hasLegacyAdminRole && !adminRoles.length) {
       return res.status(403).json({ error: "Admin access required" });
     }
 
-    const token = jwt.sign(
-      { adminId: rows[0].id, userId: rows[0].id, role: rows[0].role, adminRoles },
-      process.env.JWT_SECRET || "dev-secret",
-      { expiresIn: "30d" }
-    );
+    const token = issueAdminToken(user, adminRoles);
 
     return res.json({
       token,
       user: {
-        id: rows[0].id,
-        username: rows[0].username,
-        email: rows[0].email,
-        name: rows[0].name || "",
-        role: rows[0].role,
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        name: user.name || "",
+        role: user.role,
         adminRoles
       }
     });
   } catch (error) {
+    if (error.status && error.status < 500) {
+      return res.status(error.status).json({ error: error.message || "Invalid credentials" });
+    }
     console.error("Admin login failed:", error.message);
-    return res.status(500).json({ error: "Server login error" });
+    return res.status(error.status || 500).json({ error: error.message || "Server login error" });
   }
 });
 
@@ -2096,6 +2117,35 @@ router.get("/admin-users", requireAdminPermission("user_admin"), async (_req, re
         .filter(Boolean)
     }))
   });
+});
+
+router.get("/admin-users/timesheets-sync", requireAdminPermission("user_admin"), async (req, res) => {
+  try {
+    const includeAll = String(req.query?.includeAll || "").trim() === "1";
+    const preview = await previewTimesheetsUserSync({ includeAll });
+    res.json(preview);
+  } catch (error) {
+    console.error("Timesheets user sync preview failed:", error.message);
+    res.status(error.status || 500).json({
+      error: error.message || "Failed to preview Timesheets user sync."
+    });
+  }
+});
+
+router.post("/admin-users/timesheets-sync", requireAdminPermission("user_admin"), async (req, res) => {
+  try {
+    const includeAll = Boolean(req.body?.includeAll);
+    const userIds = Array.isArray(req.body?.userIds) ? req.body.userIds : [];
+    const result = req.body?.dryRun === false
+      ? await applyTimesheetsUserSync({ includeAll, userIds })
+      : await previewTimesheetsUserSync({ includeAll });
+    res.json(result);
+  } catch (error) {
+    console.error("Timesheets user sync apply failed:", error.message);
+    res.status(error.status || 500).json({
+      error: error.message || "Failed to apply Timesheets user sync."
+    });
+  }
 });
 
 router.get(
@@ -3043,7 +3093,12 @@ router.post("/admin-users", requireAdminPermission("user_admin"), async (req, re
   await replaceAdminRolesForUser(userId, adminRoles);
 
   let resetResult = { emailSent: false, emailReason: "User is inactive." };
-  if (active && !isEmailAddress(email)) {
+  if (shouldUseTimesheetsAdminAuth()) {
+    resetResult = {
+      emailSent: false,
+      emailReason: "Link this CSA user to a Timesheets login before they can sign in."
+    };
+  } else if (active && !isEmailAddress(email)) {
     resetResult = { emailSent: false, emailReason: "Password reset email is not set." };
   } else if (active) {
     resetResult = await sendPasswordResetForUser(
@@ -3067,6 +3122,11 @@ router.post(
     const userId = Number(req.params.id);
     if (!Number.isFinite(userId)) {
       return res.status(400).json({ error: "Invalid user id." });
+    }
+    if (shouldUseTimesheetsAdminAuth()) {
+      return res.status(400).json({
+        error: "CSA admin passwords are managed by Timesheets. Send resets from Timesheets."
+      });
     }
 
     const [rows] = await getPool().query(
