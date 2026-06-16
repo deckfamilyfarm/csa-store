@@ -88,6 +88,14 @@ export async function fetchDropSitePerformance(month = "") {
   return fetchJsonGet(url.toString(), "", "Failed to load drop-site performance");
 }
 
+export async function fetchDropSiteShareLinks() {
+  return fetchJsonGet(
+    `${base}/marketing/dropsite-share-links`,
+    "",
+    "Failed to load drop-site share links"
+  );
+}
+
 export async function submitDropSiteHostInterest(formData) {
   const response = await fetch(`${base}/dropsites/host-interest`, {
     method: "POST",

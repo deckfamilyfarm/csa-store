@@ -334,6 +334,157 @@ function buildMarketingTagSpec(baseUrl = "") {
   };
 }
 
+const DROP_SITE_SHARE_LINK_DEFINITIONS = [
+  {
+    key: "sms",
+    slug: "dropsite-host-sms",
+    label: "Drop-site host text message share",
+    channel: "sms",
+    utmContent: "sms"
+  },
+  {
+    key: "facebook",
+    slug: "dropsite-host-facebook",
+    label: "Drop-site host Facebook share",
+    channel: "facebook",
+    utmContent: "facebook"
+  },
+  {
+    key: "instagram",
+    slug: "dropsite-host-instagram",
+    label: "Drop-site host Instagram share",
+    channel: "instagram",
+    utmContent: "instagram"
+  },
+  {
+    key: "nextdoor",
+    slug: "dropsite-host-nextdoor",
+    label: "Drop-site host Nextdoor share",
+    channel: "nextdoor",
+    utmContent: "nextdoor"
+  },
+  {
+    key: "x",
+    slug: "dropsite-host-x",
+    label: "Drop-site host X share",
+    channel: "x",
+    utmContent: "x"
+  },
+  {
+    key: "copy",
+    slug: "dropsite-host-copy",
+    label: "Drop-site host copied link",
+    channel: "copy-link",
+    utmContent: "copy"
+  }
+];
+const DROP_SITE_SHARE_LINKS_BY_SLUG = new Map(
+  DROP_SITE_SHARE_LINK_DEFINITIONS.map((definition) => [definition.slug, definition])
+);
+
+function getPublicSubscribeDestinationUrl() {
+  return "https://subscribe.deckfamilyfarm.com/";
+}
+
+function getPublicMarketingRedirectBaseUrl() {
+  return "https://subscribe.deckfamilyfarm.com";
+}
+
+function buildDropSiteShareTrackedUrl(slug) {
+  return `${getPublicMarketingRedirectBaseUrl()}/api/marketing/go/${encodeURIComponent(slug)}`;
+}
+
+function serializeDropSiteShareLink(row, definition) {
+  return {
+    key: definition.key,
+    slug: definition.slug,
+    label: row?.label || definition.label,
+    channel: row?.channel || definition.channel,
+    trackedUrl: buildDropSiteShareTrackedUrl(definition.slug)
+  };
+}
+
+async function ensureDropSiteShareMarketingLinks(db) {
+  const now = new Date();
+  const destinationUrl = getPublicSubscribeDestinationUrl();
+  const usageInstructions =
+    "Drop-site hosts use this tracked link when sharing the Full Farm subscribe page with neighbors and friends.";
+  const pool = getPool();
+
+  for (const definition of DROP_SITE_SHARE_LINK_DEFINITIONS) {
+    await pool.execute(
+      `
+        INSERT INTO marketing_utm_links (
+          campaign_id,
+          content_post_id,
+          slug,
+          label,
+          is_active,
+          destination_type,
+          destination_url,
+          channel,
+          usage_instructions,
+          utm_source,
+          utm_medium,
+          utm_campaign,
+          utm_content,
+          utm_term,
+          track_token,
+          message_focus,
+          target_city,
+          target_zip,
+          target_location_label,
+          target_drop_site_id,
+          created_at,
+          updated_at
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE
+          label = VALUES(label),
+          is_active = VALUES(is_active),
+          destination_type = VALUES(destination_type),
+          destination_url = VALUES(destination_url),
+          channel = VALUES(channel),
+          usage_instructions = VALUES(usage_instructions),
+          utm_source = VALUES(utm_source),
+          utm_medium = VALUES(utm_medium),
+          utm_campaign = VALUES(utm_campaign),
+          utm_content = VALUES(utm_content),
+          utm_term = VALUES(utm_term),
+          message_focus = VALUES(message_focus),
+          updated_at = VALUES(updated_at)
+      `,
+      [
+        null,
+        null,
+        definition.slug,
+        definition.label,
+        1,
+        "subscribe",
+        destinationUrl,
+        definition.channel,
+        usageInstructions,
+        "dropsite_host",
+        null,
+        "dropsite_share",
+        definition.utmContent,
+        null,
+        crypto.randomBytes(12).toString("hex"),
+        "food",
+        null,
+        null,
+        null,
+        null,
+        now,
+        now
+      ]
+    );
+  }
+
+  const slugs = DROP_SITE_SHARE_LINK_DEFINITIONS.map((definition) => definition.slug);
+  return db.select().from(marketingUtmLinks).where(inArray(marketingUtmLinks.slug, slugs));
+}
+
 async function loadMarketingCampaignById(db, campaignId) {
   if (!Number.isFinite(Number(campaignId)) || Number(campaignId) <= 0) return null;
   const rows = await db
@@ -1739,6 +1890,30 @@ router.get("/marketing/utm-format", (req, res) => {
   res.json(buildMarketingTagSpec(baseUrl));
 });
 
+router.get("/marketing/dropsite-share-links", async (req, res) => {
+  try {
+    const db = getDb();
+    await ensureMarketingSchema().catch((error) => {
+      console.warn("Marketing schema bootstrap skipped for /marketing/dropsite-share-links:", error.message);
+    });
+    const rows = await ensureDropSiteShareMarketingLinks(db);
+    const rowsBySlug = new Map(rows.map((row) => [row.slug, row]));
+    const links = Object.fromEntries(
+      DROP_SITE_SHARE_LINK_DEFINITIONS.map((definition) => [
+        definition.key,
+        serializeDropSiteShareLink(rowsBySlug.get(definition.slug), definition)
+      ])
+    );
+    res.json({
+      links,
+      destinationUrl: getPublicSubscribeDestinationUrl()
+    });
+  } catch (error) {
+    console.error("Drop-site share links failed:", error);
+    res.status(500).json({ error: "Failed to load drop-site share links." });
+  }
+});
+
 async function handleMarketingTrack(req, res) {
   try {
     const db = getDb();
@@ -1898,10 +2073,17 @@ router.get("/marketing/go/:slug", async (req, res) => {
       return res.status(400).json({ error: "Missing link slug." });
     }
 
-    const linkRows = await db
+    let linkRows = await db
       .select()
       .from(marketingUtmLinks)
       .where(eq(marketingUtmLinks.slug, slug));
+    if (!linkRows.length && DROP_SITE_SHARE_LINKS_BY_SLUG.has(slug)) {
+      await ensureDropSiteShareMarketingLinks(db);
+      linkRows = await db
+        .select()
+        .from(marketingUtmLinks)
+        .where(eq(marketingUtmLinks.slug, slug));
+    }
     const linkRow = linkRows[0] || null;
     if (!linkRow || Number(linkRow.isActive || 0) !== 1) {
       return res.status(404).json({ error: "Tracked link not found." });

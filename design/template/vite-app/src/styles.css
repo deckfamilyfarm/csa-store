@@ -5463,6 +5463,120 @@ img {
   margin-top: 14px;
 }
 
+.dropsite-host-toolkit-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 14px;
+}
+
+.dropsite-host-toolkit-link {
+  width: fit-content;
+  margin: 0;
+  padding: 9px 14px;
+}
+
+.dropsite-share-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.dropsite-share-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(31, 27, 23, 0.14);
+  transition: transform 150ms ease, box-shadow 150ms ease, filter 150ms ease;
+}
+
+.dropsite-share-button:hover,
+.dropsite-share-button:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 26px rgba(31, 27, 23, 0.18);
+  filter: brightness(1.04);
+}
+
+.dropsite-share-button:focus-visible {
+  outline: 3px solid rgba(143, 46, 43, 0.28);
+  outline-offset: 3px;
+}
+
+.dropsite-share-button svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 1.8;
+}
+
+.dropsite-share-button-facebook {
+  background: #1877f2;
+}
+
+.dropsite-share-button-instagram {
+  background: radial-gradient(circle at 30% 105%, #feda75 0 20%, #fa7e1e 35%, #d62976 58%, #962fbf 78%, #4f5bd5 100%);
+}
+
+.dropsite-share-button-sms {
+  background: #34c759;
+}
+
+.dropsite-share-button-nextdoor {
+  background: #00a86b;
+}
+
+.dropsite-share-button-x {
+  background: #111;
+}
+
+.dropsite-share-button-link {
+  background: var(--barn);
+}
+
+.dropsite-share-modal {
+  max-width: 460px;
+}
+
+.dropsite-share-modal-backdrop {
+  z-index: 400;
+}
+
+.dropsite-share-modal-content {
+  display: grid;
+  gap: 14px;
+}
+
+.dropsite-share-modal-content h3,
+.dropsite-share-modal-content p {
+  margin: 0;
+}
+
+.dropsite-share-modal-content h3 {
+  font-family: var(--subscribe-serif);
+  font-size: 28px;
+  color: var(--navy);
+}
+
+.dropsite-share-copy-field {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.dropsite-share-modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
 .dropsites-metrics-controls {
   position: sticky;
   top: var(--dropsites-metrics-sticky-top);
@@ -5474,8 +5588,8 @@ img {
   gap: 16px;
   margin: 18px 0 0;
   padding: 12px 0;
-  background: rgba(251, 250, 246, 0.98);
-  box-shadow: 0 1px rgba(31, 27, 23, 0.08);
+  background: transparent;
+  box-shadow: none;
 }
 
 .dropsites-metrics-title-row {
