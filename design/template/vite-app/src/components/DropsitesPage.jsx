@@ -13,7 +13,7 @@ const MEDIA_KIT_URL =
 const HOST_CREDIT_INFO =
   "Host credit is the food credit hosts receive for hosting a drop site. A site qualifies by averaging 3 or more orders per active drop week OR more than 5 unique customers in the month. We count guest and member orders per drop site.";
 const SHARE_TEXT =
-  "What you eat matters.\n\nI help host a neighborhood pickup location for Full Farm, a community food network started by Deck Family Farm.\n\nFamilies can order organic produce, pasture-raised meats, eggs, dairy, and other locally produced foods from nearby farms and pick them up close to home.\n\nIt's a convenient way to eat well and support local agriculture at the same time.";
+  "What you eat matters.\n\nI help host a neighborhood pickup location for Full Farm, a community food network started by Deck Family Farm.\n\nFamilies can order organic produce, pasture-raised meats, eggs, dairy, and other locally produced foods from nearby farms and pick them up close to home.\n\nIt's a convenient way to eat well and support local agriculture at the same time.\n\nLet me know if you're interested or use the link to find out more!";
 const SHARE_TEXT_X =
   "I help host a neighborhood pickup location for Full Farm, a community food network started by Deck Family Farm. Organic produce, pasture-raised meats, eggs, dairy, and more from nearby farms, picked up close to home.";
 const SHARE_SUBSCRIBE_URL = "https://subscribe.deckfamilyfarm.com/";

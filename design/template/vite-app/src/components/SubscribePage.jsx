@@ -405,8 +405,7 @@ export function SubscribePage({
 
   useEffect(() => {
     const canonicalUrl = window.location.href.split("#")[0];
-    const title =
-      "Join Full Farm | Pasture-Raised Eggs, Meat, Raw Dairy, Pickup & Home Delivery";
+    const title = "Full Farm Subscribe Page";
     const description =
       "Join Full Farm from Deck Family Farm for pasture-raised eggs, meat, raw dairy, and nutrient-dense local food with pickup in Portland, Eugene, Salem, Corvallis, and home delivery in qualifying Oregon areas.";
     const faqEntities = allFaqs.map((faq) => ({
