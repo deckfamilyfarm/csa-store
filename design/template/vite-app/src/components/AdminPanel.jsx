@@ -893,6 +893,9 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
       if (dropSitesLoaded || activeSection === "dropSites") loaders.push(loadDropSitesData());
       if (activeSection === "localLine") loaders.push(loadLocalLineStatusData());
       await Promise.all(loaders);
+      if (selectedProductId && productEditorMode !== "new" && activeSection !== "localPricelist") {
+        await refreshSelectedProductDetail(selectedProductId);
+      }
     } catch (err) {
       setMessage("Failed to load admin data.");
     } finally {

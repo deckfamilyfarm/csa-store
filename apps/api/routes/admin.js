@@ -1477,6 +1477,103 @@ function normalizePricingUnitOfMeasure(value) {
   return String(value || "each").trim().toLowerCase() === "lbs" ? "lbs" : "each";
 }
 
+function getPricingProfileField(profile, camelKey, snakeKey) {
+  if (Object.prototype.hasOwnProperty.call(profile || {}, camelKey)) {
+    return profile[camelKey];
+  }
+  return profile?.[snakeKey];
+}
+
+function formatPackageWeight(value) {
+  const numeric = toNumber(value);
+  return numeric === null ? null : numeric.toFixed(2);
+}
+
+function buildSourceWeightPackageName(pricingProfile = {}) {
+  const unitOfMeasure = normalizePricingUnitOfMeasure(
+    getPricingProfileField(pricingProfile, "unitOfMeasure", "unit_of_measure")
+  );
+  if (unitOfMeasure !== "lbs") return null;
+
+  const minWeight = toNumber(getPricingProfileField(pricingProfile, "minWeight", "min_weight"));
+  const maxWeight = toNumber(getPricingProfileField(pricingProfile, "maxWeight", "max_weight"));
+  const avgWeightOverride = toNumber(
+    getPricingProfileField(pricingProfile, "avgWeightOverride", "avg_weight_override")
+  );
+
+  if (minWeight !== null && maxWeight !== null) {
+    if (minWeight === maxWeight) return `${formatPackageWeight(minWeight)} lbs`;
+    return `${formatPackageWeight(minWeight)} - ${formatPackageWeight(maxWeight)} lbs`;
+  }
+  if (avgWeightOverride !== null) return `${formatPackageWeight(avgWeightOverride)} lbs`;
+  if (minWeight !== null) return `${formatPackageWeight(minWeight)} lbs`;
+  if (maxWeight !== null) return `${formatPackageWeight(maxWeight)} lbs`;
+  return null;
+}
+
+const GENERATED_WEIGHT_PACKAGE_NAME_PATTERN =
+  /^\s*\d+(?:\.\d+)?(?:\s*(?:-|to)\s*\d+(?:\.\d+)?)?\s*(?:lb|lbs|pound|pounds)\s*$/i;
+
+function shouldReplaceGeneratedWeightPackageName(currentName, nextName) {
+  const current = String(currentName || "").trim();
+  const next = String(nextName || "").trim();
+  if (!next || current === next) return false;
+  return !current || GENERATED_WEIGHT_PACKAGE_NAME_PATTERN.test(current);
+}
+
+async function syncGeneratedWeightPackageNames(connection, productId, pricingProfile = {}, options = {}) {
+  if (!isSourcePricingVendor(options.vendor)) return 0;
+
+  const nextName = buildSourceWeightPackageName(pricingProfile);
+  if (!nextName) return 0;
+
+  const [packageRows] = await connection.query(
+    "SELECT id, name FROM packages WHERE product_id = ?",
+    [productId]
+  );
+  let updated = 0;
+
+  for (const packageRow of packageRows) {
+    if (!shouldReplaceGeneratedWeightPackageName(packageRow.name, nextName)) continue;
+    await connection.query(
+      "UPDATE packages SET name = ? WHERE id = ?",
+      [nextName, packageRow.id]
+    );
+    await connection.query(
+      "UPDATE local_line_price_list_entries SET package_name = ? WHERE package_id = ?",
+      [nextName, packageRow.id]
+    );
+    updated += 1;
+  }
+
+  return updated;
+}
+
+async function syncGeneratedWeightPackageNamesDb(db, productId, pricingProfile = {}, options = {}) {
+  if (!isSourcePricingVendor(options.vendor)) return 0;
+
+  const nextName = buildSourceWeightPackageName(pricingProfile);
+  if (!nextName) return 0;
+
+  const packageRows = await db.select().from(packages).where(eq(packages.productId, productId));
+  let updated = 0;
+
+  for (const packageRow of packageRows) {
+    if (!shouldReplaceGeneratedWeightPackageName(packageRow.name, nextName)) continue;
+    await db
+      .update(packages)
+      .set({ name: nextName })
+      .where(eq(packages.id, packageRow.id));
+    await db
+      .update(localLinePriceListEntries)
+      .set({ packageName: nextName })
+      .where(eq(localLinePriceListEntries.packageId, packageRow.id));
+    updated += 1;
+  }
+
+  return updated;
+}
+
 function normalizePricingProfileInput(payload = {}) {
   return {
     unitOfMeasure:
@@ -1585,6 +1682,7 @@ async function upsertProductPricingProfileRecord(connection, productId, payload 
         productId
       ]
     );
+    await syncGeneratedWeightPackageNames(connection, productId, record, options);
     return;
   }
 
@@ -1614,6 +1712,7 @@ async function upsertProductPricingProfileRecord(connection, productId, payload 
       now
     ]
   );
+  await syncGeneratedWeightPackageNames(connection, productId, record, options);
 }
 
 async function markProductRemoteSyncPending(connection, productId, message) {
@@ -3812,7 +3911,7 @@ router.get("/localline/products/:id", requireAdmin, async (req, res) => {
   });
 
   try {
-    const [productMetaRows, packageMetaRows, priceListEntryRows, syncIssueRows, mediaRows] =
+    const [productMetaRows, packageMetaRows, priceListEntryRows, syncIssueRows, mediaRows, localPackageRows] =
       await Promise.all([
         db.select().from(localLineProductMeta).where(eq(localLineProductMeta.productId, productId)),
         db
@@ -3827,8 +3926,12 @@ router.get("/localline/products/:id", requireAdmin, async (req, res) => {
           .select()
           .from(localLineSyncIssues)
           .where(eq(localLineSyncIssues.productId, productId)),
-        db.select().from(productMedia).where(eq(productMedia.productId, productId))
+        db.select().from(productMedia).where(eq(productMedia.productId, productId)),
+        db.select().from(packages).where(eq(packages.productId, productId))
       ]);
+    const localPackageNameById = new Map(
+      localPackageRows.map((row) => [Number(row.id), row.name]).filter(([id, name]) => Number.isFinite(id) && name)
+    );
 
     res.json({
       productId,
@@ -3840,7 +3943,11 @@ router.get("/localline/products/:id", requireAdmin, async (req, res) => {
           const priceListDelta = Number(left.priceListId || 0) - Number(right.priceListId || 0);
           if (priceListDelta !== 0) return priceListDelta;
           return Number(left.packageId || 0) - Number(right.packageId || 0);
-        }),
+        })
+        .map((entry) => ({
+          ...entry,
+          packageName: localPackageNameById.get(Number(entry.packageId)) || entry.packageName
+        })),
       syncIssues: syncIssueRows
         .slice()
         .sort((left, right) => new Date(right.createdAt || 0) - new Date(left.createdAt || 0)),
@@ -4682,6 +4789,8 @@ router.post("/pricelist/bulk-save", requireAdminPermission("pricing_admin"), asy
       });
     }
 
+    await syncGeneratedWeightPackageNamesDb(db, productId, payload, { vendor });
+
     savedProductIds.push(productId);
   }
 
@@ -4769,6 +4878,10 @@ router.post("/pricelist/apply-remote", requireAdminPermission("localline_push"),
         continue;
       }
 
+      const packageNameUpdates = await syncGeneratedWeightPackageNamesDb(db, productId, snapshot.profile, {
+        vendor: vendorRows[0] || null
+      });
+
       for (const packageRow of pricedPackages) {
         await db
           .update(packages)
@@ -4851,6 +4964,7 @@ router.post("/pricelist/apply-remote", requireAdminPermission("localline_push"),
         productId,
         ok: !remoteFailed,
         packageUpdates: pricedPackages.length,
+        packageNameUpdates,
         remoteInventoryUpdate: remoteResult.inventoryOk,
         remotePriceUpdate: remoteResult.priceOk,
         message: remoteFailed
