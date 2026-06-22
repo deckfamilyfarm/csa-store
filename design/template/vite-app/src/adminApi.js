@@ -63,6 +63,32 @@ export async function adminGet(path, token) {
   return fetchJsonGet(`${base}/admin/${path}`, token, "Admin request failed");
 }
 
+function filenameFromContentDisposition(disposition = "") {
+  const encodedMatch = disposition.match(/filename\*=UTF-8''([^;]+)/i);
+  if (encodedMatch?.[1]) {
+    try {
+      return decodeURIComponent(encodedMatch[1].replace(/^"|"$/g, ""));
+    } catch (_error) {
+      return encodedMatch[1].replace(/^"|"$/g, "");
+    }
+  }
+
+  const match = disposition.match(/filename="?([^";]+)"?/i);
+  return match?.[1] || "";
+}
+
+export async function adminDownload(path, token) {
+  const response = await fetch(`${base}/admin/${path}`, {
+    cache: "no-store",
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined
+  });
+  if (!response.ok) await throwForError(response, "Admin download failed");
+  return {
+    blob: await response.blob(),
+    filename: filenameFromContentDisposition(response.headers.get("Content-Disposition") || "")
+  };
+}
+
 export async function adminPut(path, token, body) {
   const response = await fetch(`${base}/admin/${path}`, {
     method: "PUT",

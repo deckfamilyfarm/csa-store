@@ -361,6 +361,106 @@ function normalizeSubscribeLeadStatus(value) {
   return "in_progress";
 }
 
+function serializeSubscribeLead(row = {}) {
+  return {
+    ...row,
+    status: normalizeSubscribeLeadStatus(row.status)
+  };
+}
+
+function sortSubscribeLeadRows(rows = []) {
+  return rows.slice().sort((left, right) => {
+    const leftTime = toTimestamp(left.submittedAt || left.createdAt);
+    const rightTime = toTimestamp(right.submittedAt || right.createdAt);
+    return rightTime - leftTime || Number(right.id || 0) - Number(left.id || 0);
+  });
+}
+
+function formatCsvDateTime(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
+  return date.toISOString();
+}
+
+function formatCsvBoolean(value) {
+  return Number(value || 0) ? "Yes" : "No";
+}
+
+function formatCsvCell(value) {
+  const raw = value instanceof Date
+    ? value.toISOString()
+    : value === null || typeof value === "undefined"
+      ? ""
+      : String(value);
+  const safe = /^[=+\-@\t\r]/.test(raw) ? `'${raw}` : raw;
+  return `"${safe.replace(/"/g, '""')}"`;
+}
+
+const SUBSCRIPTION_LEAD_EXPORT_COLUMNS = [
+  { label: "Lead ID", value: (row) => row.id },
+  { label: "Submitted At", value: (row) => formatCsvDateTime(row.submittedAt || row.createdAt) },
+  { label: "Status", value: (row) => normalizeSubscribeLeadStatus(row.status) },
+  { label: "First Name", value: (row) => row.firstName },
+  { label: "Last Name", value: (row) => row.lastName },
+  { label: "Email", value: (row) => row.email },
+  { label: "Phone", value: (row) => row.phone },
+  { label: "Country", value: (row) => row.country },
+  { label: "Address Line 1", value: (row) => row.addressLine1 },
+  { label: "Address Line 2", value: (row) => row.addressLine2 },
+  { label: "City", value: (row) => row.city },
+  { label: "State / Province", value: (row) => row.stateProvince },
+  { label: "Postal Code", value: (row) => row.postalCode },
+  { label: "Plan", value: (row) => row.selectedPlanLabel || row.selectedPlan },
+  { label: "Plan Key", value: (row) => row.selectedPlan },
+  { label: "Drop Site", value: (row) => row.selectedDropSite },
+  { label: "Has SNAP/EBT Card", value: (row) => formatCsvBoolean(row.hasCurrentSnapEbtCard) },
+  { label: "Farm Employee", value: (row) => formatCsvBoolean(row.isFarmEmployee) },
+  { label: "Closest Drop Site", value: (row) => row.closestDropSite },
+  {
+    label: "Closest Drop Site Distance Miles",
+    value: (row) => row.closestDropSiteDistanceMiles
+  },
+  {
+    label: "Inside Home Delivery Area",
+    value: (row) => formatCsvBoolean(row.insideHomeDeliveryArea)
+  },
+  { label: "Validated Address", value: (row) => row.geocodedDisplayName },
+  { label: "Latitude", value: (row) => row.geocodedLatitude },
+  { label: "Longitude", value: (row) => row.geocodedLongitude },
+  { label: "Referral Source", value: (row) => row.referralSource },
+  { label: "UTM Source", value: (row) => row.utmSource },
+  { label: "UTM Medium", value: (row) => row.utmMedium },
+  { label: "UTM Campaign", value: (row) => row.utmCampaign },
+  { label: "UTM Content", value: (row) => row.utmContent },
+  { label: "UTM Term", value: (row) => row.utmTerm },
+  { label: "Source Host", value: (row) => row.sourceHost },
+  { label: "Source Path", value: (row) => row.sourcePath },
+  {
+    label: "Agreement Accepted",
+    value: (row) => formatCsvBoolean(row.liabilityAgreementAccepted)
+  },
+  {
+    label: "Agreement Signed At",
+    value: (row) => formatCsvDateTime(row.liabilityAgreementSignedAt)
+  },
+  { label: "Agreement Signer Name", value: (row) => row.liabilityAgreementSignerName },
+  { label: "Agreement Document URL", value: (row) => row.liabilityAgreementDocumentUrl },
+  { label: "Agreement Record URL", value: (row) => row.liabilityAgreementRecordUrl },
+  { label: "Lead Notes", value: (row) => row.notes },
+  { label: "Admin Notes", value: (row) => row.adminNotes },
+  { label: "Created At", value: (row) => formatCsvDateTime(row.createdAt) },
+  { label: "Updated At", value: (row) => formatCsvDateTime(row.updatedAt) }
+];
+
+function buildSubscriptionLeadsCsv(rows = []) {
+  const header = SUBSCRIPTION_LEAD_EXPORT_COLUMNS.map((column) => formatCsvCell(column.label));
+  const dataRows = rows.map((row) =>
+    SUBSCRIPTION_LEAD_EXPORT_COLUMNS.map((column) => formatCsvCell(column.value(row))).join(",")
+  );
+  return [header.join(","), ...dataRows].join("\r\n") + "\r\n";
+}
+
 function slugifyMarketingValue(value, fallback = "campaign") {
   const normalized = String(value || "")
     .trim()
@@ -2258,21 +2358,38 @@ router.get(
         .from(subscribeLeads)
         .orderBy(subscribeLeads.submittedAt, subscribeLeads.createdAt);
       res.json({
-        leads: rows
-          .slice()
-          .sort((left, right) => {
-            const leftTime = toTimestamp(left.submittedAt || left.createdAt);
-            const rightTime = toTimestamp(right.submittedAt || right.createdAt);
-            return rightTime - leftTime || Number(right.id || 0) - Number(left.id || 0);
-          })
-          .map((row) => ({
-            ...row,
-            status: normalizeSubscribeLeadStatus(row.status)
-          }))
+        leads: sortSubscribeLeadRows(rows).map(serializeSubscribeLead)
       });
     } catch (error) {
       console.error("Subscription leads fetch failed:", error);
       res.status(500).json({ error: "Failed to load subscription leads." });
+    }
+  }
+);
+
+router.get(
+  "/subscription-leads/export",
+  requireAdminPermission(["membership_admin", "member_admin"]),
+  async (_req, res) => {
+    try {
+      await ensureSubscriberCaptureSchema();
+      const rows = await getDb()
+        .select()
+        .from(subscribeLeads)
+        .orderBy(subscribeLeads.submittedAt, subscribeLeads.createdAt);
+      const csv = buildSubscriptionLeadsCsv(
+        sortSubscribeLeadRows(rows).map(serializeSubscribeLead)
+      );
+      const today = new Date().toISOString().slice(0, 10);
+      res.setHeader("Content-Type", "text/csv; charset=utf-8");
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="subscription-leads-${today}.csv"`
+      );
+      res.send(csv);
+    } catch (error) {
+      console.error("Subscription leads export failed:", error);
+      res.status(500).json({ error: "Failed to export subscription leads." });
     }
   }
 );

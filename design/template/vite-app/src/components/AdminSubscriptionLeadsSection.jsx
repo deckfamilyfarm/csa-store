@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { adminGet, adminPost, adminPut } from "../adminApi.js";
+import { adminDownload, adminGet, adminPost, adminPut } from "../adminApi.js";
 
 const STATUS_OPTIONS = [
   { value: "in_progress", label: "In progress" },
@@ -105,6 +105,7 @@ export function AdminSubscriptionLeadsSection({ token }) {
   const [modalLeadId, setModalLeadId] = useState(null);
   const [drafts, setDrafts] = useState({});
   const [savingLeadId, setSavingLeadId] = useState(null);
+  const [exportingLeads, setExportingLeads] = useState(false);
   const [editingNotesLeadId, setEditingNotesLeadId] = useState(null);
   const [opsBusy, setOpsBusy] = useState("");
   const [opsResult, setOpsResult] = useState(null);
@@ -123,10 +124,10 @@ export function AdminSubscriptionLeadsSection({ token }) {
       const response = await adminGet("subscription-leads", token);
       const nextLeads = response.leads || [];
       setLeads(nextLeads);
-      setDrafts((current) => {
+      setDrafts(() => {
         const nextDrafts = {};
         nextLeads.forEach((lead) => {
-          nextDrafts[lead.id] = current[lead.id] || createLeadDraft(lead);
+          nextDrafts[lead.id] = createLeadDraft(lead);
         });
         return nextDrafts;
       });
@@ -184,9 +185,13 @@ export function AdminSubscriptionLeadsSection({ token }) {
     }));
   }
 
-  async function handleSaveLead(leadId) {
+  async function handleSaveLead(
+    leadId,
+    overrideDraft = null,
+    successMessage = "Subscription lead updated."
+  ) {
     const lead = leads.find((entry) => entry.id === leadId);
-    const draft = drafts[leadId] || createLeadDraft(lead);
+    const draft = overrideDraft || drafts[leadId] || createLeadDraft(lead);
     if (!lead || !draft) return;
     setSavingLeadId(leadId);
     setError("");
@@ -203,11 +208,44 @@ export function AdminSubscriptionLeadsSection({ token }) {
           [updatedLead.id]: createLeadDraft(updatedLead)
         }));
       }
-      setMessage("Subscription lead updated.");
+      setMessage(successMessage);
     } catch (saveError) {
       setError(saveError?.message || "Failed to update subscription lead.");
     } finally {
       setSavingLeadId(null);
+    }
+  }
+
+  async function handleStatusChange(leadId, status) {
+    const lead = leads.find((entry) => entry.id === leadId);
+    if (!lead) return;
+    const nextDraft = {
+      ...(drafts[leadId] || createLeadDraft(lead)),
+      status
+    };
+    updateDraft(leadId, { status });
+    await handleSaveLead(leadId, nextDraft, "Subscription lead status saved.");
+  }
+
+  async function handleExportLeads() {
+    setExportingLeads(true);
+    setError("");
+    setMessage("");
+    try {
+      const { blob, filename } = await adminDownload("subscription-leads/export", token);
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename || "subscription-leads.csv";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      setMessage("Subscription leads export downloaded.");
+    } catch (exportError) {
+      setError(exportError?.message || "Failed to export subscription leads.");
+    } finally {
+      setExportingLeads(false);
     }
   }
 
@@ -414,6 +452,19 @@ export function AdminSubscriptionLeadsSection({ token }) {
         <div className="small">No subscription leads submitted yet.</div>
       ) : (
         <>
+          <div className="button-row" style={{ marginBottom: 12 }}>
+            <button
+              className="button alt"
+              type="button"
+              onClick={handleExportLeads}
+              disabled={exportingLeads}
+            >
+              {exportingLeads ? "Exporting..." : "Export CSV"}
+            </button>
+            <button className="button alt" type="button" onClick={loadLeads} disabled={loading}>
+              Refresh
+            </button>
+          </div>
           <table className="admin-table subscription-leads-table">
             <thead>
               <tr>
@@ -487,9 +538,8 @@ export function AdminSubscriptionLeadsSection({ token }) {
                       <select
                         className="input"
                         value={draft.status || "in_progress"}
-                        onChange={(event) =>
-                          updateDraft(lead.id, { status: event.target.value })
-                        }
+                        disabled={savingLeadId === lead.id}
+                        onChange={(event) => handleStatusChange(lead.id, event.target.value)}
                       >
                         {STATUS_OPTIONS.map((option) => (
                           <option key={option.value} value={option.value}>
@@ -562,11 +612,6 @@ export function AdminSubscriptionLeadsSection({ token }) {
               })}
             </tbody>
           </table>
-          <div className="button-row" style={{ marginTop: 16 }}>
-            <button className="button alt" type="button" onClick={loadLeads} disabled={loading}>
-              Refresh
-            </button>
-          </div>
         </>
       )}
       {modalLead ? (
