@@ -18,6 +18,9 @@ const DELIVERY_MAP_URL =
   "https://berkeleymapper.berkeley.edu/index.html?tabfile=https://raw.githubusercontent.com/jdeck88/ffcsa_scripts/refs/heads/main/localline/data/delivery_data.tsv&configfile=https://raw.githubusercontent.com/jdeck88/ffcsa_scripts/refs/heads/main/dropsite_maps/dropsites2.xml&pointDisplay=markers&hideLegendItems=true";
 const LIABILITY_AGREEMENT_URL =
   "https://docs.google.com/document/d/1VFMc4euofQ1S1kjtd6jZI46uxo6YKft9cufT6Q3-nrc/edit?tab=t.0";
+const META_PIXEL_ID = "645309732709210";
+const META_PIXEL_SCRIPT_ID = "meta-pixel-code";
+const META_PIXEL_NOSCRIPT_ID = "meta-pixel-noscript";
 
 const SUBSCRIBE_PLANS = [
   {
@@ -215,6 +218,46 @@ function applyJsonLd(id, payload) {
     document.head.appendChild(element);
   }
   element.textContent = JSON.stringify(payload);
+}
+
+function ensureMetaPixelBaseCode() {
+  if (typeof document === "undefined") return;
+  if (!document.getElementById(META_PIXEL_SCRIPT_ID)) {
+    const script = document.createElement("script");
+    script.id = META_PIXEL_SCRIPT_ID;
+    script.textContent = `
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '${META_PIXEL_ID}');
+`;
+    document.head.appendChild(script);
+  }
+
+  if (!document.getElementById(META_PIXEL_NOSCRIPT_ID)) {
+    const noscript = document.createElement("noscript");
+    noscript.id = META_PIXEL_NOSCRIPT_ID;
+    noscript.innerHTML = `<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1" />`;
+    document.head.appendChild(noscript);
+  }
+}
+
+function trackMetaPixelPageView() {
+  if (typeof window === "undefined") return;
+  ensureMetaPixelBaseCode();
+  if (typeof window.fbq !== "function") return;
+  const trackedPageViews =
+    window.__csaMetaPixelTrackedPageViews ||
+    (window.__csaMetaPixelTrackedPageViews = new Set());
+  const pageViewKey = window.location.href;
+  if (trackedPageViews.has(pageViewKey)) return;
+  window.fbq("track", "PageView");
+  trackedPageViews.add(pageViewKey);
 }
 
 function storeUrlFallback() {
@@ -488,6 +531,7 @@ export function SubscribePage({
     applyJsonLd("subscribe-organization-schema", organizationSchema);
     applyJsonLd("subscribe-service-schema", serviceSchema);
     applyJsonLd("subscribe-faq-schema", faqSchema);
+    trackMetaPixelPageView();
   }, [allFaqs]);
 
   function updateField(key, value) {
