@@ -3,7 +3,8 @@ import { adminDownload, adminGet, adminPost, adminPut } from "../adminApi.js";
 
 const STATUS_OPTIONS = [
   { value: "in_progress", label: "In progress" },
-  { value: "won", label: "Won" }
+  { value: "won", label: "Won" },
+  { value: "inactive", label: "Inactive" }
 ];
 
 function formatDateTime(value) {
@@ -101,6 +102,7 @@ export function AdminSubscriptionLeadsSection({ token }) {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [leads, setLeads] = useState([]);
+  const [showInactive, setShowInactive] = useState(false);
   const [selectedLeadId, setSelectedLeadId] = useState(null);
   const [modalLeadId, setModalLeadId] = useState(null);
   const [drafts, setDrafts] = useState({});
@@ -121,7 +123,10 @@ export function AdminSubscriptionLeadsSection({ token }) {
     setLoading(true);
     setError("");
     try {
-      const response = await adminGet("subscription-leads", token);
+      const path = showInactive
+        ? "subscription-leads?includeInactive=1"
+        : "subscription-leads";
+      const response = await adminGet(path, token);
       const nextLeads = response.leads || [];
       setLeads(nextLeads);
       setDrafts(() => {
@@ -144,7 +149,7 @@ export function AdminSubscriptionLeadsSection({ token }) {
 
   useEffect(() => {
     loadLeads();
-  }, [token]);
+  }, [token, showInactive]);
 
   async function loadCreditStatus() {
     setCreditStatusLoading(true);
@@ -174,6 +179,10 @@ export function AdminSubscriptionLeadsSection({ token }) {
   const modalLead = useMemo(
     () => leads.find((lead) => lead.id === modalLeadId) || null,
     [leads, modalLeadId]
+  );
+  const visibleLeads = useMemo(
+    () => (showInactive ? leads : leads.filter((lead) => lead.status !== "inactive")),
+    [leads, showInactive]
   );
   function updateDraft(leadId, updates) {
     setDrafts((current) => ({
@@ -446,25 +455,37 @@ export function AdminSubscriptionLeadsSection({ token }) {
       </div>
       {message ? <div className="small">{message}</div> : null}
       {error ? <div className="small">{error}</div> : null}
+      <div className="button-row" style={{ marginBottom: 12 }}>
+        <label className="small" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <input
+            type="checkbox"
+            checked={showInactive}
+            onChange={(event) => setShowInactive(event.target.checked)}
+          />
+          Show inactive
+        </label>
+        <button
+          className="button alt"
+          type="button"
+          onClick={handleExportLeads}
+          disabled={exportingLeads}
+        >
+          {exportingLeads ? "Exporting..." : "Export CSV"}
+        </button>
+        <button className="button alt" type="button" onClick={loadLeads} disabled={loading}>
+          Refresh
+        </button>
+      </div>
       {loading ? (
         <div className="small">Loading subscription leads...</div>
-      ) : !leads.length ? (
-        <div className="small">No subscription leads submitted yet.</div>
+      ) : !visibleLeads.length ? (
+        <div className="small">
+          {showInactive
+            ? "No subscription leads submitted yet."
+            : "No active subscription leads shown."}
+        </div>
       ) : (
         <>
-          <div className="button-row" style={{ marginBottom: 12 }}>
-            <button
-              className="button alt"
-              type="button"
-              onClick={handleExportLeads}
-              disabled={exportingLeads}
-            >
-              {exportingLeads ? "Exporting..." : "Export CSV"}
-            </button>
-            <button className="button alt" type="button" onClick={loadLeads} disabled={loading}>
-              Refresh
-            </button>
-          </div>
           <table className="admin-table subscription-leads-table">
             <thead>
               <tr>
@@ -481,7 +502,7 @@ export function AdminSubscriptionLeadsSection({ token }) {
               </tr>
             </thead>
             <tbody>
-              {leads.map((lead) => {
+              {visibleLeads.map((lead) => {
                 const draft = drafts[lead.id] || createLeadDraft(lead);
                 const dirty = draftChanged(lead, draft);
                 return (

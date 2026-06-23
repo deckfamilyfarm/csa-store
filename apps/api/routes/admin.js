@@ -358,7 +358,12 @@ function normalizeSubscribeLeadStatus(value) {
     .toLowerCase()
     .replace(/[\s-]+/g, "_");
   if (normalized === "won") return "won";
+  if (normalized === "inactive") return "inactive";
   return "in_progress";
+}
+
+function isTruthyQueryValue(value) {
+  return ["1", "true", "yes", "on"].includes(String(value || "").trim().toLowerCase());
 }
 
 function serializeSubscribeLead(row = {}) {
@@ -366,6 +371,11 @@ function serializeSubscribeLead(row = {}) {
     ...row,
     status: normalizeSubscribeLeadStatus(row.status)
   };
+}
+
+function filterSubscribeLeadRows(rows = [], { includeInactive = false } = {}) {
+  if (includeInactive) return rows;
+  return rows.filter((row) => normalizeSubscribeLeadStatus(row.status) !== "inactive");
 }
 
 function sortSubscribeLeadRows(rows = []) {
@@ -2350,15 +2360,18 @@ router.post("/admin-users/timesheets-sync", requireAdminPermission("user_admin")
 router.get(
   "/subscription-leads",
   requireAdminPermission(["membership_admin", "member_admin"]),
-  async (_req, res) => {
+  async (req, res) => {
     try {
       await ensureSubscriberCaptureSchema();
+      const includeInactive = isTruthyQueryValue(req.query?.includeInactive);
       const rows = await getDb()
         .select()
         .from(subscribeLeads)
         .orderBy(subscribeLeads.submittedAt, subscribeLeads.createdAt);
       res.json({
-        leads: sortSubscribeLeadRows(rows).map(serializeSubscribeLead)
+        leads: filterSubscribeLeadRows(sortSubscribeLeadRows(rows), { includeInactive }).map(
+          serializeSubscribeLead
+        )
       });
     } catch (error) {
       console.error("Subscription leads fetch failed:", error);
@@ -2378,7 +2391,7 @@ router.get(
         .from(subscribeLeads)
         .orderBy(subscribeLeads.submittedAt, subscribeLeads.createdAt);
       const csv = buildSubscriptionLeadsCsv(
-        sortSubscribeLeadRows(rows).map(serializeSubscribeLead)
+        filterSubscribeLeadRows(sortSubscribeLeadRows(rows)).map(serializeSubscribeLead)
       );
       const today = new Date().toISOString().slice(0, 10);
       res.setHeader("Content-Type", "text/csv; charset=utf-8");
