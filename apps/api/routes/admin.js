@@ -386,17 +386,6 @@ function sortSubscribeLeadRows(rows = []) {
   });
 }
 
-function formatCsvDateTime(value) {
-  if (!value) return "";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return String(value);
-  return date.toISOString();
-}
-
-function formatCsvBoolean(value) {
-  return Number(value || 0) ? "Yes" : "No";
-}
-
 function formatCsvCell(value) {
   const raw = value instanceof Date
     ? value.toISOString()
@@ -407,66 +396,87 @@ function formatCsvCell(value) {
   return `"${safe.replace(/"/g, '""')}"`;
 }
 
-const SUBSCRIPTION_LEAD_EXPORT_COLUMNS = [
-  { label: "Lead ID", value: (row) => row.id },
-  { label: "Submitted At", value: (row) => formatCsvDateTime(row.submittedAt || row.createdAt) },
-  { label: "Status", value: (row) => normalizeSubscribeLeadStatus(row.status) },
+function normalizeContactLabel(value) {
+  return String(value || "").trim();
+}
+
+function normalizeDropSiteLookupKey(value) {
+  return normalizeContactLabel(value).toLowerCase().replace(/\s+/g, " ");
+}
+
+function buildDropSiteDayLookup(rows = []) {
+  return new Map(
+    rows
+      .map((row) => [
+        normalizeDropSiteLookupKey(row.name),
+        normalizeContactLabel(row.dayOfWeek || "")
+      ])
+      .filter(([name]) => name)
+  );
+}
+
+function buildStreetAddress(row = {}) {
+  return [row.addressLine1, row.addressLine2]
+    .map(normalizeContactLabel)
+    .filter(Boolean)
+    .join(", ");
+}
+
+function normalizeCountryForWix(value) {
+  const country = normalizeContactLabel(value);
+  const normalized = country.toLowerCase().replace(/\./g, "");
+  if (
+    !country ||
+    normalized === "us" ||
+    normalized === "usa" ||
+    normalized === "united states of america"
+  ) {
+    return "United States";
+  }
+  return country;
+}
+
+function inferDropCycleLabel(row = {}, dropSiteDayLookup = new Map()) {
+  const selectedDropSite = normalizeContactLabel(row.selectedDropSite);
+  const siteDay = dropSiteDayLookup.get(normalizeDropSiteLookupKey(selectedDropSite)) || "";
+  const haystack = `${siteDay} ${selectedDropSite}`.toLowerCase();
+  if (/\b(tue|tues|tuesday)\b/.test(haystack)) return "Tuesday Drop List";
+  if (/\b(fri|friday|sat|saturday)\b/.test(haystack)) return "Saturday Drop List";
+  return "";
+}
+
+function buildWixLabels(row = {}, dropSiteDayLookup = new Map()) {
+  const labels = ["All Contacts 2"];
+  const dropCycleLabel = inferDropCycleLabel(row, dropSiteDayLookup);
+  if (dropCycleLabel) {
+    labels.push(dropCycleLabel);
+  } else {
+    const customDropSiteLabel = normalizeContactLabel(row.selectedDropSite);
+    if (customDropSiteLabel) labels.push(customDropSiteLabel);
+  }
+  return [...new Set(labels)].join(";");
+}
+
+const WIX_SUBSCRIPTION_LEAD_EXPORT_COLUMNS = [
   { label: "First Name", value: (row) => row.firstName },
   { label: "Last Name", value: (row) => row.lastName },
   { label: "Email", value: (row) => row.email },
   { label: "Phone", value: (row) => row.phone },
-  { label: "Country", value: (row) => row.country },
-  { label: "Address Line 1", value: (row) => row.addressLine1 },
-  { label: "Address Line 2", value: (row) => row.addressLine2 },
+  { label: "Address", value: (row) => buildStreetAddress(row) },
   { label: "City", value: (row) => row.city },
-  { label: "State / Province", value: (row) => row.stateProvince },
-  { label: "Postal Code", value: (row) => row.postalCode },
-  { label: "Plan", value: (row) => row.selectedPlanLabel || row.selectedPlan },
-  { label: "Plan Key", value: (row) => row.selectedPlan },
-  { label: "Drop Site", value: (row) => row.selectedDropSite },
-  { label: "Has SNAP/EBT Card", value: (row) => formatCsvBoolean(row.hasCurrentSnapEbtCard) },
-  { label: "Farm Employee", value: (row) => formatCsvBoolean(row.isFarmEmployee) },
-  { label: "Closest Drop Site", value: (row) => row.closestDropSite },
-  {
-    label: "Closest Drop Site Distance Miles",
-    value: (row) => row.closestDropSiteDistanceMiles
-  },
-  {
-    label: "Inside Home Delivery Area",
-    value: (row) => formatCsvBoolean(row.insideHomeDeliveryArea)
-  },
-  { label: "Validated Address", value: (row) => row.geocodedDisplayName },
-  { label: "Latitude", value: (row) => row.geocodedLatitude },
-  { label: "Longitude", value: (row) => row.geocodedLongitude },
-  { label: "Referral Source", value: (row) => row.referralSource },
-  { label: "UTM Source", value: (row) => row.utmSource },
-  { label: "UTM Medium", value: (row) => row.utmMedium },
-  { label: "UTM Campaign", value: (row) => row.utmCampaign },
-  { label: "UTM Content", value: (row) => row.utmContent },
-  { label: "UTM Term", value: (row) => row.utmTerm },
-  { label: "Source Host", value: (row) => row.sourceHost },
-  { label: "Source Path", value: (row) => row.sourcePath },
-  {
-    label: "Agreement Accepted",
-    value: (row) => formatCsvBoolean(row.liabilityAgreementAccepted)
-  },
-  {
-    label: "Agreement Signed At",
-    value: (row) => formatCsvDateTime(row.liabilityAgreementSignedAt)
-  },
-  { label: "Agreement Signer Name", value: (row) => row.liabilityAgreementSignerName },
-  { label: "Agreement Document URL", value: (row) => row.liabilityAgreementDocumentUrl },
-  { label: "Agreement Record URL", value: (row) => row.liabilityAgreementRecordUrl },
-  { label: "Lead Notes", value: (row) => row.notes },
-  { label: "Admin Notes", value: (row) => row.adminNotes },
-  { label: "Created At", value: (row) => formatCsvDateTime(row.createdAt) },
-  { label: "Updated At", value: (row) => formatCsvDateTime(row.updatedAt) }
+  { label: "Country", value: (row) => normalizeCountryForWix(row.country) },
+  { label: "Company", value: () => "" },
+  { label: "custom field 1", value: (row) => row.selectedPlanLabel || row.selectedPlan },
+  { label: "custom field 2", value: (row) => row.selectedDropSite },
+  { label: "Labels", value: (row, context) => buildWixLabels(row, context.dropSiteDayLookup) }
 ];
 
-function buildSubscriptionLeadsCsv(rows = []) {
-  const header = SUBSCRIPTION_LEAD_EXPORT_COLUMNS.map((column) => formatCsvCell(column.label));
+function buildSubscriptionLeadsCsv(rows = [], context = {}) {
+  const header = WIX_SUBSCRIPTION_LEAD_EXPORT_COLUMNS.map((column) => formatCsvCell(column.label));
   const dataRows = rows.map((row) =>
-    SUBSCRIPTION_LEAD_EXPORT_COLUMNS.map((column) => formatCsvCell(column.value(row))).join(",")
+    WIX_SUBSCRIPTION_LEAD_EXPORT_COLUMNS.map((column) =>
+      formatCsvCell(column.value(row, context))
+    ).join(",")
   );
   return [header.join(","), ...dataRows].join("\r\n") + "\r\n";
 }
@@ -2386,18 +2396,26 @@ router.get(
   async (_req, res) => {
     try {
       await ensureSubscriberCaptureSchema();
-      const rows = await getDb()
+      const db = getDb();
+      const rows = await db
         .select()
         .from(subscribeLeads)
         .orderBy(subscribeLeads.submittedAt, subscribeLeads.createdAt);
+      let dropSiteRows = [];
+      try {
+        dropSiteRows = await db.select().from(dropSites);
+      } catch (error) {
+        if (!isMissingTableError(error, "drop_sites")) throw error;
+      }
       const csv = buildSubscriptionLeadsCsv(
-        filterSubscribeLeadRows(sortSubscribeLeadRows(rows)).map(serializeSubscribeLead)
+        filterSubscribeLeadRows(sortSubscribeLeadRows(rows)).map(serializeSubscribeLead),
+        { dropSiteDayLookup: buildDropSiteDayLookup(dropSiteRows) }
       );
       const today = new Date().toISOString().slice(0, 10);
       res.setHeader("Content-Type", "text/csv; charset=utf-8");
       res.setHeader(
         "Content-Disposition",
-        `attachment; filename="subscription-leads-${today}.csv"`
+        `attachment; filename="wix-subscription-leads-${today}.csv"`
       );
       res.send(csv);
     } catch (error) {
