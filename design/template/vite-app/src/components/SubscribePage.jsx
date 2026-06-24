@@ -684,6 +684,11 @@ export function SubscribePage({
               <p className="subscribe-lede subscribe-welcome-line">
                 {copy("hero", "welcomeLine", "We are happy you're here.")}
               </p>
+              <div className="subscribe-member-shop-cta">
+                <a className="button subscribe-member-shop-button" href={subscriptionStoreUrl()}>
+                  Already a member? Shop here
+                </a>
+              </div>
               <figure className="subscribe-hero-image-card">
                 <img
                   src="/images/subscribe-products.jpg"

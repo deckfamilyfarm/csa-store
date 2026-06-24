@@ -551,6 +551,23 @@ img {
   margin-bottom: 18px;
 }
 
+.subscribe-member-shop-cta {
+  margin: 0 0 24px;
+}
+
+.subscribe-member-shop-button {
+  background: #fff;
+  color: var(--barn);
+  border-color: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 12px 28px rgba(31, 27, 23, 0.16);
+}
+
+.subscribe-member-shop-button:hover {
+  background: var(--barn);
+  color: #fff;
+  border-color: var(--barn);
+}
+
 .subscribe-hero-notes {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
