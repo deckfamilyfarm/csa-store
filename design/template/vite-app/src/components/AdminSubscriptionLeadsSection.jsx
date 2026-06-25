@@ -97,18 +97,9 @@ function LeadFlags({ lead = {} }) {
   return <span className="subscription-leads-cell-text">{flags.join(", ")}</span>;
 }
 
-export function AdminSubscriptionLeadsSection({ token }) {
-  const [loading, setLoading] = useState(true);
+export function AdminMemberCreditsSection({ token }) {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
-  const [leads, setLeads] = useState([]);
-  const [showInactive, setShowInactive] = useState(false);
-  const [selectedLeadId, setSelectedLeadId] = useState(null);
-  const [modalLeadId, setModalLeadId] = useState(null);
-  const [drafts, setDrafts] = useState({});
-  const [savingLeadId, setSavingLeadId] = useState(null);
-  const [exportingLeads, setExportingLeads] = useState(false);
-  const [editingNotesLeadId, setEditingNotesLeadId] = useState(null);
   const [opsBusy, setOpsBusy] = useState("");
   const [opsResult, setOpsResult] = useState(null);
   const [creditStatusLoading, setCreditStatusLoading] = useState(true);
@@ -118,38 +109,6 @@ export function AdminSubscriptionLeadsSection({ token }) {
     includeRemote: true,
     localLineAuthConfigured: false
   });
-
-  async function loadLeads() {
-    setLoading(true);
-    setError("");
-    try {
-      const path = showInactive
-        ? "subscription-leads?includeInactive=1"
-        : "subscription-leads";
-      const response = await adminGet(path, token);
-      const nextLeads = response.leads || [];
-      setLeads(nextLeads);
-      setDrafts(() => {
-        const nextDrafts = {};
-        nextLeads.forEach((lead) => {
-          nextDrafts[lead.id] = createLeadDraft(lead);
-        });
-        return nextDrafts;
-      });
-      setSelectedLeadId((current) => {
-        if (current && nextLeads.some((lead) => lead.id === current)) return current;
-        return nextLeads[0]?.id || null;
-      });
-    } catch (loadError) {
-      setError(loadError?.message || "Failed to load subscription leads.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    loadLeads();
-  }, [token, showInactive]);
 
   async function loadCreditStatus() {
     setCreditStatusLoading(true);
@@ -171,92 +130,6 @@ export function AdminSubscriptionLeadsSection({ token }) {
   useEffect(() => {
     loadCreditStatus();
   }, [token]);
-
-  const selectedLead = useMemo(
-    () => leads.find((lead) => lead.id === selectedLeadId) || null,
-    [leads, selectedLeadId]
-  );
-  const modalLead = useMemo(
-    () => leads.find((lead) => lead.id === modalLeadId) || null,
-    [leads, modalLeadId]
-  );
-  const visibleLeads = useMemo(
-    () => (showInactive ? leads : leads.filter((lead) => lead.status !== "inactive")),
-    [leads, showInactive]
-  );
-  function updateDraft(leadId, updates) {
-    setDrafts((current) => ({
-      ...current,
-      [leadId]: {
-        ...(current[leadId] || createLeadDraft(leads.find((lead) => lead.id === leadId) || {})),
-        ...updates
-      }
-    }));
-  }
-
-  async function handleSaveLead(
-    leadId,
-    overrideDraft = null,
-    successMessage = "Subscription lead updated."
-  ) {
-    const lead = leads.find((entry) => entry.id === leadId);
-    const draft = overrideDraft || drafts[leadId] || createLeadDraft(lead);
-    if (!lead || !draft) return;
-    setSavingLeadId(leadId);
-    setError("");
-    setMessage("");
-    try {
-      const response = await adminPut(`subscription-leads/${leadId}`, token, draft);
-      const updatedLead = response.lead || null;
-      if (updatedLead) {
-        setLeads((current) =>
-          current.map((lead) => (lead.id === updatedLead.id ? updatedLead : lead))
-        );
-        setDrafts((current) => ({
-          ...current,
-          [updatedLead.id]: createLeadDraft(updatedLead)
-        }));
-      }
-      setMessage(successMessage);
-    } catch (saveError) {
-      setError(saveError?.message || "Failed to update subscription lead.");
-    } finally {
-      setSavingLeadId(null);
-    }
-  }
-
-  async function handleStatusChange(leadId, status) {
-    const lead = leads.find((entry) => entry.id === leadId);
-    if (!lead) return;
-    const nextDraft = {
-      ...(drafts[leadId] || createLeadDraft(lead)),
-      status
-    };
-    updateDraft(leadId, { status });
-    await handleSaveLead(leadId, nextDraft, "Subscription lead status saved.");
-  }
-
-  async function handleExportLeads() {
-    setExportingLeads(true);
-    setError("");
-    setMessage("");
-    try {
-      const { blob, filename } = await adminDownload("subscription-leads/export", token);
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = filename || "subscription-leads.csv";
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(url);
-      setMessage("Subscription leads export downloaded.");
-    } catch (exportError) {
-      setError(exportError?.message || "Failed to export subscription leads.");
-    } finally {
-      setExportingLeads(false);
-    }
-  }
 
   async function runSubscriptionOp(actionKey, path, dryRun = true) {
     setOpsBusy(actionKey);
@@ -284,10 +157,9 @@ export function AdminSubscriptionLeadsSection({ token }) {
 
   return (
     <section className="admin-section">
-      <h3>Subscription Leads</h3>
+      <h3>Member Credits</h3>
       <div className="small">
-        Review subscribe form submissions captured by the store and track whether each lead is still
-        in progress or won.
+        Preview and run member credit sync jobs, purchase debit sync, and related Local Line balance checks.
       </div>
       <div className="response-card" style={{ marginTop: 16, marginBottom: 16 }}>
         <div className="title">Subscription Operations</div>
@@ -452,6 +324,150 @@ export function AdminSubscriptionLeadsSection({ token }) {
             </table>
           </div>
         )}
+      </div>
+      {message ? <div className="small">{message}</div> : null}
+      {error ? <div className="small">{error}</div> : null}
+    </section>
+  );
+}
+
+export function AdminSubscriptionLeadsSection({ token }) {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [leads, setLeads] = useState([]);
+  const [showInactive, setShowInactive] = useState(false);
+  const [selectedLeadId, setSelectedLeadId] = useState(null);
+  const [modalLeadId, setModalLeadId] = useState(null);
+  const [drafts, setDrafts] = useState({});
+  const [savingLeadId, setSavingLeadId] = useState(null);
+  const [exportingLeads, setExportingLeads] = useState(false);
+  const [editingNotesLeadId, setEditingNotesLeadId] = useState(null);
+
+  async function loadLeads() {
+    setLoading(true);
+    setError("");
+    try {
+      const path = showInactive
+        ? "subscription-leads?includeInactive=1"
+        : "subscription-leads";
+      const response = await adminGet(path, token);
+      const nextLeads = response.leads || [];
+      setLeads(nextLeads);
+      setDrafts(() => {
+        const nextDrafts = {};
+        nextLeads.forEach((lead) => {
+          nextDrafts[lead.id] = createLeadDraft(lead);
+        });
+        return nextDrafts;
+      });
+      setSelectedLeadId((current) => {
+        if (current && nextLeads.some((lead) => lead.id === current)) return current;
+        return nextLeads[0]?.id || null;
+      });
+    } catch (loadError) {
+      setError(loadError?.message || "Failed to load subscription leads.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadLeads();
+  }, [token, showInactive]);
+
+  const selectedLead = useMemo(
+    () => leads.find((lead) => lead.id === selectedLeadId) || null,
+    [leads, selectedLeadId]
+  );
+  const modalLead = useMemo(
+    () => leads.find((lead) => lead.id === modalLeadId) || null,
+    [leads, modalLeadId]
+  );
+  const visibleLeads = useMemo(
+    () => (showInactive ? leads : leads.filter((lead) => lead.status !== "inactive")),
+    [leads, showInactive]
+  );
+  function updateDraft(leadId, updates) {
+    setDrafts((current) => ({
+      ...current,
+      [leadId]: {
+        ...(current[leadId] || createLeadDraft(leads.find((lead) => lead.id === leadId) || {})),
+        ...updates
+      }
+    }));
+  }
+
+  async function handleSaveLead(
+    leadId,
+    overrideDraft = null,
+    successMessage = "Subscription lead updated."
+  ) {
+    const lead = leads.find((entry) => entry.id === leadId);
+    const draft = overrideDraft || drafts[leadId] || createLeadDraft(lead);
+    if (!lead || !draft) return;
+    setSavingLeadId(leadId);
+    setError("");
+    setMessage("");
+    try {
+      const response = await adminPut(`subscription-leads/${leadId}`, token, draft);
+      const updatedLead = response.lead || null;
+      if (updatedLead) {
+        setLeads((current) =>
+          current.map((lead) => (lead.id === updatedLead.id ? updatedLead : lead))
+        );
+        setDrafts((current) => ({
+          ...current,
+          [updatedLead.id]: createLeadDraft(updatedLead)
+        }));
+      }
+      setMessage(successMessage);
+    } catch (saveError) {
+      setError(saveError?.message || "Failed to update subscription lead.");
+    } finally {
+      setSavingLeadId(null);
+    }
+  }
+
+  async function handleStatusChange(leadId, status) {
+    const lead = leads.find((entry) => entry.id === leadId);
+    if (!lead) return;
+    const nextDraft = {
+      ...(drafts[leadId] || createLeadDraft(lead)),
+      status
+    };
+    updateDraft(leadId, { status });
+    await handleSaveLead(leadId, nextDraft, "Subscription lead status saved.");
+  }
+
+  async function handleExportLeads() {
+    setExportingLeads(true);
+    setError("");
+    setMessage("");
+    try {
+      const { blob, filename } = await adminDownload("subscription-leads/export", token);
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename || "subscription-leads.csv";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      setMessage("Subscription leads export downloaded.");
+    } catch (exportError) {
+      setError(exportError?.message || "Failed to export subscription leads.");
+    } finally {
+      setExportingLeads(false);
+    }
+  }
+
+  return (
+    <section className="admin-section">
+      <h3>Subscription Leads</h3>
+      <div className="small">
+        Review subscribe form submissions captured by the store and track whether each lead is still
+        in progress or won.
       </div>
       {message ? <div className="small">{message}</div> : null}
       {error ? <div className="small">{error}</div> : null}

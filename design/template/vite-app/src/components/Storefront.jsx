@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import {
   accountPanel,
   brand,
@@ -31,23 +31,52 @@ import { DeliverySection } from "./DeliverySection.jsx";
 import { FooterSection } from "./FooterSection.jsx";
 import { HerdshareBanner } from "./HerdshareBanner.jsx";
 import { HeroSection } from "./HeroSection.jsx";
-import { HomeLandingPage } from "./HomeLandingPage.jsx";
 import { PlanChooser } from "./PlanChooser.jsx";
 import { ProductDetailSection } from "./ProductDetailSection.jsx";
 import { ProductGrid } from "./ProductGrid.jsx";
 import { RecipesSection } from "./RecipesSection.jsx";
-import { AdminPanel } from "./AdminPanel.jsx";
-import { MemberPortalSection } from "./MemberPortalSection.jsx";
 import { SeasonalHighlights } from "./SeasonalHighlights.jsx";
-import { SubscribePage } from "./SubscribePage.jsx";
-import { LiabilityReleasePage } from "./LiabilityReleasePage.jsx";
-import { DropsitesPage } from "./DropsitesPage.jsx";
+
+const AdminPanel = lazy(() =>
+  import("./AdminPanel.jsx").then((module) => ({ default: module.AdminPanel }))
+);
+const DropsitesPage = lazy(() =>
+  import("./DropsitesPage.jsx").then((module) => ({ default: module.DropsitesPage }))
+);
+const HomeLandingPage = lazy(() =>
+  import("./HomeLandingPage.jsx").then((module) => ({ default: module.HomeLandingPage }))
+);
+const LiabilityReleasePage = lazy(() =>
+  import("./LiabilityReleasePage.jsx").then((module) => ({ default: module.LiabilityReleasePage }))
+);
+const MemberPortalSection = lazy(() =>
+  import("./MemberPortalSection.jsx").then((module) => ({ default: module.MemberPortalSection }))
+);
+const SubscribePage = lazy(() =>
+  import("./SubscribePage.jsx").then((module) => ({ default: module.SubscribePage }))
+);
 
 function hasBackendAccess(user) {
   return (
     user?.role === "administrator" ||
     user?.role === "admin" ||
     Boolean(user?.adminRoles?.length)
+  );
+}
+
+function LoadingPanel({
+  eyebrow = "Full Farm CSA",
+  title = "Loading...",
+  detail = "Opening this section."
+}) {
+  return (
+    <section className="section tight">
+      <div className="container card pad">
+        <div className="eyebrow">{eyebrow}</div>
+        <h2 className="h2">{title}</h2>
+        {detail ? <div className="small">{detail}</div> : null}
+      </div>
+    </section>
   );
 }
 
@@ -140,6 +169,9 @@ export function Storefront() {
   const initialLiabilitySlug = getLiabilityReleaseSlug();
   const [userToken, setUserToken] = useState(() => localStorage.getItem("userToken") || "");
   const [user, setUser] = useState(null);
+  const [authResolving, setAuthResolving] = useState(() =>
+    Boolean(localStorage.getItem("userToken") || "")
+  );
   const [loginOpen, setLoginOpen] = useState(false);
   const [loginState, setLoginState] = useState({ username: "", password: "", error: "" });
   const [loginMode, setLoginMode] = useState("login");
@@ -334,12 +366,20 @@ export function Storefront() {
   }, [experienceMode]);
 
   useEffect(() => {
+    let cancelled = false;
+
     if (!userToken) {
       setUser(null);
-      return;
+      setAuthResolving(false);
+      return () => {
+        cancelled = true;
+      };
     }
+
+    setAuthResolving(!user);
     fetchMe(userToken)
       .then((data) => {
+        if (cancelled) return;
         setUser(data.user || null);
         const route = getHashRoute();
         const isStandaloneExperience = experienceMode === "subscribe" || experienceMode === "dropsites";
@@ -353,10 +393,18 @@ export function Storefront() {
         }
       })
       .catch(() => {
+        if (cancelled) return;
         localStorage.removeItem("userToken");
         setUserToken("");
         setUser(null);
+      })
+      .finally(() => {
+        if (!cancelled) setAuthResolving(false);
       });
+
+    return () => {
+      cancelled = true;
+    };
   }, [userToken, experienceMode, isStandaloneExperience]);
 
   const isAccountView = view === "account";
@@ -673,6 +721,10 @@ export function Storefront() {
   const subscribeAppUrl = getSubscribeAppUrl();
   const currentStoreUrl = getStoreUrl();
 
+  if (authResolving) {
+    return <div className="page" aria-busy="true" />;
+  }
+
   return (
     <div className="page">
       <main>
@@ -710,59 +762,90 @@ export function Storefront() {
             </div>
           </div>
         ) : null}
-        {isAdminView ? (
-          <AdminPanel onCatalogRefresh={reloadCatalog} onSiteContentRefresh={reloadSiteContent} />
-        ) : isLiabilityView ? (
-          <LiabilityReleasePage slug={liabilitySlug} />
-        ) : isDropsitesView ? (
-          <DropsitesPage siteContent={siteContent} />
-        ) : isResetPasswordView ? (
-          <section className="section tight">
-            <div className="container reset-password-panel">
-              <div className="eyebrow">Account access</div>
-              <h2 className="h2">Set Password</h2>
-              {resetUsername ? (
-                <div className="small">Setting password for username: <strong>{resetUsername}</strong></div>
-              ) : null}
-              <form className="admin-form" onSubmit={handleResetPassword}>
-                <input
-                  className="input"
-                  placeholder="New password"
-                  type="password"
-                  value={resetState.password}
-                  onChange={(event) =>
-                    setResetState((prev) => ({ ...prev, password: event.target.value }))
-                  }
-                />
-                <input
-                  className="input"
-                  placeholder="Confirm password"
-                  type="password"
-                  value={resetState.confirm}
-                  onChange={(event) =>
-                    setResetState((prev) => ({ ...prev, confirm: event.target.value }))
-                  }
-                />
-                {resetState.error ? <div className="small">{resetState.error}</div> : null}
-                {resetState.message ? <div className="small">{resetState.message}</div> : null}
-                <button className="button" type="submit" disabled={resetState.submitting || !resetToken}>
-                  {resetState.submitting ? "Setting..." : "Set password"}
-                </button>
-              </form>
-            </div>
-          </section>
-        ) : isAccountView ? (
-          isMember ? (
-            <MemberPortalSection
-              token={userToken}
-              user={user}
-              onLogout={handleLogout}
-              subscribeUrl={`${subscribeAppUrl}#/subscribe`}
-              storeUrl={currentStoreUrl}
-              adminUrl={`${subscribeAppUrl}#/admin`}
-              canAccessAdmin={isAdmin}
+        <Suspense
+          fallback={
+            <LoadingPanel
+              title="Loading..."
+              detail="Opening this section."
             />
-          ) : experienceMode === "subscribe" ? (
+          }
+        >
+          {isAdminView ? (
+            <AdminPanel onCatalogRefresh={reloadCatalog} onSiteContentRefresh={reloadSiteContent} />
+          ) : isLiabilityView ? (
+            <LiabilityReleasePage slug={liabilitySlug} />
+          ) : isDropsitesView ? (
+            <DropsitesPage siteContent={siteContent} />
+          ) : isResetPasswordView ? (
+            <section className="section tight">
+              <div className="container reset-password-panel">
+                <div className="eyebrow">Account access</div>
+                <h2 className="h2">Set Password</h2>
+                {resetUsername ? (
+                  <div className="small">Setting password for username: <strong>{resetUsername}</strong></div>
+                ) : null}
+                <form className="admin-form" onSubmit={handleResetPassword}>
+                  <input
+                    className="input"
+                    placeholder="New password"
+                    type="password"
+                    value={resetState.password}
+                    onChange={(event) =>
+                      setResetState((prev) => ({ ...prev, password: event.target.value }))
+                    }
+                  />
+                  <input
+                    className="input"
+                    placeholder="Confirm password"
+                    type="password"
+                    value={resetState.confirm}
+                    onChange={(event) =>
+                      setResetState((prev) => ({ ...prev, confirm: event.target.value }))
+                    }
+                  />
+                  {resetState.error ? <div className="small">{resetState.error}</div> : null}
+                  {resetState.message ? <div className="small">{resetState.message}</div> : null}
+                  <button className="button" type="submit" disabled={resetState.submitting || !resetToken}>
+                    {resetState.submitting ? "Setting..." : "Set password"}
+                  </button>
+                </form>
+              </div>
+            </section>
+          ) : isAccountView ? (
+            isMember ? (
+              <MemberPortalSection
+                token={userToken}
+                user={user}
+                onLogout={handleLogout}
+                subscribeUrl={`${subscribeAppUrl}#/subscribe`}
+                storeUrl={currentStoreUrl}
+                adminUrl={`${subscribeAppUrl}#/admin`}
+                canAccessAdmin={isAdmin}
+              />
+            ) : experienceMode === "subscribe" ? (
+              <SubscribePage
+                dropSites={subscribeDropSites}
+                portalBaseUrl={subscribeAppUrl}
+                isLoggedIn={isMember}
+                onAuthAction={() => (isMember ? handleLogout() : setLoginOpen(true))}
+                siteContent={siteContent}
+              />
+            ) : (
+              <AccountPanelSection accountPanel={accountPanel} dropSite={dropSite} />
+            )
+          ) : isPublicHomeView ? (
+            <HomeLandingPage
+              catalog={catalog}
+              catalogError={catalogError}
+              getPrice={getDisplayPrice}
+              onSelectProduct={(product) => setSelectedProduct(product)}
+              isLoggedIn={isMember}
+              isAdmin={isAdmin}
+              onAuthAction={() => (isMember ? handleLogout() : setLoginOpen(true))}
+              subscribeUrl={`${subscribeAppUrl}#/subscribe`}
+              siteContent={siteContent}
+            />
+          ) : experienceMode === "subscribe" || view === "subscribe" ? (
             <SubscribePage
               dropSites={subscribeDropSites}
               portalBaseUrl={subscribeAppUrl}
@@ -771,134 +854,112 @@ export function Storefront() {
               siteContent={siteContent}
             />
           ) : (
-            <AccountPanelSection accountPanel={accountPanel} dropSite={dropSite} />
-          )
-        ) : isPublicHomeView ? (
-          <HomeLandingPage
-            catalog={catalog}
-            catalogError={catalogError}
-            getPrice={getDisplayPrice}
-            onSelectProduct={(product) => setSelectedProduct(product)}
-            isLoggedIn={isMember}
-            isAdmin={isAdmin}
-            onAuthAction={() => (isMember ? handleLogout() : setLoginOpen(true))}
-            subscribeUrl={`${subscribeAppUrl}#/subscribe`}
-            siteContent={siteContent}
-          />
-        ) : experienceMode === "subscribe" || view === "subscribe" ? (
-          <SubscribePage
-            dropSites={subscribeDropSites}
-            portalBaseUrl={subscribeAppUrl}
-            isLoggedIn={isMember}
-            onAuthAction={() => (isMember ? handleLogout() : setLoginOpen(true))}
-            siteContent={siteContent}
-          />
-        ) : (
-          <>
-            {!isMember && <HeroSection hero={hero} showEyebrow={!isMember} showCard={!isMember} />}
-            {isMember ? (
-              <div ref={categoryRef}>
-                <section className="section tight" id="shop">
-                  <div className="container shop-layout">
-                    <aside className="shop-filters">
-                      <div className="eyebrow">Shop by pantry</div>
-                      <h2 className="h2">Filters</h2>
-                      <div className="filters vertical">
-                        <label className="filter-field">
-                          <span className="small">Category</span>
-                          <select
-                            className="select"
-                            value={selectedCategory}
-                            onChange={(event) => setSelectedCategory(event.target.value)}
-                          >
-                            <option value="">All categories</option>
-                            {catalog.categories.map((category) => (
-                              <option key={category.id} value={category.id}>
-                                {category.name}
-                              </option>
-                            ))}
-                          </select>
-                        </label>
-                        <label className="filter-field">
-                          <span className="small">Vendor</span>
-                          <select
-                            className="select"
-                            value={selectedVendor}
-                            onChange={(event) => setSelectedVendor(event.target.value)}
-                          >
-                            <option value="">All vendors</option>
-                            {sortedVendors.map((vendor) => (
-                              <option key={vendor.id} value={vendor.id}>
-                                {vendor.name}
-                              </option>
-                            ))}
-                          </select>
-                        </label>
-                        <label className="filter-toggle">
-                          <input
-                            type="checkbox"
-                            checked={onSaleOnly}
-                            onChange={(event) => setOnSaleOnly(event.target.checked)}
-                          />
-                          <span>On sale</span>
-                        </label>
+            <>
+              {!isMember && <HeroSection hero={hero} showEyebrow={!isMember} showCard={!isMember} />}
+              {isMember ? (
+                <div ref={categoryRef}>
+                  <section className="section tight" id="shop">
+                    <div className="container shop-layout">
+                      <aside className="shop-filters">
+                        <div className="eyebrow">Shop by pantry</div>
+                        <h2 className="h2">Filters</h2>
+                        <div className="filters vertical">
+                          <label className="filter-field">
+                            <span className="small">Category</span>
+                            <select
+                              className="select"
+                              value={selectedCategory}
+                              onChange={(event) => setSelectedCategory(event.target.value)}
+                            >
+                              <option value="">All categories</option>
+                              {catalog.categories.map((category) => (
+                                <option key={category.id} value={category.id}>
+                                  {category.name}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                          <label className="filter-field">
+                            <span className="small">Vendor</span>
+                            <select
+                              className="select"
+                              value={selectedVendor}
+                              onChange={(event) => setSelectedVendor(event.target.value)}
+                            >
+                              <option value="">All vendors</option>
+                              {sortedVendors.map((vendor) => (
+                                <option key={vendor.id} value={vendor.id}>
+                                  {vendor.name}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                          <label className="filter-toggle">
+                            <input
+                              type="checkbox"
+                              checked={onSaleOnly}
+                              onChange={(event) => setOnSaleOnly(event.target.checked)}
+                            />
+                            <span>On sale</span>
+                          </label>
+                        </div>
+                      </aside>
+                      <div className="shop-main">
+                        {catalogError && <div className="card pad">{catalogError}</div>}
+                        <ProductGrid
+                          products={filteredProducts}
+                          showCartAction
+                          onSelect={(product) => setSelectedProduct(product)}
+                          filterLabel={activeCategory ? activeCategory.name : "All"}
+                          sectionRef={productGridRef}
+                          eyebrow="Catalog"
+                          title="All products in this category."
+                          embedded
+                          getPrice={getDisplayPrice}
+                        />
                       </div>
-                    </aside>
-                    <div className="shop-main">
-                      {catalogError && <div className="card pad">{catalogError}</div>}
-                      <ProductGrid
-                        products={filteredProducts}
-                        showCartAction
-                        onSelect={(product) => setSelectedProduct(product)}
-                        filterLabel={activeCategory ? activeCategory.name : "All"}
-                        sectionRef={productGridRef}
-                        eyebrow="Catalog"
-                        title="All products in this category."
-                        embedded
-                        getPrice={getDisplayPrice}
-                      />
                     </div>
-                  </div>
-                </section>
-              </div>
-            ) : (
-              <PlanChooser plans={plans} />
-            )}
-            {isMember ? (
-              <>
-                <ProductGrid
-                  products={featuredProducts}
-                  showCartAction
-                  onSelect={(product) => setSelectedProduct(product)}
-                  getPrice={getDisplayPrice}
-                />
-                <ProductDetailSection productDetail={productDetail} />
-                <RecipesSection
-                  recipes={catalog.recipes}
-                  onSelect={(recipe) => setSelectedRecipe(recipe)}
-                />
-              </>
-            ) : (
-              <>
-                <CsaPlansSection csaPlanTiles={csaPlanTiles} />
-                <SeasonalHighlights seasonalHighlights={seasonalHighlights} />
-                {catalogError && <div className="card pad">{catalogError}</div>}
-                <ProductGrid
-                  products={featuredProducts}
-                  onSelect={(product) => setSelectedProduct(product)}
-                  getPrice={getDisplayPrice}
-                />
-                <HerdshareBanner herdshare={herdshare} />
-                <DeliverySection delivery={delivery} dropSite={dropSiteData} />
-                <ProductDetailSection productDetail={productDetail} />
-                <RecipesSection
-                  recipes={catalog.recipes}
-                  onSelect={(recipe) => setSelectedRecipe(recipe)}
-                />
-              </>
-            )}
-          </>
-        )}
+                  </section>
+                </div>
+              ) : (
+                <PlanChooser plans={plans} />
+              )}
+              {isMember ? (
+                <>
+                  <ProductGrid
+                    products={featuredProducts}
+                    showCartAction
+                    onSelect={(product) => setSelectedProduct(product)}
+                    getPrice={getDisplayPrice}
+                  />
+                  <ProductDetailSection productDetail={productDetail} />
+                  <RecipesSection
+                    recipes={catalog.recipes}
+                    onSelect={(recipe) => setSelectedRecipe(recipe)}
+                  />
+                </>
+              ) : (
+                <>
+                  <CsaPlansSection csaPlanTiles={csaPlanTiles} />
+                  <SeasonalHighlights seasonalHighlights={seasonalHighlights} />
+                  {catalogError && <div className="card pad">{catalogError}</div>}
+                  <ProductGrid
+                    products={featuredProducts}
+                    onSelect={(product) => setSelectedProduct(product)}
+                    getPrice={getDisplayPrice}
+                  />
+                  <HerdshareBanner herdshare={herdshare} />
+                  <DeliverySection delivery={delivery} dropSite={dropSiteData} />
+                  <ProductDetailSection productDetail={productDetail} />
+                  <RecipesSection
+                    recipes={catalog.recipes}
+                    onSelect={(recipe) => setSelectedRecipe(recipe)}
+                  />
+                </>
+              )}
+            </>
+          )}
+        </Suspense>
       </main>
 
       {loginOpen && (

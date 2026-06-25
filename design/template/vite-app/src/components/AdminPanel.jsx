@@ -7,7 +7,10 @@ import { AdminManualSection } from "./AdminManualSection.jsx";
 import { AdminMembershipSection } from "./AdminMembershipSection.jsx";
 import { AdminOrdersSection } from "./AdminOrdersSection.jsx";
 import { AdminPriceListSection } from "./AdminPriceListSection.jsx";
-import { AdminSubscriptionLeadsSection } from "./AdminSubscriptionLeadsSection.jsx";
+import {
+  AdminMemberCreditsSection,
+  AdminSubscriptionLeadsSection
+} from "./AdminSubscriptionLeadsSection.jsx";
 import { AdminUsersSection } from "./AdminUsersSection.jsx";
 import {
   adminDeleteImage,
@@ -53,6 +56,8 @@ function canAccessAdminSection(roleKeys, section) {
       return roleKeys.includes("membership_admin");
     case "subscriptions":
       return roleKeys.includes("membership_admin") || roleKeys.includes("member_admin");
+    case "memberCredits":
+      return roleKeys.includes("membership_admin") || roleKeys.includes("member_admin");
     case "liability":
       return roleKeys.includes("liability_admin");
     case "marketing":
@@ -90,6 +95,7 @@ function getDefaultAdminSection(roleKeys = []) {
     "marketing",
     "liability",
     "subscriptions",
+    "memberCredits",
     "membership",
     "dropSites",
     "reviews",
@@ -2779,6 +2785,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
   const canManageInventory = hasRole(currentAdminRoles, "inventory_admin");
   const canManageMembership = hasRole(currentAdminRoles, "membership_admin");
   const canManageSubscriptions = canAccessAdminSection(currentAdminRoles, "subscriptions");
+  const canManageMemberCredits = canAccessAdminSection(currentAdminRoles, "memberCredits");
   const canManageContent = canAccessAdminSection(currentAdminRoles, "content");
   const canManageMarketing = canAccessAdminSection(currentAdminRoles, "marketing");
   const canManageLiability = canAccessAdminSection(currentAdminRoles, "liability");
@@ -3616,6 +3623,18 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
               type="button"
             >
               Subscriptions
+            </button>
+          ) : null}
+          {canManageMemberCredits ? (
+            <button
+              className={`admin-nav-item ${activeSection === "memberCredits" ? "active" : ""}`}
+              onClick={() => {
+                setActiveSection("memberCredits");
+                closeProductEditor();
+              }}
+              type="button"
+            >
+              Member Credits
             </button>
           ) : null}
           {canManageContent ? (
@@ -5195,6 +5214,10 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
 
           {activeSection === "subscriptions" && canManageSubscriptions && (
             <AdminSubscriptionLeadsSection token={token} />
+          )}
+
+          {activeSection === "memberCredits" && canManageMemberCredits && (
+            <AdminMemberCreditsSection token={token} />
           )}
 
           {activeSection === "content" && canManageContent && (
