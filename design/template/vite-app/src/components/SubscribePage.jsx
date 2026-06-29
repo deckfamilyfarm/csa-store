@@ -45,7 +45,7 @@ const SUBSCRIBE_PLANS = [
     bullets: [
       "Loads $200 balance each month to spend on your individualized choice of farm products",
       "$200 minimum purchase, unused funds roll over",
-      "15% over guest pricing",
+      "15% under guest pricing",
       "10% discount at Farmers Market Booths.",
       "Access to raw dairy",
       "One-time $50 joining fee"
@@ -61,7 +61,7 @@ const SUBSCRIBE_PLANS = [
     bullets: [
       "Loads $300 balance each month to spend on your individualized choice of farm products",
       "$300 minimum purchase, unused funds roll over",
-      "15% over guest pricing",
+      "15% under guest pricing",
       "10% discount at Farmers Market Booths.",
       "Access to raw dairy",
       "One-time $50 joining fee",
@@ -78,7 +78,7 @@ const SUBSCRIBE_PLANS = [
     bullets: [
       "Loads $500 balance each month to spend on your individualized choice of farm products",
       "$500 minimum purchase, unused funds roll over",
-      "15% over guest pricing",
+      "15% under guest pricing",
       "10% discount at Farmers Market Booths.",
       "Access to raw dairy",
       "One-time $50 joining fee",

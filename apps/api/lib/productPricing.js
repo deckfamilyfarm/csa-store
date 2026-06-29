@@ -144,12 +144,17 @@ export function resolvePricingProfile({
   vendor = null
 }) {
   const sourcePricingVendor = isSourcePricingVendor(vendor);
+  const usesNoMarkupPricing = isNoMarkupProduct(product);
   const vendorPriceListMarkup = toNumber(vendor?.priceListMarkup);
   const vendorSourceMultiplier = toNumber(vendor?.sourceMultiplier);
   const sourceMultiplier =
-    sourcePricingVendor && vendorSourceMultiplier !== null && vendorSourceMultiplier > 0
-      ? vendorSourceMultiplier
-      : (toNumber(profile?.sourceMultiplier) ?? getDefaultSourceMultiplier());
+    usesNoMarkupPricing
+      ? 1
+      : (
+          sourcePricingVendor && vendorSourceMultiplier !== null && vendorSourceMultiplier > 0
+            ? vendorSourceMultiplier
+            : (toNumber(profile?.sourceMultiplier) ?? getDefaultSourceMultiplier())
+        );
   const unitOfMeasure = normalizeUnitOfMeasure(
     profile?.unitOfMeasure,
     inferUnitOfMeasure(packages, packageMetaByPackageId)
@@ -189,7 +194,6 @@ export function resolvePricingProfile({
     }
   }
 
-  const usesNoMarkupPricing = isNoMarkupProduct(product);
   const memberMarkup = usesNoMarkupPricing
     ? 0
     : vendorPriceListMarkup !== null && vendorPriceListMarkup > 0

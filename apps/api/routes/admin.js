@@ -1737,6 +1737,7 @@ async function upsertProductPricingProfileRecord(connection, productId, payload 
     isSourcePricingVendor(options.vendor)
       ? normalizeVendorSourceMultiplierInput(options.vendor?.sourceMultiplier)
       : null;
+  const forceNoMarkup = isNoMarkupProduct(options.product);
   const [existingRows] = await connection.query(
     "SELECT * FROM product_pricing_profiles WHERE product_id = ? LIMIT 1",
     [productId]
@@ -1762,14 +1763,18 @@ async function upsertProductPricingProfileRecord(connection, productId, payload 
         ? (existing?.avg_weight_override ?? null)
         : normalized.avgWeightOverride,
     source_multiplier:
-      vendorSourceMultiplier !== null
-        ? vendorSourceMultiplier
+      forceNoMarkup
+        ? 1
         : (
-            typeof normalized.sourceMultiplier === "undefined" ||
-            normalized.sourceMultiplier === null ||
-            !Number.isFinite(Number(normalized.sourceMultiplier))
-              ? (existing?.source_multiplier ?? 0.5412)
-              : normalized.sourceMultiplier
+            vendorSourceMultiplier !== null
+              ? vendorSourceMultiplier
+              : (
+                  typeof normalized.sourceMultiplier === "undefined" ||
+                  normalized.sourceMultiplier === null ||
+                  !Number.isFinite(Number(normalized.sourceMultiplier))
+                    ? (existing?.source_multiplier ?? 0.5412)
+                    : normalized.sourceMultiplier
+                )
           ),
     price_changed_at: now,
     remote_sync_status: "pending",
@@ -2002,9 +2007,11 @@ async function duplicateLocalProductRecord(connection, sourceProductId) {
       profile?.min_weight ?? null,
       profile?.max_weight ?? null,
       profile?.avg_weight_override ?? null,
-      Number.isFinite(Number(vendor?.sourceMultiplier))
-        ? Number(vendor.sourceMultiplier)
-        : (Number.isFinite(Number(profile?.source_multiplier)) ? Number(profile.source_multiplier) : 0.5412),
+      forceNoMarkup
+        ? 1
+        : Number.isFinite(Number(vendor?.sourceMultiplier))
+          ? Number(vendor.sourceMultiplier)
+          : (Number.isFinite(Number(profile?.source_multiplier)) ? Number(profile.source_multiplier) : 0.5412),
       defaultCsaMarkup,
       defaultCsaMarkup,
       defaultCsaMarkup,
@@ -4440,9 +4447,17 @@ function comparePricelistRows(left, right, columnKey, direction) {
   return compareNullableStrings(leftValue, rightValue) * multiplier;
 }
 
-function hasPendingRemoteApply(pricingProfile) {
+function hasPendingRemoteApply(pricingProfile, resolvedProfile = null) {
   if (!pricingProfile) return false;
+  const storedSourceMultiplier = toNumber(pricingProfile.sourceMultiplier);
+  const resolvedSourceMultiplier = toNumber(resolvedProfile?.sourceMultiplier);
+  const hasNoMarkupProfileDrift =
+    Boolean(resolvedProfile?.usesNoMarkupPricing) &&
+    storedSourceMultiplier !== null &&
+    resolvedSourceMultiplier !== null &&
+    Math.abs(storedSourceMultiplier - resolvedSourceMultiplier) > 0.0001;
   return (
+    hasNoMarkupProfileDrift ||
     ["pending", "failed"].includes(String(pricingProfile.remoteSyncStatus || "")) ||
     toTimestamp(pricingProfile.updatedAt) > toTimestamp(pricingProfile.remoteSyncedAt)
   );
@@ -4646,7 +4661,7 @@ function buildPricelistRows(productRows, supportingRows) {
       updatedAt: mergedProfile?.updatedAt || product.pricingUpdatedAt || null,
       saleUpdatedAt: saleRow?.updatedAt || null,
       hasRecentPriceOrSaleChange: hasRecentPriceOrSaleChange(mergedProfile, saleRow),
-      hasPendingRemoteApply: hasPendingRemoteApply(mergedProfile)
+      hasPendingRemoteApply: hasPendingRemoteApply(mergedProfile, snapshot.profile)
     };
   });
 }
@@ -4904,9 +4919,13 @@ router.post("/pricelist/bulk-save", requireAdminPermission("pricing_admin"), asy
       maxWeight: toDbDecimal(row.maxWeight),
       avgWeightOverride: toDbDecimal(row.avgWeightOverride),
       sourceMultiplier:
-        isSourcePricingVendor(vendor) && vendorSourceMultiplier !== null
-          ? vendorSourceMultiplier
-          : toDbDecimal(row.sourceMultiplier),
+        forceNoMarkup
+          ? 1
+          : (
+              isSourcePricingVendor(vendor) && vendorSourceMultiplier !== null
+                ? vendorSourceMultiplier
+                : toDbDecimal(row.sourceMultiplier)
+            ),
       guestMarkup: forceNoMarkup ? 0 : (vendorPriceListMarkup ?? toDbDecimal(row.guestMarkup)),
       memberMarkup: forceNoMarkup ? 0 : (vendorPriceListMarkup ?? toDbDecimal(row.memberMarkup)),
       herdShareMarkup: forceNoMarkup ? 0 : (vendorPriceListMarkup ?? toDbDecimal(row.herdShareMarkup)),
@@ -8173,6 +8192,7 @@ router.post("/products", requireAdminPermission(["inventory_admin", "pricing_adm
         const pricingProfile = normalizePricingProfileInput(payload.pricingProfile || payload);
         validateSourcePricingProfile(pricingProfile);
         await upsertProductPricingProfileRecord(connection, created.productId, pricingProfile, {
+          product: created.productRecord,
           vendor: vendorRows[0] || null
         });
       }
@@ -8331,7 +8351,7 @@ router.put("/products/:id/pricing-profile", requireAdminPermission(["pricing_adm
   const connection = await pool.getConnection();
   try {
     const [productRows] = await connection.query(
-      "SELECT vendor_id AS vendorId FROM products WHERE id = ? LIMIT 1",
+      "SELECT id, name, vendor_id AS vendorId FROM products WHERE id = ? LIMIT 1",
       [productId]
     );
     const product = productRows[0];
@@ -8351,6 +8371,7 @@ router.put("/products/:id/pricing-profile", requireAdminPermission(["pricing_adm
     const pricingProfile = normalizePricingProfileInput(req.body || {});
     validateSourcePricingProfile(pricingProfile);
     await upsertProductPricingProfileRecord(connection, productId, pricingProfile, {
+      product,
       vendor
     });
     return res.json({ ok: true });
