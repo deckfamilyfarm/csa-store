@@ -16,6 +16,8 @@ import {
 
 const DELIVERY_MAP_URL =
   "https://berkeleymapper.berkeley.edu/index.html?tabfile=https://raw.githubusercontent.com/jdeck88/ffcsa_scripts/refs/heads/main/localline/data/delivery_data.tsv&configfile=https://raw.githubusercontent.com/jdeck88/ffcsa_scripts/refs/heads/main/dropsite_maps/dropsites2.xml&pointDisplay=markers&hideLegendItems=true";
+const DROP_SITE_SHOP_VIDEO_URL = "https://www.youtube.com/shorts/NF7O3E1-WeM";
+const DROP_SITE_SHOP_VIDEO_EMBED_URL = "https://www.youtube.com/embed/NF7O3E1-WeM";
 const LIABILITY_AGREEMENT_URL =
   "https://docs.google.com/document/d/1VFMc4euofQ1S1kjtd6jZI46uxo6YKft9cufT6Q3-nrc/edit?tab=t.0";
 const META_PIXEL_ID = "645309732709210";
@@ -438,6 +440,7 @@ export function SubscribePage({
   const [status, setStatus] = useState({ submitting: false, success: false, error: "" });
   const [agreementModalOpen, setAgreementModalOpen] = useState(false);
   const [agreementSaved, setAgreementSaved] = useState(false);
+  const [dropSiteVideoOpen, setDropSiteVideoOpen] = useState(false);
   const [addressInsights, setAddressInsights] = useState(null);
   const [addressCheckError, setAddressCheckError] = useState("");
   const [addressCheckSource, setAddressCheckSource] = useState("");
@@ -534,6 +537,21 @@ export function SubscribePage({
     applyJsonLd("subscribe-faq-schema", faqSchema);
     trackMetaPixelPageView();
   }, [allFaqs]);
+
+  useEffect(() => {
+    if (!dropSiteVideoOpen) return undefined;
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setDropSiteVideoOpen(false);
+      }
+    };
+    document.body.classList.add("modal-open");
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.classList.remove("modal-open");
+    };
+  }, [dropSiteVideoOpen]);
 
   function updateField(key, value) {
     if (
@@ -1291,6 +1309,13 @@ export function SubscribePage({
                 Drop site locations and days are listed below. All dropsite deliveries are free. You
                 can choose your preferred dropsite location when placing your order.
               </p>
+              <button
+                className="button subscribe-drop-site-video-button"
+                type="button"
+                onClick={() => setDropSiteVideoOpen(true)}
+              >
+                Video on how to shop like a local!
+              </button>
             </div>
             <a
               className="subscribe-map-link"
@@ -1479,6 +1504,57 @@ export function SubscribePage({
           </div>
         </section>
       </main>
+
+      {dropSiteVideoOpen ? (
+        <div className="modal-backdrop" onClick={() => setDropSiteVideoOpen(false)}>
+          <div
+            className="modal modal-small subscribe-video-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="subscribe-drop-site-video-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              className="modal-close"
+              type="button"
+              onClick={() => setDropSiteVideoOpen(false)}
+              aria-label="Close video"
+            >
+              Close
+            </button>
+            <div className="modal-body single">
+              <div className="subscribe-video-modal-content">
+                <h3 id="subscribe-drop-site-video-title">How to shop at a drop site</h3>
+                <div className="subscribe-video-frame">
+                  <iframe
+                    src={DROP_SITE_SHOP_VIDEO_EMBED_URL}
+                    title="How to shop at a drop site"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  />
+                </div>
+                <div className="button-row">
+                  <a
+                    className="button alt"
+                    href={DROP_SITE_SHOP_VIDEO_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Open on YouTube
+                  </a>
+                  <button
+                    className="button"
+                    type="button"
+                    onClick={() => setDropSiteVideoOpen(false)}
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {agreementModalOpen ? (
         <div className="modal-backdrop" onClick={() => setAgreementModalOpen(false)}>

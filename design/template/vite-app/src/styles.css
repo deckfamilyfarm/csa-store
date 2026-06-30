@@ -1228,6 +1228,43 @@ img {
   flex: 0 0 auto;
 }
 
+.subscribe-drop-site-video-button {
+  margin-top: 14px;
+}
+
+.subscribe-video-modal {
+  width: min(460px, 94vw);
+}
+
+.subscribe-video-modal-content {
+  display: grid;
+  gap: 16px;
+}
+
+.subscribe-video-modal-content h3 {
+  margin: 0;
+  padding-right: 72px;
+  font-family: var(--subscribe-serif);
+  font-size: 28px;
+  color: var(--navy);
+}
+
+.subscribe-video-frame {
+  width: min(100%, 360px);
+  justify-self: center;
+  aspect-ratio: 9 / 16;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #1f1b17;
+}
+
+.subscribe-video-frame iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
 .subscribe-drop-site-table-card {
   padding: 22px 22px 18px;
   border-radius: 24px;
