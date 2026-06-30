@@ -556,16 +556,66 @@ img {
 }
 
 .subscribe-member-shop-button {
-  background: #fff;
-  color: var(--barn);
-  border-color: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 12px 28px rgba(31, 27, 23, 0.16);
-}
-
-.subscribe-member-shop-button:hover {
   background: var(--barn);
   color: #fff;
   border-color: var(--barn);
+  box-shadow: 0 12px 28px rgba(31, 27, 23, 0.24);
+}
+
+.subscribe-member-shop-button:hover {
+  background: #6f2523;
+  border-color: #6f2523;
+}
+
+.subscribe-address-check-card {
+  max-width: 660px;
+  margin: 22px 0 26px;
+  padding: 22px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 18px 42px rgba(31, 27, 23, 0.16);
+  color: #3f3a34;
+  display: grid;
+  gap: 16px;
+}
+
+.subscribe-address-check-card .eyebrow {
+  color: var(--field);
+  margin-bottom: 6px;
+}
+
+.subscribe-address-check-card h2 {
+  margin: 0 0 8px;
+  font-family: var(--subscribe-serif);
+  font-size: clamp(28px, 3vw, 38px);
+  line-height: 1;
+  color: var(--navy);
+}
+
+.subscribe-address-check-card p {
+  margin: 0;
+  line-height: 1.55;
+}
+
+.subscribe-address-check-grid {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.85fr) minmax(96px, 0.6fr) minmax(0, 1.55fr);
+  gap: 12px;
+  align-items: end;
+}
+
+.subscribe-address-check-card .input {
+  width: 100%;
+  background: #fff;
+}
+
+.subscribe-address-check-card .button-row {
+  margin-top: 0;
+}
+
+.subscribe-address-check-card .subscribe-address-insights {
+  box-shadow: none;
 }
 
 .subscribe-hero-notes {
@@ -4696,6 +4746,7 @@ img {
   .subscribe-hero-grid,
   .subscribe-proof-grid,
   .subscribe-plan-grid,
+  .subscribe-address-check-grid,
   .subscribe-form-grid,
   .subscribe-form-grid-3,
   .home-shop-browser,

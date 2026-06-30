@@ -782,13 +782,15 @@ function buildLocationIqAddressPayload({
   postalCode,
   country
 }) {
-  return {
-    street: [cleanString(addressLine1), cleanString(addressLine2)].filter(Boolean).join(" "),
-    city: cleanString(city),
-    state: cleanString(stateProvince),
-    postalcode: cleanString(postalCode, 32),
-    country: cleanString(country || "United States", 128)
-  };
+  return Object.fromEntries(
+    Object.entries({
+      street: [cleanString(addressLine1), cleanString(addressLine2)].filter(Boolean).join(" "),
+      city: cleanString(city),
+      state: cleanString(stateProvince || "Oregon"),
+      postalcode: cleanString(postalCode, 32),
+      country: cleanString(country || "United States", 128)
+    }).filter(([, value]) => value)
+  );
 }
 
 let deliveryAreaPolygonCache = null;
@@ -903,7 +905,7 @@ async function geocodeAddressWithLocationIq(addressInput) {
   };
 }
 
-async function resolveSubscriptionAddressInsights(db, addressInput) {
+async function resolveSubscriptionAddressInsights(db, addressInput, options = {}) {
   const geocoded = await geocodeAddressWithLocationIq(addressInput);
   const dropSiteRows = await getActiveDropSites(db);
   const deliverySites = dropSiteRows
@@ -952,23 +954,27 @@ async function resolveSubscriptionAddressInsights(db, addressInput) {
     closestDropSiteDistanceMiles = nearestPickupSites[0].distanceMiles;
   }
 
-  const preferredHomeDeliverySite = selectPreferredHomeDeliverySite(
-    deliverySites,
-    addressInput,
-    geocoded.displayName
-  );
-
   let insideHomeDeliveryArea = null;
-  try {
-    const polygons = await getDeliveryAreaPolygons();
-    insideHomeDeliveryArea = polygons.some((polygon) =>
-      pointInPolygon(geocoded.latitude, geocoded.longitude, polygon)
+  let preferredHomeDeliverySite = null;
+  if (options.confirmHomeDelivery !== false) {
+    preferredHomeDeliverySite = selectPreferredHomeDeliverySite(
+      deliverySites,
+      addressInput,
+      geocoded.displayName
     );
-  } catch (error) {
-    console.warn("Delivery area lookup failed:", error.message);
+    try {
+      const polygons = await getDeliveryAreaPolygons();
+      insideHomeDeliveryArea = polygons.some((polygon) =>
+        pointInPolygon(geocoded.latitude, geocoded.longitude, polygon)
+      );
+    } catch (error) {
+      console.warn("Delivery area lookup failed:", error.message);
+    }
   }
 
   return {
+    lookupPrecision: options.confirmHomeDelivery === false ? "area" : "address",
+    homeDeliveryCheckRequiresStreetAddress: options.confirmHomeDelivery === false,
     geocodedLatitude: geocoded.latitude,
     geocodedLongitude: geocoded.longitude,
     geocodedDisplayName: geocoded.displayName,
@@ -2205,16 +2211,32 @@ router.post("/subscribe/address-insights", async (req, res) => {
     const payload = req.body || {};
     const addressLine1 = cleanString(payload.addressLine1);
     const city = cleanString(payload.city);
-    const stateProvince = cleanString(payload.stateProvince);
+    const stateProvince = cleanString(payload.stateProvince || "Oregon");
     const postalCode = cleanString(payload.postalCode, 32);
+    const hasStreetAddress = Boolean(addressLine1);
+    const hasAreaLookup = Boolean(city || postalCode);
+    const hasFullAddress = Boolean(addressLine1 && city && stateProvince && postalCode);
 
-    if (!addressLine1 || !city || !stateProvince || !postalCode) {
+    if (!hasAreaLookup) {
       return res.status(400).json({
-        error: "Address, city, state, and zip are required to validate the location."
+        error: "Enter a city or ZIP to find nearby pickup sites."
       });
     }
 
-    const insights = await resolveSubscriptionAddressInsights(db, payload);
+    if (hasStreetAddress && !hasFullAddress) {
+      return res.status(400).json({
+        error: "Street address checks need city, state, and ZIP to confirm home delivery."
+      });
+    }
+
+    const insights = await resolveSubscriptionAddressInsights(
+      db,
+      {
+        ...payload,
+        stateProvince
+      },
+      { confirmHomeDelivery: hasFullAddress }
+    );
     res.json({ ok: true, insights });
   } catch (error) {
     console.error("Subscribe address insights failed:", error);

@@ -440,6 +440,7 @@ export function SubscribePage({
   const [agreementSaved, setAgreementSaved] = useState(false);
   const [addressInsights, setAddressInsights] = useState(null);
   const [addressCheckError, setAddressCheckError] = useState("");
+  const [addressCheckSource, setAddressCheckSource] = useState("");
   const [checkingAddress, setCheckingAddress] = useState(false);
   const formStatusRef = useRef(null);
   const formCardRef = useRef(null);
@@ -545,6 +546,7 @@ export function SubscribePage({
     ) {
       setAddressInsights(null);
       setAddressCheckError("");
+      setAddressCheckSource("");
     }
     if (
       key === "liabilityAgreementAccepted" ||
@@ -562,11 +564,13 @@ export function SubscribePage({
     }));
     setAddressInsights(null);
     setAddressCheckError("");
+    setAddressCheckSource("");
   }
 
-  async function handleCheckAddress() {
+  async function handleCheckAddress(source = "form") {
     setCheckingAddress(true);
     setAddressCheckError("");
+    setAddressCheckSource(source);
     try {
       const response = await fetchSubscribeAddressInsights({
         addressLine1: form.addressLine1,
@@ -583,6 +587,135 @@ export function SubscribePage({
     } finally {
       setCheckingAddress(false);
     }
+  }
+
+  const addressCheckDisabled =
+    checkingAddress ||
+    !(form.city.trim() || form.postalCode.trim()) ||
+    !form.stateProvince.trim() ||
+    (form.addressLine1.trim() && !(form.city.trim() && form.postalCode.trim()));
+
+  function handleAddressCheckSubmit(event) {
+    event.preventDefault();
+    if (!addressCheckDisabled) {
+      handleCheckAddress("hero");
+    }
+  }
+
+  function renderAddressInsightsPanel(source = "form") {
+    if (addressCheckSource && addressCheckSource !== source) return null;
+    if (!addressInsights) return null;
+    return (
+      <div className="subscribe-address-insights card">
+        <div className="small subscribe-address-insights-eyebrow">
+          Address insights
+        </div>
+        <div className="subscribe-address-insights-grid">
+          <div>
+            <strong>Validated address</strong>
+            <div>
+              {addressInsights.lookupPrecision === "area" ? "Approximate area" : "Validated address"}
+            </div>
+            <div className="small">{addressInsights.geocodedDisplayName || "—"}</div>
+          </div>
+          <div>
+            <strong>Closest pickup site</strong>
+            <div>
+              {addressInsights.closestDropSite || "Unknown"}
+              {Number.isFinite(Number(addressInsights.closestDropSiteDistanceMiles))
+                ? ` (${Number(addressInsights.closestDropSiteDistanceMiles).toFixed(2)} miles)`
+                : ""}
+            </div>
+            {addressInsights.closestDropSiteAddress ? (
+              <div className="small">{addressInsights.closestDropSiteAddress}</div>
+            ) : null}
+          </div>
+          <div>
+            <strong>Home delivery area</strong>
+            <div>
+              {addressInsights.homeDeliveryCheckRequiresStreetAddress
+                ? "Add street address to confirm"
+                : addressInsights.insideHomeDeliveryArea === true
+                ? "Inside delivery area"
+                : addressInsights.insideHomeDeliveryArea === false
+                  ? "Outside delivery area"
+                  : "Unavailable"}
+            </div>
+            {addressInsights.insideHomeDeliveryArea === true &&
+            addressInsights.preferredHomeDeliverySite?.name ? (
+              <div className="subscribe-nearest-pickup-item" style={{ marginTop: 8 }}>
+                <div>
+                  <div>
+                    <strong>{addressInsights.preferredHomeDeliverySite.name}</strong>
+                  </div>
+                  {addressInsights.preferredHomeDeliverySite.dayOfWeek ? (
+                    <div className="small">
+                      {formatDayOfWeekLabel(
+                        addressInsights.preferredHomeDeliverySite.dayOfWeek
+                      )}
+                    </div>
+                  ) : null}
+                  {addressInsights.preferredHomeDeliverySite.address ? (
+                    <div className="small">
+                      {addressInsights.preferredHomeDeliverySite.address}
+                    </div>
+                  ) : null}
+                </div>
+                <button
+                  className="button alt"
+                  type="button"
+                  onClick={() =>
+                    setPreferredDropSite(
+                      addressInsights.preferredHomeDeliverySite.name
+                    )
+                  }
+                >
+                  Set as preferred option
+                </button>
+              </div>
+            ) : null}
+          </div>
+        </div>
+        {Array.isArray(addressInsights.nearestPickupSites) &&
+        addressInsights.nearestPickupSites.length ? (
+          <div className="subscribe-nearest-pickup-list">
+            <strong>Three closest pickup sites</strong>
+            <div className="subscribe-nearest-pickup-items">
+              {addressInsights.nearestPickupSites.map((site) => (
+                <div
+                  key={`${site.name}-${site.address || ""}`}
+                  className="subscribe-nearest-pickup-item"
+                >
+                  <div>
+                    <div>
+                      <strong>{site.name || "Unknown site"}</strong>
+                      {Number.isFinite(Number(site.distanceMiles))
+                        ? ` (${Number(site.distanceMiles).toFixed(2)} miles)`
+                        : ""}
+                    </div>
+                    {site.dayOfWeek ? (
+                      <div className="small">
+                        {formatDayOfWeekLabel(site.dayOfWeek)}
+                      </div>
+                    ) : null}
+                    {site.address ? <div className="small">{site.address}</div> : null}
+                  </div>
+                  {site.name ? (
+                    <button
+                      className="button alt"
+                      type="button"
+                      onClick={() => setPreferredDropSite(site.name)}
+                    >
+                      Set as preferred site
+                    </button>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
+      </div>
+    );
   }
 
   function handleSaveAgreement() {
@@ -686,9 +819,52 @@ export function SubscribePage({
               </p>
               <div className="subscribe-member-shop-cta">
                 <a className="button subscribe-member-shop-button" href={subscriptionStoreUrl()}>
-                  Already a member? Shop here
+                  Browse the store
                 </a>
               </div>
+              <form className="subscribe-address-check-card" onSubmit={handleAddressCheckSubmit}>
+                <div>
+                  <div className="eyebrow">DELIVERY AND PICKUP OPTIONS</div>
+                </div>
+                <div className="subscribe-address-check-grid">
+                  <label className="filter-field">
+                    <span className="small">City</span>
+                    <input
+                      className="input"
+                      value={form.city}
+                      onChange={(event) => updateField("city", event.target.value)}
+                      autoComplete="address-level2"
+                    />
+                  </label>
+                  <label className="filter-field">
+                    <span className="small">ZIP</span>
+                    <input
+                      className="input"
+                      value={form.postalCode}
+                      onChange={(event) => updateField("postalCode", event.target.value)}
+                      autoComplete="postal-code"
+                    />
+                  </label>
+                  <label className="filter-field">
+                    <span className="small">Street address for delivery</span>
+                    <input
+                      className="input"
+                      value={form.addressLine1}
+                      onChange={(event) => updateField("addressLine1", event.target.value)}
+                      autoComplete="street-address"
+                    />
+                  </label>
+                </div>
+                <div className="button-row">
+                  <button className="button" type="submit" disabled={addressCheckDisabled}>
+                    {checkingAddress ? "Checking area..." : "Check my area"}
+                  </button>
+                </div>
+                {addressCheckSource === "hero" && addressCheckError ? (
+                  <div className="small subscribe-error">{addressCheckError}</div>
+                ) : null}
+                {renderAddressInsightsPanel("hero")}
+              </form>
               <figure className="subscribe-hero-image-card">
                 <img
                   src="/images/subscribe-products.jpg"
@@ -774,6 +950,7 @@ export function SubscribePage({
                         setAgreementSaved(false);
                         setAddressInsights(null);
                         setAddressCheckError("");
+                        setAddressCheckSource("");
                         setStatus({ submitting: false, success: false, error: "" });
                       }}
                     >
@@ -905,7 +1082,7 @@ export function SubscribePage({
                     <button
                       className="button alt"
                       type="button"
-                      onClick={handleCheckAddress}
+                      onClick={() => handleCheckAddress("form")}
                       disabled={
                         checkingAddress ||
                         !form.addressLine1.trim() ||
@@ -917,115 +1094,10 @@ export function SubscribePage({
                       {checkingAddress ? "Checking address..." : "Check delivery area and nearest site"}
                     </button>
                   </div>
-                  {addressCheckError ? (
+                  {addressCheckSource === "form" && addressCheckError ? (
                     <div className="small subscribe-error">{addressCheckError}</div>
                   ) : null}
-                  {addressInsights ? (
-                    <div className="subscribe-address-insights card">
-                      <div className="small subscribe-address-insights-eyebrow">
-                        Address insights
-                      </div>
-                      <div className="subscribe-address-insights-grid">
-                        <div>
-                          <strong>Validated address</strong>
-                          <div>{addressInsights.geocodedDisplayName || "—"}</div>
-                        </div>
-                        <div>
-                          <strong>Closest pickup site</strong>
-                          <div>
-                            {addressInsights.closestDropSite || "Unknown"}
-                            {Number.isFinite(Number(addressInsights.closestDropSiteDistanceMiles))
-                              ? ` (${Number(addressInsights.closestDropSiteDistanceMiles).toFixed(2)} miles)`
-                              : ""}
-                          </div>
-                          {addressInsights.closestDropSiteAddress ? (
-                            <div className="small">{addressInsights.closestDropSiteAddress}</div>
-                          ) : null}
-                        </div>
-                        <div>
-                          <strong>Home delivery area</strong>
-                          <div>
-                            {addressInsights.insideHomeDeliveryArea === true
-                              ? "Inside delivery area"
-                              : addressInsights.insideHomeDeliveryArea === false
-                                ? "Outside delivery area"
-                              : "Unavailable"}
-                          </div>
-                          {addressInsights.insideHomeDeliveryArea === true &&
-                          addressInsights.preferredHomeDeliverySite?.name ? (
-                            <div className="subscribe-nearest-pickup-item" style={{ marginTop: 8 }}>
-                              <div>
-                                <div>
-                                  <strong>{addressInsights.preferredHomeDeliverySite.name}</strong>
-                                </div>
-                                {addressInsights.preferredHomeDeliverySite.dayOfWeek ? (
-                                  <div className="small">
-                                    {formatDayOfWeekLabel(
-                                      addressInsights.preferredHomeDeliverySite.dayOfWeek
-                                    )}
-                                  </div>
-                                ) : null}
-                                {addressInsights.preferredHomeDeliverySite.address ? (
-                                  <div className="small">
-                                    {addressInsights.preferredHomeDeliverySite.address}
-                                  </div>
-                                ) : null}
-                              </div>
-                              <button
-                                className="button alt"
-                                type="button"
-                                onClick={() =>
-                                  setPreferredDropSite(
-                                    addressInsights.preferredHomeDeliverySite.name
-                                  )
-                                }
-                              >
-                                Set as preferred option
-                              </button>
-                            </div>
-                          ) : null}
-                        </div>
-                      </div>
-                      {Array.isArray(addressInsights.nearestPickupSites) &&
-                      addressInsights.nearestPickupSites.length ? (
-                        <div className="subscribe-nearest-pickup-list">
-                          <strong>Three closest pickup sites</strong>
-                          <div className="subscribe-nearest-pickup-items">
-                            {addressInsights.nearestPickupSites.map((site) => (
-                              <div
-                                key={`${site.name}-${site.address || ""}`}
-                                className="subscribe-nearest-pickup-item"
-                              >
-                                <div>
-                                  <div>
-                                    <strong>{site.name || "Unknown site"}</strong>
-                                    {Number.isFinite(Number(site.distanceMiles))
-                                      ? ` (${Number(site.distanceMiles).toFixed(2)} miles)`
-                                      : ""}
-                                  </div>
-                                  {site.dayOfWeek ? (
-                                    <div className="small">
-                                      {formatDayOfWeekLabel(site.dayOfWeek)}
-                                    </div>
-                                  ) : null}
-                                  {site.address ? <div className="small">{site.address}</div> : null}
-                                </div>
-                                {site.name ? (
-                                  <button
-                                    className="button alt"
-                                    type="button"
-                                    onClick={() => setPreferredDropSite(site.name)}
-                                  >
-                                    Set as preferred site
-                                  </button>
-                                ) : null}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ) : null}
-                    </div>
-                  ) : null}
+                  {renderAddressInsightsPanel("form")}
 
                   <div className="subscribe-form-grid">
                     <label className="filter-field">
