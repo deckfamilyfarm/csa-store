@@ -337,6 +337,25 @@ function getManualSourceValue(manualValueMap, rowLabel, weekStart) {
   return "";
 }
 
+function isLikelyExpenseMetricLabel(value) {
+  const normalized = normalizeManualMetricLabel(value);
+  return /\b(expense|expenses|cost|costs|fee|fees|rent|lease|utility|utilities|insurance|supplies|fuel|delivery|repair|repairs|processing|payroll|wage|wages|tax|taxes)\b/.test(normalized);
+}
+
+const EXCLUDED_DASHBOARD_MANUAL_METRIC_LABELS = new Set([
+  "cost of products sold",
+  "wages & fringe for packout + delivery only",
+  "delivery(includes load and clean out) hours",
+  "wages as percentage of revenue",
+  "target wages as percentage of revenue",
+  "delivery miles this week (optimaroute) inc. wholesale",
+  "# of orders home delivery"
+]);
+
+function isExcludedDashboardManualMetricLabel(value) {
+  return EXCLUDED_DASHBOARD_MANUAL_METRIC_LABELS.has(normalizeManualMetricLabel(value));
+}
+
 function normalizeManualMetricLabel(value) {
   return String(value || "")
     .trim()
@@ -354,6 +373,36 @@ function buildManualValueMapFromSourceRows(rows = [], weeks = []) {
     });
   });
   return manualValueMap;
+}
+
+function buildCustomManualRowsFromSourceRows(rows = []) {
+  const customRows = [];
+  const seen = new Set();
+
+  rows.slice(2).forEach((row) => {
+    const label = String(row?.[0] || "").trim();
+    if (!label) return;
+    const hasWeekValue = row.slice(1).some((value) => {
+      return value !== null && typeof value !== "undefined" && String(value).trim() !== "";
+    });
+    if (!hasWeekValue) return;
+
+    const normalizedLabel = normalizeManualMetricLabel(label);
+    if (!normalizedLabel || seen.has(normalizedLabel)) return;
+    if (isExcludedDashboardManualMetricLabel(label)) return;
+    if (!isLikelyExpenseMetricLabel(label)) return;
+    seen.add(normalizedLabel);
+
+    customRows.push({
+      section: "EXPENSES",
+      label,
+      entry: "MANUAL",
+      source: "Manual entry preserved from source dashboard",
+      rowLabel: label
+    });
+  });
+
+  return customRows;
 }
 
 function buildCustomManualRowsFromGeneratedRows(rows = []) {
@@ -394,6 +443,8 @@ function buildCustomManualRowsFromGeneratedRows(rows = []) {
 
     const normalizedLabel = normalizeManualMetricLabel(label);
     if (!normalizedLabel || seen.has(normalizedLabel)) return;
+    if (isExcludedDashboardManualMetricLabel(label)) return;
+    if (normalizeManualMetricLabel(currentSection || "MANUAL ENTRIES") === "manual entries") return;
     seen.add(normalizedLabel);
 
     customRows.push({
@@ -569,9 +620,20 @@ function addCustomManualRowsToLayout(layout, customManualRows = []) {
   const nextLayout = layout.map((group) => {
     const additions = additionsBySection.get(group.section) || [];
     additionsBySection.delete(group.section);
-    return additions.length
-      ? { ...group, rows: [...(group.rows || []), ...additions] }
-      : group;
+    if (!additions.length) return group;
+    const rows = group.rows || [];
+    const totalIndex = rows.findIndex((row) => normalizeManualMetricLabel(row.label) === "total expenses");
+    if (totalIndex < 0) {
+      return { ...group, rows: [...rows, ...additions] };
+    }
+    return {
+      ...group,
+      rows: [
+        ...rows.slice(0, totalIndex),
+        ...additions,
+        ...rows.slice(totalIndex)
+      ]
+    };
   });
 
   for (const [section, rows] of additionsBySection.entries()) {
@@ -579,6 +641,44 @@ function addCustomManualRowsToLayout(layout, customManualRows = []) {
   }
 
   return nextLayout;
+}
+
+function getExpenseTotalMetricLabels(layout = []) {
+  const expenseGroup = layout.find((group) => String(group.section || "").trim().toUpperCase() === "EXPENSES");
+  if (!expenseGroup) return [];
+  return (expenseGroup.rows || [])
+    .filter((row) => {
+      const normalizedLabel = normalizeManualMetricLabel(row.label);
+      if (!normalizedLabel || normalizedLabel === "total expenses") return false;
+      if (normalizedLabel.startsWith("%")) return false;
+      if (normalizedLabel.startsWith("wages - ")) return false;
+      return row.valueType === "currency" || row.entry === "MANUAL";
+    })
+    .map((row) => row.label);
+}
+
+function buildMetricSheetRowsByLabel(layout = []) {
+  const metricSheetRowsByLabel = new Map();
+  let nextSheetRowNumber = 3;
+  for (const group of layout) {
+    nextSheetRowNumber += 1;
+    for (const row of group.rows || []) {
+      metricSheetRowsByLabel.set(row.label, nextSheetRowNumber);
+      nextSheetRowNumber += 1;
+    }
+  }
+  return metricSheetRowsByLabel;
+}
+
+function getMetricCellRef(metricSheetRowsByLabel, label, columnName) {
+  const rowNumber = metricSheetRowsByLabel.get(label);
+  return rowNumber ? `${columnName}${rowNumber}` : null;
+}
+
+function getMetricCellRefs(metricSheetRowsByLabel, labels, columnName) {
+  return labels
+    .map((label) => getMetricCellRef(metricSheetRowsByLabel, label, columnName))
+    .filter(Boolean);
 }
 
 function buildDashboardRows(
@@ -595,6 +695,9 @@ function buildDashboardRows(
   const yearlyAverageOrdersByYear = buildYearlyAverageMap(weeks, weeklyKpiMap, "numOrders");
   const yearlyAverageSalesByYear = buildYearlyAverageMap(weeks, weeklyKpiMap, "totalSales");
   const getRetailSales = (week) => Number(weeklyKpiMap[week.start]?.totalSales || 0);
+  const getCashCollectedOnOrders = (week) => Number(weeklyKpiMap[week.start]?.cashCollectedOnOrders || 0);
+  const getPaymentProcessingFees = (week) => Number(weeklyKpiMap[week.start]?.paymentProcessingFees || 0);
+  const getNetOrderCash = (week) => getCashCollectedOnOrders(week) - getPaymentProcessingFees(week);
   const getPurchaseCost = (week) => Number(vendorWeeklyMap[week.start]?.purchaseCost || 0);
   const getGrossProfit = (week) => getRetailSales(week) - getPurchaseCost(week);
   const packWageTaskLabels = [
@@ -620,6 +723,7 @@ function buildDashboardRows(
       auto: (w) => Number(timesheetWeeklyMap[w.start]?.tasks?.[taskLabel] || 0)
     })
   );
+  const wageMetricLabels = wageTaskLabels.map((taskLabel) => `Wages - ${taskLabel}`);
   const layout = [
     {
       section: "GIVENS",
@@ -639,8 +743,20 @@ function buildDashboardRows(
             return ((orders - average) / average) * 100;
           }
         },
-        { label: "Num Subscriber Orders", entry: "AUTO", source: "Local DB", valueType: "int", auto: (w) => Number(weeklyKpiMap[w.start]?.numSubscriberOrders) },
-        { label: "Num Guest Orders", entry: "AUTO", source: "Local DB", valueType: "int", auto: (w) => Number(weeklyKpiMap[w.start]?.numGuestOrders) }
+        { label: "Num Guest Orders", entry: "AUTO", source: "Local DB", valueType: "int", auto: (w) => Number(weeklyKpiMap[w.start]?.numGuestOrders) },
+        {
+          label: "Num Subscriber Orders",
+          entry: "AUTO",
+          source: "Num Orders - Num Guest Orders",
+          valueType: "int",
+          formula: ({ columnName, metricSheetRowsByLabel }) => {
+            const numOrdersRef = getMetricCellRef(metricSheetRowsByLabel, "Num Orders", columnName);
+            const guestOrdersRef = getMetricCellRef(metricSheetRowsByLabel, "Num Guest Orders", columnName);
+            return numOrdersRef && guestOrdersRef
+              ? `=IF(${numOrdersRef}="","",MAX(0,${numOrdersRef}-${guestOrdersRef}))`
+              : "";
+          }
+        }
       ]
     },
     {
@@ -717,11 +833,80 @@ function buildDashboardRows(
           auto: (w) => Number(weeklyKpiMap[w.start]?.subscriptionCreditGiven)
         },
         {
-          label: "Subscription Credit Used",
+          label: "Store Credit Used",
           entry: "AUTO",
-          source: "Local Line order payment.store_credit_amount",
+          source: "Local Line order payment_store_credit_amount / payment.store_credit_amount",
           valueType: "currency",
           auto: (w) => Number(weeklyKpiMap[w.start]?.subscriptionCreditUsed)
+        },
+        {
+          label: "Cash Collected on Orders",
+          entry: "AUTO",
+          source: "Local Line order payment_strategy_amount",
+          methodology: "Sums Local Line's non-credit payment amount for paid open orders. For older rows missing payment_strategy_amount, it uses order total only when no store credit was recorded.",
+          valueType: "currency",
+          auto: (w) => getCashCollectedOnOrders(w)
+        },
+        {
+          label: "Net Order Cash",
+          entry: "AUTO",
+          source: "Cash collected on orders - payment processing fees",
+          valueType: "currency",
+          auto: (w) => getNetOrderCash(w),
+          formula: ({ columnName, metricSheetRowsByLabel }) => {
+            const cashCollectedRef = getMetricCellRef(metricSheetRowsByLabel, "Cash Collected on Orders", columnName);
+            const feesRef = getMetricCellRef(metricSheetRowsByLabel, "Payment Processing Fees", columnName);
+            return cashCollectedRef && feesRef
+              ? `=IFERROR(${cashCollectedRef}-${feesRef},"")`
+              : "";
+          }
+        },
+        {
+          label: "Member Credit Issued",
+          entry: "AUTO",
+          source: "Membership purchase credit value + member ledger credit entries",
+          methodology: "Adds Local Line membership purchase credit value to CSA member-ledger credits that are not already represented as order product sales.",
+          valueType: "currency",
+          auto: (w) => Number(weeklyKpiMap[w.start]?.memberCreditIssued || 0)
+        },
+        {
+          label: "Actual Dollars Received for Credit",
+          entry: "AUTO",
+          source: "Membership purchase income + member ledger cashReceivedCents metadata",
+          methodology: "Reports cash received for member-credit purchases separately from the face value of credits issued.",
+          valueType: "currency",
+          auto: (w) => Number(weeklyKpiMap[w.start]?.actualDollarsReceivedForCredit || 0)
+        },
+        {
+          label: "Member Bank Balance Change",
+          entry: "AUTO",
+          source: "Difference between Local Line customer credit snapshots",
+          methodology: "Calculated only when two Local Line customer export balance snapshots exist; otherwise left blank.",
+          valueType: "currency",
+          auto: (w) => {
+            const value = weeklyKpiMap[w.start]?.memberBankBalanceChange;
+            return value === null || typeof value === "undefined" ? null : Number(value);
+          },
+          formula: ({ columnName, metricSheetRowsByLabel, weekIndex }) => {
+            const balanceRow = metricSheetRowsByLabel.get("Member Bank Balance");
+            if (!balanceRow || weekIndex <= 0) return "";
+            const currentBalanceRef = `${columnName}${balanceRow}`;
+            const firstWeekColumnName = getSheetColumnName(4);
+            const previousWeekColumnName = getSheetColumnName(weekIndex + 3);
+            const previousBalancesRange = `${firstWeekColumnName}${balanceRow}:${previousWeekColumnName}${balanceRow}`;
+            return `=IFERROR(IF(${currentBalanceRef}="","",${currentBalanceRef}-LOOKUP(2,1/(${previousBalancesRange}<>""),${previousBalancesRange})),"")`;
+          }
+        },
+        {
+          label: "Member Bank Balance",
+          entry: "AUTO",
+          source: "Local Line customers export Store Credit total",
+          methodology: "Total store-credit liability from the full Local Line customer export, captured as a weekly snapshot during dashboard publish.",
+          valueType: "currency",
+          auto: (w) => {
+            const value = weeklyKpiMap[w.start]?.memberBankBalance;
+            return value === null || typeof value === "undefined" ? null : Number(value);
+          }
         },
         {
           label: "Retail Sales",
@@ -746,6 +931,13 @@ function buildDashboardRows(
             const retail = Number(vendorWeeklyMap[w.start]?.retailSales || 0);
             if (!purchase) return null;
             return ((retail - purchase) / purchase) * 100;
+          },
+          formula: ({ columnName, metricSheetRowsByLabel }) => {
+            const retailSalesRef = getMetricCellRef(metricSheetRowsByLabel, "Retail Sales", columnName);
+            const purchaseCostRef = getMetricCellRef(metricSheetRowsByLabel, "Purchase Cost", columnName);
+            return retailSalesRef && purchaseCostRef
+              ? `=IFERROR((${retailSalesRef}-${purchaseCostRef})/${purchaseCostRef},"")`
+              : "";
           }
         },
         {
@@ -770,6 +962,13 @@ function buildDashboardRows(
             const retailSales = getRetailSales(w);
             if (!retailSales) return null;
             return (getGrossProfit(w) / retailSales) * 100;
+          },
+          formula: ({ columnName, metricSheetRowsByLabel }) => {
+            const grossProfitRef = getMetricCellRef(metricSheetRowsByLabel, "Gross Profit Total", columnName);
+            const retailSalesRef = getMetricCellRef(metricSheetRowsByLabel, "Retail Sales", columnName);
+            return grossProfitRef && retailSalesRef
+              ? `=IFERROR(${grossProfitRef}/${retailSalesRef},"")`
+              : "";
           }
         },
         {
@@ -797,7 +996,11 @@ function buildDashboardRows(
           entry: "AUTO",
           source: "Timesheets DB (FFCSA wages + fringe total)",
           valueType: "currency",
-          auto: (w) => Number(timesheetWeeklyMap[w.start]?.totalWages || 0)
+          auto: (w) => Number(timesheetWeeklyMap[w.start]?.totalWages || 0),
+          formula: ({ columnName, metricSheetRowsByLabel }) => {
+            const refs = getMetricCellRefs(metricSheetRowsByLabel, wageMetricLabels, columnName);
+            return refs.length ? `=SUM(${refs.join(",")})` : "";
+          }
         },
         {
           label: "% Wages to Retail Sales",
@@ -809,6 +1012,13 @@ function buildDashboardRows(
             const retailSales = getRetailSales(w);
             if (!retailSales) return null;
             return (wages / retailSales) * 100;
+          },
+          formula: ({ columnName, metricSheetRowsByLabel }) => {
+            const wagesRef = getMetricCellRef(metricSheetRowsByLabel, "Total Wages", columnName);
+            const retailSalesRef = getMetricCellRef(metricSheetRowsByLabel, "Retail Sales", columnName);
+            return wagesRef && retailSalesRef
+              ? `=IFERROR(${wagesRef}/${retailSalesRef},"")`
+              : "";
           }
         },
         {
@@ -829,12 +1039,27 @@ function buildDashboardRows(
           }
         },
         {
-          label: "Lease Charges",
+          label: "Payment Processing Fees",
           entry: "AUTO",
-          source: "Fixed weekly dashboard assumption",
+          source: "Local Line order payment_fees + payment_tax",
+          methodology: "Uses Local Line payment_fees and payment_tax from paid open orders. If Local Line reports zero or omits these fields, this row stays zero instead of estimating processor fees.",
           valueType: "currency",
-          note: DASHBOARD_FIXED_EXPENSE_NOTE,
-          auto: () => DASHBOARD_WEEKLY_LEASE_CHARGES
+          auto: (w) => getPaymentProcessingFees(w)
+        },
+        {
+          label: "Bonus Credit Expense",
+          entry: "AUTO",
+          source: "Member credit issued - actual dollars received",
+          methodology: "Shows the bonus/manual credit portion, such as employee double-credit rules, separately from cash received.",
+          valueType: "currency",
+          auto: (w) => Number(weeklyKpiMap[w.start]?.bonusCreditExpense || 0),
+          formula: ({ columnName, metricSheetRowsByLabel }) => {
+            const creditIssuedRef = getMetricCellRef(metricSheetRowsByLabel, "Member Credit Issued", columnName);
+            const cashReceivedRef = getMetricCellRef(metricSheetRowsByLabel, "Actual Dollars Received for Credit", columnName);
+            return creditIssuedRef && cashReceivedRef
+              ? `=MAX(0,${creditIssuedRef}-${cashReceivedRef})`
+              : "";
+          }
         },
         {
           label: "Utilities",
@@ -851,11 +1076,21 @@ function buildDashboardRows(
           rowLabel: ["$ Products Given", "$ Product Credits Given"]
         },
         {
-          label: "Delivery Expenses",
+          label: "Delivery Cost",
           entry: "MANUAL",
           source: "Manual (copied from existing dashboard values by row label)",
           note: DASHBOARD_MANUAL_DELIVERY_EXPENSE_NOTE,
-          rowLabel: "Delivery Expenses"
+          rowLabel: ["Delivery Cost", "Delivery Expenses"]
+        },
+        {
+          label: "Building Depreciation & Lease",
+          entry: "MANUAL",
+          source: "Manual",
+          rowLabel: [
+            "Building Depreciation & Lease",
+            "Building Depreciation and Lease",
+            "Lease Charges"
+          ]
         },
         {
           label: "Other FFCSA operating costs",
@@ -866,19 +1101,11 @@ function buildDashboardRows(
         {
           label: "Total Expenses",
           entry: "AUTO",
-          source: "SUM($ Products Given, Delivery Expenses, Total Wages, Lease Charges, Utilities, Other FFCSA operating costs)",
+          source: "SUM(all EXPENSES currency/manual rows, excluding percentage rows)",
           valueType: "currency",
           bold: true,
           formula: ({ columnName, metricSheetRowsByLabel }) => {
-            const rowLabels = [
-              "$ Products Given",
-              "Delivery Expenses",
-              "Total Wages",
-              "Lease Charges",
-              "Utilities",
-              "Other FFCSA operating costs"
-            ];
-            const refs = rowLabels
+            const refs = totalExpenseMetricLabels
               .map((label) => metricSheetRowsByLabel.get(label))
               .filter(Boolean)
               .map((rowNumber) => `${columnName}${rowNumber}`);
@@ -891,16 +1118,30 @@ function buildDashboardRows(
       section: "NET PROFIT",
       rows: [
         {
-          label: "Net Profit Total",
+          label: "Net Profit",
           entry: "AUTO",
-          source: "Gross Profit Total - Total Expenses",
+          source: "Retail Sales - Purchase Cost - Total Expenses",
           valueType: "currency",
           bold: true,
           formula: ({ columnName, metricSheetRowsByLabel }) => {
-            const grossProfitRow = metricSheetRowsByLabel.get("Gross Profit Total");
+            const retailSalesRow = metricSheetRowsByLabel.get("Retail Sales");
+            const purchaseCostRow = metricSheetRowsByLabel.get("Purchase Cost");
             const totalExpensesRow = metricSheetRowsByLabel.get("Total Expenses");
-            return grossProfitRow && totalExpensesRow
-              ? `=${columnName}${grossProfitRow}-${columnName}${totalExpensesRow}`
+            return retailSalesRow && purchaseCostRow && totalExpensesRow
+              ? `=${columnName}${retailSalesRow}-${columnName}${purchaseCostRow}-${columnName}${totalExpensesRow}`
+              : "";
+          }
+        },
+        {
+          label: "Net Profit % of Revenue",
+          entry: "AUTO",
+          source: "Net Profit / Retail Sales",
+          valueType: "percent",
+          formula: ({ columnName, metricSheetRowsByLabel }) => {
+            const netProfitRow = metricSheetRowsByLabel.get("Net Profit");
+            const retailSalesRow = metricSheetRowsByLabel.get("Retail Sales");
+            return netProfitRow && retailSalesRow
+              ? `=IFERROR(${columnName}${netProfitRow}/${columnName}${retailSalesRow},"")`
               : "";
           }
         }
@@ -909,10 +1150,11 @@ function buildDashboardRows(
   ];
 
   const resolvedLayout = addCustomManualRowsToLayout(layout, customManualRows);
+  const totalExpenseMetricLabels = getExpenseTotalMetricLabels(resolvedLayout);
   const values = [];
   const metricRows = [];
   const sectionRows = [];
-  const metricSheetRowsByLabel = new Map();
+  const metricSheetRowsByLabel = buildMetricSheetRowsByLabel(resolvedLayout);
   const now = new Date().toISOString().replace("T", " ").slice(0, 19);
   values.push([`FFCSA Dashboard 2026`, `Updated ${now}`, "", "", ...weeks.map(() => "")]);
   values.push(["Section", "Metric", "Entry Type", "Source", ...weeks.map((w) => w.label)]);
@@ -922,7 +1164,6 @@ function buildDashboardRows(
     values.push([group.section, "", "", "", ...weeks.map(() => "")]);
     for (const row of group.rows) {
       const sheetRowNumber = values.length + 1;
-      metricSheetRowsByLabel.set(row.label, sheetRowNumber);
       const nextRow = ["", row.label, row.entry, row.source];
       for (let index = 0; index < weeks.length; index += 1) {
         const week = weeks[index];
@@ -1204,6 +1445,122 @@ function getSubscriberSnapshotSummary(rows = []) {
   };
 }
 
+function getCustomerStoreCreditAmount(row = {}) {
+  return parseCurrencyCell(
+    row["Store Credit"] ??
+      row["Store credit"] ??
+      row["Store credit balance"] ??
+      row.store_credit ??
+      row.store_credit_balance ??
+      0
+  );
+}
+
+async function fetchLocalLineCustomerCreditSummary() {
+  const accessToken = await getLocalLineAccessToken();
+  const buffer = await downloadBinaryFile(
+    `${getLocalLineBaseUrl()}customers/export/?direct=true`,
+    accessToken
+  );
+  const rows = parseRowsFromBuffer(buffer);
+  let totalBalance = 0;
+  let nonzeroBalanceCustomerCount = 0;
+
+  rows.forEach((row) => {
+    const balance = getCustomerStoreCreditAmount(row);
+    totalBalance += balance;
+    if (Math.abs(balance) > 0.000001) {
+      nonzeroBalanceCustomerCount += 1;
+    }
+  });
+
+  return {
+    customerCount: rows.length,
+    nonzeroBalanceCustomerCount,
+    totalBalance: round2(totalBalance)
+  };
+}
+
+async function captureLocalLineCustomerCreditSnapshot(connection, week) {
+  if (!week?.start || !week?.end) return null;
+  const summary = await fetchLocalLineCustomerCreditSummary();
+  const now = new Date();
+  await connection.query(
+    `
+      INSERT INTO local_line_customer_credit_snapshots (
+        snapshot_week_start,
+        snapshot_week_end,
+        customer_count,
+        nonzero_balance_customer_count,
+        total_balance,
+        captured_at,
+        summary_json,
+        created_at,
+        updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE
+        snapshot_week_end = VALUES(snapshot_week_end),
+        customer_count = VALUES(customer_count),
+        nonzero_balance_customer_count = VALUES(nonzero_balance_customer_count),
+        total_balance = VALUES(total_balance),
+        captured_at = VALUES(captured_at),
+        summary_json = VALUES(summary_json),
+        updated_at = VALUES(updated_at)
+    `,
+    [
+      week.start,
+      week.end,
+      summary.customerCount,
+      summary.nonzeroBalanceCustomerCount,
+      summary.totalBalance,
+      now,
+      stringifyJson({
+        source: "localline_live_customer_export",
+        capturedAt: now.toISOString(),
+        ...summary
+      }),
+      now,
+      now
+    ]
+  );
+
+  return {
+    weekStart: week.start,
+    weekEnd: week.end,
+    ...summary
+  };
+}
+
+async function loadCustomerCreditSnapshotForWeek(connection, weekStart) {
+  if (!weekStart) return null;
+  const [rows] = await connection.query(
+    `
+      SELECT
+        snapshot_week_start AS weekStart,
+        snapshot_week_end AS weekEnd,
+        customer_count AS customerCount,
+        nonzero_balance_customer_count AS nonzeroBalanceCustomerCount,
+        total_balance AS totalBalance,
+        captured_at AS capturedAt,
+        summary_json AS summaryJson
+      FROM local_line_customer_credit_snapshots
+      WHERE snapshot_week_start = ?
+      LIMIT 1
+    `,
+    [weekStart]
+  );
+  const row = rows?.[0] || null;
+  if (!row) return null;
+  return {
+    ...row,
+    summary: parseSnapshotRawJson(row.summaryJson)
+  };
+}
+
+function isBackfilledCustomerCreditSnapshot(snapshot) {
+  return snapshot?.summary?.source === "legacy_customer_export_backfill";
+}
+
 async function loadCurrentSnapPriceListMemberSummary() {
   const snapPriceListId = getSnapPriceListId();
   if (!snapPriceListId) {
@@ -1393,6 +1750,43 @@ async function loadWeeklyOrderMetrics(weeks) {
   const subscriptionPredicate = getDashboardSubscriptionPredicate();
   const subscriptionCreditGivenExpression = getDashboardSubscriptionCreditGivenExpression();
   const weekSql = buildInClause(weekKeys);
+  const storeCreditAmountExpression = `
+    COALESCE(
+      payment_store_credit_amount,
+      CAST(JSON_UNQUOTE(JSON_EXTRACT(raw_json, '$.payment.store_credit_amount')) AS DECIMAL(10, 2)),
+      0
+    )
+  `;
+  const paymentStrategyAmountExpression = `
+    COALESCE(
+      payment_strategy_amount,
+      CAST(JSON_UNQUOTE(JSON_EXTRACT(raw_json, '$.payment.payment_strategy_amount')) AS DECIMAL(10, 2))
+    )
+  `;
+  const cashCollectedExpression = `
+    CASE
+      WHEN COALESCE(${paymentStrategyAmountExpression}, 0) > 0
+        THEN COALESCE(${paymentStrategyAmountExpression}, 0)
+      WHEN COALESCE(${storeCreditAmountExpression}, 0) <= 0
+        THEN COALESCE(total, 0)
+      ELSE 0
+    END
+  `;
+  const paymentFeeExpression = `
+    (
+      COALESCE(
+        payment_fees,
+        CAST(JSON_UNQUOTE(JSON_EXTRACT(raw_json, '$.payment_fees')) AS DECIMAL(10, 2)),
+        0
+      )
+      +
+      COALESCE(
+        payment_tax,
+        CAST(JSON_UNQUOTE(JSON_EXTRACT(raw_json, '$.payment_tax')) AS DECIMAL(10, 2)),
+        0
+      )
+    )
+  `;
 
   const [orderRows] = await pool.query(
     `
@@ -1473,11 +1867,15 @@ async function loadWeeklyOrderMetrics(weeks) {
     `,
     weekKeys
   );
-  const [subscriptionCreditUsedRows] = await pool.query(
+  const [orderFinanceRows] = await pool.query(
     `
       SELECT
-        order_credits.weekKey,
-        COALESCE(SUM(order_credits.storeCreditAmount), 0) AS subscriptionCreditUsed
+        order_finance.weekKey,
+        COALESCE(SUM(order_finance.storeCreditAmount), 0) AS subscriptionCreditUsed,
+        COALESCE(SUM(order_finance.cashCollectedAmount), 0) AS cashCollectedOnOrders,
+        COALESCE(SUM(order_finance.paymentFeesAmount), 0) AS paymentProcessingFees,
+        COUNT(*) AS financeOrderCount,
+        COALESCE(SUM(order_finance.hasPaymentFeeData), 0) AS ordersWithPaymentFeeData
       FROM (
         SELECT
           DATE_FORMAT(
@@ -1487,25 +1885,33 @@ async function loadWeeklyOrderMetrics(weeks) {
             ),
             '%Y-%m-%d'
           ) AS weekKey,
-          CAST(JSON_UNQUOTE(JSON_EXTRACT(raw_json, '$.payment.store_credit_amount')) AS DECIMAL(10, 2)) AS storeCreditAmount
+          ${storeCreditAmountExpression} AS storeCreditAmount,
+          ${cashCollectedExpression} AS cashCollectedAmount,
+          ${paymentFeeExpression} AS paymentFeesAmount,
+          CASE
+            WHEN payment_fees IS NOT NULL
+              OR payment_tax IS NOT NULL
+              OR JSON_EXTRACT(raw_json, '$.payment_fees') IS NOT NULL
+              OR JSON_EXTRACT(raw_json, '$.payment_tax') IS NOT NULL
+            THEN 1
+            ELSE 0
+          END AS hasPaymentFeeData
         FROM local_line_orders
         WHERE status = 'OPEN'
           AND payment_status = 'PAID'
           AND COALESCE(fulfillment_date, created_at_remote) IS NOT NULL
-      ) order_credits
-      WHERE order_credits.weekKey IN (${weekSql})
-        AND order_credits.storeCreditAmount > 0
-      GROUP BY order_credits.weekKey
+      ) order_finance
+      WHERE order_finance.weekKey IN (${weekSql})
+      GROUP BY order_finance.weekKey
     `,
     weekKeys
   );
+  const ledgerFinanceMap = await loadMemberLedgerFinanceMap(weeks);
 
   const orderMap = new Map(orderRows.map((row) => [String(row.weekKey), row]));
   const reportingMap = new Map(reportingRows.map((row) => [String(row.weekKey), row]));
   const subscriptionMap = new Map(subscriptionRows.map((row) => [String(row.weekKey), row]));
-  const subscriptionCreditUsedMap = new Map(
-    subscriptionCreditUsedRows.map((row) => [String(row.weekKey), row])
-  );
+  const orderFinanceMap = new Map(orderFinanceRows.map((row) => [String(row.weekKey), row]));
   const averageOrderAmountMap = new Map();
   const orderTotalsByWeekAndOrder = new Map();
 
@@ -1548,11 +1954,27 @@ async function loadWeeklyOrderMetrics(weeks) {
     const orderRow = orderMap.get(weekKey);
     const reportingRow = reportingMap.get(weekKey);
     const subscriptionRow = subscriptionMap.get(weekKey);
-    const subscriptionCreditUsedRow = subscriptionCreditUsedMap.get(weekKey);
+    const orderFinanceRow = orderFinanceMap.get(weekKey);
+    const ledgerFinance = ledgerFinanceMap[weekKey] || {};
     const averageOrderSummary = averageOrderAmountMap.get(weekKey);
     const numOrders = Number(orderRow?.orderCount || 0);
     const numGuestOrders = Number(orderRow?.guestOrderCount || 0);
     const lineCount = Number(reportingRow?.lineCount || 0);
+    const subscriptionIncome = Number(Number(subscriptionRow?.subscriptionIncome || 0).toFixed(2));
+    const subscriptionCreditGiven = Number(
+      Number(subscriptionRow?.subscriptionCreditGiven || 0).toFixed(2)
+    );
+    const ledgerCreditIssued = Number(ledgerFinance.ledgerCreditIssued || 0);
+    const ledgerCashReceived = Number(ledgerFinance.ledgerCashReceived || 0);
+    const ledgerBonusCredit = Number(ledgerFinance.ledgerBonusCredit || 0);
+    const cashCollectedOnOrders = Number(
+      Number(orderFinanceRow?.cashCollectedOnOrders || 0).toFixed(2)
+    );
+    const paymentProcessingFees = Number(
+      Number(orderFinanceRow?.paymentProcessingFees || 0).toFixed(2)
+    );
+    const memberBankBalanceChange = ledgerFinance.memberBankBalanceChange;
+    const memberBankBalance = ledgerFinance.memberBankBalance;
     result[weekKey] = {
       numOrders,
       numGuestOrders,
@@ -1562,18 +1984,165 @@ async function loadWeeklyOrderMetrics(weeks) {
         averageOrderSummary?.count
           ? Number((averageOrderSummary.total / averageOrderSummary.count).toFixed(2))
           : Number(Number(orderRow?.averageOrderAmount || 0).toFixed(2)),
-      subscriptionIncome: Number(Number(subscriptionRow?.subscriptionIncome || 0).toFixed(2)),
-      subscriptionCreditGiven: Number(
-        Number(subscriptionRow?.subscriptionCreditGiven || 0).toFixed(2)
-      ),
+      subscriptionIncome,
+      subscriptionCreditGiven,
       subscriptionCreditUsed: Number(
-        Number(subscriptionCreditUsedRow?.subscriptionCreditUsed || 0).toFixed(2)
+        Number(orderFinanceRow?.subscriptionCreditUsed || 0).toFixed(2)
       ),
+      cashCollectedOnOrders,
+      paymentProcessingFees,
+      netOrderCash: Number(Number(cashCollectedOnOrders - paymentProcessingFees).toFixed(2)),
+      memberCreditIssued: Number(
+        Number(subscriptionCreditGiven + ledgerCreditIssued).toFixed(2)
+      ),
+      actualDollarsReceivedForCredit: Number(
+        Number(subscriptionIncome + ledgerCashReceived).toFixed(2)
+      ),
+      bonusCreditExpense: Number(
+        Number(Math.max(0, subscriptionCreditGiven - subscriptionIncome) + ledgerBonusCredit).toFixed(2)
+      ),
+      memberBankBalanceChange:
+        memberBankBalanceChange === null || typeof memberBankBalanceChange === "undefined"
+          ? null
+          : Number(Number(memberBankBalanceChange).toFixed(2)),
+      memberBankBalance:
+        memberBankBalance === null || typeof memberBankBalance === "undefined"
+          ? null
+          : Number(Number(memberBankBalance).toFixed(2)),
+      financeOrderCount: Number(orderFinanceRow?.financeOrderCount || 0),
+      ordersWithPaymentFeeData: Number(orderFinanceRow?.ordersWithPaymentFeeData || 0),
       totalSales: Number(Number(reportingRow?.retailAmount || 0).toFixed(2))
     };
   });
 
   return result;
+}
+
+async function loadMemberLedgerFinanceMap(weeks) {
+  const pool = getPool();
+  const orderedWeeks = (Array.isArray(weeks) ? weeks : [])
+    .filter((week) => week?.start && week?.end)
+    .slice()
+    .sort((left, right) => String(left.start).localeCompare(String(right.start)));
+  if (!orderedWeeks.length) return {};
+
+  const firstWeekStart = orderedWeeks[0].start;
+  const lastWeekEnd = orderedWeeks[orderedWeeks.length - 1].end;
+
+  const cashReceivedCentsExpression = `
+    CAST(JSON_UNQUOTE(JSON_EXTRACT(e.metadata_json, '$.cashReceivedCents')) AS SIGNED)
+  `;
+  const creditIssuedCentsExpression = `
+    CAST(JSON_UNQUOTE(JSON_EXTRACT(e.metadata_json, '$.creditIssuedCents')) AS SIGNED)
+  `;
+  const bonusCreditCentsExpression = `
+    CAST(JSON_UNQUOTE(JSON_EXTRACT(e.metadata_json, '$.bonusCreditCents')) AS SIGNED)
+  `;
+
+  try {
+    const [weeklyRows] = await pool.query(
+      `
+        SELECT
+          DATE_FORMAT(
+            DATE_SUB(DATE(e.effective_date), INTERVAL WEEKDAY(DATE(e.effective_date)) DAY),
+            '%Y-%m-%d'
+          ) AS weekKey,
+          COALESCE(SUM(
+            CASE
+              WHEN e.amount_cents > 0
+                AND e.entry_type IN ('subscription_deposit', 'dividend_credit', 'localline_credit_import')
+              THEN COALESCE(${creditIssuedCentsExpression}, e.amount_cents)
+              ELSE 0
+            END
+          ), 0) AS ledgerCreditIssuedCents,
+          COALESCE(SUM(
+            CASE
+              WHEN e.amount_cents > 0
+                AND e.entry_type IN ('subscription_deposit', 'dividend_credit')
+              THEN COALESCE(${cashReceivedCentsExpression}, e.amount_cents)
+              WHEN e.amount_cents > 0
+                AND e.entry_type = 'localline_credit_import'
+              THEN COALESCE(${cashReceivedCentsExpression}, 0)
+              ELSE 0
+            END
+          ), 0) AS ledgerCashReceivedCents,
+          COALESCE(SUM(
+            CASE
+              WHEN e.amount_cents > 0
+                AND e.entry_type IN ('subscription_deposit', 'dividend_credit', 'localline_credit_import')
+              THEN COALESCE(
+                ${bonusCreditCentsExpression},
+                GREATEST(
+                  COALESCE(${creditIssuedCentsExpression}, e.amount_cents)
+                    - CASE
+                        WHEN e.entry_type IN ('subscription_deposit', 'dividend_credit')
+                        THEN COALESCE(${cashReceivedCentsExpression}, e.amount_cents)
+                        ELSE COALESCE(${cashReceivedCentsExpression}, 0)
+                      END,
+                  0
+                )
+              )
+              ELSE 0
+            END
+          ), 0) AS ledgerBonusCreditCents,
+          COUNT(*) AS ledgerEntryCount
+        FROM member_ledger_entries e
+        JOIN member_ledger_accounts a ON a.id = e.account_id
+        WHERE e.effective_date >= ?
+          AND e.effective_date < DATE_ADD(?, INTERVAL 1 DAY)
+        GROUP BY weekKey
+      `,
+      [firstWeekStart, lastWeekEnd]
+    );
+
+    const [snapshotRows] = await pool.query(
+      `
+        SELECT
+          snapshot_week_start AS weekKey,
+          total_balance AS totalBalance
+        FROM local_line_customer_credit_snapshots
+        WHERE snapshot_week_start <= ?
+        ORDER BY snapshot_week_start ASC
+      `,
+      [orderedWeeks[orderedWeeks.length - 1].start]
+    );
+
+    const weeklyMap = new Map(weeklyRows.map((row) => [String(row.weekKey), row]));
+    const snapshotMap = new Map(snapshotRows.map((row) => [String(row.weekKey), Number(row.totalBalance)]));
+    const result = {};
+
+    orderedWeeks.forEach((week) => {
+      const row = weeklyMap.get(String(week.start)) || {};
+      const snapshotBalance = snapshotMap.has(String(week.start))
+        ? Number(snapshotMap.get(String(week.start)))
+        : null;
+      const previousSnapshot = snapshotRows
+        .filter((snapshotRow) => String(snapshotRow.weekKey) < String(week.start))
+        .slice(-1)[0];
+      const previousSnapshotBalance =
+        previousSnapshot && Number.isFinite(Number(previousSnapshot.totalBalance))
+          ? Number(previousSnapshot.totalBalance)
+          : null;
+      const snapshotChange =
+        snapshotBalance !== null && previousSnapshotBalance !== null
+          ? snapshotBalance - previousSnapshotBalance
+          : null;
+      result[week.start] = {
+        ledgerCreditIssued: Number(Number(row.ledgerCreditIssuedCents || 0) / 100),
+        ledgerCashReceived: Number(Number(row.ledgerCashReceivedCents || 0) / 100),
+        ledgerBonusCredit: Number(Number(row.ledgerBonusCreditCents || 0) / 100),
+        memberBankBalanceChange: snapshotChange === null ? null : round2(snapshotChange),
+        memberBankBalance: snapshotBalance === null ? null : round2(snapshotBalance)
+      };
+    });
+
+    return result;
+  } catch (error) {
+    if (error?.code === "ER_NO_SUCH_TABLE") {
+      return {};
+    }
+    throw error;
+  }
 }
 
 async function loadVendorWeeklyMap(weeks) {
@@ -2908,7 +3477,10 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       buildManualValueMapFromSourceRows(sourceRows, sourceWeeks),
       buildManualValueMapFromGeneratedRows(targetRows)
     );
-    const customManualRows = buildCustomManualRowsFromGeneratedRows(targetRows);
+    const customManualRows = [
+      ...buildCustomManualRowsFromSourceRows(sourceRows),
+      ...buildCustomManualRowsFromGeneratedRows(targetRows)
+    ];
     const availability = await loadDashboardPublishAvailability();
     const dashboardWeeks = mergeDashboardWeeks(sourceWeeks, targetWeeks);
     const { weeks, addedWeeks } = extendWeeksThroughPublishableWeek(
@@ -2956,6 +3528,24 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       dashboardWarnings.push(
         `Could not refresh SNAP price-list member count; using cached value. ${error?.message || error}`
       );
+    }
+
+    const publishableWeeks = weeks.filter((week) => publishableWeekStarts.has(week.start));
+    const latestPublishableWeek = publishableWeeks[publishableWeeks.length - 1] || null;
+    if (latestPublishableWeek) {
+      try {
+        const existingCustomerCreditSnapshot = await loadCustomerCreditSnapshotForWeek(
+          connection,
+          latestPublishableWeek.start
+        );
+        if (!isBackfilledCustomerCreditSnapshot(existingCustomerCreditSnapshot)) {
+          await captureLocalLineCustomerCreditSnapshot(connection, latestPublishableWeek);
+        }
+      } catch (error) {
+        dashboardWarnings.push(
+          `Could not refresh Local Line member-bank balance snapshot; leaving unsnapped weeks blank. ${error?.message || error}`
+        );
+      }
     }
 
     reportProgress({

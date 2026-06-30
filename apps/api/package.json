@@ -16,6 +16,7 @@
     "sync:localline-store": "node scripts/auditLocalLineSync.js --write",
     "sync:localline-cache": "node scripts/syncLocalLineCache.js",
     "sync:localline-full": "node scripts/syncLocalLineFull.js",
+    "backfill:localline-customer-credit": "node --env-file=../../.env scripts/backfillLocalLineCustomerCreditSnapshots.js",
     "sync:localline-automation": "node --env-file=../../.env scripts/runLocalLineAutomation.js",
     "sync:timesheets-users": "node scripts/syncTimesheetsUsers.js"
   },

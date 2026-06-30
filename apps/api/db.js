@@ -1522,6 +1522,13 @@ const LOCAL_LINE_TABLE_STATEMENTS = [
       pickup_start_time VARCHAR(32),
       pickup_end_time VARCHAR(32),
       payment_status VARCHAR(64),
+      payment_store_credit_amount DECIMAL(10, 2),
+      payment_strategy_amount DECIMAL(10, 2),
+      payment_strategy_name VARCHAR(255),
+      payment_strategy_type VARCHAR(255),
+      payment_fees DECIMAL(10, 2),
+      payment_tax DECIMAL(10, 2),
+      payment_strategy_fees_json TEXT,
       subtotal DECIMAL(10, 2),
       tax DECIMAL(10, 2),
       total DECIMAL(10, 2),
@@ -1627,6 +1634,19 @@ const LOCAL_LINE_TABLE_STATEMENTS = [
       skipped_subscriber_count INT,
       feed_a_friend_subscriber_count INT,
       captured_at DATETIME,
+      created_at DATETIME,
+      updated_at DATETIME
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS local_line_customer_credit_snapshots (
+      snapshot_week_start VARCHAR(10) PRIMARY KEY,
+      snapshot_week_end VARCHAR(10),
+      customer_count INT,
+      nonzero_balance_customer_count INT,
+      total_balance DECIMAL(12, 2),
+      captured_at DATETIME,
+      summary_json TEXT,
       created_at DATETIME,
       updated_at DATETIME
     )
@@ -1868,6 +1888,11 @@ const LOCAL_LINE_INDEX_STATEMENTS = [
     tableName: "local_line_subscription_snapshot_runs",
     indexName: "idx_local_line_subscription_snapshot_runs_captured",
     columns: "captured_at"
+  },
+  {
+    tableName: "local_line_customer_credit_snapshots",
+    indexName: "idx_local_line_customer_credit_snapshots_captured",
+    columns: "captured_at"
   }
 ];
 
@@ -2031,6 +2056,41 @@ const LOCAL_LINE_COLUMN_STATEMENTS = [
     tableName: "local_line_orders",
     columnName: "pickup_end_time",
     definition: "pickup_end_time VARCHAR(32)"
+  },
+  {
+    tableName: "local_line_orders",
+    columnName: "payment_store_credit_amount",
+    definition: "payment_store_credit_amount DECIMAL(10, 2)"
+  },
+  {
+    tableName: "local_line_orders",
+    columnName: "payment_strategy_amount",
+    definition: "payment_strategy_amount DECIMAL(10, 2)"
+  },
+  {
+    tableName: "local_line_orders",
+    columnName: "payment_strategy_name",
+    definition: "payment_strategy_name VARCHAR(255)"
+  },
+  {
+    tableName: "local_line_orders",
+    columnName: "payment_strategy_type",
+    definition: "payment_strategy_type VARCHAR(255)"
+  },
+  {
+    tableName: "local_line_orders",
+    columnName: "payment_fees",
+    definition: "payment_fees DECIMAL(10, 2)"
+  },
+  {
+    tableName: "local_line_orders",
+    columnName: "payment_tax",
+    definition: "payment_tax DECIMAL(10, 2)"
+  },
+  {
+    tableName: "local_line_orders",
+    columnName: "payment_strategy_fees_json",
+    definition: "payment_strategy_fees_json TEXT"
   },
   {
     tableName: "local_line_subscription_snapshot_runs",

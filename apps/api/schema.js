@@ -852,6 +852,13 @@ export const localLineOrders = mysqlTable(
     pickupStartTime: varchar("pickup_start_time", { length: 32 }),
     pickupEndTime: varchar("pickup_end_time", { length: 32 }),
     paymentStatus: varchar("payment_status", { length: 64 }),
+    paymentStoreCreditAmount: decimal("payment_store_credit_amount", { precision: 10, scale: 2 }),
+    paymentStrategyAmount: decimal("payment_strategy_amount", { precision: 10, scale: 2 }),
+    paymentStrategyName: varchar("payment_strategy_name", { length: 255 }),
+    paymentStrategyType: varchar("payment_strategy_type", { length: 255 }),
+    paymentFees: decimal("payment_fees", { precision: 10, scale: 2 }),
+    paymentTax: decimal("payment_tax", { precision: 10, scale: 2 }),
+    paymentStrategyFeesJson: text("payment_strategy_fees_json"),
     subtotal: decimal("subtotal", { precision: 10, scale: 2 }),
     tax: decimal("tax", { precision: 10, scale: 2 }),
     total: decimal("total", { precision: 10, scale: 2 }),
@@ -975,6 +982,18 @@ export const localLineSubscriptionSnapshotRuns = mysqlTable(
     updatedAt: datetime("updated_at")
   }
 );
+
+export const localLineCustomerCreditSnapshots = mysqlTable("local_line_customer_credit_snapshots", {
+  snapshotWeekStart: varchar("snapshot_week_start", { length: 10 }).primaryKey(),
+  snapshotWeekEnd: varchar("snapshot_week_end", { length: 10 }),
+  customerCount: int("customer_count"),
+  nonzeroBalanceCustomerCount: int("nonzero_balance_customer_count"),
+  totalBalance: decimal("total_balance", { precision: 12, scale: 2 }),
+  capturedAt: datetime("captured_at"),
+  summaryJson: text("summary_json"),
+  createdAt: datetime("created_at"),
+  updatedAt: datetime("updated_at")
+});
 
 export const localLineSyncCursors = mysqlTable("local_line_sync_cursors", {
   syncKey: varchar("sync_key", { length: 64 }).primaryKey(),

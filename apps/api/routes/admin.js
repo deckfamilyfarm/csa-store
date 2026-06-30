@@ -6088,6 +6088,9 @@ async function syncLocalLineOrdersToStore({ reportProgress = () => {}, cutoffDat
         const customer = order?.customer || {};
         const fulfillment = order?.fulfillment || {};
         const payment = order?.payment || {};
+        const paymentStrategyFees = Array.isArray(payment?.order_payment_strategy?.fees)
+          ? payment.order_payment_strategy.fees
+          : null;
         const orderEntries = Array.isArray(order?.order_entries) ? order.order_entries : [];
         const now = new Date();
         const fulfillmentDate = toDateOrNull(fulfillment?.fulfillment_date);
@@ -6114,6 +6117,13 @@ async function syncLocalLineOrdersToStore({ reportProgress = () => {}, cutoffDat
               pickup_start_time,
               pickup_end_time,
               payment_status,
+              payment_store_credit_amount,
+              payment_strategy_amount,
+              payment_strategy_name,
+              payment_strategy_type,
+              payment_fees,
+              payment_tax,
+              payment_strategy_fees_json,
               subtotal,
               tax,
               total,
@@ -6123,7 +6133,7 @@ async function syncLocalLineOrdersToStore({ reportProgress = () => {}, cutoffDat
               created_at,
               updated_at,
               last_synced_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON DUPLICATE KEY UPDATE
               status = VALUES(status),
               price_list_id = VALUES(price_list_id),
@@ -6141,6 +6151,13 @@ async function syncLocalLineOrdersToStore({ reportProgress = () => {}, cutoffDat
               pickup_start_time = VALUES(pickup_start_time),
               pickup_end_time = VALUES(pickup_end_time),
               payment_status = VALUES(payment_status),
+              payment_store_credit_amount = VALUES(payment_store_credit_amount),
+              payment_strategy_amount = VALUES(payment_strategy_amount),
+              payment_strategy_name = VALUES(payment_strategy_name),
+              payment_strategy_type = VALUES(payment_strategy_type),
+              payment_fees = VALUES(payment_fees),
+              payment_tax = VALUES(payment_tax),
+              payment_strategy_fees_json = VALUES(payment_strategy_fees_json),
               subtotal = VALUES(subtotal),
               tax = VALUES(tax),
               total = VALUES(total),
@@ -6173,6 +6190,13 @@ async function syncLocalLineOrdersToStore({ reportProgress = () => {}, cutoffDat
             toNullableString(fulfillment?.pickup_start_time),
             toNullableString(fulfillment?.pickup_end_time),
             toNullableString(payment?.status),
+            toDbDecimal(payment?.store_credit_amount),
+            toDbDecimal(payment?.payment_strategy_amount),
+            toNullableString(payment?.payment_strategy_name),
+            toNullableString(payment?.payment_strategy_type),
+            toDbDecimal(order?.payment_fees),
+            toDbDecimal(order?.payment_tax),
+            stringifyJson(paymentStrategyFees),
             toDbDecimal(order?.subtotal),
             toDbDecimal(order?.tax),
             toDbDecimal(order?.total),

@@ -232,6 +232,13 @@ CREATE TABLE IF NOT EXISTS local_line_orders (
   pickup_start_time VARCHAR(32),
   pickup_end_time VARCHAR(32),
   payment_status VARCHAR(64),
+  payment_store_credit_amount DECIMAL(10, 2),
+  payment_strategy_amount DECIMAL(10, 2),
+  payment_strategy_name VARCHAR(255),
+  payment_strategy_type VARCHAR(255),
+  payment_fees DECIMAL(10, 2),
+  payment_tax DECIMAL(10, 2),
+  payment_strategy_fees_json TEXT,
   subtotal DECIMAL(10, 2),
   tax DECIMAL(10, 2),
   total DECIMAL(10, 2),
@@ -291,6 +298,21 @@ CREATE INDEX IF NOT EXISTS idx_local_line_order_entries_vendor
 CREATE INDEX IF NOT EXISTS idx_local_line_order_entries_product
   ON local_line_order_entries (product_name);
 
+CREATE TABLE IF NOT EXISTS local_line_customer_credit_snapshots (
+  snapshot_week_start VARCHAR(10) PRIMARY KEY,
+  snapshot_week_end VARCHAR(10),
+  customer_count INT,
+  nonzero_balance_customer_count INT,
+  total_balance DECIMAL(12, 2),
+  captured_at DATETIME,
+  summary_json TEXT,
+  created_at DATETIME,
+  updated_at DATETIME
+);
+
+CREATE INDEX IF NOT EXISTS idx_local_line_customer_credit_snapshots_captured
+  ON local_line_customer_credit_snapshots (captured_at);
+
 CREATE TABLE IF NOT EXISTS local_line_sync_cursors (
   sync_key VARCHAR(64) PRIMARY KEY,
   cursor_value VARCHAR(255),
@@ -322,6 +344,13 @@ ALTER TABLE local_line_orders ADD COLUMN IF NOT EXISTS fulfillment_strategy_name
 ALTER TABLE local_line_orders ADD COLUMN IF NOT EXISTS fulfillment_date DATETIME;
 ALTER TABLE local_line_orders ADD COLUMN IF NOT EXISTS pickup_start_time VARCHAR(32);
 ALTER TABLE local_line_orders ADD COLUMN IF NOT EXISTS pickup_end_time VARCHAR(32);
+ALTER TABLE local_line_orders ADD COLUMN IF NOT EXISTS payment_store_credit_amount DECIMAL(10, 2);
+ALTER TABLE local_line_orders ADD COLUMN IF NOT EXISTS payment_strategy_amount DECIMAL(10, 2);
+ALTER TABLE local_line_orders ADD COLUMN IF NOT EXISTS payment_strategy_name VARCHAR(255);
+ALTER TABLE local_line_orders ADD COLUMN IF NOT EXISTS payment_strategy_type VARCHAR(255);
+ALTER TABLE local_line_orders ADD COLUMN IF NOT EXISTS payment_fees DECIMAL(10, 2);
+ALTER TABLE local_line_orders ADD COLUMN IF NOT EXISTS payment_tax DECIMAL(10, 2);
+ALTER TABLE local_line_orders ADD COLUMN IF NOT EXISTS payment_strategy_fees_json TEXT;
 
 CREATE UNIQUE INDEX IF NOT EXISTS ux_drop_sites_local_line_fulfillment
   ON drop_sites (local_line_fulfillment_strategy_id);

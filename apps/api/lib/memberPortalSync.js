@@ -32,6 +32,39 @@ function toCents(value) {
   return Math.round(numeric * 100);
 }
 
+function parseJsonObject(value) {
+  if (!value || typeof value !== "string") return null;
+  try {
+    return JSON.parse(value);
+  } catch (_error) {
+    return null;
+  }
+}
+
+function getOrderStoreCreditCents(order) {
+  const directValue = order?.paymentStoreCreditAmount;
+  if (directValue !== null && typeof directValue !== "undefined" && directValue !== "") {
+    return Math.max(0, toCents(directValue));
+  }
+
+  const raw = parseJsonObject(order?.rawJson);
+  const rawValue =
+    raw?.payment?.store_credit_amount ??
+    raw?.payment?.storeCreditAmount ??
+    null;
+  if (rawValue !== null && typeof rawValue !== "undefined" && rawValue !== "") {
+    return Math.max(0, toCents(rawValue));
+  }
+
+  return null;
+}
+
+function getOrderCreditDebitCents(order) {
+  const storeCreditCents = getOrderStoreCreditCents(order);
+  if (storeCreditCents !== null) return storeCreditCents;
+  return toCents(order?.total);
+}
+
 function normalizeRemoteTransactionId(transaction) {
   const value = transaction?.id ?? transaction?.uuid ?? transaction?.reference ?? null;
   if (value === null || value === undefined || value === "") return null;
@@ -664,7 +697,7 @@ export async function syncMemberLocalLinePurchaseDebits({ userId = null, dryRun 
       const alreadyExists = await ledgerReferenceExists(link.userId, "localline_order", orderReferenceId);
       if (alreadyExists) continue;
 
-      const orderTotalCents = toCents(order.total);
+      const orderTotalCents = getOrderCreditDebitCents(order);
       if (orderTotalCents <= 0) continue;
 
       const effectiveDate = order.fulfillmentDate || order.updatedAtRemote || order.createdAtRemote || new Date();

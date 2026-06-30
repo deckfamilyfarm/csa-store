@@ -151,26 +151,40 @@ async function applyPaidInvoiceToMemberPortal({
 
   const depositReferenceId = referenceBase;
   const herdshareReferenceId = `${referenceBase}:herdshare`;
-  const depositAmountCents =
+  const creditIssuedCents =
     Number(subscription.planAmountCents || 0) || Number(invoice?.amount_paid || 0);
+  const cashReceivedCents =
+    Number.isFinite(Number(invoice?.amount_paid)) && Number(invoice?.amount_paid) > 0
+      ? Number(invoice.amount_paid)
+      : creditIssuedCents;
+  const bonusCreditCents = Math.max(0, creditIssuedCents - cashReceivedCents);
   const herdshareFeeCents = Number(settings.herdshareMonthlyFeeCents || 500);
 
   let createdDeposit = false;
   let createdHerdshareCharge = false;
 
   if (
-    depositAmountCents > 0 &&
+    creditIssuedCents > 0 &&
     !(await ledgerReferenceExists(subscription.userId, "stripe_invoice", depositReferenceId))
   ) {
     await createLedgerEntry({
       accountId: wallet.id,
       userId: subscription.userId,
       entryType: "subscription_deposit",
-      amountCents: depositAmountCents,
+      amountCents: creditIssuedCents,
       effectiveDate: now,
       referenceType: "stripe_invoice",
       referenceId: depositReferenceId,
-      description: `Subscription deposit for ${subscription.planKey}`
+      description: `Subscription deposit for ${subscription.planKey}`,
+      metadata: {
+        source: "stripe_invoice",
+        stripeInvoiceId: invoice?.id || null,
+        stripeSubscriptionId: invoice?.subscription || subscription.stripeSubscriptionId || null,
+        planKey: subscription.planKey,
+        cashReceivedCents,
+        creditIssuedCents,
+        bonusCreditCents
+      }
     });
     createdDeposit = true;
   }
