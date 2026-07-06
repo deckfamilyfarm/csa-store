@@ -964,6 +964,147 @@ function buildVendorEntryMatchSql({
   return `(${clauses.join(" OR ")})`;
 }
 
+function buildVendorReportingMatchSql({
+  entryAlias = "r",
+  vendorName = "",
+  vendorId = null
+} = {}) {
+  const clauses = [`LOWER(TRIM(COALESCE(${entryAlias}.vendor_name, ''))) = LOWER(TRIM(?))`];
+  if (Number.isFinite(Number(vendorId)) && Number(vendorId) > 0) {
+    clauses.push(`${entryAlias}.vendor_id = ?`);
+    clauses.push(
+      `EXISTS (
+        SELECT 1
+        FROM local_line_product_meta llpm_vendor
+        JOIN products vendor_products_by_id
+          ON vendor_products_by_id.id = llpm_vendor.product_id
+        WHERE llpm_vendor.local_line_product_id = ${entryAlias}.product_id
+          AND vendor_products_by_id.vendor_id = ?
+      )`
+    );
+    clauses.push(
+      `EXISTS (
+        SELECT 1
+        FROM products vendor_products_by_name
+        WHERE vendor_products_by_name.name = ${entryAlias}.product_name
+          AND vendor_products_by_name.vendor_id = ?
+      )`
+    );
+  }
+  return `(${clauses.join(" OR ")})`;
+}
+
+function buildVendorMatchParams(vendorName = "", vendorId = null, idUseCount = 3) {
+  const params = [vendorName];
+  if (Number.isFinite(Number(vendorId)) && Number(vendorId) > 0) {
+    for (let index = 0; index < idUseCount; index += 1) {
+      params.push(Number(vendorId));
+    }
+  }
+  return params;
+}
+
+async function syncVendorNamesFromLocalLineCache(connection = getPool()) {
+  let vendorRows = [];
+  try {
+    [vendorRows] = await connection.query(
+      `
+        SELECT
+          e.vendor_id AS vendorId,
+          e.vendor_name AS vendorName,
+          COUNT(*) AS rowCount,
+          MAX(COALESCE(o.fulfillment_date, o.created_at_remote, e.updated_at, e.last_synced_at, e.created_at)) AS lastSeenAt
+        FROM local_line_order_entries e
+        LEFT JOIN local_line_orders o
+          ON o.local_line_order_id = e.local_line_order_id
+        WHERE e.vendor_id IS NOT NULL
+          AND e.vendor_id > 0
+          AND e.vendor_name IS NOT NULL
+          AND TRIM(e.vendor_name) <> ''
+        GROUP BY e.vendor_id, e.vendor_name
+      `
+    );
+  } catch (error) {
+    if (!isMissingTableError(error, "local_line_order_entries")) {
+      throw error;
+    }
+  }
+
+  const vendorById = new Map();
+  vendorRows.forEach((row) => {
+    const vendorId = Number(row.vendorId);
+    const vendorName = String(row.vendorName || "").trim();
+    if (!Number.isFinite(vendorId) || vendorId <= 0 || !vendorName) return;
+    const current = vendorById.get(vendorId);
+    const rowSeen = toTimestamp(row.lastSeenAt);
+    const currentSeen = toTimestamp(current?.lastSeenAt);
+    const rowCount = Number(row.rowCount || 0);
+    const currentCount = Number(current?.rowCount || 0);
+    if (!current || rowSeen > currentSeen || (rowSeen === currentSeen && rowCount > currentCount)) {
+      vendorById.set(vendorId, {
+        vendorId,
+        vendorName,
+        rowCount,
+        lastSeenAt: row.lastSeenAt
+      });
+    }
+  });
+
+  let vendorsInserted = 0;
+  let vendorsRenamed = 0;
+  for (const vendor of vendorById.values()) {
+    const [existingRows] = await connection.query(
+      "SELECT id, name FROM vendors WHERE id = ? LIMIT 1",
+      [vendor.vendorId]
+    );
+    const existing = existingRows[0] || null;
+    if (!existing) {
+      await connection.query(
+        "INSERT INTO vendors (id, name) VALUES (?, ?)",
+        [vendor.vendorId, vendor.vendorName]
+      );
+      vendorsInserted += 1;
+    } else if (String(existing.name || "").trim() !== vendor.vendorName) {
+      await connection.query(
+        "UPDATE vendors SET name = ? WHERE id = ?",
+        [vendor.vendorName, vendor.vendorId]
+      );
+      vendorsRenamed += 1;
+    }
+  }
+
+  let productsUpdated = 0;
+  try {
+    const [productResult] = await connection.query(
+      `
+        UPDATE products p
+        JOIN local_line_product_meta llpm
+          ON llpm.product_id = p.id
+        JOIN vendors v
+          ON LOWER(TRIM(v.name)) = LOWER(TRIM(llpm.vendor_name))
+        SET
+          p.vendor_id = v.id,
+          p.updated_at = NOW()
+        WHERE llpm.vendor_name IS NOT NULL
+          AND TRIM(llpm.vendor_name) <> ''
+          AND (p.vendor_id IS NULL OR p.vendor_id <> v.id)
+      `
+    );
+    productsUpdated = Number(productResult?.affectedRows || 0);
+  } catch (error) {
+    if (!isMissingTableError(error, "local_line_product_meta")) {
+      throw error;
+    }
+  }
+
+  return {
+    vendorsSeen: vendorById.size,
+    vendorsInserted,
+    vendorsRenamed,
+    productsUpdated
+  };
+}
+
 function stripHtmlToText(value) {
   return String(value || "")
     .replace(/<br\s*\/?>/gi, " ")
@@ -5238,6 +5379,83 @@ router.get("/vendors", requireAdmin, async (_req, res) => {
   res.json({ vendors: rows });
 });
 
+router.get("/vendors/:id/analytics", requireAdminPermission("admin"), async (req, res) => {
+  await ensureLocalLineSyncSchema().catch((error) => {
+    console.warn("Local Line schema bootstrap skipped for /admin/vendors/:id/analytics:", error.message);
+  });
+
+  const id = Number(req.params.id);
+  if (!Number.isFinite(id)) {
+    return res.status(400).json({ error: "Invalid vendor id." });
+  }
+
+  const pool = getPool();
+  const [vendorRows] = await pool.query(
+    `
+      SELECT
+        id,
+        name,
+        price_list_markup AS priceListMarkup,
+        source_multiplier AS sourceMultiplier,
+        guest_markup AS guestMarkup,
+        member_markup AS memberMarkup
+      FROM vendors
+      WHERE id = ?
+      LIMIT 1
+    `,
+    [id]
+  );
+  const vendor = vendorRows[0] || null;
+  if (!vendor) {
+    return res.status(404).json({ error: "Vendor not found." });
+  }
+
+  const monthKeys = buildRecentMonthKeys(new Date(), 12);
+  let analytics = null;
+  try {
+    analytics = await buildVendorAnalyticsFromReportingCache(pool, vendor, monthKeys);
+  } catch (error) {
+    if (!isMissingTableError(error, "local_line_order_reporting_entries")) {
+      throw error;
+    }
+  }
+
+  if (!analytics) {
+    try {
+      analytics = await buildVendorAnalyticsFromOrderEntries(pool, vendor, monthKeys);
+    } catch (error) {
+      if (!isMissingTableError(error, "local_line_orders") && !isMissingTableError(error, "local_line_order_entries")) {
+        throw error;
+      }
+      analytics = {
+        source: "none",
+        monthlySales: buildEmptyVendorMonthlySales(monthKeys),
+        topProductsByMonth: buildVendorTopProductsByMonth(monthKeys, [])
+      };
+    }
+  }
+
+  return res.json({
+    vendor,
+    analytics: {
+      monthCount: monthKeys.length,
+      ...analytics
+    }
+  });
+});
+
+router.post("/vendors/sync-names", requireAdminPermission("admin"), async (_req, res) => {
+  await ensureLocalLineSyncSchema().catch((error) => {
+    console.warn("Local Line schema bootstrap skipped for /admin/vendors/sync-names:", error.message);
+  });
+
+  const summary = await syncVendorNamesFromLocalLineCache();
+  return res.json({
+    ok: true,
+    summary
+  });
+});
+
 const LOCAL_LINE_FULFILLMENT_JOB_PHASES = [
   { key: "fetch", label: "Fetch Fulfillments" },
   { key: "store", label: "Store Fulfillments" },
@@ -6669,6 +6887,260 @@ function buildRecentWeekKeys(latestDate, count = 12) {
     keys.push(formatUtcDateKey(weekStart));
   }
   return keys.reverse();
+}
+
+function buildEmptyVendorMonthlySales(monthKeys = []) {
+  return monthKeys.map((month) => ({
+    month,
+    orderCount: 0,
+    lineCount: 0,
+    unitCount: 0,
+    retailAmount: 0
+  }));
+}
+
+function buildVendorMonthlySales(monthKeys = [], rows = []) {
+  const rowsByMonth = new Map(
+    rows.map((row) => [
+      String(row.month || ""),
+      {
+        month: String(row.month || ""),
+        orderCount: Number(row.orderCount || 0),
+        lineCount: Number(row.lineCount || 0),
+        unitCount: Number(Number(toNumber(row.unitCount) || 0).toFixed(3)),
+        retailAmount: Number(Number(toNumber(row.retailAmount) || 0).toFixed(2))
+      }
+    ])
+  );
+
+  return monthKeys.map((month) => rowsByMonth.get(month) || {
+    month,
+    orderCount: 0,
+    lineCount: 0,
+    unitCount: 0,
+    retailAmount: 0
+  });
+}
+
+function buildVendorTopProductsByMonth(monthKeys = [], rows = []) {
+  const groupedRows = new Map();
+  rows.forEach((row) => {
+    const month = String(row.month || "");
+    if (!month) return;
+    const productRows = groupedRows.get(month) || [];
+    const unitCount = Number(toNumber(row.unitCount) || 0);
+    const retailAmount = Number(toNumber(row.retailAmount) || 0);
+    productRows.push({
+      productName: row.productName || "Unknown product",
+      orderCount: Number(row.orderCount || 0),
+      lineCount: Number(row.lineCount || 0),
+      unitCount: Number(unitCount.toFixed(3)),
+      retailAmount: Number(retailAmount.toFixed(2))
+    });
+    groupedRows.set(month, productRows);
+  });
+
+  return monthKeys.map((month) => ({
+    month,
+    products: (groupedRows.get(month) || [])
+      .sort((left, right) => (
+        Number(right.retailAmount || 0) - Number(left.retailAmount || 0) ||
+        Number(right.unitCount || 0) - Number(left.unitCount || 0) ||
+        String(left.productName || "").localeCompare(String(right.productName || ""))
+      ))
+      .slice(0, 10)
+  }));
+}
+
+async function buildVendorAnalyticsFromReportingCache(pool, vendor, monthKeys = []) {
+  const vendorId = Number(vendor?.id);
+  const vendorName = String(vendor?.name || "").trim();
+  const monthPlaceholders = monthKeys.map(() => "?").join(", ");
+  const directVendorWhereSql = Number.isFinite(vendorId) && vendorId > 0
+    ? "(LOWER(TRIM(COALESCE(r.vendor_name, ''))) = LOWER(TRIM(?)) OR r.vendor_id = ?)"
+    : "LOWER(TRIM(COALESCE(r.vendor_name, ''))) = LOWER(TRIM(?))";
+  const directVendorParams = Number.isFinite(vendorId) && vendorId > 0
+    ? [vendorName, vendorId]
+    : [vendorName];
+  const fallbackVendorWhereSql = buildVendorReportingMatchSql({
+    entryAlias: "r",
+    vendorName,
+    vendorId
+  });
+  const fallbackVendorParams = buildVendorMatchParams(vendorName, vendorId, 3);
+  const buildProductOrderWhereSql = (vendorWhereSql) => `
+    ${vendorWhereSql}
+    AND r.fulfillment_month IN (${monthPlaceholders})
+    AND NOT (
+      LOWER(COALESCE(r.category_name, '')) = 'membership'
+      OR LOWER(COALESCE(r.fulfillment_name, '')) LIKE '%membership purchase%'
+    )
+  `;
+
+  const [[cacheRow]] = await pool.query(
+    `
+      SELECT COUNT(*) AS rowCount
+      FROM local_line_order_reporting_entries
+    `
+  );
+  const hasReportingRows = Number(cacheRow?.rowCount || 0) > 0;
+  if (!hasReportingRows) {
+    return null;
+  }
+
+  const directProductOrderWhereSql = buildProductOrderWhereSql(directVendorWhereSql);
+  const [[directRow]] = await pool.query(
+    `
+      SELECT COUNT(*) AS rowCount
+      FROM local_line_order_reporting_entries r
+      WHERE ${directProductOrderWhereSql}
+    `,
+    [...directVendorParams, ...monthKeys]
+  );
+  const useDirectMatch = Number(directRow?.rowCount || 0) > 0;
+  const productOrderWhereSql = useDirectMatch
+    ? directProductOrderWhereSql
+    : buildProductOrderWhereSql(fallbackVendorWhereSql);
+  const params = [
+    ...(useDirectMatch ? directVendorParams : fallbackVendorParams),
+    ...monthKeys
+  ];
+
+  const [monthlyRows] = await pool.query(
+    `
+      SELECT
+        r.fulfillment_month AS month,
+        COUNT(DISTINCT r.local_line_order_id) AS orderCount,
+        COUNT(*) AS lineCount,
+        COALESCE(SUM(r.quantity), 0) AS unitCount,
+        COALESCE(SUM(r.retail_amount), 0) AS retailAmount
+      FROM local_line_order_reporting_entries r
+      WHERE ${productOrderWhereSql}
+      GROUP BY r.fulfillment_month
+      ORDER BY r.fulfillment_month ASC
+    `,
+    params
+  );
+
+  const [productRows] = await pool.query(
+    `
+      SELECT
+        r.fulfillment_month AS month,
+        COALESCE(r.product_name, 'Unknown product') AS productName,
+        COUNT(DISTINCT r.local_line_order_id) AS orderCount,
+        COUNT(*) AS lineCount,
+        COALESCE(SUM(r.quantity), 0) AS unitCount,
+        COALESCE(SUM(r.retail_amount), 0) AS retailAmount
+      FROM local_line_order_reporting_entries r
+      WHERE ${productOrderWhereSql}
+      GROUP BY r.fulfillment_month, COALESCE(r.product_name, 'Unknown product')
+    `,
+    params
+  );
+
+  return {
+    source: useDirectMatch ? "reporting" : "reporting-fallback",
+    monthlySales: buildVendorMonthlySales(monthKeys, monthlyRows),
+    topProductsByMonth: buildVendorTopProductsByMonth(monthKeys, productRows)
+  };
+}
+
+async function buildVendorAnalyticsFromOrderEntries(pool, vendor, monthKeys = []) {
+  const vendorId = Number(vendor?.id);
+  const vendorName = String(vendor?.name || "").trim();
+  const monthPlaceholders = monthKeys.map(() => "?").join(", ");
+  const monthSql = "DATE_FORMAT(COALESCE(o.fulfillment_date, o.created_at_remote), '%Y-%m')";
+  const directVendorWhereSql = Number.isFinite(vendorId) && vendorId > 0
+    ? "(COALESCE(e.vendor_name, '') = ? OR e.vendor_id = ?)"
+    : "COALESCE(e.vendor_name, '') = ?";
+  const directVendorParams = Number.isFinite(vendorId) && vendorId > 0
+    ? [vendorName, vendorId]
+    : [vendorName];
+  const fallbackVendorWhereSql = buildVendorEntryMatchSql({
+    orderAlias: "o",
+    entryAlias: "e",
+    vendorName,
+    vendorId
+  });
+  const fallbackVendorParams = buildVendorMatchParams(vendorName, vendorId, 2);
+  const buildProductOrderWhereSql = (vendorWhereSql) => `
+    ${vendorWhereSql}
+    AND ${monthSql} IN (${monthPlaceholders})
+    AND LOWER(COALESCE(e.category_name, '')) <> 'membership'
+  `;
+  const directProductOrderWhereSql = buildProductOrderWhereSql(directVendorWhereSql);
+  const [[directRow]] = await pool.query(
+    `
+      SELECT COUNT(*) AS rowCount
+      FROM local_line_orders o
+      INNER JOIN local_line_order_entries e
+        ON e.local_line_order_id = o.local_line_order_id
+      WHERE ${directProductOrderWhereSql}
+    `,
+    [...directVendorParams, ...monthKeys]
+  );
+  const useDirectMatch = Number(directRow?.rowCount || 0) > 0;
+  const productOrderWhereSql = useDirectMatch
+    ? directProductOrderWhereSql
+    : buildProductOrderWhereSql(fallbackVendorWhereSql);
+  const params = [
+    ...(useDirectMatch ? directVendorParams : fallbackVendorParams),
+    ...monthKeys
+  ];
+
+  const [monthlyRows] = await pool.query(
+    `
+      SELECT
+        ${monthSql} AS month,
+        COUNT(DISTINCT o.local_line_order_id) AS orderCount,
+        COUNT(*) AS lineCount,
+        COALESCE(SUM(CASE WHEN COALESCE(e.unit_quantity, 0) > 0 THEN e.unit_quantity ELSE 1 END), 0) AS unitCount,
+        COALESCE(SUM(
+          CASE
+            WHEN e.total_price IS NOT NULL THEN e.total_price
+            WHEN e.price IS NOT NULL THEN e.price * (CASE WHEN COALESCE(e.unit_quantity, 0) > 0 THEN e.unit_quantity ELSE 1 END)
+            ELSE 0
+          END
+        ), 0) AS retailAmount
+      FROM local_line_orders o
+      INNER JOIN local_line_order_entries e
+        ON e.local_line_order_id = o.local_line_order_id
+      WHERE ${productOrderWhereSql}
+      GROUP BY ${monthSql}
+      ORDER BY ${monthSql} ASC
+    `,
+    params
+  );
+
+  const [productRows] = await pool.query(
+    `
+      SELECT
+        ${monthSql} AS month,
+        COALESCE(e.product_name, 'Unknown product') AS productName,
+        COUNT(DISTINCT o.local_line_order_id) AS orderCount,
+        COUNT(*) AS lineCount,
+        COALESCE(SUM(CASE WHEN COALESCE(e.unit_quantity, 0) > 0 THEN e.unit_quantity ELSE 1 END), 0) AS unitCount,
+        COALESCE(SUM(
+          CASE
+            WHEN e.total_price IS NOT NULL THEN e.total_price
+            WHEN e.price IS NOT NULL THEN e.price * (CASE WHEN COALESCE(e.unit_quantity, 0) > 0 THEN e.unit_quantity ELSE 1 END)
+            ELSE 0
+          END
+        ), 0) AS retailAmount
+      FROM local_line_orders o
+      INNER JOIN local_line_order_entries e
+        ON e.local_line_order_id = o.local_line_order_id
+      WHERE ${productOrderWhereSql}
+      GROUP BY ${monthSql}, COALESCE(e.product_name, 'Unknown product')
+    `,
+    params
+  );
+
+  return {
+    source: "orders",
+    monthlySales: buildVendorMonthlySales(monthKeys, monthlyRows),
+    topProductsByMonth: buildVendorTopProductsByMonth(monthKeys, productRows)
+  };
 }
 
 function createAggregateBucket(label) {

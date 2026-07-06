@@ -141,6 +141,20 @@ function roundCurrency(value) {
   return Number(Number(value).toFixed(2));
 }
 
+function formatMoney(value) {
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? `$${numeric.toFixed(2)}` : "$0.00";
+}
+
+function formatQuantity(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return "0";
+  return numeric.toLocaleString(undefined, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 3
+  });
+}
+
 function stripHtml(value) {
   return String(value || "")
     .replace(/<br\s*\/?>/gi, "\n")
@@ -615,6 +629,17 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
   const [newVendor, setNewVendor] = useState("");
   const [vendorEdits, setVendorEdits] = useState({});
   const [savingVendorId, setSavingVendorId] = useState(null);
+  const [selectedVendorId, setSelectedVendorId] = useState("");
+  const [vendorInfoOpen, setVendorInfoOpen] = useState({
+    priceListMarkup: false,
+    sourceMultiplier: false
+  });
+  const [vendorAnalyticsState, setVendorAnalyticsState] = useState({
+    loading: false,
+    error: "",
+    data: null
+  });
+  const [vendorNameSyncLoading, setVendorNameSyncLoading] = useState(false);
   const [newDropSite, setNewDropSite] = useState({ name: "", address: "", dayOfWeek: "", openTime: "", closeTime: "" });
   const [newRecipe, setNewRecipe] = useState({ title: "", note: "", imageUrl: "", ingredients: "", steps: "" });
   const [productNameSearch, setProductNameSearch] = useState("");
@@ -941,6 +966,17 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
       setRecipesLoaded(false);
       setReviews([]);
       setReviewsLoaded(false);
+      setSelectedVendorId("");
+      setVendorInfoOpen({
+        priceListMarkup: false,
+        sourceMultiplier: false
+      });
+      setVendorAnalyticsState({
+        loading: false,
+        error: "",
+        data: null
+      });
+      setVendorNameSyncLoading(false);
       setDropSites([]);
       setDropSitesLoaded(false);
       setDropSitesSectionLoading(false);
@@ -962,6 +998,61 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
       });
     }
   }, [token]);
+
+  useEffect(() => {
+    if (!selectedVendorId) return;
+    const selectedExists = vendors.some((vendor) => String(vendor.id) === String(selectedVendorId));
+    if (!selectedExists) {
+      setSelectedVendorId("");
+      setVendorAnalyticsState({
+        loading: false,
+        error: "",
+        data: null
+      });
+    }
+  }, [vendors, selectedVendorId]);
+
+  useEffect(() => {
+    if (!token || activeSection !== "vendors" || !selectedVendorId) {
+      setVendorAnalyticsState((prev) => ({
+        loading: false,
+        error: "",
+        data: selectedVendorId ? prev.data : null
+      }));
+      return undefined;
+    }
+
+    let cancelled = false;
+    setVendorAnalyticsState({
+      loading: true,
+      error: "",
+      data: null
+    });
+
+    async function loadVendorAnalytics() {
+      try {
+        const response = await adminGet(`vendors/${selectedVendorId}/analytics`, token);
+        if (cancelled) return;
+        setVendorAnalyticsState({
+          loading: false,
+          error: "",
+          data: response
+        });
+      } catch (error) {
+        if (cancelled) return;
+        setVendorAnalyticsState({
+          loading: false,
+          error: error?.message || "Failed to load vendor analytics.",
+          data: null
+        });
+      }
+    }
+
+    loadVendorAnalytics();
+    return () => {
+      cancelled = true;
+    };
+  }, [token, activeSection, selectedVendorId]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -2080,6 +2171,23 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
     loadAll();
   }
 
+  async function handleRefreshVendorNames() {
+    setVendorNameSyncLoading(true);
+    setMessage("");
+    try {
+      const response = await adminPost("vendors/sync-names", token, {});
+      const summary = response?.summary || {};
+      await loadAll();
+      setMessage(
+        `Vendor names refreshed. ${Number(summary.vendorsInserted || 0)} added, ${Number(summary.vendorsRenamed || 0)} renamed, ${Number(summary.productsUpdated || 0)} products reassigned.`
+      );
+    } catch (error) {
+      setMessage(error?.message || "Vendor name refresh failed.");
+    } finally {
+      setVendorNameSyncLoading(false);
+    }
+  }
+
   function updateVendorDraft(vendor, patch) {
     if (!vendor?.id) return;
     setVendorEdits((prev) => {
@@ -2639,6 +2747,32 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
   const sortedVendors = vendors
     .slice()
     .sort((left, right) => String(left.name || "").localeCompare(String(right.name || "")));
+  const selectedVendor =
+    sortedVendors.find((vendor) => String(vendor.id) === String(selectedVendorId)) || null;
+  const selectedVendorDraft = selectedVendor
+    ? vendorEdits[selectedVendor.id] || createVendorPricingDraft(selectedVendor)
+    : null;
+  const selectedVendorIsDirty =
+    selectedVendor && selectedVendorDraft
+      ? !vendorPricingDraftEquals(selectedVendor, selectedVendorDraft)
+      : false;
+  const selectedVendorIsSourceVendor = isSourcePricingVendorName(selectedVendor?.name);
+  const selectedVendorIsSaving =
+    selectedVendor && Number(savingVendorId) === Number(selectedVendor.id);
+  const vendorAnalytics = vendorAnalyticsState.data?.analytics || {};
+  const vendorMonthlySales = Array.isArray(vendorAnalytics.monthlySales)
+    ? vendorAnalytics.monthlySales
+    : [];
+  const vendorTopProductsByMonth = Array.isArray(vendorAnalytics.topProductsByMonth)
+    ? vendorAnalytics.topProductsByMonth
+    : [];
+  const vendorProductMonthsWithSales = vendorTopProductsByMonth.filter(
+    (monthRow) => Array.isArray(monthRow.products) && monthRow.products.length
+  );
+  const maxVendorMonthlySales = Math.max(
+    1,
+    ...vendorMonthlySales.map((row) => Number(row.retailAmount || 0))
+  );
   const pendingProductEditEntries = getPendingProductEditEntries();
   const auditData = localLineAuditState.data;
   const localLineStatus = localLineStatusState.data;
@@ -5271,74 +5405,170 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
           )}
 
           {activeSection === "vendors" && canManageCoreAdmin && (
-            <section className="admin-section">
+            <section className="admin-section vendor-admin-section">
               <h3>Vendors</h3>
               <div className="small">
                 Set the vendor-level pricelist markup and, for Deck / Hyland / Creamy vendors,
                 the FFCSA factor used by source-priced products.
               </div>
-              <table className="admin-table">
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Pricelist Markup %</th>
-                    <th>FFCSA Factor</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sortedVendors.map((vendor) => {
-                    const draft = vendorEdits[vendor.id] || createVendorPricingDraft(vendor);
-                    const isDirty = !vendorPricingDraftEquals(vendor, draft);
-                    const isSourceVendor = isSourcePricingVendorName(vendor?.name);
-                    const isSaving = savingVendorId === vendor.id;
 
-                    return (
-                      <tr key={vendor.id} className={isDirty ? "edited" : ""}>
-                        <td>{vendor.name}</td>
-                        <td>
-                          <input
-                            className="input"
-                            type="number"
-                            step="0.01"
-                            value={draft.priceListMarkup}
-                            onChange={(event) =>
-                              updateVendorDraft(vendor, {
-                                priceListMarkup: event.target.value === "" ? "" : Number(event.target.value)
-                              })
-                            }
-                          />
-                        </td>
-                        <td>
-                          <input
-                            className="input"
-                            type="number"
-                            step="0.0001"
-                            value={draft.sourceMultiplier}
-                            placeholder={isSourceVendor ? "0.5412" : "N/A"}
-                            disabled={!isSourceVendor}
-                            onChange={(event) =>
-                              updateVendorDraft(vendor, {
-                                sourceMultiplier: event.target.value
-                              })
-                            }
-                          />
-                        </td>
-                        <td>
-                          <button
-                            className="button alt"
-                            type="button"
-                            disabled={!isDirty || isSaving}
-                            onClick={() => handleSaveVendorPricing(vendor)}
-                          >
-                            {isSaving ? "Saving..." : "Save"}
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+              <div className="vendor-control-panel">
+                <label className="filter-field vendor-select-field">
+                  <span className="small">Vendor</span>
+                  <select
+                    className="select"
+                    value={selectedVendorId}
+                    onChange={(event) => {
+                      setSelectedVendorId(event.target.value);
+                      setVendorInfoOpen({
+                        priceListMarkup: false,
+                        sourceMultiplier: false
+                      });
+                    }}
+                  >
+                    <option value="">Choose a vendor</option>
+                    {sortedVendors.map((vendor) => (
+                      <option key={vendor.id} value={vendor.id}>
+                        {vendor.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <div className="vendor-sync-actions">
+                  <button
+                    className="button alt"
+                    type="button"
+                    onClick={handleRefreshVendorNames}
+                    disabled={vendorNameSyncLoading}
+                  >
+                    {vendorNameSyncLoading ? "Refreshing..." : "Refresh Vendor Names"}
+                  </button>
+                  <div className="small">
+                    Updates vendor names and product vendor assignments from cached Local Line data.
+                  </div>
+                </div>
+
+                {selectedVendor ? (
+                  <div className={`response-card vendor-editor-card ${selectedVendorIsDirty ? "edited" : ""}`}>
+                    <div className="vendor-editor-heading">
+                      <div>
+                        <div className="title">{selectedVendor.name}</div>
+                        <div className="small">
+                          {selectedVendorIsSourceVendor
+                            ? "Formula-pricing vendor"
+                            : "Standard vendor"}
+                        </div>
+                      </div>
+                      <button
+                        className="button alt"
+                        type="button"
+                        disabled={!selectedVendorIsDirty || selectedVendorIsSaving}
+                        onClick={() => handleSaveVendorPricing(selectedVendor)}
+                      >
+                        {selectedVendorIsSaving ? "Saving..." : "Save Vendor"}
+                      </button>
+                    </div>
+                    <div className="vendor-editor-grid">
+                      <label className="filter-field">
+                        <span className="vendor-field-label">
+                          <span className="small">Pricelist Markup %</span>
+                          <span className={`vendor-info-control ${vendorInfoOpen.priceListMarkup ? "open" : ""}`}>
+                            <button
+                              className="vendor-info-button"
+                              type="button"
+                              aria-label="Pricelist markup explanation"
+                              aria-expanded={vendorInfoOpen.priceListMarkup}
+                              onClick={() =>
+                                setVendorInfoOpen((prev) => ({
+                                  ...prev,
+                                  priceListMarkup: !prev.priceListMarkup,
+                                  sourceMultiplier: false
+                                }))
+                              }
+                              onBlur={() =>
+                                setVendorInfoOpen((prev) => ({
+                                  ...prev,
+                                  priceListMarkup: false
+                                }))
+                              }
+                            >
+                              i
+                            </button>
+                            <span className="vendor-info-bubble" role="tooltip">
+                              Default customer markup for this vendor&apos;s products. Enter 40 for a 40% markup.
+                            </span>
+                          </span>
+                        </span>
+                        <input
+                          className="input"
+                          type="number"
+                          step="0.01"
+                          value={selectedVendorDraft?.priceListMarkup ?? ""}
+                          onChange={(event) =>
+                            updateVendorDraft(selectedVendor, {
+                              priceListMarkup: event.target.value === "" ? "" : Number(event.target.value)
+                            })
+                          }
+                        />
+                      </label>
+
+                      <label className="filter-field">
+                        <span className="vendor-field-label">
+                          <span className="small">FFCSA Factor</span>
+                          <span className={`vendor-info-control ${vendorInfoOpen.sourceMultiplier ? "open" : ""}`}>
+                            <button
+                              className="vendor-info-button"
+                              type="button"
+                              aria-label="FFCSA factor explanation"
+                              aria-expanded={vendorInfoOpen.sourceMultiplier}
+                              onClick={() =>
+                                setVendorInfoOpen((prev) => ({
+                                  ...prev,
+                                  sourceMultiplier: !prev.sourceMultiplier,
+                                  priceListMarkup: false
+                                }))
+                              }
+                              onBlur={() =>
+                                setVendorInfoOpen((prev) => ({
+                                  ...prev,
+                                  sourceMultiplier: false
+                                }))
+                              }
+                            >
+                              i
+                            </button>
+                            <span className="vendor-info-bubble" role="tooltip">
+                              For formula-priced vendors, this converts vendor retail price to CSA package price before markup.
+                            </span>
+                          </span>
+                        </span>
+                        <input
+                          className="input"
+                          type="number"
+                          step="0.0001"
+                          value={selectedVendorDraft?.sourceMultiplier ?? ""}
+                          placeholder={selectedVendorIsSourceVendor ? "0.5412" : "N/A"}
+                          disabled={!selectedVendorIsSourceVendor}
+                          onChange={(event) =>
+                            updateVendorDraft(selectedVendor, {
+                              sourceMultiplier: event.target.value
+                            })
+                          }
+                        />
+                        {!selectedVendorIsSourceVendor ? (
+                          <span className="small">Used only for Deck, Hyland, and Creamy formula pricing.</span>
+                        ) : null}
+                      </label>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="response-card">
+                    <div className="title">Choose a vendor</div>
+                    <div className="small">Select a vendor to edit defaults and review sales.</div>
+                  </div>
+                )}
+              </div>
+
               <div className="admin-grid">
                 <input
                   className="input"
@@ -5350,6 +5580,112 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                   Add vendor
                 </button>
               </div>
+
+              {selectedVendor ? (
+                <div className="vendor-analytics-section">
+                  {vendorAnalyticsState.loading ? (
+                    <div className="small">Loading vendor analytics...</div>
+                  ) : null}
+                  {vendorAnalyticsState.error ? (
+                    <div className="small">{vendorAnalyticsState.error}</div>
+                  ) : null}
+                  {vendorAnalytics.source === "orders" ? (
+                    <div className="small">
+                      Using raw Local Line order entries because the reporting cache has not been populated.
+                    </div>
+                  ) : null}
+
+                  <div className="response-card vendor-sales-card">
+                    <div className="title">Sales by Month</div>
+                    <div className="small">Last 12 months by customer sales dollars.</div>
+                    <div className="vendor-sales-chart">
+                      {vendorMonthlySales.map((row) => {
+                        const retailAmount = Number(row.retailAmount || 0);
+                        const widthPercent = Math.max(
+                          0,
+                          Math.min(100, Math.round((retailAmount / maxVendorMonthlySales) * 100))
+                        );
+                        return (
+                          <div className="vendor-sales-row" key={`vendor-sales-${row.month}`}>
+                            <div className="vendor-sales-month">{formatShortMonthLabel(row.month)}</div>
+                            <div className="vendor-sales-bar-shell" title={`${formatMonthLabel(row.month)} · ${formatMoney(retailAmount)}`}>
+                              <div className="vendor-sales-bar" style={{ width: `${widthPercent}%` }} />
+                            </div>
+                            <div className="vendor-sales-amount">{formatMoney(retailAmount)}</div>
+                          </div>
+                        );
+                      })}
+                      {!vendorMonthlySales.length && !vendorAnalyticsState.loading ? (
+                        <div className="small">No sales data is available for this vendor yet.</div>
+                      ) : null}
+                    </div>
+                    <div className="admin-table-shell vendor-sales-total-table-shell">
+                      <div className="admin-table-body-scroll">
+                        <table className="admin-table vendor-sales-total-table">
+                          <thead>
+                            <tr>
+                              <th>Month</th>
+                              <th>Total Sales</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {vendorMonthlySales.map((row) => (
+                              <tr key={`vendor-sales-total-${row.month}`}>
+                                <td>{formatMonthLabel(row.month)}</td>
+                                <td>{formatMoney(row.retailAmount)}</td>
+                              </tr>
+                            ))}
+                            {!vendorMonthlySales.length && !vendorAnalyticsState.loading ? (
+                              <tr>
+                                <td colSpan={2}>No monthly sales totals are available for this vendor yet.</td>
+                              </tr>
+                            ) : null}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="response-card vendor-products-card">
+                    <div className="title">Top 10 Products by Month</div>
+                    <div className="small">Amount is customer sales dollars; quantity is the summed line-item quantity.</div>
+                    <div className="admin-table-shell vendor-products-table-shell">
+                      <div className="admin-table-body-scroll">
+                        <table className="admin-table vendor-products-table">
+                          <thead>
+                            <tr>
+                              <th>Month</th>
+                              <th>Rank</th>
+                              <th>Product</th>
+                              <th>Quantity</th>
+                              <th>Amount</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {vendorProductMonthsWithSales.map((monthRow) => {
+                              const products = Array.isArray(monthRow.products) ? monthRow.products : [];
+                              return products.map((product, index) => (
+                                <tr key={`vendor-products-${monthRow.month}-${product.productName}-${index}`}>
+                                  <td>{index === 0 ? formatMonthLabel(monthRow.month) : ""}</td>
+                                  <td>{index + 1}</td>
+                                  <td>{product.productName || "n/a"}</td>
+                                  <td>{formatQuantity(product.unitCount)}</td>
+                                  <td>{formatMoney(product.retailAmount)}</td>
+                                </tr>
+                              ));
+                            })}
+                            {!vendorProductMonthsWithSales.length && !vendorAnalyticsState.loading ? (
+                              <tr>
+                                <td colSpan={5}>No product sales data is available for this vendor yet.</td>
+                              </tr>
+                            ) : null}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
             </section>
           )}
 

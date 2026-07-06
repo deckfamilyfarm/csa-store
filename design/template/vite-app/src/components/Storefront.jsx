@@ -24,6 +24,7 @@ import {
   updateReview,
   userLogin
 } from "../api.js";
+import { trackGoogleAnalyticsPageView } from "../analytics.js";
 import { buildSiteContentLookup } from "../siteContent.js";
 import { AccountPanelSection } from "./AccountPanelSection.jsx";
 import { CsaPlansSection } from "./CsaPlansSection.jsx";
@@ -414,6 +415,31 @@ export function Storefront() {
   const isDropsitesView = view === "dropsites" || experienceMode === "dropsites";
   const isPublicHomeView = experienceMode === "store" && view === "home" && !isMember;
   const showMemberCart = isMember && !isAdminView && !isResetPasswordView;
+
+  useEffect(() => {
+    let title = "Full Farm CSA";
+    if (isAdminView) title = "CSA Store Admin";
+    else if (isLiabilityView) title = "Deck Family Farm Liability Release";
+    else if (isDropsitesView) title = "Full Farm Dropsites";
+    else if (isResetPasswordView) title = "Set Password";
+    else if (isAccountView) title = "Full Farm Member Account";
+    else if (experienceMode === "subscribe" || view === "subscribe") {
+      title = "Full Farm Subscribe Page";
+    } else if (isPublicHomeView) {
+      title = "Deck Family Farm Storefront";
+    }
+    trackGoogleAnalyticsPageView({ title });
+  }, [
+    experienceMode,
+    isAccountView,
+    isAdminView,
+    isDropsitesView,
+    isLiabilityView,
+    isPublicHomeView,
+    isResetPasswordView,
+    liabilitySlug,
+    view
+  ]);
 
   useEffect(() => {
     if (experienceMode !== "subscribe" || view !== "account" || isMember || isResetPasswordView) {
