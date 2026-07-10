@@ -313,6 +313,25 @@ CREATE TABLE IF NOT EXISTS local_line_customer_credit_snapshots (
 CREATE INDEX IF NOT EXISTS idx_local_line_customer_credit_snapshots_captured
   ON local_line_customer_credit_snapshots (captured_at);
 
+CREATE TABLE IF NOT EXISTS dashboard_qbo_period_metrics (
+  period_key VARCHAR(64) PRIMARY KEY,
+  period_label VARCHAR(32),
+  start_date VARCHAR(10),
+  end_date VARCHAR(10),
+  entity_id VARCHAR(64),
+  income DECIMAL(12, 2),
+  cogs DECIMAL(12, 2),
+  gross_profit DECIMAL(12, 2),
+  expenses DECIMAL(12, 2),
+  other_income DECIMAL(12, 2),
+  net_income DECIMAL(12, 2),
+  member_payments DECIMAL(12, 2),
+  raw_json LONGTEXT,
+  fetched_at DATETIME,
+  created_at DATETIME,
+  updated_at DATETIME
+);
+
 CREATE TABLE IF NOT EXISTS local_line_sync_cursors (
   sync_key VARCHAR(64) PRIMARY KEY,
   cursor_value VARCHAR(255),

@@ -18,6 +18,8 @@
     "sync:localline-full": "node scripts/syncLocalLineFull.js",
     "backfill:localline-customer-credit": "node --env-file=../../.env scripts/backfillLocalLineCustomerCreditSnapshots.js",
     "sync:localline-automation": "node --env-file=../../.env scripts/runLocalLineAutomation.js",
+    "publish:dashboard": "node --env-file=../../.env scripts/runLocalLineAutomation.js --mode=dashboard",
+    "check:qbo": "node --env-file=../../.env scripts/checkQboConnection.js",
     "sync:timesheets-users": "node scripts/syncTimesheetsUsers.js"
   },
   "dependencies": {

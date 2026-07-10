@@ -7,6 +7,7 @@ import { fileURLToPath } from "url";
 import xlsx from "xlsx";
 import { getPool } from "../db.js";
 import { getLocalLineAccessToken, getLocalLineBaseUrl } from "../localLineAuth.js";
+import { loadDashboardQboPeriodMetrics } from "./qboDashboard.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -66,6 +67,10 @@ const PACK_WAGES_SALES_CHART_LEGACY_TITLES = ["Pack Wages vs Retail Sales", "Pac
 const PACK_WAGES_SALES_CHART_HEIGHT_PX = 420;
 const PACK_WAGES_SALES_CHART_WIDTH_PX = 900;
 const PACK_WAGES_SALES_CHART_MIN_WEEK_START = "2026-02-09";
+const DASHBOARD_STATIC_COLUMN_COUNT = 4;
+const DASHBOARD_SUMMARY_COLUMN_COUNT = 5;
+const DASHBOARD_WEEK_START_COLUMN_INDEX =
+  DASHBOARD_STATIC_COLUMN_COUNT + DASHBOARD_SUMMARY_COLUMN_COUNT;
 const DASHBOARD_WEEKLY_LEASE_CHARGES = 375;
 const DASHBOARD_WEEKLY_UTILITIES = 56;
 // TODO: Move fixed dashboard expense assumptions to dated config so weekly changes,
@@ -657,6 +662,148 @@ function getExpenseTotalMetricLabels(layout = []) {
     .map((row) => row.label);
 }
 
+function getPublishableDashboardWeeks(weeks = [], publishableWeekStarts = null) {
+  return weeks.filter((week) => {
+    if (!week?.start || !week?.end) return false;
+    return !publishableWeekStarts || publishableWeekStarts.has(week.start);
+  });
+}
+
+function getQuarterNumberFromYmd(ymd) {
+  const date = parseYmd(ymd);
+  if (!date) return null;
+  return Math.floor(date.getUTCMonth() / 3) + 1;
+}
+
+function makeDashboardSummaryPeriod(year, key, label, periodWeeks, start = null, end = null) {
+  const weeks = periodWeeks.filter((week) => week?.start && week?.end);
+  return {
+    key: `${year}:${key}`,
+    label,
+    year,
+    start,
+    end,
+    started: Boolean(start && end && weeks.length),
+    weekStarts: new Set(weeks.map((week) => week.start))
+  };
+}
+
+function getDashboardSummaryYearForWeek(week, targetYear) {
+  const startYear = Number(String(week?.start || "").slice(0, 4));
+  const endYear = Number(String(week?.end || "").slice(0, 4));
+  if (startYear < targetYear && endYear === targetYear) return targetYear;
+  return startYear;
+}
+
+function getDashboardSummaryQuarterForWeek(week, targetYear) {
+  const startYear = Number(String(week?.start || "").slice(0, 4));
+  const endYear = Number(String(week?.end || "").slice(0, 4));
+  if (startYear < targetYear && endYear === targetYear) {
+    return getQuarterNumberFromYmd(week.end);
+  }
+  return getQuarterNumberFromYmd(week.start);
+}
+
+function getQuarterStartYmd(year, quarter) {
+  return `${year}-${String((quarter - 1) * 3 + 1).padStart(2, "0")}-01`;
+}
+
+function getQuarterEndYmd(year, quarter) {
+  return [
+    `${year}-03-31`,
+    `${year}-06-30`,
+    `${year}-09-30`,
+    `${year}-12-31`
+  ][quarter - 1];
+}
+
+function buildDashboardSummaryPeriods(weeks = [], publishableWeekStarts = null) {
+  const publishableWeeks = getPublishableDashboardWeeks(weeks, publishableWeekStarts);
+  const latestPublishableWeek = publishableWeeks[publishableWeeks.length - 1] || null;
+  const fallbackYear = Number(
+    String(latestPublishableWeek?.end || publishableWeeks[0]?.end || weeks[0]?.end || getTodayYmd()).slice(0, 4)
+  );
+  const year = Number.isFinite(fallbackYear) ? fallbackYear : new Date().getUTCFullYear();
+  const yearWeeks = publishableWeeks.filter(
+    (week) => getDashboardSummaryYearForWeek(week, year) === year
+  );
+  const latestYearWeek = yearWeeks[yearWeeks.length - 1] || null;
+  const totalEnd = latestYearWeek?.end || null;
+  const periods = [
+    makeDashboardSummaryPeriod(
+      year,
+      "total",
+      "Total",
+      yearWeeks,
+      `${year}-01-01`,
+      totalEnd
+    )
+  ];
+
+  for (let quarter = 1; quarter <= 4; quarter += 1) {
+    const quarterStart = getQuarterStartYmd(year, quarter);
+    const quarterEnd = getQuarterEndYmd(year, quarter);
+    const effectiveQuarterEnd = totalEnd && totalEnd < quarterEnd ? totalEnd : quarterEnd;
+    periods.push(
+      makeDashboardSummaryPeriod(
+        year,
+        `q${quarter}`,
+        `Q${quarter}`,
+        yearWeeks.filter((week) => getDashboardSummaryQuarterForWeek(week, year) === quarter),
+        quarterStart,
+        effectiveQuarterEnd
+      )
+    );
+  }
+
+  return periods;
+}
+
+function isWeekInDashboardSummaryPeriod(week, period) {
+  if (!week?.start || !period?.started) return false;
+  return period.weekStarts instanceof Set
+    ? period.weekStarts.has(week.start)
+    : String(week.start) >= String(period.start) && String(week.start) <= String(period.end);
+}
+
+function getRowWeeklyRawValue(row, week, index, manualValueMap) {
+  if (row.entry === "AUTO") return row.auto ? row.auto(week, index) : null;
+  return getManualSourceValue(manualValueMap, row.rowLabel || row.label, week.start);
+}
+
+function parseDashboardNumber(value) {
+  if (value === null || typeof value === "undefined" || value === "") return null;
+  const raw = String(value).trim();
+  const negative = raw.startsWith("(") && raw.endsWith(")");
+  const numeric = Number(raw.replace(/[(),$]/g, ""));
+  return Number.isFinite(numeric) ? (negative ? -numeric : numeric) : null;
+}
+
+function getPeriodRowSum(row, weeks, period, manualValueMap) {
+  let total = 0;
+  let hasValue = false;
+  weeks.forEach((week, index) => {
+    if (!isWeekInDashboardSummaryPeriod(week, period)) return;
+    const numeric = parseDashboardNumber(getRowWeeklyRawValue(row, week, index, manualValueMap));
+    if (numeric === null) return;
+    total += numeric;
+    hasValue = true;
+  });
+  return hasValue ? total : null;
+}
+
+function getPeriodRowLatestValue(row, weeks, period, manualValueMap) {
+  for (let index = weeks.length - 1; index >= 0; index -= 1) {
+    const week = weeks[index];
+    if (!isWeekInDashboardSummaryPeriod(week, period)) continue;
+    const value = getRowWeeklyRawValue(row, week, index, manualValueMap);
+    if (value !== null && typeof value !== "undefined" && String(value).trim() !== "") {
+      return value;
+    }
+  }
+  return null;
+}
+
 function buildMetricSheetRowsByLabel(layout = []) {
   const metricSheetRowsByLabel = new Map();
   let nextSheetRowNumber = 3;
@@ -690,6 +837,8 @@ function buildDashboardRows(
   timesheetTaskLabels,
   subscriberWeeklyMap,
   publishableWeekStarts = null,
+  summaryPeriods = [],
+  qboPeriodMap = {},
   customManualRows = []
 ) {
   const yearlyAverageOrdersByYear = buildYearlyAverageMap(weeks, weeklyKpiMap, "numOrders");
@@ -700,6 +849,11 @@ function buildDashboardRows(
   const getNetOrderCash = (week) => getCashCollectedOnOrders(week) - getPaymentProcessingFees(week);
   const getPurchaseCost = (week) => Number(vendorWeeklyMap[week.start]?.purchaseCost || 0);
   const getGrossProfit = (week) => getRetailSales(week) - getPurchaseCost(week);
+  const getQboMetric = (period, metricKey) => {
+    const metrics = qboPeriodMap?.[period?.key] || null;
+    const value = metrics?.[metricKey];
+    return value === null || typeof value === "undefined" ? null : Number(value);
+  };
   const packWageTaskLabels = [
     "Packout",
     "Delivery",
@@ -720,6 +874,7 @@ function buildDashboardRows(
       entry: "AUTO",
       source: "Timesheets DB (FFCSA wages + fringe)",
       valueType: "currency",
+      summary: "sum",
       auto: (w) => Number(timesheetWeeklyMap[w.start]?.tasks?.[taskLabel] || 0)
     })
   );
@@ -730,7 +885,7 @@ function buildDashboardRows(
       rows: [
         { label: "Errors/week", entry: "MANUAL", source: "Manual QA", rowLabel: "Errors/week" },
         { label: "Positive responses/week", entry: "MANUAL", source: "Manual QA", rowLabel: "Positive responses/week" },
-        { label: "Num Orders", entry: "AUTO", source: "Local DB", valueType: "int", auto: (w) => Number(weeklyKpiMap[w.start]?.numOrders) },
+        { label: "Num Orders", entry: "AUTO", source: "Local DB", valueType: "int", summary: "sum", auto: (w) => Number(weeklyKpiMap[w.start]?.numOrders) },
         {
           label: "Orders Compared to Yearly Average",
           entry: "AUTO",
@@ -743,7 +898,7 @@ function buildDashboardRows(
             return ((orders - average) / average) * 100;
           }
         },
-        { label: "Num Guest Orders", entry: "AUTO", source: "Local DB", valueType: "int", auto: (w) => Number(weeklyKpiMap[w.start]?.numGuestOrders) },
+        { label: "Num Guest Orders", entry: "AUTO", source: "Local DB", valueType: "int", summary: "sum", auto: (w) => Number(weeklyKpiMap[w.start]?.numGuestOrders) },
         {
           label: "Num Subscriber Orders",
           entry: "AUTO",
@@ -767,6 +922,7 @@ function buildDashboardRows(
           entry: "AUTO",
           source: "Subscriber export Created dates",
           valueType: "int",
+          summary: "sum",
           auto: (w) => subscriberWeeklyMap[w.start]?.newSubscribers
         },
         {
@@ -774,6 +930,7 @@ function buildDashboardRows(
           entry: "AUTO",
           source: "Subscriber export Cancelled Date values",
           valueType: "int",
+          summary: "sum",
           auto: (w) => subscriberWeeklyMap[w.start]?.exitingSubscribers
         },
         {
@@ -782,6 +939,7 @@ function buildDashboardRows(
           source: "Local Line SNAP price-list members",
           methodology: "Counts distinct customers currently assigned to the Local Line SNAP price list. The SNAP price list is read from LL_PRICE_LIST_SNAP_ID, or DASHBOARD_SNAP_PRICE_LIST_ID when set, and refreshed during subscriber sync and dashboard publish.",
           valueType: "int",
+          summary: "latest",
           auto: (w) => Number(subscriberWeeklyMap[w.start]?.snapSubscribers)
         },
         {
@@ -790,6 +948,7 @@ function buildDashboardRows(
           source: "Subscriber export active as of week end + Local Line SNAP price-list members",
           methodology: "Adds active subscribers from the Local Line subscription snapshot for the week end to the current Local Line SNAP price-list member count.",
           valueType: "int",
+          summary: "latest",
           auto: (w) => Number(subscriberWeeklyMap[w.start]?.totalSubscribers)
         },
         {
@@ -823,6 +982,7 @@ function buildDashboardRows(
           entry: "AUTO",
           source: "Paid Membership / membership purchase rows excluded from Retail Sales",
           valueType: "currency",
+          summary: "sum",
           auto: (w) => Number(weeklyKpiMap[w.start]?.subscriptionIncome)
         },
         {
@@ -830,6 +990,7 @@ function buildDashboardRows(
           entry: "AUTO",
           source: "Membership plan credit value from paid membership purchase rows",
           valueType: "currency",
+          summary: "sum",
           auto: (w) => Number(weeklyKpiMap[w.start]?.subscriptionCreditGiven)
         },
         {
@@ -837,6 +998,7 @@ function buildDashboardRows(
           entry: "AUTO",
           source: "Local Line order payment_store_credit_amount / payment.store_credit_amount",
           valueType: "currency",
+          summary: "sum",
           auto: (w) => Number(weeklyKpiMap[w.start]?.subscriptionCreditUsed)
         },
         {
@@ -845,6 +1007,7 @@ function buildDashboardRows(
           source: "Local Line order payment_strategy_amount",
           methodology: "Sums Local Line's non-credit payment amount for paid open orders. For older rows missing payment_strategy_amount, it uses order total only when no store credit was recorded.",
           valueType: "currency",
+          summary: "sum",
           auto: (w) => getCashCollectedOnOrders(w)
         },
         {
@@ -867,6 +1030,7 @@ function buildDashboardRows(
           source: "Membership purchase credit value + member ledger credit entries",
           methodology: "Adds Local Line membership purchase credit value to CSA member-ledger credits that are not already represented as order product sales.",
           valueType: "currency",
+          summary: "sum",
           auto: (w) => Number(weeklyKpiMap[w.start]?.memberCreditIssued || 0)
         },
         {
@@ -875,6 +1039,7 @@ function buildDashboardRows(
           source: "Membership purchase income + member ledger cashReceivedCents metadata",
           methodology: "Reports cash received for member-credit purchases separately from the face value of credits issued.",
           valueType: "currency",
+          summary: "sum",
           auto: (w) => Number(weeklyKpiMap[w.start]?.actualDollarsReceivedForCredit || 0)
         },
         {
@@ -883,6 +1048,7 @@ function buildDashboardRows(
           source: "Difference between Local Line customer credit snapshots",
           methodology: "Calculated only when two Local Line customer export balance snapshots exist; otherwise left blank.",
           valueType: "currency",
+          summary: "sum",
           auto: (w) => {
             const value = weeklyKpiMap[w.start]?.memberBankBalanceChange;
             return value === null || typeof value === "undefined" ? null : Number(value);
@@ -891,8 +1057,8 @@ function buildDashboardRows(
             const balanceRow = metricSheetRowsByLabel.get("Member Bank Balance");
             if (!balanceRow || weekIndex <= 0) return "";
             const currentBalanceRef = `${columnName}${balanceRow}`;
-            const firstWeekColumnName = getSheetColumnName(4);
-            const previousWeekColumnName = getSheetColumnName(weekIndex + 3);
+            const firstWeekColumnName = getSheetColumnName(DASHBOARD_WEEK_START_COLUMN_INDEX);
+            const previousWeekColumnName = getSheetColumnName(DASHBOARD_WEEK_START_COLUMN_INDEX + weekIndex - 1);
             const previousBalancesRange = `${firstWeekColumnName}${balanceRow}:${previousWeekColumnName}${balanceRow}`;
             return `=IFERROR(IF(${currentBalanceRef}="","",${currentBalanceRef}-LOOKUP(2,1/(${previousBalancesRange}<>""),${previousBalancesRange})),"")`;
           }
@@ -903,6 +1069,7 @@ function buildDashboardRows(
           source: "Local Line customers export Store Credit total",
           methodology: "Total store-credit liability from the full Local Line customer export, captured as a weekly snapshot during dashboard publish.",
           valueType: "currency",
+          summary: "latest",
           auto: (w) => {
             const value = weeklyKpiMap[w.start]?.memberBankBalance;
             return value === null || typeof value === "undefined" ? null : Number(value);
@@ -914,6 +1081,7 @@ function buildDashboardRows(
           source: "Local DB",
           valueType: "currency",
           bold: true,
+          summary: "sum",
           auto: (w) => getRetailSales(w)
         }
       ]
@@ -946,6 +1114,7 @@ function buildDashboardRows(
           source: "Local DB reporting cache",
           valueType: "currency",
           bold: true,
+          summary: "sum",
           auto: (w) => getPurchaseCost(w)
         }
       ]
@@ -996,6 +1165,7 @@ function buildDashboardRows(
           entry: "AUTO",
           source: "Timesheets DB (FFCSA wages + fringe total)",
           valueType: "currency",
+          summary: "sum",
           auto: (w) => Number(timesheetWeeklyMap[w.start]?.totalWages || 0),
           formula: ({ columnName, metricSheetRowsByLabel }) => {
             const refs = getMetricCellRefs(metricSheetRowsByLabel, wageMetricLabels, columnName);
@@ -1044,6 +1214,7 @@ function buildDashboardRows(
           source: "Local Line order payment_fees + payment_tax",
           methodology: "Uses Local Line payment_fees and payment_tax from paid open orders. If Local Line reports zero or omits these fields, this row stays zero instead of estimating processor fees.",
           valueType: "currency",
+          summary: "sum",
           auto: (w) => getPaymentProcessingFees(w)
         },
         {
@@ -1052,6 +1223,7 @@ function buildDashboardRows(
           source: "Member credit issued - actual dollars received",
           methodology: "Shows the bonus/manual credit portion, such as employee double-credit rules, separately from cash received.",
           valueType: "currency",
+          summary: "sum",
           auto: (w) => Number(weeklyKpiMap[w.start]?.bonusCreditExpense || 0),
           formula: ({ columnName, metricSheetRowsByLabel }) => {
             const creditIssuedRef = getMetricCellRef(metricSheetRowsByLabel, "Member Credit Issued", columnName);
@@ -1067,12 +1239,14 @@ function buildDashboardRows(
           source: "Fixed weekly dashboard assumption",
           valueType: "currency",
           note: DASHBOARD_FIXED_EXPENSE_NOTE,
+          summary: "sum",
           auto: () => DASHBOARD_WEEKLY_UTILITIES
         },
         {
           label: "$ Products Given",
           entry: "MANUAL",
           source: "Manual / TODO automation",
+          summary: "sum",
           rowLabel: ["$ Products Given", "$ Product Credits Given"]
         },
         {
@@ -1080,12 +1254,14 @@ function buildDashboardRows(
           entry: "MANUAL",
           source: "Manual (copied from existing dashboard values by row label)",
           note: DASHBOARD_MANUAL_DELIVERY_EXPENSE_NOTE,
+          summary: "sum",
           rowLabel: ["Delivery Cost", "Delivery Expenses"]
         },
         {
           label: "Building Depreciation & Lease",
           entry: "MANUAL",
           source: "Manual",
+          summary: "sum",
           rowLabel: [
             "Building Depreciation & Lease",
             "Building Depreciation and Lease",
@@ -1096,6 +1272,7 @@ function buildDashboardRows(
           label: "Other FFCSA operating costs",
           entry: "MANUAL",
           source: "Manual",
+          summary: "sum",
           rowLabel: ["Other FFCSA operating costs", "Other FFCSA operating costs Ops"]
         },
         {
@@ -1146,6 +1323,191 @@ function buildDashboardRows(
           }
         }
       ]
+    },
+    {
+      section: "ACCOUNTING / QBO RECONCILIATION",
+      rows: [
+        {
+          label: "QBO Total Income",
+          entry: "AUTO",
+          source: "QuickBooks Online cash-basis Profit and Loss",
+          methodology: "Fetched from the FFCSA QBO Profit and Loss report for the same date spans represented by the dashboard summary columns. Live values are cached locally and reused when QBO is temporarily unavailable.",
+          valueType: "currency",
+          summaryOnly: true,
+          periodAuto: (period) => getQboMetric(period, "income")
+        },
+        {
+          label: "QBO Cost of Goods Sold",
+          entry: "AUTO",
+          source: "QuickBooks Online cash-basis Profit and Loss",
+          valueType: "currency",
+          summaryOnly: true,
+          periodAuto: (period) => getQboMetric(period, "cogs")
+        },
+        {
+          label: "QBO Gross Profit",
+          entry: "AUTO",
+          source: "QuickBooks Online cash-basis Profit and Loss",
+          valueType: "currency",
+          bold: true,
+          summaryOnly: true,
+          periodAuto: (period) => getQboMetric(period, "grossProfit")
+        },
+        {
+          label: "QBO Total Expenses",
+          entry: "AUTO",
+          source: "QuickBooks Online cash-basis Profit and Loss",
+          valueType: "currency",
+          summaryOnly: true,
+          periodAuto: (period) => getQboMetric(period, "expenses")
+        },
+        {
+          label: "QBO Net Income",
+          entry: "AUTO",
+          source: "QuickBooks Online cash-basis Profit and Loss",
+          valueType: "currency",
+          bold: true,
+          summaryOnly: true,
+          periodAuto: (period) => getQboMetric(period, "netIncome")
+        },
+        {
+          label: "QBO Expense Adjustment / Unmapped Expenses",
+          entry: "AUTO",
+          source: "QBO Total Expenses - Dashboard Total Expenses",
+          methodology: "Shows the expense gap that is in QBO but not represented by dashboard expense rows. Use this as an adjustment row until those expenses are mapped to explicit dashboard lines.",
+          valueType: "currency",
+          summaryOnly: true,
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) => {
+            const qboExpensesRef = getMetricCellRef(metricSheetRowsByLabel, "QBO Total Expenses", columnName);
+            const dashboardExpensesRef = getMetricCellRef(metricSheetRowsByLabel, "Total Expenses", columnName);
+            return qboExpensesRef && dashboardExpensesRef
+              ? `=IF(OR(${qboExpensesRef}="",${dashboardExpensesRef}=""),"",${qboExpensesRef}-${dashboardExpensesRef})`
+              : "";
+          }
+        },
+        {
+          label: "Dashboard Adjusted Net Profit",
+          entry: "AUTO",
+          source: "Dashboard Net Profit - QBO Expense Adjustment",
+          valueType: "currency",
+          bold: true,
+          summaryOnly: true,
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) => {
+            const dashboardNetProfitRef = getMetricCellRef(metricSheetRowsByLabel, "Net Profit", columnName);
+            const adjustmentRef = getMetricCellRef(
+              metricSheetRowsByLabel,
+              "QBO Expense Adjustment / Unmapped Expenses",
+              columnName
+            );
+            return dashboardNetProfitRef && adjustmentRef
+              ? `=IF(OR(${dashboardNetProfitRef}="",${adjustmentRef}=""),"",${dashboardNetProfitRef}-${adjustmentRef})`
+              : "";
+          }
+        },
+        {
+          label: "Dashboard vs QBO Net Income Difference",
+          entry: "AUTO",
+          source: "Dashboard Adjusted Net Profit - QBO Net Income",
+          valueType: "currency",
+          bold: true,
+          summaryOnly: true,
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) => {
+            const adjustedDashboardRef = getMetricCellRef(metricSheetRowsByLabel, "Dashboard Adjusted Net Profit", columnName);
+            const qboNetIncomeRef = getMetricCellRef(metricSheetRowsByLabel, "QBO Net Income", columnName);
+            return adjustedDashboardRef && qboNetIncomeRef
+              ? `=IF(OR(${adjustedDashboardRef}="",${qboNetIncomeRef}=""),"",${adjustedDashboardRef}-${qboNetIncomeRef})`
+              : "";
+          }
+        }
+      ]
+    },
+    {
+      section: "STORE CREDIT ACCOUNTING",
+      rows: [
+        {
+          label: "QBO Member Payments",
+          entry: "AUTO",
+          source: "QuickBooks Online Member Payments account",
+          methodology: "Extracts the Member Payments account line from the same QBO P&L date spans used by the QBO reconciliation rows.",
+          valueType: "currency",
+          summaryOnly: true,
+          periodAuto: (period) => getQboMetric(period, "memberPayments")
+        },
+        {
+          label: "Credit Cash Received (Dashboard)",
+          entry: "AUTO",
+          source: "Actual Dollars Received for Credit",
+          valueType: "currency",
+          summaryOnly: true,
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) => {
+            const cashReceivedRef = getMetricCellRef(metricSheetRowsByLabel, "Actual Dollars Received for Credit", columnName);
+            return cashReceivedRef ? `=IF(${cashReceivedRef}="","",${cashReceivedRef})` : "";
+          }
+        },
+        {
+          label: "Member Credit Issued (Dashboard)",
+          entry: "AUTO",
+          source: "Member Credit Issued",
+          valueType: "currency",
+          summaryOnly: true,
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) => {
+            const creditIssuedRef = getMetricCellRef(metricSheetRowsByLabel, "Member Credit Issued", columnName);
+            return creditIssuedRef ? `=IF(${creditIssuedRef}="","",${creditIssuedRef})` : "";
+          }
+        },
+        {
+          label: "Store Credit Used (Dashboard)",
+          entry: "AUTO",
+          source: "Store Credit Used",
+          valueType: "currency",
+          summaryOnly: true,
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) => {
+            const creditUsedRef = getMetricCellRef(metricSheetRowsByLabel, "Store Credit Used", columnName);
+            return creditUsedRef ? `=IF(${creditUsedRef}="","",${creditUsedRef})` : "";
+          }
+        },
+        {
+          label: "Store Credit Net Growth",
+          entry: "AUTO",
+          source: "Member Credit Issued - Store Credit Used",
+          valueType: "currency",
+          bold: true,
+          summaryOnly: true,
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) => {
+            const creditIssuedRef = getMetricCellRef(metricSheetRowsByLabel, "Member Credit Issued (Dashboard)", columnName);
+            const creditUsedRef = getMetricCellRef(metricSheetRowsByLabel, "Store Credit Used (Dashboard)", columnName);
+            return creditIssuedRef && creditUsedRef
+              ? `=IF(OR(${creditIssuedRef}="",${creditUsedRef}=""),"",${creditIssuedRef}-${creditUsedRef})`
+              : "";
+          }
+        },
+        {
+          label: "Member Bank Balance Change (Dashboard)",
+          entry: "AUTO",
+          source: "Member Bank Balance Change",
+          valueType: "currency",
+          summaryOnly: true,
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) => {
+            const balanceChangeRef = getMetricCellRef(metricSheetRowsByLabel, "Member Bank Balance Change", columnName);
+            return balanceChangeRef ? `=IF(${balanceChangeRef}="","",${balanceChangeRef})` : "";
+          }
+        },
+        {
+          label: "Member Payments vs Credit Cash Difference",
+          entry: "AUTO",
+          source: "QBO Member Payments - Dashboard credit cash received",
+          valueType: "currency",
+          bold: true,
+          summaryOnly: true,
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) => {
+            const qboMemberPaymentsRef = getMetricCellRef(metricSheetRowsByLabel, "QBO Member Payments", columnName);
+            const dashboardCashRef = getMetricCellRef(metricSheetRowsByLabel, "Credit Cash Received (Dashboard)", columnName);
+            return qboMemberPaymentsRef && dashboardCashRef
+              ? `=IF(OR(${qboMemberPaymentsRef}="",${dashboardCashRef}=""),"",${qboMemberPaymentsRef}-${dashboardCashRef})`
+              : "";
+          }
+        }
+      ]
     }
   ];
 
@@ -1155,21 +1517,85 @@ function buildDashboardRows(
   const metricRows = [];
   const sectionRows = [];
   const metricSheetRowsByLabel = buildMetricSheetRowsByLabel(resolvedLayout);
+  const resolvedSummaryPeriods = summaryPeriods.length
+    ? summaryPeriods
+    : buildDashboardSummaryPeriods(weeks, publishableWeekStarts);
   const now = new Date().toISOString().replace("T", " ").slice(0, 19);
-  values.push([`FFCSA Dashboard 2026`, `Updated ${now}`, "", "", ...weeks.map(() => "")]);
-  values.push(["Section", "Metric", "Entry Type", "Source", ...weeks.map((w) => w.label)]);
+  values.push([
+    `FFCSA Dashboard 2026`,
+    `Updated ${now}`,
+    "",
+    "",
+    ...resolvedSummaryPeriods.map(() => ""),
+    ...weeks.map(() => "")
+  ]);
+  values.push([
+    "Section",
+    "Metric",
+    "Entry Type",
+    "Source",
+    ...resolvedSummaryPeriods.map((period) => period.label),
+    ...weeks.map((w) => w.label)
+  ]);
+
+  const getPeriodRowValue = (row, period, periodIndex) => {
+    if (!period?.started) return "";
+    const columnName = getSheetColumnName(DASHBOARD_STATIC_COLUMN_COUNT + periodIndex);
+    if (typeof row.periodFormula === "function") {
+      return row.periodFormula({
+        period,
+        periodIndex,
+        columnName,
+        metricSheetRowsByLabel
+      });
+    }
+    if (typeof row.periodAuto === "function") {
+      return normalizeAutoValue(row.valueType, row.periodAuto(period, periodIndex));
+    }
+    if (row.summary === "sum" || (row.entry === "MANUAL" && row.summary !== "blank")) {
+      return normalizeAutoValue(
+        row.valueType,
+        getPeriodRowSum(row, weeks, period, manualValueMap)
+      );
+    }
+    if (row.summary === "latest") {
+      return normalizeAutoValue(
+        row.valueType,
+        getPeriodRowLatestValue(row, weeks, period, manualValueMap)
+      );
+    }
+    if (typeof row.formula === "function" && row.summary !== "blank") {
+      return row.formula({
+        period,
+        periodIndex,
+        columnName,
+        metricSheetRowsByLabel
+      });
+    }
+    return "";
+  };
 
   for (const group of resolvedLayout) {
     sectionRows.push(values.length);
-    values.push([group.section, "", "", "", ...weeks.map(() => "")]);
+    values.push([
+      group.section,
+      "",
+      "",
+      "",
+      ...resolvedSummaryPeriods.map(() => ""),
+      ...weeks.map(() => "")
+    ]);
     for (const row of group.rows) {
       const sheetRowNumber = values.length + 1;
       const nextRow = ["", row.label, row.entry, row.source];
+      for (let index = 0; index < resolvedSummaryPeriods.length; index += 1) {
+        nextRow.push(getPeriodRowValue(row, resolvedSummaryPeriods[index], index));
+      }
       for (let index = 0; index < weeks.length; index += 1) {
         const week = weeks[index];
         const weekIsPublishable =
           !publishableWeekStarts || publishableWeekStarts.has(week.start);
-        if (!weekIsPublishable && row.entry !== "MANUAL") {
+        if (row.summaryOnly || (!weekIsPublishable && row.entry !== "MANUAL")) {
           nextRow.push("");
           continue;
         }
@@ -1177,7 +1603,7 @@ function buildDashboardRows(
           nextRow.push(row.formula({
             week,
             weekIndex: index,
-            columnName: getSheetColumnName(index + 4),
+            columnName: getSheetColumnName(DASHBOARD_WEEK_START_COLUMN_INDEX + index),
             metricSheetRowsByLabel
           }));
         } else if (row.entry === "AUTO") {
@@ -1200,7 +1626,7 @@ function buildDashboardRows(
   let packWagesSalesChart = null;
   const retailSalesRowNumber = metricSheetRowsByLabel.get("Retail Sales");
   const packWagesRowNumber = metricSheetRowsByLabel.get("% Pack Wages to Retail Sales");
-  const weekStartColumnIndex = 4;
+  const weekStartColumnIndex = DASHBOARD_WEEK_START_COLUMN_INDEX;
   const chartWeekOffset = weeks.findIndex((week) => week.start >= PACK_WAGES_SALES_CHART_MIN_WEEK_START);
   const chartStartColumnIndex = chartWeekOffset >= 0
     ? weekStartColumnIndex + chartWeekOffset
@@ -1208,7 +1634,7 @@ function buildDashboardRows(
   const weekEndColumnIndex = values[0]?.length || weekStartColumnIndex;
 
   if (retailSalesRowNumber && packWagesRowNumber && weekEndColumnIndex > chartStartColumnIndex) {
-    const blankRow = ["", "", "", "", ...weeks.map(() => "")];
+    const blankRow = ["", "", "", "", ...resolvedSummaryPeriods.map(() => ""), ...weeks.map(() => "")];
     values.push(blankRow);
 
     packWagesSalesChart = {
@@ -2729,7 +3155,7 @@ async function writeDashboardToSheet(
           sheetId,
           gridProperties: {
             frozenRowCount: 2,
-            frozenColumnCount: 4,
+            frozenColumnCount: DASHBOARD_WEEK_START_COLUMN_INDEX,
             rowCount: gridRowCount,
             columnCount: gridColumnCount
           }
@@ -2898,7 +3324,12 @@ async function writeDashboardToSheet(
     { startIndex: 0, pixelSize: 120 },
     { startIndex: 1, pixelSize: 260 },
     { startIndex: 2, pixelSize: 110 },
-    { startIndex: 3, pixelSize: 180 }
+    { startIndex: 3, pixelSize: 180 },
+    { startIndex: 4, pixelSize: 110 },
+    { startIndex: 5, pixelSize: 100 },
+    { startIndex: 6, pixelSize: 100 },
+    { startIndex: 7, pixelSize: 100 },
+    { startIndex: 8, pixelSize: 100 }
   ].forEach((column) => {
     requests.push({
       updateDimensionProperties: {
@@ -2919,7 +3350,7 @@ async function writeDashboardToSheet(
       range: {
         sheetId,
         dimension: "COLUMNS",
-        startIndex: 4,
+        startIndex: DASHBOARD_WEEK_START_COLUMN_INDEX,
         endIndex: maxCols
       },
       properties: { pixelSize: 92 },
@@ -3496,6 +3927,7 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
         )
         .map((week) => week.start)
     );
+    const summaryPeriods = buildDashboardSummaryPeriods(weeks, publishableWeekStarts);
     const skippedWeeks = weeks.filter((week) => !publishableWeekStarts.has(week.start));
     const warningSkippedWeeks = skippedWeeks.filter(
       (week) =>
@@ -3576,6 +4008,15 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       buildSubscriberWeeklyMap(weeks),
       buildTimesheetWeeklyMap(weeks)
     ]);
+    reportProgress({
+      phaseKey: "compute",
+      phaseLabel: "Compute Metrics",
+      status: "running",
+      percent: 80,
+      message: "Loading QBO reconciliation metrics"
+    });
+    const qboResult = await loadDashboardQboPeriodMetrics(summaryPeriods, { connection });
+    dashboardWarnings.push(...(qboResult.warnings || []));
 
     const { values, metricRows, sectionRows, packWagesSalesChart } = buildDashboardRows(
       weeks,
@@ -3586,6 +4027,8 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       timesheetResult.taskLabels || [],
       subscriberWeeklyMap,
       publishableWeekStarts,
+      summaryPeriods,
+      qboResult.map || {},
       customManualRows
     );
 
@@ -3639,6 +4082,14 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
         end: week.end
       })),
       publishableWeekCount: publishableWeekStarts.size,
+      summaryPeriods: summaryPeriods.map((period) => ({
+        key: period.key,
+        label: period.label,
+        start: period.start,
+        end: period.end,
+        started: period.started
+      })),
+      qboStatus: qboResult.source,
       rowCount: values.length,
       latestWeekStart: availability.publishableThroughWeekStart || null,
       latestWeekEnd: availability.publishableThroughWeekStart
