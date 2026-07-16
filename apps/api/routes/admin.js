@@ -3199,7 +3199,13 @@ router.get(
       const ensureSourceStat = (label) => {
         const key = label || "Direct / Unknown";
         if (!sourceStatsByLabel.has(key)) {
-          sourceStatsByLabel.set(key, { sourceLabel: key, signups: 0, clicks: 0, pageViews: 0 });
+          sourceStatsByLabel.set(key, {
+            sourceLabel: key,
+            signups: 0,
+            visits: 0,
+            pageViews: 0,
+            clicks: 0
+          });
         }
         return sourceStatsByLabel.get(key);
       };
@@ -3227,6 +3233,18 @@ router.get(
         });
         ensureSourceStat(attribution.source.label).clicks += 1;
         addLinkSource(linkId, attribution.source.label);
+      }
+
+      for (const session of sessionRows) {
+        const attribution = resolveMarketingRecordAttribution(session, {
+          campaignById,
+          campaignBySlug,
+          linkById,
+          linkBySlug,
+          sessionById,
+          sessionByToken
+        });
+        ensureSourceStat(attribution.source.label).visits += 1;
       }
 
       for (const pageView of pageViewRows) {
@@ -3279,15 +3297,16 @@ router.get(
         .map((row) => ({
           ...row,
           conversionRate:
-            row.pageViews > 0 ? Number(((row.signups / row.pageViews) * 100).toFixed(1)) : 0
+            row.visits > 0 ? Number(((row.signups / row.visits) * 100).toFixed(1)) : null
         }))
-        .sort((left, right) => right.signups - left.signups || right.clicks - left.clicks || left.sourceLabel.localeCompare(right.sourceLabel));
+        .sort((left, right) => right.signups - left.signups || right.visits - left.visits || left.sourceLabel.localeCompare(right.sourceLabel));
 
       res.json({
         summary: {
           campaigns: campaignRows.length,
           trackedLinks: linkRows.length,
           sessions: sessionRows.length,
+          trackedVisits: sessionRows.length,
           pageViews: pageViewRows.length,
           clickEvents: clickEventRows.length,
           subscriberEvents: reportableSubscriberRows.length,

@@ -68,6 +68,10 @@ function SummaryCard({ title, value, detail }) {
   );
 }
 
+function formatPercent(value) {
+  return typeof value === "number" && Number.isFinite(value) ? `${value.toFixed(1)}%` : "—";
+}
+
 export function AdminMarketingSection({ token }) {
   const [loading, setLoading] = useState(true);
   const [savingCampaign, setSavingCampaign] = useState(false);
@@ -368,9 +372,9 @@ export function AdminMarketingSection({ token }) {
                 detail="Configured slugs"
               />
               <SummaryCard
-                title="Page Views"
-                value={overview.summary.pageViews || 0}
-                detail="Tracked subscribe landings"
+                title="Tracked Visits"
+                value={overview.summary.trackedVisits || overview.summary.sessions || 0}
+                detail="Sessions/page views captured"
               />
               <SummaryCard
                 title="Clicks"
@@ -445,9 +449,10 @@ export function AdminMarketingSection({ token }) {
                   <tr>
                     <th>Source</th>
                     <th>Signups</th>
+                    <th>Tracked Visits</th>
                     <th>Page Views</th>
                     <th>Clicks</th>
-                    <th>Signup / View</th>
+                    <th>Signup / Visit</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -455,9 +460,10 @@ export function AdminMarketingSection({ token }) {
                     <tr key={stat.sourceLabel}>
                       <td title={stat.sourceLabel || "—"}>{truncateText(stat.sourceLabel, 34)}</td>
                       <td>{stat.signups || 0}</td>
+                      <td>{stat.visits || 0}</td>
                       <td>{stat.pageViews || 0}</td>
                       <td>{stat.clicks || 0}</td>
-                      <td>{Number(stat.conversionRate || 0).toFixed(1)}%</td>
+                      <td>{formatPercent(stat.conversionRate)}</td>
                     </tr>
                   ))}
                 </tbody>
