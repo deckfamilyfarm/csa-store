@@ -2465,10 +2465,11 @@ router.post("/subscribe", async (req, res) => {
     const searchParams = new URLSearchParams(String(payload.queryString || ""));
     const marketingParams = extractMarketingParams(payload, searchParams);
     const sourceHostHeader = cleanOptionalString(
-      req.get("x-forwarded-host") || req.get("host") || payload.sourceHost,
+      payload.sourceHost || req.get("x-forwarded-host") || req.get("host"),
       255
     );
     const sourcePath = cleanOptionalString(payload.sourcePath, 255);
+    const referrerUrl = cleanOptionalUrl(payload.referrerUrl || req.get("referer"));
     const attribution = await resolveMarketingAttribution(db, marketingParams);
     let addressInsights = null;
     try {
@@ -2534,6 +2535,7 @@ router.post("/subscribe", async (req, res) => {
       liabilityAgreementSignedAt: now,
       sourceHost: sourceHostHeader,
       sourcePath,
+      referrerUrl,
       utmSource: marketingParams.utmSource,
       utmMedium: marketingParams.utmMedium,
       utmCampaign: marketingParams.utmCampaign,
@@ -2635,6 +2637,7 @@ router.post("/subscribe", async (req, res) => {
           marketingParams.csaTrackToken ||
           marketingParams.csaLinkSlug ||
           marketingParams.csaCampaignSlug ||
+          referrerUrl ||
           attribution.linkRow ||
           attribution.campaignRow
         )
@@ -2646,7 +2649,9 @@ router.post("/subscribe", async (req, res) => {
         campaignId: attribution.campaignRow?.id ?? attribution.sessionRow?.campaignId ?? null,
         utmLinkId: attribution.linkRow?.id ?? attribution.sessionRow?.utmLinkId ?? null,
         sessionId: attribution.sessionRow?.id ?? null,
-        matchMethod: attribution.matchMethod || "direct_utm",
+        matchMethod:
+          attribution.matchMethod ||
+          (marketingParams.csaTrackToken ? "session_token" : referrerUrl ? "referrer" : "direct_form"),
         email,
         firstName,
         lastName,
@@ -2656,6 +2661,7 @@ router.post("/subscribe", async (req, res) => {
         subscribedAt: now,
         sourceHost: sourceHostHeader,
         sourcePath,
+        referrerUrl,
         utmSource: marketingParams.utmSource,
         utmMedium: marketingParams.utmMedium,
         utmCampaign: marketingParams.utmCampaign,

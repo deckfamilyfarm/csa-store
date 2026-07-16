@@ -386,6 +386,313 @@ function sortSubscribeLeadRows(rows = []) {
   });
 }
 
+const TEST_SUBSCRIBE_SIGNUP_NAMES = new Set(["john deck", "laura wayte"]);
+
+function normalizeMarketingText(value) {
+  return String(value || "").trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function getSignupName(row = {}) {
+  return normalizeMarketingText([row.firstName, row.lastName].filter(Boolean).join(" "));
+}
+
+function isTestSubscribeSignup(row = {}, linkedLead = null) {
+  return [row, linkedLead].some((candidate) => {
+    const name = getSignupName(candidate || {});
+    return name && TEST_SUBSCRIBE_SIGNUP_NAMES.has(name);
+  });
+}
+
+function isReportableSubscribeLead(row = {}) {
+  return normalizeSubscribeLeadStatus(row.status) !== "inactive" && !isTestSubscribeSignup(row);
+}
+
+function parseJsonObject(value) {
+  if (!value) return {};
+  try {
+    const parsed = JSON.parse(String(value));
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+  } catch (_error) {
+    return {};
+  }
+}
+
+function appendQueryParams(target, queryValue) {
+  const query = String(queryValue || "").trim().replace(/^\?/, "");
+  if (!query) return;
+  for (const [key, value] of new URLSearchParams(query)) {
+    if (!target.has(key)) target.set(key, value);
+  }
+}
+
+function appendUrlQueryParams(target, urlValue) {
+  const value = String(urlValue || "").trim();
+  if (!value) return;
+  try {
+    const parsed = new URL(value);
+    appendQueryParams(target, parsed.search);
+    const hash = String(parsed.hash || "");
+    const hashQueryIndex = hash.indexOf("?");
+    if (hashQueryIndex >= 0) {
+      appendQueryParams(target, hash.slice(hashQueryIndex + 1).split("#")[0]);
+    }
+  } catch (_error) {
+    // Ignore invalid or relative URLs; explicit stored fields still cover attribution.
+  }
+}
+
+function collectMarketingParams(row = {}, linkedLead = null, session = null) {
+  const params = new URLSearchParams();
+  const rawPayload = parseJsonObject(linkedLead?.rawJson || row.rawJson);
+  appendQueryParams(params, rawPayload.queryString);
+  appendQueryParams(params, row.queryString);
+  appendUrlQueryParams(params, rawPayload.pageUrl);
+  appendUrlQueryParams(params, row.pageUrl);
+  appendUrlQueryParams(params, session?.landingUrl);
+  return params;
+}
+
+function getFirstValue(...values) {
+  for (const value of values) {
+    const trimmed = String(value || "").trim();
+    if (trimmed) return trimmed;
+  }
+  return "";
+}
+
+function isPaidMarketingMedium(value) {
+  const normalized = normalizeMarketingText(value);
+  return /\b(ad|ads|cpc|cpm|display|paid|paid-social|ppc|retargeting)\b/.test(normalized);
+}
+
+function formatMarketingSourceLabel(value) {
+  const normalized = String(value || "").trim();
+  if (!normalized) return "";
+  return normalized
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function deriveMarketingSource(row = {}, { linkedLead = null, session = null, link = null } = {}) {
+  const params = collectMarketingParams(row, linkedLead, session);
+  const rawPayload = parseJsonObject(linkedLead?.rawJson || row.rawJson);
+  const utmSource = getFirstValue(
+    row.utmSource,
+    linkedLead?.utmSource,
+    session?.utmSource,
+    params.get("utm_source")
+  );
+  const utmMedium = getFirstValue(
+    row.utmMedium,
+    linkedLead?.utmMedium,
+    session?.utmMedium,
+    params.get("utm_medium")
+  );
+  const referrerUrl = getFirstValue(
+    row.referrerUrl,
+    linkedLead?.referrerUrl,
+    session?.referrerUrl,
+    rawPayload.referrerUrl
+  );
+  const referrerHost = deriveHostFromUrl(referrerUrl);
+  const utmSourceLower = normalizeMarketingText(utmSource);
+  const utmMediumLower = normalizeMarketingText(utmMedium);
+  const referrerHostLower = normalizeMarketingText(referrerHost);
+
+  if (params.get("fbclid")) {
+    return { label: "Facebook Ads", detail: "fbclid", referrerHost };
+  }
+  if (params.get("gclid") || params.get("gbraid") || params.get("wbraid")) {
+    return { label: "Google Ads", detail: "google click id", referrerHost };
+  }
+  if (params.get("msclkid")) {
+    return { label: "Microsoft Ads", detail: "msclkid", referrerHost };
+  }
+  if (params.get("ttclid")) {
+    return { label: "TikTok Ads", detail: "ttclid", referrerHost };
+  }
+
+  if (utmSourceLower) {
+    if (
+      /(^|\b)(facebook|fb|meta|instagram|ig)(\b|$)/.test(utmSourceLower) &&
+      isPaidMarketingMedium(utmMediumLower)
+    ) {
+      return { label: "Facebook Ads", detail: `utm_source=${utmSource}`, referrerHost };
+    }
+    if (/google|adwords/.test(utmSourceLower) && isPaidMarketingMedium(utmMediumLower)) {
+      return { label: "Google Ads", detail: `utm_source=${utmSource}`, referrerHost };
+    }
+    return {
+      label: formatMarketingSourceLabel(utmSource),
+      detail: utmMedium ? `utm_medium=${utmMedium}` : "utm_source",
+      referrerHost
+    };
+  }
+
+  if (/facebook\.com|fb\.com|instagram\.com/.test(referrerHostLower)) {
+    return { label: "Facebook Referral", detail: referrerHost, referrerHost };
+  }
+  if (/google\./.test(referrerHostLower)) {
+    return { label: "Google Referral", detail: referrerHost, referrerHost };
+  }
+  if (referrerHost) {
+    return { label: referrerHost, detail: "referrer", referrerHost };
+  }
+  if (link || row.csaLinkSlug || linkedLead?.csaLinkSlug) {
+    return { label: "Tracked Link", detail: link?.slug || row.csaLinkSlug || linkedLead?.csaLinkSlug || "", referrerHost };
+  }
+  return { label: "Direct / Unknown", detail: "", referrerHost };
+}
+
+function resolveMarketingRecordAttribution(
+  row = {},
+  { linkedLead = null, campaignById, campaignBySlug, linkById, linkBySlug, sessionById, sessionByToken }
+) {
+  const session =
+    sessionById.get(Number(row.sessionId)) ||
+    sessionByToken.get(String(row.csaTrackToken || linkedLead?.csaTrackToken || "")) ||
+    null;
+  const link =
+    linkById.get(Number(row.utmLinkId)) ||
+    linkBySlug.get(String(row.csaLinkSlug || linkedLead?.csaLinkSlug || "")) ||
+    linkById.get(Number(session?.utmLinkId)) ||
+    null;
+  const campaign =
+    campaignById.get(Number(row.campaignId)) ||
+    campaignBySlug.get(String(row.csaCampaignSlug || linkedLead?.csaCampaignSlug || "")) ||
+    (link ? campaignById.get(Number(link.campaignId)) : null) ||
+    campaignById.get(Number(session?.campaignId)) ||
+    null;
+  const source = deriveMarketingSource(row, { linkedLead, session, link });
+  return { campaign, link, session, source };
+}
+
+function buildMarketingConversionRecords({
+  leadRows = [],
+  subscriberRows = [],
+  campaignById,
+  campaignBySlug,
+  linkById,
+  linkBySlug,
+  sessionById,
+  sessionByToken
+}) {
+  const leadById = new Map(leadRows.map((row) => [Number(row.id), row]));
+  const reportableLeadById = new Map(
+    leadRows.filter(isReportableSubscribeLead).map((row) => [Number(row.id), row])
+  );
+  const seenLeadIds = new Set();
+  const records = [];
+  const sortedSubscriberRows = subscriberRows.slice().sort((left, right) => {
+    const leftTime = toTimestamp(left.subscribedAt || left.createdAt);
+    const rightTime = toTimestamp(right.subscribedAt || right.createdAt);
+    return rightTime - leftTime || Number(right.id || 0) - Number(left.id || 0);
+  });
+
+  for (const event of sortedSubscriberRows) {
+    const leadId = Number(event.subscribeLeadId);
+    const linkedLead = leadById.get(leadId) || null;
+    if (linkedLead && !isReportableSubscribeLead(linkedLead)) continue;
+    if (!linkedLead && isTestSubscribeSignup(event)) continue;
+    if (Number.isFinite(leadId) && leadId > 0) {
+      if (seenLeadIds.has(leadId)) continue;
+      seenLeadIds.add(leadId);
+    }
+    const attribution = resolveMarketingRecordAttribution(event, {
+      linkedLead,
+      campaignById,
+      campaignBySlug,
+      linkById,
+      linkBySlug,
+      sessionById,
+      sessionByToken
+    });
+    records.push({
+      id: `subscriber-${event.id}`,
+      sourceRecordType: "subscriber_event",
+      subscribeLeadId: Number.isFinite(leadId) && leadId > 0 ? leadId : null,
+      subscriberEventId: event.id,
+      subscribedAt: event.subscribedAt || linkedLead?.submittedAt || event.createdAt || linkedLead?.createdAt,
+      campaignId: attribution.campaign?.id || null,
+      campaignSlug: attribution.campaign?.slug || event.csaCampaignSlug || linkedLead?.csaCampaignSlug || null,
+      campaignName: attribution.campaign?.name || null,
+      linkId: attribution.link?.id || null,
+      linkSlug: attribution.link?.slug || event.csaLinkSlug || linkedLead?.csaLinkSlug || null,
+      linkLabel: attribution.link?.label || null,
+      email: event.email || linkedLead?.email || null,
+      firstName: event.firstName || linkedLead?.firstName || null,
+      lastName: event.lastName || linkedLead?.lastName || null,
+      city: event.city || linkedLead?.city || null,
+      postalCode: event.postalCode || linkedLead?.postalCode || null,
+      selectedDropSite: event.selectedDropSite || linkedLead?.selectedDropSite || null,
+      leadStatus: linkedLead ? normalizeSubscribeLeadStatus(linkedLead.status) : null,
+      sourceHost: event.sourceHost || linkedLead?.sourceHost || attribution.session?.sourceHost || null,
+      sourceLabel: attribution.source.label,
+      sourceDetail: attribution.source.detail,
+      referrerHost: attribution.source.referrerHost,
+      referrerUrl: event.referrerUrl || linkedLead?.referrerUrl || attribution.session?.referrerUrl || null,
+      utmSource: event.utmSource || linkedLead?.utmSource || attribution.session?.utmSource || null,
+      utmMedium: event.utmMedium || linkedLead?.utmMedium || attribution.session?.utmMedium || null,
+      utmCampaign: event.utmCampaign || linkedLead?.utmCampaign || attribution.session?.utmCampaign || null,
+      utmContent: event.utmContent || linkedLead?.utmContent || attribution.session?.utmContent || null,
+      messageFocus: event.messageFocus || linkedLead?.messageFocus || attribution.link?.messageFocus || attribution.campaign?.messageFocus || null,
+      matchMethod: event.matchMethod || "subscriber_event"
+    });
+  }
+
+  for (const lead of reportableLeadById.values()) {
+    const leadId = Number(lead.id);
+    if (seenLeadIds.has(leadId)) continue;
+    const attribution = resolveMarketingRecordAttribution(lead, {
+      linkedLead: lead,
+      campaignById,
+      campaignBySlug,
+      linkById,
+      linkBySlug,
+      sessionById,
+      sessionByToken
+    });
+    records.push({
+      id: `lead-${lead.id}`,
+      sourceRecordType: "subscribe_lead",
+      subscribeLeadId: leadId,
+      subscriberEventId: null,
+      subscribedAt: lead.submittedAt || lead.createdAt,
+      campaignId: attribution.campaign?.id || null,
+      campaignSlug: attribution.campaign?.slug || lead.csaCampaignSlug || null,
+      campaignName: attribution.campaign?.name || null,
+      linkId: attribution.link?.id || null,
+      linkSlug: attribution.link?.slug || lead.csaLinkSlug || null,
+      linkLabel: attribution.link?.label || null,
+      email: lead.email || null,
+      firstName: lead.firstName || null,
+      lastName: lead.lastName || null,
+      city: lead.city || null,
+      postalCode: lead.postalCode || null,
+      selectedDropSite: lead.selectedDropSite || null,
+      leadStatus: normalizeSubscribeLeadStatus(lead.status),
+      sourceHost: lead.sourceHost || attribution.session?.sourceHost || null,
+      sourceLabel: attribution.source.label,
+      sourceDetail: attribution.source.detail,
+      referrerHost: attribution.source.referrerHost,
+      referrerUrl: lead.referrerUrl || attribution.session?.referrerUrl || null,
+      utmSource: lead.utmSource || attribution.session?.utmSource || null,
+      utmMedium: lead.utmMedium || attribution.session?.utmMedium || null,
+      utmCampaign: lead.utmCampaign || attribution.session?.utmCampaign || null,
+      utmContent: lead.utmContent || attribution.session?.utmContent || null,
+      messageFocus: lead.messageFocus || attribution.link?.messageFocus || attribution.campaign?.messageFocus || null,
+      matchMethod: attribution.session ? "session_lead" : lead.csaLinkSlug ? "lead_link" : lead.utmSource ? "lead_utm" : "lead"
+    });
+  }
+
+  return records.sort((left, right) => {
+    const leftTime = toTimestamp(left.subscribedAt);
+    const rightTime = toTimestamp(right.subscribedAt);
+    return rightTime - leftTime || String(right.id).localeCompare(String(left.id));
+  });
+}
+
 function formatCsvCell(value) {
   const raw = value instanceof Date
     ? value.toISOString()
@@ -2843,58 +3150,115 @@ router.get(
           db.select().from(subscribeLeads)
         ]);
 
-      const recentSubscriberEvents = subscriberRows
-        .slice()
-        .sort((left, right) => {
-          const leftTime = toTimestamp(left.subscribedAt || left.createdAt);
-          const rightTime = toTimestamp(right.subscribedAt || right.createdAt);
-          return rightTime - leftTime || Number(right.id || 0) - Number(left.id || 0);
-        })
-        .slice(0, 25);
+      const campaignById = new Map(campaignRows.map((row) => [Number(row.id), row]));
+      const campaignBySlug = new Map(campaignRows.map((row) => [String(row.slug || ""), row]));
+      const linkById = new Map(linkRows.map((row) => [Number(row.id), row]));
+      const linkBySlug = new Map(linkRows.map((row) => [String(row.slug || ""), row]));
+      const sessionById = new Map(sessionRows.map((row) => [Number(row.id), row]));
+      const sessionByToken = new Map(sessionRows.map((row) => [String(row.sessionToken || ""), row]));
+      const leadById = new Map(leadRows.map((row) => [Number(row.id), row]));
+      const reportableLeadRows = leadRows.filter(isReportableSubscribeLead);
+      const reportableSubscriberRows = subscriberRows.filter((row) => {
+        const linkedLead = leadById.get(Number(row.subscribeLeadId)) || null;
+        if (linkedLead) return isReportableSubscribeLead(linkedLead);
+        return !isTestSubscribeSignup(row);
+      });
+      const conversionRecords = buildMarketingConversionRecords({
+        leadRows,
+        subscriberRows: reportableSubscriberRows,
+        campaignById,
+        campaignBySlug,
+        linkById,
+        linkBySlug,
+        sessionById,
+        sessionByToken
+      });
 
-      const attributedLeadCount = leadRows.filter(
+      const recentSubscriberEvents = conversionRecords.slice(0, 25);
+      const clickEventRows = clickRows.filter(
+        (row) => String(row.eventType || "click").toLowerCase() === "click"
+      );
+      const pageViewRows = clickRows.filter(
+        (row) => String(row.eventType || "").toLowerCase() === "page_view"
+      );
+      const attributedLeadCount = conversionRecords.filter(
         (row) =>
+          row.linkId ||
+          row.campaignId ||
           row.utmSource ||
           row.utmMedium ||
           row.utmCampaign ||
-          row.csaTrackToken ||
-          row.csaLinkSlug ||
-          row.csaCampaignSlug
+          row.referrerHost ||
+          row.sourceLabel !== "Direct / Unknown"
       ).length;
 
       const clickCountsByLinkId = new Map();
-      const subscriberCountsByLinkId = new Map();
-      const referrersByLinkId = new Map();
+      const signupCountsByLinkId = new Map();
+      const sourcesByLinkId = new Map();
+      const sourceStatsByLabel = new Map();
+      const ensureSourceStat = (label) => {
+        const key = label || "Direct / Unknown";
+        if (!sourceStatsByLabel.has(key)) {
+          sourceStatsByLabel.set(key, { sourceLabel: key, signups: 0, clicks: 0, pageViews: 0 });
+        }
+        return sourceStatsByLabel.get(key);
+      };
+      const addLinkSource = (linkId, label) => {
+        if (!Number.isFinite(linkId) || linkId <= 0) return;
+        const sourceLabel = label || "Direct / Unknown";
+        const sourceMap = sourcesByLinkId.get(linkId) || new Map();
+        sourceMap.set(sourceLabel, (sourceMap.get(sourceLabel) || 0) + 1);
+        sourcesByLinkId.set(linkId, sourceMap);
+      };
 
-      for (const click of clickRows) {
+      for (const click of clickEventRows) {
         if (String(click.eventType || "click").toLowerCase() !== "click") continue;
         const linkId = Number(click.utmLinkId);
-        if (!Number.isFinite(linkId) || linkId <= 0) continue;
-        clickCountsByLinkId.set(linkId, (clickCountsByLinkId.get(linkId) || 0) + 1);
-        const referrerHost = deriveHostFromUrl(click.referrerUrl);
-        if (referrerHost) {
-          const refMap = referrersByLinkId.get(linkId) || new Map();
-          refMap.set(referrerHost, (refMap.get(referrerHost) || 0) + 1);
-          referrersByLinkId.set(linkId, refMap);
+        if (Number.isFinite(linkId) && linkId > 0) {
+          clickCountsByLinkId.set(linkId, (clickCountsByLinkId.get(linkId) || 0) + 1);
         }
+        const attribution = resolveMarketingRecordAttribution(click, {
+          campaignById,
+          campaignBySlug,
+          linkById,
+          linkBySlug,
+          sessionById,
+          sessionByToken
+        });
+        ensureSourceStat(attribution.source.label).clicks += 1;
+        addLinkSource(linkId, attribution.source.label);
       }
 
-      for (const subscriberEvent of subscriberRows) {
-        const linkId = Number(subscriberEvent.utmLinkId);
+      for (const pageView of pageViewRows) {
+        const attribution = resolveMarketingRecordAttribution(pageView, {
+          campaignById,
+          campaignBySlug,
+          linkById,
+          linkBySlug,
+          sessionById,
+          sessionByToken
+        });
+        ensureSourceStat(attribution.source.label).pageViews += 1;
+      }
+
+      for (const conversion of conversionRecords) {
+        ensureSourceStat(conversion.sourceLabel).signups += 1;
+        const linkId = Number(conversion.linkId);
         if (!Number.isFinite(linkId) || linkId <= 0) continue;
-        subscriberCountsByLinkId.set(linkId, (subscriberCountsByLinkId.get(linkId) || 0) + 1);
+        signupCountsByLinkId.set(linkId, (signupCountsByLinkId.get(linkId) || 0) + 1);
+        addLinkSource(linkId, conversion.sourceLabel);
       }
 
       const linkStats = linkRows
         .map((link) => {
           const linkId = Number(link.id);
           const clicks = clickCountsByLinkId.get(linkId) || 0;
-          const subscribers = subscriberCountsByLinkId.get(linkId) || 0;
-          const refMap = referrersByLinkId.get(linkId) || new Map();
-          const topReferrers = [...refMap.entries()]
+          const signups = signupCountsByLinkId.get(linkId) || 0;
+          const sourceMap = sourcesByLinkId.get(linkId) || new Map();
+          const topSources = [...sourceMap.entries()]
             .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
             .slice(0, 3)
-            .map(([host, count]) => ({ host, count }));
+            .map(([label, count]) => ({ label, count }));
           return {
             linkId,
             slug: link.slug,
@@ -2903,24 +3267,37 @@ router.get(
             utmContent: link.utmContent,
             messageFocus: link.messageFocus,
             clicks,
-            subscribers,
-            conversionRate: clicks > 0 ? Number(((subscribers / clicks) * 100).toFixed(1)) : 0,
-            topReferrers
+            subscribers: signups,
+            signups,
+            conversionRate: clicks > 0 ? Number(((signups / clicks) * 100).toFixed(1)) : 0,
+            topSources
           };
         })
-        .sort((left, right) => right.clicks - left.clicks || right.subscribers - left.subscribers || left.slug.localeCompare(right.slug));
+        .sort((left, right) => right.clicks - left.clicks || right.signups - left.signups || left.slug.localeCompare(right.slug));
+
+      const sourceStats = [...sourceStatsByLabel.values()]
+        .map((row) => ({
+          ...row,
+          conversionRate:
+            row.pageViews > 0 ? Number(((row.signups / row.pageViews) * 100).toFixed(1)) : 0
+        }))
+        .sort((left, right) => right.signups - left.signups || right.clicks - left.clicks || left.sourceLabel.localeCompare(right.sourceLabel));
 
       res.json({
         summary: {
           campaigns: campaignRows.length,
           trackedLinks: linkRows.length,
           sessions: sessionRows.length,
-          clickEvents: clickRows.length,
-          subscriberEvents: subscriberRows.length,
+          pageViews: pageViewRows.length,
+          clickEvents: clickEventRows.length,
+          subscriberEvents: reportableSubscriberRows.length,
+          signups: conversionRecords.length,
+          subscriptionLeads: reportableLeadRows.length,
           attributedSubscriptionLeads: attributedLeadCount
         },
         recentSubscriberEvents,
-        linkStats
+        linkStats,
+        sourceStats
       });
     } catch (error) {
       console.error("Marketing overview fetch failed:", error);
@@ -2937,17 +3314,21 @@ router.get(
       await ensureMarketingSchema();
       await ensureSubscriberCaptureSchema();
       const db = getDb();
-      const [campaignRows, linkRows, clickRows, subscriberRows, leadRows] = await Promise.all([
+      const [campaignRows, linkRows, sessionRows, clickRows, subscriberRows, leadRows] = await Promise.all([
         db.select().from(marketingCampaigns),
         db.select().from(marketingUtmLinks),
+        db.select().from(marketingSessions),
         db.select().from(marketingClickEvents),
         db.select().from(marketingSubscriberEvents),
         db.select().from(subscribeLeads)
       ]);
 
       const campaignById = new Map(campaignRows.map((row) => [Number(row.id), row]));
+      const campaignBySlug = new Map(campaignRows.map((row) => [String(row.slug || ""), row]));
       const linkById = new Map(linkRows.map((row) => [Number(row.id), row]));
-      const leadById = new Map(leadRows.map((row) => [Number(row.id), row]));
+      const linkBySlug = new Map(linkRows.map((row) => [String(row.slug || ""), row]));
+      const sessionById = new Map(sessionRows.map((row) => [Number(row.id), row]));
+      const sessionByToken = new Map(sessionRows.map((row) => [String(row.sessionToken || ""), row]));
 
       const recentClicks = clickRows
         .slice()
@@ -2958,20 +3339,25 @@ router.get(
         })
         .slice(0, 100)
         .map((click) => {
-          const link = linkById.get(Number(click.utmLinkId)) || null;
-          const campaign =
-            campaignById.get(Number(click.campaignId)) ||
-            (link ? campaignById.get(Number(link.campaignId)) : null) ||
-            null;
+          const attribution = resolveMarketingRecordAttribution(click, {
+            campaignById,
+            campaignBySlug,
+            linkById,
+            linkBySlug,
+            sessionById,
+            sessionByToken
+          });
           return {
             id: click.id,
             occurredAt: click.occurredAt || click.createdAt,
             eventType: click.eventType,
-            campaignSlug: campaign?.slug || null,
-            campaignName: campaign?.name || null,
-            linkSlug: link?.slug || null,
-            linkLabel: link?.label || null,
-            sourceHost: deriveHostFromUrl(click.referrerUrl) || click.sourceHost || null,
+            campaignSlug: attribution.campaign?.slug || null,
+            campaignName: attribution.campaign?.name || null,
+            linkSlug: attribution.link?.slug || null,
+            linkLabel: attribution.link?.label || null,
+            sourceHost:
+              attribution.source.label || deriveHostFromUrl(click.referrerUrl) || click.sourceHost || null,
+            sourceDetail: attribution.source.detail || null,
             referrerUrl: click.referrerUrl || null,
             pageUrl: click.pageUrl || null,
             destinationUrl: click.destinationUrl || null,
@@ -2983,43 +3369,43 @@ router.get(
           };
         });
 
-      const recentConversions = subscriberRows
-        .slice()
-        .sort((left, right) => {
-          const leftTime = toTimestamp(left.subscribedAt || left.createdAt);
-          const rightTime = toTimestamp(right.subscribedAt || right.createdAt);
-          return rightTime - leftTime || Number(right.id || 0) - Number(left.id || 0);
-        })
+      const recentConversions = buildMarketingConversionRecords({
+        leadRows,
+        subscriberRows,
+        campaignById,
+        campaignBySlug,
+        linkById,
+        linkBySlug,
+        sessionById,
+        sessionByToken
+      })
         .slice(0, 100)
-        .map((event) => {
-          const link = linkById.get(Number(event.utmLinkId)) || null;
-          const campaign =
-            campaignById.get(Number(event.campaignId)) ||
-            (link ? campaignById.get(Number(link.campaignId)) : null) ||
-            null;
-          const lead = leadById.get(Number(event.subscribeLeadId)) || null;
+        .map((record) => {
           return {
-            id: event.id,
-            subscribedAt: event.subscribedAt || event.createdAt,
-            campaignSlug: campaign?.slug || null,
-            campaignName: campaign?.name || null,
-            linkSlug: link?.slug || event.csaLinkSlug || null,
-            linkLabel: link?.label || null,
-            email: event.email || null,
-            firstName: event.firstName || lead?.firstName || null,
-            lastName: event.lastName || lead?.lastName || null,
-            city: event.city || lead?.city || null,
-            postalCode: event.postalCode || lead?.postalCode || null,
-            selectedDropSite: event.selectedDropSite || lead?.selectedDropSite || null,
-            sourceHost: event.sourceHost || lead?.sourceHost || null,
-            utmSource: event.utmSource || null,
-            utmMedium: event.utmMedium || null,
-            utmCampaign: event.utmCampaign || null,
-            utmContent: event.utmContent || null,
-            messageFocus: event.messageFocus || lead?.messageFocus || null,
-            matchMethod: event.matchMethod || null,
-            subscribeLeadId: event.subscribeLeadId || null,
-            leadStatus: lead?.status || null
+            id: record.id,
+            subscribedAt: record.subscribedAt,
+            campaignSlug: record.campaignSlug,
+            campaignName: record.campaignName,
+            linkSlug: record.linkSlug,
+            linkLabel: record.linkLabel,
+            email: record.email,
+            firstName: record.firstName,
+            lastName: record.lastName,
+            city: record.city,
+            postalCode: record.postalCode,
+            selectedDropSite: record.selectedDropSite,
+            sourceHost: record.sourceLabel,
+            sourceDetail: record.sourceDetail || record.referrerHost || null,
+            referrerUrl: record.referrerUrl || null,
+            utmSource: record.utmSource,
+            utmMedium: record.utmMedium,
+            utmCampaign: record.utmCampaign,
+            utmContent: record.utmContent,
+            messageFocus: record.messageFocus,
+            matchMethod: record.matchMethod,
+            subscribeLeadId: record.subscribeLeadId,
+            leadStatus: record.leadStatus,
+            sourceRecordType: record.sourceRecordType
           };
         });
 

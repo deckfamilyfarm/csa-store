@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { fetchSubscribeAddressInsights, submitSubscribeLead } from "../api.js";
+import { fetchSubscribeAddressInsights, submitSubscribeLead, trackMarketingEvent } from "../api.js";
 import { getSiteContentValue } from "../siteContent.js";
 import { SUBSCRIBE_PARTNERS } from "../data/subscribePartners.js";
 import {
@@ -262,6 +262,27 @@ function trackMetaPixelPageView() {
   trackedPageViews.add(pageViewKey);
 }
 
+function getMarketingQueryString() {
+  if (typeof window === "undefined") return "";
+  const parts = [];
+  const search = String(window.location.search || "").replace(/^\?/, "");
+  if (search) parts.push(search);
+  const hash = String(window.location.hash || "");
+  const hashQueryIndex = hash.indexOf("?");
+  if (hashQueryIndex >= 0) {
+    const hashQuery = hash.slice(hashQueryIndex + 1).split("#")[0];
+    if (hashQuery) parts.push(hashQuery);
+  }
+  return parts.length ? `?${parts.join("&")}` : "";
+}
+
+function getMarketingSourcePath() {
+  if (typeof window === "undefined") return "";
+  const hash = String(window.location.hash || "");
+  const hashPath = hash ? hash.split("?")[0] : "";
+  return `${window.location.pathname}${hashPath}`;
+}
+
 function storeUrlFallback() {
   return "https://fullfarmcsa.deckfamilyfarm.com/";
 }
@@ -447,6 +468,7 @@ export function SubscribePage({
   const [checkingAddress, setCheckingAddress] = useState(false);
   const formStatusRef = useRef(null);
   const formCardRef = useRef(null);
+  const marketingSessionTokenRef = useRef("");
   const copy = (section, field, fallback) =>
     getSiteContentValue(siteContent, "subscribe", section, field, fallback);
 
@@ -536,6 +558,28 @@ export function SubscribePage({
     applyJsonLd("subscribe-service-schema", serviceSchema);
     applyJsonLd("subscribe-faq-schema", faqSchema);
     trackMetaPixelPageView();
+
+    const pageViewKey = window.location.href;
+    window.__csaMarketingPageViewPromises = window.__csaMarketingPageViewPromises || new Map();
+    if (!window.__csaMarketingPageViewPromises.has(pageViewKey)) {
+      window.__csaMarketingPageViewPromises.set(
+        pageViewKey,
+        trackMarketingEvent({
+          eventType: "page_view",
+          pageUrl: window.location.href,
+          destinationUrl: window.location.href,
+          referrerUrl: document.referrer || "",
+          sourceHost: window.location.host,
+          sourcePath: getMarketingSourcePath(),
+          queryString: getMarketingQueryString()
+        }).catch(() => null)
+      );
+    }
+    window.__csaMarketingPageViewPromises.get(pageViewKey)?.then((response) => {
+      if (response?.sessionToken) {
+        marketingSessionTokenRef.current = response.sessionToken;
+      }
+    });
   }, [allFaqs]);
 
   useEffect(() => {
@@ -781,6 +825,13 @@ export function SubscribePage({
       }
       const plan = SUBSCRIBE_PLANS.find((entry) => entry.value === form.selectedPlan);
       const { billingDayOfMonth, ...leadForm } = form;
+      const marketingQueryString = getMarketingQueryString();
+      const marketingSearchParams = new URLSearchParams(marketingQueryString);
+      const csaTrackToken =
+        marketingSearchParams.get("csa_track") ||
+        marketingSearchParams.get("csa_session") ||
+        marketingSessionTokenRef.current ||
+        "";
       const response = await submitSubscribeLead({
         ...leadForm,
         selectedPlanLabel: plan?.title || form.selectedPlan,
@@ -789,9 +840,12 @@ export function SubscribePage({
           : {}),
         liabilityAgreementSignatureMode: "typed",
         liabilityAgreementSignatureDataUrl: "",
+        ...(csaTrackToken ? { csaTrackToken } : {}),
         sourceHost: window.location.host,
-        sourcePath: window.location.pathname,
-        queryString: window.location.search
+        sourcePath: getMarketingSourcePath(),
+        referrerUrl: document.referrer || "",
+        pageUrl: window.location.href,
+        queryString: marketingQueryString
       });
       setAddressInsights(response?.addressInsights || addressInsights);
       if (SUBSCRIBE_PORTAL_ONBOARDING_ENABLED && response?.token) {

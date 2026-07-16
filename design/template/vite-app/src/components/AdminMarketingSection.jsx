@@ -368,19 +368,24 @@ export function AdminMarketingSection({ token }) {
                 detail="Configured slugs"
               />
               <SummaryCard
+                title="Page Views"
+                value={overview.summary.pageViews || 0}
+                detail="Tracked subscribe landings"
+              />
+              <SummaryCard
                 title="Clicks"
                 value={overview.summary.clickEvents || 0}
                 detail="Tracked CTA clicks"
               />
               <SummaryCard
-                title="Conversions"
-                value={overview.summary.subscriberEvents || 0}
-                detail="Subscribe form completions"
+                title="Signups"
+                value={overview.summary.signups || overview.summary.subscriberEvents || 0}
+                detail="Form completions, tests excluded"
               />
               <SummaryCard
-                title="Attributed Leads"
+                title="Attributed Signups"
                 value={overview.summary.attributedSubscriptionLeads || 0}
-                detail="Leads with campaign data"
+                detail="UTM, referrer, session, or link"
               />
             </div>
           ) : null}
@@ -407,16 +412,20 @@ export function AdminMarketingSection({ token }) {
                       <td title={stat.slug || "—"}>{truncateText(stat.slug, 40)}</td>
                       <td>{stat.messageFocus || "—"}</td>
                       <td>{stat.clicks || 0}</td>
-                      <td>{stat.subscribers || 0}</td>
+                      <td>{stat.signups || stat.subscribers || 0}</td>
                       <td>{Number(stat.conversionRate || 0).toFixed(1)}%</td>
                       <td
                         title={
-                          stat.topReferrers?.map((entry) => `${entry.host} (${entry.count})`).join(", ") ||
+                          (stat.topSources || stat.topReferrers)
+                            ?.map((entry) => `${entry.label || entry.host} (${entry.count})`)
+                            .join(", ") ||
                           "—"
                         }
                       >
-                        {stat.topReferrers?.length
-                          ? `${stat.topReferrers[0].host} (${stat.topReferrers[0].count})`
+                        {stat.topSources?.length
+                          ? `${stat.topSources[0].label} (${stat.topSources[0].count})`
+                          : stat.topReferrers?.length
+                            ? `${stat.topReferrers[0].host} (${stat.topReferrers[0].count})`
                           : "—"}
                       </td>
                     </tr>
@@ -427,14 +436,45 @@ export function AdminMarketingSection({ token }) {
           </div>
 
           <div className="audit-section">
-            <h4>Recent Click Activity</h4>
+            <h4>Signup Sources</h4>
+            {!overview?.sourceStats?.length ? (
+              <div className="small">No signup source analytics yet.</div>
+            ) : (
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Source</th>
+                    <th>Signups</th>
+                    <th>Page Views</th>
+                    <th>Clicks</th>
+                    <th>Signup / View</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {overview.sourceStats.map((stat) => (
+                    <tr key={stat.sourceLabel}>
+                      <td title={stat.sourceLabel || "—"}>{truncateText(stat.sourceLabel, 34)}</td>
+                      <td>{stat.signups || 0}</td>
+                      <td>{stat.pageViews || 0}</td>
+                      <td>{stat.clicks || 0}</td>
+                      <td>{Number(stat.conversionRate || 0).toFixed(1)}%</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+
+          <div className="audit-section">
+            <h4>Recent Marketing Activity</h4>
             {!activity.clicks.length ? (
-              <div className="small">No click activity yet.</div>
+              <div className="small">No marketing activity yet.</div>
             ) : (
               <table className="admin-table">
                 <thead>
                   <tr>
                     <th>When</th>
+                    <th>Type</th>
                     <th>Slug</th>
                     <th>Source</th>
                     <th>Campaign</th>
@@ -447,8 +487,9 @@ export function AdminMarketingSection({ token }) {
                   {activity.clicks.map((click) => (
                     <tr key={click.id}>
                       <td title={formatDateTime(click.occurredAt)}>{truncateText(formatDateTime(click.occurredAt), 22)}</td>
+                      <td>{click.eventType || "—"}</td>
                       <td title={click.linkSlug || "—"}>{truncateText(click.linkSlug, 38)}</td>
-                      <td title={click.referrerUrl || click.sourceHost || "—"}>
+                      <td title={click.sourceDetail || click.referrerUrl || click.sourceHost || "—"}>
                         {truncateText(click.sourceHost, 28)}
                       </td>
                       <td title={click.campaignSlug || click.campaignName || "—"}>
@@ -467,7 +508,7 @@ export function AdminMarketingSection({ token }) {
           </div>
 
           <div className="audit-section">
-            <h4>Recent Subscribe Conversions</h4>
+            <h4>Recent Subscribe Signups</h4>
             {!activity.conversions.length ? (
               <div className="small">No subscribe conversions yet.</div>
             ) : (
@@ -495,7 +536,9 @@ export function AdminMarketingSection({ token }) {
                       </td>
                       <td title={conversion.email || "—"}>{truncateText(conversion.email, 30)}</td>
                       <td title={conversion.linkSlug || "—"}>{truncateText(conversion.linkSlug, 38)}</td>
-                      <td title={conversion.sourceHost || "—"}>{truncateText(conversion.sourceHost, 24)}</td>
+                      <td title={conversion.sourceDetail || conversion.referrerUrl || conversion.sourceHost || "—"}>
+                        {truncateText(conversion.sourceHost, 24)}
+                      </td>
                       <td title={conversion.city || "—"}>{truncateText(conversion.city, 20)}</td>
                       <td title={conversion.selectedDropSite || "—"}>
                         {truncateText(conversion.selectedDropSite, 28)}

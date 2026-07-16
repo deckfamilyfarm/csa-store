@@ -96,6 +96,22 @@ export async function fetchDropSiteShareLinks() {
   );
 }
 
+export async function trackMarketingEvent(payload) {
+  const response = await fetch(`${base}/marketing/track`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload || {})
+  });
+
+  if (!response.ok) {
+    await throwForError(response, "Unable to record marketing activity");
+  }
+
+  return response.json();
+}
+
 export async function submitDropSiteHostInterest(formData) {
   const response = await fetch(`${base}/dropsites/host-interest`, {
     method: "POST",

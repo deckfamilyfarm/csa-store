@@ -78,6 +78,7 @@ const SUBSCRIBER_CAPTURE_TABLE_STATEMENTS = [
       liability_agreement_signed_at DATETIME,
       source_host VARCHAR(255),
       source_path VARCHAR(255),
+      referrer_url VARCHAR(2048),
       utm_source VARCHAR(255),
       utm_medium VARCHAR(255),
       utm_campaign VARCHAR(255),
@@ -252,6 +253,11 @@ const SUBSCRIBER_CAPTURE_COLUMN_STATEMENTS = [
     tableName: "subscribe_leads",
     columnName: "target_drop_site_id",
     definition: "target_drop_site_id INT"
+  },
+  {
+    tableName: "subscribe_leads",
+    columnName: "referrer_url",
+    definition: "referrer_url VARCHAR(2048)"
   }
 ];
 
@@ -772,6 +778,7 @@ const MARKETING_TABLE_STATEMENTS = [
       subscribed_at DATETIME,
       source_host VARCHAR(255),
       source_path VARCHAR(255),
+      referrer_url VARCHAR(2048),
       utm_source VARCHAR(255),
       utm_medium VARCHAR(255),
       utm_campaign VARCHAR(255),
@@ -822,6 +829,14 @@ const MARKETING_TABLE_STATEMENTS = [
       updated_at DATETIME
     )
   `
+];
+
+const MARKETING_COLUMN_STATEMENTS = [
+  {
+    tableName: "marketing_subscriber_events",
+    columnName: "referrer_url",
+    definition: "referrer_url VARCHAR(2048)"
+  }
 ];
 
 const SUBSCRIPTION_PORTAL_TABLE_STATEMENTS = [
@@ -2660,6 +2675,19 @@ async function runSiteContentSchemaBootstrap(connection) {
 async function runMarketingSchemaBootstrap(connection) {
   for (const statement of MARKETING_TABLE_STATEMENTS) {
     await connection.query(statement);
+  }
+
+  for (const columnDefinition of MARKETING_COLUMN_STATEMENTS) {
+    const exists = await columnExists(
+      connection,
+      columnDefinition.tableName,
+      columnDefinition.columnName
+    );
+    if (exists) continue;
+
+    await connection.query(
+      `ALTER TABLE ${columnDefinition.tableName} ADD COLUMN ${columnDefinition.definition}`
+    );
   }
 
   for (const indexDefinition of MARKETING_INDEX_STATEMENTS) {
