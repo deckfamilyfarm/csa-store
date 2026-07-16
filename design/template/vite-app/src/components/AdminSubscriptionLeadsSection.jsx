@@ -510,6 +510,7 @@ export function AdminSubscriptionLeadsSection({ token }) {
                 <th>Email</th>
                 <th>Plan</th>
                 <th>Drop Site</th>
+                <th>Referral Source</th>
                 <th>Flags</th>
                 <th>Agreement</th>
                 <th>Status</th>
@@ -556,6 +557,11 @@ export function AdminSubscriptionLeadsSection({ token }) {
                     <td title={lead.selectedDropSite || "—"}>
                       <span className="subscription-leads-cell-text">
                         {truncateText(lead.selectedDropSite, 32)}
+                      </span>
+                    </td>
+                    <td title={lead.referralSource || "—"}>
+                      <span className="subscription-leads-cell-text">
+                        {truncateText(lead.referralSource, 32)}
                       </span>
                     </td>
                     <td
