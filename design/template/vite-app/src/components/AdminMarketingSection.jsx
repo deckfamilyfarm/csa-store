@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { adminGet, adminPost } from "../adminApi.js";
+import { adminDownload, adminGet, adminPost } from "../adminApi.js";
 
 function truncateText(value, maxLength = 72) {
   const text = String(value || "").trim();
@@ -77,6 +77,7 @@ export function AdminMarketingSection({ token }) {
   const [savingCampaign, setSavingCampaign] = useState(false);
   const [savingLink, setSavingLink] = useState(false);
   const [creatingBrandSet, setCreatingBrandSet] = useState(false);
+  const [downloadingReport, setDownloadingReport] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [activeTab, setActiveTab] = useState("activity");
@@ -250,6 +251,28 @@ export function AdminMarketingSection({ token }) {
     }
   }
 
+  async function handleDownloadReport() {
+    setDownloadingReport(true);
+    setError("");
+    setMessage("");
+    try {
+      const { blob, filename } = await adminDownload("marketing/report.pdf", token);
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename || "marketing-link-analytics.pdf";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      setMessage("Marketing analytics PDF downloaded.");
+    } catch (downloadError) {
+      setError(downloadError?.message || "Failed to download marketing analytics PDF.");
+    } finally {
+      setDownloadingReport(false);
+    }
+  }
+
   function populateLinkDraftFromLink(link) {
     if (!link) return;
     const duplicateSlug = slugifyValue(`${link.slug || link.label || "tracked-link"} copy`);
@@ -335,7 +358,17 @@ export function AdminMarketingSection({ token }) {
 
   return (
     <section className="admin-section">
-      <h3>Marketing</h3>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+        <h3 style={{ marginBottom: 0 }}>Marketing</h3>
+        <button
+          className="button alt"
+          type="button"
+          onClick={handleDownloadReport}
+          disabled={downloadingReport}
+        >
+          {downloadingReport ? "Preparing PDF..." : "Download PDF"}
+        </button>
+      </div>
       <div className="small">
         Track which pages and slugs bring people in, where they came from, and whether they
         completed the subscribe form.
@@ -372,14 +405,9 @@ export function AdminMarketingSection({ token }) {
                 detail="Configured slugs"
               />
               <SummaryCard
-                title="Tracked Visits"
-                value={overview.summary.trackedVisits || overview.summary.sessions || 0}
-                detail="Sessions/page views captured"
-              />
-              <SummaryCard
-                title="Clicks"
-                value={overview.summary.clickEvents || 0}
-                detail="Tracked CTA clicks"
+                title="Arrival Clicks"
+                value={overview.summary.arrivals || overview.summary.trackedVisits || overview.summary.sessions || 0}
+                detail="Deduped tracked sessions"
               />
               <SummaryCard
                 title="Signups"
@@ -395,7 +423,7 @@ export function AdminMarketingSection({ token }) {
           ) : null}
 
           <div className="audit-section">
-            <h4>Link Analytics</h4>
+            <h4>Arrival Click Analytics</h4>
             {!overview?.linkStats?.length ? (
               <div className="small">No tracked-link analytics yet.</div>
             ) : (
@@ -404,20 +432,27 @@ export function AdminMarketingSection({ token }) {
                   <tr>
                     <th>Slug</th>
                     <th>Focus</th>
-                    <th>Clicks</th>
+                    <th>Arrival Clicks</th>
                     <th>Signups</th>
-                    <th>Conv %</th>
+                    <th>Signup Rate</th>
                     <th>Top Source</th>
                   </tr>
                 </thead>
                 <tbody>
                   {overview.linkStats.map((stat) => (
                     <tr key={stat.linkId || stat.slug}>
-                      <td title={stat.slug || "—"}>{truncateText(stat.slug, 40)}</td>
+                      <td title={stat.label && stat.slug ? `${stat.label} - ${stat.slug}` : stat.slug || "—"}>
+                        {truncateText(
+                          stat.label && stat.slug && stat.label !== stat.slug
+                            ? `${stat.label} - ${stat.slug}`
+                            : stat.slug,
+                          48
+                        )}
+                      </td>
                       <td>{stat.messageFocus || "—"}</td>
-                      <td>{stat.clicks || 0}</td>
+                      <td>{stat.arrivals || stat.clicks || 0}</td>
                       <td>{stat.signups || stat.subscribers || 0}</td>
-                      <td>{Number(stat.conversionRate || 0).toFixed(1)}%</td>
+                      <td>{formatPercent(stat.conversionRate)}</td>
                       <td
                         title={
                           (stat.topSources || stat.topReferrers)
@@ -432,38 +467,6 @@ export function AdminMarketingSection({ token }) {
                             ? `${stat.topReferrers[0].host} (${stat.topReferrers[0].count})`
                           : "—"}
                       </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-
-          <div className="audit-section">
-            <h4>Signup Sources</h4>
-            {!overview?.sourceStats?.length ? (
-              <div className="small">No signup source analytics yet.</div>
-            ) : (
-              <table className="admin-table">
-                <thead>
-                  <tr>
-                    <th>Source</th>
-                    <th>Signups</th>
-                    <th>Tracked Visits</th>
-                    <th>Page Views</th>
-                    <th>Clicks</th>
-                    <th>Signup / Visit</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {overview.sourceStats.map((stat) => (
-                    <tr key={stat.sourceLabel}>
-                      <td title={stat.sourceLabel || "—"}>{truncateText(stat.sourceLabel, 34)}</td>
-                      <td>{stat.signups || 0}</td>
-                      <td>{stat.visits || 0}</td>
-                      <td>{stat.pageViews || 0}</td>
-                      <td>{stat.clicks || 0}</td>
-                      <td>{formatPercent(stat.conversionRate)}</td>
                     </tr>
                   ))}
                 </tbody>

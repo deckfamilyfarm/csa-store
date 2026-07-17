@@ -4,6 +4,7 @@ import crypto from "crypto";
 import multer from "multer";
 import sharp from "sharp";
 import xlsx from "xlsx";
+import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { DeleteObjectCommand, S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import {
   ensureMarketingSchema,
@@ -691,6 +692,671 @@ function buildMarketingConversionRecords({
     const rightTime = toTimestamp(right.subscribedAt);
     return rightTime - leftTime || String(right.id).localeCompare(String(left.id));
   });
+}
+
+function formatReportDate(value = new Date()) {
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toISOString().slice(0, 10);
+}
+
+function formatReportDateTime(value = new Date()) {
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleString("en-US", {
+    timeZone: "America/Los_Angeles",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    timeZoneName: "short"
+  });
+}
+
+function formatReportCurrency(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return "N/A";
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0
+  }).format(numeric);
+}
+
+function formatReportOptionalCount(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric) || numeric === 0) return "";
+  return String(numeric);
+}
+
+function getReportLabel(value, fallback = "not selected") {
+  const text = String(value || "").trim();
+  return text || fallback;
+}
+
+function countRecordsBy(records = [], getKey, { fallback = "unknown", limit = 12 } = {}) {
+  const counts = new Map();
+  for (const record of records) {
+    const key = getReportLabel(getKey(record), fallback);
+    counts.set(key, (counts.get(key) || 0) + 1);
+  }
+  return [...counts.entries()]
+    .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
+    .slice(0, limit)
+    .map(([label, count]) => [label, String(count)]);
+}
+
+function buildMarketingSourceStats({ conversionRecords = [], sessionRows = [], clickRows = [], context }) {
+  const sourceStatsByLabel = new Map();
+  const ensureSourceStat = (label) => {
+    const key = label || "Direct / Unknown";
+    if (!sourceStatsByLabel.has(key)) {
+      sourceStatsByLabel.set(key, {
+        sourceLabel: key,
+        signups: 0,
+        visits: 0,
+        pageViews: 0,
+        clicks: 0,
+        arrivals: 0,
+        conversionRate: null
+      });
+    }
+    return sourceStatsByLabel.get(key);
+  };
+
+  for (const conversion of conversionRecords) {
+    ensureSourceStat(conversion.sourceLabel).signups += 1;
+  }
+
+  for (const session of sessionRows) {
+    const attribution = resolveMarketingRecordAttribution(session, context);
+    const stat = ensureSourceStat(attribution.source.label);
+    stat.visits += 1;
+    stat.arrivals += 1;
+  }
+
+  for (const event of clickRows) {
+    const attribution = resolveMarketingRecordAttribution(event, context);
+    const stat = ensureSourceStat(attribution.source.label);
+    const eventType = String(event.eventType || "").toLowerCase();
+    if (eventType === "page_view") {
+      stat.pageViews += 1;
+    } else if (eventType === "click" || !eventType) {
+      stat.clicks += 1;
+    }
+  }
+
+  return [...sourceStatsByLabel.values()]
+    .map((row) => ({
+      ...row,
+      conversionRate: formatMarketingRate(row.signups, row.arrivals)
+    }))
+    .sort((left, right) => right.signups - left.signups || right.visits - left.visits || left.sourceLabel.localeCompare(right.sourceLabel));
+}
+
+function getMarketingArrivalKey(row = {}, fallbackPrefix = "row") {
+  const sessionToken = String(row.sessionToken || row.csaTrackToken || "").trim();
+  if (sessionToken) return `token:${sessionToken}`;
+  const sessionId = Number(row.sessionId || row.id);
+  if (Number.isFinite(sessionId) && sessionId > 0) return `session:${sessionId}`;
+  const rowId = Number(row.id);
+  return Number.isFinite(rowId) && rowId > 0 ? `${fallbackPrefix}:${rowId}` : "";
+}
+
+function getMarketingEventArrivalKey(row = {}, session = null) {
+  const sessionToken = String(session?.sessionToken || row.csaTrackToken || "").trim();
+  if (sessionToken) return `token:${sessionToken}`;
+  const sessionId = Number(row.sessionId);
+  if (Number.isFinite(sessionId) && sessionId > 0) return `session:${sessionId}`;
+  return getMarketingArrivalKey(row, "event");
+}
+
+function formatMarketingRate(signups, arrivals) {
+  const signupCount = Number(signups || 0);
+  const arrivalCount = Number(arrivals || 0);
+  if (!arrivalCount || signupCount > arrivalCount) return null;
+  return Number(((signupCount / arrivalCount) * 100).toFixed(1));
+}
+
+const FARM_BRAND_FOCUS_LABELS = {
+  farm: "Farm Angle",
+  csa: "CSA Angle",
+  food: "Food Angle"
+};
+
+function isFarmBrandTestValue(value) {
+  return /farm[\s_-]*brand(?:[\s_-]*tests?)?/i.test(String(value || ""));
+}
+
+function inferFarmBrandFocus(...values) {
+  for (const value of values) {
+    const normalized = normalizeMarketingText(value);
+    if (!normalized) continue;
+    if (["farm", "csa", "food"].includes(normalized)) return normalized;
+    if (/farm angle/.test(normalized) || /[-_\s]farm$/.test(normalized)) return "farm";
+    if (/csa angle/.test(normalized) || /[-_\s]csa$/.test(normalized)) return "csa";
+    if (/food angle/.test(normalized) || /[-_\s]food$/.test(normalized)) return "food";
+  }
+  return "";
+}
+
+function getFarmBrandVariant(row = {}, attribution = {}) {
+  const params = collectMarketingParams(row, null, attribution.session || null);
+  const values = [
+    row.sourceLabel,
+    row.sourceDetail,
+    row.utmSource,
+    row.utmMedium,
+    row.utmCampaign,
+    row.utmContent,
+    row.csaLinkSlug,
+    row.csaCampaignSlug,
+    row.slug,
+    row.label,
+    row.linkSlug,
+    row.linkLabel,
+    row.campaignSlug,
+    row.campaignName,
+    row.messageFocus,
+    row.destinationUrl,
+    row.landingUrl,
+    row.pageUrl,
+    params.get("utm_source"),
+    params.get("utm_campaign"),
+    params.get("utm_content"),
+    params.get("csa_link"),
+    params.get("csa_campaign"),
+    params.get("csa_message_focus"),
+    attribution.source?.label,
+    attribution.source?.detail,
+    attribution.link?.slug,
+    attribution.link?.label,
+    attribution.link?.utmSource,
+    attribution.link?.utmCampaign,
+    attribution.link?.utmContent,
+    attribution.link?.messageFocus,
+    attribution.campaign?.slug,
+    attribution.campaign?.name,
+    attribution.campaign?.messageFocus
+  ];
+  if (!values.some(isFarmBrandTestValue)) return null;
+  const focus = inferFarmBrandFocus(
+    row.messageFocus,
+    params.get("csa_message_focus"),
+    attribution.link?.messageFocus,
+    attribution.campaign?.messageFocus,
+    row.utmContent,
+    params.get("utm_content"),
+    row.csaLinkSlug,
+    row.slug,
+    params.get("csa_link"),
+    attribution.link?.slug,
+    attribution.link?.utmContent,
+    row.linkSlug,
+    row.label,
+    row.linkLabel,
+    attribution.link?.label
+  );
+  if (!focus) return null;
+  return {
+    key: `farm-brand:${focus}`,
+    focus,
+    label: FARM_BRAND_FOCUS_LABELS[focus] || `${focus} Angle`,
+    slug: `farm-brand-tests-${focus}`
+  };
+}
+
+function buildMarketingArrivalStats({
+  linkRows = [],
+  conversionRecords = [],
+  sessionRows = [],
+  clickRows = [],
+  context,
+  includeDirectUnknown = false
+}) {
+  const statsByKey = new Map();
+  const ensureFarmBrandStat = (variant, link = null) => {
+    if (!variant) return null;
+    if (!statsByKey.has(variant.key)) {
+      statsByKey.set(variant.key, {
+        key: variant.key,
+        linkId: null,
+        slug: link?.slug || variant.slug,
+        label: link?.label || variant.label,
+        messageFocus: variant.focus,
+        utmContent: link?.utmContent || "",
+        sourceLabel: "Farm Brand Tests",
+        arrivalKeys: new Set(),
+        signups: 0
+      });
+    }
+    const stat = statsByKey.get(variant.key);
+    if (link) {
+      stat.linkId = stat.linkId || Number(link.id) || null;
+      stat.slug = stat.slug === variant.slug && link.slug ? link.slug : stat.slug;
+      stat.label = stat.label === variant.label && link.label ? link.label : stat.label;
+      stat.utmContent = stat.utmContent || link.utmContent || "";
+    }
+    return stat;
+  };
+  const ensureLinkStat = (link) => {
+    const farmBrandStat = ensureFarmBrandStat(getFarmBrandVariant(link), link);
+    if (farmBrandStat) return farmBrandStat;
+    const linkId = Number(link?.id);
+    const key = Number.isFinite(linkId) && linkId > 0 ? `link:${linkId}` : "direct";
+    if (!statsByKey.has(key)) {
+      statsByKey.set(key, {
+        key,
+        linkId: Number.isFinite(linkId) && linkId > 0 ? linkId : null,
+        slug: link?.slug || "Direct / Unknown",
+        label: link?.label || "Direct / Unknown",
+        messageFocus: link?.messageFocus || (link ? "" : "direct landing"),
+        utmContent: link?.utmContent || "",
+        sourceLabel: link ? "Tracked Link" : "Direct / Unknown",
+        arrivalKeys: new Set(),
+        signups: 0
+      });
+    }
+    return statsByKey.get(key);
+  };
+  const directStat = includeDirectUnknown ? ensureLinkStat(null) : null;
+
+  for (const link of linkRows) ensureLinkStat(link);
+
+  for (const session of sessionRows) {
+    const attribution = resolveMarketingRecordAttribution(session, context);
+    const arrivalKey = getMarketingArrivalKey(session, "session");
+    if (!arrivalKey) continue;
+    const farmBrandStat = ensureFarmBrandStat(getFarmBrandVariant(session, attribution), attribution.link);
+    if (farmBrandStat) {
+      farmBrandStat.arrivalKeys.add(arrivalKey);
+    } else if (attribution.link) {
+      ensureLinkStat(attribution.link).arrivalKeys.add(arrivalKey);
+    } else if (directStat && attribution.source.label === "Direct / Unknown") {
+      directStat.arrivalKeys.add(arrivalKey);
+    }
+  }
+
+  for (const event of clickRows) {
+    const eventType = String(event.eventType || "click").toLowerCase();
+    if (eventType !== "click" && eventType !== "page_view") continue;
+    const attribution = resolveMarketingRecordAttribution(event, context);
+    const arrivalKey = getMarketingEventArrivalKey(event, attribution.session);
+    if (!arrivalKey) continue;
+    const farmBrandStat = ensureFarmBrandStat(getFarmBrandVariant(event, attribution), attribution.link);
+    if (farmBrandStat) {
+      farmBrandStat.arrivalKeys.add(arrivalKey);
+    } else if (attribution.link) {
+      ensureLinkStat(attribution.link).arrivalKeys.add(arrivalKey);
+    } else if (directStat && attribution.source.label === "Direct / Unknown") {
+      directStat.arrivalKeys.add(arrivalKey);
+    }
+  }
+
+  for (const conversion of conversionRecords) {
+    const linkId = Number(conversion.linkId);
+    const link = Number.isFinite(linkId) && linkId > 0 ? context.linkById.get(linkId) || { id: linkId, slug: conversion.linkSlug } : null;
+    const campaign = conversion.campaignId ? context.campaignById.get(Number(conversion.campaignId)) : null;
+    const farmBrandStat = ensureFarmBrandStat(getFarmBrandVariant(conversion, { link, campaign }), link);
+    if (farmBrandStat) {
+      farmBrandStat.signups += 1;
+    } else if (Number.isFinite(linkId) && linkId > 0) {
+      ensureLinkStat(link).signups += 1;
+    } else if (directStat && conversion.sourceLabel === "Direct / Unknown") {
+      directStat.signups += 1;
+    }
+  }
+
+  return [...statsByKey.values()]
+    .map((row) => {
+      const arrivals = row.arrivalKeys.size;
+      const conversionRate = formatMarketingRate(row.signups, arrivals);
+      return {
+        key: row.key,
+        linkId: row.linkId,
+        slug: row.slug,
+        label: row.label,
+        messageFocus: row.messageFocus,
+        utmContent: row.utmContent,
+        sourceLabel: row.sourceLabel,
+        arrivals,
+        signups: row.signups,
+        conversionRate,
+        topSources: row.sourceLabel
+          ? [{ label: row.sourceLabel, count: arrivals || row.signups }]
+          : [],
+        arrivalKeys: undefined
+      };
+    })
+    .filter((row) => row.arrivals || row.signups)
+    .sort((left, right) => {
+      const leftDirect = left.sourceLabel === "Direct / Unknown" ? 1 : 0;
+      const rightDirect = right.sourceLabel === "Direct / Unknown" ? 1 : 0;
+      return (
+        right.arrivals - left.arrivals ||
+        right.signups - left.signups ||
+        leftDirect - rightDirect ||
+        left.slug.localeCompare(right.slug)
+      );
+    });
+}
+
+async function loadLocalLineSubscriptionReportRows() {
+  try {
+    const [rows] = await getPool().query(
+      `
+        SELECT
+          snapshot_week_end AS weekEnd,
+          row_count AS rowCount,
+          active_subscriber_count AS activeCount,
+          snap_subscriber_count AS snapCount,
+          projected_monthly_revenue AS projectedMonthlyRevenue,
+          captured_at AS capturedAt
+        FROM local_line_subscription_snapshot_runs
+        ORDER BY snapshot_week_end DESC
+        LIMIT 5
+      `
+    );
+    return rows;
+  } catch (error) {
+    if (isMissingTableError(error, "local_line_subscription_snapshot_runs")) return [];
+    throw error;
+  }
+}
+
+function buildDailySignupRows(records = [], limit = 14) {
+  const counts = new Map();
+  for (const record of records) {
+    const date = record.subscribedAt ? new Date(record.subscribedAt) : null;
+    if (!date || Number.isNaN(date.getTime())) continue;
+    const pdtDate = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/Los_Angeles",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }).format(date);
+    counts.set(pdtDate, (counts.get(pdtDate) || 0) + 1);
+  }
+  return [...counts.entries()]
+    .sort((left, right) => right[0].localeCompare(left[0]))
+    .slice(0, limit)
+    .map(([date, count]) => [date, String(count)]);
+}
+
+function buildMarketingReportData({
+  campaignRows,
+  linkRows,
+  sessionRows,
+  clickRows,
+  subscriberRows,
+  leadRows,
+  localLineRows,
+  generatedAt = new Date()
+}) {
+  const campaignById = new Map(campaignRows.map((row) => [Number(row.id), row]));
+  const campaignBySlug = new Map(campaignRows.map((row) => [String(row.slug || ""), row]));
+  const linkById = new Map(linkRows.map((row) => [Number(row.id), row]));
+  const linkBySlug = new Map(linkRows.map((row) => [String(row.slug || ""), row]));
+  const sessionById = new Map(sessionRows.map((row) => [Number(row.id), row]));
+  const sessionByToken = new Map(sessionRows.map((row) => [String(row.sessionToken || ""), row]));
+  const context = {
+    campaignById,
+    campaignBySlug,
+    linkById,
+    linkBySlug,
+    sessionById,
+    sessionByToken
+  };
+  const reportableLeadRows = leadRows.filter(isReportableSubscribeLead);
+  const testLeadRows = leadRows.filter((row) => isTestSubscribeSignup(row));
+  const conversionRecords = buildMarketingConversionRecords({
+    leadRows,
+    subscriberRows,
+    ...context
+  });
+  const arrivalStats = buildMarketingArrivalStats({
+    linkRows,
+    conversionRecords,
+    sessionRows,
+    clickRows,
+    context,
+    includeDirectUnknown: true
+  });
+
+  return {
+    generatedAt,
+    cleanupNote: `${testLeadRows.length} internal test submissions were removed from all report totals.`,
+    arrivalNote:
+      "Arrival clicks combine tracked redirect clicks and subscribe-page loads into one deduped session count where the tracking token/session is available. Farm-brand-test rows split by the tracked farm, CSA, or food message focus.",
+    directUnknownNote:
+      "Direct / Unknown arrivals count direct subscribe-page sessions captured by the tracker. Older direct signups may not have an arrival record, so that row may show N/A for signup rate.",
+    linkRows: arrivalStats.map((row) => [
+      row.label && row.slug && row.label !== row.slug
+        ? `${row.label} - ${row.slug}`
+        : row.slug || row.label || row.sourceLabel || "tracked arrival",
+      row.messageFocus || row.utmContent || "N/A",
+      formatReportOptionalCount(row.arrivals),
+      formatReportOptionalCount(row.signups),
+      row.conversionRate === null ? "N/A" : `${row.conversionRate.toFixed(1)}%`
+    ]),
+    statusRows: countRecordsBy(reportableLeadRows, (row) => normalizeSubscribeLeadStatus(row.status), {
+      fallback: "in_progress"
+    }),
+    planRows: countRecordsBy(reportableLeadRows, (row) => row.selectedPlan, { fallback: "unknown" }),
+    dropSiteRows: countRecordsBy(reportableLeadRows, (row) => row.selectedDropSite, {
+      fallback: "not selected",
+      limit: 12
+    }),
+    dailyRows: buildDailySignupRows(conversionRecords, 14),
+    localLineRows: localLineRows.map((row) => [
+      formatReportDate(row.weekEnd) || "N/A",
+      String(row.activeCount || 0),
+      String(row.snapCount || 0),
+      String(Number(row.activeCount || 0) + Number(row.snapCount || 0)),
+      formatReportCurrency(row.projectedMonthlyRevenue)
+    ])
+  };
+}
+
+async function generateMarketingReportPdf(report) {
+  const pdfDoc = await PDFDocument.create();
+  const fonts = {
+    regular: await pdfDoc.embedFont(StandardFonts.Helvetica),
+    bold: await pdfDoc.embedFont(StandardFonts.HelveticaBold),
+    italic: await pdfDoc.embedFont(StandardFonts.HelveticaOblique)
+  };
+  const colors = {
+    ink: rgb(0.1, 0.12, 0.14),
+    muted: rgb(0.36, 0.39, 0.42),
+    rule: rgb(0.82, 0.84, 0.86),
+    header: rgb(0.05, 0.2, 0.18),
+    pale: rgb(0.94, 0.98, 0.96),
+    white: rgb(1, 1, 1)
+  };
+  const pageSize = [612, 792];
+  const margin = 54;
+  let page = null;
+  let pageNumber = 0;
+  let y = 0;
+
+  function addPage() {
+    page = pdfDoc.addPage(pageSize);
+    pageNumber += 1;
+    y = 724;
+    page.drawText("CSA Store Marketing Link Analytics Report", {
+      x: margin,
+      y: 754,
+      size: 9,
+      font: fonts.bold,
+      color: colors.muted
+    });
+    page.drawText(`Page ${pageNumber}`, {
+      x: 520,
+      y: 28,
+      size: 8,
+      font: fonts.regular,
+      color: colors.muted
+    });
+    page.drawLine({
+      start: { x: margin, y: 740 },
+      end: { x: 558, y: 740 },
+      thickness: 0.6,
+      color: colors.rule
+    });
+  }
+
+  function ensureSpace(height) {
+    if (!page || y - height < 70) addPage();
+  }
+
+  function widthOf(text, font, size) {
+    return font.widthOfTextAtSize(String(text), size);
+  }
+
+  function wrapText(text, maxWidth, font, size) {
+    const words = String(text || "").split(/\s+/).filter(Boolean);
+    const lines = [];
+    let current = "";
+    for (const word of words) {
+      const candidate = current ? `${current} ${word}` : word;
+      if (widthOf(candidate, font, size) <= maxWidth) {
+        current = candidate;
+      } else {
+        if (current) lines.push(current);
+        current = word;
+      }
+    }
+    if (current) lines.push(current);
+    return lines.length ? lines : [""];
+  }
+
+  function drawWrapped(text, options = {}) {
+    const {
+      x = margin,
+      size = 10.5,
+      font = fonts.regular,
+      color = colors.ink,
+      maxWidth = 504,
+      lineHeight = size + 4
+    } = options;
+    const lines = wrapText(text, maxWidth, font, size);
+    ensureSpace(lines.length * lineHeight + 4);
+    for (const line of lines) {
+      page.drawText(line, { x, y, size, font, color });
+      y -= lineHeight;
+    }
+  }
+
+  function h1(text) {
+    ensureSpace(44);
+    page.drawText(text, { x: margin, y, size: 22, font: fonts.bold, color: colors.header });
+    y -= 30;
+  }
+
+  function h2(text) {
+    ensureSpace(34);
+    y -= 4;
+    page.drawText(text, { x: margin, y, size: 14, font: fonts.bold, color: colors.header });
+    y -= 19;
+  }
+
+  function paragraph(text) {
+    drawWrapped(text, { size: 10.5, lineHeight: 14.5 });
+    y -= 6;
+  }
+
+  function bullet(text) {
+    ensureSpace(20);
+    page.drawText("-", { x: margin + 2, y, size: 10.5, font: fonts.bold, color: colors.header });
+    drawWrapped(text, { x: margin + 18, maxWidth: 486, size: 10.5, lineHeight: 14.5 });
+    y -= 2;
+  }
+
+  function table(headers, rows, widths) {
+    const safeRows = rows?.length ? rows : [["No data", ""]];
+    const rowHeight = 22;
+    const tableWidth = widths.reduce((sum, value) => sum + value, 0);
+    ensureSpace(rowHeight * (safeRows.length + 1) + 14);
+    page.drawRectangle({
+      x: margin,
+      y: y - rowHeight + 5,
+      width: tableWidth,
+      height: rowHeight,
+      color: colors.header
+    });
+    let x = margin + 6;
+    headers.forEach((header, index) => {
+      page.drawText(header, { x, y: y - 10, size: 8.2, font: fonts.bold, color: colors.white });
+      x += widths[index];
+    });
+    y -= rowHeight;
+    safeRows.forEach((row, rowIndex) => {
+      const fill = rowIndex % 2 === 0 ? colors.pale : colors.white;
+      page.drawRectangle({
+        x: margin,
+        y: y - rowHeight + 5,
+        width: tableWidth,
+        height: rowHeight,
+        color: fill
+      });
+      let cellX = margin + 6;
+      row.forEach((cell, index) => {
+        const lines = wrapText(cell, widths[index] - 12, fonts.regular, 8).slice(0, 2);
+        lines.forEach((line, lineIndex) => {
+          page.drawText(line, {
+            x: cellX,
+            y: y - 8 - lineIndex * 9,
+            size: 8,
+            font: fonts.regular,
+            color: colors.ink
+          });
+        });
+        cellX += widths[index];
+      });
+      y -= rowHeight;
+    });
+    y -= 10;
+  }
+
+  addPage();
+  h1("Marketing Link Analytics Report");
+  paragraph(`Generated ${formatReportDateTime(report.generatedAt)} from live CSA Store data.`);
+  paragraph(
+    "This report summarizes live signup/source behavior and explains how marketing links are tracked."
+  );
+
+  h2("Executive Summary");
+  bullet("Signup totals now come from subscribe form completions, not only the smaller marketing subscriber-event table.");
+  bullet("Clicks and subscribe-page views are combined into Arrival clicks so each tracked session is counted once where possible.");
+  bullet("Paid-source attribution depends on UTMs, click IDs such as fbclid/gclid, tracked redirect slugs, or browser referrer data.");
+  paragraph(report.cleanupNote);
+
+  h2("How Links Are Tracked");
+  bullet("Tracked CSA Store links use /api/marketing/go/:slug to record the click, create a session, and forward the visitor to the subscribe page.");
+  bullet("UTM fields identify source, medium, campaign, content, and term. CSA fields such as csa_track and csa_link connect a click/session to a completed signup.");
+  bullet("Direct landing URLs are also tracked now, including URL parameters in hash routes. If there are no UTMs, click IDs, tracked slugs, or referrer, the source remains Direct / Unknown.");
+
+  h2("Tracked Arrival Clicks");
+  table(["Link / source", "Focus", "Arrival clicks", "Signups", "Signup rate"], report.linkRows, [195, 80, 80, 65, 84]);
+  paragraph(report.arrivalNote);
+  paragraph(report.directUnknownNote);
+
+  addPage();
+  h2("Signup Breakdown");
+  table(["Status", "Signups"], report.statusRows, [220, 90]);
+  table(["Plan", "Signups"], report.planRows, [220, 90]);
+
+  h2("Drop-Site Interest");
+  table(["Drop site", "Signups"], report.dropSiteRows, [330, 90]);
+
+  h2("Recent Signup Pace");
+  table(["Signup date (Pacific)", "Signups"], report.dailyRows, [220, 90]);
+
+  h2("Local Line Subscription Snapshot");
+  table(["Week end", "Active", "SNAP", "Total", "Projected monthly"], report.localLineRows, [105, 75, 75, 75, 145]);
+
+  return Buffer.from(await pdfDoc.save());
 }
 
 function formatCsvCell(value) {
@@ -3133,6 +3799,54 @@ router.post(
 );
 
 router.get(
+  "/marketing/report.pdf",
+  requireAdminPermission(["marketing_admin", "campaign_manager", "analytics_viewer"]),
+  async (_req, res) => {
+    try {
+      await ensureMarketingSchema();
+      await ensureSubscriberCaptureSchema();
+      await ensureLocalLineSyncSchema().catch((error) => {
+        console.warn("Local Line schema bootstrap skipped for /marketing/report.pdf:", error.message);
+      });
+
+      const db = getDb();
+      const [campaignRows, linkRows, sessionRows, clickRows, subscriberRows, leadRows, localLineRows] =
+        await Promise.all([
+          db.select().from(marketingCampaigns),
+          db.select().from(marketingUtmLinks),
+          db.select().from(marketingSessions),
+          db.select().from(marketingClickEvents),
+          db.select().from(marketingSubscriberEvents),
+          db.select().from(subscribeLeads),
+          loadLocalLineSubscriptionReportRows()
+        ]);
+
+      const generatedAt = new Date();
+      const report = buildMarketingReportData({
+        campaignRows,
+        linkRows,
+        sessionRows,
+        clickRows,
+        subscriberRows,
+        leadRows,
+        localLineRows,
+        generatedAt
+      });
+      const pdfBuffer = await generateMarketingReportPdf(report);
+      const filename = `marketing-link-analytics-${formatReportDate(generatedAt)}.pdf`;
+
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Length", String(pdfBuffer.length));
+      res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+      res.send(pdfBuffer);
+    } catch (error) {
+      console.error("Marketing PDF report failed:", error);
+      res.status(500).json({ error: "Failed to generate marketing PDF report." });
+    }
+  }
+);
+
+router.get(
   "/marketing/overview",
   requireAdminPermission(["marketing_admin", "campaign_manager", "analytics_viewer"]),
   async (_req, res) => {
@@ -3193,6 +3907,7 @@ router.get(
       ).length;
 
       const clickCountsByLinkId = new Map();
+      const arrivalCountsByLinkId = new Map();
       const signupCountsByLinkId = new Map();
       const sourcesByLinkId = new Map();
       const sourceStatsByLabel = new Map();
@@ -3204,10 +3919,15 @@ router.get(
             signups: 0,
             visits: 0,
             pageViews: 0,
-            clicks: 0
+            clicks: 0,
+            arrivals: 0
           });
         }
         return sourceStatsByLabel.get(key);
+      };
+      const addLinkArrival = (linkId) => {
+        if (!Number.isFinite(linkId) || linkId <= 0) return;
+        arrivalCountsByLinkId.set(linkId, (arrivalCountsByLinkId.get(linkId) || 0) + 1);
       };
       const addLinkSource = (linkId, label) => {
         if (!Number.isFinite(linkId) || linkId <= 0) return;
@@ -3222,6 +3942,7 @@ router.get(
         const linkId = Number(click.utmLinkId);
         if (Number.isFinite(linkId) && linkId > 0) {
           clickCountsByLinkId.set(linkId, (clickCountsByLinkId.get(linkId) || 0) + 1);
+          if (!click.sessionId) addLinkArrival(linkId);
         }
         const attribution = resolveMarketingRecordAttribution(click, {
           campaignById,
@@ -3244,7 +3965,11 @@ router.get(
           sessionById,
           sessionByToken
         });
-        ensureSourceStat(attribution.source.label).visits += 1;
+        const stat = ensureSourceStat(attribution.source.label);
+        stat.visits += 1;
+        stat.arrivals += 1;
+        const linkId = Number(attribution.link?.id);
+        if (Number.isFinite(linkId) && linkId > 0) addLinkArrival(linkId);
       }
 
       for (const pageView of pageViewRows) {
@@ -3257,6 +3982,11 @@ router.get(
           sessionByToken
         });
         ensureSourceStat(attribution.source.label).pageViews += 1;
+        if (!pageView.sessionId) {
+          ensureSourceStat(attribution.source.label).arrivals += 1;
+          const linkId = Number(attribution.link?.id);
+          if (Number.isFinite(linkId) && linkId > 0) addLinkArrival(linkId);
+        }
       }
 
       for (const conversion of conversionRecords) {
@@ -3267,39 +3997,44 @@ router.get(
         addLinkSource(linkId, conversion.sourceLabel);
       }
 
-      const linkStats = linkRows
-        .map((link) => {
-          const linkId = Number(link.id);
-          const clicks = clickCountsByLinkId.get(linkId) || 0;
-          const signups = signupCountsByLinkId.get(linkId) || 0;
-          const sourceMap = sourcesByLinkId.get(linkId) || new Map();
-          const topSources = [...sourceMap.entries()]
-            .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
-            .slice(0, 3)
-            .map(([label, count]) => ({ label, count }));
-          return {
-            linkId,
-            slug: link.slug,
-            label: link.label,
-            campaignId: link.campaignId,
-            utmContent: link.utmContent,
-            messageFocus: link.messageFocus,
-            clicks,
-            subscribers: signups,
-            signups,
-            conversionRate: clicks > 0 ? Number(((signups / clicks) * 100).toFixed(1)) : 0,
-            topSources
-          };
-        })
-        .sort((left, right) => right.clicks - left.clicks || right.signups - left.signups || left.slug.localeCompare(right.slug));
-
       const sourceStats = [...sourceStatsByLabel.values()]
         .map((row) => ({
           ...row,
-          conversionRate:
-            row.visits > 0 ? Number(((row.signups / row.visits) * 100).toFixed(1)) : null
+          conversionRate: formatMarketingRate(row.signups, row.arrivals)
         }))
-        .sort((left, right) => right.signups - left.signups || right.visits - left.visits || left.sourceLabel.localeCompare(right.sourceLabel));
+        .sort((left, right) => right.signups - left.signups || right.arrivals - left.arrivals || left.sourceLabel.localeCompare(right.sourceLabel));
+      const linkStats = buildMarketingArrivalStats({
+        linkRows,
+        conversionRecords,
+        sessionRows,
+        clickRows,
+        context: {
+          campaignById,
+          campaignBySlug,
+          linkById,
+          linkBySlug,
+          sessionById,
+          sessionByToken
+        },
+        includeDirectUnknown: true
+      }).map((row) => ({
+        linkId: row.key || row.linkId,
+        slug: row.slug,
+        label: row.label,
+        campaignId: null,
+        utmContent: row.utmContent,
+        messageFocus: row.messageFocus,
+        arrivals: row.arrivals,
+        clicks: row.arrivals,
+        subscribers: row.signups,
+        signups: row.signups,
+        conversionRate: row.conversionRate,
+        topSources: row.topSources
+      }));
+      const trackedArrivalTotal = linkStats.reduce(
+        (sum, row) => sum + Number(row.arrivals || 0),
+        0
+      );
 
       res.json({
         summary: {
@@ -3307,6 +4042,7 @@ router.get(
           trackedLinks: linkRows.length,
           sessions: sessionRows.length,
           trackedVisits: sessionRows.length,
+          arrivals: trackedArrivalTotal || sessionRows.length,
           pageViews: pageViewRows.length,
           clickEvents: clickEventRows.length,
           subscriberEvents: reportableSubscriberRows.length,
