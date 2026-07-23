@@ -4842,6 +4842,42 @@ img {
   margin-bottom: 6px;
 }
 
+.marketing-summary-list {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  max-height: none;
+  overflow: visible;
+}
+
+.marketing-summary-card {
+  min-width: 0;
+  padding: 8px 10px;
+}
+
+.marketing-summary-card .title {
+  margin-bottom: 3px;
+  font-size: 12px;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.marketing-summary-value {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.marketing-summary-card .small {
+  margin-top: 3px;
+  font-size: 11px;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .pricelist-push-review-modal {
   width: min(880px, 96vw);
 }

@@ -7,11 +7,137 @@ function truncateText(value, maxLength = 72) {
   return text.length > maxLength ? `${text.slice(0, maxLength - 1)}…` : text;
 }
 
+const FARM_BRAND_DISPLAY_VARIANTS = [
+  {
+    label: "Eat Full Farm",
+    patterns: ["eat full farm", "eat-full-farm", "eat_full_farm", "eatfullfarm"]
+  },
+  {
+    label: "Full Farm Direct",
+    patterns: ["full farm direct", "full-farm-direct", "full_farm_direct", "fullfarmdirect"]
+  },
+  {
+    label: "Willamette Valley Pastures",
+    patterns: [
+      "willamette valley pastures",
+      "willamette-valley-pastures",
+      "willamette_valley_pastures",
+      "willamettevalleypastures"
+    ]
+  }
+];
+
+function normalizeDisplayText(value) {
+  return String(value || "").trim().toLowerCase().replace(/[_-]+/g, " ").replace(/\s+/g, " ");
+}
+
+function formatAnalyticsSourceLabel(value) {
+  const label = String(value || "").trim();
+  if (!label) return "—";
+  return normalizeDisplayText(label) === "direct / unknown" ? "Direct" : label;
+}
+
+function getFarmBrandDisplayLabel(...values) {
+  const normalizedValues = values
+    .map((value) => normalizeDisplayText(value))
+    .filter(Boolean);
+  const compactValues = normalizedValues.map((value) => value.replace(/\s+/g, ""));
+
+  for (const variant of FARM_BRAND_DISPLAY_VARIANTS) {
+    const matched = variant.patterns.some((pattern) => {
+      const normalizedPattern = normalizeDisplayText(pattern);
+      const compactPattern = normalizedPattern.replace(/\s+/g, "");
+      return normalizedValues.some((value) => value.includes(normalizedPattern)) ||
+        compactValues.some((value) => compactPattern && value.includes(compactPattern));
+    });
+    if (matched) return variant.label;
+  }
+
+  return "";
+}
+
+function formatSlugTrackingLabel(stat = {}) {
+  const farmBrandLabel = getFarmBrandDisplayLabel(
+    stat.label,
+    stat.slug,
+    stat.utmContent,
+    stat.sourceLabel
+  );
+  if (farmBrandLabel) return farmBrandLabel;
+
+  const label = String(stat.label || "").trim();
+  const slug = String(stat.slug || "").trim();
+  const preferred = label && label !== slug ? `${label} - ${slug}` : label || slug;
+  return formatAnalyticsSourceLabel(preferred);
+}
+
+function formatTopSourceSummary(entries = []) {
+  const entry = entries[0] || null;
+  if (!entry) return "—";
+  return `${formatAnalyticsSourceLabel(entry.label || entry.host)} (${entry.count})`;
+}
+
+function formatSourceListTitle(entries = []) {
+  const summary = entries
+    .map((entry) => `${formatAnalyticsSourceLabel(entry.label || entry.host)} (${entry.count})`)
+    .join(", ");
+  return summary || "—";
+}
+
 function formatDateTime(value) {
   if (!value) return "—";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return String(value);
   return date.toLocaleString();
+}
+
+function formatDateInput(value) {
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function addDays(value, days) {
+  const date = new Date(value);
+  date.setDate(date.getDate() + days);
+  return date;
+}
+
+function getPresetDateRange(preset) {
+  if (preset === "all") return { dateFrom: "", dateTo: "" };
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  if (preset === "last7") {
+    return { dateFrom: formatDateInput(addDays(today, -6)), dateTo: formatDateInput(today) };
+  }
+  if (preset === "last14") {
+    return { dateFrom: formatDateInput(addDays(today, -13)), dateTo: formatDateInput(today) };
+  }
+  if (preset === "last21") {
+    return { dateFrom: formatDateInput(addDays(today, -20)), dateTo: formatDateInput(today) };
+  }
+  if (preset === "last30") {
+    return { dateFrom: formatDateInput(addDays(today, -29)), dateTo: formatDateInput(today) };
+  }
+  return { dateFrom: "", dateTo: "" };
+}
+
+function buildDateRangeQuery(range) {
+  const params = new URLSearchParams();
+  if (range?.dateFrom) params.set("dateFrom", range.dateFrom);
+  if (range?.dateTo) params.set("dateTo", range.dateTo);
+  const query = params.toString();
+  return query ? `?${query}` : "";
+}
+
+function formatDateRangeLabel(range, preset) {
+  if (preset === "all" || (!range?.dateFrom && !range?.dateTo)) return "All dates";
+  if (range.dateFrom && range.dateTo) return `${range.dateFrom} to ${range.dateTo}`;
+  if (range.dateFrom) return `Since ${range.dateFrom}`;
+  return `Through ${range.dateTo}`;
 }
 
 function formatName(firstName, lastName) {
@@ -58,11 +184,20 @@ function createLinkDraft(campaignId = "") {
   };
 }
 
+const DATE_RANGE_OPTIONS = [
+  { value: "all", label: "All time" },
+  { value: "last7", label: "Last week" },
+  { value: "last14", label: "Last two weeks" },
+  { value: "last21", label: "Last three weeks" },
+  { value: "last30", label: "Last month" },
+  { value: "custom", label: "Custom" }
+];
+
 function SummaryCard({ title, value, detail }) {
   return (
-    <div className="response-card">
+    <div className="response-card marketing-summary-card">
       <div className="title">{title}</div>
-      <div style={{ fontSize: 28, fontWeight: 700, lineHeight: 1.1 }}>{value}</div>
+      <div className="marketing-summary-value">{value}</div>
       {detail ? <div className="small">{detail}</div> : null}
     </div>
   );
@@ -87,6 +222,26 @@ export function AdminMarketingSection({ token }) {
   const [links, setLinks] = useState([]);
   const [campaignDraft, setCampaignDraft] = useState(createCampaignDraft());
   const [linkDraft, setLinkDraft] = useState(createLinkDraft());
+  const [dateRangePreset, setDateRangePreset] = useState("last21");
+  const [customDateFrom, setCustomDateFrom] = useState("");
+  const [customDateTo, setCustomDateTo] = useState("");
+
+  const selectedDateRange = useMemo(() => {
+    if (dateRangePreset === "custom") {
+      return { dateFrom: customDateFrom, dateTo: customDateTo };
+    }
+    return getPresetDateRange(dateRangePreset);
+  }, [customDateFrom, customDateTo, dateRangePreset]);
+
+  const marketingDateQuery = useMemo(
+    () => buildDateRangeQuery(selectedDateRange),
+    [selectedDateRange]
+  );
+
+  const dateRangeLabel = useMemo(
+    () => formatDateRangeLabel(selectedDateRange, dateRangePreset),
+    [dateRangePreset, selectedDateRange]
+  );
 
   function handleCampaignNameChange(nextName) {
     setCampaignDraft((current) => {
@@ -164,8 +319,8 @@ export function AdminMarketingSection({ token }) {
     try {
       const [overviewResponse, activityResponse, campaignsResponse, linksResponse] =
         await Promise.all([
-          adminGet("marketing/overview", token),
-          adminGet("marketing/activity", token),
+          adminGet(`marketing/overview${marketingDateQuery}`, token),
+          adminGet(`marketing/activity${marketingDateQuery}`, token),
           adminGet("marketing/campaigns", token),
           adminGet("marketing/utm-links", token)
         ]);
@@ -190,7 +345,7 @@ export function AdminMarketingSection({ token }) {
 
   useEffect(() => {
     loadMarketing();
-  }, [token]);
+  }, [token, marketingDateQuery]);
 
   async function handleCreateCampaign(event) {
     event.preventDefault();
@@ -256,7 +411,7 @@ export function AdminMarketingSection({ token }) {
     setError("");
     setMessage("");
     try {
-      const { blob, filename } = await adminDownload("marketing/report.pdf", token);
+      const { blob, filename } = await adminDownload(`marketing/report.pdf${marketingDateQuery}`, token);
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
@@ -393,21 +548,70 @@ export function AdminMarketingSection({ token }) {
         </button>
       </div>
 
+      {activeTab === "activity" ? (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-end",
+            gap: 12,
+            marginBottom: 20,
+            flexWrap: "wrap"
+          }}
+        >
+          <label className="field" style={{ margin: 0, minWidth: 180 }}>
+            <span>Date Range</span>
+            <select
+              value={dateRangePreset}
+              onChange={(event) => setDateRangePreset(event.target.value)}
+            >
+              {DATE_RANGE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          {dateRangePreset === "custom" ? (
+            <>
+              <label className="field" style={{ margin: 0, minWidth: 150 }}>
+                <span>From</span>
+                <input
+                  type="date"
+                  value={customDateFrom}
+                  onChange={(event) => setCustomDateFrom(event.target.value)}
+                />
+              </label>
+              <label className="field" style={{ margin: 0, minWidth: 150 }}>
+                <span>To</span>
+                <input
+                  type="date"
+                  value={customDateTo}
+                  onChange={(event) => setCustomDateTo(event.target.value)}
+                />
+              </label>
+            </>
+          ) : null}
+          <div className="small" style={{ paddingBottom: 10 }}>
+            {dateRangeLabel}
+          </div>
+        </div>
+      ) : null}
+
       {loading ? (
         <div className="small">Loading marketing data...</div>
       ) : activeTab === "activity" ? (
         <>
           {overview?.summary ? (
-            <div className="response-list">
+            <div className="response-list marketing-summary-list">
               <SummaryCard
                 title="Tracked Links"
                 value={overview.summary.trackedLinks || 0}
                 detail="Configured slugs"
               />
               <SummaryCard
-                title="Arrival Clicks"
-                value={overview.summary.arrivals || overview.summary.trackedVisits || overview.summary.sessions || 0}
-                detail="Deduped tracked sessions"
+                title="Visits"
+                value={overview.summary.visits || overview.summary.trackedVisits || overview.summary.sessions || 0}
+                detail="One count per visit"
               />
               <SummaryCard
                 title="Signups"
@@ -423,7 +627,8 @@ export function AdminMarketingSection({ token }) {
           ) : null}
 
           <div className="audit-section">
-            <h4>Arrival Click Analytics</h4>
+            <h4>Visit Analytics</h4>
+            <h5>Slug Tracking</h5>
             {!overview?.linkStats?.length ? (
               <div className="small">No tracked-link analytics yet.</div>
             ) : (
@@ -432,43 +637,59 @@ export function AdminMarketingSection({ token }) {
                   <tr>
                     <th>Slug</th>
                     <th>Focus</th>
-                    <th>Arrival Clicks</th>
+                    <th>Visits</th>
                     <th>Signups</th>
                     <th>Signup Rate</th>
                     <th>Top Source</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {overview.linkStats.map((stat) => (
-                    <tr key={stat.linkId || stat.slug}>
-                      <td title={stat.label && stat.slug ? `${stat.label} - ${stat.slug}` : stat.slug || "—"}>
-                        {truncateText(
-                          stat.label && stat.slug && stat.label !== stat.slug
-                            ? `${stat.label} - ${stat.slug}`
-                            : stat.slug,
-                          48
-                        )}
-                      </td>
-                      <td>{stat.messageFocus || "—"}</td>
-                      <td>{stat.arrivals || stat.clicks || 0}</td>
-                      <td>{stat.signups || stat.subscribers || 0}</td>
-                      <td>{formatPercent(stat.conversionRate)}</td>
-                      <td
-                        title={
-                          (stat.topSources || stat.topReferrers)
-                            ?.map((entry) => `${entry.label || entry.host} (${entry.count})`)
-                            .join(", ") ||
-                          "—"
-                        }
-                      >
-                        {stat.topSources?.length
-                          ? `${stat.topSources[0].label} (${stat.topSources[0].count})`
-                          : stat.topReferrers?.length
-                            ? `${stat.topReferrers[0].host} (${stat.topReferrers[0].count})`
-                          : "—"}
-                      </td>
-                    </tr>
-                  ))}
+                  {overview.linkStats.map((stat) => {
+                    const topSourceEntries = stat.topSources || stat.topReferrers || [];
+                    return (
+                      <tr key={stat.linkId || stat.slug}>
+                        <td title={formatSlugTrackingLabel(stat)}>
+                          {truncateText(formatSlugTrackingLabel(stat), 48)}
+                        </td>
+                        <td>{stat.messageFocus || "—"}</td>
+                        <td>{stat.visits || stat.arrivals || stat.clicks || 0}</td>
+                        <td>{stat.signups || stat.subscribers || 0}</td>
+                        <td>{formatPercent(stat.conversionRate)}</td>
+                        <td title={formatSourceListTitle(topSourceEntries)}>
+                          {formatTopSourceSummary(topSourceEntries)}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            )}
+
+            <h5 style={{ marginTop: 24 }}>Source Tracking</h5>
+            {!overview?.sourceStats?.length ? (
+              <div className="small">No source analytics yet.</div>
+            ) : (
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Visits</th>
+                    <th>Source</th>
+                    <th>Signups</th>
+                    <th>Signup Rate</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {overview.sourceStats.map((source) => {
+                    const sourceLabel = formatAnalyticsSourceLabel(source.sourceLabel);
+                    return (
+                      <tr key={source.sourceLabel || "direct"}>
+                        <td>{source.visits || source.arrivals || source.pageViews || 0}</td>
+                        <td title={sourceLabel}>{truncateText(sourceLabel, 48)}</td>
+                        <td>{source.signups || 0}</td>
+                        <td>{formatPercent(source.conversionRate)}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             )}

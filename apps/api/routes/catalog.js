@@ -2098,6 +2098,7 @@ router.get("/marketing/go/:slug", async (req, res) => {
     const campaignRow = linkRow.campaignId
       ? await loadMarketingCampaignById(db, linkRow.campaignId)
       : null;
+    const incomingMarketingParams = extractMarketingParams(req.query || {});
     const destination = new URL(String(linkRow.destinationUrl));
     for (const [key, value] of Object.entries(req.query || {})) {
       if (Array.isArray(value)) {
@@ -2109,11 +2110,17 @@ router.get("/marketing/go/:slug", async (req, res) => {
       }
     }
 
-    if (linkRow.utmSource) destination.searchParams.set("utm_source", String(linkRow.utmSource));
-    if (linkRow.utmMedium) destination.searchParams.set("utm_medium", String(linkRow.utmMedium));
-    if (linkRow.utmCampaign) destination.searchParams.set("utm_campaign", String(linkRow.utmCampaign));
-    if (linkRow.utmContent) destination.searchParams.set("utm_content", String(linkRow.utmContent));
-    if (linkRow.utmTerm) destination.searchParams.set("utm_term", String(linkRow.utmTerm));
+    const nextUtmSource = incomingMarketingParams.utmSource || cleanOptionalString(linkRow.utmSource, 255);
+    const nextUtmMedium = incomingMarketingParams.utmMedium || cleanOptionalString(linkRow.utmMedium, 255);
+    const nextUtmCampaign = incomingMarketingParams.utmCampaign || cleanOptionalString(linkRow.utmCampaign, 255);
+    const nextUtmContent = incomingMarketingParams.utmContent || cleanOptionalString(linkRow.utmContent, 255);
+    const nextUtmTerm = incomingMarketingParams.utmTerm || cleanOptionalString(linkRow.utmTerm, 255);
+
+    if (nextUtmSource) destination.searchParams.set("utm_source", String(nextUtmSource));
+    if (nextUtmMedium) destination.searchParams.set("utm_medium", String(nextUtmMedium));
+    if (nextUtmCampaign) destination.searchParams.set("utm_campaign", String(nextUtmCampaign));
+    if (nextUtmContent) destination.searchParams.set("utm_content", String(nextUtmContent));
+    if (nextUtmTerm) destination.searchParams.set("utm_term", String(nextUtmTerm));
 
     const sessionToken =
       cleanOptionalString(
@@ -2154,11 +2161,11 @@ router.get("/marketing/go/:slug", async (req, res) => {
       sourcePath,
       landingUrl: cleanOptionalUrl(`${req.protocol}://${req.get("host")}${req.originalUrl}`),
       referrerUrl: cleanOptionalUrl(req.get("referer")),
-      utmSource: cleanOptionalString(linkRow.utmSource, 255),
-      utmMedium: cleanOptionalString(linkRow.utmMedium, 255),
-      utmCampaign: cleanOptionalString(linkRow.utmCampaign, 255),
-      utmContent: cleanOptionalString(linkRow.utmContent, 255),
-      utmTerm: cleanOptionalString(linkRow.utmTerm, 255),
+      utmSource: nextUtmSource,
+      utmMedium: nextUtmMedium,
+      utmCampaign: nextUtmCampaign,
+      utmContent: nextUtmContent,
+      utmTerm: nextUtmTerm,
       messageFocus: linkRow.messageFocus || campaignRow?.messageFocus || null,
       targetCity: linkRow.targetCity || campaignRow?.targetCity || null,
       targetZip: linkRow.targetZip || campaignRow?.targetZip || null,
@@ -2180,11 +2187,11 @@ router.get("/marketing/go/:slug", async (req, res) => {
       destinationUrl: cleanOptionalUrl(destination.toString()),
       sourceHost,
       sourcePath,
-      utmSource: cleanOptionalString(linkRow.utmSource, 255),
-      utmMedium: cleanOptionalString(linkRow.utmMedium, 255),
-      utmCampaign: cleanOptionalString(linkRow.utmCampaign, 255),
-      utmContent: cleanOptionalString(linkRow.utmContent, 255),
-      utmTerm: cleanOptionalString(linkRow.utmTerm, 255),
+      utmSource: nextUtmSource,
+      utmMedium: nextUtmMedium,
+      utmCampaign: nextUtmCampaign,
+      utmContent: nextUtmContent,
+      utmTerm: nextUtmTerm,
       messageFocus: linkRow.messageFocus || campaignRow?.messageFocus || null,
       targetCity: linkRow.targetCity || campaignRow?.targetCity || null,
       targetZip: linkRow.targetZip || campaignRow?.targetZip || null,

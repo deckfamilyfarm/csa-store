@@ -5164,7 +5164,9 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                 </div>
                 <div className="response-card">
                   <div className="title">Dashboard</div>
-                  <div className="small">Target tab: Dashboard-auto-26</div>
+                  <div className="small">
+                    Target tabs: Dashboard-auto-26, Dashboard-auto-26v2, Dashboard-auto-employee-credits26
+                  </div>
                   <div className="small">Latest week: {dashboardLatestWeekLabel}</div>
                   <div className="small">Last publish: {dashboardLastPublishLabel}</div>
                   <div className="small">Publish status: {dashboardPublishStatusLabel}</div>

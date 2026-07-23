@@ -41,6 +41,18 @@ const DASHBOARD_TARGET_TITLE =
   getDashboardEnv("GOOGLE_SHEETS_TAB") ||
   getDashboardEnv("DASHBOARD_TARGET_TITLE") ||
   "Dashboard-auto-26";
+const DASHBOARD_V2_TARGET_TITLE =
+  getDashboardEnv("DASHBOARD_V2_TARGET_TITLE") || `${DASHBOARD_TARGET_TITLE}v2`;
+const DASHBOARD_EMPLOYEE_CREDITS_TARGET_TITLE =
+  getDashboardEnv("DASHBOARD_EMPLOYEE_CREDITS_TARGET_TITLE") ||
+  "Dashboard-auto-employee-credits26";
+const DASHBOARD_EMPLOYEE_CREDITS_YEAR =
+  Number.parseInt(getDashboardEnv("DASHBOARD_EMPLOYEE_CREDITS_YEAR", "2026"), 10) || 2026;
+const DASHBOARD_EMPLOYEE_CREDIT_PRICE_LIST_ID =
+  Number(getDashboardEnv("DASHBOARD_EMPLOYEE_CREDIT_PRICE_LIST_ID", "2719")) || 2719;
+const DASHBOARD_EMPLOYEE_CREDIT_PACKAGE_IDS = parseDashboardIdList(
+  getDashboardEnv("DASHBOARD_EMPLOYEE_CREDIT_PACKAGE_IDS", "632658,632662,632661")
+);
 const DEFAULT_SUBSCRIBER_HISTORY_DIR =
   getDashboardEnv("LOCALLINE_SUBSCRIBER_HISTORY_DIR") ||
   "/Users/jdeck/code/ffcsa_scripts/localline/data";
@@ -79,6 +91,20 @@ const DASHBOARD_FIXED_EXPENSE_NOTE =
   "Hard-coded weekly value for now. TODO: move to dated config so weekly changes, increases, and historical values can be handled without code edits.";
 const DASHBOARD_MANUAL_DELIVERY_EXPENSE_NOTE =
   "MANUAL row: dashboard publishing copies existing weekly values back by row label. TODO: keep this durable if row labels or weekly structure change.";
+const DASHBOARD_MONTH_LABELS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec"
+];
 
 function parseDashboardIdList(value) {
   return String(value || "")
@@ -759,6 +785,18 @@ function buildDashboardSummaryPeriods(weeks = [], publishableWeekStarts = null) 
   return periods;
 }
 
+function buildDashboardWeekPeriods(weeks = [], publishableWeekStarts = null) {
+  return getPublishableDashboardWeeks(weeks, publishableWeekStarts).map((week) => ({
+    key: `week:${week.start}`,
+    label: week.label || formatDashboardWeekLabel(week.start),
+    year: getYearFromWeekStart(week.start),
+    start: week.start,
+    end: week.end,
+    started: Boolean(week.start && week.end),
+    weekStarts: new Set([week.start])
+  }));
+}
+
 function isWeekInDashboardSummaryPeriod(week, period) {
   if (!week?.start || !period?.started) return false;
   return period.weekStarts instanceof Set
@@ -1078,7 +1116,9 @@ function buildDashboardRows(
         {
           label: "Retail Sales",
           entry: "AUTO",
-          source: "Local DB",
+          source: "SUM(product order-line retail amount)",
+          methodology:
+            "Formula: SUM(local_line_order_reporting_entries.retail_amount) for paid open Local Line reporting lines where the order line is not a Membership / membership purchase row. This is product value delivered, not cash received, so it intentionally does not equal Cash Collected on Orders + Store Credit Used.",
           valueType: "currency",
           bold: true,
           summary: "sum",
@@ -1650,6 +1690,1179 @@ function buildDashboardRows(
   }
 
   return { values, metricRows, sectionRows, packWagesSalesChart };
+}
+
+function getDashboardMonthStartYmd(value) {
+  const match = String(value || "").match(/^(\d{4})-(\d{2})/);
+  return match ? `${match[1]}-${match[2]}-01` : "";
+}
+
+function getDashboardMonthEndYmd(monthStart) {
+  const date = parseYmd(monthStart);
+  if (!date) return monthStart;
+  date.setUTCMonth(date.getUTCMonth() + 1);
+  date.setUTCDate(0);
+  return formatYmd(date);
+}
+
+function formatDashboardMonthLabel(monthStart) {
+  const date = parseYmd(monthStart);
+  if (!date) return String(monthStart || "");
+  const monthLabel = DASHBOARD_MONTH_LABELS[date.getUTCMonth()] || String(date.getUTCMonth() + 1);
+  return `${monthLabel} ${date.getUTCFullYear()}`;
+}
+
+function formatDashboardHeaderLabel(value) {
+  const label = String(value || "");
+  return /^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{4}$/.test(label)
+    ? `'${label}`
+    : label;
+}
+
+function getDashboardMonthlyReportYear(weeks = [], publishableWeekStarts = null) {
+  const publishableWeeks = getPublishableDashboardWeeks(weeks, publishableWeekStarts);
+  const candidate =
+    publishableWeeks[publishableWeeks.length - 1]?.end ||
+    weeks[weeks.length - 1]?.end ||
+    weeks[0]?.end ||
+    getTodayYmd();
+  const year = Number(String(candidate || "").slice(0, 4));
+  return Number.isFinite(year) ? year : new Date().getUTCFullYear();
+}
+
+function getLatestCompleteCalendarMonthEndYmd(referenceDate = new Date()) {
+  const startOfCurrentMonth = new Date(
+    Date.UTC(referenceDate.getUTCFullYear(), referenceDate.getUTCMonth(), 1)
+  );
+  startOfCurrentMonth.setUTCDate(0);
+  return formatYmd(startOfCurrentMonth);
+}
+
+function buildDashboardMonthColumns(weeks = [], publishableWeekStarts = null) {
+  const year = getDashboardMonthlyReportYear(weeks, publishableWeekStarts);
+  const publishableWeeks = getPublishableDashboardWeeks(weeks, publishableWeekStarts);
+  const latestPublishableEnd = publishableWeeks[publishableWeeks.length - 1]?.end || null;
+  const latestCompleteMonthEnd = getMinimumYmd([
+    latestPublishableEnd,
+    getLatestCompleteCalendarMonthEndYmd()
+  ]);
+
+  return Array.from({ length: 12 }, (_unused, index) => {
+    const monthStart = `${year}-${String(index + 1).padStart(2, "0")}-01`;
+    const monthEnd = getDashboardMonthEndYmd(monthStart);
+    if (!latestCompleteMonthEnd || String(monthEnd) > String(latestCompleteMonthEnd)) {
+      return null;
+    }
+    return {
+      key: `${year}:m${String(index + 1).padStart(2, "0")}`,
+      label: formatDashboardMonthLabel(monthStart),
+      start: monthStart,
+      end: monthEnd,
+      year,
+      month: index + 1,
+      started: true,
+      weekStarts: new Set([monthStart])
+    };
+  }).filter(Boolean);
+}
+
+function buildPublishableDashboardMonthStarts(weeks = [], publishableWeekStarts = null) {
+  return new Set(
+    getPublishableDashboardWeeks(weeks, publishableWeekStarts)
+      .map((week) => getDashboardMonthStartYmd(week.start))
+      .filter(Boolean)
+  );
+}
+
+function addDashboardMonthlyNumber(target, key, value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return false;
+  target[key] = round2(Number(target[key] || 0) + numeric);
+  return true;
+}
+
+function buildMonthlyDashboardKpiMap(weeks = [], weeklyKpiMap = {}) {
+  const byMonth = new Map();
+  const sumFields = [
+    "numOrders",
+    "numGuestOrders",
+    "numSubscriberOrders",
+    "guestPurchaseDollars",
+    "subscriptionIncome",
+    "subscriptionCreditGiven",
+    "subscriptionCreditUsed",
+    "cashCollectedOnOrders",
+    "paymentProcessingFees",
+    "memberCreditIssued",
+    "actualDollarsReceivedForCredit",
+    "bonusCreditExpense",
+    "financeOrderCount",
+    "ordersWithPaymentFeeData",
+    "totalSales"
+  ];
+
+  (weeks || []).forEach((week) => {
+    const monthStart = getDashboardMonthStartYmd(week.start);
+    if (!monthStart) return;
+    const source = weeklyKpiMap?.[week.start] || {};
+    const summary = byMonth.get(monthStart) || {
+      totalItemsWeightedByOrder: 0,
+      totalOrderAmountWeightedByOrder: 0,
+      hasMemberBankBalanceChange: false,
+      latestMemberBankBalance: null
+    };
+    sumFields.forEach((field) => {
+      addDashboardMonthlyNumber(summary, field, source[field]);
+    });
+
+    const orderCount = Number(source.numOrders || 0);
+    if (Number.isFinite(orderCount) && orderCount > 0) {
+      const averageItems = Number(source.averageItemsPerOrder);
+      const averageOrderAmount = Number(source.averageOrderAmount);
+      if (Number.isFinite(averageItems)) {
+        summary.totalItemsWeightedByOrder += averageItems * orderCount;
+      }
+      if (Number.isFinite(averageOrderAmount)) {
+        summary.totalOrderAmountWeightedByOrder += averageOrderAmount * orderCount;
+      }
+    }
+
+    const memberBankBalanceChange = Number(source.memberBankBalanceChange);
+    if (Number.isFinite(memberBankBalanceChange)) {
+      summary.memberBankBalanceChange = round2(
+        Number(summary.memberBankBalanceChange || 0) + memberBankBalanceChange
+      );
+      summary.hasMemberBankBalanceChange = true;
+    }
+    const memberBankBalance = Number(source.memberBankBalance);
+    if (Number.isFinite(memberBankBalance)) {
+      summary.latestMemberBankBalance = round2(memberBankBalance);
+    }
+
+    byMonth.set(monthStart, summary);
+  });
+
+  return Object.fromEntries(
+    Array.from(byMonth.entries()).map(([monthStart, summary]) => {
+      const numOrders = Number(summary.numOrders || 0);
+      return [
+        monthStart,
+        {
+          ...summary,
+          averageItemsPerOrder: numOrders
+            ? Math.round(summary.totalItemsWeightedByOrder / numOrders)
+            : 0,
+          averageOrderAmount: numOrders
+            ? round2(summary.totalOrderAmountWeightedByOrder / numOrders)
+            : 0,
+          netOrderCash: round2(
+            Number(summary.cashCollectedOnOrders || 0) -
+              Number(summary.paymentProcessingFees || 0)
+          ),
+          memberBankBalanceChange: summary.hasMemberBankBalanceChange
+            ? round2(summary.memberBankBalanceChange || 0)
+            : null,
+          memberBankBalance: summary.latestMemberBankBalance
+        }
+      ];
+    })
+  );
+}
+
+function buildMonthlyDashboardVendorMap(weeks = [], vendorWeeklyMap = {}) {
+  const byMonth = new Map();
+  (weeks || []).forEach((week) => {
+    const monthStart = getDashboardMonthStartYmd(week.start);
+    if (!monthStart) return;
+    const source = vendorWeeklyMap?.[week.start] || {};
+    const summary = byMonth.get(monthStart) || {};
+    addDashboardMonthlyNumber(summary, "retailSales", source.retailSales);
+    addDashboardMonthlyNumber(summary, "purchaseCost", source.purchaseCost);
+    byMonth.set(monthStart, summary);
+  });
+  return Object.fromEntries(byMonth.entries());
+}
+
+function buildMonthlyDashboardTimesheetMap(weeks = [], timesheetWeeklyMap = {}) {
+  const byMonth = new Map();
+  (weeks || []).forEach((week) => {
+    const monthStart = getDashboardMonthStartYmd(week.start);
+    if (!monthStart) return;
+    const source = timesheetWeeklyMap?.[week.start] || {};
+    const summary = byMonth.get(monthStart) || { tasks: {} };
+    addDashboardMonthlyNumber(summary, "totalWages", source.totalWages);
+    Object.entries(source.tasks || {}).forEach(([taskLabel, value]) => {
+      addDashboardMonthlyNumber(summary.tasks, taskLabel, value);
+    });
+    byMonth.set(monthStart, summary);
+  });
+  return Object.fromEntries(byMonth.entries());
+}
+
+function buildMonthlyDashboardSubscriberMap(weeks = [], subscriberWeeklyMap = {}) {
+  const byMonth = new Map();
+  (weeks || []).forEach((week) => {
+    const monthStart = getDashboardMonthStartYmd(week.start);
+    if (!monthStart) return;
+    const source = subscriberWeeklyMap?.[week.start] || {};
+    const summary = byMonth.get(monthStart) || {};
+    addDashboardMonthlyNumber(summary, "newSubscribers", source.newSubscribers);
+    addDashboardMonthlyNumber(summary, "exitingSubscribers", source.exitingSubscribers);
+    const snapSubscribers = Number(source.snapSubscribers);
+    if (Number.isFinite(snapSubscribers)) summary.snapSubscribers = snapSubscribers;
+    const totalSubscribers = Number(source.totalSubscribers);
+    if (Number.isFinite(totalSubscribers)) summary.totalSubscribers = totalSubscribers;
+    byMonth.set(monthStart, summary);
+  });
+  return Object.fromEntries(byMonth.entries());
+}
+
+function buildMonthlyDashboardManualValueMap(manualValueMap = new Map(), weeks = []) {
+  const allowedWeekStarts = new Set((weeks || []).map((week) => week.start).filter(Boolean));
+  const byLabelAndMonth = new Map();
+
+  for (const [label, rowValues] of manualValueMap.entries()) {
+    for (const [weekStart, value] of rowValues.entries()) {
+      if (!allowedWeekStarts.has(weekStart)) continue;
+      if (value === null || typeof value === "undefined" || String(value).trim() === "") continue;
+      const monthStart = getDashboardMonthStartYmd(weekStart);
+      if (!monthStart) continue;
+      const labelSummary = byLabelAndMonth.get(label) || new Map();
+      const monthSummary = labelSummary.get(monthStart) || { total: 0, numericCount: 0, latestText: "" };
+      const numeric = parseDashboardNumber(value);
+      if (numeric === null) {
+        monthSummary.latestText = value;
+      } else {
+        monthSummary.total += numeric;
+        monthSummary.numericCount += 1;
+      }
+      labelSummary.set(monthStart, monthSummary);
+      byLabelAndMonth.set(label, labelSummary);
+    }
+  }
+
+  const monthlyManualValueMap = new Map();
+  for (const [label, monthMap] of byLabelAndMonth.entries()) {
+    for (const [monthStart, summary] of monthMap.entries()) {
+      setManualValue(
+        monthlyManualValueMap,
+        label,
+        monthStart,
+        summary.numericCount ? round2(summary.total) : summary.latestText,
+        { overwrite: true }
+      );
+    }
+  }
+  return monthlyManualValueMap;
+}
+
+function buildMonthlyDashboardInputs({
+  weeks = [],
+  publishableWeekStarts = null,
+  manualValueMap = new Map(),
+  weeklyKpiMap = {},
+  vendorWeeklyMap = {},
+  timesheetWeeklyMap = {},
+  subscriberWeeklyMap = {}
+} = {}) {
+  const months = buildDashboardMonthColumns(weeks, publishableWeekStarts);
+  return {
+    months,
+    publishableMonthStarts: buildPublishableDashboardMonthStarts(weeks, publishableWeekStarts),
+    manualValueMap: buildMonthlyDashboardManualValueMap(manualValueMap, weeks),
+    weeklyKpiMap: buildMonthlyDashboardKpiMap(weeks, weeklyKpiMap),
+    vendorWeeklyMap: buildMonthlyDashboardVendorMap(weeks, vendorWeeklyMap),
+    timesheetWeeklyMap: buildMonthlyDashboardTimesheetMap(weeks, timesheetWeeklyMap),
+    subscriberWeeklyMap: buildMonthlyDashboardSubscriberMap(weeks, subscriberWeeklyMap)
+  };
+}
+
+function sumPeriodWeekValues(weeks = [], period, getValue) {
+  let total = 0;
+  let hasValue = false;
+  weeks.forEach((week, index) => {
+    if (!isWeekInDashboardSummaryPeriod(week, period)) return;
+    const numeric = Number(getValue(week, index));
+    if (!Number.isFinite(numeric)) return;
+    total += numeric;
+    hasValue = true;
+  });
+  return hasValue ? total : null;
+}
+
+function sumPeriodManualValues(weeks = [], period, manualValueMap, rowLabel) {
+  return sumPeriodWeekValues(weeks, period, (week) =>
+    parseDashboardNumber(getManualSourceValue(manualValueMap, rowLabel, week.start))
+  );
+}
+
+function latestPeriodWeekValue(weeks = [], period, getValue) {
+  for (let index = weeks.length - 1; index >= 0; index -= 1) {
+    const week = weeks[index];
+    if (!isWeekInDashboardSummaryPeriod(week, period)) continue;
+    const numeric = Number(getValue(week, index));
+    if (Number.isFinite(numeric)) return numeric;
+  }
+  return null;
+}
+
+function buildStartedDashboardSummaryPeriods(weeks = [], publishableWeekStarts = null) {
+  return buildDashboardSummaryPeriods(weeks, publishableWeekStarts).filter(
+    (period) => period.key?.endsWith(":total") || period.started
+  );
+}
+
+function buildDashboardV2SummaryPeriods(months = [], publishableMonthStarts = null) {
+  return buildStartedDashboardSummaryPeriods(months, publishableMonthStarts).map((period) => ({
+    ...period,
+    key: `v2:${period.key}`,
+    fallbackKey: period.key?.endsWith(":total") ? null : period.key
+  }));
+}
+
+function dedupeDashboardPeriods(periods = []) {
+  const byKey = new Map();
+  periods.forEach((period) => {
+    if (!period?.key) return;
+    if (!byKey.has(period.key)) byKey.set(period.key, period);
+  });
+  return [...byKey.values()];
+}
+
+function getDashboardQboMetric(qboPeriodMap = {}, period, metricKey) {
+  const metrics = qboPeriodMap?.[period?.key] || qboPeriodMap?.[period?.fallbackKey] || null;
+  const value = metrics?.[metricKey];
+  return value === null || typeof value === "undefined" ? null : Number(value);
+}
+
+function collectQboExpenseLineLabels(qboPeriodMap = {}) {
+  const labels = new Set();
+  Object.values(qboPeriodMap || {}).forEach((metrics) => {
+    (metrics?.expenseLines || []).forEach((line) => {
+      if (!line?.label || line.isPayroll) return;
+      if (!Number(line.total || 0)) return;
+      labels.add(String(line.label));
+    });
+  });
+  return [...labels].sort((left, right) => left.localeCompare(right));
+}
+
+function collectQboIncomeLineLabels(qboPeriodMap = {}) {
+  const labels = new Set();
+  Object.values(qboPeriodMap || {}).forEach((metrics) => {
+    (metrics?.incomeLines || []).forEach((line) => {
+      if (!line?.label) return;
+      if (!Number(line.total || 0)) return;
+      labels.add(String(line.label));
+    });
+  });
+  return [...labels].sort((left, right) => left.localeCompare(right));
+}
+
+function getQboExpenseLineValue(qboPeriodMap = {}, period, label) {
+  const metrics = qboPeriodMap?.[period?.key] || qboPeriodMap?.[period?.fallbackKey] || null;
+  const value = metrics?.expenseLineMap?.[label];
+  return value === null || typeof value === "undefined" ? null : Number(value);
+}
+
+function getQboIncomeLineValue(qboPeriodMap = {}, period, label) {
+  const metrics = qboPeriodMap?.[period?.key] || qboPeriodMap?.[period?.fallbackKey] || null;
+  const value = metrics?.incomeLineMap?.[label];
+  return value === null || typeof value === "undefined" ? null : Number(value);
+}
+
+function buildDashboardV2Rows({
+  months = [],
+  summaryPeriods = [],
+  manualValueMap,
+  monthlyKpiMap = {},
+  monthlyVendorMap = {},
+  monthlyTimesheetMap = {},
+  monthlySubscriberMap = {},
+  qboPeriodMap = {},
+  generatedAt = new Date()
+} = {}) {
+  const periods = [...summaryPeriods, ...months];
+  const incomeLineLabels = collectQboIncomeLineLabels(qboPeriodMap);
+  const expenseLineLabels = collectQboExpenseLineLabels(qboPeriodMap);
+  const getPeriodSum = (period, getValue) => sumPeriodWeekValues(months, period, getValue);
+  const getPeriodLatest = (period, getValue) => latestPeriodWeekValue(months, period, getValue);
+  const formulaDivide = (metricSheetRowsByLabel, numeratorLabel, denominatorLabel, columnName) => {
+    const numeratorRef = getMetricCellRef(metricSheetRowsByLabel, numeratorLabel, columnName);
+    const denominatorRef = getMetricCellRef(metricSheetRowsByLabel, denominatorLabel, columnName);
+    return numeratorRef && denominatorRef
+      ? `=IFERROR(${numeratorRef}/${denominatorRef},"")`
+      : "";
+  };
+
+  const incomeLineRows = incomeLineLabels.map((label) => ({
+    label: `QBO Revenue - ${label}`,
+    entry: "AUTO",
+    source: "QBO income account line",
+    valueType: "currency",
+    periodAuto: (period) => getQboIncomeLineValue(qboPeriodMap, period, label)
+  }));
+  const expenseLineRows = expenseLineLabels.map((label) => ({
+    label: `QBO Expense - ${label}`,
+    entry: "AUTO",
+    source: "QBO expense account line",
+    valueType: "currency",
+    periodAuto: (period) => getQboExpenseLineValue(qboPeriodMap, period, label)
+  }));
+  const expenseComponentLabels = [
+    "QBO Payroll Expenses",
+    ...expenseLineRows.map((row) => row.label)
+  ];
+
+  const layout = [
+    {
+      section: "GIVENS",
+      rows: [
+        {
+          label: "Errors/week",
+          entry: "MANUAL",
+          source: "Manual QA",
+          rowLabel: "Errors/week",
+          valueType: "int",
+          periodAuto: (period) => sumPeriodManualValues(months, period, manualValueMap, "Errors/week")
+        },
+        {
+          label: "Positive responses/week",
+          entry: "MANUAL",
+          source: "Manual QA",
+          rowLabel: "Positive responses/week",
+          valueType: "int",
+          periodAuto: (period) =>
+            sumPeriodManualValues(months, period, manualValueMap, "Positive responses/week")
+        },
+        {
+          label: "New Subscribers",
+          entry: "AUTO",
+          source: "Subscriber export Created dates",
+          valueType: "int",
+          periodAuto: (period) =>
+            getPeriodSum(period, (month) => monthlySubscriberMap[month.start]?.newSubscribers)
+        },
+        {
+          label: "Exiting Subscribers",
+          entry: "AUTO",
+          source: "Subscriber export Cancelled Date values",
+          valueType: "int",
+          periodAuto: (period) =>
+            getPeriodSum(period, (month) => monthlySubscriberMap[month.start]?.exitingSubscribers)
+        },
+        {
+          label: "SNAP subscribers",
+          entry: "AUTO",
+          source: "Local Line SNAP price-list members",
+          valueType: "int",
+          periodAuto: (period) =>
+            getPeriodLatest(period, (month) => monthlySubscriberMap[month.start]?.snapSubscribers)
+        },
+        {
+          label: "Total Subscribers",
+          entry: "AUTO",
+          source: "Subscriber export active as of month end + Local Line SNAP price-list members",
+          valueType: "int",
+          periodAuto: (period) =>
+            getPeriodLatest(period, (month) => monthlySubscriberMap[month.start]?.totalSubscribers)
+        }
+      ]
+    },
+    {
+      section: "REVENUE",
+      rows: [
+        {
+          label: "Member Dollars Received",
+          entry: "AUTO",
+          source: "Local member-credit cash received",
+          valueType: "currency",
+          periodAuto: (period) =>
+            getPeriodSum(period, (month) => monthlyKpiMap[month.start]?.actualDollarsReceivedForCredit)
+        },
+        {
+          label: "Guest Purchase Dollars",
+          entry: "AUTO",
+          source: "Local Line guest price-list retail dollars",
+          valueType: "currency",
+          periodAuto: (period) =>
+            getPeriodSum(period, (month) => monthlyKpiMap[month.start]?.guestPurchaseDollars)
+        },
+        {
+          label: "Local Revenue Dollars",
+          entry: "AUTO",
+          source: "Member Dollars Received + Guest Purchase Dollars",
+          valueType: "currency",
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) => {
+            const dollarsReceivedRef = getMetricCellRef(metricSheetRowsByLabel, "Member Dollars Received", columnName);
+            const guestPurchasesRef = getMetricCellRef(metricSheetRowsByLabel, "Guest Purchase Dollars", columnName);
+            return dollarsReceivedRef && guestPurchasesRef
+              ? `=IF(COUNTA(${dollarsReceivedRef},${guestPurchasesRef})=0,"",${dollarsReceivedRef}+${guestPurchasesRef})`
+              : "";
+          }
+        },
+        {
+          label: "Extra Credit Issued",
+          entry: "AUTO",
+          source: "Credit issued above dollars received",
+          valueType: "currency",
+          periodAuto: (period) =>
+            getPeriodSum(period, (month) => monthlyKpiMap[month.start]?.bonusCreditExpense)
+        },
+        {
+          label: "Member Credit Used for Purchases",
+          entry: "AUTO",
+          source: "Local Line store credit used on paid orders",
+          valueType: "currency",
+          periodAuto: (period) =>
+            getPeriodSum(period, (month) => monthlyKpiMap[month.start]?.subscriptionCreditUsed)
+        },
+        {
+          label: "Member Bank Balance Change",
+          entry: "AUTO",
+          source: "Member Dollars Received + Extra Credit Issued - Member Credit Used for Purchases",
+          valueType: "currency",
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) => {
+            const dollarsReceivedRef = getMetricCellRef(metricSheetRowsByLabel, "Member Dollars Received", columnName);
+            const extraCreditRef = getMetricCellRef(metricSheetRowsByLabel, "Extra Credit Issued", columnName);
+            const creditUsedRef = getMetricCellRef(metricSheetRowsByLabel, "Member Credit Used for Purchases", columnName);
+            return dollarsReceivedRef && extraCreditRef && creditUsedRef
+              ? `=IF(COUNTA(${dollarsReceivedRef},${extraCreditRef},${creditUsedRef})=0,"",${dollarsReceivedRef}+${extraCreditRef}-${creditUsedRef})`
+              : "";
+          }
+        },
+        {
+          label: "Member Bank Balance",
+          entry: "AUTO",
+          source: "Local Line customer credit balance snapshot",
+          valueType: "currency",
+          periodAuto: (period) =>
+            getPeriodLatest(period, (month) => monthlyKpiMap[month.start]?.memberBankBalance)
+        },
+        {
+          label: "Local Purchase Dollars",
+          entry: "AUTO",
+          source: "Member Credit Used for Purchases + Guest Purchase Dollars",
+          valueType: "currency",
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) => {
+            const memberPurchasesRef = getMetricCellRef(metricSheetRowsByLabel, "Member Credit Used for Purchases", columnName);
+            const guestPurchasesRef = getMetricCellRef(metricSheetRowsByLabel, "Guest Purchase Dollars", columnName);
+            return memberPurchasesRef && guestPurchasesRef
+              ? `=IF(COUNTA(${memberPurchasesRef},${guestPurchasesRef})=0,"",${memberPurchasesRef}+${guestPurchasesRef})`
+              : "";
+          }
+        },
+        ...incomeLineRows,
+        {
+          label: "QBO Revenue",
+          entry: "AUTO",
+          source: "QBO Total Income",
+          valueType: "currency",
+          bold: true,
+          periodAuto: (period) => getDashboardQboMetric(qboPeriodMap, period, "income")
+        },
+        {
+          label: "LL Revenue",
+          entry: "AUTO",
+          source: "Local Line retail sales from paid product order lines",
+          valueType: "currency",
+          bold: true,
+          italic: true,
+          periodAuto: (period) =>
+            getPeriodSum(period, (month) => monthlyKpiMap[month.start]?.totalSales)
+        }
+      ]
+    },
+    {
+      section: "COGS",
+      rows: [
+        {
+          label: "QBO Purchase Cost",
+          entry: "AUTO",
+          source: "QBO Cost of Goods Sold",
+          valueType: "currency",
+          bold: true,
+          periodAuto: (period) => getDashboardQboMetric(qboPeriodMap, period, "cogs")
+        },
+        {
+          label: "LL Purchase Cost",
+          entry: "AUTO",
+          source: "Local Line purchase cost from paid product order lines",
+          valueType: "currency",
+          bold: true,
+          italic: true,
+          periodAuto: (period) =>
+            getPeriodSum(period, (month) => monthlyVendorMap[month.start]?.purchaseCost)
+        }
+      ]
+    },
+    {
+      section: "GROSS PROFIT",
+      rows: [
+        {
+          label: "QBO Gross Profit",
+          entry: "AUTO",
+          source: "QBO Gross Profit",
+          valueType: "currency",
+          bold: true,
+          periodAuto: (period) => getDashboardQboMetric(qboPeriodMap, period, "grossProfit")
+        },
+        {
+          label: "LL Gross Profit",
+          entry: "AUTO",
+          source: "LL Revenue - LL Purchase Cost",
+          valueType: "currency",
+          bold: true,
+          italic: true,
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) => {
+            const llRevenueRef = getMetricCellRef(metricSheetRowsByLabel, "LL Revenue", columnName);
+            const llPurchaseCostRef = getMetricCellRef(metricSheetRowsByLabel, "LL Purchase Cost", columnName);
+            return llRevenueRef && llPurchaseCostRef
+              ? `=IF(OR(${llRevenueRef}="",${llPurchaseCostRef}=""),"",${llRevenueRef}-${llPurchaseCostRef})`
+              : "";
+          }
+        },
+        {
+          label: "QBO GPPR %",
+          entry: "AUTO",
+          source: "QBO Gross Profit / QBO Revenue",
+          valueType: "percent",
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) =>
+            formulaDivide(metricSheetRowsByLabel, "QBO Gross Profit", "QBO Revenue", columnName)
+        }
+      ]
+    },
+    {
+      section: "EXPENSES",
+      rows: [
+        {
+          label: "QBO Payroll Expenses",
+          entry: "AUTO",
+          source: "QBO Payroll Expenses",
+          valueType: "currency",
+          periodAuto: (period) => getDashboardQboMetric(qboPeriodMap, period, "payrollExpense")
+        },
+        {
+          label: "QBO Payroll % of Gross Profit",
+          entry: "AUTO",
+          source: "QBO Payroll Expenses / QBO Gross Profit",
+          valueType: "percent",
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) =>
+            formulaDivide(metricSheetRowsByLabel, "QBO Payroll Expenses", "QBO Gross Profit", columnName)
+        },
+        ...expenseLineRows,
+        {
+          label: "QBO Expenses",
+          entry: "AUTO",
+          source: "QBO payroll expenses + QBO non-labor expense lines",
+          valueType: "currency",
+          bold: true,
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) => {
+            const refs = expenseComponentLabels
+              .map((label) => getMetricCellRef(metricSheetRowsByLabel, label, columnName))
+              .filter(Boolean);
+            return refs.length ? `=IF(COUNTA(${refs.join(",")})=0,"",SUM(${refs.join(",")}))` : "";
+          }
+        }
+      ]
+    },
+    {
+      section: "NET PROFIT",
+      rows: [
+        {
+          label: "QBO Net Profit",
+          entry: "AUTO",
+          source: "QBO Net Income",
+          methodology: "Net Profit is read directly from QBO so the dashboard matches actual QBO net income.",
+          valueType: "currency",
+          bold: true,
+          periodAuto: (period) => getDashboardQboMetric(qboPeriodMap, period, "netIncome")
+        }
+      ]
+    }
+  ];
+
+  const values = [];
+  const metricRows = [];
+  const sectionRows = [];
+  const metricSheetRowsByLabel = buildMetricSheetRowsByLabel(layout);
+  const now = generatedAt.toISOString().replace("T", " ").slice(0, 19);
+
+  values.push([
+    "FFCSA Dashboard 2026 v2",
+    `Updated ${now}`,
+    "",
+    "",
+    ...periods.map(() => "")
+  ]);
+  values.push([
+    "Section",
+    "Metric",
+    "Entry Type",
+    "Source",
+    ...periods.map((period) => formatDashboardHeaderLabel(period.label))
+  ]);
+
+  for (const group of layout) {
+    sectionRows.push(values.length);
+    values.push([group.section, "", "", "", ...periods.map(() => "")]);
+    for (const row of group.rows) {
+      const nextRow = ["", row.label, row.entry, row.source];
+      for (let index = 0; index < periods.length; index += 1) {
+        const period = periods[index];
+        const columnName = getSheetColumnName(DASHBOARD_STATIC_COLUMN_COUNT + index);
+        if (typeof row.periodFormula === "function") {
+          nextRow.push(
+            row.periodFormula({
+              period,
+              periodIndex: index,
+              columnName,
+              metricSheetRowsByLabel
+            })
+          );
+        } else if (typeof row.periodAuto === "function") {
+          nextRow.push(normalizeAutoValue(row.valueType, row.periodAuto(period, index)));
+        } else {
+          nextRow.push("");
+        }
+      }
+      metricRows.push({
+        rowIndex: values.length,
+        valueType: row.valueType || null,
+        entry: row.entry,
+        bold: Boolean(row.bold),
+        italic: Boolean(row.italic),
+        note: buildMetricMethodologyNote(row)
+      });
+      values.push(nextRow);
+    }
+  }
+
+  return {
+    values,
+    metricRows,
+    sectionRows,
+    packWagesSalesChart: null,
+    periodCount: periods.length,
+    monthCount: months.length
+  };
+}
+
+function buildQboDashboardRows({
+  weeks = [],
+  manualValueMap,
+  weeklyKpiMap = {},
+  timesheetWeeklyMap = {},
+  subscriberWeeklyMap = {},
+  summaryPeriods = [],
+  qboPeriodMap = {},
+  qboWeeklyMap = {},
+  generatedAt = new Date()
+} = {}) {
+  const resolvedSummaryPeriods = summaryPeriods.length
+    ? summaryPeriods
+    : buildDashboardSummaryPeriods(weeks);
+  const resolvedQboWeeklyMap = qboWeeklyMap || qboPeriodMap || {};
+  const getQboMetricFromMap = (map, period, metricKey) => {
+    const metrics = map?.[period?.key] || null;
+    const value = metrics?.[metricKey];
+    return value === null || typeof value === "undefined" ? null : Number(value);
+  };
+  const getQboMetric = (period, metricKey) => getQboMetricFromMap(qboPeriodMap, period, metricKey);
+  const getQboWeekMetric = (week, metricKey) =>
+    getQboMetricFromMap(resolvedQboWeeklyMap, { key: `week:${week.start}` }, metricKey);
+  const formulaDivide = (metricSheetRowsByLabel, numeratorLabel, denominatorLabel, columnName) => {
+    const numeratorRef = getMetricCellRef(metricSheetRowsByLabel, numeratorLabel, columnName);
+    const denominatorRef = getMetricCellRef(metricSheetRowsByLabel, denominatorLabel, columnName);
+    return numeratorRef && denominatorRef
+      ? `=IFERROR(${numeratorRef}/${denominatorRef},"")`
+      : "";
+  };
+
+  const layout = [
+    {
+      section: "GIVENS",
+      rows: [
+        {
+          label: "Errors/week",
+          entry: "MANUAL",
+          source: "Manual QA",
+          rowLabel: "Errors/week",
+          valueType: "int",
+          periodAuto: (period) => sumPeriodManualValues(weeks, period, manualValueMap, "Errors/week")
+        },
+        {
+          label: "Positive responses/week",
+          entry: "MANUAL",
+          source: "Manual QA",
+          rowLabel: "Positive responses/week",
+          valueType: "int",
+          periodAuto: (period) =>
+            sumPeriodManualValues(weeks, period, manualValueMap, "Positive responses/week")
+        },
+        {
+          label: "New Subscribers",
+          entry: "AUTO",
+          source: "Subscriber export Created dates",
+          valueType: "int",
+          periodAuto: (period) =>
+            sumPeriodWeekValues(weeks, period, (week) =>
+              subscriberWeeklyMap[week.start]?.newSubscribers
+            ),
+          weekAuto: (week) => subscriberWeeklyMap[week.start]?.newSubscribers
+        },
+        {
+          label: "Exiting Subscribers",
+          entry: "AUTO",
+          source: "Subscriber export Cancelled Date values",
+          valueType: "int",
+          periodAuto: (period) =>
+            sumPeriodWeekValues(weeks, period, (week) =>
+              subscriberWeeklyMap[week.start]?.exitingSubscribers
+            ),
+          weekAuto: (week) => subscriberWeeklyMap[week.start]?.exitingSubscribers
+        },
+        {
+          label: "SNAP subscribers",
+          entry: "AUTO",
+          source: "Local Line SNAP price-list members",
+          methodology: "Counts distinct customers currently assigned to the Local Line SNAP price list. The SNAP price list is read from LL_PRICE_LIST_SNAP_ID, or DASHBOARD_SNAP_PRICE_LIST_ID when set, and refreshed during subscriber sync and dashboard publish.",
+          valueType: "int",
+          periodAuto: (period) =>
+            latestPeriodWeekValue(weeks, period, (week) =>
+              subscriberWeeklyMap[week.start]?.snapSubscribers
+            ),
+          weekAuto: (week) => subscriberWeeklyMap[week.start]?.snapSubscribers
+        },
+        {
+          label: "Total Subscribers",
+          entry: "AUTO",
+          source: "Subscriber export active as of week end + Local Line SNAP price-list members",
+          methodology: "Adds active subscribers from the Local Line subscription snapshot for the week end to the current Local Line SNAP price-list member count.",
+          valueType: "int",
+          periodAuto: (period) =>
+            latestPeriodWeekValue(weeks, period, (week) =>
+              subscriberWeeklyMap[week.start]?.totalSubscribers
+            ),
+          weekAuto: (week) => subscriberWeeklyMap[week.start]?.totalSubscribers
+        }
+      ]
+    },
+    {
+      section: "FORMULAS",
+      rows: [
+        {
+          label: "Revenue",
+          entry: "FORMULA",
+          source: "QBO Revenue = QuickBooks Online Total Income. Member-bank movement is tracked separately and is not added into revenue.",
+          boxed: true
+        },
+        {
+          label: "COGS",
+          entry: "FORMULA",
+          source: "QBO Product Purchases / COGS = QuickBooks Online Cost of Goods Sold.",
+          boxed: true
+        },
+        {
+          label: "Gross Profit",
+          entry: "FORMULA",
+          source: "QBO Gross Profit = QBO Revenue - QBO Product Purchases / COGS.",
+          boxed: true
+        },
+        {
+          label: "Gross Margin %",
+          entry: "FORMULA",
+          source: "QBO Gross Margin % = QBO Gross Profit / QBO Revenue.",
+          boxed: true
+        },
+        {
+          label: "% Wages to Gross Profit",
+          entry: "FORMULA",
+          source: "% Wages to Gross Profit = Timesheet Wages / QBO Gross Profit.",
+          boxed: true
+        },
+        {
+          label: "Net Margin %",
+          entry: "FORMULA",
+          source: "QBO Net Margin % = QBO Net Income / QBO Revenue.",
+          boxed: true
+        }
+      ]
+    },
+    {
+      section: "REVENUE",
+      rows: [
+        {
+          label: "QBO Revenue",
+          entry: "AUTO",
+          source: "QuickBooks Online cash-basis Profit and Loss",
+          methodology: "QBO Total Income for the same summary period.",
+          valueType: "currency",
+          bold: true,
+          periodAuto: (period) => getQboMetric(period, "income"),
+          weekAuto: (week) => getQboWeekMetric(week, "income")
+        },
+        {
+          label: "QBO Member Payments",
+          entry: "AUTO",
+          source: "QuickBooks Online Member Payments account",
+          methodology: "Extracts the Member Payments account line from the QBO P&L.",
+          valueType: "currency",
+          periodAuto: (period) => getQboMetric(period, "memberPayments"),
+          weekAuto: (week) => getQboWeekMetric(week, "memberPayments")
+        },
+        {
+          label: "Member Payments % of Revenue",
+          entry: "AUTO",
+          source: "QBO Member Payments / QBO Revenue",
+          valueType: "percent",
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) =>
+            formulaDivide(metricSheetRowsByLabel, "QBO Member Payments", "QBO Revenue", columnName),
+          weekFormula: ({ columnName, metricSheetRowsByLabel }) =>
+            formulaDivide(metricSheetRowsByLabel, "QBO Member Payments", "QBO Revenue", columnName)
+        }
+      ]
+    },
+    {
+      section: "COGS",
+      rows: [
+        {
+          label: "QBO Product Purchases / COGS",
+          entry: "AUTO",
+          source: "QuickBooks Online cash-basis Profit and Loss",
+          methodology: "QBO Cost of Goods Sold, currently Product Purchases.",
+          valueType: "currency",
+          bold: true,
+          periodAuto: (period) => getQboMetric(period, "cogs"),
+          weekAuto: (week) => getQboWeekMetric(week, "cogs")
+        }
+      ]
+    },
+    {
+      section: "GROSS PROFIT",
+      rows: [
+        {
+          label: "QBO Gross Profit",
+          entry: "AUTO",
+          source: "QBO Revenue - QBO Product Purchases / COGS",
+          valueType: "currency",
+          bold: true,
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) => {
+            const revenueRef = getMetricCellRef(metricSheetRowsByLabel, "QBO Revenue", columnName);
+            const cogsRef = getMetricCellRef(metricSheetRowsByLabel, "QBO Product Purchases / COGS", columnName);
+            return revenueRef && cogsRef ? `=IFERROR(${revenueRef}-${cogsRef},"")` : "";
+          },
+          weekFormula: ({ columnName, metricSheetRowsByLabel }) => {
+            const revenueRef = getMetricCellRef(metricSheetRowsByLabel, "QBO Revenue", columnName);
+            const cogsRef = getMetricCellRef(metricSheetRowsByLabel, "QBO Product Purchases / COGS", columnName);
+            return revenueRef && cogsRef ? `=IFERROR(${revenueRef}-${cogsRef},"")` : "";
+          }
+        },
+        {
+          label: "QBO Gross Margin %",
+          entry: "AUTO",
+          source: "QBO Gross Profit / QBO Revenue",
+          valueType: "percent",
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) =>
+            formulaDivide(metricSheetRowsByLabel, "QBO Gross Profit", "QBO Revenue", columnName),
+          weekFormula: ({ columnName, metricSheetRowsByLabel }) =>
+            formulaDivide(metricSheetRowsByLabel, "QBO Gross Profit", "QBO Revenue", columnName)
+        }
+      ]
+    },
+    {
+      section: "EXPENSES",
+      rows: [
+        {
+          label: "QBO Operating Expenses",
+          entry: "AUTO",
+          source: "QuickBooks Online cash-basis Profit and Loss",
+          methodology: "QBO Total Expenses for the same summary period.",
+          valueType: "currency",
+          bold: true,
+          periodAuto: (period) => getQboMetric(period, "expenses"),
+          weekAuto: (week) => getQboWeekMetric(week, "expenses")
+        },
+        {
+          label: "Timesheet Wages",
+          entry: "AUTO",
+          source: "Timesheets DB (FFCSA wages + fringe total)",
+          valueType: "currency",
+          periodAuto: (period) =>
+            sumPeriodWeekValues(weeks, period, (week) =>
+              Number(timesheetWeeklyMap[week.start]?.totalWages || 0)
+            ),
+          weekAuto: (week) => Number(timesheetWeeklyMap[week.start]?.totalWages || 0)
+        },
+        {
+          label: "% Wages to Gross Profit",
+          entry: "AUTO",
+          source: "Timesheet Wages / QBO Gross Profit",
+          valueType: "percent",
+          bold: true,
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) =>
+            formulaDivide(metricSheetRowsByLabel, "Timesheet Wages", "QBO Gross Profit", columnName),
+          weekFormula: ({ columnName, metricSheetRowsByLabel }) =>
+            formulaDivide(metricSheetRowsByLabel, "Timesheet Wages", "QBO Gross Profit", columnName)
+        }
+      ]
+    },
+    {
+      section: "MEMBER BANK",
+      rows: [
+        {
+          label: "Member Bank Growth",
+          entry: "AUTO",
+          source: "Local Line member-bank balance change; tracked separately from QBO revenue.",
+          methodology: "Calculated from Local Line customer store-credit balance snapshots. This row shows liability growth/change and is intentionally not included in QBO Revenue.",
+          valueType: "currency",
+          boxed: true,
+          periodAuto: (period) =>
+            sumPeriodWeekValues(weeks, period, (week) =>
+              weeklyKpiMap[week.start]?.memberBankBalanceChange
+            ),
+          weekAuto: (week) => weeklyKpiMap[week.start]?.memberBankBalanceChange
+        },
+        {
+          label: "Member Bank Value",
+          entry: "AUTO",
+          source: "Local Line member-bank balance value; tracked separately from QBO revenue.",
+          methodology: "Total store-credit liability from Local Line customer balance snapshots. Summary columns use the latest value in the period.",
+          valueType: "currency",
+          boxed: true,
+          periodAuto: (period) =>
+            latestPeriodWeekValue(weeks, period, (week) =>
+              weeklyKpiMap[week.start]?.memberBankBalance
+            ),
+          weekAuto: (week) => weeklyKpiMap[week.start]?.memberBankBalance
+        }
+      ]
+    },
+    {
+      section: "NET INCOME",
+      rows: [
+        {
+          label: "QBO Net Income",
+          entry: "AUTO",
+          source: "QuickBooks Online cash-basis Profit and Loss",
+          methodology: "QBO Net Income from the P&L. This remains sourced from QBO instead of recomputed so other income or account-specific QBO behavior is preserved.",
+          valueType: "currency",
+          bold: true,
+          periodAuto: (period) => getQboMetric(period, "netIncome"),
+          weekAuto: (week) => getQboWeekMetric(week, "netIncome")
+        },
+        {
+          label: "QBO Net Margin %",
+          entry: "AUTO",
+          source: "QBO Net Income / QBO Revenue",
+          valueType: "percent",
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) =>
+            formulaDivide(metricSheetRowsByLabel, "QBO Net Income", "QBO Revenue", columnName),
+          weekFormula: ({ columnName, metricSheetRowsByLabel }) =>
+            formulaDivide(metricSheetRowsByLabel, "QBO Net Income", "QBO Revenue", columnName)
+        }
+      ]
+    }
+  ];
+
+  const values = [];
+  const metricRows = [];
+  const sectionRows = [];
+  const metricSheetRowsByLabel = buildMetricSheetRowsByLabel(layout);
+  const weekStartColumnIndex = DASHBOARD_STATIC_COLUMN_COUNT + resolvedSummaryPeriods.length;
+  const now = generatedAt.toISOString().replace("T", " ").slice(0, 19);
+  values.push([
+    "FFCSA QBO Dashboard 2026",
+    `Updated ${now}`,
+    "",
+    "",
+    ...resolvedSummaryPeriods.map(() => ""),
+    ...weeks.map(() => "")
+  ]);
+  values.push([
+    "Section",
+    "Metric",
+    "Entry Type",
+    "Source",
+    ...resolvedSummaryPeriods.map((period) => period.label),
+    ...weeks.map((week) => week.label)
+  ]);
+
+  const getPeriodRowValue = (row, period, periodIndex) => {
+    if (!period?.started) return "";
+    const columnName = getSheetColumnName(4 + periodIndex);
+    if (typeof row.periodFormula === "function") {
+      return row.periodFormula({
+        period,
+        periodIndex,
+        columnName,
+        metricSheetRowsByLabel
+      });
+    }
+    if (typeof row.periodAuto === "function") {
+      return normalizeAutoValue(row.valueType, row.periodAuto(period, periodIndex));
+    }
+    return "";
+  };
+  const getWeekRowValue = (row, week, weekIndex) => {
+    const columnName = getSheetColumnName(weekStartColumnIndex + weekIndex);
+    if (typeof row.weekFormula === "function") {
+      return row.weekFormula({
+        week,
+        weekIndex,
+        columnName,
+        metricSheetRowsByLabel
+      });
+    }
+    if (typeof row.weekAuto === "function") {
+      return normalizeAutoValue(row.valueType, row.weekAuto(week, weekIndex));
+    }
+    if (typeof row.weekValue === "function") {
+      return row.weekValue(week, weekIndex);
+    }
+    if (row.entry === "MANUAL") {
+      return getManualSourceValue(manualValueMap, row.rowLabel || row.label, week.start);
+    }
+    return "";
+  };
+
+  for (const group of layout) {
+    sectionRows.push(values.length);
+    values.push([
+      group.section,
+      "",
+      "",
+      "",
+      ...resolvedSummaryPeriods.map(() => ""),
+      ...weeks.map(() => "")
+    ]);
+    for (const row of group.rows) {
+      const nextRow = ["", row.label, row.entry, row.source];
+      for (let index = 0; index < resolvedSummaryPeriods.length; index += 1) {
+        nextRow.push(getPeriodRowValue(row, resolvedSummaryPeriods[index], index));
+      }
+      for (let index = 0; index < weeks.length; index += 1) {
+        nextRow.push(getWeekRowValue(row, weeks[index], index));
+      }
+      metricRows.push({
+        rowIndex: values.length,
+        valueType: row.valueType || null,
+        entry: row.entry,
+        bold: Boolean(row.bold),
+        note: buildMetricMethodologyNote(row),
+        boxed: Boolean(row.boxed)
+      });
+      values.push(nextRow);
+    }
+  }
+
+  return {
+    values,
+    metricRows,
+    sectionRows,
+    packWagesSalesChart: null,
+    weekStartColumnIndex
+  };
 }
 
 async function loadDashboardPublishAvailability() {
@@ -2250,6 +3463,12 @@ async function loadWeeklyOrderMetrics(weeks) {
         week_start AS weekKey,
         COUNT(*) AS lineCount,
         COALESCE(SUM(retail_amount), 0) AS retailAmount,
+        COALESCE(SUM(
+          CASE
+            WHEN LOWER(COALESCE(price_list_name, '')) LIKE '%guest%' THEN retail_amount
+            ELSE 0
+          END
+        ), 0) AS guestRetailAmount,
         COALESCE(SUM(purchase_total), 0) AS purchaseTotal
       FROM local_line_order_reporting_entries
       WHERE order_status = 'OPEN'
@@ -2410,6 +3629,7 @@ async function loadWeeklyOrderMetrics(weeks) {
         averageOrderSummary?.count
           ? Number((averageOrderSummary.total / averageOrderSummary.count).toFixed(2))
           : Number(Number(orderRow?.averageOrderAmount || 0).toFixed(2)),
+      guestPurchaseDollars: Number(Number(reportingRow?.guestRetailAmount || 0).toFixed(2)),
       subscriptionIncome,
       subscriptionCreditGiven,
       subscriptionCreditUsed: Number(
@@ -2913,6 +4133,27 @@ function hexColor(hex) {
   };
 }
 
+function buildClearSheetBordersRequest(sheetId, rowCount, columnCount) {
+  const clearBorder = { style: "NONE" };
+  return {
+    updateBorders: {
+      range: {
+        sheetId,
+        startRowIndex: 0,
+        endRowIndex: Math.max(Number(rowCount) || 1, 1),
+        startColumnIndex: 0,
+        endColumnIndex: Math.max(Number(columnCount) || 1, 1)
+      },
+      top: clearBorder,
+      bottom: clearBorder,
+      left: clearBorder,
+      right: clearBorder,
+      innerHorizontal: clearBorder,
+      innerVertical: clearBorder
+    }
+  };
+}
+
 async function getSheetsAccessToken() {
   const serviceAccountJson =
     getDashboardEnv("GOOGLE_SERVICE_ACCOUNT_JSON") ||
@@ -3008,7 +4249,14 @@ async function sheetsRequest(accessToken, method, url, body) {
   return response.json().catch(() => ({}));
 }
 
-async function getOrCreateSheetMetadata(accessToken, spreadsheetId, title) {
+function getSheetInsertIndexAfterTitle(sheets = [], afterTitle = "") {
+  if (!afterTitle) return null;
+  const match = (sheets || []).find((sheet) => sheet?.properties?.title === afterTitle);
+  const index = Number(match?.properties?.index);
+  return Number.isFinite(index) ? index + 1 : null;
+}
+
+async function getOrCreateSheetMetadata(accessToken, spreadsheetId, title, { afterTitle = "" } = {}) {
   const meta = await sheetsRequest(
     accessToken,
     "GET",
@@ -3016,17 +4264,62 @@ async function getOrCreateSheetMetadata(accessToken, spreadsheetId, title) {
   );
   const match = (meta.sheets || []).find((sheet) => sheet?.properties?.title === title);
   if (match?.properties?.sheetId || match?.properties?.sheetId === 0) {
+    const desiredIndex = getSheetInsertIndexAfterTitle(meta.sheets || [], afterTitle);
+    if (
+      desiredIndex !== null &&
+      title !== afterTitle &&
+      Number(match.properties.index) !== desiredIndex
+    ) {
+      await sheetsRequest(
+        accessToken,
+        "POST",
+        `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}:batchUpdate`,
+        {
+          requests: [
+            {
+              updateSheetProperties: {
+                properties: {
+                  sheetId: match.properties.sheetId,
+                  index: desiredIndex
+                },
+                fields: "index"
+              }
+            }
+          ]
+        }
+      );
+      const movedMeta = await sheetsRequest(
+        accessToken,
+        "GET",
+        `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?fields=sheets(properties,charts(chartId,spec/title))`
+      );
+      const movedMatch = (movedMeta.sheets || []).find((sheet) => sheet?.properties?.title === title);
+      return {
+        properties: movedMatch?.properties || match.properties,
+        charts: movedMatch?.charts || match.charts || []
+      };
+    }
     return {
       properties: match.properties,
       charts: match.charts || []
     };
   }
+  const desiredIndex = getSheetInsertIndexAfterTitle(meta.sheets || [], afterTitle);
   const created = await sheetsRequest(
     accessToken,
     "POST",
     `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}:batchUpdate`,
     {
-      requests: [{ addSheet: { properties: { title } } }]
+      requests: [
+        {
+          addSheet: {
+            properties: {
+              title,
+              ...(desiredIndex === null ? {} : { index: desiredIndex })
+            }
+          }
+        }
+      ]
     }
   );
   return {
@@ -3110,12 +4403,19 @@ async function writeDashboardToSheet(
   values,
   metricRows,
   sectionRows,
-  packWagesSalesChart
+  packWagesSalesChart,
+  {
+    targetTitle = DASHBOARD_TARGET_TITLE,
+    placeAfterTitle = "",
+    frozenColumnCount = DASHBOARD_WEEK_START_COLUMN_INDEX,
+    weekStartColumnIndex = DASHBOARD_WEEK_START_COLUMN_INDEX
+  } = {}
 ) {
   const sheetMetadata = await getOrCreateSheetMetadata(
     accessToken,
     DASHBOARD_SHEET_ID,
-    DASHBOARD_TARGET_TITLE
+    targetTitle,
+    { afterTitle: placeAfterTitle }
   );
   const sheetProperties = sheetMetadata.properties;
   const sheetId = Number(sheetProperties?.sheetId);
@@ -3134,15 +4434,15 @@ async function writeDashboardToSheet(
   await sheetsRequest(
     accessToken,
     "POST",
-    `https://sheets.googleapis.com/v4/spreadsheets/${DASHBOARD_SHEET_ID}/values/${encodeURIComponent(`${DASHBOARD_TARGET_TITLE}!A:ZZ`)}:clear`,
+    `https://sheets.googleapis.com/v4/spreadsheets/${DASHBOARD_SHEET_ID}/values/${encodeURIComponent(`${targetTitle}!A:ZZ`)}:clear`,
     {}
   );
   await sheetsRequest(
     accessToken,
     "PUT",
-    `https://sheets.googleapis.com/v4/spreadsheets/${DASHBOARD_SHEET_ID}/values/${encodeURIComponent(`${DASHBOARD_TARGET_TITLE}!A1`)}?valueInputOption=USER_ENTERED`,
+    `https://sheets.googleapis.com/v4/spreadsheets/${DASHBOARD_SHEET_ID}/values/${encodeURIComponent(`${targetTitle}!A1`)}?valueInputOption=USER_ENTERED`,
     {
-      range: `${DASHBOARD_TARGET_TITLE}!A1`,
+      range: `${targetTitle}!A1`,
       majorDimension: "ROWS",
       values
     }
@@ -3155,7 +4455,7 @@ async function writeDashboardToSheet(
           sheetId,
           gridProperties: {
             frozenRowCount: 2,
-            frozenColumnCount: DASHBOARD_WEEK_START_COLUMN_INDEX,
+            frozenColumnCount: Math.min(frozenColumnCount, maxCols),
             rowCount: gridRowCount,
             columnCount: gridColumnCount
           }
@@ -3163,6 +4463,7 @@ async function writeDashboardToSheet(
         fields: "gridProperties.frozenRowCount,gridProperties.frozenColumnCount,gridProperties.rowCount,gridProperties.columnCount"
       }
     },
+    buildClearSheetBordersRequest(sheetId, gridRowCount, gridColumnCount),
     {
       repeatCell: {
         range: {
@@ -3255,12 +4556,18 @@ async function writeDashboardToSheet(
 
 
   metricRows.forEach((metric) => {
+    const entryBackground =
+      metric.entry === "AUTO"
+        ? hexColor("#D9EAD3")
+        : metric.entry === "FORMULA"
+          ? hexColor("#D9EAF7")
+          : hexColor("#FFF2CC");
     requests.push({
       repeatCell: {
         range: { sheetId, startRowIndex: metric.rowIndex, endRowIndex: metric.rowIndex + 1, startColumnIndex: 2, endColumnIndex: 3 },
         cell: {
           userEnteredFormat: {
-            backgroundColor: metric.entry === "AUTO" ? hexColor("#D9EAD3") : hexColor("#FFF2CC"),
+            backgroundColor: entryBackground,
             textFormat: { bold: true },
             horizontalAlignment: "CENTER"
           }
@@ -3279,6 +4586,48 @@ async function writeDashboardToSheet(
       });
     }
 
+    if (metric.boxed) {
+      const border = {
+        style: "SOLID_THICK",
+        width: 1,
+        color: hexColor("#1F4E78")
+      };
+      requests.push(
+        {
+          repeatCell: {
+            range: {
+              sheetId,
+              startRowIndex: metric.rowIndex,
+              endRowIndex: metric.rowIndex + 1,
+              startColumnIndex: 0,
+              endColumnIndex: maxCols
+            },
+            cell: {
+              userEnteredFormat: {
+                backgroundColor: hexColor("#F3F8FC")
+              }
+            },
+            fields: "userEnteredFormat.backgroundColor"
+          }
+        },
+        {
+          updateBorders: {
+            range: {
+              sheetId,
+              startRowIndex: metric.rowIndex,
+              endRowIndex: metric.rowIndex + 1,
+              startColumnIndex: 0,
+              endColumnIndex: maxCols
+            },
+            top: border,
+            bottom: border,
+            left: border,
+            right: border
+          }
+        }
+      );
+    }
+
     if (metric.bold) {
       requests.push({
         repeatCell: {
@@ -3289,6 +4638,20 @@ async function writeDashboardToSheet(
             }
           },
           fields: "userEnteredFormat.textFormat.bold"
+        }
+      });
+    }
+
+    if (metric.italic) {
+      requests.push({
+        repeatCell: {
+          range: { sheetId, startRowIndex: metric.rowIndex, endRowIndex: metric.rowIndex + 1, startColumnIndex: 0, endColumnIndex: maxCols },
+          cell: {
+            userEnteredFormat: {
+              textFormat: { italic: true }
+            }
+          },
+          fields: "userEnteredFormat.textFormat.italic"
         }
       });
     }
@@ -3345,18 +4708,20 @@ async function writeDashboardToSheet(
     });
   });
 
-  requests.push({
-    updateDimensionProperties: {
-      range: {
-        sheetId,
-        dimension: "COLUMNS",
-        startIndex: DASHBOARD_WEEK_START_COLUMN_INDEX,
-        endIndex: maxCols
-      },
-      properties: { pixelSize: 92 },
-      fields: "pixelSize"
-    }
-  });
+  if (weekStartColumnIndex < maxCols) {
+    requests.push({
+      updateDimensionProperties: {
+        range: {
+          sheetId,
+          dimension: "COLUMNS",
+          startIndex: weekStartColumnIndex,
+          endIndex: maxCols
+        },
+        properties: { pixelSize: 92 },
+        fields: "pixelSize"
+      }
+    });
+  }
 
   (sheetMetadata.charts || [])
     .filter((chart) =>
@@ -3372,6 +4737,429 @@ async function writeDashboardToSheet(
   if (packWagesSalesChart) {
     requests.push(...buildPackWagesSalesChartRequests(sheetId, packWagesSalesChart));
   }
+
+  await sheetsRequest(
+    accessToken,
+    "POST",
+    `https://sheets.googleapis.com/v4/spreadsheets/${DASHBOARD_SHEET_ID}:batchUpdate`,
+    { requests }
+  );
+}
+
+function buildEmployeeCreditMonthColumns(year = DASHBOARD_EMPLOYEE_CREDITS_YEAR) {
+  return DASHBOARD_MONTH_LABELS.map((label, index) => {
+    const monthNumber = String(index + 1).padStart(2, "0");
+    return {
+      key: `${year}-${monthNumber}`,
+      label: `${label} ${year}`
+    };
+  });
+}
+
+function normalizeDashboardStatus(value) {
+  return String(value || "").trim().toUpperCase();
+}
+
+function getEmployeeCreditAmount(row = {}) {
+  const retailAmount = toNumber(row.retailAmount);
+  if (retailAmount !== null) return round2(retailAmount);
+  const purchaseTotal = toNumber(row.purchaseTotal);
+  return round2(purchaseTotal || 0);
+}
+
+function getEmployeeCreditStatusBucket(row = {}) {
+  const orderStatus = normalizeDashboardStatus(row.orderStatus);
+  const paymentStatus = normalizeDashboardStatus(row.paymentStatus);
+  if (orderStatus === "CANCELLED" || orderStatus === "CANCELED") return "cancelled";
+  if (orderStatus === "OPEN" && paymentStatus === "PAID") return "paidOpen";
+  if (orderStatus === "DRAFT" && paymentStatus === "UNPAID") return "draftUnpaid";
+  return "otherIncluded";
+}
+
+async function loadEmployeeCreditOrderRows(connection, year = DASHBOARD_EMPLOYEE_CREDITS_YEAR) {
+  const startMonth = `${year}-01`;
+  const endMonth = `${year + 1}-01`;
+  const packageIds = DASHBOARD_EMPLOYEE_CREDIT_PACKAGE_IDS.map((value) => String(value)).filter(Boolean);
+  const packageFilterSql = packageIds.length ? "AND r.package_id IN (?)" : "";
+  const params = [
+    DASHBOARD_EMPLOYEE_CREDIT_PRICE_LIST_ID,
+    startMonth,
+    endMonth,
+    "Employee%"
+  ];
+  if (packageIds.length) params.push(packageIds);
+
+  const [rows] = await connection.query(
+    `
+      SELECT
+        r.fulfillment_month AS fulfillmentMonth,
+        r.fulfillment_date AS fulfillmentDate,
+        r.local_line_order_id AS orderId,
+        r.customer_name AS employee,
+        r.product_name AS productName,
+        r.package_id AS packageId,
+        r.package_name AS packageName,
+        r.quantity AS quantity,
+        r.retail_amount AS retailAmount,
+        r.purchase_total AS purchaseTotal,
+        o.status AS orderStatus,
+        o.payment_status AS paymentStatus
+      FROM local_line_order_reporting_entries r
+      JOIN local_line_orders o ON o.local_line_order_id = r.local_line_order_id
+      WHERE o.price_list_id = ?
+        AND r.fulfillment_month >= ?
+        AND r.fulfillment_month < ?
+        AND r.product_name LIKE ?
+        ${packageFilterSql}
+      ORDER BY r.fulfillment_month ASC,
+        COALESCE(r.customer_name, '') ASC,
+        COALESCE(r.product_name, '') ASC,
+        r.local_line_order_id ASC
+    `,
+    params
+  );
+  return rows || [];
+}
+
+function createEmployeeCreditSummaryRow(employee, monthColumns) {
+  return {
+    employee,
+    months: Object.fromEntries(monthColumns.map((month) => [month.key, 0])),
+    totalCredit: 0,
+    paidOpen: 0,
+    draftUnpaid: 0,
+    otherIncluded: 0,
+    cancelledExcluded: 0,
+    lineCount: 0
+  };
+}
+
+function numberOrBlank(value) {
+  return Number(value) ? Number(value) : "";
+}
+
+function buildEmployeeCreditsReportValues({
+  rows = [],
+  year = DASHBOARD_EMPLOYEE_CREDITS_YEAR,
+  generatedAt = new Date()
+} = {}) {
+  const monthColumns = buildEmployeeCreditMonthColumns(year);
+  const monthByKey = new Map(monthColumns.map((month) => [month.key, month]));
+  const values = [];
+
+  const summaryByEmployee = new Map();
+  const sortedRows = [...rows].sort((a, b) => {
+    const monthCompare = String(a.fulfillmentMonth || "").localeCompare(String(b.fulfillmentMonth || ""));
+    if (monthCompare) return monthCompare;
+    const employeeCompare = String(a.employee || "").localeCompare(String(b.employee || ""));
+    if (employeeCompare) return employeeCompare;
+    return Number(a.orderId || 0) - Number(b.orderId || 0);
+  });
+
+  sortedRows.forEach((row) => {
+    const employee = String(row.employee || "Unknown").trim() || "Unknown";
+    const month = monthByKey.get(String(row.fulfillmentMonth || ""));
+    const amount = getEmployeeCreditAmount(row);
+    const bucket = getEmployeeCreditStatusBucket(row);
+    const includedAmount = bucket === "cancelled" ? 0 : amount;
+    const summary =
+      summaryByEmployee.get(employee) || createEmployeeCreditSummaryRow(employee, monthColumns);
+    summary.lineCount += 1;
+    if (month && includedAmount) {
+      summary.months[month.key] = round2(summary.months[month.key] + includedAmount);
+      summary.totalCredit = round2(summary.totalCredit + includedAmount);
+    }
+    if (bucket === "paidOpen") summary.paidOpen = round2(summary.paidOpen + amount);
+    if (bucket === "draftUnpaid") summary.draftUnpaid = round2(summary.draftUnpaid + amount);
+    if (bucket === "otherIncluded") summary.otherIncluded = round2(summary.otherIncluded + amount);
+    if (bucket === "cancelled") summary.cancelledExcluded = round2(summary.cancelledExcluded + amount);
+    summaryByEmployee.set(employee, summary);
+  });
+
+  const summaryRows = [...summaryByEmployee.values()].sort((a, b) =>
+    a.employee.localeCompare(b.employee)
+  );
+  const totalSummary = createEmployeeCreditSummaryRow("TOTAL", monthColumns);
+  summaryRows.forEach((row) => {
+    monthColumns.forEach((month) => {
+      totalSummary.months[month.key] = round2(totalSummary.months[month.key] + row.months[month.key]);
+    });
+    totalSummary.totalCredit = round2(totalSummary.totalCredit + row.totalCredit);
+    totalSummary.paidOpen = round2(totalSummary.paidOpen + row.paidOpen);
+    totalSummary.draftUnpaid = round2(totalSummary.draftUnpaid + row.draftUnpaid);
+    totalSummary.otherIncluded = round2(totalSummary.otherIncluded + row.otherIncluded);
+    totalSummary.cancelledExcluded = round2(totalSummary.cancelledExcluded + row.cancelledExcluded);
+    totalSummary.lineCount += row.lineCount;
+  });
+
+  const sectionRows = [];
+  const headerRows = [];
+  const summaryHeaderRowIndex = values.length;
+  headerRows.push(summaryHeaderRowIndex);
+  values.push([
+    "Employee",
+    ...monthColumns.map((month) => month.label),
+    "Total Credit"
+  ]);
+  const summaryDataStartRowIndex = values.length;
+  [...summaryRows, totalSummary].forEach((row) => {
+    values.push([
+      row.employee,
+      ...monthColumns.map((month) => numberOrBlank(row.months[month.key])),
+      numberOrBlank(row.totalCredit)
+    ]);
+  });
+  const summaryDataEndRowIndex = values.length;
+  const summaryTotalRowIndex = summaryDataEndRowIndex - 1;
+
+  return {
+    values,
+    sectionRows,
+    headerRows,
+    rowCount: values.length,
+    dataLineCount: sortedRows.length,
+    employeeCount: summaryRows.length,
+    includedCreditTotal: totalSummary.totalCredit,
+    cancelledExcludedTotal: totalSummary.cancelledExcluded,
+    summary: {
+      headerRowIndex: summaryHeaderRowIndex,
+      dataStartRowIndex: summaryDataStartRowIndex,
+      dataEndRowIndex: summaryDataEndRowIndex,
+      totalRowIndex: summaryTotalRowIndex,
+      currencyStartColumnIndex: 1,
+      currencyEndColumnIndex: monthColumns.length + 2
+    }
+  };
+}
+
+async function buildEmployeeCreditsReport(connection, { generatedAt = new Date() } = {}) {
+  const rows = await loadEmployeeCreditOrderRows(connection, DASHBOARD_EMPLOYEE_CREDITS_YEAR);
+  return buildEmployeeCreditsReportValues({
+    rows,
+    year: DASHBOARD_EMPLOYEE_CREDITS_YEAR,
+    generatedAt
+  });
+}
+
+function pushEmployeeCreditNumberFormatRequest(
+  requests,
+  sheetId,
+  {
+    startRowIndex,
+    endRowIndex,
+    startColumnIndex,
+    endColumnIndex,
+    type = "CURRENCY",
+    pattern = "$#,##0.00"
+  }
+) {
+  if (
+    !Number.isFinite(startRowIndex) ||
+    !Number.isFinite(endRowIndex) ||
+    !Number.isFinite(startColumnIndex) ||
+    !Number.isFinite(endColumnIndex) ||
+    endRowIndex <= startRowIndex ||
+    endColumnIndex <= startColumnIndex
+  ) {
+    return;
+  }
+  requests.push({
+    repeatCell: {
+      range: { sheetId, startRowIndex, endRowIndex, startColumnIndex, endColumnIndex },
+      cell: {
+        userEnteredFormat: {
+          numberFormat: { type, pattern }
+        }
+      },
+      fields: "userEnteredFormat.numberFormat"
+    }
+  });
+}
+
+async function writeEmployeeCreditsReportToSheet(
+  accessToken,
+  report,
+  {
+    targetTitle = DASHBOARD_EMPLOYEE_CREDITS_TARGET_TITLE,
+    placeAfterTitle = DASHBOARD_V2_TARGET_TITLE
+  } = {}
+) {
+  const values = report?.values || [["Employee Credit Report"]];
+  const sheetMetadata = await getOrCreateSheetMetadata(
+    accessToken,
+    DASHBOARD_SHEET_ID,
+    targetTitle,
+    { afterTitle: placeAfterTitle }
+  );
+  const sheetProperties = sheetMetadata.properties;
+  const sheetId = Number(sheetProperties?.sheetId);
+  const maxRows = Math.max(values.length, 1);
+  const maxCols = Math.max(...values.map((row) => row.length), 1);
+  const gridRowCount = Math.max(Number(sheetProperties?.gridProperties?.rowCount || 0), maxRows, 1);
+  const gridColumnCount = Math.max(Number(sheetProperties?.gridProperties?.columnCount || 0), maxCols, 1);
+
+  await sheetsRequest(
+    accessToken,
+    "POST",
+    `https://sheets.googleapis.com/v4/spreadsheets/${DASHBOARD_SHEET_ID}/values/${encodeURIComponent(`${targetTitle}!A:ZZ`)}:clear`,
+    {}
+  );
+  await sheetsRequest(
+    accessToken,
+    "PUT",
+    `https://sheets.googleapis.com/v4/spreadsheets/${DASHBOARD_SHEET_ID}/values/${encodeURIComponent(`${targetTitle}!A1`)}?valueInputOption=USER_ENTERED`,
+    {
+      range: `${targetTitle}!A1`,
+      majorDimension: "ROWS",
+      values
+    }
+  );
+
+  const requests = [
+    {
+      updateSheetProperties: {
+        properties: {
+          sheetId,
+          gridProperties: {
+            frozenRowCount: Math.min((report?.summary?.headerRowIndex ?? 0) + 1, maxRows),
+            frozenColumnCount: Math.min(1, maxCols),
+            rowCount: gridRowCount,
+            columnCount: gridColumnCount
+          }
+        },
+        fields: "gridProperties.frozenRowCount,gridProperties.frozenColumnCount,gridProperties.rowCount,gridProperties.columnCount"
+      }
+    },
+    buildClearSheetBordersRequest(sheetId, gridRowCount, gridColumnCount),
+    {
+      repeatCell: {
+        range: {
+          sheetId,
+          startRowIndex: 0,
+          endRowIndex: gridRowCount,
+          startColumnIndex: 0,
+          endColumnIndex: gridColumnCount
+        },
+        cell: {
+          userEnteredFormat: {
+            backgroundColor: hexColor("#FFFFFF"),
+            textFormat: { foregroundColor: hexColor("#000000"), fontSize: 10, bold: false },
+            horizontalAlignment: "LEFT",
+            verticalAlignment: "MIDDLE",
+            wrapStrategy: "WRAP"
+          }
+        },
+        fields: "userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment,wrapStrategy)"
+      }
+    },
+    {
+      repeatCell: {
+        range: { sheetId, startRowIndex: 0, endRowIndex: 1, startColumnIndex: 0, endColumnIndex: maxCols },
+        cell: {
+          userEnteredFormat: {
+            backgroundColor: hexColor("#1F4E78"),
+            textFormat: { foregroundColor: hexColor("#FFFFFF"), bold: true, fontSize: 12 }
+          }
+        },
+        fields: "userEnteredFormat(backgroundColor,textFormat)"
+      }
+    }
+  ];
+
+  (report?.sectionRows || []).forEach((rowIndex) => {
+    requests.push({
+      repeatCell: {
+        range: { sheetId, startRowIndex: rowIndex, endRowIndex: rowIndex + 1, startColumnIndex: 0, endColumnIndex: maxCols },
+        cell: {
+          userEnteredFormat: {
+            backgroundColor: hexColor("#D9E1F2"),
+            textFormat: { bold: true }
+          }
+        },
+        fields: "userEnteredFormat(backgroundColor,textFormat)"
+      }
+    });
+  });
+
+  (report?.headerRows || []).forEach((rowIndex) => {
+    requests.push({
+      repeatCell: {
+        range: { sheetId, startRowIndex: rowIndex, endRowIndex: rowIndex + 1, startColumnIndex: 0, endColumnIndex: maxCols },
+        cell: {
+          userEnteredFormat: {
+            backgroundColor: hexColor("#2F75B5"),
+            textFormat: { foregroundColor: hexColor("#FFFFFF"), bold: true },
+            horizontalAlignment: "CENTER"
+          }
+        },
+        fields: "userEnteredFormat(backgroundColor,textFormat,horizontalAlignment)"
+      }
+    });
+  });
+
+  if (Number.isFinite(report?.summary?.totalRowIndex)) {
+    requests.push({
+      repeatCell: {
+        range: {
+          sheetId,
+          startRowIndex: report.summary.totalRowIndex,
+          endRowIndex: report.summary.totalRowIndex + 1,
+          startColumnIndex: 0,
+          endColumnIndex: maxCols
+        },
+        cell: {
+          userEnteredFormat: {
+            textFormat: { bold: true },
+            backgroundColor: hexColor("#EAF2F8")
+          }
+        },
+        fields: "userEnteredFormat(textFormat,backgroundColor)"
+      }
+    });
+  }
+
+  pushEmployeeCreditNumberFormatRequest(requests, sheetId, {
+    startRowIndex: report.summary.dataStartRowIndex,
+    endRowIndex: report.summary.dataEndRowIndex,
+    startColumnIndex: report.summary.currencyStartColumnIndex,
+    endColumnIndex: report.summary.currencyEndColumnIndex
+  });
+
+  [
+    { startIndex: 0, pixelSize: 170 },
+    { startIndex: 1, pixelSize: 110 },
+    { startIndex: 2, pixelSize: 180 },
+    { startIndex: 3, pixelSize: 260 },
+    { startIndex: 4, pixelSize: 110 },
+    { startIndex: 5, pixelSize: 110 },
+    { startIndex: 6, pixelSize: 90 },
+    { startIndex: 7, pixelSize: 105 },
+    { startIndex: 8, pixelSize: 105 },
+    { startIndex: 9, pixelSize: 115 },
+    { startIndex: 10, pixelSize: 115 },
+    { startIndex: 11, pixelSize: 125 },
+    { startIndex: 12, pixelSize: 105 },
+    { startIndex: 13, pixelSize: 110 },
+    { startIndex: 14, pixelSize: 110 },
+    { startIndex: 15, pixelSize: 110 },
+    { startIndex: 16, pixelSize: 120 },
+    { startIndex: 17, pixelSize: 130 },
+    { startIndex: 18, pixelSize: 70 }
+  ].forEach((column) => {
+    if (column.startIndex >= maxCols) return;
+    requests.push({
+      updateDimensionProperties: {
+        range: {
+          sheetId,
+          dimension: "COLUMNS",
+          startIndex: column.startIndex,
+          endIndex: Math.min(column.startIndex + 1, maxCols)
+        },
+        properties: { pixelSize: column.pixelSize },
+        fields: "pixelSize"
+      }
+    });
+  });
 
   await sheetsRequest(
     accessToken,
@@ -4008,6 +5796,19 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       buildSubscriberWeeklyMap(weeks),
       buildTimesheetWeeklyMap(weeks)
     ]);
+    const monthlyDashboardInputs = buildMonthlyDashboardInputs({
+      weeks,
+      publishableWeekStarts,
+      manualValueMap,
+      weeklyKpiMap,
+      vendorWeeklyMap,
+      timesheetWeeklyMap: timesheetResult.map || {},
+      subscriberWeeklyMap
+    });
+    const monthlySummaryPeriods = buildDashboardV2SummaryPeriods(
+      monthlyDashboardInputs.months,
+      monthlyDashboardInputs.publishableMonthStarts
+    );
     reportProgress({
       phaseKey: "compute",
       phaseLabel: "Compute Metrics",
@@ -4015,7 +5816,12 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       percent: 80,
       message: "Loading QBO reconciliation metrics"
     });
-    const qboResult = await loadDashboardQboPeriodMetrics(summaryPeriods, { connection });
+    const qboPeriods = dedupeDashboardPeriods([
+      ...summaryPeriods,
+      ...monthlySummaryPeriods,
+      ...monthlyDashboardInputs.months
+    ]);
+    const qboResult = await loadDashboardQboPeriodMetrics(qboPeriods, { connection });
     dashboardWarnings.push(...(qboResult.warnings || []));
 
     const { values, metricRows, sectionRows, packWagesSalesChart } = buildDashboardRows(
@@ -4031,6 +5837,20 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       qboResult.map || {},
       customManualRows
     );
+    const monthlyDashboard = buildDashboardV2Rows({
+      months: monthlyDashboardInputs.months,
+      summaryPeriods: monthlySummaryPeriods,
+      manualValueMap: monthlyDashboardInputs.manualValueMap,
+      monthlyKpiMap: monthlyDashboardInputs.weeklyKpiMap,
+      monthlyVendorMap: monthlyDashboardInputs.vendorWeeklyMap,
+      monthlyTimesheetMap: monthlyDashboardInputs.timesheetWeeklyMap,
+      monthlySubscriberMap: monthlyDashboardInputs.subscriberWeeklyMap,
+      qboPeriodMap: qboResult.map || {},
+      generatedAt: startedAt
+    });
+    const employeeCreditsReport = await buildEmployeeCreditsReport(connection, {
+      generatedAt: startedAt
+    });
 
     const missingSubscriberWeeks = weeks
       .filter(
@@ -4064,13 +5884,51 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       values,
       metricRows,
       sectionRows,
-      packWagesSalesChart
+      packWagesSalesChart,
+      { targetTitle: DASHBOARD_TARGET_TITLE }
     );
+
+    reportProgress({
+      phaseKey: "publish",
+      phaseLabel: "Publish Dashboard",
+      status: "running",
+      percent: 45,
+      message: `Writing ${DASHBOARD_V2_TARGET_TITLE} to Google Sheets`
+    });
+
+    await writeDashboardToSheet(
+      accessToken,
+      monthlyDashboard.values,
+      monthlyDashboard.metricRows,
+      monthlyDashboard.sectionRows,
+      monthlyDashboard.packWagesSalesChart,
+      {
+        targetTitle: DASHBOARD_V2_TARGET_TITLE,
+        placeAfterTitle: DASHBOARD_TARGET_TITLE,
+        frozenColumnCount: DASHBOARD_STATIC_COLUMN_COUNT,
+        weekStartColumnIndex: DASHBOARD_STATIC_COLUMN_COUNT
+      }
+    );
+
+    reportProgress({
+      phaseKey: "publish",
+      phaseLabel: "Publish Dashboard",
+      status: "running",
+      percent: 80,
+      message: `Writing ${DASHBOARD_EMPLOYEE_CREDITS_TARGET_TITLE} to Google Sheets`
+    });
+
+    await writeEmployeeCreditsReportToSheet(accessToken, employeeCreditsReport, {
+      targetTitle: DASHBOARD_EMPLOYEE_CREDITS_TARGET_TITLE,
+      placeAfterTitle: DASHBOARD_V2_TARGET_TITLE
+    });
 
     const finishedAt = new Date();
     const summary = {
       spreadsheetId: DASHBOARD_SHEET_ID,
       targetTitle: DASHBOARD_TARGET_TITLE,
+      v2TargetTitle: DASHBOARD_V2_TARGET_TITLE,
+      employeeCreditsTargetTitle: DASHBOARD_EMPLOYEE_CREDITS_TARGET_TITLE,
       sourceGid: DASHBOARD_SOURCE_GID,
       weekCount: weeks.length,
       sourceWeekCount: sourceWeeks.length,
@@ -4091,6 +5949,13 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       })),
       qboStatus: qboResult.source,
       rowCount: values.length,
+      v2RowCount: monthlyDashboard.values.length,
+      v2MonthCount: monthlyDashboardInputs.months.length,
+      employeeCreditsRowCount: employeeCreditsReport.rowCount,
+      employeeCreditsLineCount: employeeCreditsReport.dataLineCount,
+      employeeCreditsEmployeeCount: employeeCreditsReport.employeeCount,
+      employeeCreditsIncludedCreditTotal: employeeCreditsReport.includedCreditTotal,
+      employeeCreditsCancelledExcludedTotal: employeeCreditsReport.cancelledExcludedTotal,
       latestWeekStart: availability.publishableThroughWeekStart || null,
       latestWeekEnd: availability.publishableThroughWeekStart
         ? addDaysYmd(availability.publishableThroughWeekStart, 6)
@@ -4128,7 +5993,7 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       lastStatus: "completed",
       lastMessage: dashboardWarnings.length
         ? `Published dashboard with warning: ${dashboardWarnings[0]}`
-        : `Published ${values.length} dashboard rows`,
+        : `Published ${values.length} dashboard rows, ${monthlyDashboard.values.length} monthly v2 rows, and ${employeeCreditsReport.dataLineCount} employee credit lines`,
       summaryJson: stringifyJson(summary),
       updatedAt: finishedAt
     });
@@ -4139,8 +6004,8 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       status: "completed",
       percent: 100,
       message: dashboardWarnings.length
-        ? `Published ${DASHBOARD_TARGET_TITLE} with warnings`
-        : `Published ${DASHBOARD_TARGET_TITLE}`
+        ? `Published ${DASHBOARD_TARGET_TITLE}, ${DASHBOARD_V2_TARGET_TITLE}, and ${DASHBOARD_EMPLOYEE_CREDITS_TARGET_TITLE} with warnings`
+        : `Published ${DASHBOARD_TARGET_TITLE}, ${DASHBOARD_V2_TARGET_TITLE}, and ${DASHBOARD_EMPLOYEE_CREDITS_TARGET_TITLE}`
     });
     reportProgress({
       phaseKey: "finalize",

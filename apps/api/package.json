@@ -20,7 +20,8 @@
     "sync:localline-automation": "node --env-file=../../.env scripts/runLocalLineAutomation.js",
     "publish:dashboard": "node --env-file=../../.env scripts/runLocalLineAutomation.js --mode=dashboard",
     "check:qbo": "node --env-file=../../.env scripts/checkQboConnection.js",
-    "sync:timesheets-users": "node scripts/syncTimesheetsUsers.js"
+    "sync:timesheets-users": "node scripts/syncTimesheetsUsers.js",
+    "import:ga4-subscribe-visits": "node scripts/importGa4SubscribeVisits.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.540.0",

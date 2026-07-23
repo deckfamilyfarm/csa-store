@@ -1,12 +1,23 @@
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+import xlsx from "xlsx";
 import { getPool } from "../db.js";
 import {
   DEFAULT_QBO_ENTITY_ID,
   buildQboClientConfig,
+  getQboPathEnv,
   getQboEntityId,
   getQboEntityName,
   getQboEnv
 } from "./qboConfig.js";
 import { QuickBooksClient } from "./quickBooksClient.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const repoRoot = path.resolve(__dirname, "../../..");
+const DEFAULT_QBO_BACKUP_CSV_PATH = path.resolve(repoRoot, "apps/api/data/qbo/fullfarmcsa.csv");
+const QBO_BACKUP_MONTH_LABELS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 function round2(value) {
   return Math.round((Number(value) || 0) * 100) / 100;
@@ -80,12 +91,475 @@ function extractReportLinesTotal(report, labels = []) {
   return total;
 }
 
+function isExpenseSection(row) {
+  const label = normalizeReportLabel(row?.Header?.ColData?.[0]?.value);
+  return label.includes("expense");
+}
+
+function isIncomeSection(row) {
+  const label = normalizeReportLabel(row?.Header?.ColData?.[0]?.value);
+  return label.includes("income") && !label.includes("other");
+}
+
+function isPayrollExpenseLabel(value) {
+  const label = normalizeReportLabel(value);
+  return /\b(payroll|labor|labour|wage|wages|employer taxes|employee bonus)\b/.test(label);
+}
+
+function extractQboIncomeLines(report) {
+  const lines = [];
+  for (const section of getReportRows(report)) {
+    if (!isIncomeSection(section)) continue;
+    for (const row of section?.Rows?.Row || []) {
+      const label = getReportRowLabel(row);
+      if (!label) continue;
+      const total = round2(getReportRowTotal(row));
+      if (!total) continue;
+      lines.push({ label, total });
+    }
+  }
+  return {
+    incomeLines: lines,
+    incomeLineMap: Object.fromEntries(lines.map((line) => [line.label, line.total]))
+  };
+}
+
+function extractQboExpenseLines(report) {
+  const lines = [];
+  for (const section of getReportRows(report)) {
+    if (!isExpenseSection(section)) continue;
+    for (const row of section?.Rows?.Row || []) {
+      const label = getReportRowLabel(row);
+      if (!label) continue;
+      const total = round2(getReportRowTotal(row));
+      lines.push({
+        label,
+        total,
+        isPayroll: isPayrollExpenseLabel(label)
+      });
+    }
+  }
+  const payrollExpense = round2(
+    lines
+      .filter((line) => line.isPayroll)
+      .reduce((sum, line) => sum + Number(line.total || 0), 0)
+  );
+  const nonLaborExpense = round2(
+    lines
+      .filter((line) => !line.isPayroll)
+      .reduce((sum, line) => sum + Number(line.total || 0), 0)
+  );
+  return {
+    expenseLines: lines,
+    expenseLineMap: Object.fromEntries(lines.map((line) => [line.label, line.total])),
+    payrollExpense,
+    nonLaborExpense
+  };
+}
+
+function parseRawReport(value) {
+  if (!value) return null;
+  try {
+    return typeof value === "string" ? JSON.parse(value) : value;
+  } catch (_error) {
+    return null;
+  }
+}
+
+function formatDateYmd(date) {
+  return date.toISOString().slice(0, 10);
+}
+
+function getMonthEndYmd(monthStart) {
+  const match = String(monthStart || "").match(/^(\d{4})-(\d{2})-01$/);
+  if (!match) return "";
+  return formatDateYmd(new Date(Date.UTC(Number(match[1]), Number(match[2]), 0)));
+}
+
+function addMonthsYmd(monthStart, count = 1) {
+  const match = String(monthStart || "").match(/^(\d{4})-(\d{2})-01$/);
+  if (!match) return "";
+  return formatDateYmd(new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1 + count, 1)));
+}
+
+function getWholeMonthStartsForPeriod(start, end) {
+  const startValue = String(start || "");
+  const endValue = String(end || "");
+  const endMatch = endValue.match(/^(\d{4})-(\d{2})-\d{2}$/);
+  if (!/^\d{4}-\d{2}-01$/.test(startValue)) return [];
+  if (!endMatch) return [];
+  if (getMonthEndYmd(`${endMatch[1]}-${endMatch[2]}-01`) !== endValue) return [];
+
+  const months = [];
+  let monthStart = startValue;
+  while (monthStart && monthStart <= endValue) {
+    months.push(monthStart);
+    monthStart = addMonthsYmd(monthStart, 1);
+    if (months.length > 240) return [];
+  }
+  return months;
+}
+
+function parseQboBackupMonthHeader(value) {
+  const raw = String(value || "").trim();
+  const labelMatch = raw.match(/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{4})$/i);
+  const dateMatch = raw.match(/^(\d{1,2})\/1\/(\d{2}|\d{4})$/);
+  let monthIndex = -1;
+  let year = null;
+  if (labelMatch) {
+    monthIndex = QBO_BACKUP_MONTH_LABELS.findIndex(
+      (label) => label.toLowerCase() === labelMatch[1].toLowerCase()
+    );
+    year = Number(labelMatch[2]);
+  } else if (dateMatch) {
+    monthIndex = Number(dateMatch[1]) - 1;
+    year = Number(dateMatch[2]);
+    if (year < 100) year += year >= 70 ? 1900 : 2000;
+  }
+  if (monthIndex < 0 || monthIndex > 11 || !Number.isFinite(year)) return null;
+  const monthStart = `${year}-${String(monthIndex + 1).padStart(2, "0")}-01`;
+  return {
+    label: `${QBO_BACKUP_MONTH_LABELS[monthIndex]} ${year}`,
+    monthStart,
+    monthEnd: getMonthEndYmd(monthStart)
+  };
+}
+
+function normalizeCsvReportLabel(value) {
+  return String(value || "").trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function findCsvReportRow(rows = [], labels = []) {
+  const targets = new Set(labels.map((label) => normalizeCsvReportLabel(label)).filter(Boolean));
+  return rows.find((row) => targets.has(normalizeCsvReportLabel(row?.[0]))) || null;
+}
+
+function getCsvRowValue(row, columnIndex) {
+  if (!row) return 0;
+  return parseReportNumber(row[columnIndex]);
+}
+
+function getCsvRowMonthValues(row, monthColumns = []) {
+  return Object.fromEntries(
+    monthColumns.map((month) => [month.monthStart, round2(getCsvRowValue(row, month.columnIndex))])
+  );
+}
+
+function addMonthlyValues(target, source = {}) {
+  Object.entries(source || {}).forEach(([monthStart, value]) => {
+    target[monthStart] = round2(Number(target[monthStart] || 0) + Number(value || 0));
+  });
+}
+
+function buildQboBackupMetric({
+  entityId,
+  entityName,
+  source,
+  fetchedAt,
+  income = 0,
+  cogs = 0,
+  grossProfit = null,
+  expenses = 0,
+  otherIncome = 0,
+  netIncome = 0,
+  memberPayments = 0,
+  payrollExpense = 0,
+  incomeLines = [],
+  expenseLines = []
+} = {}) {
+  const incomeLineMap = Object.fromEntries(
+    incomeLines.map((line) => [line.label, round2(line.total)])
+  );
+  const expenseLineMap = Object.fromEntries(
+    expenseLines.map((line) => [line.label, round2(line.total)])
+  );
+  const nonLaborExpense = round2(
+    expenseLines
+      .filter((line) => !line.isPayroll)
+      .reduce((sum, line) => sum + Number(line.total || 0), 0)
+  );
+  return {
+    entityId,
+    entityName,
+    income: round2(income),
+    cogs: round2(cogs),
+    grossProfit: round2(grossProfit === null || typeof grossProfit === "undefined" ? income - cogs : grossProfit),
+    expenses: round2(expenses),
+    otherIncome: round2(otherIncome),
+    netIncome: round2(netIncome),
+    memberPayments: round2(memberPayments),
+    incomeLines: incomeLines.map((line) => ({
+      label: line.label,
+      total: round2(line.total)
+    })),
+    incomeLineMap,
+    expenseLines: expenseLines.map((line) => ({
+      label: line.label,
+      total: round2(line.total),
+      isPayroll: Boolean(line.isPayroll)
+    })),
+    expenseLineMap,
+    payrollExpense: round2(payrollExpense),
+    nonLaborExpense,
+    fetchedAt,
+    source
+  };
+}
+
+function collectQboBackupIncomeLines(rows = [], monthColumns = []) {
+  const incomeStartIndex = rows.findIndex((row) => normalizeCsvReportLabel(row?.[0]) === "income");
+  const incomeEndIndex = rows.findIndex(
+    (row, index) => index > incomeStartIndex && normalizeCsvReportLabel(row?.[0]) === "total for income"
+  );
+  if (incomeStartIndex < 0 || incomeEndIndex < 0) return [];
+
+  const incomeLines = [];
+  for (let index = incomeStartIndex + 1; index < incomeEndIndex; index += 1) {
+    const row = rows[index];
+    const label = String(row?.[0] || "").trim();
+    const normalizedLabel = normalizeCsvReportLabel(label);
+    if (!label || normalizedLabel.startsWith("total for ")) continue;
+
+    const values = getCsvRowMonthValues(row, monthColumns);
+    const total = round2(Object.values(values).reduce((sum, value) => sum + Number(value || 0), 0));
+    if (!total) continue;
+    incomeLines.push({ label, values, total });
+  }
+
+  return incomeLines;
+}
+
+function collectQboBackupExpenseLines(rows = [], monthColumns = []) {
+  const expenseStartIndex = rows.findIndex((row) => normalizeCsvReportLabel(row?.[0]) === "expenses");
+  const expenseEndIndex = rows.findIndex(
+    (row, index) => index > expenseStartIndex && normalizeCsvReportLabel(row?.[0]) === "total for expenses"
+  );
+  if (expenseStartIndex < 0 || expenseEndIndex < 0) {
+    return { expenseLines: [], extraPayrollValues: {} };
+  }
+
+  const expenseLines = [];
+  const extraPayrollValues = {};
+  let inPayrollSection = false;
+  for (let index = expenseStartIndex + 1; index < expenseEndIndex; index += 1) {
+    const row = rows[index];
+    const label = String(row?.[0] || "").trim();
+    const normalizedLabel = normalizeCsvReportLabel(label);
+    if (!label) continue;
+
+    if (normalizedLabel === "payroll expenses") {
+      inPayrollSection = true;
+      continue;
+    }
+    if (normalizedLabel === "total for payroll expenses") {
+      inPayrollSection = false;
+      continue;
+    }
+    if (inPayrollSection || normalizedLabel.startsWith("total for ")) continue;
+
+    const values = getCsvRowMonthValues(row, monthColumns);
+    const total = round2(Object.values(values).reduce((sum, value) => sum + Number(value || 0), 0));
+    if (!total) continue;
+
+    if (isPayrollExpenseLabel(label)) {
+      addMonthlyValues(extraPayrollValues, values);
+      continue;
+    }
+
+    expenseLines.push({
+      label,
+      values,
+      total,
+      isPayroll: false
+    });
+  }
+
+  return { expenseLines, extraPayrollValues };
+}
+
+function readQboBackupCsvMetrics({ entityId, entityName } = {}) {
+  const csvPath = getQboPathEnv("DASHBOARD_QBO_BACKUP_CSV_PATH", DEFAULT_QBO_BACKUP_CSV_PATH);
+  if (!csvPath || !fs.existsSync(csvPath)) return {};
+
+  const stat = fs.statSync(csvPath);
+  const workbook = xlsx.read(fs.readFileSync(csvPath, "utf8"), { type: "string" });
+  const worksheet = workbook.Sheets[workbook.SheetNames?.[0]];
+  if (!worksheet) return {};
+
+  const rows = xlsx.utils.sheet_to_json(worksheet, { header: 1, raw: false, defval: "" });
+  const headerRowIndex = rows.findIndex((row) => row.some((cell) => parseQboBackupMonthHeader(cell)));
+  if (headerRowIndex < 0) return {};
+
+  const monthColumns = rows[headerRowIndex]
+    .map((cell, columnIndex) => {
+      const parsed = parseQboBackupMonthHeader(cell);
+      return parsed ? { ...parsed, columnIndex } : null;
+    })
+    .filter(Boolean);
+  if (!monthColumns.length) return {};
+
+  const incomeValues = getCsvRowMonthValues(findCsvReportRow(rows, ["Total for Income"]), monthColumns);
+  const cogsValues = getCsvRowMonthValues(findCsvReportRow(rows, ["Total for Cost of Goods Sold"]), monthColumns);
+  const grossProfitValues = getCsvRowMonthValues(findCsvReportRow(rows, ["Gross Profit"]), monthColumns);
+  const expensesValues = getCsvRowMonthValues(findCsvReportRow(rows, ["Total for Expenses"]), monthColumns);
+  const netIncomeValues = getCsvRowMonthValues(findCsvReportRow(rows, ["Net Income"]), monthColumns);
+  const memberPaymentsValues = getCsvRowMonthValues(findCsvReportRow(rows, ["Member Payments"]), monthColumns);
+  const payrollValues = getCsvRowMonthValues(findCsvReportRow(rows, ["Total for Payroll Expenses"]), monthColumns);
+  const rawIncomeLines = collectQboBackupIncomeLines(rows, monthColumns);
+  const { expenseLines: rawExpenseLines, extraPayrollValues } = collectQboBackupExpenseLines(rows, monthColumns);
+  addMonthlyValues(payrollValues, extraPayrollValues);
+
+  return Object.fromEntries(
+    monthColumns.map((month) => {
+      const monthIncomeLines = rawIncomeLines
+        .map((line) => ({
+          label: line.label,
+          total: round2(Number(line.values?.[month.monthStart] || 0))
+        }))
+        .filter((line) => line.total);
+      const monthExpenseLines = rawExpenseLines
+        .map((line) => ({
+          label: line.label,
+          total: round2(Number(line.values?.[month.monthStart] || 0)),
+          isPayroll: false
+        }))
+        .filter((line) => line.total);
+      const nonLaborExpense = round2(
+        monthExpenseLines.reduce((sum, line) => sum + Number(line.total || 0), 0)
+      );
+      const expenseRemainder = round2(
+        Number(expensesValues[month.monthStart] || 0) -
+          Number(payrollValues[month.monthStart] || 0) -
+          nonLaborExpense
+      );
+      if (expenseRemainder) {
+        monthExpenseLines.push({
+          label: "Other QBO Expenses",
+          total: expenseRemainder,
+          isPayroll: false
+        });
+      }
+
+      return [
+        month.monthStart,
+        buildQboBackupMetric({
+          entityId,
+          entityName,
+          source: "backup-csv",
+          fetchedAt: stat.mtime.toISOString(),
+          income: incomeValues[month.monthStart],
+          cogs: cogsValues[month.monthStart],
+          grossProfit: grossProfitValues[month.monthStart],
+          expenses: expensesValues[month.monthStart],
+          netIncome: netIncomeValues[month.monthStart],
+          memberPayments: memberPaymentsValues[month.monthStart],
+          payrollExpense: payrollValues[month.monthStart],
+          incomeLines: monthIncomeLines,
+          expenseLines: monthExpenseLines
+        })
+      ];
+    })
+  );
+}
+
+function aggregateQboMetrics(metricsList = [], { entityId, entityName, source, fetchedAt } = {}) {
+  const fields = [
+    "income",
+    "cogs",
+    "grossProfit",
+    "expenses",
+    "otherIncome",
+    "netIncome",
+    "memberPayments",
+    "payrollExpense",
+    "nonLaborExpense"
+  ];
+  const aggregate = Object.fromEntries(fields.map((field) => [field, 0]));
+  const incomeLineMap = new Map();
+  const expenseLineMap = new Map();
+  const expenseLinePayrollFlags = new Map();
+
+  metricsList.forEach((metrics) => {
+    fields.forEach((field) => {
+      aggregate[field] = round2(Number(aggregate[field] || 0) + Number(metrics?.[field] || 0));
+    });
+    (metrics?.incomeLines || []).forEach((line) => {
+      if (!line?.label) return;
+      const label = String(line.label);
+      incomeLineMap.set(label, round2(Number(incomeLineMap.get(label) || 0) + Number(line.total || 0)));
+    });
+    (metrics?.expenseLines || []).forEach((line) => {
+      if (!line?.label) return;
+      const label = String(line.label);
+      expenseLineMap.set(label, round2(Number(expenseLineMap.get(label) || 0) + Number(line.total || 0)));
+      expenseLinePayrollFlags.set(label, Boolean(line.isPayroll));
+    });
+  });
+
+  const incomeLines = [...incomeLineMap.entries()].map(([label, total]) => ({
+    label,
+    total
+  }));
+  const expenseLines = [...expenseLineMap.entries()].map(([label, total]) => ({
+    label,
+    total,
+    isPayroll: Boolean(expenseLinePayrollFlags.get(label))
+  }));
+
+  return buildQboBackupMetric({
+    entityId,
+    entityName,
+    source,
+    fetchedAt,
+    ...aggregate,
+    incomeLines,
+    expenseLines
+  });
+}
+
+function loadBackupQboPeriodMetrics(periods = [], { entityId, entityName } = {}) {
+  let monthlyMetrics = {};
+  try {
+    monthlyMetrics = readQboBackupCsvMetrics({ entityId, entityName });
+  } catch (_error) {
+    return {};
+  }
+
+  return Object.fromEntries(
+    periods
+      .map((period) => {
+        const monthStarts = getWholeMonthStartsForPeriod(period?.start, period?.end);
+        if (!monthStarts.length) return null;
+        const metricsList = monthStarts.map((monthStart) => monthlyMetrics[monthStart]);
+        if (metricsList.some((metrics) => !metrics)) return null;
+        const fetchedAt = metricsList
+          .map((metrics) => metrics?.fetchedAt)
+          .filter(Boolean)
+          .sort()
+          .at(-1);
+        const metrics =
+          metricsList.length === 1
+            ? { ...metricsList[0] }
+            : aggregateQboMetrics(metricsList, {
+                entityId,
+                entityName,
+                source: "backup-csv",
+                fetchedAt
+              });
+        return [period.key, { ...metrics, source: "backup-csv" }];
+      })
+      .filter(Boolean)
+  );
+}
+
 export function parseDashboardPnlReport(report, { entityId = DEFAULT_QBO_ENTITY_ID, entityName = entityId } = {}) {
   let income = 0;
   let cogs = 0;
   let expenses = 0;
   let otherIncome = 0;
   let netIncome = 0;
+  const incomeSummary = extractQboIncomeLines(report);
+  const expenseSummary = extractQboExpenseLines(report);
 
   for (const row of getReportRows(report)) {
     const header = normalizeReportLabel(row?.Header?.ColData?.[0]?.value);
@@ -118,12 +592,17 @@ export function parseDashboardPnlReport(report, { entityId = DEFAULT_QBO_ENTITY_
     expenses: round2(expenses),
     otherIncome: round2(otherIncome),
     netIncome: round2(netIncome),
-    memberPayments: round2(extractReportLinesTotal(report, ["Member Payments"]))
+    memberPayments: round2(extractReportLinesTotal(report, ["Member Payments"])),
+    ...incomeSummary,
+    ...expenseSummary
   };
 }
 
 function fromCacheRow(row) {
   if (!row) return null;
+  const cachedReport = parseRawReport(row.raw_json);
+  const incomeSummary = cachedReport ? extractQboIncomeLines(cachedReport) : {};
+  const expenseSummary = cachedReport ? extractQboExpenseLines(cachedReport) : {};
   return {
     entityId: row.entity_id,
     income: Number(row.income || 0),
@@ -133,6 +612,12 @@ function fromCacheRow(row) {
     otherIncome: Number(row.other_income || 0),
     netIncome: Number(row.net_income || 0),
     memberPayments: Number(row.member_payments || 0),
+    incomeLines: incomeSummary.incomeLines || [],
+    incomeLineMap: incomeSummary.incomeLineMap || {},
+    expenseLines: expenseSummary.expenseLines || [],
+    expenseLineMap: expenseSummary.expenseLineMap || {},
+    payrollExpense: Number(expenseSummary.payrollExpense || 0),
+    nonLaborExpense: Number(expenseSummary.nonLaborExpense || 0),
     fetchedAt: row.fetched_at || null,
     source: "cache"
   };
@@ -167,6 +652,7 @@ async function loadCachedQboPeriodMetrics(periods = [], { connection = null } = 
             other_income,
             net_income,
             member_payments,
+            raw_json,
             fetched_at
           FROM dashboard_qbo_period_metrics
           WHERE period_key IN (${placeholders})
@@ -239,6 +725,16 @@ async function saveCachedQboPeriodMetric(period, entityId, metrics, report, { co
   });
 }
 
+function shouldStopQboLiveAttempts(error) {
+  const message = String(error?.message || error || "").toLowerCase();
+  return (
+    message.includes("qbo token refresh failed") ||
+    message.includes("invalid_grant") ||
+    message.includes("fetch failed") ||
+    message.includes("connect timeout")
+  );
+}
+
 export async function loadDashboardQboPeriodMetrics(periods = [], { connection = null } = {}) {
   const activePeriods = periods.filter(
     (period) => period?.key && period?.start && period?.end && period.started !== false
@@ -247,12 +743,29 @@ export async function loadDashboardQboPeriodMetrics(periods = [], { connection =
 
   const entityId = getQboEntityId();
   const cachedMetrics = await loadCachedQboPeriodMetrics(activePeriods, { connection }).catch(() => ({}));
+  const backupMetrics = loadBackupQboPeriodMetrics(activePeriods, {
+    entityId,
+    entityName: getQboEntityName(entityId)
+  });
+  const fallbackForPeriod = (period) => {
+    if (backupMetrics[period.key]) return { metrics: backupMetrics[period.key], label: "backup CSV values" };
+    if (cachedMetrics[period.key]) return { metrics: cachedMetrics[period.key], label: "cached values" };
+    return null;
+  };
+  const fallbackMap = Object.fromEntries(
+    activePeriods
+      .map((period) => {
+        const fallback = fallbackForPeriod(period);
+        return fallback ? [period.key, fallback.metrics] : null;
+      })
+      .filter(Boolean)
+  );
   const qboEnabled = String(getQboEnv("DASHBOARD_QBO_ENABLED", "true")).toLowerCase() !== "false";
   if (!qboEnabled) {
     return {
-      map: cachedMetrics,
-      warnings: Object.keys(cachedMetrics).length
-        ? ["QBO dashboard metrics are disabled; using cached QBO reconciliation values."]
+      map: fallbackMap,
+      warnings: Object.keys(fallbackMap).length
+        ? ["QBO dashboard metrics are disabled; using local backup/cached QBO reconciliation values."]
         : ["QBO dashboard metrics are disabled; reconciliation rows are blank."],
       source: "disabled"
     };
@@ -262,9 +775,9 @@ export async function loadDashboardQboPeriodMetrics(periods = [], { connection =
   if (!config) {
     const missing = missingEnv.map((key) => `QBO_${entityId}_${key}`).join(", ");
     return {
-      map: cachedMetrics,
-      warnings: Object.keys(cachedMetrics).length
-        ? [`QBO dashboard metrics are using cached values because live config is missing: ${missing}.`]
+      map: fallbackMap,
+      warnings: Object.keys(fallbackMap).length
+        ? [`QBO dashboard metrics are using local backup/cached values because live config is missing: ${missing}.`]
         : [`QBO dashboard metrics are blank because live config is missing: ${missing}.`],
       source: "cache"
     };
@@ -273,8 +786,29 @@ export async function loadDashboardQboPeriodMetrics(periods = [], { connection =
   const client = new QuickBooksClient(config);
   const map = {};
   const warnings = [];
+  let stoppedLiveAttemptsMessage = "";
+  let skippedLivePeriodCount = 0;
+  let skippedLiveBackupCount = 0;
+  let skippedLiveCachedCount = 0;
+  let skippedLiveBlankCount = 0;
 
   for (const period of activePeriods) {
+    if (stoppedLiveAttemptsMessage) {
+      const fallback = fallbackForPeriod(period);
+      if (fallback) {
+        map[period.key] = fallback.metrics;
+        if (fallback.metrics?.source === "backup-csv") {
+          skippedLiveBackupCount += 1;
+        } else {
+          skippedLiveCachedCount += 1;
+        }
+      } else {
+        skippedLiveBlankCount += 1;
+      }
+      skippedLivePeriodCount += 1;
+      continue;
+    }
+
     try {
       const report = await client.fetchProfitAndLoss(period.start, period.end);
       const metrics = parseDashboardPnlReport(report, {
@@ -290,10 +824,14 @@ export async function loadDashboardQboPeriodMetrics(periods = [], { connection =
         );
       }
     } catch (error) {
-      if (cachedMetrics[period.key]) {
-        map[period.key] = cachedMetrics[period.key];
+      if (shouldStopQboLiveAttempts(error)) {
+        stoppedLiveAttemptsMessage = error?.message || String(error);
+      }
+      const fallback = fallbackForPeriod(period);
+      if (fallback) {
+        map[period.key] = fallback.metrics;
         warnings.push(
-          `QBO ${period.label || period.key} metrics used cached values because live fetch failed: ${error?.message || error}`
+          `QBO ${period.label || period.key} metrics used ${fallback.label} because live fetch failed: ${error?.message || error}`
         );
       } else {
         warnings.push(
@@ -301,6 +839,12 @@ export async function loadDashboardQboPeriodMetrics(periods = [], { connection =
         );
       }
     }
+  }
+
+  if (skippedLivePeriodCount) {
+    warnings.push(
+      `QBO live fetch was skipped for ${skippedLivePeriodCount} later periods after an earlier failure: ${stoppedLiveAttemptsMessage}. Backup CSV values used for ${skippedLiveBackupCount}; cached values used for ${skippedLiveCachedCount}; blank for ${skippedLiveBlankCount}.`
+    );
   }
 
   return { map, warnings, source: warnings.length ? "partial" : "live" };
