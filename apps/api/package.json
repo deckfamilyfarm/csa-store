@@ -20,6 +20,7 @@
     "sync:localline-automation": "node --env-file=../../.env scripts/runLocalLineAutomation.js",
     "publish:dashboard": "node --env-file=../../.env scripts/runLocalLineAutomation.js --mode=dashboard",
     "check:qbo": "node --env-file=../../.env scripts/checkQboConnection.js",
+    "qbo:reauthorize": "node --env-file=../../.env scripts/reauthorizeQbo.js",
     "sync:timesheets-users": "node scripts/syncTimesheetsUsers.js",
     "import:ga4-subscribe-visits": "node scripts/importGa4SubscribeVisits.js"
   },

@@ -113,6 +113,47 @@ PM2 helpers
 - `start.sh` builds the frontend and runs one PM2 process named `store` on port 5176.
 - `restart.sh` rebuilds and recreates that PM2 process.
 
+QuickBooks integration authentication and running
+- Purpose: the dashboard uses QuickBooks Online as the accounting source of truth for QBO revenue, COGS, expenses, gross profit, and net-profit rows. Local Line still provides store/order operational data, but QBO is used where the report needs actual accounting totals.
+- Why this is in this repository: the CSA Store dashboard publisher already combines Local Line, member-bank, subscriber, and weekly operating metrics. Keeping the QuickBooks integration here lets one publish flow build the complete dashboard instead of manually joining QBO numbers from a separate reporting project.
+- The Intuit/QuickBooks user account controlling this API integration is `creamycowllc@gmail.com`.
+- Current production QBO entity: `BUSINESS_B` / Full Farm CSA. The configured QBO company realm is `9130350050724666`.
+- If dashboard publish or `npm run check:qbo` fails with `invalid_grant`, the saved QBO refresh token is expired/stale/revoked and the app must be reauthorized.
+- Reauthorization does not require a browser on the machine running the command. The script prints an Intuit authorization URL; open that URL in any browser, approve access to the correct QuickBooks company, then paste the returned callback URL, query string, or authorization code back into the terminal.
+- The redirect URI must already be registered on the Intuit Developer app. The OAuth Playground redirect currently used for manual reauth is:
+  - `https://developer.intuit.com/v2/OAuth2Playground/RedirectUrl`
+
+Running the QuickBooks integration:
+- Test the currently saved token and fetch the default P&L:
+  - `npm run check:qbo`
+- Publish the automated dashboard with the QBO-backed rows:
+  - `npm run publish:dashboard`
+- If QBO auth is broken, reauthorize first, then rerun the dashboard publish command.
+
+Interactive local or server flow:
+1. SSH to the server if needed, then `cd` into this repo.
+2. Make sure the server has the current code containing `qbo:reauthorize`.
+3. Run:
+   - `npm run qbo:reauthorize -- --redirect-uri=https://developer.intuit.com/v2/OAuth2Playground/RedirectUrl`
+4. Copy the printed `https://appcenter.intuit.com/connect/oauth2?...` URL into your browser.
+5. Sign in to Intuit/QuickBooks and select/approve the Full Farm CSA company.
+6. Paste the full redirected callback URL or just the authorization code back into the same terminal prompt.
+7. The script exchanges the code, saves the new refresh token, runs a QBO connection test, and then prompts to reauthorize again, test again, or quit.
+
+Useful one-off commands:
+- Print a URL and exit without the interactive prompt:
+  - `npm run qbo:reauthorize -- --redirect-uri=https://developer.intuit.com/v2/OAuth2Playground/RedirectUrl --print-url-only`
+- Exchange a code directly:
+  - `npm run qbo:reauthorize -- --code=PASTE_CODE_HERE --realm-id=9130350050724666`
+- Test the currently saved token without pulling a full P&L report:
+  - `npm run qbo:reauthorize -- --test --skip-report`
+
+Token storage notes
+- The script writes the new refresh token to `.qbo/qbo-refresh.json`.
+- If a fallback token store is configured, such as `../accounting-reports/tokens/qbo-refresh.json`, it writes there too so the sibling accounting reports app stays in sync.
+- Do not commit token files. They are local/server secrets.
+- Avoid running multiple QBO refresh/reauthorization jobs at the same time on different machines. Intuit rotates refresh tokens; using an old token after a newer one has been issued can trigger another `invalid_grant`.
+
 Store pricelist sync
 - Preview the store master pricelist export with `npm run export:master-pricelist:preview`.
 - Run the store master pricelist export with `npm run export:master-pricelist`.

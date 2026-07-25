@@ -16,7 +16,8 @@
     "sync:localline-full:checked": "npm run sync:localline-full -- && npm run verify:localline-sync",
     "sync:localline-automation": "node --env-file=.env apps/api/scripts/runLocalLineAutomation.js",
     "publish:dashboard": "node --env-file=.env apps/api/scripts/runLocalLineAutomation.js --mode=dashboard",
-    "check:qbo": "npm --prefix apps/api run check:qbo --"
+    "check:qbo": "npm --prefix apps/api run check:qbo --",
+    "qbo:reauthorize": "npm --prefix apps/api run qbo:reauthorize --"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

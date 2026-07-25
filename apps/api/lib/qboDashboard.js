@@ -106,6 +106,48 @@ function isPayrollExpenseLabel(value) {
   return /\b(payroll|labor|labour|wage|wages|employer taxes|employee bonus)\b/.test(label);
 }
 
+function isOwnerPayrollExpenseLabel(value) {
+  const label = normalizeReportLabel(value);
+  return (
+    label === "payroll expenses owner" ||
+    label === "owner payroll expenses" ||
+    label === "owner payroll" ||
+    (label.includes("owner") && /\b(payroll|wage|wages|tax|taxes)\b/.test(label))
+  );
+}
+
+function extractOwnerPayrollExpense(report) {
+  let parentTotal = 0;
+  let childTotal = 0;
+  let foundParent = false;
+
+  const visit = (row) => {
+    if (!row) return;
+    const label = getReportRowLabel(row);
+    const normalizedLabel = normalizeReportLabel(label);
+    const isOwnerParent =
+      normalizedLabel === "payroll expenses owner" ||
+      normalizedLabel === "owner payroll expenses" ||
+      normalizedLabel === "owner payroll";
+
+    if (isOwnerParent) {
+      parentTotal += getReportRowTotal(row);
+      foundParent = true;
+      return;
+    }
+
+    if (isOwnerPayrollExpenseLabel(label)) {
+      childTotal += getReportRowTotal(row);
+    }
+
+    const children = row?.Rows?.Row || [];
+    children.forEach(visit);
+  };
+
+  getReportRows(report).forEach(visit);
+  return round2(foundParent ? parentTotal : childTotal);
+}
+
 function extractQboIncomeLines(report) {
   const lines = [];
   for (const section of getReportRows(report)) {
@@ -132,10 +174,12 @@ function extractQboExpenseLines(report) {
       const label = getReportRowLabel(row);
       if (!label) continue;
       const total = round2(getReportRowTotal(row));
+      const isPayroll = isPayrollExpenseLabel(label);
       lines.push({
         label,
         total,
-        isPayroll: isPayrollExpenseLabel(label)
+        isPayroll,
+        isOwnerPayroll: isOwnerPayrollExpenseLabel(label)
       });
     }
   }
@@ -149,10 +193,19 @@ function extractQboExpenseLines(report) {
       .filter((line) => !line.isPayroll)
       .reduce((sum, line) => sum + Number(line.total || 0), 0)
   );
+  const ownerPayrollExpense = round2(
+    lines
+      .filter((line) => line.isOwnerPayroll)
+      .reduce((sum, line) => sum + Number(line.total || 0), 0)
+  );
+  const resolvedOwnerPayrollExpense = ownerPayrollExpense || extractOwnerPayrollExpense(report);
   return {
     expenseLines: lines,
     expenseLineMap: Object.fromEntries(lines.map((line) => [line.label, line.total])),
     payrollExpense,
+    payrollEmployeeExpense: round2(payrollExpense - resolvedOwnerPayrollExpense),
+    payrollEmployerExpense: round2(resolvedOwnerPayrollExpense),
+    ownerPayrollExpense: resolvedOwnerPayrollExpense,
     nonLaborExpense
   };
 }
@@ -261,9 +314,15 @@ function buildQboBackupMetric({
   grossProfit = null,
   expenses = 0,
   otherIncome = 0,
+  otherExpenses = 0,
+  otherIncomeExpenses = null,
+  netOperatingIncome = null,
   netIncome = 0,
   memberPayments = 0,
   payrollExpense = 0,
+  payrollEmployeeExpense = 0,
+  payrollEmployerExpense = 0,
+  ownerPayrollExpense = 0,
   incomeLines = [],
   expenseLines = []
 } = {}) {
@@ -278,6 +337,7 @@ function buildQboBackupMetric({
       .filter((line) => !line.isPayroll)
       .reduce((sum, line) => sum + Number(line.total || 0), 0)
   );
+  const hasPayrollSplit = Boolean(Number(payrollEmployeeExpense || 0) || Number(payrollEmployerExpense || 0));
   return {
     entityId,
     entityName,
@@ -286,6 +346,17 @@ function buildQboBackupMetric({
     grossProfit: round2(grossProfit === null || typeof grossProfit === "undefined" ? income - cogs : grossProfit),
     expenses: round2(expenses),
     otherIncome: round2(otherIncome),
+    otherExpenses: round2(otherExpenses),
+    otherIncomeExpenses: round2(
+      otherIncomeExpenses === null || typeof otherIncomeExpenses === "undefined"
+        ? Number(otherIncome || 0) - Number(otherExpenses || 0)
+        : otherIncomeExpenses
+    ),
+    netOperatingIncome: round2(
+      netOperatingIncome === null || typeof netOperatingIncome === "undefined"
+        ? Number(income || 0) - Number(cogs || 0) - Number(expenses || 0)
+        : netOperatingIncome
+    ),
     netIncome: round2(netIncome),
     memberPayments: round2(memberPayments),
     incomeLines: incomeLines.map((line) => ({
@@ -296,10 +367,14 @@ function buildQboBackupMetric({
     expenseLines: expenseLines.map((line) => ({
       label: line.label,
       total: round2(line.total),
-      isPayroll: Boolean(line.isPayroll)
+      isPayroll: Boolean(line.isPayroll),
+      isOwnerPayroll: Boolean(line.isOwnerPayroll)
     })),
     expenseLineMap,
     payrollExpense: round2(payrollExpense),
+    payrollEmployeeExpense: round2(hasPayrollSplit ? payrollEmployeeExpense : payrollExpense),
+    payrollEmployerExpense: round2(payrollEmployerExpense),
+    ownerPayrollExpense: round2(ownerPayrollExpense),
     nonLaborExpense,
     fetchedAt,
     source
@@ -335,34 +410,90 @@ function collectQboBackupExpenseLines(rows = [], monthColumns = []) {
     (row, index) => index > expenseStartIndex && normalizeCsvReportLabel(row?.[0]) === "total for expenses"
   );
   if (expenseStartIndex < 0 || expenseEndIndex < 0) {
-    return { expenseLines: [], extraPayrollValues: {} };
+    return {
+      expenseLines: [],
+      extraPayrollValues: {},
+      ownerPayrollValues: {},
+      employeePayrollValues: {},
+      employerPayrollValues: {}
+    };
   }
 
   const expenseLines = [];
   const extraPayrollValues = {};
+  const ownerPayrollValues = {};
+  const employeePayrollValues = {};
+  const employerPayrollValues = {};
+  let pendingOwnerPayrollValues = {};
   let inPayrollSection = false;
+  let inOwnerPayrollSection = false;
   for (let index = expenseStartIndex + 1; index < expenseEndIndex; index += 1) {
     const row = rows[index];
     const label = String(row?.[0] || "").trim();
     const normalizedLabel = normalizeCsvReportLabel(label);
     if (!label) continue;
 
+    if (inOwnerPayrollSection && normalizedLabel === "total for payroll expenses owner") {
+      const values = getCsvRowMonthValues(row, monthColumns);
+      addMonthlyValues(ownerPayrollValues, values);
+      addMonthlyValues(employerPayrollValues, values);
+      addMonthlyValues(extraPayrollValues, values);
+      pendingOwnerPayrollValues = {};
+      inOwnerPayrollSection = false;
+      continue;
+    }
     if (normalizedLabel === "payroll expenses") {
+      const values = getCsvRowMonthValues(row, monthColumns);
+      addMonthlyValues(employeePayrollValues, values);
       inPayrollSection = true;
+      continue;
+    }
+    if (
+      normalizedLabel === "payroll expenses owner" ||
+      normalizedLabel === "owner payroll expenses" ||
+      normalizedLabel === "owner payroll"
+    ) {
+      inOwnerPayrollSection = true;
+      pendingOwnerPayrollValues = {};
       continue;
     }
     if (normalizedLabel === "total for payroll expenses") {
       inPayrollSection = false;
       continue;
     }
-    if (inPayrollSection || normalizedLabel.startsWith("total for ")) continue;
+    if (inOwnerPayrollSection) {
+      const values = getCsvRowMonthValues(row, monthColumns);
+      addMonthlyValues(employerPayrollValues, values);
+      addMonthlyValues(pendingOwnerPayrollValues, values);
+      continue;
+    }
+
+    if (inPayrollSection) {
+      const values = getCsvRowMonthValues(row, monthColumns);
+      if (normalizedLabel === "employee wages" || normalizedLabel === "employer taxes") {
+        addMonthlyValues(ownerPayrollValues, values);
+        addMonthlyValues(employerPayrollValues, values);
+      } else {
+        addMonthlyValues(employeePayrollValues, values);
+      }
+      continue;
+    }
+    if (normalizedLabel.startsWith("total for ")) continue;
 
     const values = getCsvRowMonthValues(row, monthColumns);
     const total = round2(Object.values(values).reduce((sum, value) => sum + Number(value || 0), 0));
     if (!total) continue;
 
+    if (isOwnerPayrollExpenseLabel(label)) {
+      addMonthlyValues(ownerPayrollValues, values);
+      addMonthlyValues(extraPayrollValues, values);
+      addMonthlyValues(employerPayrollValues, values);
+      continue;
+    }
+
     if (isPayrollExpenseLabel(label)) {
       addMonthlyValues(extraPayrollValues, values);
+      addMonthlyValues(employeePayrollValues, values);
       continue;
     }
 
@@ -374,7 +505,17 @@ function collectQboBackupExpenseLines(rows = [], monthColumns = []) {
     });
   }
 
-  return { expenseLines, extraPayrollValues };
+  addMonthlyValues(ownerPayrollValues, pendingOwnerPayrollValues);
+  addMonthlyValues(employerPayrollValues, pendingOwnerPayrollValues);
+  addMonthlyValues(extraPayrollValues, pendingOwnerPayrollValues);
+
+  return {
+    expenseLines,
+    extraPayrollValues,
+    ownerPayrollValues,
+    employeePayrollValues,
+    employerPayrollValues
+  };
 }
 
 function readQboBackupCsvMetrics({ entityId, entityName } = {}) {
@@ -402,11 +543,21 @@ function readQboBackupCsvMetrics({ entityId, entityName } = {}) {
   const cogsValues = getCsvRowMonthValues(findCsvReportRow(rows, ["Total for Cost of Goods Sold"]), monthColumns);
   const grossProfitValues = getCsvRowMonthValues(findCsvReportRow(rows, ["Gross Profit"]), monthColumns);
   const expensesValues = getCsvRowMonthValues(findCsvReportRow(rows, ["Total for Expenses"]), monthColumns);
+  const netOperatingIncomeValues = getCsvRowMonthValues(
+    findCsvReportRow(rows, ["Net Operating Income"]),
+    monthColumns
+  );
   const netIncomeValues = getCsvRowMonthValues(findCsvReportRow(rows, ["Net Income"]), monthColumns);
   const memberPaymentsValues = getCsvRowMonthValues(findCsvReportRow(rows, ["Member Payments"]), monthColumns);
   const payrollValues = getCsvRowMonthValues(findCsvReportRow(rows, ["Total for Payroll Expenses"]), monthColumns);
   const rawIncomeLines = collectQboBackupIncomeLines(rows, monthColumns);
-  const { expenseLines: rawExpenseLines, extraPayrollValues } = collectQboBackupExpenseLines(rows, monthColumns);
+  const {
+    expenseLines: rawExpenseLines,
+    extraPayrollValues,
+    ownerPayrollValues,
+    employeePayrollValues,
+    employerPayrollValues
+  } = collectQboBackupExpenseLines(rows, monthColumns);
   addMonthlyValues(payrollValues, extraPayrollValues);
 
   return Object.fromEntries(
@@ -451,9 +602,28 @@ function readQboBackupCsvMetrics({ entityId, entityName } = {}) {
           cogs: cogsValues[month.monthStart],
           grossProfit: grossProfitValues[month.monthStart],
           expenses: expensesValues[month.monthStart],
+          netOperatingIncome:
+            netOperatingIncomeValues[month.monthStart] ||
+            round2(
+              Number(grossProfitValues[month.monthStart] || 0) -
+                Number(expensesValues[month.monthStart] || 0)
+            ),
+          otherIncomeExpenses: round2(
+            Number(netIncomeValues[month.monthStart] || 0) -
+              Number(
+                netOperatingIncomeValues[month.monthStart] ||
+                  round2(
+                    Number(grossProfitValues[month.monthStart] || 0) -
+                      Number(expensesValues[month.monthStart] || 0)
+                  )
+              )
+          ),
           netIncome: netIncomeValues[month.monthStart],
           memberPayments: memberPaymentsValues[month.monthStart],
           payrollExpense: payrollValues[month.monthStart],
+          payrollEmployeeExpense: employeePayrollValues[month.monthStart],
+          payrollEmployerExpense: employerPayrollValues[month.monthStart],
+          ownerPayrollExpense: ownerPayrollValues[month.monthStart],
           incomeLines: monthIncomeLines,
           expenseLines: monthExpenseLines
         })
@@ -469,15 +639,22 @@ function aggregateQboMetrics(metricsList = [], { entityId, entityName, source, f
     "grossProfit",
     "expenses",
     "otherIncome",
+    "otherExpenses",
+    "otherIncomeExpenses",
+    "netOperatingIncome",
     "netIncome",
     "memberPayments",
     "payrollExpense",
+    "payrollEmployeeExpense",
+    "payrollEmployerExpense",
+    "ownerPayrollExpense",
     "nonLaborExpense"
   ];
   const aggregate = Object.fromEntries(fields.map((field) => [field, 0]));
   const incomeLineMap = new Map();
   const expenseLineMap = new Map();
   const expenseLinePayrollFlags = new Map();
+  const expenseLineOwnerPayrollFlags = new Map();
 
   metricsList.forEach((metrics) => {
     fields.forEach((field) => {
@@ -493,6 +670,7 @@ function aggregateQboMetrics(metricsList = [], { entityId, entityName, source, f
       const label = String(line.label);
       expenseLineMap.set(label, round2(Number(expenseLineMap.get(label) || 0) + Number(line.total || 0)));
       expenseLinePayrollFlags.set(label, Boolean(line.isPayroll));
+      expenseLineOwnerPayrollFlags.set(label, Boolean(line.isOwnerPayroll));
     });
   });
 
@@ -503,7 +681,8 @@ function aggregateQboMetrics(metricsList = [], { entityId, entityName, source, f
   const expenseLines = [...expenseLineMap.entries()].map(([label, total]) => ({
     label,
     total,
-    isPayroll: Boolean(expenseLinePayrollFlags.get(label))
+    isPayroll: Boolean(expenseLinePayrollFlags.get(label)),
+    isOwnerPayroll: Boolean(expenseLineOwnerPayrollFlags.get(label))
   }));
 
   return buildQboBackupMetric({
@@ -557,7 +736,9 @@ export function parseDashboardPnlReport(report, { entityId = DEFAULT_QBO_ENTITY_
   let cogs = 0;
   let expenses = 0;
   let otherIncome = 0;
-  let netIncome = 0;
+  let otherExpenses = 0;
+  let netOperatingIncome = null;
+  let netIncome = null;
   const incomeSummary = extractQboIncomeLines(report);
   const expenseSummary = extractQboExpenseLines(report);
 
@@ -571,16 +752,24 @@ export function parseDashboardPnlReport(report, { entityId = DEFAULT_QBO_ENTITY_
       expenses += totalFromSection(row);
     } else if (header.includes("other income")) {
       otherIncome += totalFromSection(row);
+    } else if (header.includes("other expense")) {
+      otherExpenses += totalFromSection(row);
     }
 
     const summaryLabel = normalizeReportLabel(row?.Summary?.ColData?.[0]?.value);
-    if (summaryLabel.includes("net income")) {
+    if (summaryLabel.includes("net operating income")) {
+      netOperatingIncome = totalFromSection(row);
+    } else if (summaryLabel.includes("net income")) {
       netIncome = totalFromSection(row);
     }
   }
 
-  if (!netIncome) {
-    netIncome = income - cogs - expenses + otherIncome;
+  if (netOperatingIncome === null || typeof netOperatingIncome === "undefined") {
+    netOperatingIncome = income - cogs - expenses;
+  }
+
+  if (netIncome === null || typeof netIncome === "undefined") {
+    netIncome = netOperatingIncome + otherIncome - otherExpenses;
   }
 
   return {
@@ -591,6 +780,9 @@ export function parseDashboardPnlReport(report, { entityId = DEFAULT_QBO_ENTITY_
     grossProfit: round2(income - cogs),
     expenses: round2(expenses),
     otherIncome: round2(otherIncome),
+    otherExpenses: round2(otherExpenses),
+    otherIncomeExpenses: round2(netIncome - netOperatingIncome),
+    netOperatingIncome: round2(netOperatingIncome),
     netIncome: round2(netIncome),
     memberPayments: round2(extractReportLinesTotal(report, ["Member Payments"])),
     ...incomeSummary,
@@ -601,23 +793,40 @@ export function parseDashboardPnlReport(report, { entityId = DEFAULT_QBO_ENTITY_
 function fromCacheRow(row) {
   if (!row) return null;
   const cachedReport = parseRawReport(row.raw_json);
-  const incomeSummary = cachedReport ? extractQboIncomeLines(cachedReport) : {};
-  const expenseSummary = cachedReport ? extractQboExpenseLines(cachedReport) : {};
+  const parsedReport = cachedReport
+    ? parseDashboardPnlReport(cachedReport, {
+        entityId: row.entity_id,
+        entityName: getQboEntityName(row.entity_id)
+      })
+    : null;
   return {
     entityId: row.entity_id,
     income: Number(row.income || 0),
     cogs: Number(row.cogs || 0),
     grossProfit: Number(row.gross_profit || 0),
     expenses: Number(row.expenses || 0),
-    otherIncome: Number(row.other_income || 0),
+    otherIncome: Number(row.other_income || parsedReport?.otherIncome || 0),
+    otherExpenses: Number(parsedReport?.otherExpenses || 0),
+    otherIncomeExpenses: Number(
+      parsedReport?.otherIncomeExpenses ??
+        Number(row.net_income || 0) -
+          (Number(row.gross_profit || 0) - Number(row.expenses || 0))
+    ),
+    netOperatingIncome: Number(
+      parsedReport?.netOperatingIncome ??
+        Number(row.gross_profit || 0) - Number(row.expenses || 0)
+    ),
     netIncome: Number(row.net_income || 0),
     memberPayments: Number(row.member_payments || 0),
-    incomeLines: incomeSummary.incomeLines || [],
-    incomeLineMap: incomeSummary.incomeLineMap || {},
-    expenseLines: expenseSummary.expenseLines || [],
-    expenseLineMap: expenseSummary.expenseLineMap || {},
-    payrollExpense: Number(expenseSummary.payrollExpense || 0),
-    nonLaborExpense: Number(expenseSummary.nonLaborExpense || 0),
+    incomeLines: parsedReport?.incomeLines || [],
+    incomeLineMap: parsedReport?.incomeLineMap || {},
+    expenseLines: parsedReport?.expenseLines || [],
+    expenseLineMap: parsedReport?.expenseLineMap || {},
+    payrollExpense: Number(parsedReport?.payrollExpense || 0),
+    payrollEmployeeExpense: Number(parsedReport?.payrollEmployeeExpense || parsedReport?.payrollExpense || 0),
+    payrollEmployerExpense: Number(parsedReport?.payrollEmployerExpense || 0),
+    ownerPayrollExpense: Number(parsedReport?.ownerPayrollExpense || 0),
+    nonLaborExpense: Number(parsedReport?.nonLaborExpense || 0),
     fetchedAt: row.fetched_at || null,
     source: "cache"
   };

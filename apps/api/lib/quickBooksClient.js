@@ -189,18 +189,31 @@ export class QuickBooksClient {
   }
 
   saveRefreshTokenToStore(token) {
-    const tokenStorePath = this.config.tokenStorePath;
-    if (!tokenStorePath || !token) return;
-    try {
-      fs.mkdirSync(path.dirname(tokenStorePath), { recursive: true });
-      let existing = {};
-      if (fs.existsSync(tokenStorePath)) {
-        existing = JSON.parse(fs.readFileSync(tokenStorePath, "utf8"));
+    if (!token) return;
+    const paths = [
+      this.config.tokenStorePath,
+      this.config.fallbackTokenStorePath
+    ]
+      .filter(Boolean)
+      .filter((tokenStorePath, index, allPaths) => allPaths.indexOf(tokenStorePath) === index);
+
+    for (const tokenStorePath of paths) {
+      try {
+        fs.mkdirSync(path.dirname(tokenStorePath), { recursive: true });
+        let existing = {};
+        if (fs.existsSync(tokenStorePath)) {
+          existing = JSON.parse(fs.readFileSync(tokenStorePath, "utf8"));
+        }
+        existing[this.config.realmId] = token;
+        fs.writeFileSync(tokenStorePath, JSON.stringify(existing, null, 2), "utf8");
+        try {
+          fs.chmodSync(tokenStorePath, 0o600);
+        } catch {
+          // Best effort on non-POSIX filesystems.
+        }
+      } catch {
+        // Best effort only; the in-memory token can still be used for this process.
       }
-      existing[this.config.realmId] = token;
-      fs.writeFileSync(tokenStorePath, JSON.stringify(existing, null, 2), "utf8");
-    } catch {
-      // Best effort only; the in-memory token can still be used for this process.
     }
   }
 }

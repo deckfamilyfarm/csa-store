@@ -46,6 +46,8 @@ const DASHBOARD_V2_TARGET_TITLE =
 const DASHBOARD_EMPLOYEE_CREDITS_TARGET_TITLE =
   getDashboardEnv("DASHBOARD_EMPLOYEE_CREDITS_TARGET_TITLE") ||
   "Dashboard-auto-employee-credits26";
+const DASHBOARD_CREDITS_SOURCE_TITLE =
+  getDashboardEnv("DASHBOARD_CREDITS_SOURCE_TITLE") || "Credits";
 const DASHBOARD_EMPLOYEE_CREDITS_YEAR =
   Number.parseInt(getDashboardEnv("DASHBOARD_EMPLOYEE_CREDITS_YEAR", "2026"), 10) || 2026;
 const DASHBOARD_EMPLOYEE_CREDIT_PRICE_LIST_ID =
@@ -1917,6 +1919,98 @@ function buildMonthlyDashboardSubscriberMap(weeks = [], subscriberWeeklyMap = {}
   return Object.fromEntries(byMonth.entries());
 }
 
+const DASHBOARD_CREDITS_TYPE_KEYS = new Map([
+  ["owners equity", "ownersEquity"],
+  ["owner equity", "ownersEquity"],
+  ["dff trade", "dffTrade"],
+  ["marketing", "marketing"],
+  ["dropsite host credit", "dropsiteHostCredit"],
+  ["ffcsa employee credit", "ffcsaEmployeeCredit"],
+  ["dff employee credit", "dffEmployeeCredit"]
+]);
+
+function normalizeDashboardCreditsType(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[’']/g, "")
+    .replace(/\s+/g, " ");
+}
+
+function getDashboardCreditsTypeKey(value) {
+  return DASHBOARD_CREDITS_TYPE_KEYS.get(normalizeDashboardCreditsType(value)) || null;
+}
+
+function parseDashboardCreditsMonthHeader(value, year = DASHBOARD_EMPLOYEE_CREDITS_YEAR) {
+  const normalized = String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\./g, "");
+  if (!normalized || normalized === "total") return null;
+  const aliases = new Map([
+    ["jan", 1],
+    ["january", 1],
+    ["feb", 2],
+    ["february", 2],
+    ["mar", 3],
+    ["march", 3],
+    ["apr", 4],
+    ["april", 4],
+    ["may", 5],
+    ["jun", 6],
+    ["june", 6],
+    ["jul", 7],
+    ["july", 7],
+    ["aug", 8],
+    ["august", 8],
+    ["sep", 9],
+    ["sept", 9],
+    ["september", 9],
+    ["oct", 10],
+    ["october", 10],
+    ["nov", 11],
+    ["november", 11],
+    ["dec", 12],
+    ["december", 12]
+  ]);
+  const month = aliases.get(normalized);
+  if (!month) return null;
+  return `${year}-${String(month).padStart(2, "0")}-01`;
+}
+
+function buildDashboardCreditsMonthlyMap(rows = [], year = DASHBOARD_EMPLOYEE_CREDITS_YEAR) {
+  const headerIndex = rows.findIndex((row) => {
+    const first = String(row?.[0] || "").trim().toLowerCase();
+    const second = String(row?.[1] || "").trim().toLowerCase();
+    return first === "type" && second === "name";
+  });
+  if (headerIndex < 0) return {};
+
+  const header = rows[headerIndex] || [];
+  const monthColumns = header
+    .map((value, columnIndex) => {
+      const monthStart = parseDashboardCreditsMonthHeader(value, year);
+      return monthStart ? { monthStart, columnIndex } : null;
+    })
+    .filter(Boolean);
+  if (!monthColumns.length) return {};
+
+  const monthlyMap = {};
+  rows.slice(headerIndex + 1).forEach((row) => {
+    const typeKey = getDashboardCreditsTypeKey(row?.[0]);
+    if (!typeKey) return;
+    monthColumns.forEach(({ monthStart, columnIndex }) => {
+      const value = parseDashboardNumber(row?.[columnIndex]);
+      if (value === null) return;
+      const monthSummary = monthlyMap[monthStart] || {};
+      monthSummary[typeKey] = round2(Number(monthSummary[typeKey] || 0) + value);
+      monthlyMap[monthStart] = monthSummary;
+    });
+  });
+
+  return monthlyMap;
+}
+
 function buildMonthlyDashboardManualValueMap(manualValueMap = new Map(), weeks = []) {
   const allowedWeekStarts = new Set((weeks || []).map((week) => week.start).filter(Boolean));
   const byLabelAndMonth = new Map();
@@ -2079,6 +2173,7 @@ function buildDashboardV2Rows({
   monthlyVendorMap = {},
   monthlyTimesheetMap = {},
   monthlySubscriberMap = {},
+  creditsMonthlyMap = {},
   qboPeriodMap = {},
   generatedAt = new Date()
 } = {}) {
@@ -2087,6 +2182,8 @@ function buildDashboardV2Rows({
   const expenseLineLabels = collectQboExpenseLineLabels(qboPeriodMap);
   const getPeriodSum = (period, getValue) => sumPeriodWeekValues(months, period, getValue);
   const getPeriodLatest = (period, getValue) => latestPeriodWeekValue(months, period, getValue);
+  const getCreditPeriodSum = (period, creditKey) =>
+    getPeriodSum(period, (month) => creditsMonthlyMap[month.start]?.[creditKey]);
   const formulaDivide = (metricSheetRowsByLabel, numeratorLabel, denominatorLabel, columnName) => {
     const numeratorRef = getMetricCellRef(metricSheetRowsByLabel, numeratorLabel, columnName);
     const denominatorRef = getMetricCellRef(metricSheetRowsByLabel, denominatorLabel, columnName);
@@ -2173,33 +2270,84 @@ function buildDashboardV2Rows({
       section: "REVENUE",
       rows: [
         {
+          label: "QBO Revenue",
+          entry: "AUTO",
+          source: "QBO Total Income",
+          methodology: "QuickBooks Online Total Income; this is the accounting revenue line used as the dashboard source of truth.",
+          valueType: "currency",
+          bold: true,
+          periodAuto: (period) => getDashboardQboMetric(qboPeriodMap, period, "income")
+        },
+        {
+          label: "LL Revenue",
+          entry: "AUTO",
+          source: "Local Line retail sales from paid product order lines",
+          methodology: "Local Line sold revenue; used as an operational comparison against QBO accounting revenue.",
+          valueType: "currency",
+          bold: true,
+          italic: true,
+          periodAuto: (period) =>
+            getPeriodSum(period, (month) => monthlyKpiMap[month.start]?.totalSales)
+        },
+        {
+          label: "Revenue Difference",
+          entry: "AUTO",
+          source: "LL Revenue - QBO Revenue",
+          methodology: "Difference between Local Line sold revenue and QBO accounting revenue. Use this to spot timing, account mapping, or sales/import differences.",
+          valueType: "currency",
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) => {
+            const llRevenueRef = getMetricCellRef(metricSheetRowsByLabel, "LL Revenue", columnName);
+            const qboRevenueRef = getMetricCellRef(metricSheetRowsByLabel, "QBO Revenue", columnName);
+            return llRevenueRef && qboRevenueRef
+              ? `=IF(OR(${llRevenueRef}="",${qboRevenueRef}=""),"",${llRevenueRef}-${qboRevenueRef})`
+              : "";
+          }
+        },
+        {
+          label: "DFF Trade",
+          entry: "AUTO",
+          source: "Credits tab Type = DFF Trade",
+          methodology: "Monthly total from the Credits tab for DFF Trade rows; treated as trade revenue in the adjusted dashboard profit story.",
+          valueType: "currency",
+          periodAuto: (period) => getCreditPeriodSum(period, "dffTrade")
+        },
+        {
+          label: "DFF Employee Credit",
+          entry: "AUTO",
+          source: "Credits tab Type = DFF Employee Credit",
+          methodology: "Monthly total from the Credits tab for DFF Employee Credit rows; treated as trade revenue in the adjusted dashboard profit story.",
+          valueType: "currency",
+          periodAuto: (period) => getCreditPeriodSum(period, "dffEmployeeCredit")
+        },
+        {
+          label: "Total Revenue",
+          entry: "AUTO",
+          source: "QBO Revenue + DFF Trade + DFF Employee Credit",
+          methodology: "Total Revenue starts with QBO Total Income and adds Credits tab trade revenue from DFF Trade and DFF Employee Credit rows. This is the revenue line used for adjusted Gross Profit and Net Profit.",
+          valueType: "currency",
+          bold: true,
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) => {
+            const qboRevenueRef = getMetricCellRef(metricSheetRowsByLabel, "QBO Revenue", columnName);
+            const dffTradeRef = getMetricCellRef(metricSheetRowsByLabel, "DFF Trade", columnName);
+            const dffEmployeeCreditRef = getMetricCellRef(metricSheetRowsByLabel, "DFF Employee Credit", columnName);
+            return qboRevenueRef && dffTradeRef && dffEmployeeCreditRef
+              ? `=IF(COUNTA(${qboRevenueRef},${dffTradeRef},${dffEmployeeCreditRef})=0,"",${qboRevenueRef}+${dffTradeRef}+${dffEmployeeCreditRef})`
+              : "";
+          }
+        }
+      ]
+    },
+    {
+      section: "MEMBER BANK",
+      rows: [
+        {
           label: "Member Dollars Received",
           entry: "AUTO",
           source: "Local member-credit cash received",
+          methodology: "Member-bank cash and credit movement supports the revenue story, but it is tracked separately from accounting revenue.",
           valueType: "currency",
           periodAuto: (period) =>
             getPeriodSum(period, (month) => monthlyKpiMap[month.start]?.actualDollarsReceivedForCredit)
-        },
-        {
-          label: "Guest Purchase Dollars",
-          entry: "AUTO",
-          source: "Local Line guest price-list retail dollars",
-          valueType: "currency",
-          periodAuto: (period) =>
-            getPeriodSum(period, (month) => monthlyKpiMap[month.start]?.guestPurchaseDollars)
-        },
-        {
-          label: "Local Revenue Dollars",
-          entry: "AUTO",
-          source: "Member Dollars Received + Guest Purchase Dollars",
-          valueType: "currency",
-          periodFormula: ({ columnName, metricSheetRowsByLabel }) => {
-            const dollarsReceivedRef = getMetricCellRef(metricSheetRowsByLabel, "Member Dollars Received", columnName);
-            const guestPurchasesRef = getMetricCellRef(metricSheetRowsByLabel, "Guest Purchase Dollars", columnName);
-            return dollarsReceivedRef && guestPurchasesRef
-              ? `=IF(COUNTA(${dollarsReceivedRef},${guestPurchasesRef})=0,"",${dollarsReceivedRef}+${guestPurchasesRef})`
-              : "";
-          }
         },
         {
           label: "Extra Credit Issued",
@@ -2238,6 +2386,32 @@ function buildDashboardV2Rows({
           valueType: "currency",
           periodAuto: (period) =>
             getPeriodLatest(period, (month) => monthlyKpiMap[month.start]?.memberBankBalance)
+        }
+      ]
+    },
+    {
+      section: "REVENUE DETAIL",
+      rows: [
+        {
+          label: "Guest Purchase Dollars",
+          entry: "AUTO",
+          source: "Local Line guest price-list retail dollars",
+          valueType: "currency",
+          periodAuto: (period) =>
+            getPeriodSum(period, (month) => monthlyKpiMap[month.start]?.guestPurchaseDollars)
+        },
+        {
+          label: "Local Revenue Dollars",
+          entry: "AUTO",
+          source: "Member Dollars Received + Guest Purchase Dollars",
+          valueType: "currency",
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) => {
+            const dollarsReceivedRef = getMetricCellRef(metricSheetRowsByLabel, "Member Dollars Received", columnName);
+            const guestPurchasesRef = getMetricCellRef(metricSheetRowsByLabel, "Guest Purchase Dollars", columnName);
+            return dollarsReceivedRef && guestPurchasesRef
+              ? `=IF(COUNTA(${dollarsReceivedRef},${guestPurchasesRef})=0,"",${dollarsReceivedRef}+${guestPurchasesRef})`
+              : "";
+          }
         },
         {
           label: "Local Purchase Dollars",
@@ -2252,25 +2426,7 @@ function buildDashboardV2Rows({
               : "";
           }
         },
-        ...incomeLineRows,
-        {
-          label: "QBO Revenue",
-          entry: "AUTO",
-          source: "QBO Total Income",
-          valueType: "currency",
-          bold: true,
-          periodAuto: (period) => getDashboardQboMetric(qboPeriodMap, period, "income")
-        },
-        {
-          label: "LL Revenue",
-          entry: "AUTO",
-          source: "Local Line retail sales from paid product order lines",
-          valueType: "currency",
-          bold: true,
-          italic: true,
-          periodAuto: (period) =>
-            getPeriodSum(period, (month) => monthlyKpiMap[month.start]?.totalSales)
-        }
+        ...incomeLineRows
       ]
     },
     {
@@ -2293,12 +2449,37 @@ function buildDashboardV2Rows({
           italic: true,
           periodAuto: (period) =>
             getPeriodSum(period, (month) => monthlyVendorMap[month.start]?.purchaseCost)
+        },
+        {
+          label: "Purchasing Efficiency",
+          entry: "AUTO",
+          source: "LL Purchase Cost / QBO Purchase Cost",
+          methodology: "Shows how much product cost was sold in Local Line compared with product cost purchased in QBO for the same period. Ideally this is 100%; lower numbers indicate less efficient purchasing. This line is more accurate across more months because purchase timing and sales timing do not always land in the same month.",
+          valueType: "percent",
+          bold: true,
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) =>
+            formulaDivide(metricSheetRowsByLabel, "LL Purchase Cost", "QBO Purchase Cost", columnName)
         }
       ]
     },
     {
       section: "GROSS PROFIT",
       rows: [
+        {
+          label: "Gross Profit",
+          entry: "AUTO",
+          source: "Total Revenue - QBO Purchase Cost",
+          methodology: "Adjusted Gross Profit uses Total Revenue, including Credits tab trade revenue, minus QBO Purchase Cost / COGS.",
+          valueType: "currency",
+          bold: true,
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) => {
+            const totalRevenueRef = getMetricCellRef(metricSheetRowsByLabel, "Total Revenue", columnName);
+            const qboPurchaseCostRef = getMetricCellRef(metricSheetRowsByLabel, "QBO Purchase Cost", columnName);
+            return totalRevenueRef && qboPurchaseCostRef
+              ? `=IF(OR(${totalRevenueRef}="",${qboPurchaseCostRef}=""),"",${totalRevenueRef}-${qboPurchaseCostRef})`
+              : "";
+          }
+        },
         {
           label: "QBO Gross Profit",
           entry: "AUTO",
@@ -2336,19 +2517,74 @@ function buildDashboardV2Rows({
       section: "EXPENSES",
       rows: [
         {
+          label: "QBO Payroll Employee Expenses",
+          entry: "AUTO",
+          source: "QBO Payroll Expenses regular employee category",
+          methodology: "Regular employee payroll from QBO, including the Payroll Expenses category and employee bonus rows, excluding the Payroll Expenses Owner category.",
+          valueType: "currency",
+          periodAuto: (period) => getDashboardQboMetric(qboPeriodMap, period, "payrollEmployeeExpense")
+        },
+        {
+          label: "QBO Payroll Employer Expenses",
+          entry: "AUTO",
+          source: "QBO Payroll Expenses Owner category",
+          methodology: "Employer/owner payroll from QBO Payroll Expenses Owner, including Owner Wages and Owner Payroll Taxes.",
+          valueType: "currency",
+          periodAuto: (period) => getDashboardQboMetric(qboPeriodMap, period, "payrollEmployerExpense")
+        },
+        {
           label: "QBO Payroll Expenses",
           entry: "AUTO",
-          source: "QBO Payroll Expenses",
+          source: "QBO Payroll Employee Expenses + QBO Payroll Employer Expenses",
           valueType: "currency",
-          periodAuto: (period) => getDashboardQboMetric(qboPeriodMap, period, "payrollExpense")
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) => {
+            const employeePayrollRef = getMetricCellRef(
+              metricSheetRowsByLabel,
+              "QBO Payroll Employee Expenses",
+              columnName
+            );
+            const employerPayrollRef = getMetricCellRef(
+              metricSheetRowsByLabel,
+              "QBO Payroll Employer Expenses",
+              columnName
+            );
+            return employeePayrollRef && employerPayrollRef
+              ? `=IF(COUNTA(${employeePayrollRef},${employerPayrollRef})=0,"",${employeePayrollRef}+${employerPayrollRef})`
+              : "";
+          }
         },
         {
           label: "QBO Payroll % of Gross Profit",
           entry: "AUTO",
-          source: "QBO Payroll Expenses / QBO Gross Profit",
+          source: "QBO Payroll Employee Expenses / Gross Profit",
+          methodology: "Uses employee payroll only as the numerator, not employer payroll taxes/fees.",
           valueType: "percent",
           periodFormula: ({ columnName, metricSheetRowsByLabel }) =>
-            formulaDivide(metricSheetRowsByLabel, "QBO Payroll Expenses", "QBO Gross Profit", columnName)
+            formulaDivide(metricSheetRowsByLabel, "QBO Payroll Employee Expenses", "Gross Profit", columnName)
+        },
+        {
+          label: "Marketing Trade Expense",
+          entry: "AUTO",
+          source: "Credits tab Type = Marketing",
+          methodology: "Monthly total from the Credits tab for Marketing rows; treated as a trade expense in the adjusted dashboard profit story.",
+          valueType: "currency",
+          periodAuto: (period) => getCreditPeriodSum(period, "marketing")
+        },
+        {
+          label: "Dropsite Host Credit",
+          entry: "AUTO",
+          source: "Credits tab Type = Dropsite Host Credit",
+          methodology: "Monthly total from the Credits tab for Dropsite Host Credit rows; treated as a trade expense in the adjusted dashboard profit story.",
+          valueType: "currency",
+          periodAuto: (period) => getCreditPeriodSum(period, "dropsiteHostCredit")
+        },
+        {
+          label: "Employee Benefit Trades",
+          entry: "AUTO",
+          source: "Credits tab Type = FFCSA Employee Credit",
+          methodology: "Monthly total from the Credits tab for FFCSA Employee Credit rows; treated as an employee benefit trade expense in the adjusted dashboard profit story.",
+          valueType: "currency",
+          periodAuto: (period) => getCreditPeriodSum(period, "ffcsaEmployeeCredit")
         },
         ...expenseLineRows,
         {
@@ -2363,6 +2599,121 @@ function buildDashboardV2Rows({
               .filter(Boolean);
             return refs.length ? `=IF(COUNTA(${refs.join(",")})=0,"",SUM(${refs.join(",")}))` : "";
           }
+        },
+        {
+          label: "Total Expenses",
+          entry: "AUTO",
+          source: "QBO Expenses + Marketing Trade Expense + Dropsite Host Credit + Employee Benefit Trades",
+          methodology: "Total Expenses starts with QBO Expenses and adds Credits tab trade expense rows for Marketing, Dropsite Host Credit, and FFCSA Employee Credit / Employee Benefit Trades.",
+          valueType: "currency",
+          bold: true,
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) => {
+            const qboExpensesRef = getMetricCellRef(metricSheetRowsByLabel, "QBO Expenses", columnName);
+            const marketingTradeExpenseRef = getMetricCellRef(
+              metricSheetRowsByLabel,
+              "Marketing Trade Expense",
+              columnName
+            );
+            const dropsiteHostCreditRef = getMetricCellRef(
+              metricSheetRowsByLabel,
+              "Dropsite Host Credit",
+              columnName
+            );
+            const employeeBenefitTradesRef = getMetricCellRef(
+              metricSheetRowsByLabel,
+              "Employee Benefit Trades",
+              columnName
+            );
+            return qboExpensesRef && marketingTradeExpenseRef && dropsiteHostCreditRef && employeeBenefitTradesRef
+              ? `=IF(COUNTA(${qboExpensesRef},${marketingTradeExpenseRef},${dropsiteHostCreditRef},${employeeBenefitTradesRef})=0,"",${qboExpensesRef}+${marketingTradeExpenseRef}+${dropsiteHostCreditRef}+${employeeBenefitTradesRef})`
+              : "";
+          }
+        }
+      ]
+    },
+    {
+      section: "NET OPERATING INCOME",
+      rows: [
+        {
+          label: "Net Operating Income",
+          entry: "AUTO",
+          source: "Gross Profit - Total Expenses",
+          methodology: "Adjusted NOI uses adjusted Gross Profit minus Total Expenses, including Credits tab trade expense rows.",
+          valueType: "currency",
+          bold: true,
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) => {
+            const grossProfitRef = getMetricCellRef(metricSheetRowsByLabel, "Gross Profit", columnName);
+            const totalExpensesRef = getMetricCellRef(metricSheetRowsByLabel, "Total Expenses", columnName);
+            return grossProfitRef && totalExpensesRef
+              ? `=IF(OR(${grossProfitRef}="",${totalExpensesRef}=""),"",${grossProfitRef}-${totalExpensesRef})`
+              : "";
+          }
+        },
+        {
+          label: "QBO Net Operating Income",
+          entry: "AUTO",
+          source: "QBO Net Operating Income",
+          methodology: "QBO Net Operating Income after revenue, COGS, and operating expenses. Owner payroll is still included in QBO expenses at this point.",
+          valueType: "currency",
+          bold: true,
+          periodAuto: (period) => getDashboardQboMetric(qboPeriodMap, period, "netOperatingIncome")
+        }
+      ]
+    },
+    {
+      section: "OTHER INCOME / EXPENSES",
+      rows: [
+        {
+          label: "QBO Other Income / Expenses",
+          entry: "AUTO",
+          source: "QBO Net Income - QBO Net Operating Income",
+          methodology: "Net total of QBO other income and other expenses below operating income.",
+          valueType: "currency",
+          periodAuto: (period) => getDashboardQboMetric(qboPeriodMap, period, "otherIncomeExpenses")
+        },
+        {
+          label: "QBO Payroll Expenses Owner Addback",
+          entry: "AUTO",
+          source: "QBO Payroll Expenses Owner",
+          methodology: "Adds back QBO Payroll Expenses Owner, including Owner Wages and Owner Payroll Taxes, so owner payroll is not treated as an operating deduction in the final dashboard profit line.",
+          valueType: "currency",
+          periodAuto: (period) => getDashboardQboMetric(qboPeriodMap, period, "ownerPayrollExpense")
+        },
+        {
+          label: "Owners Equity Credits",
+          entry: "AUTO",
+          source: "Credits tab Type = Owners Equity",
+          methodology: "Monthly total from the Credits tab for Owners Equity rows; treated as an income adjustment added back below Net Operating Income.",
+          valueType: "currency",
+          periodAuto: (period) => getCreditPeriodSum(period, "ownersEquity")
+        },
+        {
+          label: "Total Other Income / Expenses",
+          entry: "AUTO",
+          source: "QBO Other Income / Expenses + QBO Payroll Expenses Owner Addback + Owners Equity Credits",
+          methodology: "This is the total income-adjustment/add-back pool below NOI. QBO other income/expenses, owner payroll addback, and Owners Equity Credits are all added back into the final Net Profit calculation.",
+          valueType: "currency",
+          bold: true,
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) => {
+            const ownersEquityCreditsRef = getMetricCellRef(
+              metricSheetRowsByLabel,
+              "Owners Equity Credits",
+              columnName
+            );
+            const otherIncomeExpensesRef = getMetricCellRef(
+              metricSheetRowsByLabel,
+              "QBO Other Income / Expenses",
+              columnName
+            );
+            const ownerPayrollAddbackRef = getMetricCellRef(
+              metricSheetRowsByLabel,
+              "QBO Payroll Expenses Owner Addback",
+              columnName
+            );
+            return ownersEquityCreditsRef && otherIncomeExpensesRef && ownerPayrollAddbackRef
+              ? `=IF(COUNTA(${otherIncomeExpensesRef},${ownerPayrollAddbackRef},${ownersEquityCreditsRef})=0,"",${otherIncomeExpensesRef}+${ownerPayrollAddbackRef}+${ownersEquityCreditsRef})`
+              : "";
+          }
         }
       ]
     },
@@ -2370,13 +2721,32 @@ function buildDashboardV2Rows({
       section: "NET PROFIT",
       rows: [
         {
-          label: "QBO Net Profit",
+          label: "Net Profit",
           entry: "AUTO",
-          source: "QBO Net Income",
-          methodology: "Net Profit is read directly from QBO so the dashboard matches actual QBO net income.",
+          source: "Net Operating Income + Total Other Income / Expenses",
+          methodology: "Net Profit uses the adjusted dashboard story: Total Revenue minus QBO Purchase Cost equals Gross Profit; Total Expenses are subtracted to get NOI; Total Other Income / Expenses is then added back to NOI.",
           valueType: "currency",
           bold: true,
-          periodAuto: (period) => getDashboardQboMetric(qboPeriodMap, period, "netIncome")
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) => {
+            const netOperatingIncomeRef = getMetricCellRef(metricSheetRowsByLabel, "Net Operating Income", columnName);
+            const totalOtherIncomeExpensesRef = getMetricCellRef(
+              metricSheetRowsByLabel,
+              "Total Other Income / Expenses",
+              columnName
+            );
+            return netOperatingIncomeRef && totalOtherIncomeExpensesRef
+              ? `=IF(OR(${netOperatingIncomeRef}="",${totalOtherIncomeExpensesRef}=""),"",${netOperatingIncomeRef}+${totalOtherIncomeExpensesRef})`
+              : "";
+          }
+        },
+        {
+          label: "Net Profit as % of Revenue",
+          entry: "AUTO",
+          source: "Net Profit / Total Revenue",
+          valueType: "percent",
+          bold: true,
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) =>
+            formulaDivide(metricSheetRowsByLabel, "Net Profit", "Total Revenue", columnName)
         }
       ]
     }
@@ -3272,7 +3642,7 @@ async function fetchSourceSheetRows() {
   return xlsx.utils.sheet_to_json(worksheet, { header: 1, raw: false, defval: "" });
 }
 
-async function fetchSheetRowsByTitle(accessToken, title) {
+async function fetchSheetRowsByTitle(accessToken, title, { valueRenderOption = "FORMULA" } = {}) {
   const metadata = await sheetsRequest(
     accessToken,
     "GET",
@@ -3284,7 +3654,7 @@ async function fetchSheetRowsByTitle(accessToken, title) {
   const payload = await sheetsRequest(
     accessToken,
     "GET",
-    `https://sheets.googleapis.com/v4/spreadsheets/${DASHBOARD_SHEET_ID}/values/${encodeURIComponent(`${title}!A:ZZ`)}?valueRenderOption=FORMULA`
+    `https://sheets.googleapis.com/v4/spreadsheets/${DASHBOARD_SHEET_ID}/values/${encodeURIComponent(`${title}!A:ZZ`)}?valueRenderOption=${encodeURIComponent(valueRenderOption)}`
   );
   return Array.isArray(payload?.values) ? payload.values : [];
 }
@@ -5691,6 +6061,13 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
     }
     const accessToken = await getSheetsAccessToken();
     const targetRows = await fetchSheetRowsByTitle(accessToken, DASHBOARD_TARGET_TITLE);
+    const creditsRows = await fetchSheetRowsByTitle(accessToken, DASHBOARD_CREDITS_SOURCE_TITLE, {
+      valueRenderOption: "UNFORMATTED_VALUE"
+    });
+    const creditsMonthlyMap = buildDashboardCreditsMonthlyMap(
+      creditsRows,
+      DASHBOARD_EMPLOYEE_CREDITS_YEAR
+    );
     const targetWeeks = extractWeeksFromGeneratedRows(targetRows);
     const manualValueMap = mergeManualValueMaps(
       buildManualValueMapFromSourceRows(sourceRows, sourceWeeks),
@@ -5845,6 +6222,7 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       monthlyVendorMap: monthlyDashboardInputs.vendorWeeklyMap,
       monthlyTimesheetMap: monthlyDashboardInputs.timesheetWeeklyMap,
       monthlySubscriberMap: monthlyDashboardInputs.subscriberWeeklyMap,
+      creditsMonthlyMap,
       qboPeriodMap: qboResult.map || {},
       generatedAt: startedAt
     });
