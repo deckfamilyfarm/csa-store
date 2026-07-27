@@ -1667,6 +1667,90 @@ const LOCAL_LINE_TABLE_STATEMENTS = [
     )
   `,
   `
+    CREATE TABLE IF NOT EXISTS local_line_store_credit_sync_runs (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      sync_year INT NOT NULL,
+      start_date VARCHAR(10),
+      end_exclusive_date VARCHAR(10),
+      status VARCHAR(32) NOT NULL,
+      customer_count INT DEFAULT 0,
+      transaction_count INT DEFAULT 0,
+      manual_credit_total DECIMAL(12, 2) DEFAULT 0,
+      manual_debit_total DECIMAL(12, 2) DEFAULT 0,
+      order_debit_total DECIMAL(12, 2) DEFAULT 0,
+      summary_json LONGTEXT,
+      error_message TEXT,
+      started_at DATETIME,
+      finished_at DATETIME,
+      created_at DATETIME,
+      updated_at DATETIME
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS local_line_store_credit_customer_cursors (
+      customer_id VARCHAR(64) PRIMARY KEY,
+      customer_name VARCHAR(255),
+      email VARCHAR(255),
+      last_transaction_id VARCHAR(64),
+      last_transaction_at DATETIME,
+      last_synced_at DATETIME,
+      transaction_count INT DEFAULT 0,
+      last_error TEXT,
+      created_at DATETIME,
+      updated_at DATETIME
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS local_line_store_credit_transactions (
+      transaction_id VARCHAR(64) PRIMARY KEY,
+      customer_id VARCHAR(64) NOT NULL,
+      customer_name VARCHAR(255),
+      email VARCHAR(255),
+      transaction_at DATETIME,
+      transaction_date VARCHAR(10),
+      transaction_month VARCHAR(10),
+      transaction_type VARCHAR(64),
+      category_key VARCHAR(128),
+      category_label VARCHAR(255),
+      amount DECIMAL(12, 2),
+      store_credit_balance DECIMAL(12, 2),
+      order_id VARCHAR(64),
+      note TEXT,
+      raw_json LONGTEXT,
+      last_synced_run_id INT,
+      created_at DATETIME,
+      updated_at DATETIME
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS local_line_store_credit_balance_snapshots (
+      snapshot_date VARCHAR(10) NOT NULL,
+      customer_id VARCHAR(64) NOT NULL,
+      customer_name VARCHAR(255),
+      email VARCHAR(255),
+      store_credit_balance DECIMAL(12, 2),
+      raw_json LONGTEXT,
+      run_id INT,
+      captured_at DATETIME,
+      created_at DATETIME,
+      updated_at DATETIME,
+      PRIMARY KEY (snapshot_date, customer_id)
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS local_line_store_credit_monthly_rollups (
+      month_start VARCHAR(10) NOT NULL,
+      transaction_type VARCHAR(64) NOT NULL,
+      category_key VARCHAR(128) NOT NULL,
+      category_label VARCHAR(255),
+      transaction_count INT DEFAULT 0,
+      amount DECIMAL(12, 2) DEFAULT 0,
+      latest_run_id INT,
+      updated_at DATETIME,
+      PRIMARY KEY (month_start, transaction_type, category_key)
+    )
+  `,
+  `
     CREATE TABLE IF NOT EXISTS dashboard_qbo_period_metrics (
       period_key VARCHAR(64) PRIMARY KEY,
       period_label VARCHAR(32),
@@ -1928,6 +2012,41 @@ const LOCAL_LINE_INDEX_STATEMENTS = [
     tableName: "local_line_customer_credit_snapshots",
     indexName: "idx_local_line_customer_credit_snapshots_captured",
     columns: "captured_at"
+  },
+  {
+    tableName: "local_line_store_credit_sync_runs",
+    indexName: "idx_local_line_store_credit_sync_runs_year_started",
+    columns: "sync_year, started_at"
+  },
+  {
+    tableName: "local_line_store_credit_customer_cursors",
+    indexName: "idx_local_line_store_credit_customer_cursors_synced",
+    columns: "last_synced_at"
+  },
+  {
+    tableName: "local_line_store_credit_transactions",
+    indexName: "idx_local_line_store_credit_transactions_month_type",
+    columns: "transaction_month, transaction_type"
+  },
+  {
+    tableName: "local_line_store_credit_transactions",
+    indexName: "idx_local_line_store_credit_transactions_customer",
+    columns: "customer_id"
+  },
+  {
+    tableName: "local_line_store_credit_transactions",
+    indexName: "idx_local_line_store_credit_transactions_date",
+    columns: "transaction_date"
+  },
+  {
+    tableName: "local_line_store_credit_balance_snapshots",
+    indexName: "idx_local_line_store_credit_balance_snapshots_captured",
+    columns: "captured_at"
+  },
+  {
+    tableName: "local_line_store_credit_monthly_rollups",
+    indexName: "idx_local_line_store_credit_monthly_rollups_type",
+    columns: "transaction_type, category_key"
   }
 ];
 

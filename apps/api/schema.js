@@ -997,6 +997,126 @@ export const localLineCustomerCreditSnapshots = mysqlTable("local_line_customer_
   updatedAt: datetime("updated_at")
 });
 
+export const localLineStoreCreditSyncRuns = mysqlTable(
+  "local_line_store_credit_sync_runs",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    syncYear: int("sync_year").notNull(),
+    startDate: varchar("start_date", { length: 10 }),
+    endExclusiveDate: varchar("end_exclusive_date", { length: 10 }),
+    status: varchar("status", { length: 32 }).notNull(),
+    customerCount: int("customer_count").default(0),
+    transactionCount: int("transaction_count").default(0),
+    manualCreditTotal: decimal("manual_credit_total", { precision: 12, scale: 2 }).default("0"),
+    manualDebitTotal: decimal("manual_debit_total", { precision: 12, scale: 2 }).default("0"),
+    orderDebitTotal: decimal("order_debit_total", { precision: 12, scale: 2 }).default("0"),
+    summaryJson: text("summary_json"),
+    errorMessage: text("error_message"),
+    startedAt: datetime("started_at"),
+    finishedAt: datetime("finished_at"),
+    createdAt: datetime("created_at"),
+    updatedAt: datetime("updated_at")
+  },
+  (table) => ({
+    yearStartedIdx: index("idx_local_line_store_credit_sync_runs_year_started").on(
+      table.syncYear,
+      table.startedAt
+    )
+  })
+);
+
+export const localLineStoreCreditCustomerCursors = mysqlTable(
+  "local_line_store_credit_customer_cursors",
+  {
+    customerId: varchar("customer_id", { length: 64 }).primaryKey(),
+    customerName: varchar("customer_name", { length: 255 }),
+    email: varchar("email", { length: 255 }),
+    lastTransactionId: varchar("last_transaction_id", { length: 64 }),
+    lastTransactionAt: datetime("last_transaction_at"),
+    lastSyncedAt: datetime("last_synced_at"),
+    transactionCount: int("transaction_count").default(0),
+    lastError: text("last_error"),
+    createdAt: datetime("created_at"),
+    updatedAt: datetime("updated_at")
+  },
+  (table) => ({
+    syncedIdx: index("idx_local_line_store_credit_customer_cursors_synced").on(table.lastSyncedAt)
+  })
+);
+
+export const localLineStoreCreditTransactions = mysqlTable(
+  "local_line_store_credit_transactions",
+  {
+    transactionId: varchar("transaction_id", { length: 64 }).primaryKey(),
+    customerId: varchar("customer_id", { length: 64 }).notNull(),
+    customerName: varchar("customer_name", { length: 255 }),
+    email: varchar("email", { length: 255 }),
+    transactionAt: datetime("transaction_at"),
+    transactionDate: varchar("transaction_date", { length: 10 }),
+    transactionMonth: varchar("transaction_month", { length: 10 }),
+    transactionType: varchar("transaction_type", { length: 64 }),
+    categoryKey: varchar("category_key", { length: 128 }),
+    categoryLabel: varchar("category_label", { length: 255 }),
+    amount: decimal("amount", { precision: 12, scale: 2 }),
+    storeCreditBalance: decimal("store_credit_balance", { precision: 12, scale: 2 }),
+    orderId: varchar("order_id", { length: 64 }),
+    note: text("note"),
+    rawJson: text("raw_json"),
+    lastSyncedRunId: int("last_synced_run_id"),
+    createdAt: datetime("created_at"),
+    updatedAt: datetime("updated_at")
+  },
+  (table) => ({
+    monthTypeIdx: index("idx_local_line_store_credit_transactions_month_type").on(
+      table.transactionMonth,
+      table.transactionType
+    ),
+    customerIdx: index("idx_local_line_store_credit_transactions_customer").on(table.customerId),
+    dateIdx: index("idx_local_line_store_credit_transactions_date").on(table.transactionDate)
+  })
+);
+
+export const localLineStoreCreditBalanceSnapshots = mysqlTable(
+  "local_line_store_credit_balance_snapshots",
+  {
+    snapshotDate: varchar("snapshot_date", { length: 10 }).notNull(),
+    customerId: varchar("customer_id", { length: 64 }).notNull(),
+    customerName: varchar("customer_name", { length: 255 }),
+    email: varchar("email", { length: 255 }),
+    storeCreditBalance: decimal("store_credit_balance", { precision: 12, scale: 2 }),
+    rawJson: text("raw_json"),
+    runId: int("run_id"),
+    capturedAt: datetime("captured_at"),
+    createdAt: datetime("created_at"),
+    updatedAt: datetime("updated_at")
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.snapshotDate, table.customerId] }),
+    capturedIdx: index("idx_local_line_store_credit_balance_snapshots_captured").on(table.capturedAt)
+  })
+);
+
+export const localLineStoreCreditMonthlyRollups = mysqlTable(
+  "local_line_store_credit_monthly_rollups",
+  {
+    monthStart: varchar("month_start", { length: 10 }).notNull(),
+    transactionType: varchar("transaction_type", { length: 64 }).notNull(),
+    categoryKey: varchar("category_key", { length: 128 }).notNull(),
+    categoryLabel: varchar("category_label", { length: 255 }),
+    transactionCount: int("transaction_count").default(0),
+    amount: decimal("amount", { precision: 12, scale: 2 }).default("0"),
+    latestRunId: int("latest_run_id"),
+    updatedAt: datetime("updated_at")
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.monthStart, table.transactionType, table.categoryKey] }),
+    typeIdx: index("idx_local_line_store_credit_monthly_rollups_type").on(
+      table.transactionType,
+      table.categoryKey
+    )
+  })
+);
+
 export const localLineSyncCursors = mysqlTable("local_line_sync_cursors", {
   syncKey: varchar("sync_key", { length: 64 }).primaryKey(),
   cursorValue: varchar("cursor_value", { length: 255 }),

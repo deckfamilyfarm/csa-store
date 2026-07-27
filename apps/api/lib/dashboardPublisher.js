@@ -50,6 +50,15 @@ const DASHBOARD_CREDITS_SOURCE_TITLE =
   getDashboardEnv("DASHBOARD_CREDITS_SOURCE_TITLE") || "Credits";
 const DASHBOARD_EMPLOYEE_CREDITS_YEAR =
   Number.parseInt(getDashboardEnv("DASHBOARD_EMPLOYEE_CREDITS_YEAR", "2026"), 10) || 2026;
+const DASHBOARD_STORE_CREDIT_SYNC_YEAR =
+  Number.parseInt(
+    getDashboardEnv("DASHBOARD_STORE_CREDIT_SYNC_YEAR", String(DASHBOARD_EMPLOYEE_CREDITS_YEAR)),
+    10
+  ) || DASHBOARD_EMPLOYEE_CREDITS_YEAR;
+const DASHBOARD_STORE_CREDIT_SYNC_PAGE_SIZE =
+  Math.max(25, Number.parseInt(getDashboardEnv("DASHBOARD_STORE_CREDIT_SYNC_PAGE_SIZE", "100"), 10) || 100);
+const DASHBOARD_STORE_CREDIT_SYNC_CONCURRENCY =
+  Math.max(1, Number.parseInt(getDashboardEnv("DASHBOARD_STORE_CREDIT_SYNC_CONCURRENCY", "8"), 10) || 8);
 const DASHBOARD_EMPLOYEE_CREDIT_PRICE_LIST_ID =
   Number(getDashboardEnv("DASHBOARD_EMPLOYEE_CREDIT_PRICE_LIST_ID", "2719")) || 2719;
 const DASHBOARD_EMPLOYEE_CREDIT_PACKAGE_IDS = parseDashboardIdList(
@@ -72,6 +81,58 @@ const DASHBOARD_SNAP_PRICE_LIST_ID = Number(
   getDashboardEnv("DASHBOARD_SNAP_PRICE_LIST_ID") ||
     getDashboardEnv("LL_PRICE_LIST_SNAP_ID")
 );
+const DASHBOARD_SNAP_MANUAL_CREDIT_MIN_AMOUNT =
+  Math.max(
+    0,
+    Number.parseFloat(getDashboardEnv("DASHBOARD_SNAP_MANUAL_CREDIT_MIN_AMOUNT", "50")) || 50
+  );
+const DASHBOARD_TOM_CULHANE_CASH_RECEIVED_EMAIL = normalizeDashboardText(
+  getDashboardEnv("DASHBOARD_TOM_CULHANE_CASH_RECEIVED_EMAIL", "thomasabcxyz@yahoo.com")
+);
+const DASHBOARD_TOM_CULHANE_CASH_RECEIVED_NAME = normalizeDashboardText(
+  getDashboardEnv("DASHBOARD_TOM_CULHANE_CASH_RECEIVED_NAME", "Tom Culhane")
+);
+const DASHBOARD_TOM_CULHANE_CASH_RECEIVED_AMOUNT =
+  Number.parseFloat(getDashboardEnv("DASHBOARD_TOM_CULHANE_CASH_RECEIVED_AMOUNT", "500")) || 500;
+const DASHBOARD_MANUAL_CREDIT_NOTE_BUCKETS = [
+  {
+    key: "jarDepositReturnCredit",
+    label: "Manual Credit - Jar / Deposit Returns",
+    source: "Local Line MANUAL_CREDIT note bucket",
+    methodology: "Local Line manual credit additions whose note points to jar, bottle, deposit, or container returns, capped to the remaining ledger pool after authoritative Credits-tab categories are removed."
+  },
+  {
+    key: "productItemCredit",
+    label: "Manual Credit - Product / Item Credits",
+    source: "Local Line MANUAL_CREDIT note bucket",
+    methodology: "Local Line manual credit additions with a specific product or item note, capped to the remaining ledger pool after authoritative Credits-tab categories and clearer note buckets are removed."
+  },
+  {
+    key: "productIssueRefundCredit",
+    label: "Manual Credit - Product Issue / Refunds",
+    source: "Local Line MANUAL_CREDIT note bucket",
+    methodology: "Local Line manual credit additions whose note points to refunds, missing items, quality issues, cancellations, reimbursements, shorts, or undelivered products, capped to the remaining ledger pool after authoritative Credits-tab categories are removed."
+  },
+  {
+    key: "paymentTradeAdminCredit",
+    label: "Manual Credit - Payment / Trade / Admin Notes",
+    source: "Local Line MANUAL_CREDIT note bucket",
+    methodology: "Local Line manual credit additions whose note points to payments, trades, employee/admin approvals, invoices, checks, cash, gifts, influencer/farm-stay items, or similar administrative notes, capped to the remaining ledger pool after authoritative Credits-tab categories are removed."
+  },
+  {
+    key: "blankManualCredit",
+    label: "Manual Credit - Blank / Unlabeled",
+    source: "Local Line MANUAL_CREDIT note bucket",
+    methodology: "Local Line manual credit additions with no note, capped to the remaining ledger pool after authoritative Credits-tab categories and clearer note buckets are removed."
+  }
+];
+const DASHBOARD_MANUAL_CREDIT_NOTE_BUCKET_ALLOCATION_ORDER = [
+  "jarDepositReturnCredit",
+  "productIssueRefundCredit",
+  "productItemCredit",
+  "paymentTradeAdminCredit",
+  "blankManualCredit"
+];
 const LOCAL_LINE_RETRY_ATTEMPTS = Math.max(
   1,
   Number.parseInt(process.env.LOCALLINE_FETCH_RETRY_ATTEMPTS || "2", 10) || 2
@@ -249,6 +310,42 @@ function buildSubscriberSnapshotKey(row) {
 function parseCurrencyCell(value) {
   const numeric = Number(String(value ?? "").replace(/[^0-9.\-]/g, ""));
   return Number.isFinite(numeric) ? numeric : 0;
+}
+
+function normalizeDashboardText(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[’']/g, "")
+    .replace(/\s+/g, " ");
+}
+
+function slugifyDashboardKey(value, fallback = "uncategorized") {
+  const slug = normalizeDashboardText(value)
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+  return slug || fallback;
+}
+
+function titleCaseDashboardLabel(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  return raw
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .split(" ")
+    .map((word) => {
+      if (/^[A-Z0-9]{2,}$/.test(word)) return word;
+      if (/^(DFF|FFCSA|CSA|SNAP|QBO|LL)$/i.test(word)) return word.toUpperCase();
+      return `${word.slice(0, 1).toUpperCase()}${word.slice(1).toLowerCase()}`;
+    })
+    .join(" ");
+}
+
+function formatMysqlDateTime(value) {
+  if (!(value instanceof Date) || Number.isNaN(value.getTime())) return null;
+  return value.toISOString().slice(0, 19).replace("T", " ");
 }
 
 function parseLocalLineExportDate(value) {
@@ -1930,15 +2027,124 @@ const DASHBOARD_CREDITS_TYPE_KEYS = new Map([
 ]);
 
 function normalizeDashboardCreditsType(value) {
-  return String(value || "")
-    .trim()
-    .toLowerCase()
-    .replace(/[’']/g, "")
-    .replace(/\s+/g, " ");
+  return normalizeDashboardText(value);
 }
 
 function getDashboardCreditsTypeKey(value) {
   return DASHBOARD_CREDITS_TYPE_KEYS.get(normalizeDashboardCreditsType(value)) || null;
+}
+
+function formatDashboardCurrencyText(value) {
+  const number = Number(value || 0);
+  const absolute = Math.abs(number);
+  const formatted = `$${absolute.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  })}`;
+  return number < 0 ? `-${formatted}` : formatted;
+}
+
+function classifyDashboardCreditsTypeForMemberBank(value) {
+  const normalized = normalizeDashboardCreditsType(value);
+  const display = titleCaseDashboardLabel(value);
+  if (!normalized) return null;
+  const exactLabels = new Map([
+    ["owners equity", "Manual Credit - Owners Equity"],
+    ["owner equity", "Manual Credit - Owners Equity"],
+    ["entered", "Manual Credit - Entered Credits"],
+    ["dff trade", "Manual Credit - DFF Trade"],
+    ["marketing", "Manual Credit - Marketing"],
+    ["dropsite host credit", "Manual Credit - Dropsite Host Credit"],
+    ["ffcsa employee credit", "Manual Credit - FFCSA Employee Credit"],
+    ["dff employee credit", "Manual Credit - DFF Employee Credit"]
+  ]);
+  const exactSortOrders = new Map([
+    ["entered", 10],
+    ["dropsite host credit", 20],
+    ["marketing", 30],
+    ["dff trade", 40],
+    ["dff employee credit", 50],
+    ["ffcsa employee credit", 60],
+    ["owners equity", 70],
+    ["owner equity", 70]
+  ]);
+  const labelSuffix = display.endsWith("Credit") || display.endsWith("Credits")
+    ? display
+    : `${display} Credits`;
+  const label = exactLabels.get(normalized) || `Manual Credit - ${labelSuffix}`;
+  const sortOrder = exactSortOrders.get(normalized) || 100;
+  if (normalized.includes("snap")) {
+    return { key: "snapCredits", label: "Manual Credit - SNAP Credits", sortOrder: 10, sourceTypeLabel: display };
+  }
+  if (
+    normalized.includes("jar") ||
+    normalized.includes("bottle") ||
+    normalized.includes("deposit") ||
+    normalized.includes("container return")
+  ) {
+    return {
+      key: "jarReturnCredits",
+      label: "Manual Credit - Jar Return Credits",
+      sortOrder: 20,
+      sourceTypeLabel: display
+    };
+  }
+  if (
+    normalized.includes("product return") ||
+    normalized.includes("product credit") ||
+    normalized.includes("missing") ||
+    normalized.includes("not received") ||
+    normalized.includes("refund") ||
+    normalized.includes("reimburse") ||
+    normalized.includes("cancel") ||
+    normalized.includes("quality") ||
+    normalized.includes("wrong item") ||
+    normalized.includes("damaged")
+  ) {
+    return {
+      key: "productReturnIssueCredits",
+      label: "Manual Credit - Product Return / Issue Credits",
+      sortOrder: 30,
+      sourceTypeLabel: display
+    };
+  }
+  return {
+    key: `creditType_${slugifyDashboardKey(normalized)}`,
+    label,
+    sortOrder,
+    sourceTypeLabel: display
+  };
+}
+
+function normalizeDashboardCreditsName(value) {
+  return String(value || "").trim();
+}
+
+function addDashboardCreditsCategoryName(monthSummary, categoryKey, name, value) {
+  if (!categoryKey || !name || !Number(value)) return;
+  const namesByCategory = monthSummary.memberBankCreditCategoryNames || {};
+  const categoryNames = namesByCategory[categoryKey] || {};
+  categoryNames[name] = round2(Number(categoryNames[name] || 0) + Number(value || 0));
+  namesByCategory[categoryKey] = categoryNames;
+  monthSummary.memberBankCreditCategoryNames = namesByCategory;
+}
+
+function addDashboardMemberBankCreditCategory(monthSummary, typeLabel, value) {
+  const category = classifyDashboardCreditsTypeForMemberBank(typeLabel);
+  if (!category) return;
+  const categories = monthSummary.memberBankCreditCategories || {};
+  const existing = categories[category.key] || {
+    label: category.label,
+    sourceTypeLabel: category.sourceTypeLabel || typeLabel,
+    amount: 0,
+    sortOrder: category.sortOrder
+  };
+  existing.amount = round2(Number(existing.amount || 0) + Number(value || 0));
+  existing.label = category.label;
+  existing.sourceTypeLabel = existing.sourceTypeLabel || category.sourceTypeLabel || typeLabel;
+  existing.sortOrder = Math.min(Number(existing.sortOrder || category.sortOrder), category.sortOrder);
+  categories[category.key] = existing;
+  monthSummary.memberBankCreditCategories = categories;
 }
 
 function parseDashboardCreditsMonthHeader(value, year = DASHBOARD_EMPLOYEE_CREDITS_YEAR) {
@@ -1996,19 +2202,182 @@ function buildDashboardCreditsMonthlyMap(rows = [], year = DASHBOARD_EMPLOYEE_CR
   if (!monthColumns.length) return {};
 
   const monthlyMap = {};
-  rows.slice(headerIndex + 1).forEach((row) => {
-    const typeKey = getDashboardCreditsTypeKey(row?.[0]);
-    if (!typeKey) return;
-    monthColumns.forEach(({ monthStart, columnIndex }) => {
-      const value = parseDashboardNumber(row?.[columnIndex]);
-      if (value === null) return;
-      const monthSummary = monthlyMap[monthStart] || {};
-      monthSummary[typeKey] = round2(Number(monthSummary[typeKey] || 0) + value);
-      monthlyMap[monthStart] = monthSummary;
-    });
-  });
+	  rows.slice(headerIndex + 1).forEach((row) => {
+	    const typeLabel = String(row?.[0] || "").trim();
+	    const typeKey = getDashboardCreditsTypeKey(typeLabel);
+	    const category = classifyDashboardCreditsTypeForMemberBank(typeLabel);
+	    const name = normalizeDashboardCreditsName(row?.[1]);
+	    if (!typeLabel) return;
+	    monthColumns.forEach(({ monthStart, columnIndex }) => {
+	      const value = parseDashboardNumber(row?.[columnIndex]);
+	      if (value === null) return;
+	      const monthSummary = monthlyMap[monthStart] || {};
+      if (typeKey) {
+        monthSummary[typeKey] = round2(Number(monthSummary[typeKey] || 0) + value);
+	      }
+	      addDashboardMemberBankCreditCategory(monthSummary, typeLabel, value);
+	      if (category) {
+	        addDashboardCreditsCategoryName(monthSummary, category.key, name, value);
+	      }
+	      monthlyMap[monthStart] = monthSummary;
+	    });
+	  });
 
   return monthlyMap;
+}
+
+function getCreditsMemberBankCategoryAmount(creditsMonthlyMap = {}, monthStart, categoryKey) {
+  return Number(
+    creditsMonthlyMap?.[monthStart]?.memberBankCreditCategories?.[categoryKey]?.amount || 0
+  );
+}
+
+function getCreditsMemberBankCategoryTotal(creditsMonthlyMap = {}, monthStart) {
+  return round2(
+    Object.values(creditsMonthlyMap?.[monthStart]?.memberBankCreditCategories || {})
+      .reduce((sum, category) => sum + Number(category?.amount || 0), 0)
+  );
+}
+
+function getManualCreditResidualBeforeNoteBuckets({
+  creditsMonthlyMap = {},
+  storeCreditMonthlyMap = {},
+  monthStart
+} = {}) {
+  return round2(
+    Number(storeCreditMonthlyMap?.[monthStart]?.manualCreditTotal || 0) -
+      Number(storeCreditMonthlyMap?.[monthStart]?.automatedSubscriptionCredit || 0) -
+      Number(storeCreditMonthlyMap?.[monthStart]?.snapCredit || 0) -
+      Number(storeCreditMonthlyMap?.[monthStart]?.tomCulhaneCashReceived || 0) -
+      Number(getCreditsMemberBankCategoryTotal(creditsMonthlyMap, monthStart) || 0)
+  );
+}
+
+function getAdjustedManualCreditNoteBucketValues({
+  creditsMonthlyMap = {},
+  storeCreditMonthlyMap = {},
+  monthStart
+} = {}) {
+  const rawValues = Object.fromEntries(
+    DASHBOARD_MANUAL_CREDIT_NOTE_BUCKETS.map((bucket) => [
+      bucket.key,
+      Number(storeCreditMonthlyMap?.[monthStart]?.[bucket.key] || 0)
+    ])
+  );
+  let remainingResidual = Math.max(
+    0,
+    getManualCreditResidualBeforeNoteBuckets({
+      creditsMonthlyMap,
+      storeCreditMonthlyMap,
+      monthStart
+    })
+  );
+  const adjustedValues = Object.fromEntries(
+    DASHBOARD_MANUAL_CREDIT_NOTE_BUCKETS.map((bucket) => [bucket.key, 0])
+  );
+
+  DASHBOARD_MANUAL_CREDIT_NOTE_BUCKET_ALLOCATION_ORDER.forEach((bucketKey) => {
+    if (remainingResidual <= 0) return;
+    const bucketValue = Math.max(0, Number(rawValues[bucketKey] || 0));
+    const applied = Math.min(bucketValue, remainingResidual);
+    adjustedValues[bucketKey] = round2(applied);
+    remainingResidual = round2(remainingResidual - applied);
+  });
+
+  return adjustedValues;
+}
+
+function getAdjustedManualCreditNoteBucketValue({
+  creditsMonthlyMap = {},
+  storeCreditMonthlyMap = {},
+  monthStart,
+  bucketKey
+} = {}) {
+  const adjustedValues = getAdjustedManualCreditNoteBucketValues({
+    creditsMonthlyMap,
+    storeCreditMonthlyMap,
+    monthStart
+  });
+  return Number(adjustedValues[bucketKey] || 0);
+}
+
+function getUncategorizedManualCreditValue({
+  creditsMonthlyMap = {},
+  storeCreditMonthlyMap = {},
+  monthStart
+} = {}) {
+  const adjustedNoteBucketValues = getAdjustedManualCreditNoteBucketValues({
+    creditsMonthlyMap,
+    storeCreditMonthlyMap,
+    monthStart
+  });
+  const adjustedNoteBucketTotal = Object.values(adjustedNoteBucketValues)
+    .reduce((sum, value) => sum + Number(value || 0), 0);
+  return round2(
+    getManualCreditResidualBeforeNoteBuckets({
+      creditsMonthlyMap,
+      storeCreditMonthlyMap,
+      monthStart
+    }) - adjustedNoteBucketTotal
+  );
+}
+
+function collectDashboardMemberBankCreditCategoryRows(creditsMonthlyMap = {}, { monthStarts = null } = {}) {
+  const byKey = new Map();
+  const includedMonthStarts = monthStarts ? new Set(monthStarts) : null;
+  Object.entries(creditsMonthlyMap || {}).forEach(([monthStart, monthSummary]) => {
+    if (includedMonthStarts && !includedMonthStarts.has(monthStart)) return;
+    Object.entries(monthSummary?.memberBankCreditCategories || {}).forEach(([key, category]) => {
+      if (!Number(category?.amount)) return;
+      const existing = byKey.get(key) || {
+        key,
+        label: category.label,
+        sourceTypeLabel: category.sourceTypeLabel,
+        sortOrder: Number(category.sortOrder || 100),
+        total: 0,
+        names: new Map()
+      };
+      existing.total = round2(existing.total + Number(category.amount || 0));
+      existing.label = category.label || existing.label;
+      existing.sourceTypeLabel = existing.sourceTypeLabel || category.sourceTypeLabel;
+      existing.sortOrder = Math.min(existing.sortOrder, Number(category.sortOrder || 100));
+      Object.entries(monthSummary?.memberBankCreditCategoryNames?.[key] || {}).forEach(([name, amount]) => {
+        if (!name || !Number(amount)) return;
+        existing.names.set(name, round2(Number(existing.names.get(name) || 0) + Number(amount || 0)));
+      });
+      byKey.set(key, existing);
+    });
+  });
+  return Array.from(byKey.values()).map((category) => ({
+    ...category,
+    names: Array.from(category.names.entries())
+      .map(([name, amount]) => ({ name, amount }))
+      .sort((left, right) => {
+        const amountDiff = Math.abs(Number(right.amount || 0)) - Math.abs(Number(left.amount || 0));
+        if (amountDiff) return amountDiff;
+        return String(left.name || "").localeCompare(String(right.name || ""));
+      })
+  })).sort((left, right) => {
+    if (left.sortOrder !== right.sortOrder) return left.sortOrder - right.sortOrder;
+    return String(left.label || "").localeCompare(String(right.label || ""));
+  });
+}
+
+function formatDashboardCreditsNameBreakdown(names = [], { maxNames = 18 } = {}) {
+  const filtered = (names || []).filter((item) => item?.name && Number(item.amount));
+  if (!filtered.length) return "";
+  const visible = filtered.slice(0, maxNames);
+  const remaining = filtered.slice(maxNames);
+  const visibleText = visible
+    .map((item) => `${item.name} (${formatDashboardCurrencyText(item.amount)})`)
+    .join("; ");
+  const remainingTotal = round2(
+    remaining.reduce((sum, item) => sum + Number(item.amount || 0), 0)
+  );
+  const remainingText = remaining.length
+    ? `; ${remaining.length} other name${remaining.length === 1 ? "" : "s"} (${formatDashboardCurrencyText(remainingTotal)})`
+    : "";
+  return `Credits-tab names for shown months: ${visibleText}${remainingText}.`;
 }
 
 function buildMonthlyDashboardManualValueMap(manualValueMap = new Map(), weeks = []) {
@@ -2174,6 +2543,7 @@ function buildDashboardV2Rows({
   monthlyTimesheetMap = {},
   monthlySubscriberMap = {},
   creditsMonthlyMap = {},
+  storeCreditMonthlyMap = {},
   qboPeriodMap = {},
   generatedAt = new Date()
 } = {}) {
@@ -2182,8 +2552,58 @@ function buildDashboardV2Rows({
   const expenseLineLabels = collectQboExpenseLineLabels(qboPeriodMap);
   const getPeriodSum = (period, getValue) => sumPeriodWeekValues(months, period, getValue);
   const getPeriodLatest = (period, getValue) => latestPeriodWeekValue(months, period, getValue);
+  const getPeriodFirst = (period, getValue) => {
+    for (const month of months) {
+      if (!isWeekInDashboardSummaryPeriod(month, period)) continue;
+      const value = getValue(month);
+      if (value !== null && typeof value !== "undefined" && value !== "") return value;
+    }
+    return null;
+  };
   const getCreditPeriodSum = (period, creditKey) =>
     getPeriodSum(period, (month) => creditsMonthlyMap[month.start]?.[creditKey]);
+  const creditsTabManualCreditCategories = collectDashboardMemberBankCreditCategoryRows(
+    creditsMonthlyMap,
+    { monthStarts: months.map((month) => month.start) }
+  );
+  const getCreditsTabNameBreakdownNote = (typeLabel) => {
+    const normalizedType = normalizeDashboardCreditsType(typeLabel);
+    const category = creditsTabManualCreditCategories.find(
+      (item) => normalizeDashboardCreditsType(item.sourceTypeLabel) === normalizedType
+    );
+    return category ? formatDashboardCreditsNameBreakdown(category.names) : "";
+  };
+  const creditsTabManualCreditCategoryRows = creditsTabManualCreditCategories.map((category) => ({
+    label: category.label,
+    entry: "AUTO",
+    source: `Credits tab Type = ${category.sourceTypeLabel || category.label.replace(/^Manual Credit - /, "")}`,
+    methodology: "Authoritative manual-credit classification from the Credits worksheet. Local Line remains the source of truth for total ledger movement; Local Line note buckets only classify the remaining movement after these Credits-tab rows are removed.",
+    note: formatDashboardCreditsNameBreakdown(category.names),
+    valueType: "currency",
+    periodAuto: (period) =>
+      getPeriodSum(period, (month) =>
+        getCreditsMemberBankCategoryAmount(creditsMonthlyMap, month.start, category.key)
+      )
+  }));
+  const creditsTabManualCreditComponentLabels = creditsTabManualCreditCategoryRows.length
+    ? creditsTabManualCreditCategoryRows.map((row) => row.label)
+    : ["Manual Credit - Credits Tab Total"];
+  const memberBankLedgerComponentLabels = [
+    "Manual Credit - Automated Subscription Credits",
+    "Manual Credit - SNAP Payments",
+    "Manual Credit - Tom Culhane Cash Received",
+    ...creditsTabManualCreditComponentLabels,
+    ...DASHBOARD_MANUAL_CREDIT_NOTE_BUCKETS.map((bucket) => bucket.label),
+    "Manual Credit - Uncategorized",
+    "Manual Debits",
+    "Member Credit Used on Orders"
+  ];
+  const formulaSumRows = (metricSheetRowsByLabel, labels, columnName) => {
+    const refs = labels
+      .map((label) => getMetricCellRef(metricSheetRowsByLabel, label, columnName))
+      .filter(Boolean);
+    return refs.length ? `=IF(COUNTA(${refs.join(",")})=0,"",${refs.join("+")})` : "";
+  };
   const formulaDivide = (metricSheetRowsByLabel, numeratorLabel, denominatorLabel, columnName) => {
     const numeratorRef = getMetricCellRef(metricSheetRowsByLabel, numeratorLabel, columnName);
     const denominatorRef = getMetricCellRef(metricSheetRowsByLabel, denominatorLabel, columnName);
@@ -2304,34 +2724,36 @@ function buildDashboardV2Rows({
           }
         },
         {
-          label: "DFF Trade",
+          label: "Manual Credit - Credits Tab Total",
           entry: "AUTO",
-          source: "Credits tab Type = DFF Trade",
-          methodology: "Monthly total from the Credits tab for DFF Trade rows; treated as trade revenue in the adjusted dashboard profit story.",
+          source: "Credits tab Type totals",
+          methodology: "Total manual-credit value from the Credits tab. These credits are also classified elsewhere in the dashboard as expenses, trade, employee benefits, or owner-equity adjustments; this line keeps the issued credit counted as revenue while the offsetting business purpose is accounted for in those sections.",
           valueType: "currency",
-          periodAuto: (period) => getCreditPeriodSum(period, "dffTrade")
-        },
-        {
-          label: "DFF Employee Credit",
-          entry: "AUTO",
-          source: "Credits tab Type = DFF Employee Credit",
-          methodology: "Monthly total from the Credits tab for DFF Employee Credit rows; treated as trade revenue in the adjusted dashboard profit story.",
-          valueType: "currency",
-          periodAuto: (period) => getCreditPeriodSum(period, "dffEmployeeCredit")
+          bold: true,
+          periodAuto: (period) =>
+            getPeriodSum(period, (month) => getCreditsMemberBankCategoryTotal(creditsMonthlyMap, month.start))
         },
         {
           label: "Total Revenue",
           entry: "AUTO",
-          source: "QBO Revenue + DFF Trade + DFF Employee Credit",
-          methodology: "Total Revenue starts with QBO Total Income and adds Credits tab trade revenue from DFF Trade and DFF Employee Credit rows. This is the revenue line used for adjusted Gross Profit and Net Profit.",
+          source: "QBO Revenue + Manual Credit - Credits Tab Total + Manual Credit - Tom Culhane Cash Received",
+          methodology: "Total Revenue starts with QBO Total Income and adds manual-credit revenue tracked outside normal QBO income: Credits-tab manual credits and Tom Culhane cash received.",
           valueType: "currency",
           bold: true,
           periodFormula: ({ columnName, metricSheetRowsByLabel }) => {
             const qboRevenueRef = getMetricCellRef(metricSheetRowsByLabel, "QBO Revenue", columnName);
-            const dffTradeRef = getMetricCellRef(metricSheetRowsByLabel, "DFF Trade", columnName);
-            const dffEmployeeCreditRef = getMetricCellRef(metricSheetRowsByLabel, "DFF Employee Credit", columnName);
-            return qboRevenueRef && dffTradeRef && dffEmployeeCreditRef
-              ? `=IF(COUNTA(${qboRevenueRef},${dffTradeRef},${dffEmployeeCreditRef})=0,"",${qboRevenueRef}+${dffTradeRef}+${dffEmployeeCreditRef})`
+            const manualCreditsFromCreditsTabRef = getMetricCellRef(
+              metricSheetRowsByLabel,
+              "Manual Credit - Credits Tab Total",
+              columnName
+            );
+            const tomCulhaneCashReceivedRef = getMetricCellRef(
+              metricSheetRowsByLabel,
+              "Manual Credit - Tom Culhane Cash Received",
+              columnName
+            );
+            return qboRevenueRef && manualCreditsFromCreditsTabRef && tomCulhaneCashReceivedRef
+              ? `=IF(COUNTA(${qboRevenueRef},${manualCreditsFromCreditsTabRef},${tomCulhaneCashReceivedRef})=0,"",${qboRevenueRef}+${manualCreditsFromCreditsTabRef}+${tomCulhaneCashReceivedRef})`
               : "";
           }
         }
@@ -2341,51 +2763,139 @@ function buildDashboardV2Rows({
       section: "MEMBER BANK",
       rows: [
         {
-          label: "Member Dollars Received",
+          label: "Member Bank Opening Balance",
           entry: "AUTO",
-          source: "Local member-credit cash received",
-          methodology: "Member-bank cash and credit movement supports the revenue story, but it is tracked separately from accounting revenue.",
+          source: "Local Line customer Store Credit balance snapshot",
+          methodology: "Opening balance is the latest Local Line customer Store Credit balance snapshot on or before the first day of the period.",
           valueType: "currency",
           periodAuto: (period) =>
-            getPeriodSum(period, (month) => monthlyKpiMap[month.start]?.actualDollarsReceivedForCredit)
+            getPeriodFirst(period, (month) => storeCreditMonthlyMap[month.start]?.openingBalance)
         },
         {
-          label: "Extra Credit Issued",
+          label: "Manual Credit - Automated Subscription Credits",
           entry: "AUTO",
-          source: "Credit issued above dollars received",
+          source: "Local Line store-credit transactions: MANUAL_CREDIT note = automated monthly subscription addition",
+          methodology: "Actual Local Line credit transactions created by the subscription automation.",
           valueType: "currency",
           periodAuto: (period) =>
-            getPeriodSum(period, (month) => monthlyKpiMap[month.start]?.bonusCreditExpense)
+            getPeriodSum(period, (month) => storeCreditMonthlyMap[month.start]?.automatedSubscriptionCredit)
         },
         {
-          label: "Member Credit Used for Purchases",
+          label: "Manual Credit - SNAP Payments",
           entry: "AUTO",
-          source: "Local Line store credit used on paid orders",
+          source: `Local Line MANUAL_CREDIT for SNAP price-list/tag customers over $${DASHBOARD_SNAP_MANUAL_CREDIT_MIN_AMOUNT}`,
+          methodology: "Manual store-credit additions for customers whose Local Line customer export has Price Lists or Tags containing SNAP. Clear SNAP notes are also included, while produce notes such as snap peas are excluded.",
           valueType: "currency",
           periodAuto: (period) =>
-            getPeriodSum(period, (month) => monthlyKpiMap[month.start]?.subscriptionCreditUsed)
+            getPeriodSum(period, (month) => storeCreditMonthlyMap[month.start]?.snapCredit)
+        },
+        {
+          label: "Manual Credit - Tom Culhane Cash Received",
+          entry: "AUTO",
+          source: `Local Line MANUAL_CREDIT for Tom Culhane at $${DASHBOARD_TOM_CULHANE_CASH_RECEIVED_AMOUNT}`,
+          methodology: "Cash received from Tom Culhane and loaded as Local Line store credit. A matching Owners Equity Cash Credits line below NOI offsets this so the cash handling does not inflate final Net Profit.",
+          valueType: "currency",
+          periodAuto: (period) =>
+            getPeriodSum(period, (month) => storeCreditMonthlyMap[month.start]?.tomCulhaneCashReceived)
+        },
+        ...creditsTabManualCreditCategoryRows,
+        ...DASHBOARD_MANUAL_CREDIT_NOTE_BUCKETS.map((bucket) => ({
+          label: bucket.label,
+          entry: "AUTO",
+          source: bucket.source,
+          methodology: bucket.methodology,
+          valueType: "currency",
+          periodAuto: (period) =>
+            getPeriodSum(period, (month) =>
+              getAdjustedManualCreditNoteBucketValue({
+                creditsMonthlyMap,
+                storeCreditMonthlyMap,
+                monthStart: month.start,
+                bucketKey: bucket.key
+              })
+            )
+        })),
+        {
+          label: "Manual Credit - Uncategorized",
+          entry: "AUTO",
+          source: "Local Line MANUAL_CREDIT minus known member-bank credit buckets",
+          methodology: "Remaining manual credit movement after automated, SNAP, Tom Culhane cash, Credits-tab detail, and adjusted Local Line note buckets are removed. This should be close to zero.",
+          valueType: "currency",
+          periodAuto: (period) =>
+            getPeriodSum(period, (month) =>
+              getUncategorizedManualCreditValue({
+                creditsMonthlyMap,
+                storeCreditMonthlyMap,
+                monthStart: month.start
+              })
+            )
+        },
+        {
+          label: "Manual Debits",
+          entry: "AUTO",
+          source: "Local Line store-credit transactions: MANUAL_DEBIT",
+          methodology: "Signed Local Line manual debits. These reduce member-bank balance.",
+          valueType: "currency",
+          periodAuto: (period) =>
+            getPeriodSum(period, (month) => storeCreditMonthlyMap[month.start]?.manualDebitTotal)
+        },
+        {
+          label: "Member Credit Used on Orders",
+          entry: "AUTO",
+          source: "Local Line store-credit transactions: ORDER_DEBIT",
+          methodology: "Signed Local Line order debits. These reduce member-bank balance and are the source of truth for credit used on orders.",
+          valueType: "currency",
+          periodAuto: (period) =>
+            getPeriodSum(period, (month) => storeCreditMonthlyMap[month.start]?.orderDebitTotal)
+        },
+        {
+          label: "Member Bank Ledger Net Movement",
+          entry: "AUTO",
+          source: "Manual-credit component rows + Manual Debits + Member Credit Used on Orders",
+          methodology: "Signed Local Line ledger movement for the period after automated, SNAP, Tom Culhane cash, Credits-tab manual credits, adjusted Local Line note buckets, remaining uncategorized manual credits, manual debits, and order debits are separated.",
+          valueType: "currency",
+          bold: true,
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) =>
+            formulaSumRows(metricSheetRowsByLabel, memberBankLedgerComponentLabels, columnName)
+        },
+        {
+          label: "Member Bank Closing Balance",
+          entry: "AUTO",
+          source: "Local Line customer Store Credit balance snapshot",
+          methodology: "Closing balance is the latest Local Line customer Store Credit balance snapshot on or before the day after the period end.",
+          valueType: "currency",
+          periodAuto: (period) =>
+            getPeriodLatest(period, (month) => storeCreditMonthlyMap[month.start]?.closingBalance)
         },
         {
           label: "Member Bank Balance Change",
           entry: "AUTO",
-          source: "Member Dollars Received + Extra Credit Issued - Member Credit Used for Purchases",
+          source: "Member Bank Closing Balance - Member Bank Opening Balance",
+          methodology: "Actual balance change from Local Line customer Store Credit snapshots.",
           valueType: "currency",
+          bold: true,
           periodFormula: ({ columnName, metricSheetRowsByLabel }) => {
-            const dollarsReceivedRef = getMetricCellRef(metricSheetRowsByLabel, "Member Dollars Received", columnName);
-            const extraCreditRef = getMetricCellRef(metricSheetRowsByLabel, "Extra Credit Issued", columnName);
-            const creditUsedRef = getMetricCellRef(metricSheetRowsByLabel, "Member Credit Used for Purchases", columnName);
-            return dollarsReceivedRef && extraCreditRef && creditUsedRef
-              ? `=IF(COUNTA(${dollarsReceivedRef},${extraCreditRef},${creditUsedRef})=0,"",${dollarsReceivedRef}+${extraCreditRef}-${creditUsedRef})`
+            const openingRef = getMetricCellRef(metricSheetRowsByLabel, "Member Bank Opening Balance", columnName);
+            const closingRef = getMetricCellRef(metricSheetRowsByLabel, "Member Bank Closing Balance", columnName);
+            return openingRef && closingRef
+              ? `=IF(OR(${openingRef}="",${closingRef}=""),"",${closingRef}-${openingRef})`
               : "";
           }
         },
         {
-          label: "Member Bank Balance",
+          label: "Unreconciled Balance Difference",
           entry: "AUTO",
-          source: "Local Line customer credit balance snapshot",
+          source: "Member Bank Balance Change - Member Bank Ledger Net Movement",
+          methodology: "Snapshot-vs-ledger drift. This should stay very small; February 2026 was about -$2.15 in the Local Line audit.",
           valueType: "currency",
-          periodAuto: (period) =>
-            getPeriodLatest(period, (month) => monthlyKpiMap[month.start]?.memberBankBalance)
+          bold: true,
+          periodFormula: ({ columnName, metricSheetRowsByLabel }) => {
+            const balanceChangeRef = getMetricCellRef(metricSheetRowsByLabel, "Member Bank Balance Change", columnName);
+            const ledgerMovementRef = getMetricCellRef(metricSheetRowsByLabel, "Member Bank Ledger Net Movement", columnName);
+            return balanceChangeRef && ledgerMovementRef
+              ? `=IF(OR(${balanceChangeRef}="",${ledgerMovementRef}=""),"",${balanceChangeRef}-${ledgerMovementRef})`
+              : "";
+          }
         }
       ]
     },
@@ -2403,26 +2913,25 @@ function buildDashboardV2Rows({
         {
           label: "Local Revenue Dollars",
           entry: "AUTO",
-          source: "Member Dollars Received + Guest Purchase Dollars",
+          source: "LL Revenue",
           valueType: "currency",
           periodFormula: ({ columnName, metricSheetRowsByLabel }) => {
-            const dollarsReceivedRef = getMetricCellRef(metricSheetRowsByLabel, "Member Dollars Received", columnName);
-            const guestPurchasesRef = getMetricCellRef(metricSheetRowsByLabel, "Guest Purchase Dollars", columnName);
-            return dollarsReceivedRef && guestPurchasesRef
-              ? `=IF(COUNTA(${dollarsReceivedRef},${guestPurchasesRef})=0,"",${dollarsReceivedRef}+${guestPurchasesRef})`
+            const llRevenueRef = getMetricCellRef(metricSheetRowsByLabel, "LL Revenue", columnName);
+            return llRevenueRef
+              ? `=IF(${llRevenueRef}="","",${llRevenueRef})`
               : "";
           }
         },
         {
           label: "Local Purchase Dollars",
           entry: "AUTO",
-          source: "Member Credit Used for Purchases + Guest Purchase Dollars",
+          source: "ABS(Member Credit Used on Orders) + Guest Purchase Dollars",
           valueType: "currency",
           periodFormula: ({ columnName, metricSheetRowsByLabel }) => {
-            const memberPurchasesRef = getMetricCellRef(metricSheetRowsByLabel, "Member Credit Used for Purchases", columnName);
+            const memberPurchasesRef = getMetricCellRef(metricSheetRowsByLabel, "Member Credit Used on Orders", columnName);
             const guestPurchasesRef = getMetricCellRef(metricSheetRowsByLabel, "Guest Purchase Dollars", columnName);
             return memberPurchasesRef && guestPurchasesRef
-              ? `=IF(COUNTA(${memberPurchasesRef},${guestPurchasesRef})=0,"",${memberPurchasesRef}+${guestPurchasesRef})`
+              ? `=IF(COUNTA(${memberPurchasesRef},${guestPurchasesRef})=0,"",ABS(${memberPurchasesRef})+${guestPurchasesRef})`
               : "";
           }
         },
@@ -2688,10 +3197,21 @@ function buildDashboardV2Rows({
           periodAuto: (period) => getCreditPeriodSum(period, "ownersEquity")
         },
         {
+          label: "Owners Equity Cash Credits",
+          entry: "AUTO",
+          source: "Offset for Manual Credit - Tom Culhane Cash Received",
+          methodology: "Negative offset for Tom Culhane cash received that was used for owners equity. This balances the manual-credit revenue line so those cash loads do not inflate final Net Profit.",
+          valueType: "currency",
+          periodAuto: (period) =>
+            getPeriodSum(period, (month) =>
+              -Number(storeCreditMonthlyMap[month.start]?.tomCulhaneCashReceived || 0)
+            )
+        },
+        {
           label: "Total Other Income / Expenses",
           entry: "AUTO",
-          source: "QBO Other Income / Expenses + QBO Payroll Expenses Owner Addback + Owners Equity Credits",
-          methodology: "This is the total income-adjustment/add-back pool below NOI. QBO other income/expenses, owner payroll addback, and Owners Equity Credits are all added back into the final Net Profit calculation.",
+          source: "QBO Other Income / Expenses + QBO Payroll Expenses Owner Addback + Owners Equity Credits + Owners Equity Cash Credits",
+          methodology: "This is the total income-adjustment/add-back pool below NOI. QBO other income/expenses, owner payroll addback, and Owners Equity Credits are added back; Owners Equity Cash Credits offsets Tom Culhane cash received.",
           valueType: "currency",
           bold: true,
           periodFormula: ({ columnName, metricSheetRowsByLabel }) => {
@@ -2710,8 +3230,13 @@ function buildDashboardV2Rows({
               "QBO Payroll Expenses Owner Addback",
               columnName
             );
-            return ownersEquityCreditsRef && otherIncomeExpensesRef && ownerPayrollAddbackRef
-              ? `=IF(COUNTA(${otherIncomeExpensesRef},${ownerPayrollAddbackRef},${ownersEquityCreditsRef})=0,"",${otherIncomeExpensesRef}+${ownerPayrollAddbackRef}+${ownersEquityCreditsRef})`
+            const ownersEquityCashCreditsRef = getMetricCellRef(
+              metricSheetRowsByLabel,
+              "Owners Equity Cash Credits",
+              columnName
+            );
+            return ownersEquityCreditsRef && otherIncomeExpensesRef && ownerPayrollAddbackRef && ownersEquityCashCreditsRef
+              ? `=IF(COUNTA(${otherIncomeExpensesRef},${ownerPayrollAddbackRef},${ownersEquityCreditsRef},${ownersEquityCashCreditsRef})=0,"",${otherIncomeExpensesRef}+${ownerPayrollAddbackRef}+${ownersEquityCreditsRef}+${ownersEquityCashCreditsRef})`
               : "";
           }
         }
@@ -3465,13 +3990,90 @@ function getCustomerStoreCreditAmount(row = {}) {
   );
 }
 
-async function fetchLocalLineCustomerCreditSummary() {
+function getCustomerExportCustomerId(row = {}) {
+  const value =
+    row["Customer ID"] ??
+    row["Customer Id"] ??
+    row["Customer id"] ??
+    row.customer_id ??
+    row.id ??
+    "";
+  const normalized = String(value || "").trim();
+  return normalized || null;
+}
+
+function getCustomerExportEmail(row = {}) {
+  const email = String(row.Email ?? row.email ?? "").trim().toLowerCase();
+  return email || null;
+}
+
+function getCustomerExportName(row = {}) {
+  const name = String(row.Customer ?? row.customer ?? row.name ?? "").trim();
+  return name || null;
+}
+
+function getCustomerExportSnapFields(row = {}) {
+  return [
+    row["Price Lists"],
+    row["Price List"],
+    row.price_lists,
+    row.priceLists,
+    row.Tags,
+    row.tags
+  ];
+}
+
+function isSnapCustomerExportRow(row = {}) {
+  return getCustomerExportSnapFields(row)
+    .map((value) => {
+      if (Array.isArray(value)) {
+        return value
+          .map((item) => {
+            const text = item?.name ?? item?.price_list ?? item?.priceList ?? item;
+            return String(text || "");
+          })
+          .join(" ");
+      }
+      return String(value || "");
+    })
+    .some((value) => normalizeDashboardText(value).includes("snap"));
+}
+
+function buildStoreCreditSnapCustomerLookup(customers = []) {
+  const lookup = {
+    ids: new Set(),
+    emails: new Set(),
+    names: new Set()
+  };
+  customers.forEach((customer) => {
+    if (!customer?.isSnapCustomer) return;
+    if (customer.customerId) lookup.ids.add(String(customer.customerId));
+    if (customer.email) lookup.emails.add(String(customer.email).trim().toLowerCase());
+    if (customer.customerName) lookup.names.add(normalizeDashboardText(customer.customerName));
+  });
+  return lookup;
+}
+
+function isStoreCreditSnapCustomer(customer = {}, snapCustomerLookup = {}) {
+  const customerId = String(customer.customerId || "").trim();
+  if (customerId && snapCustomerLookup.ids?.has(customerId)) return true;
+  const email = String(customer.email || "").trim().toLowerCase();
+  if (email && snapCustomerLookup.emails?.has(email)) return true;
+  const name = normalizeDashboardText(customer.customerName);
+  return Boolean(name && snapCustomerLookup.names?.has(name));
+}
+
+async function fetchLocalLineCustomerCreditRows() {
   const accessToken = await getLocalLineAccessToken();
   const buffer = await downloadBinaryFile(
     `${getLocalLineBaseUrl()}customers/export/?direct=true`,
     accessToken
   );
-  const rows = parseRowsFromBuffer(buffer);
+  return parseRowsFromBuffer(buffer);
+}
+
+async function fetchLocalLineCustomerCreditSummary() {
+  const rows = await fetchLocalLineCustomerCreditRows();
   let totalBalance = 0;
   let nonzeroBalanceCustomerCount = 0;
 
@@ -3488,6 +4090,1048 @@ async function fetchLocalLineCustomerCreditSummary() {
     nonzeroBalanceCustomerCount,
     totalBalance: round2(totalBalance)
   };
+}
+
+function getStoreCreditTransactionId(transaction = {}) {
+  const value =
+    transaction.id ??
+    transaction.uuid ??
+    transaction.reference ??
+    transaction.transaction_id ??
+    null;
+  return value === null || typeof value === "undefined" || value === "" ? null : String(value);
+}
+
+function getStoreCreditTransactionDateRaw(transaction = {}) {
+  return (
+    transaction.created_at ||
+    transaction.createdAt ||
+    transaction.transaction_date ||
+    transaction.transactionDate ||
+    transaction.effective_date ||
+    transaction.effectiveDate ||
+    ""
+  );
+}
+
+function getStoreCreditTransactionType(transaction = {}) {
+  return String(
+    transaction.transaction_type ||
+      transaction.transactionType ||
+      transaction.type ||
+      "UNKNOWN"
+  ).trim().toUpperCase();
+}
+
+function getStoreCreditTransactionAmount(transaction = {}) {
+  return round2(
+    Number(
+      transaction.amount ??
+        transaction.amount_total ??
+        transaction.amountTotal ??
+        0
+    ) || 0
+  );
+}
+
+function getStoreCreditTransactionBalance(transaction = {}) {
+  const value =
+    transaction.store_credit_balance ??
+    transaction.storeCreditBalance ??
+    transaction.balance ??
+    transaction.current_balance ??
+    transaction.currentBalance ??
+    null;
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? round2(numeric) : null;
+}
+
+function getStoreCreditTransactionOrderId(transaction = {}) {
+  const value =
+    transaction.order ??
+    transaction.order_id ??
+    transaction.orderId ??
+    transaction.local_line_order_id ??
+    null;
+  return value === null || typeof value === "undefined" || value === "" ? null : String(value);
+}
+
+function getStoreCreditTransactionNote(transaction = {}) {
+  const note = String(transaction.note ?? transaction.description ?? "").trim();
+  return note || null;
+}
+
+function isSnapPaymentStoreCreditNote(note) {
+  const normalized = normalizeDashboardText(note);
+  if (!normalized || normalized.includes("snap peas") || normalized.includes("sugar snap")) {
+    return false;
+  }
+  return /\bsnap\b/.test(normalized);
+}
+
+function shouldClassifyAsSnapStoreCredit(transaction = {}, options = {}) {
+  const amount = Math.abs(getStoreCreditTransactionAmount(transaction));
+  if (amount <= DASHBOARD_SNAP_MANUAL_CREDIT_MIN_AMOUNT) return false;
+  if (isStoreCreditSnapCustomer(options.customer, options.snapCustomerLookup)) return true;
+  return isSnapPaymentStoreCreditNote(getStoreCreditTransactionNote(transaction));
+}
+
+function classifyManualCreditNoteBucket(note) {
+  const normalized = normalizeDashboardText(note);
+  if (!normalized) {
+    return {
+      key: "blankManualCredit",
+      label: "Manual Credit - Blank / Unlabeled"
+    };
+  }
+  if (
+    normalized.includes("jar") ||
+    normalized.includes("bottle") ||
+    normalized.includes("deposit") ||
+    normalized.includes("container")
+  ) {
+    return {
+      key: "jarDepositReturnCredit",
+      label: "Manual Credit - Jar / Deposit Returns"
+    };
+  }
+  if (normalized.includes("host")) {
+    return {
+      key: "hostCredit",
+      label: "Manual Credit - Host Credits"
+    };
+  }
+  if (
+    /refund|return|missing|not received|credit for|wrong|damaged|quality|cancel|reimburse|short|out of stock|not delivered|broken/.test(
+      normalized
+    )
+  ) {
+    return {
+      key: "productIssueRefundCredit",
+      label: "Manual Credit - Product Issue / Refunds"
+    };
+  }
+  if (
+    /farm stay|camp|influencer|trade|gift|nancy|employee|approved|cash payment|store credit|payment|invoice|monthly credit|landing page|successful charge|sent by check|charge|cash|check/.test(
+      normalized
+    )
+  ) {
+    return {
+      key: "paymentTradeAdminCredit",
+      label: "Manual Credit - Payment / Trade / Admin Notes"
+    };
+  }
+  return {
+    key: "productItemCredit",
+    label: "Manual Credit - Product / Item Credits"
+  };
+}
+
+function isTomCulhaneCashReceivedTransaction(customer = {}, transaction = {}) {
+  const amount = Number(getStoreCreditTransactionAmount(transaction));
+  if (Math.abs(amount - DASHBOARD_TOM_CULHANE_CASH_RECEIVED_AMOUNT) > 0.005) return false;
+  const email = normalizeDashboardText(customer.email);
+  if (email && email === DASHBOARD_TOM_CULHANE_CASH_RECEIVED_EMAIL) return true;
+  const name = normalizeDashboardText(customer.customerName);
+  return Boolean(name && name === DASHBOARD_TOM_CULHANE_CASH_RECEIVED_NAME);
+}
+
+function classifyLocalLineStoreCreditTransaction(transaction = {}, options = {}) {
+  const type = getStoreCreditTransactionType(transaction);
+  const note = normalizeDashboardText(getStoreCreditTransactionNote(transaction));
+  if (type === "MANUAL_CREDIT" && note === "automated monthly subscription addition") {
+    return {
+      key: "automatedSubscriptionCredit",
+      label: "Manual Credit - Automated Subscription Credits"
+    };
+  }
+  if (type === "MANUAL_CREDIT" && isTomCulhaneCashReceivedTransaction(options.customer, transaction)) {
+    return {
+      key: "tomCulhaneCashReceived",
+      label: "Manual Credit - Tom Culhane Cash Received"
+    };
+  }
+  if (type === "MANUAL_CREDIT" && shouldClassifyAsSnapStoreCredit(transaction, options)) {
+    return {
+      key: "snapCredit",
+      label: "Manual Credit - SNAP Payments"
+    };
+  }
+  if (type === "MANUAL_CREDIT") {
+    return classifyManualCreditNoteBucket(getStoreCreditTransactionNote(transaction));
+  }
+  if (type === "MANUAL_DEBIT") {
+    return {
+      key: "manualDebit",
+      label: "Manual Debits"
+    };
+  }
+  if (type === "ORDER_DEBIT") {
+    return {
+      key: "orderDebit",
+      label: "Member Credit Used on Orders"
+    };
+  }
+  return {
+    key: slugifyDashboardKey(type, "otherStoreCreditActivity"),
+    label: titleCaseDashboardLabel(type)
+  };
+}
+
+function buildStoreCreditCustomerFromExportRow(row = {}) {
+  const customerId = getCustomerExportCustomerId(row);
+  if (!customerId) return null;
+  return {
+    customerId,
+    customerName: getCustomerExportName(row),
+    email: getCustomerExportEmail(row),
+    storeCreditBalance: getCustomerStoreCreditAmount(row),
+    isSnapCustomer: isSnapCustomerExportRow(row),
+    rawJson: stringifyJson(row)
+  };
+}
+
+function buildStoreCreditTransactionRecord(customer, transaction, runId, options = {}) {
+  const transactionId = getStoreCreditTransactionId(transaction);
+  if (!transactionId) return null;
+  const rawDate = getStoreCreditTransactionDateRaw(transaction);
+  const parsedDate = rawDate ? new Date(rawDate) : null;
+  const transactionDate = String(rawDate || "").slice(0, 10) || toYmdFromDateish(parsedDate);
+  const transactionMonth = transactionDate ? `${transactionDate.slice(0, 7)}-01` : null;
+  const category = classifyLocalLineStoreCreditTransaction(transaction, {
+    ...options,
+    customer
+  });
+  return {
+    transactionId,
+    customerId: customer.customerId,
+    customerName: customer.customerName,
+    email: customer.email,
+    transactionAt:
+      parsedDate && !Number.isNaN(parsedDate.getTime()) ? formatMysqlDateTime(parsedDate) : null,
+    transactionDate,
+    transactionMonth,
+    transactionType: getStoreCreditTransactionType(transaction),
+    categoryKey: category.key,
+    categoryLabel: category.label,
+    amount: getStoreCreditTransactionAmount(transaction),
+    storeCreditBalance: getStoreCreditTransactionBalance(transaction),
+    orderId: getStoreCreditTransactionOrderId(transaction),
+    note: getStoreCreditTransactionNote(transaction),
+    rawJson: stringifyJson(transaction),
+    lastSyncedRunId: runId
+  };
+}
+
+function chunkDashboardRows(rows = [], size = 200) {
+  const chunks = [];
+  for (let index = 0; index < rows.length; index += size) {
+    chunks.push(rows.slice(index, index + size));
+  }
+  return chunks;
+}
+
+async function insertStoreCreditSyncRun(connection, {
+  year,
+  startDate,
+  endExclusiveDate
+}) {
+  const now = new Date();
+  const [result] = await connection.query(
+    `
+      INSERT INTO local_line_store_credit_sync_runs (
+        sync_year,
+        start_date,
+        end_exclusive_date,
+        status,
+        started_at,
+        created_at,
+        updated_at
+      ) VALUES (?, ?, ?, 'running', ?, ?, ?)
+    `,
+    [year, startDate, endExclusiveDate, now, now, now]
+  );
+  return Number(result?.insertId || 0);
+}
+
+async function updateStoreCreditSyncRun(connection, runId, values = {}) {
+  if (!runId) return;
+  const now = new Date();
+  await connection.query(
+    `
+      UPDATE local_line_store_credit_sync_runs
+      SET status = ?,
+          customer_count = ?,
+          transaction_count = ?,
+          manual_credit_total = ?,
+          manual_debit_total = ?,
+          order_debit_total = ?,
+          summary_json = ?,
+          error_message = ?,
+          finished_at = ?,
+          updated_at = ?
+      WHERE id = ?
+    `,
+    [
+      values.status || "completed",
+      Number(values.customerCount || 0),
+      Number(values.transactionCount || 0),
+      round2(values.manualCreditTotal || 0),
+      round2(values.manualDebitTotal || 0),
+      round2(values.orderDebitTotal || 0),
+      values.summaryJson ?? null,
+      values.errorMessage ?? null,
+      values.finishedAt ?? now,
+      now,
+      runId
+    ]
+  );
+}
+
+async function loadStoreCreditCustomerCursors(connection) {
+  const [rows] = await connection.query(
+    `
+      SELECT
+        customer_id AS customerId,
+        last_transaction_id AS lastTransactionId,
+        last_transaction_at AS lastTransactionAt
+      FROM local_line_store_credit_customer_cursors
+    `
+  );
+  return new Map((rows || []).map((row) => [String(row.customerId), row]));
+}
+
+async function upsertStoreCreditBalanceSnapshotRows(connection, {
+  snapshotDate,
+  customers,
+  runId,
+  capturedAt = new Date()
+}) {
+  if (!snapshotDate || !customers.length) return;
+  await connection.query(
+    `DELETE FROM local_line_store_credit_balance_snapshots WHERE snapshot_date = ?`,
+    [snapshotDate]
+  );
+  for (const chunk of chunkDashboardRows(customers, 200)) {
+    const placeholders = chunk.map(() => "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)").join(", ");
+    const values = [];
+    chunk.forEach((customer) => {
+      values.push(
+        snapshotDate,
+        customer.customerId,
+        customer.customerName,
+        customer.email,
+        customer.storeCreditBalance,
+        customer.rawJson,
+        runId || null,
+        capturedAt,
+        capturedAt,
+        capturedAt
+      );
+    });
+    await connection.query(
+      `
+        INSERT INTO local_line_store_credit_balance_snapshots (
+          snapshot_date,
+          customer_id,
+          customer_name,
+          email,
+          store_credit_balance,
+          raw_json,
+          run_id,
+          captured_at,
+          created_at,
+          updated_at
+        ) VALUES ${placeholders}
+        ON DUPLICATE KEY UPDATE
+          customer_name = VALUES(customer_name),
+          email = VALUES(email),
+          store_credit_balance = VALUES(store_credit_balance),
+          raw_json = VALUES(raw_json),
+          run_id = VALUES(run_id),
+          captured_at = VALUES(captured_at),
+          updated_at = VALUES(updated_at)
+      `,
+      values
+    );
+  }
+}
+
+async function upsertStoreCreditTransactions(connection, records = []) {
+  const validRecords = records.filter((record) => record?.transactionId);
+  if (!validRecords.length) return;
+  for (const chunk of chunkDashboardRows(validRecords, 200)) {
+    const placeholders = chunk.map(() => "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)").join(", ");
+    const values = [];
+    const now = new Date();
+    chunk.forEach((record) => {
+      values.push(
+        record.transactionId,
+        record.customerId,
+        record.customerName,
+        record.email,
+        record.transactionAt,
+        record.transactionDate,
+        record.transactionMonth,
+        record.transactionType,
+        record.categoryKey,
+        record.categoryLabel,
+        record.amount,
+        record.storeCreditBalance,
+        record.orderId,
+        record.note,
+        record.rawJson,
+        record.lastSyncedRunId || null,
+        now,
+        now
+      );
+    });
+    await connection.query(
+      `
+        INSERT INTO local_line_store_credit_transactions (
+          transaction_id,
+          customer_id,
+          customer_name,
+          email,
+          transaction_at,
+          transaction_date,
+          transaction_month,
+          transaction_type,
+          category_key,
+          category_label,
+          amount,
+          store_credit_balance,
+          order_id,
+          note,
+          raw_json,
+          last_synced_run_id,
+          created_at,
+          updated_at
+        ) VALUES ${placeholders}
+        ON DUPLICATE KEY UPDATE
+          customer_id = VALUES(customer_id),
+          customer_name = VALUES(customer_name),
+          email = VALUES(email),
+          transaction_at = VALUES(transaction_at),
+          transaction_date = VALUES(transaction_date),
+          transaction_month = VALUES(transaction_month),
+          transaction_type = VALUES(transaction_type),
+          category_key = VALUES(category_key),
+          category_label = VALUES(category_label),
+          amount = VALUES(amount),
+          store_credit_balance = VALUES(store_credit_balance),
+          order_id = VALUES(order_id),
+          note = VALUES(note),
+          raw_json = VALUES(raw_json),
+          last_synced_run_id = VALUES(last_synced_run_id),
+          updated_at = VALUES(updated_at)
+      `,
+      values
+    );
+  }
+}
+
+async function upsertStoreCreditCustomerCursor(connection, {
+  customer,
+  latestRecord = null,
+  fetchedCount = 0,
+  error = null
+}) {
+  const now = new Date();
+  await connection.query(
+    `
+      INSERT INTO local_line_store_credit_customer_cursors (
+        customer_id,
+        customer_name,
+        email,
+        last_transaction_id,
+        last_transaction_at,
+        last_synced_at,
+        transaction_count,
+        last_error,
+        created_at,
+        updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE
+        customer_name = VALUES(customer_name),
+        email = VALUES(email),
+        last_transaction_id = COALESCE(VALUES(last_transaction_id), last_transaction_id),
+        last_transaction_at = COALESCE(VALUES(last_transaction_at), last_transaction_at),
+        last_synced_at = VALUES(last_synced_at),
+        transaction_count = transaction_count + VALUES(transaction_count),
+        last_error = VALUES(last_error),
+        updated_at = VALUES(updated_at)
+    `,
+    [
+      customer.customerId,
+      customer.customerName,
+      customer.email,
+      latestRecord?.transactionId || null,
+      latestRecord?.transactionAt || null,
+      now,
+      Number(fetchedCount || 0),
+      error ? String(error?.message || error) : null,
+      now,
+      now
+    ]
+  );
+}
+
+async function fetchStoreCreditTransactionsForCustomer(customer, accessToken, {
+  startDate,
+  endExclusiveDate,
+  latestImportedAt = null,
+  runId,
+  snapCustomerLookup = null
+}) {
+  const latestImportedTime = latestImportedAt ? new Date(latestImportedAt).getTime() : null;
+  const records = [];
+  let page = 1;
+  let keepGoing = true;
+
+  while (keepGoing && page <= 100) {
+    const payload = await downloadLocalLineJson(
+      `customers/${encodeURIComponent(customer.customerId)}/store-credit-transaction/?page=${page}&page_size=${DASHBOARD_STORE_CREDIT_SYNC_PAGE_SIZE}`,
+      accessToken,
+      `Local Line store-credit transactions for customer ${customer.customerId}`
+    );
+    const results = Array.isArray(payload?.results) ? payload.results : [];
+    if (!results.length) break;
+
+    let allRowsOlderThanSyncStart = true;
+    let allRowsAlreadyImported = Boolean(latestImportedTime);
+    for (const transaction of results) {
+      const rawDate = getStoreCreditTransactionDateRaw(transaction);
+      const transactionDate = toYmdFromDateish(rawDate);
+      const transactionTime = rawDate ? new Date(rawDate).getTime() : NaN;
+      if (!transactionDate) {
+        allRowsOlderThanSyncStart = false;
+      } else if (transactionDate >= startDate) {
+        allRowsOlderThanSyncStart = false;
+      }
+
+      if (!Number.isFinite(transactionTime)) {
+        allRowsAlreadyImported = false;
+        continue;
+      }
+      const shouldImportForCursor = !latestImportedTime || transactionTime >= latestImportedTime;
+      if (shouldImportForCursor) {
+        allRowsAlreadyImported = false;
+      }
+      if (
+        shouldImportForCursor &&
+        transactionDate &&
+        transactionDate >= startDate &&
+        transactionDate < endExclusiveDate
+      ) {
+        const record = buildStoreCreditTransactionRecord(customer, transaction, runId, {
+          snapCustomerLookup
+        });
+        if (record) records.push(record);
+      }
+    }
+
+    if (allRowsOlderThanSyncStart || allRowsAlreadyImported || !payload?.next) break;
+    page += 1;
+  }
+
+  return records;
+}
+
+async function refreshStoreCreditTransactionCategories(connection, {
+  year,
+  snapCustomerLookup = {},
+  runId = null
+}) {
+  const startDate = `${year}-01-01`;
+  const endExclusiveDate = `${year + 1}-01-01`;
+  const now = new Date();
+  await connection.query(
+    `
+      UPDATE local_line_store_credit_transactions
+      SET category_key = CASE
+            WHEN LOWER(TRIM(COALESCE(note, ''))) = 'automated monthly subscription addition'
+              THEN 'automatedSubscriptionCredit'
+            ELSE 'manualCredit'
+          END,
+          category_label = CASE
+            WHEN LOWER(TRIM(COALESCE(note, ''))) = 'automated monthly subscription addition'
+              THEN 'Manual Credit - Automated Subscription Credits'
+            ELSE 'Manual Credit - Uncategorized'
+          END,
+          last_synced_run_id = COALESCE(?, last_synced_run_id),
+          updated_at = ?
+      WHERE transaction_type = 'MANUAL_CREDIT'
+        AND transaction_month >= ?
+        AND transaction_month < ?
+    `,
+    [runId || null, now, startDate, endExclusiveDate]
+  );
+
+  const predicates = [];
+  const values = [
+    "snapCredit",
+    "Manual Credit - SNAP Payments",
+    runId || null,
+    now,
+    DASHBOARD_SNAP_MANUAL_CREDIT_MIN_AMOUNT,
+    startDate,
+    endExclusiveDate
+  ];
+  const snapCustomerIds = Array.from(snapCustomerLookup.ids || []).filter(Boolean);
+  const snapCustomerEmails = Array.from(snapCustomerLookup.emails || []).filter(Boolean);
+  const snapCustomerNames = Array.from(snapCustomerLookup.names || []).filter(Boolean);
+
+  if (snapCustomerIds.length) {
+    predicates.push(`customer_id IN (${buildInClause(snapCustomerIds)})`);
+    values.push(...snapCustomerIds);
+  }
+  if (snapCustomerEmails.length) {
+    predicates.push(`LOWER(COALESCE(email, '')) IN (${buildInClause(snapCustomerEmails)})`);
+    values.push(...snapCustomerEmails);
+  }
+  if (snapCustomerNames.length) {
+    predicates.push(`LOWER(TRIM(COALESCE(customer_name, ''))) IN (${buildInClause(snapCustomerNames)})`);
+    values.push(...snapCustomerNames);
+  }
+  predicates.push(
+    `(LOWER(COALESCE(note, '')) REGEXP '(^|[[:space:][:punct:]])snap([[:space:][:punct:]]|$)'
+      AND LOWER(COALESCE(note, '')) NOT REGEXP 'snap peas|sugar snap')`
+  );
+
+  const [result] = await connection.query(
+    `
+      UPDATE local_line_store_credit_transactions
+      SET category_key = ?,
+          category_label = ?,
+          last_synced_run_id = COALESCE(?, last_synced_run_id),
+          updated_at = ?
+      WHERE transaction_type = 'MANUAL_CREDIT'
+        AND COALESCE(category_key, '') <> 'automatedSubscriptionCredit'
+        AND amount > ?
+        AND transaction_month >= ?
+        AND transaction_month < ?
+        AND (${predicates.join(" OR ")})
+    `,
+    values
+  );
+
+  const [tomResult] = await connection.query(
+    `
+      UPDATE local_line_store_credit_transactions
+      SET category_key = ?,
+          category_label = ?,
+          last_synced_run_id = COALESCE(?, last_synced_run_id),
+          updated_at = ?
+      WHERE transaction_type = 'MANUAL_CREDIT'
+        AND COALESCE(category_key, '') <> 'automatedSubscriptionCredit'
+        AND ABS(amount - ?) < 0.005
+        AND transaction_month >= ?
+        AND transaction_month < ?
+        AND (
+          LOWER(COALESCE(email, '')) = ?
+          OR LOWER(TRIM(COALESCE(customer_name, ''))) = ?
+        )
+    `,
+    [
+      "tomCulhaneCashReceived",
+      "Manual Credit - Tom Culhane Cash Received",
+      runId || null,
+      now,
+      DASHBOARD_TOM_CULHANE_CASH_RECEIVED_AMOUNT,
+      startDate,
+      endExclusiveDate,
+      DASHBOARD_TOM_CULHANE_CASH_RECEIVED_EMAIL,
+      DASHBOARD_TOM_CULHANE_CASH_RECEIVED_NAME
+    ]
+  );
+
+  const [noteBucketResult] = await connection.query(
+    `
+      UPDATE local_line_store_credit_transactions
+      SET category_key = CASE
+            WHEN TRIM(COALESCE(note, '')) = ''
+              THEN 'blankManualCredit'
+            WHEN LOWER(COALESCE(note, '')) REGEXP 'jar|bottle|deposit|container'
+              THEN 'jarDepositReturnCredit'
+            WHEN LOWER(COALESCE(note, '')) REGEXP 'host'
+              THEN 'hostCredit'
+            WHEN LOWER(COALESCE(note, '')) REGEXP 'refund|return|missing|not received|credit for|wrong|damaged|quality|cancel|reimburse|short|out of stock|not delivered|broken'
+              THEN 'productIssueRefundCredit'
+            WHEN LOWER(COALESCE(note, '')) REGEXP 'farm stay|camp|influencer|trade|gift|nancy|employee|approved|cash payment|store credit|payment|invoice|monthly credit|landing page|successful charge|sent by check|charge|cash|check'
+              THEN 'paymentTradeAdminCredit'
+            ELSE 'productItemCredit'
+          END,
+          category_label = CASE
+            WHEN TRIM(COALESCE(note, '')) = ''
+              THEN 'Manual Credit - Blank / Unlabeled'
+            WHEN LOWER(COALESCE(note, '')) REGEXP 'jar|bottle|deposit|container'
+              THEN 'Manual Credit - Jar / Deposit Returns'
+            WHEN LOWER(COALESCE(note, '')) REGEXP 'host'
+              THEN 'Manual Credit - Host Credits'
+            WHEN LOWER(COALESCE(note, '')) REGEXP 'refund|return|missing|not received|credit for|wrong|damaged|quality|cancel|reimburse|short|out of stock|not delivered|broken'
+              THEN 'Manual Credit - Product Issue / Refunds'
+            WHEN LOWER(COALESCE(note, '')) REGEXP 'farm stay|camp|influencer|trade|gift|nancy|employee|approved|cash payment|store credit|payment|invoice|monthly credit|landing page|successful charge|sent by check|charge|cash|check'
+              THEN 'Manual Credit - Payment / Trade / Admin Notes'
+            ELSE 'Manual Credit - Product / Item Credits'
+          END,
+          last_synced_run_id = COALESCE(?, last_synced_run_id),
+          updated_at = ?
+      WHERE transaction_type = 'MANUAL_CREDIT'
+        AND category_key = 'manualCredit'
+        AND transaction_month >= ?
+        AND transaction_month < ?
+    `,
+    [runId || null, now, startDate, endExclusiveDate]
+  );
+
+  return {
+    snapCustomerCount: snapCustomerIds.length,
+    snapManualCreditMinAmount: DASHBOARD_SNAP_MANUAL_CREDIT_MIN_AMOUNT,
+    snapManualCreditRowsClassified: Number(result?.affectedRows || 0),
+    tomCulhaneCashReceivedRowsClassified: Number(tomResult?.affectedRows || 0),
+    noteBucketRowsClassified: Number(noteBucketResult?.affectedRows || 0)
+  };
+}
+
+async function rebuildStoreCreditMonthlyRollups(connection, { year, runId }) {
+  const startDate = `${year}-01-01`;
+  const endExclusiveDate = `${year + 1}-01-01`;
+  await connection.query(
+    `
+      DELETE FROM local_line_store_credit_monthly_rollups
+      WHERE month_start >= ? AND month_start < ?
+    `,
+    [startDate, endExclusiveDate]
+  );
+  await connection.query(
+    `
+      INSERT INTO local_line_store_credit_monthly_rollups (
+        month_start,
+        transaction_type,
+        category_key,
+        category_label,
+        transaction_count,
+        amount,
+        latest_run_id,
+        updated_at
+      )
+      SELECT
+        transaction_month,
+        COALESCE(transaction_type, 'UNKNOWN'),
+        COALESCE(category_key, 'uncategorized'),
+        MAX(COALESCE(category_label, 'Uncategorized')),
+        COUNT(*),
+        ROUND(COALESCE(SUM(amount), 0), 2),
+        ?,
+        ?
+      FROM local_line_store_credit_transactions
+      WHERE transaction_month >= ? AND transaction_month < ?
+      GROUP BY transaction_month, COALESCE(transaction_type, 'UNKNOWN'), COALESCE(category_key, 'uncategorized')
+    `,
+    [runId || null, new Date(), startDate, endExclusiveDate]
+  );
+}
+
+async function syncLocalLineStoreCreditTransactionsForYear(connection, {
+  year = DASHBOARD_STORE_CREDIT_SYNC_YEAR,
+  reportProgress = () => {}
+} = {}) {
+  const startDate = `${year}-01-01`;
+  const endExclusiveDate = addDaysYmd(getTodayYmd(), 1);
+  const runId = await insertStoreCreditSyncRun(connection, { year, startDate, endExclusiveDate });
+  const startedAt = new Date();
+
+  try {
+    const accessToken = await getLocalLineAccessToken();
+    const exportRows = await fetchLocalLineCustomerCreditRows();
+    const customers = exportRows
+      .map((row) => buildStoreCreditCustomerFromExportRow(row))
+      .filter(Boolean);
+    const snapCustomerLookup = buildStoreCreditSnapCustomerLookup(customers);
+    const cursors = await loadStoreCreditCustomerCursors(connection);
+    const snapshotDate = getTodayYmd();
+    await upsertStoreCreditBalanceSnapshotRows(connection, {
+      snapshotDate,
+      customers,
+      runId,
+      capturedAt: startedAt
+    });
+
+    let nextIndex = 0;
+    let processedCount = 0;
+    let fetchedTransactionCount = 0;
+    let manualCreditTotal = 0;
+    let manualDebitTotal = 0;
+    let orderDebitTotal = 0;
+    const errors = [];
+
+    const worker = async () => {
+      while (nextIndex < customers.length) {
+        const customer = customers[nextIndex];
+        nextIndex += 1;
+        const cursor = cursors.get(customer.customerId);
+        try {
+          const records = await fetchStoreCreditTransactionsForCustomer(customer, accessToken, {
+            startDate,
+            endExclusiveDate,
+            latestImportedAt: cursor?.lastTransactionAt || null,
+            runId,
+            snapCustomerLookup
+          });
+          await upsertStoreCreditTransactions(getPool(), records);
+          const newestRecord = records
+            .slice()
+            .sort((left, right) => String(right.transactionAt || "").localeCompare(String(left.transactionAt || "")))[0] || null;
+          await upsertStoreCreditCustomerCursor(getPool(), {
+            customer,
+            latestRecord: newestRecord,
+            fetchedCount: records.length
+          });
+          fetchedTransactionCount += records.length;
+          records.forEach((record) => {
+            if (record.transactionType === "MANUAL_CREDIT") {
+              manualCreditTotal = round2(manualCreditTotal + Number(record.amount || 0));
+            } else if (record.transactionType === "MANUAL_DEBIT") {
+              manualDebitTotal = round2(manualDebitTotal + Number(record.amount || 0));
+            } else if (record.transactionType === "ORDER_DEBIT") {
+              orderDebitTotal = round2(orderDebitTotal + Number(record.amount || 0));
+            }
+          });
+        } catch (error) {
+          errors.push({
+            customerId: customer.customerId,
+            email: customer.email,
+            message: error?.message || String(error)
+          });
+          await upsertStoreCreditCustomerCursor(getPool(), {
+            customer,
+            fetchedCount: 0,
+            error
+          });
+        } finally {
+          processedCount += 1;
+          if (processedCount % 100 === 0 || processedCount === customers.length) {
+            reportProgress({
+              phaseKey: "compute",
+              phaseLabel: "Compute Metrics",
+              status: "running",
+              percent: Math.min(75, Math.round((processedCount / Math.max(customers.length, 1)) * 60)),
+              current: processedCount,
+              total: customers.length,
+              message: `Synced member-bank ledger for ${processedCount}/${customers.length} Local Line customers`
+            });
+          }
+        }
+      }
+    };
+
+    await Promise.all(
+      Array.from({ length: Math.min(DASHBOARD_STORE_CREDIT_SYNC_CONCURRENCY, customers.length || 1) }, worker)
+    );
+    const categoryRefreshSummary = await refreshStoreCreditTransactionCategories(connection, {
+      year,
+      snapCustomerLookup,
+      runId
+    });
+    await rebuildStoreCreditMonthlyRollups(connection, { year, runId });
+
+    const summary = {
+      source: "localline_store_credit_transactions",
+      year,
+      startDate,
+      endExclusiveDate,
+      customerCount: customers.length,
+      fetchedTransactionCount,
+      errors,
+      snapshotDate,
+      ...categoryRefreshSummary
+    };
+    await updateStoreCreditSyncRun(connection, runId, {
+      status: errors.length ? "completed_with_errors" : "completed",
+      customerCount: customers.length,
+      transactionCount: fetchedTransactionCount,
+      manualCreditTotal,
+      manualDebitTotal,
+      orderDebitTotal,
+      summaryJson: stringifyJson(summary)
+    });
+    await upsertSyncCursor(connection, `store-credit-ledger-${year}`, {
+      cursorValue: endExclusiveDate,
+      syncedThroughAt: new Date(`${endExclusiveDate}T00:00:00Z`),
+      lastStartedAt: startedAt,
+      lastFinishedAt: new Date(),
+      lastStatus: errors.length ? "completed_with_errors" : "completed",
+      lastMessage: errors.length
+        ? `Synced ${fetchedTransactionCount} transactions with ${errors.length} customer errors`
+        : `Synced ${fetchedTransactionCount} store-credit transactions`,
+      summaryJson: stringifyJson(summary)
+    });
+
+    return summary;
+  } catch (error) {
+    await updateStoreCreditSyncRun(connection, runId, {
+      status: "failed",
+      errorMessage: error?.message || String(error),
+      summaryJson: stringifyJson({ year, startDate, endExclusiveDate })
+    });
+    await upsertSyncCursor(connection, `store-credit-ledger-${year}`, {
+      cursorValue: endExclusiveDate,
+      lastStartedAt: startedAt,
+      lastFinishedAt: new Date(),
+      lastStatus: "failed",
+      lastMessage: error?.message || "Store-credit ledger sync failed"
+    });
+    throw error;
+  }
+}
+
+function addStoreCreditMonthlyValue(target, monthStart, key, value) {
+  if (!monthStart) return;
+  const summary = target[monthStart] || {};
+  summary[key] = round2(Number(summary[key] || 0) + Number(value || 0));
+  target[monthStart] = summary;
+}
+
+function chooseStoreCreditSnapshotOnOrBefore(snapshots = [], ymd) {
+  return snapshots
+    .filter((snapshot) => snapshot.snapshotDate && String(snapshot.snapshotDate) <= String(ymd))
+    .slice(-1)[0] || null;
+}
+
+async function loadStoreCreditBalanceSnapshots(connection, year) {
+  const startDate = `${year}-01-01`;
+  const endDate = `${year + 1}-01-10`;
+  const snapshots = [];
+  const [aggregateRows] = await connection.query(
+    `
+      SELECT
+        snapshot_week_start AS snapshotWeekStart,
+        snapshot_week_end AS snapshotWeekEnd,
+        total_balance AS totalBalance,
+        summary_json AS summaryJson,
+        captured_at AS capturedAt
+      FROM local_line_customer_credit_snapshots
+      WHERE snapshot_week_end >= ? AND snapshot_week_start <= ?
+      ORDER BY snapshot_week_start ASC
+    `,
+    [startDate, endDate]
+  );
+  (aggregateRows || []).forEach((row) => {
+    const summary = parseSnapshotRawJson(row.summaryJson);
+    const snapshotDate =
+      summary.fileDate ||
+      summary.snapshotDate ||
+      row.snapshotWeekEnd ||
+      row.snapshotWeekStart ||
+      null;
+    if (!snapshotDate) return;
+    snapshots.push({
+      snapshotDate: String(snapshotDate),
+      totalBalance: Number(row.totalBalance || 0),
+      source: summary.source || "local_line_customer_credit_snapshots"
+    });
+  });
+
+  const [customerSnapshotRows] = await connection.query(
+    `
+      SELECT
+        snapshot_date AS snapshotDate,
+        COALESCE(SUM(store_credit_balance), 0) AS totalBalance,
+        COUNT(*) AS customerCount
+      FROM local_line_store_credit_balance_snapshots
+      WHERE snapshot_date >= ? AND snapshot_date <= ?
+      GROUP BY snapshot_date
+      ORDER BY snapshot_date ASC
+    `,
+    [startDate, endDate]
+  );
+  (customerSnapshotRows || []).forEach((row) => {
+    snapshots.push({
+      snapshotDate: String(row.snapshotDate),
+      totalBalance: Number(row.totalBalance || 0),
+      source: "local_line_store_credit_balance_snapshots",
+      customerCount: Number(row.customerCount || 0)
+    });
+  });
+
+  return snapshots
+    .filter((snapshot) => Number.isFinite(Number(snapshot.totalBalance)))
+    .sort((left, right) => String(left.snapshotDate).localeCompare(String(right.snapshotDate)));
+}
+
+async function loadDashboardStoreCreditMonthlyMap(connection, {
+  year = DASHBOARD_STORE_CREDIT_SYNC_YEAR
+} = {}) {
+  const startDate = `${year}-01-01`;
+  const endExclusiveDate = `${year + 1}-01-01`;
+  const monthlyMap = {};
+  const [rollupRows] = await connection.query(
+    `
+      SELECT
+        month_start AS monthStart,
+        transaction_type AS transactionType,
+        category_key AS categoryKey,
+        category_label AS categoryLabel,
+        transaction_count AS transactionCount,
+        amount
+      FROM local_line_store_credit_monthly_rollups
+      WHERE month_start >= ? AND month_start < ?
+      ORDER BY month_start ASC, transaction_type ASC, category_key ASC
+    `,
+    [startDate, endExclusiveDate]
+  );
+  (rollupRows || []).forEach((row) => {
+    const monthStart = String(row.monthStart || "");
+    const amount = Number(row.amount || 0);
+    const transactionType = String(row.transactionType || "");
+    const categoryKey = String(row.categoryKey || "");
+    addStoreCreditMonthlyValue(monthlyMap, monthStart, "ledgerNetMovement", amount);
+    if (transactionType === "MANUAL_CREDIT") {
+      addStoreCreditMonthlyValue(monthlyMap, monthStart, "manualCreditTotal", amount);
+      if (categoryKey === "automatedSubscriptionCredit") {
+        addStoreCreditMonthlyValue(monthlyMap, monthStart, "automatedSubscriptionCredit", amount);
+      } else if (categoryKey === "snapCredit") {
+        addStoreCreditMonthlyValue(monthlyMap, monthStart, "snapCredit", amount);
+	      } else if (categoryKey === "tomCulhaneCashReceived") {
+	        addStoreCreditMonthlyValue(monthlyMap, monthStart, "tomCulhaneCashReceived", amount);
+	      } else if (
+	        DASHBOARD_MANUAL_CREDIT_NOTE_BUCKETS.some((bucket) => bucket.key === categoryKey)
+	      ) {
+	        addStoreCreditMonthlyValue(monthlyMap, monthStart, categoryKey, amount);
+	      }
+    } else if (transactionType === "MANUAL_DEBIT") {
+      addStoreCreditMonthlyValue(monthlyMap, monthStart, "manualDebitTotal", amount);
+    } else if (transactionType === "ORDER_DEBIT") {
+      addStoreCreditMonthlyValue(monthlyMap, monthStart, "orderDebitTotal", amount);
+    }
+  });
+
+  const snapshots = await loadStoreCreditBalanceSnapshots(connection, year);
+  Object.keys(monthlyMap).forEach((monthStart) => {
+    const monthEnd = getDashboardMonthEndYmd(monthStart);
+    const closingCutoff = addDaysYmd(monthEnd, 1);
+    const openingSnapshot = chooseStoreCreditSnapshotOnOrBefore(snapshots, monthStart);
+    const closingSnapshot = chooseStoreCreditSnapshotOnOrBefore(snapshots, closingCutoff);
+    const summary = monthlyMap[monthStart] || {};
+    if (openingSnapshot) {
+      summary.openingBalance = round2(openingSnapshot.totalBalance);
+      summary.openingBalanceDate = openingSnapshot.snapshotDate;
+    }
+    if (closingSnapshot) {
+      summary.closingBalance = round2(closingSnapshot.totalBalance);
+      summary.closingBalanceDate = closingSnapshot.snapshotDate;
+    }
+    if (openingSnapshot && closingSnapshot) {
+      summary.balanceChange = round2(closingSnapshot.totalBalance - openingSnapshot.totalBalance);
+      summary.unreconciledBalanceDifference = round2(
+        summary.balanceChange - Number(summary.ledgerNetMovement || 0)
+      );
+    }
+    monthlyMap[monthStart] = summary;
+  });
+
+  return monthlyMap;
 }
 
 async function captureLocalLineCustomerCreditSnapshot(connection, week) {
@@ -6145,6 +7789,29 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       }
     }
 
+    try {
+      reportProgress({
+        phaseKey: "prepare",
+        phaseLabel: "Prepare Dashboard",
+        status: "running",
+        percent: 80,
+        message: `Syncing ${DASHBOARD_STORE_CREDIT_SYNC_YEAR} Local Line member-bank ledger`
+      });
+      const storeCreditSyncSummary = await syncLocalLineStoreCreditTransactionsForYear(connection, {
+        year: DASHBOARD_STORE_CREDIT_SYNC_YEAR,
+        reportProgress
+      });
+      if (storeCreditSyncSummary?.errors?.length) {
+        dashboardWarnings.push(
+          `Local Line member-bank ledger synced with ${storeCreditSyncSummary.errors.length} customer errors; cached data was still updated.`
+        );
+      }
+    } catch (error) {
+      dashboardWarnings.push(
+        `Could not refresh Local Line member-bank transaction ledger; using cached values. ${error?.message || error}`
+      );
+    }
+
     reportProgress({
       phaseKey: "prepare",
       phaseLabel: "Prepare Dashboard",
@@ -6167,11 +7834,12 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       message: "Building weekly dashboard metrics"
     });
 
-    const [weeklyKpiMap, vendorWeeklyMap, subscriberWeeklyMap, timesheetResult] = await Promise.all([
+    const [weeklyKpiMap, vendorWeeklyMap, subscriberWeeklyMap, timesheetResult, storeCreditMonthlyMap] = await Promise.all([
       loadWeeklyOrderMetrics(weeks),
       loadVendorWeeklyMap(weeks),
       buildSubscriberWeeklyMap(weeks),
-      buildTimesheetWeeklyMap(weeks)
+      buildTimesheetWeeklyMap(weeks),
+      loadDashboardStoreCreditMonthlyMap(connection, { year: DASHBOARD_STORE_CREDIT_SYNC_YEAR })
     ]);
     const monthlyDashboardInputs = buildMonthlyDashboardInputs({
       weeks,
@@ -6223,6 +7891,7 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       monthlyTimesheetMap: monthlyDashboardInputs.timesheetWeeklyMap,
       monthlySubscriberMap: monthlyDashboardInputs.subscriberWeeklyMap,
       creditsMonthlyMap,
+      storeCreditMonthlyMap,
       qboPeriodMap: qboResult.map || {},
       generatedAt: startedAt
     });

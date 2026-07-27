@@ -150,7 +150,7 @@ Useful one-off commands:
 
 Token storage notes
 - The script writes the new refresh token to `.qbo/qbo-refresh.json`.
-- If a fallback token store is configured, such as `../accounting-reports/tokens/qbo-refresh.json`, it writes there too so the sibling accounting reports app stays in sync.
+- QBO env values are loaded from this repo only: `.env`, then `apps/api/.env` if present. The dashboard publisher no longer reads `../accounting-reports/.env`.
 - Do not commit token files. They are local/server secrets.
 - Avoid running multiple QBO refresh/reauthorization jobs at the same time on different machines. Intuit rotates refresh tokens; using an old token after a newer one has been issued can trigger another `invalid_grant`.
 

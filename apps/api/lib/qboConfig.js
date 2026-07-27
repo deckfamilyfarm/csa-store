@@ -29,24 +29,9 @@ function loadEnvSource(envPath, label) {
 }
 
 function buildEnvSources() {
-  const localSources = [
+  return [
     loadEnvSource(path.resolve(repoRoot, ".env"), "repo .env"),
     loadEnvSource(path.resolve(repoRoot, "apps/api/.env"), "apps/api .env")
-  ].filter(Boolean);
-  const getLocalEnvValue = (key) => {
-    if (process.env[key]) return process.env[key];
-    for (const source of localSources) {
-      if (source.values[key]) return source.values[key];
-    }
-    return null;
-  };
-
-  return [
-    ...localSources,
-    loadEnvSource(getLocalEnvValue("DASHBOARD_QBO_ENV_PATH"), "DASHBOARD_QBO_ENV_PATH"),
-    loadEnvSource(getLocalEnvValue("ACCOUNTING_REPORTS_ENV_PATH"), "ACCOUNTING_REPORTS_ENV_PATH"),
-    loadEnvSource(path.resolve(repoRoot, "../accounting-reports/.env"), "sibling accounting-reports .env"),
-    loadEnvSource(path.resolve(repoRoot, "../account-reports/.env"), "sibling account-reports .env")
   ].filter(Boolean);
 }
 
