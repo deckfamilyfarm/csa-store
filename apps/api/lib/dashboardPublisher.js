@@ -2202,26 +2202,26 @@ function buildDashboardCreditsMonthlyMap(rows = [], year = DASHBOARD_EMPLOYEE_CR
   if (!monthColumns.length) return {};
 
   const monthlyMap = {};
-	  rows.slice(headerIndex + 1).forEach((row) => {
-	    const typeLabel = String(row?.[0] || "").trim();
-	    const typeKey = getDashboardCreditsTypeKey(typeLabel);
-	    const category = classifyDashboardCreditsTypeForMemberBank(typeLabel);
-	    const name = normalizeDashboardCreditsName(row?.[1]);
-	    if (!typeLabel) return;
-	    monthColumns.forEach(({ monthStart, columnIndex }) => {
-	      const value = parseDashboardNumber(row?.[columnIndex]);
-	      if (value === null) return;
-	      const monthSummary = monthlyMap[monthStart] || {};
+  rows.slice(headerIndex + 1).forEach((row) => {
+    const typeLabel = String(row?.[0] || "").trim();
+    const typeKey = getDashboardCreditsTypeKey(typeLabel);
+    const category = classifyDashboardCreditsTypeForMemberBank(typeLabel);
+    const name = normalizeDashboardCreditsName(row?.[1]);
+    if (!typeLabel) return;
+    monthColumns.forEach(({ monthStart, columnIndex }) => {
+      const value = parseDashboardNumber(row?.[columnIndex]);
+      if (value === null) return;
+      const monthSummary = monthlyMap[monthStart] || {};
       if (typeKey) {
         monthSummary[typeKey] = round2(Number(monthSummary[typeKey] || 0) + value);
-	      }
-	      addDashboardMemberBankCreditCategory(monthSummary, typeLabel, value);
-	      if (category) {
-	        addDashboardCreditsCategoryName(monthSummary, category.key, name, value);
-	      }
-	      monthlyMap[monthStart] = monthSummary;
-	    });
-	  });
+      }
+      addDashboardMemberBankCreditCategory(monthSummary, typeLabel, value);
+      if (category) {
+        addDashboardCreditsCategoryName(monthSummary, category.key, name, value);
+      }
+      monthlyMap[monthStart] = monthSummary;
+    });
+  });
 
   return monthlyMap;
 }
@@ -2378,6 +2378,27 @@ function formatDashboardCreditsNameBreakdown(names = [], { maxNames = 18 } = {})
     ? `; ${remaining.length} other name${remaining.length === 1 ? "" : "s"} (${formatDashboardCurrencyText(remainingTotal)})`
     : "";
   return `Credits-tab names for shown months: ${visibleText}${remainingText}.`;
+}
+
+function formatDashboardCreditsCategoryBreakdown(categories = [], { maxNamesPerCategory = 8 } = {}) {
+  const filtered = (categories || []).filter((category) => Number(category?.total || 0));
+  if (!filtered.length) return "";
+  const lines = filtered.map((category) => {
+    const names = (category.names || []).filter((item) => item?.name && Number(item.amount));
+    const visibleNames = names.slice(0, maxNamesPerCategory);
+    const remainingNames = names.slice(maxNamesPerCategory);
+    const visibleText = visibleNames
+      .map((item) => `${item.name} (${formatDashboardCurrencyText(item.amount)})`)
+      .join("; ");
+    const remainingTotal = round2(
+      remainingNames.reduce((sum, item) => sum + Number(item.amount || 0), 0)
+    );
+    const remainingText = remainingNames.length
+      ? `; ${remainingNames.length} other name${remainingNames.length === 1 ? "" : "s"} (${formatDashboardCurrencyText(remainingTotal)})`
+      : "";
+    return `${category.label} (${formatDashboardCurrencyText(category.total)}): ${visibleText}${remainingText}`;
+  });
+  return `Credits-tab category/name detail for shown months:\n${lines.join("\n")}`;
 }
 
 function buildMonthlyDashboardManualValueMap(manualValueMap = new Map(), weeks = []) {
@@ -2728,6 +2749,7 @@ function buildDashboardV2Rows({
           entry: "AUTO",
           source: "Credits tab Type totals",
           methodology: "Total manual-credit value from the Credits tab. These credits are also classified elsewhere in the dashboard as expenses, trade, employee benefits, or owner-equity adjustments; this line keeps the issued credit counted as revenue while the offsetting business purpose is accounted for in those sections.",
+          note: formatDashboardCreditsCategoryBreakdown(creditsTabManualCreditCategories),
           valueType: "currency",
           bold: true,
           periodAuto: (period) =>
@@ -3076,6 +3098,7 @@ function buildDashboardV2Rows({
           entry: "AUTO",
           source: "Credits tab Type = Marketing",
           methodology: "Monthly total from the Credits tab for Marketing rows; treated as a trade expense in the adjusted dashboard profit story.",
+          note: getCreditsTabNameBreakdownNote("Marketing"),
           valueType: "currency",
           periodAuto: (period) => getCreditPeriodSum(period, "marketing")
         },
@@ -3084,6 +3107,7 @@ function buildDashboardV2Rows({
           entry: "AUTO",
           source: "Credits tab Type = Dropsite Host Credit",
           methodology: "Monthly total from the Credits tab for Dropsite Host Credit rows; treated as a trade expense in the adjusted dashboard profit story.",
+          note: getCreditsTabNameBreakdownNote("Dropsite Host Credit"),
           valueType: "currency",
           periodAuto: (period) => getCreditPeriodSum(period, "dropsiteHostCredit")
         },
@@ -3092,6 +3116,7 @@ function buildDashboardV2Rows({
           entry: "AUTO",
           source: "Credits tab Type = FFCSA Employee Credit",
           methodology: "Monthly total from the Credits tab for FFCSA Employee Credit rows; treated as an employee benefit trade expense in the adjusted dashboard profit story.",
+          note: getCreditsTabNameBreakdownNote("FFCSA Employee Credit"),
           valueType: "currency",
           periodAuto: (period) => getCreditPeriodSum(period, "ffcsaEmployeeCredit")
         },
@@ -3193,6 +3218,7 @@ function buildDashboardV2Rows({
           entry: "AUTO",
           source: "Credits tab Type = Owners Equity",
           methodology: "Monthly total from the Credits tab for Owners Equity rows; treated as an income adjustment added back below Net Operating Income.",
+          note: getCreditsTabNameBreakdownNote("Owners Equity"),
           valueType: "currency",
           periodAuto: (period) => getCreditPeriodSum(period, "ownersEquity")
         },
