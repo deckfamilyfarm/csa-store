@@ -1,6 +1,9 @@
 import React from "react";
 
-export function SubscribeFooter({ visitorLiabilityReleaseUrl = "/liability/visitor" }) {
+export function SubscribeFooter({
+  visitorLiabilityReleaseUrl = "/liability/visitor",
+  firearmLiabilityReleaseUrl = "/liability/firearm"
+}) {
   return (
     <footer className="subscribe-footer">
       <div className="container subscribe-footer-row">
@@ -35,6 +38,12 @@ export function SubscribeFooter({ visitorLiabilityReleaseUrl = "/liability/visit
               !
             </span>
             <span>Visitor Liability Release</span>
+          </a>
+          <a className="subscribe-review-link" href={firearmLiabilityReleaseUrl}>
+            <span className="subscribe-review-link-star" aria-hidden="true">
+              !
+            </span>
+            <span>Firearms Liability Release</span>
           </a>
           <a
             className="subscribe-review-link"

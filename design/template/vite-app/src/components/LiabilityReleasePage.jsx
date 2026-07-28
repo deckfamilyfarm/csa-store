@@ -22,7 +22,9 @@ function createForm() {
     signerPostalCode: "",
     participants: [],
     accepted: false,
-    signatureMode: "typed"
+    signatureMode: "typed",
+    humanCheck: "",
+    website: ""
   };
 }
 
@@ -426,6 +428,29 @@ export function LiabilityReleasePage({ slug, homeUrl = "https://www.deckfamilyfa
               onChange={(event) => updateField("accepted", event.target.checked)}
             />
             <span>I have reviewed this release and agree to sign it electronically.</span>
+          </label>
+
+          <div style={{ display: "none" }} aria-hidden="true">
+            <label>
+              Website
+              <input
+                tabIndex="-1"
+                autoComplete="off"
+                value={form.website}
+                onChange={(event) => updateField("website", event.target.value)}
+              />
+            </label>
+          </div>
+
+          <label className="filter-field">
+            <span className="small">Human check*</span>
+            <input
+              className="input"
+              value={form.humanCheck}
+              onChange={(event) => updateField("humanCheck", event.target.value)}
+              placeholder='Type "farm"'
+              required
+            />
           </label>
 
           {error ? <div className="small form-error">{error}</div> : null}

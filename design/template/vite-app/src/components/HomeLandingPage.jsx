@@ -47,16 +47,16 @@ function categoryMatchesProduct(category, product) {
   return normalizeCategoryName(product.category) === normalizeCategoryName(category.name);
 }
 
-function buildVisitorLiabilityReleaseUrl() {
-  if (typeof window === "undefined") return "/liability/visitor";
+function buildLiabilityReleaseUrl(slug) {
+  if (typeof window === "undefined") return `/liability/${slug}`;
   try {
     const url = new URL(window.location.origin);
-    url.pathname = "/liability/visitor";
+    url.pathname = `/liability/${slug}`;
     url.search = "";
     url.hash = "";
     return url.toString();
   } catch (_error) {
-    return "/liability/visitor";
+    return `/liability/${slug}`;
   }
 }
 
@@ -181,7 +181,8 @@ export function HomeLandingPage({
   const boxLead = boxProducts[0] || null;
   const vendorCount = catalog?.vendors?.length || 0;
   const activeProducts = activeGroup ? activeGroup.products : featuredProducts.slice(0, 8);
-  const visitorLiabilityReleaseUrl = useMemo(() => buildVisitorLiabilityReleaseUrl(), []);
+  const visitorLiabilityReleaseUrl = useMemo(() => buildLiabilityReleaseUrl("visitor"), []);
+  const firearmLiabilityReleaseUrl = useMemo(() => buildLiabilityReleaseUrl("firearm"), []);
 
   const navLinks = useMemo(
     () => [
@@ -467,7 +468,10 @@ export function HomeLandingPage({
         </div>
       </section>
 
-      <SubscribeFooter visitorLiabilityReleaseUrl={visitorLiabilityReleaseUrl} />
+      <SubscribeFooter
+        visitorLiabilityReleaseUrl={visitorLiabilityReleaseUrl}
+        firearmLiabilityReleaseUrl={firearmLiabilityReleaseUrl}
+      />
     </div>
   );
 }

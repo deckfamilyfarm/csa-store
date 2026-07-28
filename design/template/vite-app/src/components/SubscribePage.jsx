@@ -382,6 +382,20 @@ function DropSiteTable({ title, orderWindow, sites = [] }) {
   );
 }
 
+function buildLiabilityReleaseUrl(slug, portalBaseHref) {
+  try {
+    const baseOrigin =
+      typeof window !== "undefined" ? window.location.origin : "https://fullfarmcsa.deckfamilyfarm.com";
+    const url = new URL(portalBaseHref || baseOrigin, baseOrigin);
+    url.pathname = `/liability/${slug}`;
+    url.search = "";
+    url.hash = "";
+    return url.toString();
+  } catch (_error) {
+    return `/liability/${slug}`;
+  }
+}
+
 export function SubscribePage({
   dropSites = [],
   portalBaseUrl,
@@ -394,19 +408,14 @@ export function SubscribePage({
     () => String(portalBaseUrl || subscriptionStoreUrl()).replace(/#.*$/, "").replace(/\/+$/, ""),
     [portalBaseUrl]
   );
-  const visitorLiabilityReleaseUrl = useMemo(() => {
-    try {
-      const baseOrigin =
-        typeof window !== "undefined" ? window.location.origin : "https://fullfarmcsa.deckfamilyfarm.com";
-      const url = new URL(portalBaseHref || baseOrigin, baseOrigin);
-      url.pathname = "/liability/visitor";
-      url.search = "";
-      url.hash = "";
-      return url.toString();
-    } catch (_error) {
-      return "/liability/visitor";
-    }
-  }, [portalBaseHref]);
+  const visitorLiabilityReleaseUrl = useMemo(
+    () => buildLiabilityReleaseUrl("visitor", portalBaseHref),
+    [portalBaseHref]
+  );
+  const firearmLiabilityReleaseUrl = useMemo(
+    () => buildLiabilityReleaseUrl("firearm", portalBaseHref),
+    [portalBaseHref]
+  );
   const subscribeNavLinks = useMemo(
     () => buildSubscribeNavLinks(),
     []
@@ -1664,7 +1673,10 @@ export function SubscribePage({
         </div>
       ) : null}
 
-      <SubscribeFooter visitorLiabilityReleaseUrl={visitorLiabilityReleaseUrl} />
+      <SubscribeFooter
+        visitorLiabilityReleaseUrl={visitorLiabilityReleaseUrl}
+        firearmLiabilityReleaseUrl={firearmLiabilityReleaseUrl}
+      />
     </div>
   );
 }

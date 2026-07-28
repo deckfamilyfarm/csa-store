@@ -118,6 +118,7 @@ import {
   listLiabilityReleaseTemplates,
   listSignedLiabilityReleases,
   publishLiabilityReleaseTemplate,
+  updateLiabilityReleaseSubmissionStatus,
   upsertLiabilityReleaseTemplate,
   validateLegacyImport
 } from "../lib/liabilityReleases.js";
@@ -3790,13 +3791,33 @@ router.post(
 router.get(
   "/liability/releases",
   requireAdminPermission("liability_admin"),
-  async (_req, res) => {
+  async (req, res) => {
     try {
-      const releases = await listSignedLiabilityReleases();
+      const releases = await listSignedLiabilityReleases({
+        includeHidden: req.query.includeHidden === "1",
+        includeSpam: req.query.includeSpam === "1",
+        templateSlug: req.query.templateSlug || ""
+      });
       res.json({ releases });
     } catch (error) {
       console.error("Liability releases fetch failed:", error);
       res.status(500).json({ error: "Failed to load signed liability releases." });
+    }
+  }
+);
+
+router.put(
+  "/liability/releases/:id/status",
+  requireAdminPermission("liability_admin"),
+  async (req, res) => {
+    try {
+      const release = await updateLiabilityReleaseSubmissionStatus(Number(req.params.id), req.body || {});
+      res.json({ ok: true, release });
+    } catch (error) {
+      console.error("Liability release status update failed:", error);
+      res.status(error.status || 500).json({
+        error: error?.message || "Failed to update signed liability release."
+      });
     }
   }
 );

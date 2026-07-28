@@ -55,6 +55,21 @@ export const VISITOR_RELEASE_TEXT = [
   "I HAVE READ THIS DOCUMENT AND UNDERSTAND IT. I FURTHER UNDERSTAND THAT BY SIGNING THIS RELEASE, I VOLUNTARY SURRENDER CERTAIN LEGAL RIGHTS"
 ].join("\n\n");
 
+export const FIREARM_LIABILITY_RELEASE_TEXT = [
+  "FIREARMS LIABILITY RELEASE, ASSUMPTION OF RISK, AND INDEMNITY AGREEMENT",
+  "This Firearms Liability Release is for visitors, volunteers, guests, participants, and any other person who handles, observes, transports, stores, shoots, or is present near firearms, ammunition, targets, shooting areas, firearm demonstrations, firearm instruction, hunting-related activities, or any other firearm-related activity on or around Deck Family Farm property at 25362 High Pass Road, Junction City, Oregon 97448, or any other location where Deck Family Farm, Full Farm CSA LLC, their owners, employees, representatives, hosts, volunteers, agents, contractors, affiliated farms, or event organizers are involved. In this agreement, those persons and entities are called the Released Parties.",
+  "LEGAL CAPACITY AND FIREARM ELIGIBILITY. I represent that I am legally permitted to possess, handle, transport, and use firearms and ammunition under federal, state, and local law. I am not prohibited from possessing firearms. I am not under the influence of alcohol, marijuana, controlled substances, medication, fatigue, illness, or any condition that would impair my judgment, coordination, or ability to safely participate. If I am signing for a minor or another participant, I represent that I am the parent, legal guardian, or authorized responsible adult for that participant and that I accept responsibility for that participant's conduct and safety.",
+  "AGREEMENT TO FOLLOW DIRECTIONS. I agree to follow all written, posted, and verbal safety instructions immediately. I agree that any firearm will be treated as loaded at all times; the muzzle will always be pointed in a safe direction; my finger will remain off the trigger until I am instructed that I may shoot and I am ready to shoot; I will know my target and what is beyond it; and I will not handle, load, unload, display, dry fire, shoot, clean, transport, or pass any firearm or ammunition except as specifically allowed by the person supervising the activity. I agree to wear eye and ear protection when instructed. I agree that the supervising person may immediately stop my participation for any reason, including unsafe conduct, unsafe conditions, or failure to follow instructions.",
+  "ASSUMPTION OF INHERENT AND EXTRAORDINARY RISKS. I understand that firearm-related activities are inherently dangerous and can result in serious bodily injury, permanent disability, emotional distress, property damage, or death. Risks include, but are not limited to: accidental or negligent discharge; ricochet; bullet or projectile impact; misfire, hangfire, squib load, malfunction, or equipment failure; hearing damage; eye injury; burns; cuts; lead or chemical exposure; falling, tripping, uneven ground, weather, animals, vehicles, gates, fences, farm equipment, and the acts or omissions of other participants or third parties. I knowingly and voluntarily assume all risks, known and unknown, foreseeable and unforeseeable, associated with being present for or participating in firearm-related activities.",
+  "RELEASE OF LIABILITY. To the fullest extent allowed by Oregon law, I release and discharge the Released Parties from all claims, demands, causes of action, damages, losses, costs, attorney fees, expenses, or liability of any kind arising out of or related to my presence on the property or my participation in firearm-related activities, including claims involving ordinary negligence. This release is intended to be as broad and inclusive as Oregon law permits. It does not release claims that cannot legally be released under Oregon law.",
+  "INDEMNIFICATION AND DUTY TO DEFEND. I agree to indemnify, defend, and hold harmless the Released Parties from any claim, demand, cause of action, damage, judgment, cost, attorney fee, expense, or liability arising out of or related to my conduct, my firearm or ammunition, my guests, any participant for whom I sign, my violation of law or safety instructions, or any claim brought by or on behalf of a participant for whom I sign.",
+  "PERSONAL RESPONSIBILITY FOR FIREARMS AND AMMUNITION. I am responsible for any firearm, ammunition, magazine, holster, case, target, equipment, or personal property I bring or control. I agree not to bring unsafe, illegal, modified, defective, or inappropriate firearms or ammunition. I agree that firearms and ammunition must remain secured unless expressly authorized for use. I agree to comply with all applicable firearm storage, transportation, possession, and use laws.",
+  "MEDICAL TREATMENT. If I or a participant for whom I sign is injured or appears to need emergency care, I authorize the Released Parties to seek emergency medical assistance. I understand that the Released Parties are not required to provide medical care and that I am responsible for medical costs arising from my participation or the participation of anyone for whom I sign.",
+  "APPLICABLE LAW AND SEVERABILITY. This agreement is governed by Oregon law. If any provision is found invalid or unenforceable, the remaining provisions remain in effect to the fullest extent allowed by law.",
+  "VOLUNTARY ELECTRONIC SIGNATURE. I have had the opportunity to read this agreement, ask questions, decline participation, and seek legal advice before signing. By signing electronically, I agree that my electronic signature has the same legal effect as a handwritten signature. I understand that I am giving up substantial legal rights, including the right to sue for certain claims.",
+  "I HAVE READ THIS FIREARMS LIABILITY RELEASE, UNDERSTAND IT, AND SIGN IT VOLUNTARILY."
+].join("\n\n");
+
 const DEFAULT_TEMPLATES = [
   {
     slug: "visitor",
@@ -80,6 +95,18 @@ const DEFAULT_TEMPLATES = [
     publicPath: "/liability/horse",
     renewalMonths: null,
     requiresParticipants: 1,
+    allowDrawnSignature: 1
+  },
+  {
+    slug: "firearm",
+    title: "Firearms Liability Release",
+    description: "Firearms activity release for visitors and participants.",
+    bodyText: FIREARM_LIABILITY_RELEASE_TEXT,
+    sourceUrl: "",
+    status: "published",
+    publicPath: "/liability/firearm",
+    renewalMonths: null,
+    requiresParticipants: 0,
     allowDrawnSignature: 1
   },
   {
@@ -176,6 +203,25 @@ function toNullableInt(value) {
   return Number.isFinite(numeric) && numeric > 0 ? numeric : null;
 }
 
+function validatePublicLiabilityHumanCheck(payload = {}) {
+  const honeypot = cleanString(payload.website || payload.companyWebsite || payload.url, 255);
+  if (honeypot) {
+    const error = new Error("Unable to submit this release.");
+    error.status = 400;
+    throw error;
+  }
+
+  const answer = String(payload.humanCheck || payload.liabilityReleaseHumanCheck || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "");
+  if (!["farm", "deck", "deckfamilyfarm", "fullfarm"].includes(answer)) {
+    const error = new Error('Type "farm" in the human check field.');
+    error.status = 400;
+    throw error;
+  }
+}
+
 function parseJsonArray(value) {
   if (!value) return [];
   if (Array.isArray(value)) return value;
@@ -185,6 +231,37 @@ function parseJsonArray(value) {
   } catch (_error) {
     return [];
   }
+}
+
+function isLikelySpamLiabilityRelease(row = {}) {
+  const sourceType = String(row.sourceType || "").trim().toLowerCase();
+  if (sourceType && sourceType !== "public") return false;
+
+  const name = String(row.signerName || "").trim();
+  const email = String(row.signerEmail || "").trim().toLowerCase();
+  const phone = String(row.signerPhone || "").trim();
+  const address = [
+    row.signerAddressLine1,
+    row.signerAddressLine2,
+    row.signerCity,
+    row.signerPostalCode
+  ]
+    .map((value) => String(value || "").trim())
+    .filter(Boolean)
+    .join(" ");
+
+  const compactName = name.replace(/\s+/g, "");
+  const randomTokenName =
+    compactName.length >= 14 &&
+    /^[a-z0-9]+$/i.test(compactName) &&
+    /[a-z]/.test(compactName) &&
+    /[A-Z]/.test(compactName) &&
+    !phone &&
+    !address;
+  const invalidEmail = email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const dotHeavyEmail = /^[^@]*\.{2,}[^@]*@/.test(email);
+
+  return randomTokenName || invalidEmail || dotHeavyEmail;
 }
 
 export function parseSignatureDataUrl(value) {
@@ -736,6 +813,7 @@ export async function createSignedLiabilityRelease({
   sendEmails = true
 }) {
   await ensureDefaultLiabilityReleaseTemplates();
+  if (sourceType === "public") validatePublicLiabilityHumanCheck(payload);
   const template = await getLiabilityReleaseTemplateBySlug(slug, { publicOnly: true });
   if (!template) {
     const error = new Error("This release is not available for signing.");
@@ -862,11 +940,26 @@ export async function createSignedLiabilityRelease({
   return submission;
 }
 
-export async function listSignedLiabilityReleases() {
+export async function listSignedLiabilityReleases({
+  includeHidden = false,
+  includeSpam = false,
+  templateSlug = ""
+} = {}) {
   await ensureDefaultLiabilityReleaseTemplates();
+  const normalizedTemplateSlug = normalizeSlug(templateSlug);
   const db = getDb();
   const rows = await db.select().from(liabilityReleaseSubmissions);
   return rows
+    .filter((row) => {
+      const status = String(row.status || "signed").trim().toLowerCase();
+      if (includeHidden) {
+        if (!["signed", "hidden"].includes(status)) return false;
+      } else if (status !== "signed") {
+        return false;
+      }
+      if (!includeSpam && isLikelySpamLiabilityRelease(row)) return false;
+      return !normalizedTemplateSlug || row.templateSlug === normalizedTemplateSlug;
+    })
     .map((row) => ({
       ...row,
       participants: parseJsonArray(row.participantJson)
@@ -876,6 +969,58 @@ export async function listSignedLiabilityReleases() {
       const rightTime = right.signedAt ? new Date(right.signedAt).getTime() : 0;
       return rightTime - leftTime || Number(right.id || 0) - Number(left.id || 0);
     });
+}
+
+export async function updateLiabilityReleaseSubmissionStatus(
+  submissionId,
+  payload = {}
+) {
+  await ensureDefaultLiabilityReleaseTemplates();
+  const id = Number(submissionId);
+  if (!Number.isFinite(id) || id <= 0) {
+    const error = new Error("Valid liability release id is required.");
+    error.status = 400;
+    throw error;
+  }
+
+  const status = String(payload.status || "")
+    .trim()
+    .toLowerCase();
+  if (!["signed", "hidden"].includes(status)) {
+    const error = new Error("Release status must be signed or hidden.");
+    error.status = 400;
+    throw error;
+  }
+
+  const db = getDb();
+  const existingRows = await db
+    .select()
+    .from(liabilityReleaseSubmissions)
+    .where(eq(liabilityReleaseSubmissions.id, id));
+  if (!existingRows.length) {
+    const error = new Error("Signed liability release not found.");
+    error.status = 404;
+    throw error;
+  }
+
+  const updateValues = {
+    status,
+    updatedAt: new Date()
+  };
+  const adminNotes = cleanOptionalText(payload.adminNotes);
+  if (adminNotes) updateValues.adminNotes = adminNotes;
+
+  await db
+    .update(liabilityReleaseSubmissions)
+    .set(updateValues)
+    .where(eq(liabilityReleaseSubmissions.id, id));
+
+  const updatedRows = await db
+    .select()
+    .from(liabilityReleaseSubmissions)
+    .where(eq(liabilityReleaseSubmissions.id, id));
+  const row = updatedRows[0] || null;
+  return row ? { ...row, participants: parseJsonArray(row.participantJson) } : null;
 }
 
 function parseCsvLine(line) {

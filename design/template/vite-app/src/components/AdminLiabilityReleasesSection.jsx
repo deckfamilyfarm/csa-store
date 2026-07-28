@@ -1,6 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { adminGet, adminPost, adminPut, adminUploadFiles } from "../adminApi.js";
 
+const RELEASE_TYPE_OPTIONS = [
+  { value: "", label: "All release types" },
+  { value: "product-liability", label: "Product Liability" },
+  { value: "visitor", label: "Visitor" },
+  { value: "firearm", label: "Firearms" }
+];
+
 function formatDate(value) {
   if (!value) return "—";
   const date = new Date(value);
@@ -42,6 +49,8 @@ export function AdminLiabilityReleasesSection({ token }) {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [releaseFilter, setReleaseFilter] = useState("");
+  const [releaseTypeFilter, setReleaseTypeFilter] = useState("");
+  const [showHiddenReleases, setShowHiddenReleases] = useState(false);
   const [selectedReleaseId, setSelectedReleaseId] = useState(null);
   const [importFiles, setImportFiles] = useState([]);
   const [importResult, setImportResult] = useState(null);
@@ -50,9 +59,13 @@ export function AdminLiabilityReleasesSection({ token }) {
     setLoading(true);
     setError("");
     try {
+      const releaseParams = new URLSearchParams();
+      if (showHiddenReleases) releaseParams.set("includeHidden", "1");
+      if (releaseTypeFilter) releaseParams.set("templateSlug", releaseTypeFilter);
+      const releasePath = `liability/releases${releaseParams.toString() ? `?${releaseParams}` : ""}`;
       const [templateResponse, releaseResponse] = await Promise.all([
         adminGet("liability/templates", token),
-        adminGet("liability/releases", token)
+        adminGet(releasePath, token)
       ]);
       const nextTemplates = templateResponse.templates || [];
       const nextReleases = releaseResponse.releases || [];
@@ -76,7 +89,7 @@ export function AdminLiabilityReleasesSection({ token }) {
 
   useEffect(() => {
     loadAll();
-  }, [token]);
+  }, [token, releaseTypeFilter, showHiddenReleases]);
 
   const selectedTemplate = useMemo(
     () => templates.find((template) => template.id === selectedTemplateId) || null,
@@ -103,8 +116,11 @@ export function AdminLiabilityReleasesSection({ token }) {
     );
   }, [releases, releaseFilter]);
   const selectedRelease = useMemo(
-    () => releases.find((release) => release.id === selectedReleaseId) || filteredReleases[0] || null,
-    [releases, selectedReleaseId, filteredReleases]
+    () =>
+      filteredReleases.find((release) => release.id === selectedReleaseId) ||
+      filteredReleases[0] ||
+      null,
+    [selectedReleaseId, filteredReleases]
   );
 
   function updateTemplateDraft(updates) {
@@ -161,6 +177,38 @@ export function AdminLiabilityReleasesSection({ token }) {
       setMessage("Template published.");
     } catch (publishError) {
       setError(publishError?.message || "Failed to publish template.");
+    } finally {
+      setSaving("");
+    }
+  }
+
+  async function updateReleaseStatus(release, status) {
+    if (!release?.id) return;
+    if (
+      status === "hidden" &&
+      typeof window !== "undefined" &&
+      !window.confirm("Hide this signed release from the default admin list?")
+    ) {
+      return;
+    }
+    setSaving(`release-${release.id}`);
+    setError("");
+    setMessage("");
+    try {
+      await adminPut(`liability/releases/${release.id}/status`, token, {
+        status,
+        adminNotes:
+          status === "hidden"
+            ? "Hidden from the default admin signed-release list as spam/test/noise."
+            : "Restored to the default admin signed-release list."
+      });
+      setMessage(status === "hidden" ? "Release hidden from default view." : "Release restored.");
+      if (status === "hidden" && !showHiddenReleases) {
+        setSelectedReleaseId(null);
+      }
+      await loadAll();
+    } catch (statusError) {
+      setError(statusError?.message || "Failed to update release visibility.");
     } finally {
       setSaving("");
     }
@@ -240,14 +288,44 @@ export function AdminLiabilityReleasesSection({ token }) {
       {activeTab === "releases" ? (
         <div className="liability-admin-grid">
           <div>
-            <label className="filter-field">
-              <span className="small">Search signed releases</span>
+            <div className="admin-form-grid">
+              <label className="filter-field">
+                <span className="small">Release type</span>
+                <select
+                  className="input"
+                  value={releaseTypeFilter}
+                  onChange={(event) => {
+                    setReleaseTypeFilter(event.target.value);
+                    setSelectedReleaseId(null);
+                  }}
+                >
+                  {RELEASE_TYPE_OPTIONS.map((option) => (
+                    <option key={option.value || "all"} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="filter-field">
+                <span className="small">Search signed releases</span>
+                <input
+                  className="input"
+                  value={releaseFilter}
+                  onChange={(event) => setReleaseFilter(event.target.value)}
+                  placeholder="Signer, email, template, source id"
+                />
+              </label>
+            </div>
+            <label className="subscribe-agreement-check compact-check">
               <input
-                className="input"
-                value={releaseFilter}
-                onChange={(event) => setReleaseFilter(event.target.value)}
-                placeholder="Signer, email, template, source id"
+                type="checkbox"
+                checked={showHiddenReleases}
+                onChange={(event) => {
+                  setShowHiddenReleases(event.target.checked);
+                  setSelectedReleaseId(null);
+                }}
               />
+              <span>Show hidden spam/test records</span>
             </label>
             <div className="admin-table-wrap">
               <table className="admin-table compact">
@@ -267,7 +345,12 @@ export function AdminLiabilityReleasesSection({ token }) {
                       onClick={() => setSelectedReleaseId(release.id)}
                     >
                       <td>{formatDate(release.signedAt)}</td>
-                      <td>{release.templateSlug}</td>
+                      <td>
+                        <div>{release.templateSlug}</div>
+                        {release.status && release.status !== "signed" ? (
+                          <div className="small">{release.status}</div>
+                        ) : null}
+                      </td>
                       <td>
                         <div>{release.signerName}</div>
                         <div className="small">{release.signerEmail || "No email"}</div>
@@ -319,9 +402,34 @@ export function AdminLiabilityReleasesSection({ token }) {
                     <div>{selectedRelease.sourceType || "—"}</div>
                   </div>
                   <div>
+                    <strong>Status</strong>
+                    <div>{selectedRelease.status || "signed"}</div>
+                  </div>
+                  <div>
                     <strong>Expires</strong>
                     <div>{formatDate(selectedRelease.expiresAt)}</div>
                   </div>
+                </div>
+                <div className="button-row">
+                  {selectedRelease.status === "hidden" ? (
+                    <button
+                      className="button alt"
+                      type="button"
+                      disabled={saving === `release-${selectedRelease.id}`}
+                      onClick={() => updateReleaseStatus(selectedRelease, "signed")}
+                    >
+                      Restore to list
+                    </button>
+                  ) : (
+                    <button
+                      className="button alt"
+                      type="button"
+                      disabled={saving === `release-${selectedRelease.id}`}
+                      onClick={() => updateReleaseStatus(selectedRelease, "hidden")}
+                    >
+                      Hide from list
+                    </button>
+                  )}
                 </div>
                 {selectedRelease.participants?.length ? (
                   <div>
