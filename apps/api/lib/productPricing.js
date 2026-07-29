@@ -1,4 +1,5 @@
 function toNumber(value) {
+  if (value === null || typeof value === "undefined" || value === "") return null;
   const numeric = Number(value);
   return Number.isFinite(numeric) ? numeric : null;
 }
@@ -93,6 +94,29 @@ function getPackageQuantity(pkg, packageMeta) {
   const quantity = toNumber(packageMeta?.numOfItems ?? pkg?.numOfItems);
   if (quantity === null || quantity <= 0) return 1;
   return quantity;
+}
+
+function parsePackageRawJson(packageMeta = null) {
+  if (!packageMeta?.rawJson) return null;
+  if (typeof packageMeta.rawJson === "object") return packageMeta.rawJson;
+  try {
+    return JSON.parse(packageMeta.rawJson);
+  } catch {
+    return null;
+  }
+}
+
+function getPackageChargeUnit(pkg, packageMeta = null, profile = null) {
+  const rawJson = parsePackageRawJson(packageMeta);
+  const rawUnit =
+    rawJson?.export?.["Charge Unit"] ||
+    rawJson?.live?.product_charge_unit ||
+    rawJson?.live?.charge_unit ||
+    packageMeta?.chargeUnit ||
+    pkg?.unit ||
+    profile?.unitOfMeasure ||
+    "";
+  return String(rawUnit || "").trim();
 }
 
 function resolveSourcePricingMarkup(value, fallback = SOURCE_PRICING_DEFAULT_MARKUP) {
@@ -252,6 +276,10 @@ export function resolvePricingProfile({
 }
 
 export function computePackageBasePrice(profile, pkg, packageMeta = null) {
+  if (!profile?.usesSourcePricing) {
+    return toNumber(pkg?.price);
+  }
+
   const sourceUnitPrice = toNumber(profile?.sourceUnitPrice);
   const sourceMultiplier = toNumber(profile?.sourceMultiplier);
   if (sourceUnitPrice === null || sourceMultiplier === null) return null;
@@ -336,6 +364,9 @@ export function computeProductPricingSnapshot({
     return {
       id: pkg.id,
       name: pkg.name || "",
+      unit: pkg.unit || "",
+      chargeType: pkg.chargeType ?? pkg.charge_type ?? "",
+      chargeUnit: getPackageChargeUnit(pkg, packageMeta, resolvedProfile),
       quantity: getPackageQuantity(pkg, packageMeta),
       averageWeight: computeAverageWeight(resolvedProfile, packageMeta),
       basePrice

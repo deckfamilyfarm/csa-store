@@ -6115,6 +6115,11 @@ function buildPricelistRows(productRows, supportingRows) {
       profile: mergedProfile
     });
     const usesSourcePricing = isSourcePricingVendor(vendor);
+    const basePricePackage =
+      snapshot.basePrice !== null
+        ? snapshot.packageRows.find((row) => row.basePrice !== null && Number(row.basePrice) === Number(snapshot.basePrice))
+        : null;
+    const basePriceUnitPackage = basePricePackage || snapshot.packageRows[0] || null;
 
     return {
       productId,
@@ -6156,6 +6161,8 @@ function buildPricelistRows(productRows, supportingRows) {
       onSale: Boolean(snapshot.profile.onSale),
       saleDiscount: snapshot.profile.saleDiscount,
       basePrice: snapshot.basePrice,
+      basePriceUnit: basePriceUnitPackage?.chargeUnit || snapshot.profile.unitOfMeasure || null,
+      basePricePackageName: basePriceUnitPackage?.name || null,
       guestPrice: snapshot.guestPrice,
       memberPrice: snapshot.memberPrice,
       herdSharePrice: snapshot.herdSharePrice,

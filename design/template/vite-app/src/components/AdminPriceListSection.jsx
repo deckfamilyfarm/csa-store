@@ -14,7 +14,7 @@ const PRICELIST_COLUMNS = [
   { key: "product", label: "Product", width: 280, sticky: "left", required: true, defaultVisible: true },
   { key: "sourceUnitPrice", label: "Vendor's Retail Price", width: 156, defaultVisible: true },
   { key: "unit", label: "Vendor's Unit Type", width: 128, defaultVisible: true },
-  { key: "basePrice", label: "CSA Package Price", width: 146, defaultVisible: true },
+  { key: "basePrice", label: "CSA Base Price / Unit", width: 170, defaultVisible: true },
   { key: "memberPrice", label: "Member Adjusted $", width: 152, defaultVisible: true },
   { key: "visible", label: "Visible", width: 96, defaultVisible: true },
   { key: "trackInventory", label: "Track Inventory", width: 132, defaultVisible: true },
@@ -151,6 +151,7 @@ function loadCurrentColumnPreferences() {
 }
 
 function toNumber(value) {
+  if (value === null || typeof value === "undefined" || value === "") return null;
   const numeric = Number(value);
   return Number.isFinite(numeric) ? numeric : null;
 }
@@ -210,6 +211,36 @@ function normalizePricelistEdit(changes, defaults) {
 function formatMoney(value) {
   const numeric = toNumber(value);
   return numeric === null ? "n/a" : `$${numeric.toFixed(2)}`;
+}
+
+function formatUnitLabel(value) {
+  const normalized = String(value || "").trim();
+  if (!normalized) return "";
+  if (/^(lb|lbs|pound|pounds)$/i.test(normalized)) return "lb";
+  if (/^(ea|each|item)$/i.test(normalized)) return "each";
+  return normalized;
+}
+
+function getBasePriceUnit(row) {
+  const explicitUnit = formatUnitLabel(row?.basePriceUnit);
+  if (explicitUnit) return explicitUnit;
+  const packages = Array.isArray(row?.packages) ? row.packages : [];
+  const basePrice = toNumber(row?.basePrice);
+  const matchingPackage = basePrice === null
+    ? null
+    : packages.find((pkg) => toNumber(pkg?.basePrice) === basePrice);
+  return formatUnitLabel(
+    matchingPackage?.chargeUnit ||
+      packages[0]?.chargeUnit ||
+      row?.unitOfMeasure
+  );
+}
+
+function formatBasePriceWithUnit(row, value = row?.basePrice) {
+  const price = formatMoney(value);
+  const unit = getBasePriceUnit(row);
+  if (price === "n/a" || !unit) return price;
+  return `${price} / ${unit}`;
 }
 
 function formatDateTime(value) {
@@ -1277,7 +1308,7 @@ export function AdminPriceListSection({
       case "sourceMultiplier":
         return row.usesSourcePricing ? row.sourceMultiplier ?? "" : "";
       case "basePrice":
-        return formatMoney(displayRow.basePrice);
+        return formatBasePriceWithUnit(row, displayRow.basePrice);
       case "guestMarkup":
         return row.usesNoMarkupPricing ? "0.00" : `${roundCurrency((toNumber(row.guestMarkup) || 0) * 100).toFixed(2)}`;
       case "guestPrice":
@@ -1930,7 +1961,7 @@ export function AdminPriceListSection({
                   <tr>
                     <th>Product</th>
                     <th>Vendor</th>
-                    <th>CSA Package Price</th>
+                    <th>CSA Base Price / Unit</th>
                     <th>Member Adjusted $</th>
                     <th>Sale</th>
                     <th>Status</th>
@@ -1955,7 +1986,7 @@ export function AdminPriceListSection({
                         <tr key={`push-review-${row.productId}`}>
                           <td>{row.name}</td>
                           <td>{row.vendorName}</td>
-                          <td>{formatMoney(row.basePrice)}</td>
+                          <td>{formatBasePriceWithUnit(row)}</td>
                           <td>{formatMoney(row.memberPrice)}</td>
                           <td>{row.onSale ? `${roundCurrency((toNumber(row.saleDiscount) || 0) * 100).toFixed(2)}%` : "No"}</td>
                           <td>{statusLabel}</td>
