@@ -438,11 +438,13 @@ export function AdminPriceListSection({
   const [scheduleState, setScheduleState] = useState({
     open: false,
     updates: [],
-    error: ""
+    error: "",
+    localChangesAlreadyApplied: false
   });
   const [scheduleName, setScheduleName] = useState("");
   const [scheduleAtLocal, setScheduleAtLocal] = useState(getNextHourLocalInputValue);
   const [scheduleLoading, setScheduleLoading] = useState(false);
+  const [schedulePendingPushLoading, setSchedulePendingPushLoading] = useState(false);
   const [scheduleActionLoading, setScheduleActionLoading] = useState("");
   const [pushState, setPushState] = useState({
     active: false,
@@ -653,29 +655,49 @@ export function AdminPriceListSection({
     });
   }
 
+  function buildScheduleUpdateFromValues({ productId, productName, categoryName, values }) {
+    const safeDiscount = Math.min(Math.max(Number(values.saleDiscount) || 0, 0), 100);
+    return {
+      productId,
+      productName,
+      category: categoryName,
+      changes: {
+        visible: values.visible ? 1 : 0,
+        trackInventory: values.trackInventory ? 1 : 0,
+        inventory: Number(values.inventory) || 0,
+        onSale: values.onSale ? 1 : 0,
+        saleDiscount: safeDiscount / 100
+      },
+      display: {
+        visible: values.visible ? "On" : "Off",
+        trackInventory: values.trackInventory ? "On" : "Off",
+        inventory: Number(values.inventory) || 0,
+        onSale: values.onSale ? "On" : "Off",
+        saleDiscount: safeDiscount
+      }
+    };
+  }
+
   function buildPendingGridUpdates() {
-    return getPendingPricelistEditEntries().map(([, entry]) => {
-      const safeDiscount = Math.min(Math.max(Number(entry.values.saleDiscount) || 0, 0), 100);
-      return {
+    return getPendingPricelistEditEntries().map(([, entry]) =>
+      buildScheduleUpdateFromValues({
         productId: entry.meta.productId,
         productName: entry.meta.productName,
-        category: entry.meta.categoryName,
-        changes: {
-          visible: entry.values.visible ? 1 : 0,
-          trackInventory: entry.values.trackInventory ? 1 : 0,
-          inventory: Number(entry.values.inventory) || 0,
-          onSale: entry.values.onSale ? 1 : 0,
-          saleDiscount: safeDiscount / 100
-        },
-        display: {
-          visible: entry.values.visible ? "On" : "Off",
-          trackInventory: entry.values.trackInventory ? "On" : "Off",
-          inventory: Number(entry.values.inventory) || 0,
-          onSale: entry.values.onSale ? "On" : "Off",
-          saleDiscount: safeDiscount
-        }
-      };
-    });
+        categoryName: entry.meta.categoryName,
+        values: entry.values
+      })
+    );
+  }
+
+  function buildPendingPushScheduleUpdates(pushRows = []) {
+    return pushRows.map((row) =>
+      buildScheduleUpdateFromValues({
+        productId: row.productId,
+        productName: row.name || `Product ${row.productId}`,
+        categoryName: row.categoryName || "Uncategorized",
+        values: getRowDefaults(row)
+      })
+    );
   }
 
   function updatePricelistEdit(row, patch) {
@@ -884,13 +906,39 @@ export function AdminPriceListSection({
     if (!updates.length) return;
     setScheduleName(`Pricelist release ${new Date().toLocaleDateString()}`);
     setScheduleAtLocal(getNextHourLocalInputValue());
-    setScheduleState({ open: true, updates, error: "" });
+    setScheduleState({ open: true, updates, error: "", localChangesAlreadyApplied: false });
     setMessage("");
+  }
+
+  async function openSchedulePendingPushesModal() {
+    if (!pendingRemoteApplyCount || schedulePendingPushLoading) return;
+    setSchedulePendingPushLoading(true);
+    setMessage("");
+    try {
+      const pendingRows = await loadAllPendingPushRows();
+      const updates = buildPendingPushScheduleUpdates(pendingRows);
+      if (!updates.length) {
+        setMessage("No pending Local Line push products found to schedule.");
+        return;
+      }
+      setScheduleName(`Pending Local Line push ${new Date().toLocaleDateString()}`);
+      setScheduleAtLocal(getNextHourLocalInputValue());
+      setScheduleState({
+        open: true,
+        updates,
+        error: "",
+        localChangesAlreadyApplied: true
+      });
+    } catch (error) {
+      setMessage(error?.message || "Failed to load pending Local Line push products for scheduling.");
+    } finally {
+      setSchedulePendingPushLoading(false);
+    }
   }
 
   function closeScheduleModal() {
     if (scheduleLoading) return;
-    setScheduleState({ open: false, updates: [], error: "" });
+    setScheduleState({ open: false, updates: [], error: "", localChangesAlreadyApplied: false });
   }
 
   async function handleScheduleChanges() {
@@ -915,7 +963,7 @@ export function AdminPriceListSection({
         rows: scheduleState.updates
       });
       setPricelistEdits({});
-      setScheduleState({ open: false, updates: [], error: "" });
+      setScheduleState({ open: false, updates: [], error: "", localChangesAlreadyApplied: false });
       setMessage(`Scheduled ${response.batch?.itemCount || scheduleState.updates.length} pricelist change${scheduleState.updates.length === 1 ? "" : "s"}.`);
       await loadScheduledBatches();
     } catch (error) {
@@ -1509,6 +1557,18 @@ export function AdminPriceListSection({
             >
               Schedule Changes
             </button>
+            {pendingRemoteApplyCount > 0 ? (
+              <button
+                className="button alt"
+                type="button"
+                onClick={openSchedulePendingPushesModal}
+                disabled={scheduleLoading || schedulePendingPushLoading}
+              >
+                {schedulePendingPushLoading
+                  ? "Loading pending pushes..."
+                  : `Schedule Pending Pushes (${pendingRemoteApplyCount})`}
+              </button>
+            ) : null}
             <button
               className="button alt"
               type="button"
@@ -1667,7 +1727,7 @@ export function AdminPriceListSection({
             <div className="small">Hourly release checks run at the top of the hour.</div>
           </div>
           <button className="button alt" type="button" onClick={loadScheduledBatches} disabled={scheduledLoading}>
-            {scheduledLoading ? "Refreshing..." : "Refresh Releases"}
+            {scheduledLoading ? "Reloading..." : "Reload Scheduled Releases"}
           </button>
         </div>
         <div className="scheduled-pricelist-table-shell">
@@ -1768,7 +1828,9 @@ export function AdminPriceListSection({
             </button>
             <h3>Schedule Pricelist Changes</h3>
             <div className="small">
-              These changes stay hidden until the scheduled release runs. The server cron should run this check hourly.
+              {scheduleState.localChangesAlreadyApplied
+                ? "These products already have local changes applied. The scheduled release will push the current local values to Local Line at the release time."
+                : "These changes stay hidden until the scheduled release runs. The server cron should run this check hourly."}
             </div>
             <div className="scheduled-pricelist-form">
               <label className="filter-field">
