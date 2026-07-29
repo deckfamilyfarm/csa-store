@@ -9,6 +9,7 @@ import sharp from "sharp";
 import xlsx from "xlsx";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { ensureLocalLineSyncSchema } from "../db.js";
+import { getActiveScheduledPricelistProductChangeMap } from "../lib/scheduledPricelistReleases.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -1551,7 +1552,9 @@ async function replaceProductMemberships(connection, rows, priceListIdMap, store
 }
 
 async function replaceProductSales(connection, rows, options = {}) {
-  const productIds = [...new Set(rows.map((row) => row.productId))];
+  const protectedProductIds = options.protectedProductIds || new Set();
+  const writeRows = rows.filter((row) => !protectedProductIds.has(Number(row.productId)));
+  const productIds = [...new Set(writeRows.map((row) => row.productId))];
   if (productIds.length) {
     for (const ids of chunk(productIds, 200)) {
       await connection.query(`DELETE FROM product_sales WHERE product_id IN (?)`, [ids]);
@@ -1559,7 +1562,7 @@ async function replaceProductSales(connection, rows, options = {}) {
   }
 
   let completed = 0;
-  for (const batch of chunk(rows, 100)) {
+  for (const batch of chunk(writeRows, 100)) {
     const values = batch.flatMap((row) => [
       row.productId,
       row.onSale,
@@ -1582,9 +1585,34 @@ async function replaceProductSales(connection, rows, options = {}) {
     completed += batch.length;
     options.onProgress?.({
       completed,
-      total: rows.length
+      total: writeRows.length
     });
   }
+
+  return {
+    writtenRows: writeRows.length,
+    skippedRows: rows.length - writeRows.length,
+    protectedProductIds: [...protectedProductIds]
+  };
+}
+
+function getScheduledProtectionSummary(scheduledChangeMap = new Map()) {
+  return [...scheduledChangeMap.values()].map((entry) => ({
+    productId: entry.productId,
+    productName: entry.productName,
+    changeKeys: [...entry.changeKeys],
+    batches: entry.batches
+  }));
+}
+
+function getScheduledSaleProtectedProductIds(scheduledChangeMap = new Map()) {
+  const saleKeys = new Set(["onSale", "saleDiscount"]);
+  return new Set(
+    [...scheduledChangeMap.values()]
+      .filter((entry) => [...entry.changeKeys].some((key) => saleKeys.has(key)))
+      .map((entry) => Number(entry.productId))
+      .filter((productId) => Number.isFinite(productId))
+  );
 }
 
 async function replaceProductMedia(connection, rows, productIds, options = {}) {
@@ -2047,6 +2075,7 @@ export async function runLocalLineCacheSync(options = {}) {
 
   const connection = await mysql.createConnection(storeConfig);
   let syncRun = null;
+  let productSalesReplacement = null;
   const spacesClient = createSpacesClient();
 
   try {
@@ -2058,6 +2087,10 @@ export async function runLocalLineCacheSync(options = {}) {
       message: "Preparing Local Line cache sync"
     });
     await ensureLocalLineSyncSchema(connection);
+    const scheduledChangeMap = write
+      ? await getActiveScheduledPricelistProductChangeMap(connection)
+      : new Map();
+    const scheduledSaleProtectedProductIds = getScheduledSaleProtectedProductIds(scheduledChangeMap);
     reportProgress({
       phaseKey: "localline-fetch",
       phaseLabel: "Local Line Fetch",
@@ -2254,7 +2287,8 @@ export async function runLocalLineCacheSync(options = {}) {
           }
         }
       );
-      await replaceProductSales(connection, dataset.productSaleRows, {
+      productSalesReplacement = await replaceProductSales(connection, dataset.productSaleRows, {
+        protectedProductIds: scheduledSaleProtectedProductIds,
         onProgress: ({ completed, total }) => {
           reportProgress({
             phaseKey: "store-write",
@@ -2352,7 +2386,12 @@ export async function runLocalLineCacheSync(options = {}) {
       totalConsideredProducts: incremental.totalConsideredProducts,
       candidateProducts: incremental.candidateProductIds.length,
       skippedUnchangedProducts: incremental.skippedProductIds.length,
-      reasonCounts: incremental.reasonCounts
+      reasonCounts: incremental.reasonCounts,
+      scheduledPricelistProtection: {
+        products: getScheduledProtectionSummary(scheduledChangeMap),
+        saleProtectedProductIds: [...scheduledSaleProtectedProductIds],
+        productSalesReplacement
+      }
     });
     fs.mkdirSync(path.dirname(reportFile), { recursive: true });
     fs.writeFileSync(

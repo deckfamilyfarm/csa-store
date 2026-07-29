@@ -270,6 +270,73 @@ async function findActiveProductConflicts(connection, productIds) {
   }));
 }
 
+function isMissingScheduledPricelistTableError(error) {
+  const message = String(error?.message || "").toLowerCase();
+  return (
+    error?.code === "ER_NO_SUCH_TABLE" ||
+    (
+      (message.includes("pricelist_change_items") || message.includes("pricelist_change_batches")) &&
+      (message.includes("doesn't exist") || message.includes("no such table"))
+    )
+  );
+}
+
+export async function getActiveScheduledPricelistProductChangeMap(connection = getPool()) {
+  let rows = [];
+  try {
+    [rows] = await connection.query(
+      `
+        SELECT
+          i.product_id AS productId,
+          i.product_name AS productName,
+          i.payload_json AS payloadJson,
+          b.id AS batchId,
+          b.name AS batchName,
+          DATE_FORMAT(b.scheduled_at, '%Y-%m-%d %H:%i:%s') AS scheduledAtUtc
+        FROM pricelist_change_items i
+        JOIN pricelist_change_batches b ON b.id = i.batch_id
+        WHERE b.status IN (?, ?)
+          AND i.status IN (?, ?)
+        ORDER BY b.scheduled_at ASC, b.id ASC
+      `,
+      [
+        BATCH_STATUS_SCHEDULED,
+        BATCH_STATUS_RUNNING,
+        ITEM_STATUS_PENDING,
+        ITEM_STATUS_LOCAL_APPLIED
+      ]
+    );
+  } catch (error) {
+    if (isMissingScheduledPricelistTableError(error)) return new Map();
+    throw error;
+  }
+
+  return rows.reduce((acc, row) => {
+    const productId = Number(row.productId);
+    if (!Number.isFinite(productId)) return acc;
+    const payload = safeJsonParse(row.payloadJson, {});
+    const changeKeys = Object.keys(normalizeChangePayload(payload?.changes || {}));
+    const entry =
+      acc.get(productId) ||
+      {
+        productId,
+        productName: row.productName || `Product ${productId}`,
+        changeKeys: new Set(),
+        batches: []
+      };
+
+    changeKeys.forEach((key) => entry.changeKeys.add(key));
+    entry.batches.push({
+      batchId: Number(row.batchId),
+      batchName: row.batchName || `Release ${row.batchId}`,
+      scheduledAt: mysqlUtcToIso(row.scheduledAtUtc),
+      changeKeys
+    });
+    acc.set(productId, entry);
+    return acc;
+  }, new Map());
+}
+
 async function insertBatch(connection, { name, scheduledAt, timezone, createdByUserId, itemCount }) {
   const now = dateToMysqlUtc(new Date());
   const [result] = await connection.query(

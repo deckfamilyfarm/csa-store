@@ -1035,6 +1035,15 @@ export function AdminPriceListSection({
   const activeScheduledBatches = scheduledBatches.filter((batch) =>
     ["scheduled", "running"].includes(String(batch.status || ""))
   );
+  const activeScheduledProductIds = new Set();
+  activeScheduledBatches.forEach((batch) => {
+    (Array.isArray(batch.items) ? batch.items : []).forEach((item) => {
+      if (!["pending", "local_applied"].includes(String(item.status || ""))) return;
+      const productId = Number(item.productId);
+      if (Number.isFinite(productId)) activeScheduledProductIds.add(productId);
+    });
+  });
+  const activeScheduledProductCount = activeScheduledProductIds.size;
   const scheduledProductById = activeScheduledBatches.reduce((acc, batch) => {
     (Array.isArray(batch.items) ? batch.items : []).forEach((item) => {
       if (!["pending", "local_applied"].includes(String(item.status || ""))) return;
@@ -1644,6 +1653,11 @@ export function AdminPriceListSection({
       {pendingProductsOutsideVisibleRows > 0 ? (
         <div className="small pricelist-count">
           {pendingProductsOutsideVisibleRows} product{pendingProductsOutsideVisibleRows === 1 ? "" : "s"} needing a push are not shown in the current view.
+        </div>
+      ) : null}
+      {activeScheduledProductCount > 0 ? (
+        <div className="small pricelist-count subscribe-error">
+          Warning: {activeScheduledProductCount} product{activeScheduledProductCount === 1 ? "" : "s"} have active scheduled pricelist changes. Pull From Local Line will skip scheduled local fields for those products so pending release changes are not overwritten.
         </div>
       ) : null}
       <div className="scheduled-pricelist-panel">

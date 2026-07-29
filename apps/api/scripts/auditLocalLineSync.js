@@ -5,6 +5,7 @@ import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import mysql from "mysql2/promise";
 import xlsx from "xlsx";
+import { getActiveScheduledPricelistProductChangeMap } from "../lib/scheduledPricelistReleases.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -1207,6 +1208,45 @@ function extractStoreProductValues(proposal) {
   return values;
 }
 
+function getScheduledProtectionSummary(scheduledChangeMap = new Map()) {
+  return [...scheduledChangeMap.values()].map((entry) => ({
+    productId: entry.productId,
+    productName: entry.productName,
+    changeKeys: [...entry.changeKeys],
+    batches: entry.batches
+  }));
+}
+
+function filterScheduledProtectedProductProposal(proposal, scheduledChangeMap = new Map()) {
+  const scheduledChange = scheduledChangeMap.get(Number(proposal.productId));
+  if (!scheduledChange) {
+    return {
+      proposal,
+      protectedFields: [],
+      scheduledChange: null
+    };
+  }
+
+  const protectedFields = [];
+  const changes = {};
+  for (const [field, change] of Object.entries(proposal.changes || {})) {
+    if (scheduledChange.changeKeys.has(field)) {
+      protectedFields.push(field);
+    } else {
+      changes[field] = change;
+    }
+  }
+
+  return {
+    proposal: {
+      ...proposal,
+      changes
+    },
+    protectedFields,
+    scheduledChange
+  };
+}
+
 function extractStorePackageValues(proposal) {
   const values = {};
   for (const [field, change] of Object.entries(proposal.changes || {})) {
@@ -1346,13 +1386,35 @@ async function applyUpdateStoreProduct(connection, proposal, state) {
   }
 
   try {
-    const values = extractStoreProductValues(proposal);
+    const {
+      proposal: safeProposal,
+      protectedFields,
+      scheduledChange
+    } = filterScheduledProtectedProductProposal(proposal, state.scheduledChangeMap);
+    if (!Object.keys(safeProposal.changes || {}).length) {
+      return {
+        action: proposal.action,
+        productId: proposal.productId,
+        status: "skipped",
+        reason: "active-scheduled-pricelist-change",
+        protectedFields,
+        scheduledRelease: scheduledChange
+          ? {
+              productName: scheduledChange.productName,
+              batches: scheduledChange.batches
+            }
+          : null
+      };
+    }
+
+    const values = extractStoreProductValues(safeProposal);
     const result = await runUpdateQuery(connection, "products", "id", proposal.productId, values);
     return {
       action: proposal.action,
       productId: proposal.productId,
       status: result.updated ? "applied" : "skipped",
       reason: result.reason || null,
+      protectedFields,
       updatedFields: Object.keys(values).filter((key) => key !== "updated_at")
     };
   } catch (error) {
@@ -1472,7 +1534,8 @@ async function applyAddMissingStorePackage(connection, proposal, state) {
 async function applySelectedProposals(storeConnection, _pricelistConnection, storeCatalog, proposals, options = {}) {
   const state = {
     productsById: mapBy(storeCatalog.products, "id"),
-    packagesById: mapBy(storeCatalog.packages, "id")
+    packagesById: mapBy(storeCatalog.packages, "id"),
+    scheduledChangeMap: options.scheduledChangeMap || new Map()
   };
   const selectedFixKeys = Array.isArray(options.selectedFixKeys) ? options.selectedFixKeys : [];
   const actionable = buildActionableProposals(proposals, selectedFixKeys);
@@ -1495,6 +1558,9 @@ async function applySelectedProposals(storeConnection, _pricelistConnection, sto
     attempted: actionable.length,
     applied: results.filter((item) => item.status === "applied").length,
     skipped: results.filter((item) => item.status === "skipped").length,
+    skippedForScheduledPricelistChanges: results.filter(
+      (item) => item.reason === "active-scheduled-pricelist-change"
+    ).length,
     errors: results.filter((item) => item.status === "error").length,
     createdProducts: results.filter(
       (item) => item.status === "applied" && item.action === "create-store-product-from-localline"
@@ -1512,7 +1578,8 @@ async function applySelectedProposals(storeConnection, _pricelistConnection, sto
       proposals.storePackageShapeFixes.filter((item) => item.action === "review-extra-store-package").length +
       proposals.reviewMissingLocalLineProducts.length +
       proposals.repairDeadMappings.length +
-      proposals.priceListOverrideCaptures.length
+      proposals.priceListOverrideCaptures.length,
+    scheduledPricelistProtection: getScheduledProtectionSummary(state.scheduledChangeMap)
   };
 
   return { summary, results };
@@ -1617,6 +1684,9 @@ export async function runLocalLineAudit(options = {}) {
     const pricelistRows = pricelistState.rows;
 
     const catalogComparison = buildCatalogComparison(exportCatalog, storeCatalog);
+    const scheduledChangeMap = write
+      ? await getActiveScheduledPricelistProductChangeMap(storeConnection)
+      : new Map();
     reportProgress({
       phaseKey: "catalog-sync",
       phaseLabel: "Catalog Sync",
@@ -1681,9 +1751,10 @@ export async function runLocalLineAudit(options = {}) {
           killdeerConnection,
           storeCatalog,
           proposals,
-          { selectedFixKeys }
+          { selectedFixKeys, scheduledChangeMap }
         )
       : null;
+    const scheduledPricelistProtection = getScheduledProtectionSummary(scheduledChangeMap);
 
     reportProgress({
       phaseKey: "catalog-sync",
@@ -1703,6 +1774,7 @@ export async function runLocalLineAudit(options = {}) {
       includeInactive,
       skipPricelist,
       selectedFixKeys,
+      scheduledPricelistProtection,
       pricelistSource: {
         table: pricelistState.sourceTable,
         warning: pricelistState.warning
@@ -1750,6 +1822,7 @@ export async function runLocalLineAudit(options = {}) {
       },
       suggestedFixes: limitRows(suggestedFixes, limit),
       applySummary: applyResult?.summary || null,
+      scheduledPricelistProtection,
       proposedUpdateSummary: {
         storeProductCreates: proposals.storeProductCreates.length,
         storeProductUpdates: proposals.storeProductUpdates.length,
