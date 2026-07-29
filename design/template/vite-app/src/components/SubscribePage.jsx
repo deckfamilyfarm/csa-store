@@ -90,6 +90,30 @@ const SUBSCRIBE_PLANS = [
   }
 ];
 
+const FARMERS_MARKET_REFERRAL_SOURCE = "Farmers Market";
+const CURRENT_MEMBER_REFERRAL_SOURCE = "A current CSA member";
+const DROP_SITE_REFERRAL_SOURCE = "Drop site host or pickup site";
+const COMMUNITY_EVENT_REFERRAL_SOURCE = "Community event";
+const FARM_PARTNER_REFERRAL_SOURCE = "Farm partner or local business";
+const OTHER_REFERRAL_SOURCE = "Other";
+
+const REFERRAL_SOURCE_OPTIONS = [
+  FARMERS_MARKET_REFERRAL_SOURCE,
+  CURRENT_MEMBER_REFERRAL_SOURCE,
+  "Friend or family",
+  "Google / search engine",
+  "Instagram",
+  "Facebook",
+  "Email newsletter",
+  "Deck Family Farm website",
+  "Full Farm CSA website",
+  "Local Line / online store",
+  DROP_SITE_REFERRAL_SOURCE,
+  COMMUNITY_EVENT_REFERRAL_SOURCE,
+  FARM_PARTNER_REFERRAL_SOURCE,
+  OTHER_REFERRAL_SOURCE
+];
+
 const TESTIMONIALS = [
   {
     author: "K. Green",
@@ -302,6 +326,7 @@ function buildInitialForm(dropSites = []) {
     stateProvince: "Oregon",
     postalCode: "",
     referralSource: "",
+    referralSourceDetail: "",
     selectedPlan: "forager",
     billingDayOfMonth: 1,
     selectedDropSite: "",
@@ -312,6 +337,72 @@ function buildInitialForm(dropSites = []) {
     liabilityAgreementSignerName: "",
     liabilityAgreementSignatureMode: "typed"
   };
+}
+
+function getReferralSourceDetailField(referralSource) {
+  if (referralSource === FARMERS_MARKET_REFERRAL_SOURCE) {
+    return {
+      label: "Who can we thank?",
+      placeholder: "Farmers market rep name"
+    };
+  }
+  if (referralSource === CURRENT_MEMBER_REFERRAL_SOURCE) {
+    return {
+      label: "Who can we thank?",
+      placeholder: "CSA member name"
+    };
+  }
+  if (referralSource === DROP_SITE_REFERRAL_SOURCE) {
+    return {
+      label: "Which dropsite host can we thank?",
+      placeholder: "Host or pickup site name"
+    };
+  }
+  if (referralSource === COMMUNITY_EVENT_REFERRAL_SOURCE) {
+    return {
+      label: "Which community event?",
+      placeholder: "Event name"
+    };
+  }
+  if (referralSource === FARM_PARTNER_REFERRAL_SOURCE) {
+    return {
+      label: "Who can we thank?",
+      placeholder: "Farm, business, or person"
+    };
+  }
+  if (referralSource === OTHER_REFERRAL_SOURCE) {
+    return {
+      label: "Other source",
+      placeholder: "Name of the person, place, or source"
+    };
+  }
+  return null;
+}
+
+function buildReferralSourceSummary(form) {
+  const source = String(form.referralSource || "").trim();
+  const detail = String(form.referralSourceDetail || "").trim();
+  if (!source) return "";
+  if (!detail) return source;
+  if (source === FARMERS_MARKET_REFERRAL_SOURCE) {
+    return `${source} - Rep: ${detail}`;
+  }
+  if (source === CURRENT_MEMBER_REFERRAL_SOURCE) {
+    return `${source} - Member: ${detail}`;
+  }
+  if (source === DROP_SITE_REFERRAL_SOURCE) {
+    return `${source} - Host/site: ${detail}`;
+  }
+  if (source === COMMUNITY_EVENT_REFERRAL_SOURCE) {
+    return `${source} - Event: ${detail}`;
+  }
+  if (source === FARM_PARTNER_REFERRAL_SOURCE) {
+    return `${source} - Partner: ${detail}`;
+  }
+  if (source === OTHER_REFERRAL_SOURCE) {
+    return `${source} - ${detail}`;
+  }
+  return `${source} - ${detail}`;
 }
 
 function isVisibleSubscribeDropSite(site) {
@@ -625,6 +716,17 @@ export function SubscribePage({
     ) {
       setAgreementSaved(false);
     }
+    if (key === "referralSource") {
+      setForm((prev) => ({
+        ...prev,
+        referralSource: value,
+        referralSourceDetail:
+          value === prev.referralSource && getReferralSourceDetailField(value)
+            ? prev.referralSourceDetail
+            : ""
+      }));
+      return;
+    }
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
@@ -834,6 +936,7 @@ export function SubscribePage({
       }
       const plan = SUBSCRIBE_PLANS.find((entry) => entry.value === form.selectedPlan);
       const { billingDayOfMonth, ...leadForm } = form;
+      const referralSourceSummary = buildReferralSourceSummary(form);
       const marketingQueryString = getMarketingQueryString();
       const marketingSearchParams = new URLSearchParams(marketingQueryString);
       const csaTrackToken =
@@ -843,6 +946,9 @@ export function SubscribePage({
         "";
       const response = await submitSubscribeLead({
         ...leadForm,
+        referralSource: referralSourceSummary,
+        referralSourceSelection: form.referralSource,
+        referralSourceDetail: form.referralSourceDetail,
         selectedPlanLabel: plan?.title || form.selectedPlan,
         ...(SUBSCRIBE_PORTAL_ONBOARDING_ENABLED
           ? { billingDayOfMonth: Number(billingDayOfMonth || 1) }
@@ -880,6 +986,8 @@ export function SubscribePage({
       }, 0);
     }
   }
+
+  const referralSourceDetailField = getReferralSourceDetailField(form.referralSource);
 
   return (
     <div className="subscribe-page">
@@ -1250,14 +1358,36 @@ export function SubscribePage({
                     </label>
                   </div>
 
-                  <label className="filter-field">
-                    <span className="small">Where did you hear about Full Farm?</span>
-                    <input
-                      className="input"
-                      value={form.referralSource}
-                      onChange={(event) => updateField("referralSource", event.target.value)}
-                    />
-                  </label>
+                  <div className="subscribe-form-grid">
+                    <label className="filter-field">
+                      <span className="small">How did you hear about us?</span>
+                      <select
+                        className="select"
+                        value={form.referralSource}
+                        onChange={(event) => updateField("referralSource", event.target.value)}
+                      >
+                        <option value="">Select one</option>
+                        {REFERRAL_SOURCE_OPTIONS.map((source) => (
+                          <option key={source} value={source}>
+                            {source}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    {referralSourceDetailField ? (
+                      <label className="filter-field">
+                        <span className="small">{referralSourceDetailField.label}</span>
+                        <input
+                          className="input"
+                          value={form.referralSourceDetail}
+                          onChange={(event) =>
+                            updateField("referralSourceDetail", event.target.value)
+                          }
+                          placeholder={referralSourceDetailField.placeholder}
+                        />
+                      </label>
+                    ) : null}
+                  </div>
 
                   <label className="filter-field">
                     <span className="small">Anything else we should know?</span>

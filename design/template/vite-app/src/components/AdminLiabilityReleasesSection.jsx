@@ -38,6 +38,37 @@ function templateChanged(template, draft) {
   return JSON.stringify(createTemplateDraft(template)) !== JSON.stringify(draft);
 }
 
+function isLikelySpamRelease(release = {}) {
+  const sourceType = String(release.sourceType || "").trim().toLowerCase();
+  if (sourceType && sourceType !== "public") return false;
+
+  const name = String(release.signerName || "").trim();
+  const email = String(release.signerEmail || "").trim().toLowerCase();
+  const phone = String(release.signerPhone || "").trim();
+  const address = [
+    release.signerAddressLine1,
+    release.signerAddressLine2,
+    release.signerCity,
+    release.signerPostalCode
+  ]
+    .map((value) => String(value || "").trim())
+    .filter(Boolean)
+    .join(" ");
+  const compactName = name.replace(/\s+/g, "");
+
+  const randomTokenName =
+    compactName.length >= 14 &&
+    /^[a-z0-9]+$/i.test(compactName) &&
+    /[a-z]/.test(compactName) &&
+    /[A-Z]/.test(compactName) &&
+    !phone &&
+    !address;
+  const invalidEmail = email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const dotHeavyEmail = /^[^@]*\.{2,}[^@]*@/.test(email);
+
+  return randomTokenName || invalidEmail || dotHeavyEmail;
+}
+
 export function AdminLiabilityReleasesSection({ token }) {
   const [activeTab, setActiveTab] = useState("releases");
   const [templates, setTemplates] = useState([]);
@@ -60,7 +91,10 @@ export function AdminLiabilityReleasesSection({ token }) {
     setError("");
     try {
       const releaseParams = new URLSearchParams();
-      if (showHiddenReleases) releaseParams.set("includeHidden", "1");
+      if (showHiddenReleases) {
+        releaseParams.set("includeHidden", "1");
+        releaseParams.set("includeSpam", "1");
+      }
       if (releaseTypeFilter) releaseParams.set("templateSlug", releaseTypeFilter);
       const releasePath = `liability/releases${releaseParams.toString() ? `?${releaseParams}` : ""}`;
       const [templateResponse, releaseResponse] = await Promise.all([
@@ -100,9 +134,12 @@ export function AdminLiabilityReleasesSection({ token }) {
     : createTemplateDraft();
   const filteredReleases = useMemo(() => {
     const query = releaseFilter.trim().toLowerCase();
-    if (!query) return releases;
-    return releases.filter((release) =>
-      [
+    return releases.filter((release) => {
+      if (releaseTypeFilter && release.templateSlug !== releaseTypeFilter) return false;
+      if (!showHiddenReleases && release.status === "hidden") return false;
+      if (!showHiddenReleases && isLikelySpamRelease(release)) return false;
+      if (!query) return true;
+      return [
         release.templateSlug,
         release.templateTitle,
         release.signerName,
@@ -112,9 +149,9 @@ export function AdminLiabilityReleasesSection({ token }) {
       ]
         .join(" ")
         .toLowerCase()
-        .includes(query)
-    );
-  }, [releases, releaseFilter]);
+        .includes(query);
+    });
+  }, [releases, releaseFilter, releaseTypeFilter, showHiddenReleases]);
   const selectedRelease = useMemo(
     () =>
       filteredReleases.find((release) => release.id === selectedReleaseId) ||
@@ -325,7 +362,7 @@ export function AdminLiabilityReleasesSection({ token }) {
                   setSelectedReleaseId(null);
                 }}
               />
-              <span>Show hidden spam/test records</span>
+              <span>Show hidden/spam/test records</span>
             </label>
             <div className="admin-table-wrap">
               <table className="admin-table compact">

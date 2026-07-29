@@ -8,6 +8,7 @@ import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { DeleteObjectCommand, S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import {
   ensureMarketingSchema,
+  ensureScheduledPricelistSchema,
   ensureSubscriberCaptureSchema,
   ensureSiteContentSchema,
   ensureSubscriptionPortalSchema,
@@ -123,6 +124,14 @@ import {
   validateLegacyImport
 } from "../lib/liabilityReleases.js";
 import { buildDropSitePerformancePayload } from "../lib/dropSitePerformance.js";
+import {
+  cancelScheduledPricelistBatch,
+  createScheduledPricelistBatch,
+  getScheduledPricelistBatch,
+  listScheduledPricelistBatches,
+  retryScheduledPricelistBatch,
+  runScheduledPricelistBatch
+} from "../lib/scheduledPricelistReleases.js";
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -6237,11 +6246,34 @@ router.get("/pricelist", requireAdmin, async (req, res) => {
   `;
   const [[countRow]] = await pool.query(countSql, params);
   const totalRows = Number(countRow?.total || 0);
-  const pendingCountClauses = buildPendingPricelistClauses(clauses, statusFilter);
+  const filteredPendingCountClauses = buildPendingPricelistClauses(clauses, statusFilter);
+  const filteredPendingCountWhereSql = filteredPendingCountClauses.length
+    ? `WHERE ${filteredPendingCountClauses.join(" AND ")}`
+    : "";
+  const filteredPendingCountParams = [...params];
+  const filteredPendingCountSql = `
+    SELECT COUNT(*) AS total
+    ${baseFromSql}
+    ${filteredPendingCountWhereSql}
+  `;
+  const [[filteredPendingCountRow]] = await pool.query(filteredPendingCountSql, filteredPendingCountParams);
+  const filteredPendingRemoteApplyRows = Number(filteredPendingCountRow?.total || 0);
+  const {
+    clauses: allProductPendingClauses,
+    params: allProductPendingParams
+  } = buildPricelistWhereClause({
+    search: "",
+    categoryId: null,
+    vendorId: null,
+    saleFilter: "all",
+    statusFilter: "all",
+    membershipCategoryIds
+  });
+  const pendingCountClauses = buildPendingPricelistClauses(allProductPendingClauses, "all");
   const pendingCountWhereSql = pendingCountClauses.length
     ? `WHERE ${pendingCountClauses.join(" AND ")}`
     : "";
-  const pendingCountParams = [...params];
+  const pendingCountParams = [...allProductPendingParams];
   const pendingCountSql = `
     SELECT COUNT(*) AS total
     ${baseFromSql}
@@ -6300,7 +6332,8 @@ router.get("/pricelist", requireAdmin, async (req, res) => {
       totalPages
     },
     summary: {
-      pendingRemoteApplyRows
+      pendingRemoteApplyRows,
+      filteredPendingRemoteApplyRows
     },
     sort: {
       key: sortKey,
@@ -6718,6 +6751,83 @@ router.post("/pricelist/cleanup-recent-change-false-positives", requireAdminPerm
     return res.status(500).json({
       ok: false,
       error: error?.message || "Unable to clean recent-change false positives."
+    });
+  }
+});
+
+router.get("/pricelist/scheduled-batches", requireAdminPermission("pricing_admin"), async (req, res) => {
+  try {
+    await ensureScheduledPricelistSchema();
+    const limit = parsePositiveInteger(req.query?.limit, 25);
+    const batches = await listScheduledPricelistBatches({ limit });
+    return res.json({ batches });
+  } catch (error) {
+    return res.status(500).json({
+      error: error?.message || "Unable to load scheduled pricelist releases."
+    });
+  }
+});
+
+router.post("/pricelist/scheduled-batches", requireAdminPermission("pricing_admin"), async (req, res) => {
+  try {
+    const batch = await createScheduledPricelistBatch({
+      name: req.body?.name,
+      scheduledAt: req.body?.scheduledAt,
+      timezone: req.body?.timezone,
+      rows: Array.isArray(req.body?.rows) ? req.body.rows : [],
+      createdByUserId: req.admin?.userId || req.admin?.adminId || null
+    });
+    return res.json({ ok: true, batch });
+  } catch (error) {
+    return res.status(400).json({
+      error: error?.message || "Unable to schedule pricelist release."
+    });
+  }
+});
+
+router.get("/pricelist/scheduled-batches/:id", requireAdminPermission("pricing_admin"), async (req, res) => {
+  try {
+    const batch = await getScheduledPricelistBatch(req.params.id);
+    if (!batch) {
+      return res.status(404).json({ error: "Scheduled pricelist release not found." });
+    }
+    return res.json({ batch });
+  } catch (error) {
+    return res.status(400).json({
+      error: error?.message || "Unable to load scheduled pricelist release."
+    });
+  }
+});
+
+router.post("/pricelist/scheduled-batches/:id/cancel", requireAdminPermission("pricing_admin"), async (req, res) => {
+  try {
+    const batch = await cancelScheduledPricelistBatch(req.params.id);
+    return res.json({ ok: true, batch });
+  } catch (error) {
+    return res.status(400).json({
+      error: error?.message || "Unable to cancel scheduled pricelist release."
+    });
+  }
+});
+
+router.post("/pricelist/scheduled-batches/:id/run-now", requireAdminPermission("localline_push"), async (req, res) => {
+  try {
+    const batch = await runScheduledPricelistBatch(req.params.id, { allowFuture: true });
+    return res.json({ ok: true, batch });
+  } catch (error) {
+    return res.status(400).json({
+      error: error?.message || "Unable to run scheduled pricelist release."
+    });
+  }
+});
+
+router.post("/pricelist/scheduled-batches/:id/retry", requireAdminPermission("localline_push"), async (req, res) => {
+  try {
+    const batch = await retryScheduledPricelistBatch(req.params.id);
+    return res.json({ ok: true, batch });
+  } catch (error) {
+    return res.status(400).json({
+      error: error?.message || "Unable to retry scheduled pricelist release."
     });
   }
 });

@@ -8,6 +8,7 @@ const PRICELIST_DEFAULT_PAGE_SIZE = 50;
 const PRICELIST_PAGE_SIZE_OPTIONS = [50, 100, 200];
 const PRICELIST_SEARCH_DEBOUNCE_MS = 250;
 const PUSH_REVIEW_FETCH_PAGE_SIZE = 200;
+const SCHEDULED_RELEASE_TIMEZONE = "America/Los_Angeles";
 
 const PRICELIST_COLUMNS = [
   { key: "product", label: "Product", width: 280, sticky: "left", required: true, defaultVisible: true },
@@ -218,6 +219,21 @@ function formatDateTime(value) {
   return date.toLocaleString();
 }
 
+function formatLocalDateTimeInput(date) {
+  const pad = (value) => String(value).padStart(2, "0");
+  return [
+    date.getFullYear(),
+    pad(date.getMonth() + 1),
+    pad(date.getDate())
+  ].join("-") + `T${pad(date.getHours())}:00`;
+}
+
+function getNextHourLocalInputValue() {
+  const date = new Date();
+  date.setHours(date.getHours() + 1, 0, 0, 0);
+  return formatLocalDateTimeInput(date);
+}
+
 function computeEditedBasePrice(row, rowValues) {
   if (!row?.usesSourcePricing) {
     return toNumber(row?.basePrice);
@@ -413,10 +429,21 @@ export function AdminPriceListSection({
   const [pageSize, setPageSize] = useState(PRICELIST_DEFAULT_PAGE_SIZE);
   const [totalRows, setTotalRows] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
-  const [filteredPendingCount, setFilteredPendingCount] = useState(0);
+  const [pendingRemoteApplyCount, setPendingRemoteApplyCount] = useState(0);
   const [pushReviewLoading, setPushReviewLoading] = useState(false);
   const [pushReviewRows, setPushReviewRows] = useState([]);
   const [pushReviewProductIds, setPushReviewProductIds] = useState([]);
+  const [scheduledBatches, setScheduledBatches] = useState([]);
+  const [scheduledLoading, setScheduledLoading] = useState(false);
+  const [scheduleState, setScheduleState] = useState({
+    open: false,
+    updates: [],
+    error: ""
+  });
+  const [scheduleName, setScheduleName] = useState("");
+  const [scheduleAtLocal, setScheduleAtLocal] = useState(getNextHourLocalInputValue);
+  const [scheduleLoading, setScheduleLoading] = useState(false);
+  const [scheduleActionLoading, setScheduleActionLoading] = useState("");
   const [pushState, setPushState] = useState({
     active: false,
     completed: 0,
@@ -518,11 +545,11 @@ export function AdminPriceListSection({
   }, [openActionMenuProductId]);
 
   useEffect(() => {
-    document.body.classList.toggle("modal-open", pushReviewOpen);
+    document.body.classList.toggle("modal-open", pushReviewOpen || scheduleState.open);
     return () => {
       document.body.classList.remove("modal-open");
     };
-  }, [pushReviewOpen]);
+  }, [pushReviewOpen, scheduleState.open]);
 
   function buildPriceListQueryParams() {
     const params = new URLSearchParams({
@@ -552,10 +579,6 @@ export function AdminPriceListSection({
         sortDirection: "asc",
         status: "needsApply"
       });
-      if (debouncedProductSearch) params.set("search", debouncedProductSearch);
-      if (categoryFilter) params.set("categoryId", categoryFilter);
-      if (vendorFilter) params.set("vendorId", vendorFilter);
-      if (saleFilter && saleFilter !== "all") params.set("sale", saleFilter);
 
       const response = await adminGet(`pricelist?${params.toString()}`, token);
       const rowsForPage = Array.isArray(response.rows) ? response.rows : [];
@@ -583,10 +606,10 @@ export function AdminPriceListSection({
       const nextPageSize = Number(response.pagination?.pageSize || pageSize);
       const nextTotalRows = Number(response.pagination?.totalRows || 0);
       const nextTotalPages = Number(response.pagination?.totalPages || 1);
-      const nextFilteredPendingCount = Number(response.summary?.pendingRemoteApplyRows || 0);
+      const nextPendingRemoteApplyCount = Number(response.summary?.pendingRemoteApplyRows || 0);
       setTotalRows(nextTotalRows);
       setTotalPages(nextTotalPages);
-      setFilteredPendingCount(nextFilteredPendingCount);
+      setPendingRemoteApplyCount(nextPendingRemoteApplyCount);
       if (nextPage !== page) setPage(nextPage);
       if (nextPageSize !== pageSize) setPageSize(nextPageSize);
     } catch (_error) {
@@ -600,6 +623,19 @@ export function AdminPriceListSection({
     }
   }
 
+  async function loadScheduledBatches() {
+    if (!token) return;
+    setScheduledLoading(true);
+    try {
+      const response = await adminGet("pricelist/scheduled-batches?limit=30", token);
+      setScheduledBatches(Array.isArray(response.batches) ? response.batches : []);
+    } catch (_error) {
+      setMessage("Failed to load scheduled releases.");
+    } finally {
+      setScheduledLoading(false);
+    }
+  }
+
   useEffect(() => {
     loadPriceList();
   }, [token, page, pageSize, debouncedProductSearch, categoryFilter, vendorFilter, saleFilter, statusFilter, sortConfig.key, sortConfig.direction]);
@@ -607,12 +643,38 @@ export function AdminPriceListSection({
   useEffect(() => {
     if (!token) return;
     loadPriceList();
+    loadScheduledBatches();
   }, [token, refreshNonce]);
 
   function getPendingPricelistEditEntries() {
     return Object.entries(pricelistEdits).filter(([, entry]) => {
       if (!entry?.defaults || !entry?.values) return false;
       return !editsMatch(entry.values, entry.defaults);
+    });
+  }
+
+  function buildPendingGridUpdates() {
+    return getPendingPricelistEditEntries().map(([, entry]) => {
+      const safeDiscount = Math.min(Math.max(Number(entry.values.saleDiscount) || 0, 0), 100);
+      return {
+        productId: entry.meta.productId,
+        productName: entry.meta.productName,
+        category: entry.meta.categoryName,
+        changes: {
+          visible: entry.values.visible ? 1 : 0,
+          trackInventory: entry.values.trackInventory ? 1 : 0,
+          inventory: Number(entry.values.inventory) || 0,
+          onSale: entry.values.onSale ? 1 : 0,
+          saleDiscount: safeDiscount / 100
+        },
+        display: {
+          visible: entry.values.visible ? "On" : "Off",
+          trackInventory: entry.values.trackInventory ? "On" : "Off",
+          inventory: Number(entry.values.inventory) || 0,
+          onSale: entry.values.onSale ? "On" : "Off",
+          saleDiscount: safeDiscount
+        }
+      };
     });
   }
 
@@ -817,31 +879,94 @@ export function AdminPriceListSection({
     }
   }
 
+  function openScheduleModal() {
+    const updates = buildPendingGridUpdates();
+    if (!updates.length) return;
+    setScheduleName(`Pricelist release ${new Date().toLocaleDateString()}`);
+    setScheduleAtLocal(getNextHourLocalInputValue());
+    setScheduleState({ open: true, updates, error: "" });
+    setMessage("");
+  }
+
+  function closeScheduleModal() {
+    if (scheduleLoading) return;
+    setScheduleState({ open: false, updates: [], error: "" });
+  }
+
+  async function handleScheduleChanges() {
+    if (!scheduleState.updates.length) return;
+    const scheduledDate = new Date(scheduleAtLocal);
+    if (!Number.isFinite(scheduledDate.getTime())) {
+      setScheduleState((prev) => ({ ...prev, error: "Choose a valid release time." }));
+      return;
+    }
+    if (scheduledDate.getMinutes() !== 0) {
+      setScheduleState((prev) => ({ ...prev, error: "Scheduled releases run at the top of the hour." }));
+      return;
+    }
+
+    setScheduleLoading(true);
+    setScheduleState((prev) => ({ ...prev, error: "" }));
+    try {
+      const response = await adminPost("pricelist/scheduled-batches", token, {
+        name: scheduleName,
+        scheduledAt: scheduledDate.toISOString(),
+        timezone: SCHEDULED_RELEASE_TIMEZONE,
+        rows: scheduleState.updates
+      });
+      setPricelistEdits({});
+      setScheduleState({ open: false, updates: [], error: "" });
+      setMessage(`Scheduled ${response.batch?.itemCount || scheduleState.updates.length} pricelist change${scheduleState.updates.length === 1 ? "" : "s"}.`);
+      await loadScheduledBatches();
+    } catch (error) {
+      setScheduleState((prev) => ({
+        ...prev,
+        error: error?.message || "Failed to schedule pricelist release."
+      }));
+    } finally {
+      setScheduleLoading(false);
+    }
+  }
+
+  async function handleScheduledBatchAction(batch, action) {
+    if (!batch?.id) return;
+    const actionKey = `${action}-${batch.id}`;
+    if (action === "cancel" && !window.confirm(`Cancel scheduled release "${batch.name}"?`)) {
+      return;
+    }
+    if (action === "run-now" && !window.confirm(`Run "${batch.name}" now? This will make the local store changes live immediately.`)) {
+      return;
+    }
+    setScheduleActionLoading(actionKey);
+    setMessage("");
+    try {
+      await adminPost(`pricelist/scheduled-batches/${batch.id}/${action}`, token, {});
+      if (action === "cancel") {
+        setMessage("Scheduled release cancelled.");
+      } else if (action === "retry") {
+        setMessage("Scheduled release retry complete.");
+      } else {
+        setMessage("Scheduled release run complete.");
+      }
+      await loadScheduledBatches();
+      await loadPriceList();
+      if (action !== "cancel" && typeof onDataRefresh === "function") {
+        await onDataRefresh();
+      }
+      if (action !== "cancel" && typeof onCatalogRefresh === "function") {
+        await onCatalogRefresh();
+      }
+    } catch (error) {
+      setMessage(error?.message || "Scheduled release action failed.");
+    } finally {
+      setScheduleActionLoading("");
+    }
+  }
+
   async function handleApplyChanges() {
     if (!pendingPricelistEditEntries.length) return;
 
-    const updates = pendingPricelistEditEntries.map(([, entry]) => {
-      const safeDiscount = Math.min(Math.max(Number(entry.values.saleDiscount) || 0, 0), 100);
-      return {
-        productId: entry.meta.productId,
-        productName: entry.meta.productName,
-        category: entry.meta.categoryName,
-        changes: {
-          visible: entry.values.visible ? 1 : 0,
-          trackInventory: entry.values.trackInventory ? 1 : 0,
-          inventory: Number(entry.values.inventory) || 0,
-          onSale: entry.values.onSale ? 1 : 0,
-          saleDiscount: safeDiscount / 100
-        },
-        display: {
-          visible: entry.values.visible ? "On" : "Off",
-          trackInventory: entry.values.trackInventory ? "On" : "Off",
-          inventory: Number(entry.values.inventory) || 0,
-          onSale: entry.values.onSale ? "On" : "Off",
-          saleDiscount: safeDiscount
-        }
-      };
-    });
+    const updates = buildPendingGridUpdates();
 
     setApplyState({ open: true, updates, results: [], error: "", localOnly: true });
     setApplyLoading(true);
@@ -907,7 +1032,25 @@ export function AdminPriceListSection({
     .filter((row) => row.hasPendingRemoteApply)
     .map((row) => row.productId);
   const pendingPricelistEditEntries = getPendingPricelistEditEntries();
-  const pendingProductsOffPage = Math.max(0, filteredPendingCount - remoteReadyProductIds.length);
+  const activeScheduledBatches = scheduledBatches.filter((batch) =>
+    ["scheduled", "running"].includes(String(batch.status || ""))
+  );
+  const scheduledProductById = activeScheduledBatches.reduce((acc, batch) => {
+    (Array.isArray(batch.items) ? batch.items : []).forEach((item) => {
+      if (!["pending", "local_applied"].includes(String(item.status || ""))) return;
+      acc.set(Number(item.productId), {
+        batchId: batch.id,
+        batchName: batch.name,
+        scheduledAt: batch.scheduledAt,
+        status: batch.status
+      });
+    });
+    return acc;
+  }, new Map());
+  const pendingProductsOutsideVisibleRows = Math.max(
+    0,
+    pendingRemoteApplyCount - remoteReadyProductIds.length
+  );
   const statusText = loading
     ? "Loading pricelist..."
     : message || `${rows.length ? `${(page - 1) * pageSize + 1}-${(page - 1) * pageSize + rows.length}` : "0"} / ${totalRows} products`;
@@ -944,7 +1087,7 @@ export function AdminPriceListSection({
   }
 
   async function openPushReview() {
-    if (!filteredPendingCount || applyingProductIds.length || pushReviewLoading) return;
+    if (!pendingRemoteApplyCount || applyingProductIds.length || pushReviewLoading) return;
     setPushReviewOpen(true);
     setPushReviewLoading(true);
     setPushState({
@@ -1032,6 +1175,7 @@ export function AdminPriceListSection({
     const defaults = editEntry?.defaults || getRowDefaults(row);
     const rowValues = editEntry?.values || defaults;
     const displayRow = buildDisplayRow(row, rowValues);
+    const scheduledInfo = scheduledProductById.get(Number(row.productId));
 
     switch (column.key) {
       case "status":
@@ -1040,6 +1184,11 @@ export function AdminPriceListSection({
             <div className={`small pricelist-status ${row.remoteSyncStatus}`}>{row.remoteSyncStatus}</div>
             {row.hasPendingRemoteApply ? <div className="small">Needs push to Local Line</div> : null}
             {Number(row.localLineProductId || 0) <= 0 ? <div className="small">Local-only</div> : null}
+            {scheduledInfo ? (
+              <div className="small pricelist-scheduled-badge">
+                Scheduled: {formatDateTime(scheduledInfo.scheduledAt)}
+              </div>
+            ) : null}
           </>
         );
       case "product":
@@ -1047,6 +1196,9 @@ export function AdminPriceListSection({
           <div className="admin-product-cell">
             <div className="admin-product-cell-title">{row.name}</div>
             <div className="admin-product-cell-meta">{getProductMetaLine(row)}</div>
+            {scheduledInfo ? (
+              <div className="small pricelist-scheduled-badge">{scheduledInfo.batchName}</div>
+            ) : null}
           </div>
         );
       case "category":
@@ -1343,6 +1495,14 @@ export function AdminPriceListSection({
             <button
               className="button alt"
               type="button"
+              onClick={openScheduleModal}
+              disabled={applyLoading || scheduleLoading || pendingPricelistEditEntries.length === 0}
+            >
+              Schedule Changes
+            </button>
+            <button
+              className="button alt"
+              type="button"
               disabled={applyLoading || pendingPricelistEditEntries.length === 0}
               onClick={() => {
                 if (!window.confirm("Discard all pending pricelist changes? This cannot be undone.")) {
@@ -1455,7 +1615,7 @@ export function AdminPriceListSection({
               className="button sync-button"
               type="button"
               onClick={openPushReview}
-              disabled={applyingProductIds.length > 0 || pushReviewLoading || filteredPendingCount === 0}
+              disabled={applyingProductIds.length > 0 || pushReviewLoading || pendingRemoteApplyCount === 0}
             >
               {applyingProductIds.length ? "Pushing..." : pushReviewLoading ? "Loading..." : "Push to Local Line"}
             </button>
@@ -1479,11 +1639,180 @@ export function AdminPriceListSection({
         Pending pricelist changes: {pendingPricelistEditEntries.length}
       </div>
       <div className="small pricelist-count">
-        {filteredPendingCount} product{filteredPendingCount === 1 ? "" : "s"} currently need a Local Line push.
+        {pendingRemoteApplyCount} product{pendingRemoteApplyCount === 1 ? "" : "s"} currently need a Local Line push across all products.
       </div>
-      {pendingProductsOffPage > 0 ? (
+      {pendingProductsOutsideVisibleRows > 0 ? (
         <div className="small pricelist-count">
-          {pendingProductsOffPage} product{pendingProductsOffPage === 1 ? "" : "s"} need a Local Line push on other pages. Use the `Needs push` filter to find them.
+          {pendingProductsOutsideVisibleRows} product{pendingProductsOutsideVisibleRows === 1 ? "" : "s"} needing a push are not shown in the current view.
+        </div>
+      ) : null}
+      <div className="scheduled-pricelist-panel">
+        <div className="scheduled-pricelist-header">
+          <div>
+            <div className="title">Scheduled Releases</div>
+            <div className="small">Hourly release checks run at the top of the hour.</div>
+          </div>
+          <button className="button alt" type="button" onClick={loadScheduledBatches} disabled={scheduledLoading}>
+            {scheduledLoading ? "Refreshing..." : "Refresh Releases"}
+          </button>
+        </div>
+        <div className="scheduled-pricelist-table-shell">
+          <table className="admin-table scheduled-pricelist-table">
+            <thead>
+              <tr>
+                <th>Release</th>
+                <th>Scheduled</th>
+                <th>Status</th>
+                <th>Products</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {scheduledLoading ? (
+                <tr>
+                  <td colSpan={5}>Loading scheduled releases...</td>
+                </tr>
+              ) : scheduledBatches.length ? (
+                scheduledBatches.map((batch) => {
+                  const items = Array.isArray(batch.items) ? batch.items : [];
+                  const productNames = items
+                    .slice(0, 4)
+                    .map((item) => item.productName || `Product ${item.productId}`)
+                    .join(", ");
+                  const moreCount = Math.max(0, items.length - 4);
+                  const failedCount = Number(batch.failedCount || 0);
+                  const actionDisabled = Boolean(scheduleActionLoading);
+                  return (
+                    <tr key={`scheduled-pricelist-${batch.id}`}>
+                      <td>
+                        <div>{batch.name}</div>
+                        {batch.createdByUsername ? <div className="small">By {batch.createdByUsername}</div> : null}
+                      </td>
+                      <td>{formatDateTime(batch.scheduledAt)}</td>
+                      <td>
+                        <div className={`small pricelist-status ${batch.status}`}>{batch.status}</div>
+                        {failedCount ? <div className="small">{failedCount} failed</div> : null}
+                      </td>
+                      <td>
+                        <div>{items.length} product{items.length === 1 ? "" : "s"}</div>
+                        <div className="small">
+                          {productNames || "No products"}
+                          {moreCount ? `, +${moreCount} more` : ""}
+                        </div>
+                      </td>
+                      <td>
+                        <div className="scheduled-pricelist-actions">
+                          {batch.status === "scheduled" ? (
+                            <>
+                              <button
+                                className="button alt"
+                                type="button"
+                                disabled={actionDisabled}
+                                onClick={() => handleScheduledBatchAction(batch, "cancel")}
+                              >
+                                {scheduleActionLoading === `cancel-${batch.id}` ? "Cancelling..." : "Cancel"}
+                              </button>
+                              <button
+                                className="button alt"
+                                type="button"
+                                disabled={actionDisabled}
+                                onClick={() => handleScheduledBatchAction(batch, "run-now")}
+                              >
+                                {scheduleActionLoading === `run-now-${batch.id}` ? "Running..." : "Run Now"}
+                              </button>
+                            </>
+                          ) : null}
+                          {["partial", "failed"].includes(String(batch.status || "")) ? (
+                            <button
+                              className="button alt"
+                              type="button"
+                              disabled={actionDisabled}
+                              onClick={() => handleScheduledBatchAction(batch, "retry")}
+                            >
+                              {scheduleActionLoading === `retry-${batch.id}` ? "Retrying..." : "Retry"}
+                            </button>
+                          ) : null}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan={5}>No scheduled releases yet.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {scheduleState.open ? (
+        <div className="modal-backdrop" onClick={closeScheduleModal}>
+          <div className="modal response-modal scheduled-pricelist-modal" onClick={(event) => event.stopPropagation()}>
+            <button className="modal-close" type="button" onClick={closeScheduleModal} disabled={scheduleLoading}>
+              Close
+            </button>
+            <h3>Schedule Pricelist Changes</h3>
+            <div className="small">
+              These changes stay hidden until the scheduled release runs. The server cron should run this check hourly.
+            </div>
+            <div className="scheduled-pricelist-form">
+              <label className="filter-field">
+                <span className="small">Release name</span>
+                <input
+                  className="input"
+                  type="text"
+                  value={scheduleName}
+                  onChange={(event) => setScheduleName(event.target.value)}
+                  disabled={scheduleLoading}
+                />
+              </label>
+              <label className="filter-field">
+                <span className="small">Release time</span>
+                <input
+                  className="input"
+                  type="datetime-local"
+                  step="3600"
+                  value={scheduleAtLocal}
+                  onChange={(event) => setScheduleAtLocal(event.target.value)}
+                  disabled={scheduleLoading}
+                />
+              </label>
+            </div>
+            <div className="small">Timezone: {SCHEDULED_RELEASE_TIMEZONE}</div>
+            {scheduleState.error ? <div className="small form-error">{scheduleState.error}</div> : null}
+            <div className="response-progress">
+              {scheduleState.updates.length} product{scheduleState.updates.length === 1 ? "" : "s"} will be scheduled.
+            </div>
+            <div className="response-list scheduled-pricelist-update-list">
+              {scheduleState.updates.map((update) => (
+                <div className="response-card" key={`schedule-update-${update.productId}`}>
+                  <div className="title">{update.productName}</div>
+                  <div className="small">Category: {update.category}</div>
+                  <div className="small">
+                    Visible: {update.display.visible} · Track: {update.display.trackInventory} ·
+                    Stock: {update.display.inventory}
+                  </div>
+                  <div className="small">
+                    Sale: {update.display.onSale} · Discount: {update.display.saleDiscount}%
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="response-actions">
+              <button className="button alt" type="button" onClick={closeScheduleModal} disabled={scheduleLoading}>
+                Cancel
+              </button>
+              <button
+                className="button"
+                type="button"
+                onClick={handleScheduleChanges}
+                disabled={scheduleLoading || scheduleState.updates.length === 0}
+              >
+                {scheduleLoading ? "Scheduling..." : "Schedule Release"}
+              </button>
+            </div>
+          </div>
         </div>
       ) : null}
       {pushReviewOpen ? (
@@ -1494,7 +1823,7 @@ export function AdminPriceListSection({
             </button>
             <h3>Review Local Line Push</h3>
             <div className="small">
-              Review the current page pricing updates before sending them to Local Line.
+              Review all pending pricing updates before sending them to Local Line.
             </div>
             <div className="response-card pricelist-push-note">
               <div className="title">Scheduling Note</div>
@@ -1514,9 +1843,9 @@ export function AdminPriceListSection({
                 Push complete: {pushState.completed} of {pushState.total} processed.
               </div>
             ) : null}
-            {pendingProductsOffPage > 0 ? (
+            {pendingProductsOutsideVisibleRows > 0 ? (
               <div className="small">
-                {pendingProductsOffPage} pending product{pendingProductsOffPage === 1 ? "" : "s"} are outside the current page, but will still be included.
+                {pendingProductsOutsideVisibleRows} pending product{pendingProductsOutsideVisibleRows === 1 ? "" : "s"} are not shown in the current table view, but will still be included.
               </div>
             ) : null}
             <div className="pricelist-push-review-table-shell">

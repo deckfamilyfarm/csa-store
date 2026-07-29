@@ -87,6 +87,48 @@ CREATE TABLE IF NOT EXISTS product_sales (
   updated_at DATETIME
 );
 
+CREATE TABLE IF NOT EXISTS pricelist_change_batches (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  status VARCHAR(32) NOT NULL DEFAULT 'scheduled',
+  scheduled_at DATETIME NOT NULL,
+  timezone VARCHAR(64) NOT NULL DEFAULT 'America/Los_Angeles',
+  created_by_user_id INT,
+  item_count INT DEFAULT 0,
+  summary_json TEXT,
+  error_message TEXT,
+  started_at DATETIME,
+  finished_at DATETIME,
+  created_at DATETIME,
+  updated_at DATETIME
+);
+
+CREATE INDEX IF NOT EXISTS idx_pricelist_change_batches_status_scheduled
+  ON pricelist_change_batches (status, scheduled_at);
+
+CREATE TABLE IF NOT EXISTS pricelist_change_items (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  batch_id INT NOT NULL,
+  product_id INT NOT NULL,
+  product_name VARCHAR(255),
+  status VARCHAR(32) NOT NULL DEFAULT 'pending',
+  payload_json TEXT NOT NULL,
+  display_json TEXT,
+  original_snapshot_json TEXT,
+  result_json TEXT,
+  error_message TEXT,
+  local_applied_at DATETIME,
+  remote_applied_at DATETIME,
+  created_at DATETIME,
+  updated_at DATETIME
+);
+
+CREATE INDEX IF NOT EXISTS idx_pricelist_change_items_batch
+  ON pricelist_change_items (batch_id);
+
+CREATE INDEX IF NOT EXISTS idx_pricelist_change_items_product_status
+  ON pricelist_change_items (product_id, status);
+
 CREATE TABLE IF NOT EXISTS drop_sites (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(255) NOT NULL,

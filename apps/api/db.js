@@ -16,6 +16,7 @@ let siteContentSchemaPromise;
 let marketingSchemaPromise;
 let subscriptionPortalSchemaPromise;
 let liabilityReleaseSchemaPromise;
+let scheduledPricelistSchemaPromise;
 
 const SOURCE_PRICING_VENDOR_FACTOR_DEFAULT = 0.5412;
 
@@ -37,6 +38,62 @@ const PRODUCT_PRICING_COLUMN_STATEMENTS = [
     tableName: "product_pricing_profiles",
     columnName: "price_changed_at",
     definition: "price_changed_at DATETIME"
+  }
+];
+
+const SCHEDULED_PRICELIST_TABLE_STATEMENTS = [
+  `
+    CREATE TABLE IF NOT EXISTS pricelist_change_batches (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      status VARCHAR(32) NOT NULL DEFAULT 'scheduled',
+      scheduled_at DATETIME NOT NULL,
+      timezone VARCHAR(64) NOT NULL DEFAULT 'America/Los_Angeles',
+      created_by_user_id INT,
+      item_count INT DEFAULT 0,
+      summary_json TEXT,
+      error_message TEXT,
+      started_at DATETIME,
+      finished_at DATETIME,
+      created_at DATETIME,
+      updated_at DATETIME
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS pricelist_change_items (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      batch_id INT NOT NULL,
+      product_id INT NOT NULL,
+      product_name VARCHAR(255),
+      status VARCHAR(32) NOT NULL DEFAULT 'pending',
+      payload_json TEXT NOT NULL,
+      display_json TEXT,
+      original_snapshot_json TEXT,
+      result_json TEXT,
+      error_message TEXT,
+      local_applied_at DATETIME,
+      remote_applied_at DATETIME,
+      created_at DATETIME,
+      updated_at DATETIME
+    )
+  `
+];
+
+const SCHEDULED_PRICELIST_INDEX_STATEMENTS = [
+  {
+    tableName: "pricelist_change_batches",
+    indexName: "idx_pricelist_change_batches_status_scheduled",
+    columns: "status, scheduled_at"
+  },
+  {
+    tableName: "pricelist_change_items",
+    indexName: "idx_pricelist_change_items_batch",
+    columns: "batch_id"
+  },
+  {
+    tableName: "pricelist_change_items",
+    indexName: "idx_pricelist_change_items_product_status",
+    columns: "product_id, status"
   }
 ];
 
@@ -2692,6 +2749,25 @@ async function runProductPricingSchemaBootstrap(connection) {
   }
 }
 
+async function runScheduledPricelistSchemaBootstrap(connection) {
+  for (const statement of SCHEDULED_PRICELIST_TABLE_STATEMENTS) {
+    await connection.query(statement);
+  }
+
+  for (const indexDefinition of SCHEDULED_PRICELIST_INDEX_STATEMENTS) {
+    const exists = await indexExists(
+      connection,
+      indexDefinition.tableName,
+      indexDefinition.indexName
+    );
+    if (exists) continue;
+
+    await connection.query(
+      `CREATE INDEX ${indexDefinition.indexName} ON ${indexDefinition.tableName} (${indexDefinition.columns})`
+    );
+  }
+}
+
 async function runSubscriberCaptureSchemaBootstrap(connection) {
   for (const statement of SUBSCRIBER_CAPTURE_TABLE_STATEMENTS) {
     await connection.query(statement);
@@ -3053,6 +3129,22 @@ export async function ensureProductPricingSchema(connection = getPool()) {
   }
 
   return runProductPricingSchemaBootstrap(connection);
+}
+
+export async function ensureScheduledPricelistSchema(connection = getPool()) {
+  if (connection === getPool()) {
+    if (!scheduledPricelistSchemaPromise) {
+      scheduledPricelistSchemaPromise = runScheduledPricelistSchemaBootstrap(connection).catch(
+        (error) => {
+          scheduledPricelistSchemaPromise = null;
+          throw error;
+        }
+      );
+    }
+    return scheduledPricelistSchemaPromise;
+  }
+
+  return runScheduledPricelistSchemaBootstrap(connection);
 }
 
 export async function ensureSubscriberCaptureSchema(connection = getPool()) {

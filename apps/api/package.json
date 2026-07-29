@@ -18,6 +18,7 @@
     "sync:localline-full": "node scripts/syncLocalLineFull.js",
     "backfill:localline-customer-credit": "node --env-file=../../.env scripts/backfillLocalLineCustomerCreditSnapshots.js",
     "sync:localline-automation": "node --env-file=../../.env scripts/runLocalLineAutomation.js",
+    "run:scheduled-pricelist": "node --env-file=../../.env scripts/runScheduledPricelistReleases.js",
     "publish:dashboard": "node --env-file=../../.env scripts/runLocalLineAutomation.js --mode=dashboard",
     "check:qbo": "node --env-file=../../.env scripts/checkQboConnection.js",
     "qbo:reauthorize": "node --env-file=../../.env scripts/reauthorizeQbo.js",

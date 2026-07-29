@@ -3229,6 +3229,24 @@ img {
   color: var(--barn);
 }
 
+.pricelist-status.scheduled,
+.pricelist-status.running,
+.pricelist-status.partial {
+  color: #8b5e1a;
+}
+
+.pricelist-status.completed {
+  color: var(--field);
+}
+
+.pricelist-status.cancelled {
+  color: #7f7b74;
+}
+
+.pricelist-scheduled-badge {
+  color: #8b5e1a;
+}
+
 .pricelist-section {
   margin-top: 0;
 }
@@ -3505,6 +3523,69 @@ img {
 .pricelist-count {
   margin-right: 4px;
   white-space: nowrap;
+}
+
+.scheduled-pricelist-panel {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.scheduled-pricelist-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.scheduled-pricelist-table-shell {
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.scheduled-pricelist-table {
+  min-width: 860px;
+  border: 0;
+}
+
+.scheduled-pricelist-table th,
+.scheduled-pricelist-table td {
+  vertical-align: top;
+}
+
+.scheduled-pricelist-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.scheduled-pricelist-actions .button {
+  padding: 6px 8px;
+}
+
+.scheduled-pricelist-modal {
+  width: min(760px, 96vw);
+}
+
+.scheduled-pricelist-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 280px);
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.scheduled-pricelist-update-list {
+  max-height: 42vh;
+  overflow: auto;
+}
+
+@media (max-width: 720px) {
+  .scheduled-pricelist-header,
+  .scheduled-pricelist-form {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
 }
 
 .pricelist-pagination {

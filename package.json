@@ -15,6 +15,7 @@
     "sync:localline-full": "npm --prefix apps/api run sync:localline-full --",
     "sync:localline-full:checked": "npm run sync:localline-full -- && npm run verify:localline-sync",
     "sync:localline-automation": "node --env-file=.env apps/api/scripts/runLocalLineAutomation.js",
+    "run:scheduled-pricelist": "node --env-file=.env apps/api/scripts/runScheduledPricelistReleases.js",
     "publish:dashboard": "node --env-file=.env apps/api/scripts/runLocalLineAutomation.js --mode=dashboard",
     "check:qbo": "npm --prefix apps/api run check:qbo --",
     "qbo:reauthorize": "npm --prefix apps/api run qbo:reauthorize --"

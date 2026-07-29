@@ -1212,6 +1212,58 @@ export const productPricingProfiles = mysqlTable("product_pricing_profiles", {
   updatedAt: datetime("updated_at")
 });
 
+export const pricelistChangeBatches = mysqlTable(
+  "pricelist_change_batches",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    name: varchar("name", { length: 255 }).notNull(),
+    status: varchar("status", { length: 32 }).notNull().default("scheduled"),
+    scheduledAt: datetime("scheduled_at").notNull(),
+    timezone: varchar("timezone", { length: 64 }).notNull().default("America/Los_Angeles"),
+    createdByUserId: int("created_by_user_id"),
+    itemCount: int("item_count").default(0),
+    summaryJson: text("summary_json"),
+    errorMessage: text("error_message"),
+    startedAt: datetime("started_at"),
+    finishedAt: datetime("finished_at"),
+    createdAt: datetime("created_at"),
+    updatedAt: datetime("updated_at")
+  },
+  (table) => ({
+    statusScheduledIdx: index("idx_pricelist_change_batches_status_scheduled").on(
+      table.status,
+      table.scheduledAt
+    )
+  })
+);
+
+export const pricelistChangeItems = mysqlTable(
+  "pricelist_change_items",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    batchId: int("batch_id").notNull(),
+    productId: int("product_id").notNull(),
+    productName: varchar("product_name", { length: 255 }),
+    status: varchar("status", { length: 32 }).notNull().default("pending"),
+    payloadJson: text("payload_json").notNull(),
+    displayJson: text("display_json"),
+    originalSnapshotJson: text("original_snapshot_json"),
+    resultJson: text("result_json"),
+    errorMessage: text("error_message"),
+    localAppliedAt: datetime("local_applied_at"),
+    remoteAppliedAt: datetime("remote_applied_at"),
+    createdAt: datetime("created_at"),
+    updatedAt: datetime("updated_at")
+  },
+  (table) => ({
+    batchIdx: index("idx_pricelist_change_items_batch").on(table.batchId),
+    productStatusIdx: index("idx_pricelist_change_items_product_status").on(
+      table.productId,
+      table.status
+    )
+  })
+);
+
 export const productMedia = mysqlTable(
   "product_media",
   {
