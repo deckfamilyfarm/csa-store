@@ -503,6 +503,10 @@ export function SubscribePage({
     () => buildLiabilityReleaseUrl("visitor", portalBaseHref),
     [portalBaseHref]
   );
+  const horseLiabilityReleaseUrl = useMemo(
+    () => buildLiabilityReleaseUrl("horse", portalBaseHref),
+    [portalBaseHref]
+  );
   const firearmLiabilityReleaseUrl = useMemo(
     () => buildLiabilityReleaseUrl("firearm", portalBaseHref),
     [portalBaseHref]
@@ -1805,6 +1809,7 @@ export function SubscribePage({
 
       <SubscribeFooter
         visitorLiabilityReleaseUrl={visitorLiabilityReleaseUrl}
+        horseLiabilityReleaseUrl={horseLiabilityReleaseUrl}
         firearmLiabilityReleaseUrl={firearmLiabilityReleaseUrl}
       />
     </div>

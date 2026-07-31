@@ -5,6 +5,7 @@ const RELEASE_TYPE_OPTIONS = [
   { value: "", label: "All release types" },
   { value: "product-liability", label: "Product Liability" },
   { value: "visitor", label: "Visitor" },
+  { value: "horse", label: "Horse" },
   { value: "firearm", label: "Firearms" }
 ];
 

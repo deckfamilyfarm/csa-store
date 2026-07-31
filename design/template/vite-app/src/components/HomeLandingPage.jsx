@@ -182,6 +182,7 @@ export function HomeLandingPage({
   const vendorCount = catalog?.vendors?.length || 0;
   const activeProducts = activeGroup ? activeGroup.products : featuredProducts.slice(0, 8);
   const visitorLiabilityReleaseUrl = useMemo(() => buildLiabilityReleaseUrl("visitor"), []);
+  const horseLiabilityReleaseUrl = useMemo(() => buildLiabilityReleaseUrl("horse"), []);
   const firearmLiabilityReleaseUrl = useMemo(() => buildLiabilityReleaseUrl("firearm"), []);
 
   const navLinks = useMemo(
@@ -470,6 +471,7 @@ export function HomeLandingPage({
 
       <SubscribeFooter
         visitorLiabilityReleaseUrl={visitorLiabilityReleaseUrl}
+        horseLiabilityReleaseUrl={horseLiabilityReleaseUrl}
         firearmLiabilityReleaseUrl={firearmLiabilityReleaseUrl}
       />
     </div>

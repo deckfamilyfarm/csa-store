@@ -2,6 +2,7 @@ import React from "react";
 
 export function SubscribeFooter({
   visitorLiabilityReleaseUrl = "/liability/visitor",
+  horseLiabilityReleaseUrl = "/liability/horse",
   firearmLiabilityReleaseUrl = "/liability/firearm"
 }) {
   return (
@@ -38,6 +39,12 @@ export function SubscribeFooter({
               !
             </span>
             <span>Visitor Liability Release</span>
+          </a>
+          <a className="subscribe-review-link" href={horseLiabilityReleaseUrl}>
+            <span className="subscribe-review-link-star" aria-hidden="true">
+              !
+            </span>
+            <span>Horse Liability Release</span>
           </a>
           <a className="subscribe-review-link" href={firearmLiabilityReleaseUrl}>
             <span className="subscribe-review-link-star" aria-hidden="true">

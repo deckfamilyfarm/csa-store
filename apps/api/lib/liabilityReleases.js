@@ -70,6 +70,22 @@ export const FIREARM_LIABILITY_RELEASE_TEXT = [
   "I HAVE READ THIS FIREARMS LIABILITY RELEASE, UNDERSTAND IT, AND SIGN IT VOLUNTARILY."
 ].join("\n\n");
 
+export const HORSE_LIABILITY_RELEASE_TEXT = [
+  "HORSE AND EQUINE ACTIVITY LIABILITY RELEASE, ASSUMPTION OF RISK, AND INDEMNITY AGREEMENT",
+  "This Horse and Equine Activity Liability Release is for visitors, volunteers, guests, riders, handlers, parents, guardians, and any other person who rides, handles, leads, grooms, feeds, observes, assists with, or is present near horses, ponies, mules, donkeys, hinnies, tack, barns, corrals, pastures, gates, fences, trailers, vehicles, farm equipment, or any equine-related activity on or around Deck Family Farm property at 25362 High Pass Road, Junction City, Oregon 97448, or any other location where Deck Family Farm, Full Farm CSA LLC, their owners, employees, representatives, hosts, volunteers, agents, contractors, affiliated farms, or event organizers are involved. In this agreement, those persons and entities are called the Released Parties.",
+  "OREGON EQUINE ACTIVITY ACKNOWLEDGMENT. I understand that Oregon law recognizes risks inherent in equine activities under ORS 30.687 to 30.697. I knowingly and voluntarily agree that, as a condition of participation, I waive the right to bring an action against the Released Parties, including any equine activity sponsor or equine professional, for injury or death arising out of riding, training, driving, grooming, handling, leading, inspecting, evaluating, assisting with, or riding as a passenger upon any equine, to the fullest extent allowed by Oregon law. This release does not release claims that cannot legally be released under Oregon law.",
+  "ASSUMPTION OF RISKS. I understand that horses and other equines are large, powerful, and unpredictable animals. Risks include, but are not limited to: falling; being kicked, bitten, stepped on, crushed, dragged, pinned, thrown, or struck; sudden movement, spooking, bucking, bolting, rearing, slipping, tripping, or refusing commands; tack, saddle, halter, lead rope, gate, fence, trailer, or equipment failure; uneven ground, mud, manure, holes, rocks, weather, insects, dust, allergens, animal disease exposure, vehicles, farm machinery, other animals, and the acts or omissions of other participants or third parties. I knowingly and voluntarily assume all risks, known and unknown, foreseeable and unforeseeable, associated with being present for or participating in equine activities.",
+  "AGREEMENT TO FOLLOW DIRECTIONS. I agree to follow all posted, written, and verbal safety instructions immediately. I will not enter stalls, barns, pastures, paddocks, corrals, trailers, or restricted areas without permission. I will not touch, feed, mount, lead, groom, tease, approach, or pass behind any horse or equine unless specifically allowed. I agree to wear required protective equipment, including a helmet when instructed. I agree that the supervising person may stop my participation at any time for unsafe conduct, unsafe conditions, or failure to follow instructions.",
+  "PARTICIPANT RESPONSIBILITY. I represent that I am physically and mentally able to participate safely. I am not under the influence of alcohol, marijuana, controlled substances, medication, fatigue, illness, or any condition that would impair my judgment, balance, coordination, or ability to follow instructions. I agree to disclose any relevant medical condition, fear, inexperience, allergy, disability, or limitation before participating.",
+  "RELEASE OF LIABILITY. To the fullest extent allowed by Oregon law, I release and discharge the Released Parties from all claims, demands, causes of action, damages, losses, costs, attorney fees, expenses, or liability of any kind arising out of or related to my presence on the property or my participation in equine activities, including claims involving ordinary negligence. This release is intended to be as broad and inclusive as Oregon law permits. It does not release claims that cannot legally be released.",
+  "INDEMNIFICATION AND DUTY TO DEFEND. I agree to indemnify, defend, and hold harmless the Released Parties from any claim, demand, cause of action, damage, judgment, cost, attorney fee, expense, or liability arising out of or related to my conduct, my guests, any participant for whom I sign, my violation of safety instructions, or any claim brought by or on behalf of a participant for whom I sign, to the fullest extent allowed by law.",
+  "MINORS AND PARTICIPANTS I SIGN FOR. If I sign for a minor or another participant, I represent that I am the parent, legal guardian, or authorized responsible adult for that participant. I consent to that participant's presence and participation, accept responsibility for that participant's conduct and safety, and agree to explain the risks and rules to that participant. I understand that a parent or guardian release may not waive every claim a minor may have under Oregon law, but I personally agree to the assumption of risk, release, indemnity, and defense obligations in this agreement to the fullest extent allowed by law.",
+  "MEDICAL TREATMENT. If I or a participant for whom I sign is injured or appears to need emergency care, I authorize the Released Parties to seek emergency medical assistance. I understand that the Released Parties are not required to provide medical care and that I am responsible for medical costs arising from my participation or the participation of anyone for whom I sign.",
+  "APPLICABLE LAW AND SEVERABILITY. This agreement is governed by Oregon law. If any provision is found invalid or unenforceable, the remaining provisions remain in effect to the fullest extent allowed by law.",
+  "VOLUNTARY ELECTRONIC SIGNATURE. I have had the opportunity to read this agreement, ask questions, decline participation, and seek legal advice before signing. By signing electronically, I agree that my electronic signature has the same legal effect as a handwritten signature. I understand that I am giving up substantial legal rights, including the right to sue for certain claims.",
+  "I HAVE READ THIS HORSE AND EQUINE ACTIVITY LIABILITY RELEASE, UNDERSTAND IT, AND SIGN IT VOLUNTARILY."
+].join("\n\n");
+
 const DEFAULT_TEMPLATES = [
   {
     slug: "visitor",
@@ -88,10 +104,10 @@ const DEFAULT_TEMPLATES = [
     slug: "horse",
     title: "Horse Liability Release",
     description: "Horse and equine activity release replacing the former Jotform horse agreement.",
-    bodyText: "",
+    bodyText: HORSE_LIABILITY_RELEASE_TEXT,
     sourceUrl:
       "https://www.jotform.com/sign/241205842481048/invite/01hwr9k4j04390b77f6afbb433",
-    status: "draft",
+    status: "published",
     publicPath: "/liability/horse",
     renewalMonths: null,
     requiresParticipants: 1,
@@ -552,7 +568,7 @@ export async function ensureDefaultLiabilityReleaseTemplates() {
             status
           ),
           public_path = IF(public_path IS NULL OR TRIM(public_path) = '', VALUES(public_path), public_path),
-          requires_participants = IF(slug = 'visitor', VALUES(requires_participants), requires_participants),
+          requires_participants = IF(slug IN ('visitor', 'horse'), VALUES(requires_participants), requires_participants),
           updated_at = VALUES(updated_at)
       `,
       [
@@ -571,6 +587,20 @@ export async function ensureDefaultLiabilityReleaseTemplates() {
       ]
     );
   }
+
+  await pool.query(
+    `
+      UPDATE liability_release_templates
+      SET status = 'published',
+          updated_at = ?
+      WHERE slug = 'horse'
+        AND status <> 'published'
+        AND current_version_id IS NULL
+        AND body_text IS NOT NULL
+        AND TRIM(body_text) <> ''
+    `,
+    [now]
+  );
 
   const [publishedRows] = await pool.query(
     `

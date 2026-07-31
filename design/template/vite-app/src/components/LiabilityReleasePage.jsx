@@ -303,8 +303,8 @@ export function LiabilityReleasePage({ slug, homeUrl = "https://www.deckfamilyfa
             <div className="button-row" style={{ justifyContent: "space-between" }}>
               <h2>
                 {template.requiresParticipants
-                  ? "Other Visitors Covered by This Signature"
-                  : "Other Visitors Covered by This Signature (Optional)"}
+                  ? "Participants Covered by This Signature"
+                  : "Participants Covered by This Signature (Optional)"}
               </h2>
               <button className="button alt" type="button" onClick={addParticipant}>
                 Add participant
