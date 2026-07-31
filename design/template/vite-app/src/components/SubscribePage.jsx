@@ -92,6 +92,7 @@ const SUBSCRIBE_PLANS = [
 
 const FARMERS_MARKET_REFERRAL_SOURCE = "Farmers Market";
 const CURRENT_MEMBER_REFERRAL_SOURCE = "A current CSA member";
+const FRIEND_OR_FAMILY_REFERRAL_SOURCE = "Friend or family";
 const DROP_SITE_REFERRAL_SOURCE = "Drop site host or pickup site";
 const COMMUNITY_EVENT_REFERRAL_SOURCE = "Community event";
 const FARM_PARTNER_REFERRAL_SOURCE = "Farm partner or local business";
@@ -100,7 +101,7 @@ const OTHER_REFERRAL_SOURCE = "Other";
 const REFERRAL_SOURCE_OPTIONS = [
   FARMERS_MARKET_REFERRAL_SOURCE,
   CURRENT_MEMBER_REFERRAL_SOURCE,
-  "Friend or family",
+  FRIEND_OR_FAMILY_REFERRAL_SOURCE,
   "Google / search engine",
   "Instagram",
   "Facebook",
@@ -352,6 +353,12 @@ function getReferralSourceDetailField(referralSource) {
       placeholder: "CSA member name"
     };
   }
+  if (referralSource === FRIEND_OR_FAMILY_REFERRAL_SOURCE) {
+    return {
+      label: "Who can we thank?",
+      placeholder: "Friend or family member name"
+    };
+  }
   if (referralSource === DROP_SITE_REFERRAL_SOURCE) {
     return {
       label: "Which dropsite host can we thank?",
@@ -390,6 +397,9 @@ function buildReferralSourceSummary(form) {
   if (source === CURRENT_MEMBER_REFERRAL_SOURCE) {
     return `${source} - Member: ${detail}`;
   }
+  if (source === FRIEND_OR_FAMILY_REFERRAL_SOURCE) {
+    return `${source} - Friend/family: ${detail}`;
+  }
   if (source === DROP_SITE_REFERRAL_SOURCE) {
     return `${source} - Host/site: ${detail}`;
   }
@@ -418,9 +428,26 @@ function isVisibleSubscribeDropSite(site) {
   return true;
 }
 
+function formatDropSiteTime(value) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+  const match = text.match(/^(\d{1,2})(?::(\d{2}))?(?::\d{2})?$/);
+  if (!match) return text;
+
+  const hour = Number(match[1]);
+  const minute = Number(match[2] || 0);
+  if (!Number.isInteger(hour) || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+    return text;
+  }
+
+  const period = hour >= 12 ? "pm" : "am";
+  const displayHour = hour % 12 || 12;
+  return minute ? `${displayHour}:${String(minute).padStart(2, "0")}${period}` : `${displayHour}${period}`;
+}
+
 function formatDropSiteWindow(site) {
-  const openTime = String(site?.openTime || "").trim();
-  const closeTime = String(site?.closeTime || "").trim();
+  const openTime = formatDropSiteTime(site?.openTime);
+  const closeTime = formatDropSiteTime(site?.closeTime);
   if (!openTime && !closeTime) return "";
   return [openTime, closeTime].filter(Boolean).join(" - ");
 }
@@ -442,7 +469,37 @@ function formatDayOfWeekLabel(value) {
   return normalized.charAt(0).toUpperCase() + normalized.slice(1);
 }
 
-function DropSiteTable({ title, orderWindow, sites = [] }) {
+function getDropSiteDaySortValue(site) {
+  const normalized = String(site?.dayOfWeek || "").trim().toLowerCase();
+  const order = {
+    mon: 1,
+    monday: 1,
+    tue: 2,
+    tues: 2,
+    tuesday: 2,
+    wed: 3,
+    wednesday: 3,
+    thu: 4,
+    thur: 4,
+    thurs: 4,
+    thursday: 4,
+    fri: 5,
+    friday: 5,
+    sat: 6,
+    saturday: 6,
+    sun: 7,
+    sunday: 7
+  };
+  return order[normalized] || 99;
+}
+
+function sortDropSitesByDayThenName(left, right) {
+  const dayDelta = getDropSiteDaySortValue(left) - getDropSiteDaySortValue(right);
+  if (dayDelta !== 0) return dayDelta;
+  return String(left.name || "").localeCompare(String(right.name || ""));
+}
+
+function DropSiteTable({ title, orderWindow, sites = [], showDay = false }) {
   if (!sites.length) return null;
   return (
     <section className="card subscribe-drop-site-table-card">
@@ -454,6 +511,7 @@ function DropSiteTable({ title, orderWindow, sites = [] }) {
           <thead>
             <tr>
               <th>Name</th>
+              {showDay ? <th>Day</th> : null}
               <th>Time of Day</th>
               <th>Address</th>
             </tr>
@@ -462,6 +520,9 @@ function DropSiteTable({ title, orderWindow, sites = [] }) {
             {sites.map((site) => (
               <tr key={site.id || site.name}>
                 <td data-label="Name">{site.name}</td>
+                {showDay ? (
+                  <td data-label="Day">{formatDayOfWeekLabel(site.dayOfWeek) || "—"}</td>
+                ) : null}
                 <td data-label="Time of Day">{formatDropSiteWindow(site) || "—"}</td>
                 <td data-label="Address">{formatDropSiteAddress(site) || "—"}</td>
               </tr>
@@ -540,25 +601,26 @@ export function SubscribePage({
       ),
     [visibleDropSites]
   );
-  const tuesdayDropSites = useMemo(
+  const tuesdayCycleDropSites = useMemo(
     () =>
       pickupDropSites
-        .filter((site) => String(site.dayOfWeek || "").toLowerCase() === "tue")
-        .sort((left, right) => String(left.name || "").localeCompare(String(right.name || ""))),
+        .filter((site) =>
+          ["tue", "tues", "tuesday", "wed", "wednesday"].includes(
+            String(site.dayOfWeek || "").toLowerCase()
+          )
+        )
+        .sort(sortDropSitesByDayThenName),
     [pickupDropSites]
   );
-  const saturdayDropSites = useMemo(
+  const fridaySaturdayCycleDropSites = useMemo(
     () =>
       pickupDropSites
-        .filter((site) => String(site.dayOfWeek || "").toLowerCase() === "sat")
-        .sort((left, right) => String(left.name || "").localeCompare(String(right.name || ""))),
-    [pickupDropSites]
-  );
-  const fridayDropSites = useMemo(
-    () =>
-      pickupDropSites
-        .filter((site) => String(site.dayOfWeek || "").toLowerCase() === "fri")
-        .sort((left, right) => String(left.name || "").localeCompare(String(right.name || ""))),
+        .filter((site) =>
+          ["fri", "friday", "sat", "saturday"].includes(
+            String(site.dayOfWeek || "").toLowerCase()
+          )
+        )
+        .sort(sortDropSitesByDayThenName),
     [pickupDropSites]
   );
   const [form, setForm] = useState(() => buildInitialForm(siteOptions));
@@ -1532,19 +1594,16 @@ export function SubscribePage({
             </div>
             <div className="subscribe-drop-site-groups">
               <DropSiteTable
-                title="Tuesday Dropsites"
+                title="Tuesday / Wednesday Dropsites"
                 orderWindow="order window Thursday through Sunday"
-                sites={tuesdayDropSites}
+                sites={tuesdayCycleDropSites}
+                showDay
               />
               <DropSiteTable
-                title="Friday Dropsites"
+                title="Friday / Saturday Dropsites"
                 orderWindow="order window Monday through Wednesday"
-                sites={fridayDropSites}
-              />
-              <DropSiteTable
-                title="Saturday Dropsites"
-                orderWindow="order window Monday through Wednesday"
-                sites={saturdayDropSites}
+                sites={fridaySaturdayCycleDropSites}
+                showDay
               />
             </div>
             <div className="subscribe-drop-site-host-callout">

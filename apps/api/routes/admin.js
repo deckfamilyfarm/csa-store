@@ -1594,7 +1594,7 @@ function inferDropCycleLabel(row = {}, dropSiteDayLookup = new Map()) {
   const selectedDropSite = normalizeContactLabel(row.selectedDropSite);
   const siteDay = dropSiteDayLookup.get(normalizeDropSiteLookupKey(selectedDropSite)) || "";
   const haystack = `${siteDay} ${selectedDropSite}`.toLowerCase();
-  if (/\b(tue|tues|tuesday)\b/.test(haystack)) return "Tuesday Drop List";
+  if (/\b(tue|tues|tuesday|wed|wednesday)\b/.test(haystack)) return "Tuesday Drop List";
   if (/\b(fri|friday|sat|saturday)\b/.test(haystack)) return "Saturday Drop List";
   return "";
 }
