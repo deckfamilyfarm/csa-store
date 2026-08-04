@@ -740,119 +740,11 @@ export async function buildDropSitePerformancePayload({
     ? performanceMonths.slice(0, 6)
     : [selectedMonth].filter(Boolean);
 
-  let rankedSites = [];
-  if (publicOnly && !isTrendMode && selectedMonth) {
-    let metricRows = [];
-    try {
-      [metricRows] = await queryWithConnectionRetry(
-        pool,
-        `
-          SELECT
-            NULL AS fulfillmentStrategyId,
-            COALESCE(NULLIF(TRIM(fulfillment_name), ''), 'Unassigned') AS fulfillmentSiteName,
-            COUNT(DISTINCT local_line_order_id) AS orderCount,
-            COUNT(DISTINCT fulfillment_date) AS activeDropWeeks,
-            COUNT(DISTINCT NULLIF(TRIM(customer_name), '')) AS uniqueCustomerCount
-          FROM local_line_order_reporting_entries
-          WHERE fulfillment_month = ?
-          GROUP BY fulfillmentSiteName
-        `,
-        [selectedMonth]
-      );
-    } catch (error) {
-      if (!isMissingReportingCacheError(error)) {
-        throw error;
-      }
-    }
-
-    if (metricRows.length) {
-      const metricsBySiteKey = metricRows.reduce((map, row) => {
-        const siteKey = getDropSitePerformanceKey({
-          name: row.fulfillmentSiteName,
-          strategyId: row.fulfillmentStrategyId
-        });
-        map.set(siteKey, row);
-        return map;
-      }, new Map());
-
-      rankedSites = performanceSites
-        .map((site) => {
-          const siteKey = getDropSitePerformanceKey({
-            name: site.name,
-            strategyId: site.localLineFulfillmentStrategyId
-          });
-          const metrics = metricsBySiteKey.get(siteKey) || {};
-          const orderCount = Number(metrics.orderCount || 0);
-          const activeDropWeeks = Number(metrics.activeDropWeeks || 0);
-          const averageOrdersPerActiveDropWeek =
-            activeDropWeeks > 0 ? Number((orderCount / activeDropWeeks).toFixed(2)) : 0;
-          const legacyMonthlyUniqueCustomers = Number(metrics.uniqueCustomerCount || 0);
-          const weeklyCreditEligible = averageOrdersPerActiveDropWeek >= WEEKLY_CREDIT_THRESHOLD;
-          const legacyCreditEligible = legacyMonthlyUniqueCustomers > LEGACY_MONTHLY_UNIQUE_THRESHOLD;
-
-          return {
-            id: site.id,
-            name: site.name,
-            area: site.area || "",
-            source: site.source,
-            active: site.active,
-            localLineFulfillmentStrategyId: site.localLineFulfillmentStrategyId,
-            orderCount,
-            scheduledDrops: activeDropWeeks,
-            activeDropWeeks,
-            averageWeeklyOrders: averageOrdersPerActiveDropWeek,
-            averageOrdersPerScheduledDropWeek: averageOrdersPerActiveDropWeek,
-            averageOrdersPerActiveDropWeek,
-            latestAverageWeeklyOrders: averageOrdersPerActiveDropWeek,
-            latestAverageOrdersPerActiveDropWeek: averageOrdersPerActiveDropWeek,
-            legacyMonthlyUniqueCustomers,
-            latestLegacyMonthlyUniqueCustomers: legacyMonthlyUniqueCustomers,
-            weeklyCreditEligible,
-            legacyCreditEligible,
-            transitionCreditEligible: weeklyCreditEligible || legacyCreditEligible,
-            thresholdMet: weeklyCreditEligible,
-            performanceTier: getDropSitePerformanceTier(averageOrdersPerActiveDropWeek),
-            trendSeries: [],
-            detailSeries: []
-          };
-        })
-        .sort((left, right) => {
-          if (right.averageOrdersPerActiveDropWeek !== left.averageOrdersPerActiveDropWeek) {
-            return right.averageOrdersPerActiveDropWeek - left.averageOrdersPerActiveDropWeek;
-          }
-          if (right.orderCount !== left.orderCount) {
-            return right.orderCount - left.orderCount;
-          }
-          return String(left.name || "").localeCompare(String(right.name || ""));
-        });
-    }
-  }
-
-  if (!rankedSites.length && monthsForData.length) {
-    const monthPlaceholders = monthsForData.map(() => "?").join(", ");
-    const [orderRows] = await queryWithConnectionRetry(
-      pool,
-      `
-        SELECT
-          ${fulfillmentStrategyIdSql} AS fulfillmentStrategyId,
-          ${fulfillmentSiteSql} AS fulfillmentSiteName,
-          ${fulfillmentDateSql} AS fulfillmentDate,
-          o.customer_id AS customerId,
-          o.customer_name AS customerName,
-          o.local_line_order_id AS localLineOrderId
-        FROM local_line_orders o
-        LEFT JOIN drop_sites ds
-          ON ds.local_line_fulfillment_strategy_id = ${fulfillmentStrategyIdSql}
-        WHERE ${fulfillmentDateSql} IS NOT NULL
-          AND ${fulfillmentDateSql} < ?
-          AND DATE_FORMAT(${fulfillmentDateSql}, '%Y-%m') IN (${monthPlaceholders})
-      `,
-      [completedFulfillmentCutoff, ...monthsForData]
-    );
-
+  function buildRankedSitesFromOrderRows(orderRows = []) {
     const orderGroupsByKeyMonth = new Map();
     for (const row of orderRows) {
       const fulfillmentDate = toDateOrNull(row.fulfillmentDate);
+      if (!fulfillmentDate || fulfillmentDate >= completedFulfillmentCutoff) continue;
       const monthKey = formatMonthKey(fulfillmentDate);
       const siteKey = getDropSitePerformanceKey({
         name: row.fulfillmentSiteName,
@@ -869,7 +761,7 @@ export async function buildDropSitePerformancePayload({
       orderGroupsByKeyMonth.set(bucketKey, existing);
     }
 
-    rankedSites = performanceSites
+    return performanceSites
       .map((site) => {
         const siteKey = getDropSitePerformanceKey({
           name: site.name,
@@ -999,6 +891,64 @@ export async function buildDropSitePerformancePayload({
         }
         return String(left.name || "").localeCompare(String(right.name || ""));
       });
+  }
+
+  let rankedSites = [];
+  if (monthsForData.length) {
+    const monthPlaceholders = monthsForData.map(() => "?").join(", ");
+    let reportingOrderRows = [];
+    try {
+      [reportingOrderRows] = await queryWithConnectionRetry(
+        pool,
+        `
+          SELECT DISTINCT
+            NULL AS fulfillmentStrategyId,
+            COALESCE(NULLIF(TRIM(fulfillment_name), ''), 'Unassigned') AS fulfillmentSiteName,
+            STR_TO_DATE(NULLIF(TRIM(fulfillment_date), ''), '%Y-%m-%d') AS fulfillmentDate,
+            NULL AS customerId,
+            customer_name AS customerName,
+            local_line_order_id AS localLineOrderId
+          FROM local_line_order_reporting_entries
+          WHERE fulfillment_month IN (${monthPlaceholders})
+            AND fulfillment_date IS NOT NULL
+            AND TRIM(fulfillment_date) <> ''
+        `,
+        monthsForData
+      );
+    } catch (error) {
+      if (!isMissingReportingCacheError(error)) {
+        throw error;
+      }
+    }
+
+    if (reportingOrderRows.length) {
+      rankedSites = buildRankedSitesFromOrderRows(reportingOrderRows);
+    }
+  }
+
+  if (!rankedSites.length && monthsForData.length) {
+    const monthPlaceholders = monthsForData.map(() => "?").join(", ");
+    const [orderRows] = await queryWithConnectionRetry(
+      pool,
+      `
+        SELECT
+          ${fulfillmentStrategyIdSql} AS fulfillmentStrategyId,
+          ${fulfillmentSiteSql} AS fulfillmentSiteName,
+          ${fulfillmentDateSql} AS fulfillmentDate,
+          o.customer_id AS customerId,
+          o.customer_name AS customerName,
+          o.local_line_order_id AS localLineOrderId
+        FROM local_line_orders o
+        LEFT JOIN drop_sites ds
+          ON ds.local_line_fulfillment_strategy_id = ${fulfillmentStrategyIdSql}
+        WHERE ${fulfillmentDateSql} IS NOT NULL
+          AND ${fulfillmentDateSql} < ?
+          AND DATE_FORMAT(${fulfillmentDateSql}, '%Y-%m') IN (${monthPlaceholders})
+      `,
+      [completedFulfillmentCutoff, ...monthsForData]
+    );
+
+    rankedSites = buildRankedSitesFromOrderRows(orderRows);
   }
 
   const payload = {

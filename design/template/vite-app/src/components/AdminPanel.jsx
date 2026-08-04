@@ -225,8 +225,8 @@ function formatDeliveryCount(count) {
 
 function getDropSitePerformanceTier(value) {
   const numeric = Number(value) || 0;
-  if (numeric > 5) return "good";
-  if (numeric > 2) return "warn";
+  if (numeric >= 5) return "good";
+  if (numeric >= 3) return "warn";
   return "bad";
 }
 
@@ -4890,7 +4890,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
               <div className="response-card drop-site-performance-card">
                 <div className="title">Host Credit Performance</div>
                 <div className="small">
-                  Hosts qualify when active scheduled drops average {dropSitePerformance?.thresholdLabel || "more than 2"} orders per week
+                  Hosts qualify when active pickup dates average {dropSitePerformance?.thresholdLabel || "3 or more"} orders per week
                   and more than {Number(dropSitePerformance?.legacyMonthlyUniqueThreshold || 5)} members pick up during the month.
                   Green is over {Number(dropSitePerformance?.strongAverage || 5).toFixed(0)}, orange is above the credit threshold to
                   {Number(dropSitePerformance?.strongAverage || 5).toFixed(0)}, and red is at or under the weekly threshold.
@@ -4963,7 +4963,8 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                       site,
                       countZeroOrderPeriods
                     );
-                    const displayCreditEligible = displayAverage > Number(dropSitePerformance?.thresholdAverage || 2);
+                    const displayCreditEligible = displayAverage >= Number(dropSitePerformance?.thresholdAverage || 3);
+                    const displayAverageLabel = countZeroOrderPeriods ? "avg/scheduled drop" : "avg/active week";
                     const legacyUniqueCustomers = Number(site.legacyMonthlyUniqueCustomers || 0);
                     const legacyCreditEligible = Boolean(site.legacyCreditEligible);
                     const combinedCreditEligible = displayCreditEligible && legacyCreditEligible;
@@ -4982,7 +4983,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                         <div className="drop-site-performance-meta">
                           <strong>{site.name}</strong>
                           <div className="small">
-                            {displayAverage.toFixed(2)} avg/week
+                            {displayAverage.toFixed(2)} {displayAverageLabel}
                             {dropSiteTrendMode ? " (6 mo avg)" : ""}
                           </div>
                           <div className="small">
