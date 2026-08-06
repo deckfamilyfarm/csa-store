@@ -590,7 +590,7 @@ const SITE_CONTENT_BLOCK_DEFAULTS = [
     field: "hostCreditInfo",
     label: "Host credit info bubble",
     value:
-      "Host credit is the food credit hosts receive for hosting a drop site. A site qualifies by averaging 3 or more orders per active drop week OR more than 5 unique customers in the month. We count guest and member orders per drop site.",
+      "Host credit is the food credit hosts receive for hosting a drop site. A site qualifies by averaging 3 or more orders per active pickup week and having more than 5 unique customers in the month. We count guest and member orders per drop site.",
     inputType: "textarea",
     sortOrder: 710
   },

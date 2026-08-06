@@ -223,13 +223,6 @@ function formatDeliveryCount(count) {
   return `${numeric} ${numeric === 1 ? "order" : "orders"}`;
 }
 
-function getDropSitePerformanceTier(value) {
-  const numeric = Number(value) || 0;
-  if (numeric >= 5) return "good";
-  if (numeric >= 3) return "warn";
-  return "bad";
-}
-
 function formatShortDateLabel(value) {
   if (!value) return "";
   const match = String(value).match(/^(\d{4})-(\d{2})-(\d{2})$/);
@@ -322,6 +315,10 @@ function buildTrendSvgLayout(series = [], maxValue = 1) {
         ? width / 2
         : paddingX + (usableWidth * index) / (pointCount - 1);
     const value = Number(entry.averageWeeklyOrders || 0);
+    const weeklyCreditEligible =
+      typeof entry.weeklyCreditEligible === "boolean"
+        ? entry.weeklyCreditEligible
+        : entry.performanceTier === "good" || entry.performanceTier === "warn";
     const y = paddingTop + usableHeight - (usableHeight * value) / safeMax;
     return {
       x,
@@ -329,7 +326,7 @@ function buildTrendSvgLayout(series = [], maxValue = 1) {
       value,
       month: entry.month,
       weekStart: entry.weekStart,
-      performanceTier: entry.performanceTier || "bad",
+      performanceTier: weeklyCreditEligible ? "good" : "bad",
       orderCount: Number(entry.orderCount) || 0
     };
   });
@@ -778,6 +775,28 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
     setVendorEdits({});
   }
 
+  function isUnauthorizedAdminError(error) {
+    return Number(error?.status) === 401;
+  }
+
+  function clearAdminSession(message = "Your admin session expired. Please sign in again.") {
+    localStorage.removeItem("adminToken");
+    setToken("");
+    setCurrentAdmin(null);
+    setLoading(false);
+    setMessage("");
+    setLoginMode("login");
+    setLoginState((prev) => ({ ...prev, password: "", error: message }));
+  }
+
+  function handleAdminRequestError(error, fallbackMessage) {
+    if (isUnauthorizedAdminError(error)) {
+      clearAdminSession();
+      return;
+    }
+    setMessage(error?.message || fallbackMessage);
+  }
+
   async function loadProductsData() {
     const productData = await adminGet("products", token);
     setProducts(productData.products || []);
@@ -903,6 +922,10 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
         }));
       }
     } catch (error) {
+      if (isUnauthorizedAdminError(error)) {
+        clearAdminSession();
+        return;
+      }
       setLocalLineStatusState({
         loading: false,
         error: error?.message || "Failed to load Local Line status.",
@@ -928,7 +951,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
         await refreshSelectedProductDetail(selectedProductId);
       }
     } catch (err) {
-      setMessage("Failed to load admin data.");
+      handleAdminRequestError(err, "Failed to load admin data.");
     } finally {
       setLoading(false);
     }
@@ -947,7 +970,11 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
         setSelectedProductId(null);
         setSelectedProductDetail(null);
       }
-    } catch (_error) {
+    } catch (error) {
+      if (isUnauthorizedAdminError(error)) {
+        clearAdminSession();
+        return;
+      }
       setCurrentAdmin(null);
     }
   }
@@ -990,8 +1017,8 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
       setDropSitePerformanceMonth("");
       setLoading(true);
       loadCoreAdminData()
-        .catch(() => {
-          setMessage("Failed to load admin data.");
+        .catch((error) => {
+          handleAdminRequestError(error, "Failed to load admin data.");
         })
         .finally(() => {
           setLoading(false);
@@ -1084,9 +1111,9 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
     let cancelled = false;
     setLoading(true);
     loadProductsData()
-      .catch(() => {
+      .catch((error) => {
         if (!cancelled) {
-          setMessage("Failed to load products.");
+          handleAdminRequestError(error, "Failed to load products.");
         }
       })
       .finally(() => {
@@ -1116,8 +1143,8 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
       return;
     }
 
-    loadLocalPricelistData().catch(() => {
-      setMessage("Failed to load local pricelist.");
+    loadLocalPricelistData().catch((error) => {
+      handleAdminRequestError(error, "Failed to load local pricelist.");
     });
   }, [
     token,
@@ -1135,7 +1162,11 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
       return;
     }
 
-    loadLocalLineStatusData().catch(() => {
+    loadLocalLineStatusData().catch((error) => {
+      if (isUnauthorizedAdminError(error)) {
+        clearAdminSession();
+        return;
+      }
       setLocalLineStatusState({
         loading: false,
         error: "Failed to load Local Line status.",
@@ -1152,9 +1183,9 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
     let cancelled = false;
     setLoading(true);
     loadRecipesData()
-      .catch(() => {
+      .catch((error) => {
         if (!cancelled) {
-          setMessage("Failed to load recipes.");
+          handleAdminRequestError(error, "Failed to load recipes.");
         }
       })
       .finally(() => {
@@ -1176,9 +1207,9 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
     let cancelled = false;
     setLoading(true);
     loadReviewsData()
-      .catch(() => {
+      .catch((error) => {
         if (!cancelled) {
-          setMessage("Failed to load reviews.");
+          handleAdminRequestError(error, "Failed to load reviews.");
         }
       })
       .finally(() => {
@@ -1200,9 +1231,9 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
     let cancelled = false;
     setLoading(true);
     loadDropSitesData()
-      .catch(() => {
+      .catch((error) => {
         if (!cancelled) {
-          setMessage("Failed to load drop sites.");
+          handleAdminRequestError(error, "Failed to load drop sites.");
         }
       })
       .finally(() => {
@@ -1221,8 +1252,8 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
       return;
     }
 
-    loadDropSitesData().catch(() => {
-      setMessage("Failed to load drop sites.");
+    loadDropSitesData().catch((error) => {
+      handleAdminRequestError(error, "Failed to load drop sites.");
     });
   }, [token, activeSection, dropSitePerformanceMonth]);
 
@@ -4892,8 +4923,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                 <div className="small">
                   Hosts qualify when active pickup dates average {dropSitePerformance?.thresholdLabel || "3 or more"} orders per week
                   and more than {Number(dropSitePerformance?.legacyMonthlyUniqueThreshold || 5)} members pick up during the month.
-                  Green is over {Number(dropSitePerformance?.strongAverage || 5).toFixed(0)}, orange is above the credit threshold to
-                  {Number(dropSitePerformance?.strongAverage || 5).toFixed(0)}, and red is at or under the weekly threshold.
+                  Green qualifies for host credit; red does not.
                 </div>
                 <div className="pricelist-toolbar-actions drop-site-performance-controls">
                   <label className="filter-field pricelist-page-size">
@@ -4972,7 +5002,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                       site.trendSeries || [],
                       countZeroOrderPeriods
                     );
-                    const displayPerformanceTier = getDropSitePerformanceTier(displayAverage);
+                    const displayCreditClass = combinedCreditEligible ? "good" : "bad";
                     const widthPercent = Math.max(
                       0,
                       Math.min(100, Math.round((displayAverage / maxDropSiteAverage) * 100))
@@ -5049,12 +5079,12 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                               title={`${site.name} · ${Number(site.orderCount || 0)} total orders`}
                             >
                               <div
-                                className={`drop-site-performance-bar ${displayPerformanceTier || "bad"}`}
+                                className={`drop-site-performance-bar ${displayCreditClass}`}
                                 style={{ width: `${widthPercent}%` }}
                               />
                               {!combinedCreditEligible ? (
                                 <span className="drop-site-performance-warning">
-                                  below host-credit threshold
+                                  does not qualify
                                 </span>
                               ) : null}
                             </button>

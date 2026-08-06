@@ -10,8 +10,6 @@ import { buildSubscribeNavLinks } from "./subscribeNavigation.js";
 
 const MEDIA_KIT_URL =
   "https://docs.google.com/document/d/16iVw310-q0OGkJhWaXyO4Tp7WLEtU8Sf/edit";
-const HOST_CREDIT_INFO =
-  "Host credit is the food credit hosts receive for hosting a drop site. A site qualifies by averaging 3 or more orders per active drop week OR more than 5 unique customers in the month. We count guest and member orders per drop site.";
 const SHARE_TEXT =
   "What you eat matters.\n\nI help host a neighborhood pickup location for Full Farm, a community food network started by Deck Family Farm.\n\nFamilies can order organic produce, pasture-raised meats, eggs, dairy, and other locally produced foods from nearby farms and pick them up close to home.\n\nIt's a convenient way to eat well and support local agriculture at the same time.\n\nLet me know if you're interested or use the link to find out more!";
 const SHARE_TEXT_X =
@@ -77,6 +75,22 @@ function formatMonthLabel(value) {
 function formatAverage(value) {
   const numeric = Number(value || 0);
   return Number.isFinite(numeric) ? numeric.toFixed(2) : "0.00";
+}
+
+function formatThreshold(value, fallback) {
+  const numeric = Number(value ?? fallback);
+  if (!Number.isFinite(numeric)) return String(fallback);
+  return Number.isInteger(numeric) ? String(numeric) : numeric.toFixed(2);
+}
+
+function buildHostCreditCriteria(performance = {}) {
+  const weeklyThreshold = formatThreshold(performance.thresholdAverage, 3);
+  const uniqueCustomerThreshold = formatThreshold(performance.legacyMonthlyUniqueThreshold, 5);
+  return {
+    weeklyThreshold,
+    uniqueCustomerThreshold,
+    info: `Host credit is the food credit hosts receive for hosting a drop site. A site qualifies by averaging ${weeklyThreshold} or more orders per active pickup week and having more than ${uniqueCustomerThreshold} unique customers in the month. We count guest and member orders per drop site.`
+  };
 }
 
 function shouldShowPublicDropSiteMetric(row) {
@@ -205,10 +219,17 @@ function ShareIcon({ type }) {
 }
 
 function MetricStatus({ row }) {
-  if (row.transitionCreditEligible) {
-    return <span className="dropsite-status good">Credit eligible</span>;
+  const weeklyCreditEligible = Boolean(row.weeklyCreditEligible);
+  const customerCreditEligible = Boolean(row.legacyCreditEligible);
+  if (weeklyCreditEligible && customerCreditEligible) {
+    return <span className="dropsite-status good">Qualifies</span>;
   }
-  return <span className="dropsite-status bad">Below credit threshold</span>;
+  const reason = !weeklyCreditEligible && customerCreditEligible
+    ? "Below average orders threshold"
+    : weeklyCreditEligible && !customerCreditEligible
+      ? "Below unique customer threshold"
+      : "Below host credit thresholds";
+  return <span className="dropsite-status bad" title={reason}>Does not qualify</span>;
 }
 
 export function DropsitesPage({ siteContent = {} }) {
@@ -229,8 +250,6 @@ export function DropsitesPage({ siteContent = {} }) {
     "body",
     "Drop site hosts make farm-fresh, locally grown food accessible to more people while supporting regenerative agriculture right in your backyard. By offering a simple pickup spot and helping spread the word, you become an essential link in building a healthier, more sustainable food system. The more local hosts we have, the more affordable and accessible that food becomes for everyone."
   );
-  const hostCreditInfo = copy("metrics", "hostCreditInfo", HOST_CREDIT_INFO);
-
   useEffect(() => {
     const title = "Drop Site Hosts | Deck Family Farm";
     const description = heroBody;
@@ -321,6 +340,8 @@ export function DropsitesPage({ siteContent = {} }) {
 
   const performance = metrics?.performance || {};
   const metricRows = (performance.rankedSites || []).filter(shouldShowPublicDropSiteMetric);
+  const hostCreditCriteria = buildHostCreditCriteria(performance);
+  const hostCreditInfo = hostCreditCriteria.info;
 
   function updateField(key, value) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -637,6 +658,22 @@ export function DropsitesPage({ siteContent = {} }) {
             </label>
           </div>
           {metricsError ? <div className="small subscribe-error">{metricsError}</div> : null}
+          <div className="dropsite-credit-criteria" aria-label="Drop-site host credit criteria">
+            <div className="dropsite-credit-criteria-copy">
+              <strong>Host credit criteria</strong>
+              <span>
+                Status requires both metrics for {formatMonthLabel(selectedMonth || performance.selectedMonth)}.
+              </span>
+            </div>
+            <div className="dropsite-credit-criteria-metrics">
+              <span>
+                <strong>{hostCreditCriteria.weeklyThreshold}+</strong> avg orders per active pickup week
+              </span>
+              <span>
+                <strong>&gt; {hostCreditCriteria.uniqueCustomerThreshold}</strong> unique customers
+              </span>
+            </div>
+          </div>
           <div className="dropsite-metrics-table-shell">
             <table className="dropsite-metrics-table">
               <thead>
