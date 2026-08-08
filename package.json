@@ -14,6 +14,8 @@
     "sync:localline-cache": "npm --prefix apps/api run sync:localline-cache --",
     "sync:localline-full": "npm --prefix apps/api run sync:localline-full --",
     "sync:localline-full:checked": "npm run sync:localline-full -- && npm run verify:localline-sync",
+    "sync:localline-herdshare-pricelist:preview": "node --env-file=.env apps/api/scripts/syncHerdSharePriceListMembers.js",
+    "sync:localline-herdshare-pricelist": "node --env-file=.env apps/api/scripts/syncHerdSharePriceListMembers.js --apply",
     "sync:localline-automation": "node --env-file=.env apps/api/scripts/runLocalLineAutomation.js",
     "run:scheduled-pricelist": "node --env-file=.env apps/api/scripts/runScheduledPricelistReleases.js",
     "publish:dashboard": "node --env-file=.env apps/api/scripts/runLocalLineAutomation.js --mode=dashboard",

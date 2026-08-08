@@ -7,6 +7,10 @@ import { fileURLToPath } from "url";
 import xlsx from "xlsx";
 import { getPool } from "../db.js";
 import { getLocalLineAccessToken, getLocalLineBaseUrl } from "../localLineAuth.js";
+import {
+  enforceLinkedHerdShareCustomerPriceListDefaults,
+  isHerdSharePriceListConfigured
+} from "./localLinePriceListMembers.js";
 import { loadDashboardQboPeriodMetrics } from "./qboDashboard.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -7280,6 +7284,16 @@ export async function syncLocalLineSubscriberSnapshotCache({
   const summary = getSubscriberSnapshotSummary(rows);
   const snapSummary = await loadCurrentSnapPriceListMemberSummary();
   const snapSubscriberCount = snapSummary.snapSubscriberCount;
+  const shouldEnforceHerdSharePriceList =
+    isHerdSharePriceListConfigured() &&
+    String(process.env.LL_ENFORCE_HERDSHARE_PRICE_LIST_ON_SYNC || "true").toLowerCase() !== "false";
+  const herdSharePriceListSummary = shouldEnforceHerdSharePriceList
+    ? await enforceLinkedHerdShareCustomerPriceListDefaults({
+        dryRun: false,
+        removeOtherPriceLists: false,
+        throwOnError: true
+      })
+    : null;
   const pool = getPool();
   const connection = await pool.getConnection();
   const now = new Date();
@@ -7417,6 +7431,7 @@ export async function syncLocalLineSubscriberSnapshotCache({
         rowCount: preparedRows.length,
         snapSubscriberCount,
         snapPriceListId: snapSummary.snapPriceListId,
+        herdSharePriceList: herdSharePriceListSummary,
         ...summary
       }),
       updatedAt: now

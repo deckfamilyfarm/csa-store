@@ -16,6 +16,8 @@
     "sync:localline-store": "node scripts/auditLocalLineSync.js --write",
     "sync:localline-cache": "node scripts/syncLocalLineCache.js",
     "sync:localline-full": "node scripts/syncLocalLineFull.js",
+    "sync:localline-herdshare-pricelist:preview": "node --env-file=../../.env scripts/syncHerdSharePriceListMembers.js",
+    "sync:localline-herdshare-pricelist": "node --env-file=../../.env scripts/syncHerdSharePriceListMembers.js --apply",
     "backfill:localline-customer-credit": "node --env-file=../../.env scripts/backfillLocalLineCustomerCreditSnapshots.js",
     "sync:localline-automation": "node --env-file=../../.env scripts/runLocalLineAutomation.js",
     "run:scheduled-pricelist": "node --env-file=../../.env scripts/runScheduledPricelistReleases.js",
