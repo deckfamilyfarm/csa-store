@@ -1,11 +1,21 @@
 import React, { useEffect, useMemo, useState } from "react";
+import {
+  Check as CheckIcon,
+  PencilLine as EditIcon,
+  Save as SaveIcon,
+  X as XIcon
+} from "lucide-react";
 import { adminDownload, adminGet, adminPost, adminPut } from "../adminApi.js";
 
 const STATUS_OPTIONS = [
+  { value: "new", label: "New" },
   { value: "in_progress", label: "In progress" },
+  { value: "guest", label: "Guest" },
   { value: "won", label: "Won" },
-  { value: "inactive", label: "Inactive" }
+  { value: "lost", label: "Lost" }
 ];
+
+const STATUS_FILTER_OPTIONS = [{ value: "all", label: "All statuses" }, ...STATUS_OPTIONS];
 
 function formatDateTime(value) {
   if (!value) return "Unknown";
@@ -15,7 +25,7 @@ function formatDateTime(value) {
 }
 
 function formatStatusLabel(value) {
-  return STATUS_OPTIONS.find((option) => option.value === value)?.label || "In progress";
+  return STATUS_OPTIONS.find((option) => option.value === value)?.label || "New";
 }
 
 function formatMoney(cents) {
@@ -34,16 +44,30 @@ function truncateText(value, maxLength = 56) {
 
 function createLeadDraft(lead = {}) {
   return {
-    status: lead.status || "in_progress",
+    status: lead.status || "new",
     adminNotes: lead.adminNotes || ""
   };
 }
 
 function draftChanged(lead, draft) {
   return (
-    String(draft?.status || "in_progress") !== String(lead?.status || "in_progress") ||
+    String(draft?.status || "new") !== String(lead?.status || "new") ||
     String(draft?.adminNotes || "") !== String(lead?.adminNotes || "")
   );
+}
+
+function filterLeadsByStatus(leads = [], statusFilter = "all") {
+  return leads.filter((lead) => {
+    const status = lead.status || "new";
+    if (statusFilter !== "all") return status === statusFilter;
+    return true;
+  });
+}
+
+function buildSubscriptionLeadsPath(path, statusFilter = "all") {
+  const params = new URLSearchParams({ includeLost: "1" });
+  if (statusFilter !== "all") params.set("status", statusFilter);
+  return `${path}?${params.toString()}`;
 }
 
 function DetailRow({ label, value }) {
@@ -78,6 +102,7 @@ function AgreementCell({ href }) {
   if (!href) return <span className="small">No PDF</span>;
   return (
     <a
+      className="subscription-leads-pdf-link"
       href={href}
       target="_blank"
       rel="noreferrer"
@@ -336,7 +361,7 @@ export function AdminSubscriptionLeadsSection({ token }) {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [leads, setLeads] = useState([]);
-  const [showInactive, setShowInactive] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("all");
   const [selectedLeadId, setSelectedLeadId] = useState(null);
   const [modalLeadId, setModalLeadId] = useState(null);
   const [drafts, setDrafts] = useState({});
@@ -348,11 +373,10 @@ export function AdminSubscriptionLeadsSection({ token }) {
     setLoading(true);
     setError("");
     try {
-      const path = showInactive
-        ? "subscription-leads?includeInactive=1"
-        : "subscription-leads";
+      const path = buildSubscriptionLeadsPath("subscription-leads", statusFilter);
       const response = await adminGet(path, token);
       const nextLeads = response.leads || [];
+      const nextVisibleLeads = filterLeadsByStatus(nextLeads, statusFilter);
       setLeads(nextLeads);
       setDrafts(() => {
         const nextDrafts = {};
@@ -362,8 +386,8 @@ export function AdminSubscriptionLeadsSection({ token }) {
         return nextDrafts;
       });
       setSelectedLeadId((current) => {
-        if (current && nextLeads.some((lead) => lead.id === current)) return current;
-        return nextLeads[0]?.id || null;
+        if (current && nextVisibleLeads.some((lead) => lead.id === current)) return current;
+        return nextVisibleLeads[0]?.id || null;
       });
     } catch (loadError) {
       setError(loadError?.message || "Failed to load subscription leads.");
@@ -374,7 +398,7 @@ export function AdminSubscriptionLeadsSection({ token }) {
 
   useEffect(() => {
     loadLeads();
-  }, [token, showInactive]);
+  }, [token, statusFilter]);
 
   const selectedLead = useMemo(
     () => leads.find((lead) => lead.id === selectedLeadId) || null,
@@ -385,8 +409,8 @@ export function AdminSubscriptionLeadsSection({ token }) {
     [leads, modalLeadId]
   );
   const visibleLeads = useMemo(
-    () => (showInactive ? leads : leads.filter((lead) => lead.status !== "inactive")),
-    [leads, showInactive]
+    () => filterLeadsByStatus(leads, statusFilter),
+    [leads, statusFilter]
   );
   function updateDraft(leadId, updates) {
     setDrafts((current) => ({
@@ -429,15 +453,10 @@ export function AdminSubscriptionLeadsSection({ token }) {
     }
   }
 
-  async function handleStatusChange(leadId, status) {
+  function handleStatusChange(leadId, status) {
     const lead = leads.find((entry) => entry.id === leadId);
     if (!lead) return;
-    const nextDraft = {
-      ...(drafts[leadId] || createLeadDraft(lead)),
-      status
-    };
     updateDraft(leadId, { status });
-    await handleSaveLead(leadId, nextDraft, "Subscription lead status saved.");
   }
 
   async function handleExportLeads() {
@@ -445,7 +464,10 @@ export function AdminSubscriptionLeadsSection({ token }) {
     setError("");
     setMessage("");
     try {
-      const { blob, filename } = await adminDownload("subscription-leads/export", token);
+      const { blob, filename } = await adminDownload(
+        buildSubscriptionLeadsPath("subscription-leads/export", statusFilter),
+        token
+      );
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
@@ -467,18 +489,25 @@ export function AdminSubscriptionLeadsSection({ token }) {
       <h3>Subscription Leads</h3>
       <div className="small">
         Review subscribe form submissions captured by the store and track whether each lead is still
-        in progress or won.
+        new, in progress, guest, won, or lost.
       </div>
       {message ? <div className="small">{message}</div> : null}
       {error ? <div className="small">{error}</div> : null}
       <div className="button-row" style={{ marginBottom: 12 }}>
         <label className="small" style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <input
-            type="checkbox"
-            checked={showInactive}
-            onChange={(event) => setShowInactive(event.target.checked)}
-          />
-          Show inactive
+          Status
+          <select
+            className="input"
+            value={statusFilter}
+            onChange={(event) => setStatusFilter(event.target.value)}
+            style={{ width: 160 }}
+          >
+            {STATUS_FILTER_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </label>
         <button
           className="button alt"
@@ -496,9 +525,7 @@ export function AdminSubscriptionLeadsSection({ token }) {
         <div className="small">Loading subscription leads...</div>
       ) : !visibleLeads.length ? (
         <div className="small">
-          {showInactive
-            ? "No subscription leads submitted yet."
-            : "No active subscription leads shown."}
+          No subscription leads match this status filter.
         </div>
       ) : (
         <>
@@ -580,7 +607,7 @@ export function AdminSubscriptionLeadsSection({ token }) {
                     <td onClick={(event) => event.stopPropagation()}>
                       <select
                         className="input"
-                        value={draft.status || "in_progress"}
+                        value={draft.status || "new"}
                         disabled={savingLeadId === lead.id}
                         onChange={(event) => handleStatusChange(lead.id, event.target.value)}
                       >
@@ -602,25 +629,6 @@ export function AdminSubscriptionLeadsSection({ token }) {
                               updateDraft(lead.id, { adminNotes: event.target.value })
                             }
                           />
-                          <div className="button-row">
-                            <button
-                              className="button alt"
-                              type="button"
-                              onClick={() => setEditingNotesLeadId(null)}
-                            >
-                              Done
-                            </button>
-                            <button
-                              className="button alt"
-                              type="button"
-                              onClick={() => {
-                                updateDraft(lead.id, { adminNotes: lead.adminNotes || "" });
-                                setEditingNotesLeadId(null);
-                              }}
-                            >
-                              Cancel
-                            </button>
-                          </div>
                         </div>
                       ) : (
                         <div className="subscription-leads-notes-preview">
@@ -630,25 +638,59 @@ export function AdminSubscriptionLeadsSection({ token }) {
                           >
                             {truncateText(draft.adminNotes, 44)}
                           </span>
-                          <button
-                            className="button alt"
-                            type="button"
-                            onClick={() => setEditingNotesLeadId(lead.id)}
-                          >
-                            Edit
-                          </button>
                         </div>
                       )}
                     </td>
                     <td onClick={(event) => event.stopPropagation()}>
-                      <button
-                        className="button alt"
-                        type="button"
-                        disabled={!dirty || savingLeadId === lead.id}
-                        onClick={() => handleSaveLead(lead.id)}
-                      >
-                        {savingLeadId === lead.id ? "Saving..." : "Save"}
-                      </button>
+                      <div className="subscription-leads-actions">
+                        <button
+                          className={`subscription-leads-action-button subscription-leads-save-action${
+                            dirty ? " is-dirty" : ""
+                          }`}
+                          type="button"
+                          aria-label={savingLeadId === lead.id ? "Saving" : "Save"}
+                          title={savingLeadId === lead.id ? "Saving" : "Save"}
+                          disabled={!dirty || savingLeadId === lead.id}
+                          onClick={() => handleSaveLead(lead.id)}
+                        >
+                          <SaveIcon />
+                        </button>
+                        {editingNotesLeadId === lead.id ? (
+                          <>
+                            <button
+                              className="subscription-leads-action-button"
+                              type="button"
+                              aria-label="Done"
+                              title="Done"
+                              onClick={() => setEditingNotesLeadId(null)}
+                            >
+                              <CheckIcon />
+                            </button>
+                            <button
+                              className="subscription-leads-action-button"
+                              type="button"
+                              aria-label="Cancel"
+                              title="Cancel"
+                              onClick={() => {
+                                updateDraft(lead.id, { adminNotes: lead.adminNotes || "" });
+                                setEditingNotesLeadId(null);
+                              }}
+                            >
+                              <XIcon />
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            className="subscription-leads-action-button"
+                            type="button"
+                            aria-label="Edit"
+                            title="Edit"
+                            onClick={() => setEditingNotesLeadId(lead.id)}
+                          >
+                            <EditIcon />
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );

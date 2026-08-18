@@ -285,7 +285,7 @@ export const subscribeLeads = mysqlTable(
   "subscribe_leads",
   {
     id: int("id").autoincrement().primaryKey(),
-    status: varchar("status", { length: 32 }).default("in_progress"),
+    status: varchar("status", { length: 32 }).default("new"),
     firstName: varchar("first_name", { length: 255 }).notNull(),
     lastName: varchar("last_name", { length: 255 }).notNull(),
     email: varchar("email", { length: 255 }).notNull(),

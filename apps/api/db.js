@@ -101,7 +101,7 @@ const SUBSCRIBER_CAPTURE_TABLE_STATEMENTS = [
   `
     CREATE TABLE IF NOT EXISTS subscribe_leads (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      status VARCHAR(32) NOT NULL DEFAULT 'in_progress',
+      status VARCHAR(32) NOT NULL DEFAULT 'new',
       first_name VARCHAR(255) NOT NULL,
       last_name VARCHAR(255) NOT NULL,
       email VARCHAR(255) NOT NULL,
@@ -2789,17 +2789,32 @@ async function runSubscriberCaptureSchemaBootstrap(connection) {
   await connection.query(
     `
       UPDATE subscribe_leads
-      SET status = 'in_progress'
+      SET status = 'new'
       WHERE status IS NULL
         OR TRIM(status) = ''
-        OR LOWER(TRIM(status)) = 'new'
+    `
+  );
+
+  await connection.query(
+    `
+      UPDATE subscribe_leads
+      SET status = 'in_progress'
+      WHERE LOWER(TRIM(status)) IN ('in progress', 'in-progress')
+    `
+  );
+
+  await connection.query(
+    `
+      UPDATE subscribe_leads
+      SET status = 'lost'
+      WHERE LOWER(TRIM(status)) = 'inactive'
     `
   );
 
   await connection.query(
     `
       ALTER TABLE subscribe_leads
-      MODIFY COLUMN status VARCHAR(32) NOT NULL DEFAULT 'in_progress'
+      MODIFY COLUMN status VARCHAR(32) NOT NULL DEFAULT 'new'
     `
   );
 

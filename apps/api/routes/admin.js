@@ -363,14 +363,41 @@ function toNullableString(value) {
   return trimmed ? trimmed : null;
 }
 
+const SUBSCRIBE_LEAD_STATUS_LABELS = {
+  new: "New",
+  in_progress: "In progress",
+  guest: "Guest",
+  won: "Won",
+  lost: "Lost"
+};
+
+const SUBSCRIBE_LEAD_STATUS_VALUES = new Set(Object.keys(SUBSCRIBE_LEAD_STATUS_LABELS));
+
 function normalizeSubscribeLeadStatus(value) {
   const normalized = String(value || "")
     .trim()
     .toLowerCase()
     .replace(/[\s-]+/g, "_");
+  if (normalized === "new") return "new";
+  if (normalized === "in_progress") return "in_progress";
+  if (normalized === "guest") return "guest";
   if (normalized === "won") return "won";
-  if (normalized === "inactive") return "inactive";
-  return "in_progress";
+  if (normalized === "lost" || normalized === "inactive") return "lost";
+  return "new";
+}
+
+function formatSubscribeLeadStatusLabel(value) {
+  return SUBSCRIBE_LEAD_STATUS_LABELS[normalizeSubscribeLeadStatus(value)] || "New";
+}
+
+function normalizeSubscribeLeadStatusFilter(value) {
+  const normalized = String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[\s-]+/g, "_");
+  if (!normalized || normalized === "all" || normalized === "all_statuses") return "all";
+  if (normalized === "inactive") return "lost";
+  return SUBSCRIBE_LEAD_STATUS_VALUES.has(normalized) ? normalized : "all";
 }
 
 function isTruthyQueryValue(value) {
@@ -384,9 +411,16 @@ function serializeSubscribeLead(row = {}) {
   };
 }
 
-function filterSubscribeLeadRows(rows = [], { includeInactive = false } = {}) {
-  if (includeInactive) return rows;
-  return rows.filter((row) => normalizeSubscribeLeadStatus(row.status) !== "inactive");
+function filterSubscribeLeadRows(
+  rows = [],
+  { includeInactive = false, includeLost = includeInactive, statusFilter = "all" } = {}
+) {
+  const normalizedStatusFilter = normalizeSubscribeLeadStatusFilter(statusFilter);
+  if (normalizedStatusFilter !== "all") {
+    return rows.filter((row) => normalizeSubscribeLeadStatus(row.status) === normalizedStatusFilter);
+  }
+  if (includeLost) return rows;
+  return rows.filter((row) => normalizeSubscribeLeadStatus(row.status) !== "lost");
 }
 
 function sortSubscribeLeadRows(rows = []) {
@@ -415,7 +449,7 @@ function isTestSubscribeSignup(row = {}, linkedLead = null) {
 }
 
 function isReportableSubscribeLead(row = {}) {
-  return normalizeSubscribeLeadStatus(row.status) !== "inactive" && !isTestSubscribeSignup(row);
+  return normalizeSubscribeLeadStatus(row.status) !== "lost" && !isTestSubscribeSignup(row);
 }
 
 function parseJsonObject(value) {
@@ -1321,9 +1355,11 @@ function buildMarketingReportData({
       formatReportOptionalCount(row.signups),
       row.conversionRate === null ? "N/A" : `${row.conversionRate.toFixed(1)}%`
     ]),
-    statusRows: countRecordsBy(reportableLeadRows, (row) => normalizeSubscribeLeadStatus(row.status), {
-      fallback: "in_progress"
-    }),
+    statusRows: countRecordsBy(
+      reportableLeadRows,
+      (row) => formatSubscribeLeadStatusLabel(row.status),
+      { fallback: "New" }
+    ),
     planRows: countRecordsBy(reportableLeadRows, (row) => row.selectedPlan, { fallback: "unknown" }),
     dropSiteRows: countRecordsBy(reportableLeadRows, (row) => row.selectedDropSite, {
       fallback: "not selected",
@@ -1590,6 +1626,13 @@ function normalizeCountryForWix(value) {
   return country;
 }
 
+function formatSubscriptionLeadExportDate(value) {
+  if (!value) return "";
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toISOString().slice(0, 10);
+}
+
 function inferDropCycleLabel(row = {}, dropSiteDayLookup = new Map()) {
   const selectedDropSite = normalizeContactLabel(row.selectedDropSite);
   const siteDay = dropSiteDayLookup.get(normalizeDropSiteLookupKey(selectedDropSite)) || "";
@@ -1612,9 +1655,11 @@ function buildWixLabels(row = {}, dropSiteDayLookup = new Map()) {
 }
 
 const WIX_SUBSCRIPTION_LEAD_EXPORT_COLUMNS = [
+  { label: "Submitted", value: (row) => formatSubscriptionLeadExportDate(row.submittedAt || row.createdAt) },
   { label: "First Name", value: (row) => row.firstName },
   { label: "Last Name", value: (row) => row.lastName },
   { label: "Email", value: (row) => row.email },
+  { label: "Status", value: (row) => formatSubscribeLeadStatusLabel(row.status) },
   { label: "Phone", value: (row) => row.phone },
   { label: "Address", value: (row) => buildStreetAddress(row) },
   { label: "City", value: (row) => row.city },
@@ -3675,15 +3720,20 @@ router.get(
   async (req, res) => {
     try {
       await ensureSubscriberCaptureSchema();
-      const includeInactive = isTruthyQueryValue(req.query?.includeInactive);
+      const statusFilter = normalizeSubscribeLeadStatusFilter(req.query?.status);
+      const includeLost =
+        statusFilter !== "all" ||
+        isTruthyQueryValue(req.query?.includeLost) ||
+        isTruthyQueryValue(req.query?.includeInactive);
       const rows = await getDb()
         .select()
         .from(subscribeLeads)
         .orderBy(subscribeLeads.submittedAt, subscribeLeads.createdAt);
       res.json({
-        leads: filterSubscribeLeadRows(sortSubscribeLeadRows(rows), { includeInactive }).map(
-          serializeSubscribeLead
-        )
+        leads: filterSubscribeLeadRows(sortSubscribeLeadRows(rows), {
+          includeLost,
+          statusFilter
+        }).map(serializeSubscribeLead)
       });
     } catch (error) {
       console.error("Subscription leads fetch failed:", error);
@@ -3695,9 +3745,14 @@ router.get(
 router.get(
   "/subscription-leads/export",
   requireAdminPermission(["membership_admin", "member_admin"]),
-  async (_req, res) => {
+  async (req, res) => {
     try {
       await ensureSubscriberCaptureSchema();
+      const statusFilter = normalizeSubscribeLeadStatusFilter(req.query?.status);
+      const includeLost =
+        statusFilter !== "all" ||
+        isTruthyQueryValue(req.query?.includeLost) ||
+        isTruthyQueryValue(req.query?.includeInactive);
       const db = getDb();
       const rows = await db
         .select()
@@ -3710,7 +3765,10 @@ router.get(
         if (!isMissingTableError(error, "drop_sites")) throw error;
       }
       const csv = buildSubscriptionLeadsCsv(
-        filterSubscribeLeadRows(sortSubscribeLeadRows(rows)).map(serializeSubscribeLead),
+        filterSubscribeLeadRows(sortSubscribeLeadRows(rows), {
+          includeLost,
+          statusFilter
+        }).map(serializeSubscribeLead),
         { dropSiteDayLookup: buildDropSiteDayLookup(dropSiteRows) }
       );
       const today = new Date().toISOString().slice(0, 10);

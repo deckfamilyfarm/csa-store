@@ -2503,7 +2503,7 @@ router.post("/subscribe", async (req, res) => {
     const liabilityAgreementRecordUrl = liabilityReleaseSubmission.recordUrl;
 
     const subscribeInsert = await db.insert(subscribeLeads).values({
-      status: "in_progress",
+      status: "new",
       firstName,
       lastName,
       email,

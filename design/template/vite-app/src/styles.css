@@ -4506,6 +4506,87 @@ img {
   fill: currentColor;
 }
 
+.subscription-leads-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+.subscription-leads-action-button {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #7f2522;
+  cursor: pointer;
+  font: inherit;
+  box-shadow: none;
+}
+
+.subscription-leads-action-button:hover {
+  background: transparent;
+  color: #1f2f2a;
+  border-color: transparent;
+  box-shadow: none;
+  filter: none;
+}
+
+.subscription-leads-action-button:disabled,
+.subscription-leads-action-button[disabled],
+.subscription-leads-action-button:disabled:hover,
+.subscription-leads-action-button[disabled]:hover {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  color: rgba(143, 46, 43, 0.42);
+  cursor: default;
+  filter: none;
+  opacity: 1;
+}
+
+.subscription-leads-save-action.is-dirty {
+  color: #1f2f2a;
+}
+
+.subscription-leads-save-action.is-dirty:hover {
+  color: var(--barn);
+}
+
+.subscription-leads-action-button:focus-visible {
+  outline: 2px solid var(--barn);
+  outline-offset: 3px;
+}
+
+.subscription-leads-action-button svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.45;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.subscription-leads-pdf-link {
+  color: var(--barn);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.subscription-leads-pdf-link:hover {
+  color: var(--navy);
+}
+
 .admin-fields .textarea {
   min-height: 180px;
 }
