@@ -1,10 +1,4 @@
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  Check as CheckIcon,
-  PencilLine as EditIcon,
-  Save as SaveIcon,
-  X as XIcon
-} from "lucide-react";
 import { adminDownload, adminGet, adminPost, adminPut } from "../adminApi.js";
 
 const STATUS_OPTIONS = [
@@ -110,6 +104,51 @@ function AgreementCell({ href }) {
     >
       Signed PDF
     </a>
+  );
+}
+
+function IconSvg({ children }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      {children}
+    </svg>
+  );
+}
+
+function SaveIcon() {
+  return (
+    <IconSvg>
+      <path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
+      <path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7" />
+      <path d="M7 3v4a1 1 0 0 0 1 1h7" />
+    </IconSvg>
+  );
+}
+
+function EditIcon() {
+  return (
+    <IconSvg>
+      <path d="M13 21h8" />
+      <path d="m15 5 4 4" />
+      <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
+    </IconSvg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <IconSvg>
+      <path d="M20 6 9 17l-5-5" />
+    </IconSvg>
+  );
+}
+
+function XIcon() {
+  return (
+    <IconSvg>
+      <path d="M18 6 6 18" />
+      <path d="m6 6 12 12" />
+    </IconSvg>
   );
 }
 
