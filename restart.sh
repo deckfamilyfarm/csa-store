@@ -3,6 +3,9 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
+npm install
+npm --prefix apps/api install
+npm --prefix design/template/vite-app install
 npm --prefix design/template/vite-app run build
 
 wait_for_store() {
