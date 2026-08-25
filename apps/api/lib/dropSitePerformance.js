@@ -2,6 +2,9 @@ const WEEKLY_CREDIT_THRESHOLD = 3;
 const STRONG_WEEKLY_AVERAGE = 5;
 const LEGACY_MONTHLY_UNIQUE_THRESHOLD = 5;
 const TREND_MODE_KEY = "__trend6__";
+const CONSOLIDATION_QUALITY_THRESHOLD = 5;
+const CONSOLIDATION_RADIUS_MILES = 10;
+const NEARBY_DROP_SITE_LIMIT = 4;
 
 function toDateOrNull(value) {
   if (!value) return null;
@@ -472,6 +475,281 @@ function getDropSitePerformanceTier(averageWeeklyOrders) {
   return "bad";
 }
 
+function toFiniteNumber(value) {
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? numeric : null;
+}
+
+function clampNumber(value, min = 0, max = 1) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return min;
+  return Math.min(max, Math.max(min, numeric));
+}
+
+function roundNumber(value, digits = 2) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return 0;
+  const factor = 10 ** digits;
+  return Math.round(numeric * factor) / factor;
+}
+
+function getSiteCoordinates(site = {}) {
+  const latitude = toFiniteNumber(site.latitude);
+  const longitude = toFiniteNumber(site.longitude);
+  if (latitude === null || longitude === null) return null;
+  return { latitude, longitude };
+}
+
+function haversineMiles(lat1, lon1, lat2, lon2) {
+  const toRadians = (degrees) => (degrees * Math.PI) / 180;
+  const earthRadiusMiles = 3958.7613;
+  const dLat = toRadians(lat2 - lat1);
+  const dLon = toRadians(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.sin(dLon / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return earthRadiusMiles * c;
+}
+
+function haveCompatibleDropDay(left = {}, right = {}) {
+  const leftDays = getWeekdayNumbersFromDayLabel(left.dayOfWeek);
+  const rightDays = getWeekdayNumbersFromDayLabel(right.dayOfWeek);
+  if (!leftDays.length || !rightDays.length) return false;
+  return leftDays.some((day) => rightDays.includes(day));
+}
+
+function getDropSiteQualityReasons({
+  averageOrdersPerActiveDropWeek,
+  uniqueCustomers,
+  activeDropUtilization,
+  consistencyRatio,
+  active
+}) {
+  const reasons = [];
+  if (!active) {
+    reasons.push("inactive site");
+  }
+  if (averageOrdersPerActiveDropWeek < WEEKLY_CREDIT_THRESHOLD) {
+    reasons.push(`below ${WEEKLY_CREDIT_THRESHOLD} orders per active drop`);
+  } else if (averageOrdersPerActiveDropWeek >= STRONG_WEEKLY_AVERAGE) {
+    reasons.push(`strong ${STRONG_WEEKLY_AVERAGE}+ order average`);
+  }
+  if (uniqueCustomers <= LEGACY_MONTHLY_UNIQUE_THRESHOLD) {
+    reasons.push(`at or below ${LEGACY_MONTHLY_UNIQUE_THRESHOLD} unique customers`);
+  }
+  if (activeDropUtilization < 0.5) {
+    reasons.push("many scheduled drops have no orders");
+  }
+  if (consistencyRatio < 0.5) {
+    reasons.push("inconsistent threshold performance");
+  }
+  if (!reasons.length) {
+    reasons.push("meets efficiency thresholds");
+  }
+  return reasons;
+}
+
+function calculateDropSiteQuality(site = {}) {
+  const averageOrdersPerActiveDropWeek = Number(site.averageOrdersPerActiveDropWeek || 0);
+  const averageOrdersPerScheduledDropWeek = Number(
+    site.averageOrdersPerScheduledDropWeek || site.averageWeeklyOrders || 0
+  );
+  const uniqueCustomers = Number(site.legacyMonthlyUniqueCustomers || 0);
+  const orderCount = Number(site.orderCount || 0);
+  const scheduledDrops = Number(site.scheduledDrops || 0);
+  const activeDropWeeks = Number(site.activeDropWeeks || 0);
+  const activeDropUtilization =
+    scheduledDrops > 0 ? activeDropWeeks / scheduledDrops : activeDropWeeks > 0 ? 1 : 0;
+  const detailSeries = Array.isArray(site.detailSeries) ? site.detailSeries : [];
+  const trendSeries = Array.isArray(site.trendSeries) ? site.trendSeries : [];
+  const consistencySource = trendSeries.length > 1 ? trendSeries : detailSeries;
+  const consistencyRatio = consistencySource.length
+    ? consistencySource.filter((entry) => {
+        const average = Number(entry.averageOrdersPerActiveDropWeek || 0);
+        const orderCountForEntry = Number(entry.orderCount || 0);
+        return average >= WEEKLY_CREDIT_THRESHOLD || orderCountForEntry >= WEEKLY_CREDIT_THRESHOLD;
+      }).length / consistencySource.length
+    : activeDropUtilization;
+  const expectedStrongOrders =
+    STRONG_WEEKLY_AVERAGE * Math.max(activeDropWeeks || scheduledDrops || 1, 1);
+
+  const averagePoints =
+    4 * clampNumber(averageOrdersPerActiveDropWeek / STRONG_WEEKLY_AVERAGE);
+  const uniqueCustomerPoints =
+    2 * clampNumber(uniqueCustomers / (LEGACY_MONTHLY_UNIQUE_THRESHOLD + 3));
+  const utilizationPoints = 1.25 * clampNumber(activeDropUtilization);
+  const consistencyPoints = 1.25 * clampNumber(consistencyRatio);
+  const volumePoints = 1.5 * clampNumber(orderCount / expectedStrongOrders);
+  const inactivePenalty = site.active ? 0 : -2;
+  const rawScore =
+    averagePoints +
+    uniqueCustomerPoints +
+    utilizationPoints +
+    consistencyPoints +
+    volumePoints +
+    inactivePenalty;
+  const weakAverageCap =
+    averageOrdersPerActiveDropWeek < WEEKLY_CREDIT_THRESHOLD
+      ? Math.max(1, Math.floor((averageOrdersPerActiveDropWeek / WEEKLY_CREDIT_THRESHOLD) * 5))
+      : 10;
+  const adjustedRawScore = Math.min(rawScore, weakAverageCap);
+  const score = Math.max(1, Math.min(10, Math.round(adjustedRawScore)));
+  const consolidationRecommended = score <= CONSOLIDATION_QUALITY_THRESHOLD;
+
+  return {
+    score,
+    rawScore: roundNumber(adjustedRawScore, 2),
+    consolidationRecommended,
+    status: consolidationRecommended ? "consolidate" : score >= 8 ? "strong" : "watch",
+    metrics: {
+      averageOrdersPerActiveDropWeek: roundNumber(averageOrdersPerActiveDropWeek, 2),
+      averageOrdersPerScheduledDropWeek: roundNumber(averageOrdersPerScheduledDropWeek, 2),
+      uniqueCustomers,
+      orderCount,
+      scheduledDrops,
+      activeDropWeeks,
+      activeDropUtilization: roundNumber(activeDropUtilization, 2),
+      consistencyRatio: roundNumber(consistencyRatio, 2)
+    },
+    components: {
+      averageOrders: roundNumber(averagePoints, 2),
+      uniqueCustomers: roundNumber(uniqueCustomerPoints, 2),
+      activeDropUtilization: roundNumber(utilizationPoints, 2),
+      consistency: roundNumber(consistencyPoints, 2),
+      orderVolume: roundNumber(volumePoints, 2),
+      inactivePenalty,
+      weakAverageCap
+    },
+    reasons: getDropSiteQualityReasons({
+      averageOrdersPerActiveDropWeek,
+      uniqueCustomers,
+      activeDropUtilization,
+      consistencyRatio,
+      active: Boolean(site.active)
+    })
+  };
+}
+
+function buildNearbyDropSiteOptions(sourceSite = {}, rankedSites = []) {
+  if (isHomeDeliverySite(sourceSite) || isMembershipPurchaseDropSite(sourceSite)) return [];
+  const sourceCoordinates = getSiteCoordinates(sourceSite);
+  if (!sourceCoordinates) return [];
+  const sourceScore = Number(sourceSite.qualityScore || 1);
+
+  return rankedSites
+    .filter((targetSite) => {
+      if (!targetSite || targetSite.id === sourceSite.id) return false;
+      if (!targetSite.active) return false;
+      if (isHomeDeliverySite(targetSite) || isMembershipPurchaseDropSite(targetSite)) return false;
+      return Boolean(getSiteCoordinates(targetSite));
+    })
+    .map((targetSite) => {
+      const targetCoordinates = getSiteCoordinates(targetSite);
+      const distanceMiles = haversineMiles(
+        sourceCoordinates.latitude,
+        sourceCoordinates.longitude,
+        targetCoordinates.latitude,
+        targetCoordinates.longitude
+      );
+      if (distanceMiles >= CONSOLIDATION_RADIUS_MILES) return null;
+      const sameDay = haveCompatibleDropDay(sourceSite, targetSite);
+      const targetAverage = Number(targetSite.averageOrdersPerActiveDropWeek || 0);
+      const targetScore = Number(targetSite.qualityScore || 1);
+      const proximityScore = clampNumber(1 - distanceMiles / CONSOLIDATION_RADIUS_MILES);
+      const targetQualityScore = clampNumber(targetScore / 10);
+      const targetStrengthScore = clampNumber(targetAverage / STRONG_WEEKLY_AVERAGE);
+      const recommendationScore = Math.round(
+        100 *
+          (
+            proximityScore * 0.4 +
+            targetQualityScore * 0.35 +
+            (sameDay ? 1 : 0) * 0.15 +
+            targetStrengthScore * 0.1
+          )
+      );
+      const combinedActiveDropWeeks = Math.max(
+        Number(sourceSite.activeDropWeeks || 0),
+        Number(targetSite.activeDropWeeks || 0),
+        1
+      );
+      const combinedOrderCount =
+        Number(sourceSite.orderCount || 0) + Number(targetSite.orderCount || 0);
+
+      return {
+        id: targetSite.id,
+        name: targetSite.name,
+        area: targetSite.area || "",
+        dayOfWeek: targetSite.dayOfWeek || null,
+        distanceMiles: roundNumber(distanceMiles, 2),
+        qualityScore: targetScore,
+        recommendationScore,
+        sameDay,
+        averageOrdersPerActiveDropWeek: roundNumber(targetAverage, 2),
+        combinedEstimatedAverageOrdersPerActiveDropWeek: roundNumber(
+          combinedOrderCount / combinedActiveDropWeeks,
+          2
+        ),
+        improvesScore: targetScore > sourceScore
+      };
+    })
+    .filter(Boolean)
+    .sort((left, right) => {
+      if (left.distanceMiles !== right.distanceMiles) return left.distanceMiles - right.distanceMiles;
+      if (right.qualityScore !== left.qualityScore) return right.qualityScore - left.qualityScore;
+      return String(left.name || "").localeCompare(String(right.name || ""));
+    });
+}
+
+function buildConsolidationSummary(site = {}, recommendations = []) {
+  if (!site.consolidationRecommended) {
+    return "No consolidation recommendation.";
+  }
+  if (!recommendations.length) {
+    return `Review manually; no pickup sites under ${CONSOLIDATION_RADIUS_MILES} miles were found.`;
+  }
+  const best = recommendations[0];
+  return `Consider ${best.name} (${best.distanceMiles} mi, ${best.qualityScore}/10 quality, ${best.averageOrdersPerActiveDropWeek} avg orders/wk, ${best.recommendationScore}/100 fit).`;
+}
+
+function attachDropSiteQualityAndRecommendations(rankedSites = []) {
+  const scoredSites = rankedSites.map((site) => {
+    const quality = calculateDropSiteQuality(site);
+    const eligibleForConsolidation =
+      !isHomeDeliverySite(site) && !isMembershipPurchaseDropSite(site);
+    return {
+      ...site,
+      qualityScore: quality.score,
+      qualityScoreRaw: quality.rawScore,
+      qualityScoreDetails: quality,
+      consolidationRecommended: eligibleForConsolidation && quality.consolidationRecommended
+    };
+  });
+
+  return scoredSites.map((site) => {
+    const nearbyDropSites = site.consolidationRecommended
+      ? buildNearbyDropSiteOptions(site, scoredSites).slice(0, NEARBY_DROP_SITE_LIMIT)
+      : [];
+    const consolidationRecommendations = site.consolidationRecommended
+      ? nearbyDropSites
+          .sort((left, right) => {
+            if (right.recommendationScore !== left.recommendationScore) {
+              return right.recommendationScore - left.recommendationScore;
+            }
+            return left.distanceMiles - right.distanceMiles;
+          })
+          .slice(0, 3)
+      : [];
+
+    return {
+      ...site,
+      nearbyDropSites,
+      consolidationRecommendations,
+      recommendationSummary: buildConsolidationSummary(site, consolidationRecommendations)
+    };
+  });
+}
+
 function getCustomerKey(row = {}) {
   const customerId = Number(row.customerId || 0);
   if (customerId > 0) return `id:${customerId}`;
@@ -852,6 +1130,13 @@ export async function buildDropSitePerformancePayload({
           area: site.area || "",
           source: site.source,
           active: site.active,
+          dayOfWeek: site.dayOfWeek || null,
+          openTime: site.openTime || null,
+          closeTime: site.closeTime || null,
+          type: site.type || null,
+          fulfillmentType: site.fulfillmentType || null,
+          latitude: site.latitude,
+          longitude: site.longitude,
           localLineFulfillmentStrategyId: site.localLineFulfillmentStrategyId,
           ...(includeHostContact ? { derivedHostContact: site.derivedHostContact || null } : {}),
           orderCount: totalOrderCount,
@@ -950,6 +1235,8 @@ export async function buildDropSitePerformancePayload({
 
     rankedSites = buildRankedSitesFromOrderRows(orderRows);
   }
+
+  rankedSites = attachDropSiteQualityAndRecommendations(rankedSites);
 
   const payload = {
     dropSites: publicOnly ? performanceSites.map((site) => sanitizePublicSite(site)) : visibleDropSites,

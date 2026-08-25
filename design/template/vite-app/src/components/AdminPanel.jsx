@@ -353,6 +353,33 @@ function computeDropSiteAverageFromDetailSeries(site = {}, includeZeroOrders = f
   return Number((totalOrders / detailSeries.length).toFixed(2));
 }
 
+function formatDropSiteQualityScore(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return "—";
+  return String(Math.max(1, Math.min(10, Math.round(numeric))));
+}
+
+function formatDropSiteDistance(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return "n/a";
+  return `${numeric.toFixed(numeric < 10 ? 1 : 0)} mi`;
+}
+
+function getDisplayedNearbyDropSites(site = {}) {
+  const qualityScore = Number(site.qualityScore);
+  if (!Number.isFinite(qualityScore) || qualityScore > 5 || !site.consolidationRecommended) {
+    return [];
+  }
+  const recommendations = Array.isArray(site.consolidationRecommendations)
+    ? site.consolidationRecommendations
+    : [];
+  if (site.consolidationRecommended && recommendations.length) {
+    return recommendations.slice(0, 3);
+  }
+  const nearbyDropSites = Array.isArray(site.nearbyDropSites) ? site.nearbyDropSites : [];
+  return nearbyDropSites.slice(0, 3);
+}
+
 function buildDropSiteDetailSvgLayout(series = []) {
   const width = 760;
   const height = 280;
@@ -4988,6 +5015,13 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                   </div>
                 ) : null}
                 <div className="drop-site-performance-chart">
+                  {filteredDropSitePerformanceRows.length ? (
+                    <div className="drop-site-performance-header" aria-hidden="true">
+                      <span>Drop site</span>
+                      <span>Performance</span>
+                      <span>Consolidation / nearby sites</span>
+                    </div>
+                  ) : null}
                   {filteredDropSitePerformanceRows.map((site) => {
                     const displayAverage = computeDropSiteAverageFromDetailSeries(
                       site,
@@ -5003,6 +5037,8 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                       countZeroOrderPeriods
                     );
                     const displayCreditClass = combinedCreditEligible ? "good" : "bad";
+                    const qualityScore = Number(site.qualityScore || 0);
+                    const nearbySites = getDisplayedNearbyDropSites(site);
                     const widthPercent = Math.max(
                       0,
                       Math.min(100, Math.round((displayAverage / maxDropSiteAverage) * 100))
@@ -5036,69 +5072,107 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                             </div>
                           ) : null}
                         </div>
-                        <div className="drop-site-performance-bar-row">
-                          {dropSiteTrendMode ? (
-                            <button
-                              className="drop-site-graph-button drop-site-trend-shell"
-                              type="button"
-                              onClick={() => setExpandedDropSiteGraph(site)}
-                            >
-                              <svg
-                                className="drop-site-trend-svg"
-                                viewBox={`0 0 ${trendLayout.width} ${trendLayout.height}`}
-                                aria-label={`${site.name} last 6 month trend`}
-                                role="img"
+                        <div className="drop-site-performance-bar-column">
+                          <div className="drop-site-performance-bar-row">
+                            {dropSiteTrendMode ? (
+                              <button
+                                className="drop-site-graph-button drop-site-trend-shell"
+                                type="button"
+                                onClick={() => setExpandedDropSiteGraph(site)}
                               >
-                                <polyline
-                                  className="drop-site-trend-line"
-                                  fill="none"
-                                  points={trendLayout.polylinePoints}
+                                <svg
+                                  className="drop-site-trend-svg"
+                                  viewBox={`0 0 ${trendLayout.width} ${trendLayout.height}`}
+                                  aria-label={`${site.name} last 6 month trend`}
+                                  role="img"
                                 >
-                                  <title>{`${site.name} · ${Number(site.orderCount || 0)} total orders`}</title>
-                                </polyline>
-                                {trendLayout.points.map((point) => (
-                                  <circle
-                                    key={`${site.id}-${point.weekStart || point.month}`}
-                                    className={`drop-site-trend-dot ${point.performanceTier || "bad"}`}
-                                    cx={point.x}
-                                    cy={point.y}
-                                    r="3.5"
+                                  <polyline
+                                    className="drop-site-trend-line"
+                                    fill="none"
+                                    points={trendLayout.polylinePoints}
                                   >
-                                    <title>
-                                      {`${formatWeekOfLabel(point.weekStart)} \u00b7 ${formatDeliveryCount(point.orderCount)}`}
-                                    </title>
-                                  </circle>
-                                ))}
-                              </svg>
-                            </button>
-                          ) : (
-                            <button
-                              className="drop-site-graph-button drop-site-performance-bar-shell"
-                              type="button"
-                              onClick={() => setExpandedDropSiteGraph(site)}
-                              title={`${site.name} · ${Number(site.orderCount || 0)} total orders`}
+                                    <title>{`${site.name} · ${Number(site.orderCount || 0)} total orders`}</title>
+                                  </polyline>
+                                  {trendLayout.points.map((point) => (
+                                    <circle
+                                      key={`${site.id}-${point.weekStart || point.month}`}
+                                      className={`drop-site-trend-dot ${point.performanceTier || "bad"}`}
+                                      cx={point.x}
+                                      cy={point.y}
+                                      r="3.5"
+                                    >
+                                      <title>
+                                        {`${formatWeekOfLabel(point.weekStart)} \u00b7 ${formatDeliveryCount(point.orderCount)}`}
+                                      </title>
+                                    </circle>
+                                  ))}
+                                </svg>
+                              </button>
+                            ) : (
+                              <button
+                                className="drop-site-graph-button drop-site-performance-bar-shell"
+                                type="button"
+                                onClick={() => setExpandedDropSiteGraph(site)}
+                                title={`${site.name} · ${Number(site.orderCount || 0)} total orders`}
+                              >
+                                <div
+                                  className={`drop-site-performance-bar ${displayCreditClass}`}
+                                  style={{ width: `${widthPercent}%` }}
+                                />
+                                {!combinedCreditEligible ? (
+                                  <span className="drop-site-performance-warning">
+                                    does not qualify
+                                  </span>
+                                ) : null}
+                              </button>
+                            )}
+                            <span
+                              className={`drop-site-contact-status ${
+                                site.derivedHostContact?.indicator === "phone" ? "phone" : "missing"
+                              }`}
+                              title={describeDropSiteContactIndicator(site.derivedHostContact)}
+                              aria-label={describeDropSiteContactIndicator(site.derivedHostContact)}
                             >
-                              <div
-                                className={`drop-site-performance-bar ${displayCreditClass}`}
-                                style={{ width: `${widthPercent}%` }}
-                              />
-                              {!combinedCreditEligible ? (
-                                <span className="drop-site-performance-warning">
-                                  does not qualify
-                                </span>
-                              ) : null}
-                            </button>
-                          )}
-                          <span
-                            className={`drop-site-contact-status ${
-                              site.derivedHostContact?.indicator === "phone" ? "phone" : "missing"
-                            }`}
-                            title={describeDropSiteContactIndicator(site.derivedHostContact)}
-                            aria-label={describeDropSiteContactIndicator(site.derivedHostContact)}
-                          >
-                            {renderDropSiteContactStatus(site.derivedHostContact)}
-                          </span>
+                              {renderDropSiteContactStatus(site.derivedHostContact)}
+                            </span>
+                          </div>
+                          <div className="drop-site-quality-score">
+                            <strong>Quality {formatDropSiteQualityScore(qualityScore)}/10</strong>
+                          </div>
                         </div>
+                        {site.consolidationRecommended ? (
+                          <div className="drop-site-consolidation-cell needs-review">
+                            <div className="drop-site-consolidation-title">
+                              Consolidation recommendation
+                            </div>
+                            {nearbySites.length ? (
+                              <div className="drop-site-nearby-list">
+                                {nearbySites.map((nearbySite) => (
+                                  <div
+                                    className="drop-site-nearby-item"
+                                    key={`nearby-${site.id}-${nearbySite.id}`}
+                                  >
+                                    <strong>{nearbySite.name}</strong>
+                                    <span className="drop-site-nearby-metrics">
+                                      {formatDropSiteDistance(nearbySite.distanceMiles)}
+                                      {" · "}
+                                      {formatDropSiteQualityScore(nearbySite.qualityScore)}/10 quality
+                                      {" · "}
+                                      {Number(nearbySite.averageOrdersPerActiveDropWeek || 0).toFixed(2)} avg orders/wk
+                                      {" · "}
+                                      {Number(nearbySite.recommendationScore || 0)}/100 fit
+                                    </span>
+                                    <span>
+                                      {nearbySite.sameDay ? "same pickup day" : nearbySite.dayOfWeek || "different day"}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="small">No nearby coordinate-backed pickup sites under 10 miles found.</div>
+                            )}
+                          </div>
+                        ) : null}
                       </div>
                     );
                   })}
