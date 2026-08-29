@@ -107,6 +107,75 @@ function getDefaultAdminSection(roleKeys = []) {
   return order.find((section) => canAccessAdminSection(roleKeys, section)) || "inventory";
 }
 
+const ADMIN_NAV_GROUPS = [
+  {
+    key: "pricingInventory",
+    label: "Pricing / Inventory",
+    items: [
+      { section: "localLine", label: "Local Line" },
+      { section: "orders", label: "Orders" },
+      { section: "pricelist", label: "Pricelist" },
+      { section: "localPricelist", label: "Local Pricelist" },
+      { section: "inventory", label: "Inventory" }
+    ]
+  },
+  {
+    key: "membership",
+    label: "Membership",
+    items: [
+      { section: "membership", label: "Membership" },
+      { section: "subscriptions", label: "Subscriptions" },
+      { section: "memberCredits", label: "Member Credits" },
+      { section: "content", label: "Content" },
+      { section: "marketing", label: "Marketing" },
+      { section: "liability", label: "Liability Releases" }
+    ]
+  },
+  {
+    key: "ops",
+    label: "Ops",
+    items: [
+      { section: "categories", label: "Categories" },
+      { section: "vendors", label: "Vendors" },
+      { section: "recipes", label: "Recipes" },
+      { section: "dropSites", label: "Drop Sites" }
+    ]
+  },
+  {
+    key: "administration",
+    label: "Administration",
+    items: [
+      { section: "reviews", label: "Reviews" },
+      { section: "googleDrive", label: "Google Drive" },
+      { section: "users", label: "Users" },
+      { section: "manual", label: "Manual", manualTopic: "overview" }
+    ]
+  },
+  {
+    key: "siteLinks",
+    label: "Site Links",
+    items: [
+      { key: "subscribe", label: "Subscribe", getHref: getSubscribePageUrl },
+      { key: "memberPortal", label: "Member Portal", getHref: getMemberPortalUrl },
+      { key: "currentStore", label: "Current Store", getHref: getCurrentStoreUrl }
+    ]
+  }
+];
+
+function getAdminNavGroupKey(section) {
+  return (
+    ADMIN_NAV_GROUPS.find((group) =>
+      group.items.some((item) => item.section === section)
+    )?.key || "pricingInventory"
+  );
+}
+
+function getAdminNavItem(section) {
+  return ADMIN_NAV_GROUPS.flatMap((group) => group.items).find(
+    (item) => item.section === section
+  ) || null;
+}
+
 function createDraftPackage(overrides = {}) {
   return {
     id: overrides.id ?? null,
@@ -365,6 +434,26 @@ function formatDropSiteDistance(value) {
   return `${numeric.toFixed(numeric < 10 ? 1 : 0)} mi`;
 }
 
+function formatDropSiteDayCycle(cycle = null) {
+  return cycle?.shortLabel || cycle?.label || "Unknown day";
+}
+
+function getDropSiteDayCycleClass(cycle = null) {
+  const key = String(cycle?.key || "unknown");
+  if (key === "tuesdayWednesday") return "tue-wed";
+  if (key === "fridaySaturday") return "fri-sat";
+  if (key === "both") return "both";
+  return "unknown";
+}
+
+function describeDropSiteCycleRelationship(nearbySite = {}) {
+  const cycleLabel = formatDropSiteDayCycle(nearbySite.dropDayCycle);
+  if (nearbySite.alternateDropDayCycle) return `alternate ${cycleLabel} option`;
+  if (nearbySite.sameDropDayCycle) return `same ${cycleLabel} cycle`;
+  if (nearbySite.sameDay) return "same pickup day";
+  return `${cycleLabel} cycle`;
+}
+
 function getDisplayedNearbyDropSites(site = {}) {
   const qualityScore = Number(site.qualityScore);
   if (!Number.isFinite(qualityScore) || qualityScore > 5 || !site.consolidationRecommended) {
@@ -615,6 +704,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
   });
   const [loading, setLoading] = useState(false);
   const [activeSection, setActiveSection] = useState("pricelist");
+  const [openAdminNavGroup, setOpenAdminNavGroup] = useState("");
   const [manualFocusTopic, setManualFocusTopic] = useState("overview");
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [selectedProductDetail, setSelectedProductDetail] = useState(null);
@@ -755,6 +845,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
     null;
   const descriptionRef = useRef(null);
   const localPricelistMenuRef = useRef(null);
+  const adminNavRef = useRef(null);
 
   async function refreshCatalogFromAdmin() {
     if (typeof onCatalogRefresh !== "function") return;
@@ -1774,6 +1865,46 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
     setManualFocusTopic(topic);
     closeProductEditor();
     setActiveSection("manual");
+  }
+
+  useEffect(() => {
+    if (!openAdminNavGroup) return undefined;
+
+    function handlePointerDown(event) {
+      if (!adminNavRef.current?.contains(event.target)) {
+        setOpenAdminNavGroup("");
+      }
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === "Escape") {
+        setOpenAdminNavGroup("");
+      }
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [openAdminNavGroup]);
+
+  function canUseAdminNavItem(item) {
+    if (item.getHref) return true;
+    if (item.section === "manual") return Boolean(currentAdmin);
+    return canAccessAdminSection(currentAdminRoles, item.section);
+  }
+
+  function handleAdminNavItemClick(item) {
+    if (!canUseAdminNavItem(item)) return;
+    setOpenAdminNavGroup("");
+    if (item.section === "manual") {
+      openAdminManual(item.manualTopic || "overview");
+      return;
+    }
+    setActiveSection(item.section);
+    closeProductEditor();
   }
 
   function updateDraftPackage(index, patch) {
@@ -2986,6 +3117,11 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
   const canManageDropSites = hasRole(currentAdminRoles, "dropsite_admin");
   const canManageMembers = hasRole(currentAdminRoles, "member_admin");
   const canManageCoreAdmin = currentAdminRoles.includes("admin");
+  const activeAdminNavGroupKey = getAdminNavGroupKey(activeSection);
+  const activeAdminNavGroup =
+    ADMIN_NAV_GROUPS.find((group) => group.key === activeAdminNavGroupKey) || null;
+  const activeAdminNavItem = getAdminNavItem(activeSection);
+  const activeAdminSectionTitle = activeAdminNavItem?.label || "Admin";
   const expandedDropSiteDetailSeries = getDisplayedDropSitePoints(
     expandedDropSiteGraph?.detailSeries || [],
     countZeroOrderPeriods
@@ -3687,263 +3823,75 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
 
   return (
     <div className="container admin-panel">
-      <div className="admin-header">
-        <h2 className="h2">Admin Dashboard</h2>
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-          <a
-            className="button alt"
-            href={getSubscribePageUrl()}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Subscribe
-          </a>
-          <a
-            className="button alt"
-            href={getMemberPortalUrl()}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Member Portal
-          </a>
-          <a
-            className="button alt"
-            href={getCurrentStoreUrl()}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Current Store
-          </a>
-        </div>
-      </div>
       {message && <div className="small">{message}</div>}
       {loading && <div className="small">Loading...</div>}
 
       <div className="admin-layout">
-        <aside className="admin-nav">
-          {canManageGoogleDrive ? (
-            <button
-              className={`admin-nav-item ${activeSection === "googleDrive" ? "active" : ""}`}
-              onClick={() => {
-                setActiveSection("googleDrive");
-                closeProductEditor();
-              }}
-              type="button"
-            >
-              Google Drive
-            </button>
-          ) : null}
-          {canManageLocalLine ? (
-            <button
-              className={`admin-nav-item ${activeSection === "localLine" ? "active" : ""}`}
-              onClick={() => {
-                setActiveSection("localLine");
-                closeProductEditor();
-              }}
-              type="button"
-            >
-              Local Line
-            </button>
-          ) : null}
-          {canManageOrders ? (
-            <button
-              className={`admin-nav-item ${activeSection === "orders" ? "active" : ""}`}
-              onClick={() => {
-                setActiveSection("orders");
-                closeProductEditor();
-              }}
-              type="button"
-            >
-              Orders
-            </button>
-          ) : null}
-          {canManagePricing ? (
-            <button
-              className={`admin-nav-item ${activeSection === "pricelist" ? "active" : ""}`}
-              onClick={() => {
-                setActiveSection("pricelist");
-                closeProductEditor();
-              }}
-              type="button"
-            >
-              Pricelist
-            </button>
-          ) : null}
-          {canManageLocalPricelist ? (
-            <button
-              className={`admin-nav-item ${activeSection === "localPricelist" ? "active" : ""}`}
-              onClick={() => {
-                setActiveSection("localPricelist");
-                closeProductEditor();
-              }}
-              type="button"
-            >
-              Local Pricelist
-            </button>
-          ) : null}
-          {canManageInventory ? (
-            <button
-              className={`admin-nav-item ${activeSection === "inventory" ? "active" : ""}`}
-              onClick={() => {
-                setActiveSection("inventory");
-                closeProductEditor();
-              }}
-              type="button"
-            >
-              Inventory
-            </button>
-          ) : null}
-          {canManageMembership ? (
-            <button
-              className={`admin-nav-item ${activeSection === "membership" ? "active" : ""}`}
-              onClick={() => {
-                setActiveSection("membership");
-                closeProductEditor();
-              }}
-              type="button"
-            >
-              Membership
-            </button>
-          ) : null}
-          {canManageSubscriptions ? (
-            <button
-              className={`admin-nav-item ${activeSection === "subscriptions" ? "active" : ""}`}
-              onClick={() => {
-                setActiveSection("subscriptions");
-                closeProductEditor();
-              }}
-              type="button"
-            >
-              Subscriptions
-            </button>
-          ) : null}
-          {canManageMemberCredits ? (
-            <button
-              className={`admin-nav-item ${activeSection === "memberCredits" ? "active" : ""}`}
-              onClick={() => {
-                setActiveSection("memberCredits");
-                closeProductEditor();
-              }}
-              type="button"
-            >
-              Member Credits
-            </button>
-          ) : null}
-          {canManageContent ? (
-            <button
-              className={`admin-nav-item ${activeSection === "content" ? "active" : ""}`}
-              onClick={() => {
-                setActiveSection("content");
-                closeProductEditor();
-              }}
-              type="button"
-            >
-              Content
-            </button>
-          ) : null}
-          {canManageMarketing ? (
-            <button
-              className={`admin-nav-item ${activeSection === "marketing" ? "active" : ""}`}
-              onClick={() => {
-                setActiveSection("marketing");
-                closeProductEditor();
-              }}
-              type="button"
-            >
-              Marketing
-            </button>
-          ) : null}
-          {canManageLiability ? (
-            <button
-              className={`admin-nav-item ${activeSection === "liability" ? "active" : ""}`}
-              onClick={() => {
-                setActiveSection("liability");
-                closeProductEditor();
-              }}
-              type="button"
-            >
-              Liability Releases
-            </button>
-          ) : null}
-          {canManageCoreAdmin ? (
-            <>
-              <button
-                className={`admin-nav-item ${activeSection === "categories" ? "active" : ""}`}
-                onClick={() => {
-                  setActiveSection("categories");
-                  closeProductEditor();
-                }}
-                type="button"
+        <aside className="admin-nav" ref={adminNavRef}>
+          <nav className="admin-breadcrumb" aria-label="Admin breadcrumb">
+            <ol>
+              <li>Admin</li>
+              <li>{activeAdminNavGroup?.label || "Dashboard"}</li>
+              <li aria-current="page">{activeAdminSectionTitle}</li>
+            </ol>
+          </nav>
+          {ADMIN_NAV_GROUPS.map((group) => {
+            const isOpen = openAdminNavGroup === group.key;
+            const hasActiveItem = group.key === activeAdminNavGroupKey;
+            return (
+              <div
+                className={`admin-nav-group${isOpen ? " open" : ""}${hasActiveItem ? " active" : ""}`}
+                key={`admin-nav-group-${group.key}`}
               >
-                Categories
-              </button>
-              <button
-                className={`admin-nav-item ${activeSection === "vendors" ? "active" : ""}`}
-                onClick={() => {
-                  setActiveSection("vendors");
-                  closeProductEditor();
-                }}
-                type="button"
-              >
-                Vendors
-              </button>
-              <button
-                className={`admin-nav-item ${activeSection === "recipes" ? "active" : ""}`}
-                onClick={() => {
-                  setActiveSection("recipes");
-                  closeProductEditor();
-                }}
-                type="button"
-              >
-                Recipes
-              </button>
-            </>
-          ) : null}
-          {canManageDropSites ? (
-            <button
-              className={`admin-nav-item ${activeSection === "dropSites" ? "active" : ""}`}
-              onClick={() => {
-                setActiveSection("dropSites");
-                closeProductEditor();
-              }}
-              type="button"
-            >
-              Drop Sites
-            </button>
-          ) : null}
-          {canManageMembers ? (
-            <button
-              className={`admin-nav-item ${activeSection === "reviews" ? "active" : ""}`}
-              onClick={() => {
-                setActiveSection("reviews");
-                closeProductEditor();
-              }}
-              type="button"
-            >
-              Reviews
-            </button>
-          ) : null}
-          {canManageUsers ? (
-            <button
-              className={`admin-nav-item admin-users-nav-item ${activeSection === "users" ? "active" : ""}`}
-              onClick={() => {
-                setActiveSection("users");
-                closeProductEditor();
-              }}
-              type="button"
-            >
-              Users
-            </button>
-          ) : null}
-          {currentAdmin ? (
-            <button
-              className={`admin-nav-item ${activeSection === "manual" ? "active" : ""}`}
-              onClick={() => openAdminManual("overview")}
-              type="button"
-            >
-              Manual
-            </button>
-          ) : null}
+                <button
+                  className="admin-nav-group-button"
+                  type="button"
+                  aria-expanded={isOpen}
+                  aria-controls={`admin-nav-group-items-${group.key}`}
+                  onClick={() => setOpenAdminNavGroup(isOpen ? "" : group.key)}
+                >
+                  <span>{group.label}</span>
+                  <span className="admin-nav-group-caret" aria-hidden="true" />
+                </button>
+                {isOpen ? (
+                  <div
+                    className="admin-nav-group-items"
+                    id={`admin-nav-group-items-${group.key}`}
+                  >
+                    {group.items.map((item) => {
+                      const allowed = canUseAdminNavItem(item);
+                      if (item.getHref) {
+                        return (
+                          <a
+                            className="admin-nav-item admin-nav-link"
+                            href={item.getHref()}
+                            key={`admin-nav-item-${item.key}`}
+                            onClick={() => setOpenAdminNavGroup("")}
+                            rel="noreferrer"
+                            target="_blank"
+                          >
+                            {item.label}
+                          </a>
+                        );
+                      }
+                      return (
+                        <button
+                          className={`admin-nav-item ${activeSection === item.section ? "active" : ""}`}
+                          disabled={!allowed}
+                          key={`admin-nav-item-${item.section}`}
+                          onClick={() => handleAdminNavItemClick(item)}
+                          title={allowed ? item.label : "You do not have permission for this section"}
+                          type="button"
+                        >
+                          {item.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : null}
+              </div>
+            );
+          })}
         </aside>
 
         <div className="admin-content">
@@ -5048,6 +4996,13 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                       <div className="drop-site-performance-row" key={`drop-site-performance-${site.id}`}>
                         <div className="drop-site-performance-meta">
                           <strong>{site.name}</strong>
+                          <div className="drop-site-cycle-row">
+                            <span
+                              className={`drop-site-day-cycle-badge ${getDropSiteDayCycleClass(site.dropDayCycle)}`}
+                            >
+                              {formatDropSiteDayCycle(site.dropDayCycle)}
+                            </span>
+                          </div>
                           <div className="small">
                             {displayAverage.toFixed(2)} {displayAverageLabel}
                             {dropSiteTrendMode ? " (6 mo avg)" : ""}
@@ -5137,7 +5092,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                             </span>
                           </div>
                           <div className="drop-site-quality-score">
-                            <strong>Quality {formatDropSiteQualityScore(qualityScore)}/10</strong>
+                            <strong>Performance {formatDropSiteQualityScore(qualityScore)}/10</strong>
                           </div>
                         </div>
                         {site.consolidationRecommended ? (
@@ -5156,14 +5111,18 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                                     <span className="drop-site-nearby-metrics">
                                       {formatDropSiteDistance(nearbySite.distanceMiles)}
                                       {" · "}
-                                      {formatDropSiteQualityScore(nearbySite.qualityScore)}/10 quality
+                                      {formatDropSiteQualityScore(nearbySite.qualityScore)}/10 performance
                                       {" · "}
                                       {Number(nearbySite.averageOrdersPerActiveDropWeek || 0).toFixed(2)} avg orders/wk
                                       {" · "}
                                       {Number(nearbySite.recommendationScore || 0)}/100 fit
                                     </span>
-                                    <span>
-                                      {nearbySite.sameDay ? "same pickup day" : nearbySite.dayOfWeek || "different day"}
+                                    <span
+                                      className={`drop-site-day-cycle-badge ${getDropSiteDayCycleClass(
+                                        nearbySite.dropDayCycle
+                                      )}${nearbySite.alternateDropDayCycle ? " alternate" : ""}`}
+                                    >
+                                      {describeDropSiteCycleRelationship(nearbySite)}
                                     </span>
                                   </div>
                                 ))}
@@ -5185,6 +5144,13 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                 {filteredDropSites.map((site) => (
                   <div key={site.id} className="card pad">
                     <strong>{site.name}</strong>
+                    <div className="drop-site-cycle-row">
+                      <span
+                        className={`drop-site-day-cycle-badge ${getDropSiteDayCycleClass(site.dropDayCycle)}`}
+                      >
+                        {formatDropSiteDayCycle(site.dropDayCycle)}
+                      </span>
+                    </div>
                     <div className="small">
                       {site.source === "localline" ? "Local Line fulfillment" : "Local drop site"}
                       {site.type ? ` · ${site.type}` : ""}

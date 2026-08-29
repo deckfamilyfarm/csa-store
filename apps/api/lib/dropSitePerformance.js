@@ -5,6 +5,9 @@ const TREND_MODE_KEY = "__trend6__";
 const CONSOLIDATION_QUALITY_THRESHOLD = 5;
 const CONSOLIDATION_RADIUS_MILES = 10;
 const NEARBY_DROP_SITE_LIMIT = 4;
+const TUESDAY_WEDNESDAY_DAYS = new Set([2, 3]);
+const FRIDAY_SATURDAY_DAYS = new Set([5, 6]);
+const WEEKDAY_LABELS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 function toDateOrNull(value) {
   if (!value) return null;
@@ -375,6 +378,114 @@ function getWeekdayNumbersFromDayLabel(value) {
   return [...new Set(matches)];
 }
 
+function getWeekdayNumbersFromDateEntries(entries = []) {
+  if (!Array.isArray(entries)) return [];
+  return [
+    ...new Set(
+      entries
+        .map((item) => toDateOrNull(item?.available_date || item?.date || item))
+        .filter(Boolean)
+        .map((date) => date.getDay())
+    )
+  ];
+}
+
+function getDropSiteWeekdayNumbers(site = {}) {
+  const availability =
+    parseJsonValue(site?.availabilityJson || site?.availability_json, null) ||
+    parseJsonValue(site?.rawJson || site?.raw_json, {})?.availability ||
+    {};
+
+  const availabilityWeekdays = getAvailabilityWeekdayNumbers(availability);
+  if (availabilityWeekdays.length) return availabilityWeekdays;
+
+  const labelWeekdays = getWeekdayNumbersFromDayLabel(site?.dayOfWeek);
+  if (labelWeekdays.length) return labelWeekdays;
+
+  return [
+    ...new Set([
+      ...getWeekdayNumbersFromDateEntries(availability?.available_dates),
+      ...getWeekdayNumbersFromDateEntries(availability?.custom_dates)
+    ])
+  ];
+}
+
+function buildDropSiteDayCycle(site = {}) {
+  if (site?.dropDayCycle?.key) return site.dropDayCycle;
+
+  const weekdayNumbers = getDropSiteWeekdayNumbers(site);
+  const hasTuesdayWednesday = weekdayNumbers.some((day) => TUESDAY_WEDNESDAY_DAYS.has(day));
+  const hasFridaySaturday = weekdayNumbers.some((day) => FRIDAY_SATURDAY_DAYS.has(day));
+  const sortedWeekdayNumbers = [...new Set(weekdayNumbers)]
+    .filter((day) => Number.isFinite(Number(day)) && day >= 0 && day <= 6)
+    .sort((left, right) => left - right);
+
+  if (hasTuesdayWednesday && hasFridaySaturday) {
+    return {
+      key: "both",
+      label: "Tue/Wed and Fri/Sat drops",
+      shortLabel: "Both cycles",
+      weekdayNumbers: sortedWeekdayNumbers
+    };
+  }
+
+  if (hasTuesdayWednesday) {
+    return {
+      key: "tuesdayWednesday",
+      label: "Tuesday/Wednesday drop",
+      shortLabel: "Tue/Wed",
+      weekdayNumbers: sortedWeekdayNumbers
+    };
+  }
+
+  if (hasFridaySaturday) {
+    return {
+      key: "fridaySaturday",
+      label: "Friday/Saturday drop",
+      shortLabel: "Fri/Sat",
+      weekdayNumbers: sortedWeekdayNumbers
+    };
+  }
+
+  if (sortedWeekdayNumbers.length) {
+    return {
+      key: "other",
+      label: sortedWeekdayNumbers.map((day) => WEEKDAY_LABELS[day]).filter(Boolean).join("/") || "Other drop day",
+      shortLabel: "Other day",
+      weekdayNumbers: sortedWeekdayNumbers
+    };
+  }
+
+  return {
+    key: "unknown",
+    label: "Drop day unknown",
+    shortLabel: "Unknown day",
+    weekdayNumbers: []
+  };
+}
+
+function areAlternateDropDayCycles(leftCycle = {}, rightCycle = {}) {
+  const leftKey = leftCycle?.key || "unknown";
+  const rightKey = rightCycle?.key || "unknown";
+  return (
+    (leftKey === "tuesdayWednesday" && rightKey === "fridaySaturday") ||
+    (leftKey === "fridaySaturday" && rightKey === "tuesdayWednesday")
+  );
+}
+
+function haveCompatibleDropDayCycle(leftCycle = {}, rightCycle = {}) {
+  const leftKey = leftCycle?.key || "unknown";
+  const rightKey = rightCycle?.key || "unknown";
+  if (leftKey === "unknown" || rightKey === "unknown") return false;
+  if (leftKey === "both" && ["tuesdayWednesday", "fridaySaturday", "both"].includes(rightKey)) {
+    return true;
+  }
+  if (rightKey === "both" && ["tuesdayWednesday", "fridaySaturday", "both"].includes(leftKey)) {
+    return true;
+  }
+  return leftKey === rightKey;
+}
+
 function getCustomDateKeysInRange(availability = {}, rangeStart, rangeEnd) {
   const dates = Array.isArray(availability?.custom_dates) ? availability.custom_dates : [];
   return [...new Set(
@@ -513,8 +624,8 @@ function haversineMiles(lat1, lon1, lat2, lon2) {
 }
 
 function haveCompatibleDropDay(left = {}, right = {}) {
-  const leftDays = getWeekdayNumbersFromDayLabel(left.dayOfWeek);
-  const rightDays = getWeekdayNumbersFromDayLabel(right.dayOfWeek);
+  const leftDays = getDropSiteWeekdayNumbers(left);
+  const rightDays = getDropSiteWeekdayNumbers(right);
   if (!leftDays.length || !rightDays.length) return false;
   return leftDays.some((day) => rightDays.includes(day));
 }
@@ -654,6 +765,10 @@ function buildNearbyDropSiteOptions(sourceSite = {}, rankedSites = []) {
       );
       if (distanceMiles >= CONSOLIDATION_RADIUS_MILES) return null;
       const sameDay = haveCompatibleDropDay(sourceSite, targetSite);
+      const sourceDropDayCycle = buildDropSiteDayCycle(sourceSite);
+      const targetDropDayCycle = buildDropSiteDayCycle(targetSite);
+      const sameDropDayCycle = haveCompatibleDropDayCycle(sourceDropDayCycle, targetDropDayCycle);
+      const alternateDropDayCycle = areAlternateDropDayCycles(sourceDropDayCycle, targetDropDayCycle);
       const targetAverage = Number(targetSite.averageOrdersPerActiveDropWeek || 0);
       const targetScore = Number(targetSite.qualityScore || 1);
       const proximityScore = clampNumber(1 - distanceMiles / CONSOLIDATION_RADIUS_MILES);
@@ -681,10 +796,13 @@ function buildNearbyDropSiteOptions(sourceSite = {}, rankedSites = []) {
         name: targetSite.name,
         area: targetSite.area || "",
         dayOfWeek: targetSite.dayOfWeek || null,
+        dropDayCycle: targetDropDayCycle,
         distanceMiles: roundNumber(distanceMiles, 2),
         qualityScore: targetScore,
         recommendationScore,
         sameDay,
+        sameDropDayCycle,
+        alternateDropDayCycle,
         averageOrdersPerActiveDropWeek: roundNumber(targetAverage, 2),
         combinedEstimatedAverageOrdersPerActiveDropWeek: roundNumber(
           combinedOrderCount / combinedActiveDropWeeks,
@@ -709,7 +827,12 @@ function buildConsolidationSummary(site = {}, recommendations = []) {
     return `Review manually; no pickup sites under ${CONSOLIDATION_RADIUS_MILES} miles were found.`;
   }
   const best = recommendations[0];
-  return `Consider ${best.name} (${best.distanceMiles} mi, ${best.qualityScore}/10 quality, ${best.averageOrdersPerActiveDropWeek} avg orders/wk, ${best.recommendationScore}/100 fit).`;
+  const cycleNote = best.alternateDropDayCycle
+    ? `, alternate ${best.dropDayCycle?.shortLabel || "drop cycle"} option`
+    : best.sameDropDayCycle
+      ? `, ${best.dropDayCycle?.shortLabel || "same cycle"} cycle`
+      : "";
+  return `Consider ${best.name} (${best.distanceMiles} mi, ${best.qualityScore}/10 performance, ${best.averageOrdersPerActiveDropWeek} avg orders/wk, ${best.recommendationScore}/100 fit${cycleNote}).`;
 }
 
 function attachDropSiteQualityAndRecommendations(rankedSites = []) {
@@ -719,6 +842,7 @@ function attachDropSiteQualityAndRecommendations(rankedSites = []) {
       !isHomeDeliverySite(site) && !isMembershipPurchaseDropSite(site);
     return {
       ...site,
+      dropDayCycle: buildDropSiteDayCycle(site),
       qualityScore: quality.score,
       qualityScoreRaw: quality.rawScore,
       qualityScoreDetails: quality,
@@ -943,6 +1067,7 @@ export async function buildDropSitePerformancePayload({
     active: Boolean(row.active),
     isOnlineOnlyMembership: isMembershipPurchaseDropSite(row),
     area: getPublicAreaLabel(row),
+    dropDayCycle: buildDropSiteDayCycle(row),
     ...(includeHostContact ? { derivedHostContact: extractDropSiteHostContact(row) } : {})
   }));
 
@@ -1131,6 +1256,7 @@ export async function buildDropSitePerformancePayload({
           source: site.source,
           active: site.active,
           dayOfWeek: site.dayOfWeek || null,
+          dropDayCycle: site.dropDayCycle || buildDropSiteDayCycle(site),
           openTime: site.openTime || null,
           closeTime: site.closeTime || null,
           type: site.type || null,

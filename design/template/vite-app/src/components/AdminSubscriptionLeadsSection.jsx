@@ -10,6 +10,8 @@ const STATUS_OPTIONS = [
 ];
 
 const STATUS_FILTER_OPTIONS = [{ value: "all", label: "All statuses" }, ...STATUS_OPTIONS];
+const UNSAVED_CHANGES_WARNING =
+  "You have unsaved subscription lead changes. Click Save before navigating away.";
 
 function formatDateTime(value) {
   if (!value) return "Unknown";
@@ -451,6 +453,57 @@ export function AdminSubscriptionLeadsSection({ token }) {
     () => filterLeadsByStatus(leads, statusFilter),
     [leads, statusFilter]
   );
+  const unsavedLeadCount = useMemo(
+    () =>
+      leads.reduce((count, lead) => {
+        const draft = drafts[lead.id] || createLeadDraft(lead);
+        return draftChanged(lead, draft) ? count + 1 : count;
+      }, 0),
+    [drafts, leads]
+  );
+  const hasUnsavedChanges = unsavedLeadCount > 0;
+
+  useEffect(() => {
+    if (!hasUnsavedChanges) return undefined;
+
+    function handleBeforeUnload(event) {
+      event.preventDefault();
+      event.returnValue = UNSAVED_CHANGES_WARNING;
+      return UNSAVED_CHANGES_WARNING;
+    }
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [hasUnsavedChanges]);
+
+  useEffect(() => {
+    if (!hasUnsavedChanges) return undefined;
+
+    function handleDocumentClick(event) {
+      const target = event.target instanceof Element ? event.target : null;
+      if (!target) return;
+      const navItem = target.closest(".admin-nav-item");
+      const link = target.closest("a[href]");
+      if (!navItem && !link) return;
+      if (window.confirm(`${UNSAVED_CHANGES_WARNING}\n\nLeave without saving?`)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      if (typeof event.stopImmediatePropagation === "function") {
+        event.stopImmediatePropagation();
+      }
+    }
+
+    document.addEventListener("click", handleDocumentClick, true);
+    return () => document.removeEventListener("click", handleDocumentClick, true);
+  }, [hasUnsavedChanges]);
+
+  function confirmDiscardUnsavedChanges() {
+    return (
+      !hasUnsavedChanges ||
+      window.confirm(`${UNSAVED_CHANGES_WARNING}\n\nContinue without saving?`)
+    );
+  }
+
   function updateDraft(leadId, updates) {
     setDrafts((current) => ({
       ...current,
@@ -532,13 +585,22 @@ export function AdminSubscriptionLeadsSection({ token }) {
       </div>
       {message ? <div className="small">{message}</div> : null}
       {error ? <div className="small">{error}</div> : null}
+      {hasUnsavedChanges ? (
+        <div className="subscription-leads-unsaved-warning" role="alert">
+          {UNSAVED_CHANGES_WARNING} {unsavedLeadCount}{" "}
+          {unsavedLeadCount === 1 ? "lead has" : "leads have"} unsaved edits.
+        </div>
+      ) : null}
       <div className="button-row" style={{ marginBottom: 12 }}>
         <label className="small" style={{ display: "flex", alignItems: "center", gap: 8 }}>
           Status
           <select
             className="input"
             value={statusFilter}
-            onChange={(event) => setStatusFilter(event.target.value)}
+            onChange={(event) => {
+              if (!confirmDiscardUnsavedChanges()) return;
+              setStatusFilter(event.target.value);
+            }}
             style={{ width: 160 }}
           >
             {STATUS_FILTER_OPTIONS.map((option) => (
@@ -556,7 +618,15 @@ export function AdminSubscriptionLeadsSection({ token }) {
         >
           {exportingLeads ? "Exporting..." : "Export CSV"}
         </button>
-        <button className="button alt" type="button" onClick={loadLeads} disabled={loading}>
+        <button
+          className="button alt"
+          type="button"
+          onClick={() => {
+            if (!confirmDiscardUnsavedChanges()) return;
+            loadLeads();
+          }}
+          disabled={loading}
+        >
           Refresh
         </button>
       </div>
@@ -699,8 +769,9 @@ export function AdminSubscriptionLeadsSection({ token }) {
                             <button
                               className="subscription-leads-action-button"
                               type="button"
-                              aria-label="Done"
-                              title="Done"
+                              aria-label="Done editing"
+                              title="Done editing"
+                              disabled={savingLeadId === lead.id}
                               onClick={() => setEditingNotesLeadId(null)}
                             >
                               <CheckIcon />
