@@ -5203,6 +5203,72 @@ router.get("/products", requireAdmin, async (_req, res) => {
   });
 });
 
+router.get("/inventory-products", requireAdminPermission("inventory_admin"), async (_req, res) => {
+  const db = getDb();
+  const categoryRows = await db.select().from(categories);
+  const membershipCategoryIds = new Set(
+    categoryRows
+      .filter((category) => isMembershipCategoryName(category.name))
+      .map((category) => Number(category.id))
+  );
+  const productRows = (await db
+    .select({
+      id: products.id,
+      name: products.name,
+      visible: products.visible,
+      trackInventory: products.trackInventory,
+      inventory: products.inventory,
+      categoryId: products.categoryId,
+      vendorId: products.vendorId
+    })
+    .from(products))
+    .filter((product) => !membershipCategoryIds.has(Number(product.categoryId)));
+  const productIds = productRows.map((row) => row.id);
+  const [packageRows, saleRows] = productIds.length
+    ? await Promise.all([
+        db
+          .select({
+            id: packages.id,
+            productId: packages.productId,
+            name: packages.name,
+            price: packages.price
+          })
+          .from(packages)
+          .where(inArray(packages.productId, productIds)),
+        db
+          .select({
+            productId: productSales.productId,
+            onSale: productSales.onSale,
+            saleDiscount: productSales.saleDiscount
+          })
+          .from(productSales)
+          .where(inArray(productSales.productId, productIds))
+      ])
+    : [[], []];
+
+  const packagesByProduct = packageRows.reduce((acc, row) => {
+    if (!acc[row.productId]) acc[row.productId] = [];
+    acc[row.productId].push(row);
+    return acc;
+  }, {});
+  const salesByProduct = saleRows.reduce((acc, row) => {
+    acc[row.productId] = {
+      onSale: Boolean(row.onSale),
+      saleDiscount: row.saleDiscount !== null ? Number(row.saleDiscount) : null
+    };
+    return acc;
+  }, {});
+
+  res.json({
+    products: productRows.map((row) => ({
+      ...row,
+      packages: packagesByProduct[row.id] || [],
+      onSale: salesByProduct[row.id]?.onSale ?? false,
+      saleDiscount: salesByProduct[row.id]?.saleDiscount ?? null
+    }))
+  });
+});
+
 router.get("/products/:id", requireAdmin, async (req, res) => {
   const db = getDb();
   const productId = Number(req.params.id);

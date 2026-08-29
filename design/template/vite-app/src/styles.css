@@ -3452,6 +3452,25 @@ img {
   max-height: 860px;
 }
 
+.inventory-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  padding: 8px 10px;
+  border: 1px solid rgba(31, 27, 23, 0.1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.inventory-table-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 150px;
+}
+
 .inventory-package-cell {
   white-space: normal;
 }

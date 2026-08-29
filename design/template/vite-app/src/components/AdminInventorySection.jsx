@@ -70,6 +70,7 @@ function normalizeInventoryEdit(changes, defaults) {
 export function AdminInventorySection({
   token,
   products,
+  loading = false,
   categories,
   vendors,
   onDataRefresh,
@@ -385,6 +386,13 @@ export function AdminInventorySection({
 
         {message ? <div className="small">{message}</div> : null}
 
+        {loading && inventoryProducts.length ? (
+          <div className="inventory-loading" role="status" aria-live="polite">
+            <span className="loading-spinner" aria-hidden="true" />
+            <span className="small">Loading inventory products...</span>
+          </div>
+        ) : null}
+
         <div className="admin-table-shell inventory-table-shell">
           <table
             className="admin-table admin-table-head"
@@ -436,7 +444,16 @@ export function AdminInventorySection({
                 <col style={{ width: "110px" }} />
               </colgroup>
               <tbody>
-                {filteredProducts.length ? (
+                {loading && !inventoryProducts.length ? (
+                  <tr>
+                    <td colSpan="10">
+                      <div className="inventory-table-loading">
+                        <span className="loading-spinner" aria-hidden="true" />
+                        <span className="small">Loading inventory products...</span>
+                      </div>
+                    </td>
+                  </tr>
+                ) : filteredProducts.length ? (
                   filteredProducts.map((product) => {
                     const defaults = getProductDefaults(product);
                     const edits = inventoryEdits[product.id];

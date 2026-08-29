@@ -763,14 +763,6 @@ export function Storefront() {
             <div className="utility-actions">
               {isMember ? (
                 <>
-                  <a className={`button alt${isAccountView ? " selected" : ""}`} href="#/account">
-                    Member Settings
-                  </a>
-                  {isAdmin ? (
-                    <a className={`button alt${isAdminView ? " selected" : ""}`} href="#/admin">
-                      Administrator Settings
-                    </a>
-                  ) : null}
                   {showMemberCart ? (
                     <button className="button alt" type="button">
                       Cart (2)

@@ -716,6 +716,10 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
   const [pushProductLoading, setPushProductLoading] = useState(false);
   const [products, setProducts] = useState([]);
   const [productsLoaded, setProductsLoaded] = useState(false);
+  const [productsLoading, setProductsLoading] = useState(false);
+  const [inventoryProducts, setInventoryProducts] = useState([]);
+  const [inventoryProductsLoaded, setInventoryProductsLoaded] = useState(false);
+  const [inventoryProductsLoading, setInventoryProductsLoading] = useState(false);
   const [categories, setCategories] = useState([]);
   const [vendors, setVendors] = useState([]);
   const [recipes, setRecipes] = useState([]);
@@ -877,7 +881,6 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
 
   function needsProductsData() {
     return (
-      activeSection === "inventory" ||
       activeSection === "membership" ||
       (productEditorMode === "new" && activeSection !== "localPricelist")
     );
@@ -901,6 +904,8 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
     localStorage.removeItem("adminToken");
     setToken("");
     setCurrentAdmin(null);
+    setProductsLoading(false);
+    setInventoryProductsLoading(false);
     setLoading(false);
     setMessage("");
     setLoginMode("login");
@@ -916,10 +921,26 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
   }
 
   async function loadProductsData() {
-    const productData = await adminGet("products", token);
-    setProducts(productData.products || []);
-    setProductsLoaded(true);
-    setProductEdits({});
+    setProductsLoading(true);
+    try {
+      const productData = await adminGet("products", token);
+      setProducts(productData.products || []);
+      setProductsLoaded(true);
+      setProductEdits({});
+    } finally {
+      setProductsLoading(false);
+    }
+  }
+
+  async function loadInventoryProductsData() {
+    setInventoryProductsLoading(true);
+    try {
+      const productData = await adminGet("inventory-products", token);
+      setInventoryProducts(productData.products || []);
+      setInventoryProductsLoaded(true);
+    } finally {
+      setInventoryProductsLoading(false);
+    }
   }
 
   async function loadLocalPricelistData() {
@@ -1056,9 +1077,10 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
     if (!token) return;
     setLoading(true);
     try {
-      await loadCoreAdminData();
-
-      const loaders = [];
+      const loaders = [loadCoreAdminData()];
+      if (inventoryProductsLoaded || activeSection === "inventory") {
+        loaders.push(loadInventoryProductsData());
+      }
       if (productsLoaded || needsProductsData()) loaders.push(loadProductsData());
       if (recipesLoaded || activeSection === "recipes") loaders.push(loadRecipesData());
       if (reviewsLoaded || activeSection === "reviews") loaders.push(loadReviewsData());
@@ -1102,6 +1124,10 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
       localStorage.setItem("adminToken", token);
       setProducts([]);
       setProductsLoaded(false);
+      setProductsLoading(false);
+      setInventoryProducts([]);
+      setInventoryProductsLoaded(false);
+      setInventoryProductsLoading(false);
       setSelectedProductDetail(null);
       setLocalPricelistProducts([]);
       setLocalPricelistPage(1);
@@ -1244,6 +1270,30 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
       cancelled = true;
     };
   }, [token, activeSection, productEditorMode, selectedProductId, productsLoaded]);
+
+  useEffect(() => {
+    if (!token || inventoryProductsLoaded || activeSection !== "inventory") {
+      return;
+    }
+
+    let cancelled = false;
+    setLoading(true);
+    loadInventoryProductsData()
+      .catch((error) => {
+        if (!cancelled) {
+          handleAdminRequestError(error, "Failed to load inventory products.");
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [token, activeSection, inventoryProductsLoaded]);
 
   useEffect(() => {
     if (!token || !selectedProductId || productEditorMode === "new" || activeSection === "localPricelist") {
@@ -5401,7 +5451,8 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
           {activeSection === "inventory" && canManageInventory && (
             <AdminInventorySection
               token={token}
-              products={products}
+              products={inventoryProducts}
+              loading={inventoryProductsLoading || !inventoryProductsLoaded || loading}
               categories={categories}
               vendors={vendors}
               onDataRefresh={loadAll}
