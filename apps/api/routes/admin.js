@@ -5520,13 +5520,26 @@ router.get("/local-pricelist-products", requireAdmin, async (req, res) => {
   const [pagedProductRows] = await pool.query(
     `
       SELECT
-        p.*,
+        p.id,
+        p.name,
+        p.description,
+        p.visible,
+        p.track_inventory AS trackInventory,
+        p.inventory,
+        p.category_id AS categoryId,
+        p.vendor_id AS vendorId,
+        p.thumbnail_url AS thumbnailUrl,
+        p.created_at AS createdAt,
+        p.updated_at AS updatedAt,
+        p.is_deleted AS isDeleted,
         COALESCE(ps.on_sale, 0) AS onSale,
         ps.sale_discount AS saleDiscount,
-        c.name AS categoryName
+        c.name AS categoryName,
+        v.name AS vendorName
       FROM products p
       LEFT JOIN product_sales ps ON ps.product_id = p.id
       LEFT JOIN categories c ON c.id = p.category_id
+      LEFT JOIN vendors v ON v.id = p.vendor_id
       ${whereSql}
       ORDER BY p.name ASC
       LIMIT ? OFFSET ?
@@ -10621,16 +10634,20 @@ router.post("/products/bulk-update", requireAdminPermission(["inventory_admin", 
           }
         }
 
-        if (existingProfile.length) {
+        const profileValues = Object.fromEntries(
+          Object.entries(profileUpdatePayload).filter(([, value]) => typeof value !== "undefined")
+        );
+
+        if (existingProfile.length && Object.keys(profileValues).length) {
           await db
             .update(productPricingProfiles)
-            .set(profileUpdatePayload)
+            .set(profileValues)
             .where(eq(productPricingProfiles.productId, productId));
-        } else if (Object.values(profileUpdatePayload).some((value) => typeof value !== "undefined")) {
+        } else if (!existingProfile.length && Object.keys(profileValues).length) {
           await db.insert(productPricingProfiles).values({
             productId,
-            ...profileUpdatePayload,
-            createdAt: profileUpdatePayload.updatedAt || new Date()
+            ...profileValues,
+            createdAt: profileValues.updatedAt || new Date()
           });
         }
       }

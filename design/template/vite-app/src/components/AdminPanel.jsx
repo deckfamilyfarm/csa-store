@@ -866,7 +866,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
   }
 
   async function refreshSelectedProductDetail(productId = selectedProductId) {
-    if (!token || !productId || activeSection === "localPricelist") {
+    if (!token || !productId) {
       setSelectedProductDetail(null);
       return;
     }
@@ -1087,7 +1087,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
       if (dropSitesLoaded || activeSection === "dropSites") loaders.push(loadDropSitesData());
       if (activeSection === "localLine") loaders.push(loadLocalLineStatusData());
       await Promise.all(loaders);
-      if (selectedProductId && productEditorMode !== "new" && activeSection !== "localPricelist") {
+      if (selectedProductId && productEditorMode !== "new") {
         await refreshSelectedProductDetail(selectedProductId);
       }
     } catch (err) {
@@ -1296,7 +1296,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
   }, [token, activeSection, inventoryProductsLoaded]);
 
   useEffect(() => {
-    if (!token || !selectedProductId || productEditorMode === "new" || activeSection === "localPricelist") {
+    if (!token || !selectedProductId || productEditorMode === "new") {
       setSelectedProductDetail(null);
       return;
     }
@@ -2221,11 +2221,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
         await adminPut(`products/${activeProduct.id}/pricing-profile`, token, sourcePricingPayload);
       }
 
-      const linkedLocalLineProductId =
-        Number(activeProduct?.localLineMeta?.localLineProductId) ||
-        Number(localLineProductDetail?.productMeta?.localLineProductId) ||
-        0;
-      if (pushToLocalLineOnSave && linkedLocalLineProductId <= 0) {
+      if (pushToLocalLineOnSave) {
         await adminPost(`products/${activeProduct.id}/push-to-localline`, token, {});
       }
 
@@ -2234,6 +2230,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
       await refreshCatalogFromAdmin();
       setPricelistRefreshNonce((prev) => prev + 1);
       await refreshSelectedProductDetail(activeProduct.id);
+      setPushToLocalLineOnSave(false);
       setMessage(pushToLocalLineOnSave ? "Product updated and pushed to Local Line." : "Product updated.");
     } catch (err) {
       setMessage(err?.message || "Product update failed.");
@@ -4488,7 +4485,6 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                       ) : null}
                     </>
                   ) : null}
-                  {!isLocalPricelistView ? (
                   <div className="admin-price-list">
                     <div className="admin-actions">
                       <div className="small">Packages</div>
@@ -4501,7 +4497,9 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                     {(productDraft.packages || []).map((pkg, index) => (
                       <div key={pkg.id || `draft-package-${index}`} className="admin-grid">
                         <label className="filter-field">
-                          <span className="small">Package name</span>
+                          <span className="small">
+                            {isLocalPricelistView ? "Package / Weight Range" : "Package name"}
+                          </span>
                           <input
                             className="input"
                             value={pkg.name}
@@ -4522,8 +4520,10 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                             onChange={(event) =>
                               updateDraftPackage(index, { price: event.target.value })
                             }
+                            disabled={isLocalPricelistView && selectedDraftUsesSourcePricing}
+                            readOnly={isLocalPricelistView && selectedDraftUsesSourcePricing}
                           />
-                          {selectedDraftUsesSourcePricing ? (
+                          {selectedDraftUsesSourcePricing && !isLocalPricelistView ? (
                             <div className="small">
                               Auto-calculated CSA Package Price used for the local store and Local
                               Line package price push.
@@ -4532,16 +4532,18 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                         </label>
                         {productEditorMode === "new" ? (
                           <>
-                            <label className="filter-field">
-                              <span className="small">Unit</span>
-                              <input
-                                className="input"
-                                value={pkg.unit}
-                                onChange={(event) =>
-                                  updateDraftPackage(index, { unit: event.target.value })
-                                }
-                              />
-                            </label>
+                            {!isLocalPricelistView ? (
+                              <label className="filter-field">
+                                <span className="small">Unit</span>
+                                <input
+                                  className="input"
+                                  value={pkg.unit}
+                                  onChange={(event) =>
+                                    updateDraftPackage(index, { unit: event.target.value })
+                                  }
+                                />
+                              </label>
+                            ) : null}
                             <div className="admin-actions">
                               <button
                                 className="button alt"
@@ -4557,7 +4559,6 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                       </div>
                     ))}
                   </div>
-                  ) : null}
                   {productEditorMode === "existing" && !isLocalPricelistView ? (
                     <div className="admin-price-list">
                       <div className="admin-actions">
@@ -4727,44 +4728,42 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                       </button>
                     </div>
                   ) : null}
-                  {!isLocalPricelistView ? (
                   <>
-                  <label className="filter-toggle">
-                    <input
-                      type="checkbox"
-                      checked={productDraft.visible}
-                      onChange={(event) =>
-                        setProductDraft((prev) => ({ ...prev, visible: event.target.checked }))
-                      }
+                    <label className="filter-toggle">
+                      <input
+                        type="checkbox"
+                        checked={productDraft.visible}
+                        onChange={(event) =>
+                          setProductDraft((prev) => ({ ...prev, visible: event.target.checked }))
+                        }
                       />
-                    <span>Visible</span>
-                  </label>
-                  <label className="filter-toggle">
-                    <input
-                      type="checkbox"
-                      checked={productDraft.trackInventory}
-                      onChange={(event) =>
-                        setProductDraft((prev) => ({ ...prev, trackInventory: event.target.checked }))
-                      }
-                    />
-                    <span>Track inventory</span>
-                  </label>
-                  <label className="filter-field">
-                    <span className="small">Inventory</span>
-                    <input
-                      className="input"
-                      type="number"
-                      value={productDraft.inventory}
-                      onChange={(event) =>
-                        setProductDraft((prev) => ({
-                          ...prev,
-                          inventory: Number(event.target.value) || 0
-                        }))
-                      }
-                    />
-                  </label>
+                      <span>Visible</span>
+                    </label>
+                    <label className="filter-toggle">
+                      <input
+                        type="checkbox"
+                        checked={productDraft.trackInventory}
+                        onChange={(event) =>
+                          setProductDraft((prev) => ({ ...prev, trackInventory: event.target.checked }))
+                        }
+                      />
+                      <span>Track inventory</span>
+                    </label>
+                    <label className="filter-field">
+                      <span className="small">Inventory</span>
+                      <input
+                        className="input"
+                        type="number"
+                        value={productDraft.inventory}
+                        onChange={(event) =>
+                          setProductDraft((prev) => ({
+                            ...prev,
+                            inventory: Number(event.target.value) || 0
+                          }))
+                        }
+                      />
+                    </label>
                   </>
-                  ) : null}
                   <div className="admin-sale-fields">
                     <label className="admin-inline-toggle-field">
                       <span className="small">On sale</span>

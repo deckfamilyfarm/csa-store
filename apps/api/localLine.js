@@ -31,6 +31,15 @@ function parseNumber(value, fallback = null) {
   return Number.isFinite(num) ? num : fallback;
 }
 
+function toBooleanFlag(value) {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") return value !== 0;
+  const normalized = String(value ?? "").trim().toLowerCase();
+  if (["1", "true", "yes", "on"].includes(normalized)) return true;
+  if (["0", "false", "no", "off", ""].includes(normalized)) return false;
+  return Boolean(value);
+}
+
 function roundCurrency(value) {
   return Number(Number(value).toFixed(2));
 }
@@ -565,10 +574,10 @@ async function upsertLocalLinePackageMetaRows(db, productId, localPackageRows, r
 function buildInventoryPayload(changes) {
   const payload = {};
   if (typeof changes.visible !== "undefined") {
-    payload.visible = Boolean(changes.visible);
+    payload.visible = toBooleanFlag(changes.visible);
   }
   if (typeof changes.trackInventory !== "undefined") {
-    payload.track_inventory = Boolean(changes.trackInventory);
+    payload.track_inventory = toBooleanFlag(changes.trackInventory);
   }
   if (typeof changes.inventory !== "undefined") {
     const inventory = Number(changes.inventory);
@@ -580,6 +589,14 @@ function buildInventoryPayload(changes) {
     }
   }
   return payload;
+}
+
+function getLocalLineUpdateFailureMessage(result = {}) {
+  const failed = [];
+  if (result.inventoryOk === false) failed.push("visibility/inventory");
+  if (result.priceOk === false) failed.push("pricing");
+  if (result.imagesOk === false) failed.push("images");
+  return failed.length ? `Local Line sync failed for ${failed.join(", ")}.` : null;
 }
 
 function buildPriceListEntry(basePrice, regularBasePrice, entry, markupDecimal, saleEnabled, saleDiscount) {
@@ -664,7 +681,38 @@ async function updateLocalLineInventory(db, productId, changes) {
   }
   const token = await getLocalLineAccessToken();
   await patchLocalLineProduct(remoteProductId, token, payload);
-  return { ok: true };
+  const remoteProduct = await fetchLocalLineProduct(remoteProductId, token);
+  const localPackageRows = await db
+    .select()
+    .from(packages)
+    .where(eq(packages.productId, productId))
+    .catch(() => []);
+  await upsertLocalLineProductMeta(db, productId, remoteProductId, {
+    status: remoteProduct?.status || null,
+    visible: typeof remoteProduct?.visible === "boolean" ? (remoteProduct.visible ? 1 : 0) : null,
+    trackInventory:
+      typeof remoteProduct?.track_inventory === "boolean"
+        ? (remoteProduct.track_inventory ? 1 : 0)
+        : null,
+    inventoryType: remoteProduct?.inventory_type || null,
+    productInventory: parseNumber(remoteProduct?.inventory),
+    packageCodesEnabled:
+      typeof remoteProduct?.package_codes_enabled === "boolean"
+        ? (remoteProduct.package_codes_enabled ? 1 : 0)
+        : null,
+    rawJson: JSON.stringify(remoteProduct || {}),
+    lastSyncedAt: new Date()
+  });
+  await upsertLocalLinePackageMetaRows(db, productId, localPackageRows, remoteProduct?.packages || []);
+
+  const visibleMatches =
+    !Object.prototype.hasOwnProperty.call(payload, "visible") ||
+    remoteProduct?.visible === payload.visible;
+  const trackInventoryMatches =
+    !Object.prototype.hasOwnProperty.call(payload, "track_inventory") ||
+    remoteProduct?.track_inventory === payload.track_inventory;
+
+  return { ok: visibleMatches && trackInventoryMatches };
 }
 
 async function updateLocalLinePrices(db, productId, changes) {
@@ -892,7 +940,7 @@ export async function createLocalLineProductFromStoreProduct(db, productId) {
   const saleRows = await db.select().from(productSales).where(eq(productSales.productId, productId));
   const saleRow = saleRows[0] || null;
   if (Number.isFinite(existingRemoteProductId) && existingRemoteProductId > 0) {
-    await updateLocalLineForProduct(db, productId, {
+    const updateResult = await updateLocalLineForProduct(db, productId, {
       visible: product.visible,
       trackInventory: product.trackInventory,
       inventory: product.inventory,
@@ -904,6 +952,10 @@ export async function createLocalLineProductFromStoreProduct(db, productId) {
       forcePriceSync: true,
       forceImageSync: true
     });
+    const failureMessage = getLocalLineUpdateFailureMessage(updateResult);
+    if (failureMessage) {
+      throw new Error(failureMessage);
+    }
     return {
       ok: true,
       alreadyLinked: true,
@@ -974,10 +1026,10 @@ export async function createLocalLineProductFromStoreProduct(db, productId) {
   const payload = {
     name: product.name,
     description: product.description || "",
-    visible: Boolean(product.visible),
-    track_inventory: Boolean(product.trackInventory),
+    visible: toBooleanFlag(product.visible),
+    track_inventory: toBooleanFlag(product.trackInventory),
     set_inventory:
-      Number(product.trackInventory) || Number(product.inventory) === 0
+      toBooleanFlag(product.trackInventory) || Number(product.inventory) === 0
         ? parseNumber(product.inventory, 0)
         : undefined,
     base_unit_id: baseUnitId,
