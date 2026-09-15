@@ -35,6 +35,16 @@ export const ADMIN_ROLE_DEFINITIONS = [
     description: "Push approved local changes to Local Line."
   },
   {
+    key: "square_pull",
+    label: "Square Pull",
+    description: "Refresh Square catalog data and review Square product matches."
+  },
+  {
+    key: "square_push",
+    label: "Square Push",
+    description: "Push approved local price changes to Square."
+  },
+  {
     key: "dropsite_admin",
     label: "Drop Site Admin",
     description: "Add and update drop sites."

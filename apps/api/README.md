@@ -26,6 +26,9 @@ Schema notes
   `local_line_sync_runs`,
   `local_line_sync_issues`.
 - Subscriber snapshots are cached locally in `local_line_subscription_snapshot_rows` and `local_line_subscription_snapshot_runs`.
+- Square Online catalog cache, approved package-to-variation links, and sync history are stored in
+  `square_catalog_items`, `square_catalog_variations`, `square_variation_links`,
+  `square_sync_runs`, and `square_sync_results`.
 - `New Subscribers`, `Exiting Subscribers`, and the non-SNAP portion of `Total Subscribers`
   are counted from the subscription export's `Created` and `Cancelled Date` fields for each
   dashboard week. This avoids treating a late live export as a true point-in-time snapshot
@@ -55,8 +58,27 @@ Endpoints
 - POST /api/admin/admin-users
 - PUT /api/admin/admin-users/:id
 - POST /api/admin/admin-users/:id/reset-password
+- GET /api/admin/square/status
+- POST /api/admin/square/cache-sync
+- GET /api/admin/square/matches
+- POST /api/admin/square/matches/approve
+- POST /api/admin/square/matches/unlink
+- POST /api/admin/square/audit-prices
+- POST /api/admin/square/apply-prices
 - POST /api/admin/recipes
 - PUT /api/admin/recipes/:id
+
+Square Online price sync
+- V1 treats CSA Store as the source of truth and pushes the CSA Store price for Square
+  to approved existing Square item variations. Formula-priced products use Vendor's Retail Price
+  directly without FFCSA factor, package weight/quantity, or customer markup; standard products use
+  the local package price. It does
+  not create Square catalog items, sync inventory, or manage Square Online channel visibility.
+- Configure `SQUARE_ACCESS_TOKEN`, `SQUARE_ENVIRONMENT=sandbox|production`,
+  `SQUARE_LOCATION_ID`, optional `SQUARE_API_VERSION` (default `2026-08-19`), and
+  `SQUARE_CURRENCY` (default `USD`).
+- Grant `square_pull` to refresh Square catalog data and approve matches. Grant `square_push` to
+  apply audited price changes to Square.
 
 Timesheets admin login
 - When `TIMESHEETS_API_URL` is set, `/api/admin/login` validates the submitted username/password

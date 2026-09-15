@@ -3204,6 +3204,109 @@ img {
   color: var(--navy);
 }
 
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.admin-section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.admin-subsection {
+  display: grid;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.admin-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 16px 0 8px;
+}
+
+.metric-card {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.metric-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(31, 27, 23, 0.64);
+  text-transform: uppercase;
+}
+
+.metric-value {
+  color: var(--navy);
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.metric-value-small {
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.form-message {
+  margin: 12px 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+.form-message.success {
+  background: rgba(80, 104, 59, 0.13);
+  color: #2f4e34;
+}
+
+.form-message.error {
+  background: rgba(143, 46, 43, 0.12);
+  color: var(--barn);
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: #eef2f7;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+.status-pill.changed,
+.status-pill.updated,
+.status-pill.submitted {
+  background: rgba(80, 104, 59, 0.15);
+  color: #2f4e34;
+}
+
+.status-pill.blocked,
+.status-pill.failed {
+  background: rgba(143, 46, 43, 0.12);
+  color: var(--barn);
+}
+
+.status-pill.synced,
+.status-pill.skipped {
+  background: #eef2f7;
+  color: #475569;
+}
+
 .local-pricelist-table {
   width: 100%;
   min-width: 0;
@@ -4613,7 +4716,34 @@ img {
 .admin-actions {
   margin: 12px 0 18px;
   display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
   justify-content: flex-end;
+}
+
+.admin-actions .button.text {
+  border-color: transparent;
+  background: transparent;
+  color: var(--barn);
+  box-shadow: none;
+}
+
+.admin-section-header .admin-actions,
+.admin-table .admin-actions {
+  margin: 0;
+}
+
+.admin-table .admin-actions {
+  justify-content: flex-start;
+}
+
+.compact-input {
+  margin-top: 6px;
+  max-width: 280px;
+  min-height: 34px;
+  padding: 6px 8px;
+  font-size: 12px;
 }
 
 .admin-inline-audit {

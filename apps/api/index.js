@@ -7,6 +7,7 @@ import cors from "cors";
 import {
   ensureLiabilityReleaseSchema,
   ensureLocalLineSyncSchema,
+  ensureSquareSyncSchema,
   ensureSubscriptionPortalSchema,
   initDb
 } from "./db.js";
@@ -57,6 +58,9 @@ ensureSubscriptionPortalSchema().catch((err) => {
 });
 ensureLiabilityReleaseSchema().catch((err) => {
   console.error("Liability release schema bootstrap failed:", err.message);
+});
+ensureSquareSyncSchema().catch((err) => {
+  console.error("Square schema bootstrap failed:", err.message);
 });
 
 if (process.env.AUTO_SEED_ADMIN === "true") {

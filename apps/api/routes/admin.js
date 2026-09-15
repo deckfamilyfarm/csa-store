@@ -12,6 +12,7 @@ import {
   ensureSubscriberCaptureSchema,
   ensureSiteContentSchema,
   ensureSubscriptionPortalSchema,
+  ensureSquareSyncSchema,
   ensureAdminAccessSchema,
   ensureAdminPricelistIndexes,
   ensureLocalLineSyncSchema,
@@ -132,6 +133,15 @@ import {
   retryScheduledPricelistBatch,
   runScheduledPricelistBatch
 } from "../lib/scheduledPricelistReleases.js";
+import {
+  applySquarePrices,
+  approveSquareVariationLink,
+  auditSquarePrices,
+  buildSquareMatchReview,
+  getSquareStatus,
+  syncSquareCatalogCache,
+  unlinkSquareVariation
+} from "../lib/squareStoreSync.js";
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -168,6 +178,9 @@ router.use(async (_req, _res, next) => {
   });
   await ensureSiteContentSchema().catch((error) => {
     console.warn("Site content schema bootstrap skipped:", error.message);
+  });
+  await ensureSquareSyncSchema().catch((error) => {
+    console.warn("Square schema bootstrap skipped:", error.message);
   });
   next();
 });
@@ -343,6 +356,49 @@ function toBooleanFlag(value, fallback = false) {
 function toInventoryValue(value, fallback = 0) {
   const numeric = toOptionalInteger(value, fallback);
   return Number.isFinite(numeric) ? numeric : fallback;
+}
+
+function resolveAdminProductPricingProfile({
+  product = null,
+  packageRows = [],
+  packageMetaRows = [],
+  pricingProfile = null,
+  saleRow = null,
+  vendor = null
+}) {
+  const productId = Number(product?.id ?? pricingProfile?.productId);
+  if (!Number.isFinite(productId) || !isSourcePricingVendor(vendor)) {
+    return pricingProfile || null;
+  }
+
+  const mergedProfile = {
+    ...(pricingProfile || {}),
+    productId,
+    onSale: saleRow?.onSale ?? pricingProfile?.onSale ?? 0,
+    saleDiscount: saleRow?.saleDiscount ?? pricingProfile?.saleDiscount ?? 0
+  };
+  const packageMetaByPackageId = new Map(
+    (packageMetaRows || [])
+      .map((row) => [Number(row.packageId), row])
+      .filter(([packageId]) => Number.isFinite(packageId))
+  );
+  const snapshot = computeProductPricingSnapshot({
+    product,
+    packages: packageRows || [],
+    packageMetaByPackageId,
+    vendor,
+    profile: mergedProfile
+  });
+
+  return {
+    ...mergedProfile,
+    ...snapshot.profile,
+    remoteSyncStatus: pricingProfile?.remoteSyncStatus || "not-applied",
+    remoteSyncMessage: pricingProfile?.remoteSyncMessage || "",
+    remoteSyncedAt: pricingProfile?.remoteSyncedAt || null,
+    createdAt: pricingProfile?.createdAt || null,
+    updatedAt: pricingProfile?.updatedAt || null
+  };
 }
 
 function isEmailAddress(value) {
@@ -3208,6 +3264,11 @@ async function markProductRemoteSyncPending(connection, productId, message) {
         avg_weight_override, source_multiplier, on_sale, sale_discount,
         remote_sync_status, remote_sync_message, remote_synced_at, created_at, updated_at
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE
+        remote_sync_status = VALUES(remote_sync_status),
+        remote_sync_message = VALUES(remote_sync_message),
+        remote_synced_at = VALUES(remote_synced_at),
+        updated_at = VALUES(updated_at)
     `,
     [
       productId,
@@ -5043,6 +5104,11 @@ router.get("/products", requireAdmin, async (_req, res) => {
   const db = getDb();
   const productRows = await db.select().from(products);
   const productIds = productRows.map((row) => row.id);
+  const vendorIds = [...new Set(
+    productRows
+      .map((row) => Number(row.vendorId))
+      .filter((value) => Number.isFinite(value))
+  )];
 
   await ensureLocalLineSyncSchema().catch((error) => {
     console.warn("Local Line schema bootstrap skipped for /admin/products:", error.message);
@@ -5054,6 +5120,7 @@ router.get("/products", requireAdmin, async (_req, res) => {
   let mediaRows = [];
   let productMetaRows = [];
   let syncIssueRows = [];
+  let packageMetaRows = [];
   if (productIds.length) {
     try {
       mediaRows = await db.select().from(productMedia).where(inArray(productMedia.productId, productIds));
@@ -5076,6 +5143,14 @@ router.get("/products", requireAdmin, async (_req, res) => {
     } catch (error) {
       if (!isMissingTableError(error, "local_line_sync_issues")) throw error;
     }
+    try {
+      packageMetaRows = await db
+        .select()
+        .from(localLinePackageMeta)
+        .where(inArray(localLinePackageMeta.productId, productIds));
+    } catch (error) {
+      if (!isMissingTableError(error, "local_line_package_meta")) throw error;
+    }
   }
 
   const packageRows = productIds.length
@@ -5090,6 +5165,9 @@ router.get("/products", requireAdmin, async (_req, res) => {
 
   const saleRows = productIds.length
     ? await db.select().from(productSales).where(inArray(productSales.productId, productIds))
+    : [];
+  const vendorRows = vendorIds.length
+    ? await db.select().from(vendors).where(inArray(vendors.id, vendorIds))
     : [];
 
   const imagesByProduct = imageRows.reduce((acc, row) => {
@@ -5165,6 +5243,11 @@ router.get("/products", requireAdmin, async (_req, res) => {
     acc[row.productId].push(row);
     return acc;
   }, {});
+  const packageMetaByProduct = packageMetaRows.reduce((acc, row) => {
+    if (!acc[row.productId]) acc[row.productId] = [];
+    acc[row.productId].push(row);
+    return acc;
+  }, {});
   const productMetaByProduct = productMetaRows.reduce((acc, row) => {
     acc[row.productId] = row;
     return acc;
@@ -5185,21 +5268,36 @@ router.get("/products", requireAdmin, async (_req, res) => {
     };
     return acc;
   }, {});
+  const vendorById = vendorRows.reduce((acc, row) => {
+    acc[Number(row.id)] = row;
+    return acc;
+  }, {});
 
   res.json({
-    products: productRows.map((row) => ({
-      ...row,
-      images:
-        imageObjectsByProduct[row.id] ||
-        mediaObjectsByProduct[row.id] ||
-        (imagesByProduct[row.id] || []).map((url) => ({ url, thumbnailUrl: url })),
-      localLineMeta: productMetaByProduct[row.id] || null,
-      pricingProfile: pricingProfileByProduct[row.id] || null,
-      localLineSyncIssueCount: syncIssueCountsByProduct[row.id] || 0,
-      packages: packagesByProduct[row.id] || [],
-      onSale: salesByProduct[row.id]?.onSale ?? false,
-      saleDiscount: salesByProduct[row.id]?.saleDiscount ?? null
-    }))
+    products: productRows.map((row) => {
+      const productPackages = packagesByProduct[row.id] || [];
+      const saleRow = salesByProduct[row.id] || null;
+      return {
+        ...row,
+        images:
+          imageObjectsByProduct[row.id] ||
+          mediaObjectsByProduct[row.id] ||
+          (imagesByProduct[row.id] || []).map((url) => ({ url, thumbnailUrl: url })),
+        localLineMeta: productMetaByProduct[row.id] || null,
+        pricingProfile: resolveAdminProductPricingProfile({
+          product: row,
+          packageRows: productPackages,
+          packageMetaRows: packageMetaByProduct[row.id] || [],
+          pricingProfile: pricingProfileByProduct[row.id] || null,
+          saleRow,
+          vendor: vendorById[Number(row.vendorId)] || null
+        }),
+        localLineSyncIssueCount: syncIssueCountsByProduct[row.id] || 0,
+        packages: productPackages,
+        onSale: saleRow?.onSale ?? false,
+        saleDiscount: saleRow?.saleDiscount ?? null
+      };
+    })
   });
 });
 
@@ -5312,11 +5410,23 @@ router.get("/products/:id", requireAdmin, async (req, res) => {
     if (!isMissingTableError(error, "local_line_sync_issues")) throw error;
   }
 
-  const [packageRows, pricingProfileRows, saleRows] = await Promise.all([
+  const [packageRows, pricingProfileRows, saleRows, vendorRows] = await Promise.all([
     db.select().from(packages).where(eq(packages.productId, productId)),
     db.select().from(productPricingProfiles).where(eq(productPricingProfiles.productId, productId)),
-    db.select().from(productSales).where(eq(productSales.productId, productId))
+    db.select().from(productSales).where(eq(productSales.productId, productId)),
+    Number.isFinite(Number(product.vendorId))
+      ? db.select().from(vendors).where(eq(vendors.id, product.vendorId))
+      : Promise.resolve([])
   ]);
+  let packageMetaRows = [];
+  try {
+    packageMetaRows = await db
+      .select()
+      .from(localLinePackageMeta)
+      .where(eq(localLinePackageMeta.productId, productId));
+  } catch (error) {
+    if (!isMissingTableError(error, "local_line_package_meta")) throw error;
+  }
 
   const imagesByProduct = imageRows.reduce((acc, row) => {
     if (!acc[row.productId]) acc[row.productId] = [];
@@ -5410,6 +5520,14 @@ router.get("/products/:id", requireAdmin, async (req, res) => {
     };
     return acc;
   }, {});
+  const resolvedPricingProfile = resolveAdminProductPricingProfile({
+    product,
+    packageRows: packagesByProduct[product.id] || [],
+    packageMetaRows,
+    pricingProfile: pricingProfileByProduct[product.id] || null,
+    saleRow: salesByProduct[product.id] || null,
+    vendor: vendorRows[0] || null
+  });
 
   return res.json({
     product: {
@@ -5419,7 +5537,7 @@ router.get("/products/:id", requireAdmin, async (req, res) => {
         mediaObjectsByProduct[product.id] ||
         (imagesByProduct[product.id] || []).map((url) => ({ url, thumbnailUrl: url })),
       localLineMeta: productMetaByProduct[product.id] || null,
-      pricingProfile: pricingProfileByProduct[product.id] || null,
+      pricingProfile: resolvedPricingProfile,
       localLineSyncIssueCount: syncIssueCountsByProduct[product.id] || 0,
       packages: packagesByProduct[product.id] || [],
       onSale: salesByProduct[product.id]?.onSale ?? false,
@@ -5545,6 +5663,7 @@ router.get("/local-pricelist-products", requireAdmin, async (req, res) => {
     : [[], []];
 
   let productMetaRows = [];
+  let packageMetaRows = [];
   if (pagedProductIds.length) {
     try {
       productMetaRows = await db
@@ -5554,9 +5673,18 @@ router.get("/local-pricelist-products", requireAdmin, async (req, res) => {
     } catch (error) {
       if (!isMissingTableError(error, "local_line_product_meta")) throw error;
     }
+    try {
+      packageMetaRows = await db
+        .select()
+        .from(localLinePackageMeta)
+        .where(inArray(localLinePackageMeta.productId, pagedProductIds));
+    } catch (error) {
+      if (!isMissingTableError(error, "local_line_package_meta")) throw error;
+    }
   }
 
   const categoryMap = new Map(categoryRows.map((row) => [Number(row.id), row.name]));
+  const vendorMap = new Map(vendorRows.map((row) => [Number(row.id), row]));
   const availableCategories = categoryOptionRows.map((row) => ({
     id: Number(row.id),
     name: row.name
@@ -5573,6 +5701,12 @@ router.get("/local-pricelist-products", requireAdmin, async (req, res) => {
   }, {});
   const productMetaByProduct = productMetaRows.reduce((acc, row) => {
     acc[Number(row.productId)] = row;
+    return acc;
+  }, {});
+  const packageMetaByProduct = packageMetaRows.reduce((acc, row) => {
+    const productId = Number(row.productId);
+    if (!acc[productId]) acc[productId] = [];
+    acc[productId].push(row);
     return acc;
   }, {});
 
@@ -5658,22 +5792,37 @@ router.get("/local-pricelist-products", requireAdmin, async (req, res) => {
 
   return res.json({
     categories: availableCategories,
-    products: pagedProductRows.map((product) => ({
-      ...product,
-      categoryName: product.categoryName || categoryMap.get(Number(product.categoryId)) || "Uncategorized",
-      packages: packagesByProduct[Number(product.id)] || [],
-      pricingProfile: pricingProfileByProduct[Number(product.id)] || null,
-      localLineMeta: productMetaByProduct[Number(product.id)] || null,
-      onSale: Boolean(product.onSale),
-      saleDiscount:
-        product.saleDiscount === null || typeof product.saleDiscount === "undefined"
-          ? null
-          : Number(product.saleDiscount),
-      images:
-        imageObjectsByProduct[product.id] ||
-        mediaObjectsByProduct[product.id] ||
-        (imagesByProduct[product.id] || []).map((url) => ({ url, thumbnailUrl: url }))
-    })),
+    products: pagedProductRows.map((product) => {
+      const productId = Number(product.id);
+      const productPackages = packagesByProduct[productId] || [];
+      const saleRow = {
+        onSale: Boolean(product.onSale),
+        saleDiscount:
+          product.saleDiscount === null || typeof product.saleDiscount === "undefined"
+            ? null
+            : Number(product.saleDiscount)
+      };
+      return {
+        ...product,
+        categoryName: product.categoryName || categoryMap.get(Number(product.categoryId)) || "Uncategorized",
+        packages: productPackages,
+        pricingProfile: resolveAdminProductPricingProfile({
+          product,
+          packageRows: productPackages,
+          packageMetaRows: packageMetaByProduct[productId] || [],
+          pricingProfile: pricingProfileByProduct[productId] || null,
+          saleRow,
+          vendor: vendorMap.get(Number(product.vendorId)) || null
+        }),
+        localLineMeta: productMetaByProduct[productId] || null,
+        onSale: saleRow.onSale,
+        saleDiscount: saleRow.saleDiscount,
+        images:
+          imageObjectsByProduct[product.id] ||
+          mediaObjectsByProduct[product.id] ||
+          (imagesByProduct[product.id] || []).map((url) => ({ url, thumbnailUrl: url }))
+      };
+    }),
     pagination: {
       page,
       pageSize,
@@ -8267,6 +8416,97 @@ router.get("/drop-sites", requireAdmin, async (_req, res) => {
   } catch (error) {
     console.error("Drop-site performance load failed:", error);
     res.status(500).json({ error: error?.message || "Unable to load drop-site performance." });
+  }
+});
+
+router.get("/square/status", requireAdminPermission(["square_pull", "square_push", "pricing_admin"]), async (_req, res) => {
+  try {
+    await ensureSquareSyncSchema();
+    return res.json(await getSquareStatus());
+  } catch (error) {
+    console.error("Square status load failed:", error);
+    return res.status(500).json({ error: error?.message || "Unable to load Square status." });
+  }
+});
+
+router.post("/square/cache-sync", requireAdminPermission("square_pull"), async (req, res) => {
+  try {
+    await ensureSquareSyncSchema();
+    const result = await syncSquareCatalogCache({ userId: req.admin?.userId || req.admin?.adminId || null });
+    return res.json(result);
+  } catch (error) {
+    console.error("Square catalog sync failed:", error);
+    return res.status(400).json({ error: error?.message || "Unable to refresh Square catalog." });
+  }
+});
+
+router.get("/square/matches", requireAdminPermission(["square_pull", "square_push", "pricing_admin"]), async (_req, res) => {
+  try {
+    await ensureSquareSyncSchema();
+    return res.json(await buildSquareMatchReview());
+  } catch (error) {
+    console.error("Square match review failed:", error);
+    return res.status(500).json({ error: error?.message || "Unable to load Square matches." });
+  }
+});
+
+router.post("/square/matches/approve", requireAdminPermission("square_pull"), async (req, res) => {
+  try {
+    await ensureSquareSyncSchema();
+    const result = await approveSquareVariationLink({
+      productId: Number(req.body?.productId),
+      packageId: Number(req.body?.packageId),
+      squareItemId: String(req.body?.squareItemId || ""),
+      squareVariationId: String(req.body?.squareVariationId || ""),
+      matchScore: req.body?.matchScore,
+      userId: req.admin?.userId || req.admin?.adminId || null
+    });
+    return res.json(result);
+  } catch (error) {
+    console.error("Square match approval failed:", error);
+    return res.status(400).json({ error: error?.message || "Unable to approve Square match." });
+  }
+});
+
+router.post("/square/matches/unlink", requireAdminPermission("square_pull"), async (req, res) => {
+  try {
+    await ensureSquareSyncSchema();
+    const result = await unlinkSquareVariation({
+      packageId: Number(req.body?.packageId) || null,
+      squareVariationId: req.body?.squareVariationId ? String(req.body.squareVariationId) : null
+    });
+    return res.json(result);
+  } catch (error) {
+    console.error("Square match unlink failed:", error);
+    return res.status(400).json({ error: error?.message || "Unable to unlink Square match." });
+  }
+});
+
+router.post("/square/audit-prices", requireAdminPermission(["square_pull", "square_push", "pricing_admin"]), async (req, res) => {
+  try {
+    await ensureSquareSyncSchema();
+    const result = await auditSquarePrices({
+      packageIds: Array.isArray(req.body?.packageIds) ? req.body.packageIds : [],
+      userId: req.admin?.userId || req.admin?.adminId || null
+    });
+    return res.json(result);
+  } catch (error) {
+    console.error("Square price audit failed:", error);
+    return res.status(400).json({ error: error?.message || "Unable to audit Square prices." });
+  }
+});
+
+router.post("/square/apply-prices", requireAdminPermission("square_push"), async (req, res) => {
+  try {
+    await ensureSquareSyncSchema();
+    const result = await applySquarePrices({
+      packageIds: Array.isArray(req.body?.packageIds) ? req.body.packageIds : [],
+      userId: req.admin?.userId || req.admin?.adminId || null
+    });
+    return res.json(result);
+  } catch (error) {
+    console.error("Square price apply failed:", error);
+    return res.status(400).json({ error: error?.message || "Unable to apply Square prices." });
   }
 });
 

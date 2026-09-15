@@ -17,6 +17,7 @@ let marketingSchemaPromise;
 let subscriptionPortalSchemaPromise;
 let liabilityReleaseSchemaPromise;
 let scheduledPricelistSchemaPromise;
+let squareSchemaPromise;
 
 const SOURCE_PRICING_VENDOR_FACTOR_DEFAULT = 0.5412;
 
@@ -2310,6 +2311,150 @@ const LOCAL_LINE_COLUMN_STATEMENTS = [
   }
 ];
 
+const SQUARE_TABLE_STATEMENTS = [
+  `
+    CREATE TABLE IF NOT EXISTS square_catalog_items (
+      square_item_id VARCHAR(255) PRIMARY KEY,
+      name VARCHAR(255),
+      description TEXT,
+      version VARCHAR(64),
+      updated_at_remote DATETIME,
+      is_deleted TINYINT(1) DEFAULT 0,
+      present_at_all_locations TINYINT(1),
+      raw_json LONGTEXT,
+      created_at DATETIME,
+      updated_at DATETIME,
+      last_synced_at DATETIME
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS square_catalog_variations (
+      square_variation_id VARCHAR(255) PRIMARY KEY,
+      square_item_id VARCHAR(255) NOT NULL,
+      name VARCHAR(255),
+      sku VARCHAR(255),
+      pricing_type VARCHAR(64),
+      price_amount INT,
+      currency VARCHAR(8),
+      version VARCHAR(64),
+      updated_at_remote DATETIME,
+      is_deleted TINYINT(1) DEFAULT 0,
+      present_at_all_locations TINYINT(1),
+      raw_json LONGTEXT,
+      created_at DATETIME,
+      updated_at DATETIME,
+      last_synced_at DATETIME
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS square_variation_links (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      product_id INT NOT NULL,
+      package_id INT NOT NULL,
+      square_item_id VARCHAR(255) NOT NULL,
+      square_variation_id VARCHAR(255) NOT NULL,
+      match_score DECIMAL(5, 4),
+      match_notes TEXT,
+      approved_by_user_id INT,
+      approved_at DATETIME,
+      created_at DATETIME,
+      updated_at DATETIME
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS square_sync_runs (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      mode VARCHAR(32) NOT NULL,
+      status VARCHAR(32) NOT NULL,
+      started_at DATETIME NOT NULL,
+      finished_at DATETIME,
+      summary_json LONGTEXT,
+      error_message TEXT,
+      created_by_user_id INT,
+      created_at DATETIME,
+      updated_at DATETIME
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS square_sync_results (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      sync_run_id INT NOT NULL,
+      product_id INT,
+      package_id INT,
+      square_item_id VARCHAR(255),
+      square_variation_id VARCHAR(255),
+      action VARCHAR(64),
+      status VARCHAR(32) NOT NULL,
+      local_price_amount INT,
+      remote_price_amount INT,
+      currency VARCHAR(8),
+      message TEXT,
+      raw_json LONGTEXT,
+      created_at DATETIME
+    )
+  `
+];
+
+const SQUARE_INDEX_STATEMENTS = [
+  {
+    tableName: "square_catalog_items",
+    indexName: "idx_square_catalog_items_name",
+    columns: "name"
+  },
+  {
+    tableName: "square_catalog_variations",
+    indexName: "idx_square_catalog_variations_item",
+    columns: "square_item_id"
+  },
+  {
+    tableName: "square_catalog_variations",
+    indexName: "idx_square_catalog_variations_name",
+    columns: "name"
+  },
+  {
+    tableName: "square_catalog_variations",
+    indexName: "idx_square_catalog_variations_sku",
+    columns: "sku"
+  },
+  {
+    tableName: "square_variation_links",
+    indexName: "ux_square_variation_links_package",
+    unique: true,
+    columns: "package_id"
+  },
+  {
+    tableName: "square_variation_links",
+    indexName: "ux_square_variation_links_square_variation",
+    unique: true,
+    columns: "square_variation_id"
+  },
+  {
+    tableName: "square_variation_links",
+    indexName: "idx_square_variation_links_product",
+    columns: "product_id"
+  },
+  {
+    tableName: "square_sync_runs",
+    indexName: "idx_square_sync_runs_started",
+    columns: "started_at"
+  },
+  {
+    tableName: "square_sync_runs",
+    indexName: "idx_square_sync_runs_mode_status",
+    columns: "mode, status"
+  },
+  {
+    tableName: "square_sync_results",
+    indexName: "idx_square_sync_results_run",
+    columns: "sync_run_id"
+  },
+  {
+    tableName: "square_sync_results",
+    indexName: "idx_square_sync_results_package",
+    columns: "package_id"
+  }
+];
+
 const ADMIN_ACCESS_TABLE_STATEMENTS = [
   `
     CREATE TABLE IF NOT EXISTS admin_roles (
@@ -2486,6 +2631,26 @@ async function runLocalLineSchemaBootstrap(connection) {
   }
 
   for (const indexDefinition of LOCAL_LINE_INDEX_STATEMENTS) {
+    const exists = await indexExists(
+      connection,
+      indexDefinition.tableName,
+      indexDefinition.indexName
+    );
+    if (exists) continue;
+
+    const uniqueClause = indexDefinition.unique ? "UNIQUE " : "";
+    await connection.query(
+      `CREATE ${uniqueClause}INDEX ${indexDefinition.indexName} ON ${indexDefinition.tableName} (${indexDefinition.columns})`
+    );
+  }
+}
+
+async function runSquareSchemaBootstrap(connection) {
+  for (const statement of SQUARE_TABLE_STATEMENTS) {
+    await connection.query(statement);
+  }
+
+  for (const indexDefinition of SQUARE_INDEX_STATEMENTS) {
     const exists = await indexExists(
       connection,
       indexDefinition.tableName,
@@ -3088,6 +3253,20 @@ export async function ensureLocalLineSyncSchema(connection = getPool()) {
   }
 
   return runLocalLineSchemaBootstrap(connection);
+}
+
+export async function ensureSquareSyncSchema(connection = getPool()) {
+  if (connection === getPool()) {
+    if (!squareSchemaPromise) {
+      squareSchemaPromise = runSquareSchemaBootstrap(connection).catch((error) => {
+        squareSchemaPromise = null;
+        throw error;
+      });
+    }
+    return squareSchemaPromise;
+  }
+
+  return runSquareSchemaBootstrap(connection);
 }
 
 export async function ensureAdminAccessSchema(connection = getPool()) {

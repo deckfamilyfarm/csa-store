@@ -1393,6 +1393,120 @@ export const localLinePriceListEntries = mysqlTable(
   })
 );
 
+export const squareCatalogItems = mysqlTable(
+  "square_catalog_items",
+  {
+    squareItemId: varchar("square_item_id", { length: 255 }).primaryKey(),
+    name: varchar("name", { length: 255 }),
+    description: text("description"),
+    version: varchar("version", { length: 64 }),
+    updatedAtRemote: datetime("updated_at_remote"),
+    isDeleted: tinyint("is_deleted").default(0),
+    presentAtAllLocations: tinyint("present_at_all_locations"),
+    rawJson: text("raw_json"),
+    createdAt: datetime("created_at"),
+    updatedAt: datetime("updated_at"),
+    lastSyncedAt: datetime("last_synced_at")
+  },
+  (table) => ({
+    nameIdx: index("idx_square_catalog_items_name").on(table.name)
+  })
+);
+
+export const squareCatalogVariations = mysqlTable(
+  "square_catalog_variations",
+  {
+    squareVariationId: varchar("square_variation_id", { length: 255 }).primaryKey(),
+    squareItemId: varchar("square_item_id", { length: 255 }).notNull(),
+    name: varchar("name", { length: 255 }),
+    sku: varchar("sku", { length: 255 }),
+    pricingType: varchar("pricing_type", { length: 64 }),
+    priceAmount: int("price_amount"),
+    currency: varchar("currency", { length: 8 }),
+    version: varchar("version", { length: 64 }),
+    updatedAtRemote: datetime("updated_at_remote"),
+    isDeleted: tinyint("is_deleted").default(0),
+    presentAtAllLocations: tinyint("present_at_all_locations"),
+    rawJson: text("raw_json"),
+    createdAt: datetime("created_at"),
+    updatedAt: datetime("updated_at"),
+    lastSyncedAt: datetime("last_synced_at")
+  },
+  (table) => ({
+    itemIdx: index("idx_square_catalog_variations_item").on(table.squareItemId),
+    nameIdx: index("idx_square_catalog_variations_name").on(table.name),
+    skuIdx: index("idx_square_catalog_variations_sku").on(table.sku)
+  })
+);
+
+export const squareVariationLinks = mysqlTable(
+  "square_variation_links",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    productId: int("product_id").notNull(),
+    packageId: int("package_id").notNull(),
+    squareItemId: varchar("square_item_id", { length: 255 }).notNull(),
+    squareVariationId: varchar("square_variation_id", { length: 255 }).notNull(),
+    matchScore: decimal("match_score", { precision: 5, scale: 4 }),
+    matchNotes: text("match_notes"),
+    approvedByUserId: int("approved_by_user_id"),
+    approvedAt: datetime("approved_at"),
+    createdAt: datetime("created_at"),
+    updatedAt: datetime("updated_at")
+  },
+  (table) => ({
+    packageIdx: uniqueIndex("ux_square_variation_links_package").on(table.packageId),
+    squareVariationIdx: uniqueIndex("ux_square_variation_links_square_variation").on(
+      table.squareVariationId
+    ),
+    productIdx: index("idx_square_variation_links_product").on(table.productId)
+  })
+);
+
+export const squareSyncRuns = mysqlTable(
+  "square_sync_runs",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    mode: varchar("mode", { length: 32 }).notNull(),
+    status: varchar("status", { length: 32 }).notNull(),
+    startedAt: datetime("started_at").notNull(),
+    finishedAt: datetime("finished_at"),
+    summaryJson: text("summary_json"),
+    errorMessage: text("error_message"),
+    createdByUserId: int("created_by_user_id"),
+    createdAt: datetime("created_at"),
+    updatedAt: datetime("updated_at")
+  },
+  (table) => ({
+    startedIdx: index("idx_square_sync_runs_started").on(table.startedAt),
+    modeStatusIdx: index("idx_square_sync_runs_mode_status").on(table.mode, table.status)
+  })
+);
+
+export const squareSyncResults = mysqlTable(
+  "square_sync_results",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    syncRunId: int("sync_run_id").notNull(),
+    productId: int("product_id"),
+    packageId: int("package_id"),
+    squareItemId: varchar("square_item_id", { length: 255 }),
+    squareVariationId: varchar("square_variation_id", { length: 255 }),
+    action: varchar("action", { length: 64 }),
+    status: varchar("status", { length: 32 }).notNull(),
+    localPriceAmount: int("local_price_amount"),
+    remotePriceAmount: int("remote_price_amount"),
+    currency: varchar("currency", { length: 8 }),
+    message: text("message"),
+    rawJson: text("raw_json"),
+    createdAt: datetime("created_at")
+  },
+  (table) => ({
+    runIdx: index("idx_square_sync_results_run").on(table.syncRunId),
+    packageIdx: index("idx_square_sync_results_package").on(table.packageId)
+  })
+);
+
 export const localLineSyncRuns = mysqlTable("local_line_sync_runs", {
   id: int("id").autoincrement().primaryKey(),
   mode: varchar("mode", { length: 32 }).notNull(),

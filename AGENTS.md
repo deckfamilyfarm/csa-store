@@ -5,6 +5,7 @@
 This application sits between three sources:
 
 - Local Line, the remote store and product API.
+- Square Online, the public online store catalog.
 - The local `store` MySQL database used by this CSA storefront.
 - Legacy/Killdeer pricelist data used for some source pricing workflows.
 
@@ -12,7 +13,10 @@ The intended behavior is two-way, but not symmetric:
 
 - Pull from Local Line: admins should be able to run a Local Line audit/sync from the UI, review all proposed changes, warnings, and errors, then approve specific supported fixes before the local database is written.
 - Push to Local Line: admins should be able to save local pricing changes, then explicitly apply pending remote changes to Local Line.
+- Push to Square: admins should review and approve local package-to-Square variation matches, audit proposed guest-price changes, then explicitly apply supported price changes to Square.
 - Automatic Local Line pull writes must stay narrow. Current supported pull writes are local catalog repair actions such as missing local products/packages and local product/package field updates. Price-list drift and overrides from Local Line are review-only unless a future change adds an explicit schema and approval flow.
+
+Square Online v1 is a price mirror only. CSA Store remains the pricing source of truth; Square price drift is review data and should not back-capture into local formula/pricelist fields. Do not create Square products, sync stock, manage Square Online visibility, or push member/herd-share/SNAP prices without an explicit future workflow. The value pushed to Square is the CSA Store price for Square: for formula-priced products, use the local Vendor's Retail Price (`sourceUnitPrice`) directly without FFCSA factor, package weight/quantity, or customer markup; for standard products, use the local package price. Apply sale discounts as the normal Square variation price.
 
 ## Local Line API
 
@@ -50,7 +54,7 @@ The admin pricelist intentionally has two edit paths:
 - `Edit Row` edits formula/pricelist fields inline for the row.
 - `Details` opens the same product detail editor used by the Products section for product metadata, descriptions, images, package prices, and cached Local Line price-list entries.
 
-Admin access uses Timesheets as the credential authority when `TIMESHEETS_API_URL` is configured. CSA Store still owns authorization: the local `users` table stores the CSA user record and Timesheets link fields, while `admin_roles` and `admin_user_roles` store backend permissions. The full `admin` role grants every permission. Granular backend roles are `user_admin`, `inventory_admin`, `pricing_admin`, `localline_pull`, `localline_push`, `dropsite_admin`, `membership_admin`, and `member_admin`. Do not infer CSA admin permissions from the Timesheets role; Timesheets only proves identity.
+Admin access uses Timesheets as the credential authority when `TIMESHEETS_API_URL` is configured. CSA Store still owns authorization: the local `users` table stores the CSA user record and Timesheets link fields, while `admin_roles` and `admin_user_roles` store backend permissions. The full `admin` role grants every permission. Granular backend roles are `user_admin`, `inventory_admin`, `pricing_admin`, `localline_pull`, `localline_push`, `square_pull`, `square_push`, `dropsite_admin`, `membership_admin`, and `member_admin`. Do not infer CSA admin permissions from the Timesheets role; Timesheets only proves identity.
 
 Admin `Users` creates local CSA backend users, assigns roles, and links them to Timesheets via `timesheets_user_id` and `timesheets_employee_id`. John Deck's Timesheets login (`deck.john`) is the default seed administrator unless `ADMIN_USER` overrides it. The Users screen can preview/apply exact Timesheets matches, and `npm run sync:timesheets-users` does the same from the API directory. The sync matches backend users to Timesheets users by username, email/full name, or unique last-name match; ambiguous last-name matches must be reviewed manually.
 
@@ -67,3 +71,4 @@ Key implementation points:
 - Local Line push payloads are built in `apps/api/localLine.js`.
 - Local Line pull/audit behavior lives in `apps/api/scripts/auditLocalLineSync.js`.
 - Local Line cache/full-sync behavior lives in `apps/api/scripts/syncLocalLineCache.js` and `apps/api/scripts/syncLocalLineFull.js`.
+- Square cache, match approval, price audit, and apply behavior lives in `apps/api/lib/squareStoreSync.js` and `apps/api/routes/admin.js`.

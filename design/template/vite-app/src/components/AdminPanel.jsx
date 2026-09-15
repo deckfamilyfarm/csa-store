@@ -7,6 +7,7 @@ import { AdminManualSection } from "./AdminManualSection.jsx";
 import { AdminMembershipSection } from "./AdminMembershipSection.jsx";
 import { AdminOrdersSection } from "./AdminOrdersSection.jsx";
 import { AdminPriceListSection } from "./AdminPriceListSection.jsx";
+import { AdminSquareSection } from "./AdminSquareSection.jsx";
 import {
   AdminMemberCreditsSection,
   AdminSubscriptionLeadsSection
@@ -38,6 +39,12 @@ function canAccessAdminSection(roleKeys, section) {
       );
     case "localLine":
       return roleKeys.includes("localline_pull") || roleKeys.includes("dropsite_admin");
+    case "square":
+      return (
+        roleKeys.includes("square_pull") ||
+        roleKeys.includes("square_push") ||
+        roleKeys.includes("pricing_admin")
+      );
     case "orders":
       return Array.isArray(roleKeys) && roleKeys.some((roleKey) => roleKey !== "content_editor");
     case "pricelist":
@@ -87,6 +94,7 @@ function getDefaultAdminSection(roleKeys = []) {
   const order = [
     "googleDrive",
     "localLine",
+    "square",
     "orders",
     "pricelist",
     "localPricelist",
@@ -113,6 +121,7 @@ const ADMIN_NAV_GROUPS = [
     label: "Pricing / Inventory",
     items: [
       { section: "localLine", label: "Local Line" },
+      { section: "square", label: "Square" },
       { section: "orders", label: "Orders" },
       { section: "pricelist", label: "Pricelist" },
       { section: "localPricelist", label: "Local Pricelist" },
@@ -3154,6 +3163,9 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
   const canManageUsers = hasRole(currentAdminRoles, "user_admin");
   const canManageGoogleDrive = canAccessAdminSection(currentAdminRoles, "googleDrive");
   const canManageLocalLine = canAccessAdminSection(currentAdminRoles, "localLine");
+  const canManageSquare = canAccessAdminSection(currentAdminRoles, "square");
+  const canPullSquare = hasRole(currentAdminRoles, "square_pull");
+  const canPushSquare = hasRole(currentAdminRoles, "square_push");
   const canManageOrders = canAccessAdminSection(currentAdminRoles, "orders");
   const canManageInventory = hasRole(currentAdminRoles, "inventory_admin");
   const canManageMembership = hasRole(currentAdminRoles, "membership_admin");
@@ -5255,6 +5267,14 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                 }}
               />
             </>
+          )}
+
+          {activeSection === "square" && canManageSquare && (
+            <AdminSquareSection
+              token={token}
+              canPullSquare={canPullSquare}
+              canPushSquare={canPushSquare}
+            />
           )}
 
           {activeSection === "manual" && currentAdmin && (
