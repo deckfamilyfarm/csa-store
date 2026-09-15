@@ -623,6 +623,17 @@ export function AdminPriceListSection({
     return collectedRows;
   }
 
+  function getProductIdsFromRows(rowList = []) {
+    return rowList
+      .map((row) => Number(row.productId))
+      .filter((value) => Number.isFinite(value));
+  }
+
+  function setPushReviewData(rowList = []) {
+    setPushReviewRows(rowList);
+    setPushReviewProductIds(getProductIdsFromRows(rowList));
+  }
+
   async function loadPriceList() {
     if (!token) return;
     const requestId = loadRequestRef.current + 1;
@@ -892,6 +903,16 @@ export function AdminPriceListSection({
           : "Changes pushed to Local Line."
       );
       await loadPriceList();
+      try {
+        setPushReviewData(await loadAllPendingPushRows());
+      } catch (_error) {
+        setPushReviewData(
+          pushReviewRows.filter((row) => {
+            const result = nextResultsById[Number(row.productId)];
+            return !result || !result.ok;
+          })
+        );
+      }
       if (typeof onDataRefresh === "function") {
         await onDataRefresh();
       }
@@ -1142,6 +1163,13 @@ export function AdminPriceListSection({
   const statusText = loading
     ? "Loading pricelist..."
     : message || `${rows.length ? `${(page - 1) * pageSize + 1}-${(page - 1) * pageSize + rows.length}` : "0"} / ${totalRows} products`;
+  const pushReviewSubmitLabel = pushState.active
+    ? "Pushing..."
+    : pushReviewProductIds.length
+      ? `Submit Push (${pushReviewProductIds.length})`
+      : pushState.completed > 0
+        ? "All Pushed"
+        : "Submit Push (0)";
   const pricelistCategories = categories.filter(
     (category) => !isMembershipCategoryName(category.name)
   );
@@ -1191,12 +1219,7 @@ export function AdminPriceListSection({
     setMessage("");
     try {
       const responseRows = await loadAllPendingPushRows();
-      setPushReviewRows(responseRows);
-      setPushReviewProductIds(
-        responseRows
-          .map((row) => Number(row.productId))
-          .filter((value) => Number.isFinite(value))
-      );
+      setPushReviewData(responseRows);
     } catch (_error) {
       setPushReviewOpen(false);
       setMessage("Failed to load pending Local Line push products.");
@@ -1939,7 +1962,7 @@ export function AdminPriceListSection({
               </div>
             </div>
             <div className="response-progress">
-              {pushReviewProductIds.length} product{pushReviewProductIds.length === 1 ? "" : "s"} will be pushed.
+              {pushReviewProductIds.length} product{pushReviewProductIds.length === 1 ? "" : "s"} pending push.
             </div>
             {pushState.active ? (
               <div className="small">
@@ -2011,7 +2034,7 @@ export function AdminPriceListSection({
                 onClick={() => applyRemote(pushReviewProductIds)}
                 disabled={applyingProductIds.length > 0 || pushState.active || pushReviewLoading || pushReviewProductIds.length === 0}
               >
-                {pushState.active ? "Pushing..." : `Submit Push (${pushReviewProductIds.length})`}
+                {pushReviewSubmitLabel}
               </button>
             </div>
           </div>
