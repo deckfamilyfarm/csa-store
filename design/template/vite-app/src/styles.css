@@ -3258,6 +3258,34 @@ img {
   line-height: 1.25;
 }
 
+.square-scope-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 16px 0 8px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fffaf0;
+}
+
+.square-scope-box.warning {
+  border-color: rgba(143, 46, 43, 0.35);
+  background: rgba(143, 46, 43, 0.08);
+}
+
+.square-scope-warning {
+  margin-top: 4px;
+  color: var(--barn);
+  font-weight: 700;
+}
+
+.square-scope-toggle {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
 .form-message {
   margin: 12px 0;
   padding: 10px 12px;

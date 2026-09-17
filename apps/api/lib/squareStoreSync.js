@@ -572,7 +572,27 @@ function scoreSquareCandidate(localPackage, squareVariation) {
   return Number(score.toFixed(4));
 }
 
-async function loadLocalPackagesForSquare() {
+function isDefaultSquareProductScope(row = {}) {
+  const vendorName = normalizeName(row.vendorName);
+  if (vendorName.includes("deck family farm") || vendorName.includes("hyland")) {
+    return true;
+  }
+
+  const fullName = normalizeName(
+    [
+      row.productName,
+      row.packageName,
+      row.categoryName
+    ].filter(Boolean).join(" ")
+  );
+  return (
+    fullName.includes("full farm") &&
+    fullName.includes("csa") &&
+    (fullName.includes("tote") || fullName.includes("bag"))
+  );
+}
+
+async function loadLocalPackagesForSquare({ includeAllProducts = false } = {}) {
   const [rows] = await getPool().query(
     `
       SELECT
@@ -596,7 +616,7 @@ async function loadLocalPackagesForSquare() {
       ORDER BY p.name ASC, pkg.name ASC, pkg.id ASC
     `
   );
-  return rows;
+  return includeAllProducts ? rows : rows.filter(isDefaultSquareProductScope);
 }
 
 async function loadSquareVariationsForReview() {
@@ -645,10 +665,10 @@ async function loadSquareLinks() {
   return rows;
 }
 
-export async function buildSquareMatchReview({ limitCandidates = 5 } = {}) {
+export async function buildSquareMatchReview({ limitCandidates = 5, includeAllProducts = false } = {}) {
   await ensureSquareSyncSchema();
   const [localPackages, squareVariations, links] = await Promise.all([
-    loadLocalPackagesForSquare(),
+    loadLocalPackagesForSquare({ includeAllProducts }),
     loadSquareVariationsForReview(),
     loadSquareLinks()
   ]);
@@ -712,7 +732,8 @@ export async function buildSquareMatchReview({ limitCandidates = 5 } = {}) {
       localPackages: rows.length,
       linked: rows.filter((row) => row.linked).length,
       unmatched: rows.filter((row) => !row.linked).length,
-      squareVariations: squareVariations.length
+      squareVariations: squareVariations.length,
+      includeAllProducts: Boolean(includeAllProducts)
     }
   };
 }
@@ -822,7 +843,7 @@ export async function unlinkSquareVariation({ packageId, squareVariationId }) {
   return { ok: true };
 }
 
-async function loadApprovedSquarePricingRows(packageIds = []) {
+async function loadApprovedSquarePricingRows(packageIds = [], { includeAllProducts = false } = {}) {
   const params = [];
   let packageFilter = "";
   if (packageIds.length) {
@@ -889,7 +910,7 @@ async function loadApprovedSquarePricingRows(packageIds = []) {
     params
   );
 
-  return rows;
+  return includeAllProducts ? rows : rows.filter(isDefaultSquareProductScope);
 }
 
 async function loadPackagesByProduct(productIds) {
@@ -1113,26 +1134,32 @@ function buildSquarePriceAuditRow(row, packagesByProductId, metaByPackageId) {
   };
 }
 
-async function buildSquarePriceAuditRows(packageIds = []) {
-  const rows = await loadApprovedSquarePricingRows(packageIds);
+async function buildSquarePriceAuditRows(packageIds = [], { includeAllProducts = false } = {}) {
+  const rows = await loadApprovedSquarePricingRows(packageIds, { includeAllProducts });
   const productIds = [...new Set(rows.map((row) => Number(row.productId)).filter(Number.isFinite))];
   const { packagesByProductId, metaByPackageId } = await loadPackagesByProduct(productIds);
   return rows.map((row) => buildSquarePriceAuditRow(row, packagesByProductId, metaByPackageId));
 }
 
-export async function auditSquarePrices({ packageIds = [], userId = null, persist = true } = {}) {
+export async function auditSquarePrices({
+  packageIds = [],
+  userId = null,
+  persist = true,
+  includeAllProducts = false
+} = {}) {
   await ensureSquareSyncSchema();
   const cleanPackageIds = [...new Set(
     (Array.isArray(packageIds) ? packageIds : [])
       .map((value) => Number(value))
       .filter(Number.isFinite)
   )];
-  const rows = await buildSquarePriceAuditRows(cleanPackageIds);
+  const rows = await buildSquarePriceAuditRows(cleanPackageIds, { includeAllProducts });
   const summary = {
     total: rows.length,
     changed: rows.filter((row) => row.status === "changed").length,
     synced: rows.filter((row) => row.status === "synced").length,
-    blocked: rows.filter((row) => row.status === "blocked").length
+    blocked: rows.filter((row) => row.status === "blocked").length,
+    includeAllProducts: Boolean(includeAllProducts)
   };
 
   if (!persist) return { rows, summary, runId: null };
@@ -1185,13 +1212,13 @@ function buildVariationUpdateObject(latestVariation, proposedAmount, currency) {
   return nextObject;
 }
 
-export async function applySquarePrices({ packageIds = [], userId = null } = {}) {
+export async function applySquarePrices({ packageIds = [], userId = null, includeAllProducts = false } = {}) {
   await ensureSquareSyncSchema();
   if (!isSquareEnabled()) {
     throw new Error("Square access token is not configured.");
   }
 
-  const audit = await auditSquarePrices({ packageIds, userId, persist: false });
+  const audit = await auditSquarePrices({ packageIds, userId, persist: false, includeAllProducts });
   const targets = audit.rows.filter((row) => row.status === "changed");
   const connection = await getPool().getConnection();
   let runId = null;

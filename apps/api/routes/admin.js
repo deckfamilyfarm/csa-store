@@ -8456,7 +8456,10 @@ router.post("/square/cache-sync", requireAdminPermission("square_pull"), async (
 router.get("/square/matches", requireAdminPermission(["square_pull", "square_push", "pricing_admin"]), async (_req, res) => {
   try {
     await ensureSquareSyncSchema();
-    return res.json(await buildSquareMatchReview());
+    const includeAllProducts =
+      _req.query?.includeAllProducts === "1" ||
+      String(_req.query?.includeAllProducts || "").toLowerCase() === "true";
+    return res.json(await buildSquareMatchReview({ includeAllProducts }));
   } catch (error) {
     console.error("Square match review failed:", error);
     return res.status(500).json({ error: error?.message || "Unable to load Square matches." });
@@ -8500,6 +8503,7 @@ router.post("/square/audit-prices", requireAdminPermission(["square_pull", "squa
     await ensureSquareSyncSchema();
     const result = await auditSquarePrices({
       packageIds: Array.isArray(req.body?.packageIds) ? req.body.packageIds : [],
+      includeAllProducts: Boolean(req.body?.includeAllProducts),
       userId: req.admin?.userId || req.admin?.adminId || null
     });
     return res.json(result);
@@ -8514,6 +8518,7 @@ router.post("/square/apply-prices", requireAdminPermission("square_push"), async
     await ensureSquareSyncSchema();
     const result = await applySquarePrices({
       packageIds: Array.isArray(req.body?.packageIds) ? req.body.packageIds : [],
+      includeAllProducts: Boolean(req.body?.includeAllProducts),
       userId: req.admin?.userId || req.admin?.adminId || null
     });
     return res.json(result);

@@ -60,6 +60,7 @@ export function AdminSquareSection({
   const [auditFilter, setAuditFilter] = useState("changed");
   const [candidateSelections, setCandidateSelections] = useState({});
   const [matchesCollapsed, setMatchesCollapsed] = useState(false);
+  const [includeAllProducts, setIncludeAllProducts] = useState(false);
   const [loadingAction, setLoadingAction] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -70,7 +71,10 @@ export function AdminSquareSection({
   }
 
   async function loadMatches() {
-    const response = await adminGet("square/matches", token);
+    const response = await adminGet(
+      `square/matches${includeAllProducts ? "?includeAllProducts=1" : ""}`,
+      token
+    );
     setMatches(response.rows || []);
     setMatchSummary(response.summary || null);
   }
@@ -92,7 +96,14 @@ export function AdminSquareSection({
   useEffect(() => {
     refreshAll();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
+  }, [token, includeAllProducts]);
+
+  useEffect(() => {
+    setAuditRows([]);
+    setAuditSummary(null);
+    setApplySummary(null);
+    setCandidateSelections({});
+  }, [includeAllProducts]);
 
   async function handleCatalogSync() {
     setError("");
@@ -156,7 +167,9 @@ export function AdminSquareSection({
     setApplySummary(null);
     setLoadingAction("audit");
     try {
-      const response = await adminPost("square/audit-prices", token, {});
+      const response = await adminPost("square/audit-prices", token, {
+        includeAllProducts
+      });
       setAuditRows(response.rows || []);
       setAuditSummary(response.summary || null);
       setMessage(`Square audit complete: ${response.summary?.changed || 0} changed.`);
@@ -179,7 +192,10 @@ export function AdminSquareSection({
     setMessage("");
     setLoadingAction("apply");
     try {
-      const response = await adminPost("square/apply-prices", token, { packageIds });
+      const response = await adminPost("square/apply-prices", token, {
+        packageIds,
+        includeAllProducts
+      });
       setAuditRows(response.rows || []);
       setApplySummary(response.summary || null);
       setAuditFilter("all");
@@ -273,6 +289,28 @@ export function AdminSquareSection({
             {formatDateTime(status?.latestRuns?.[0]?.finishedAt || status?.latestRuns?.[0]?.startedAt)}
           </div>
         </div>
+      </div>
+
+      <div className={`square-scope-box ${includeAllProducts ? "warning" : ""}`}>
+        <div>
+          <div className="title">Square product scope</div>
+          <div className="small">
+            Default: Deck Family Farm, Hyland Processing, and Full Farm CSA tote bags.
+          </div>
+          {includeAllProducts ? (
+            <div className="small square-scope-warning">
+              Be careful: all local products are visible and can be matched to Square, including other vendors.
+            </div>
+          ) : null}
+        </div>
+        <label className="filter-toggle square-scope-toggle">
+          <input
+            type="checkbox"
+            checked={includeAllProducts}
+            onChange={(event) => setIncludeAllProducts(event.target.checked)}
+          />
+          <span>Include all products</span>
+        </label>
       </div>
 
       <div className="admin-subsection">
