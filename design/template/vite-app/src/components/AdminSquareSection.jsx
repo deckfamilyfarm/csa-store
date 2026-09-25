@@ -47,7 +47,9 @@ function formatPriceBasis(value) {
 export function AdminSquareSection({
   token,
   canPullSquare = false,
-  canPushSquare = false
+  canPushSquare = false,
+  matchesOnly = false,
+  onMatchesChanged
 }) {
   const [status, setStatus] = useState(null);
   const [matches, setMatches] = useState([]);
@@ -75,8 +77,9 @@ export function AdminSquareSection({
       `square/matches${includeAllProducts ? "?includeAllProducts=1" : ""}`,
       token
     );
-    setMatches(response.rows || []);
-    setMatchSummary(response.summary || null);
+    const visibleRows = (response.rows || []).filter(row => !matchesOnly || includeAllProducts || /deck family farm/i.test(row.vendorName || ""));
+    setMatches(visibleRows);
+    setMatchSummary(matchesOnly ? { linked: visibleRows.filter(row => row.linked).length, unmatched: visibleRows.filter(row => !row.linked).length } : response.summary || null);
   }
 
   async function refreshAll() {
@@ -136,6 +139,7 @@ export function AdminSquareSection({
         matchScore: candidate.score
       });
       setMessage(`Linked ${row.productName} / ${row.packageName}.`);
+      onMatchesChanged?.();
       await Promise.all([loadMatches(), loadStatus()]);
     } catch (nextError) {
       setError(nextError?.message || "Unable to approve Square match.");
@@ -153,6 +157,7 @@ export function AdminSquareSection({
         packageId: row.packageId
       });
       setMessage(`Unlinked ${row.productName} / ${row.packageName}.`);
+      onMatchesChanged?.();
       await Promise.all([loadMatches(), loadStatus()]);
     } catch (nextError) {
       setError(nextError?.message || "Unable to unlink Square match.");
@@ -270,7 +275,7 @@ export function AdminSquareSection({
       {message ? <div className="form-message success">{message}</div> : null}
       {error ? <div className="form-message error">{error}</div> : null}
 
-      <div className="admin-metric-grid">
+      {!matchesOnly && <div className="admin-metric-grid">
         <div className="metric-card">
           <div className="metric-label">Square Items</div>
           <div className="metric-value">{status?.counts?.items ?? 0}</div>
@@ -289,13 +294,13 @@ export function AdminSquareSection({
             {formatDateTime(status?.latestRuns?.[0]?.finishedAt || status?.latestRuns?.[0]?.startedAt)}
           </div>
         </div>
-      </div>
+      </div>}
 
       <div className={`square-scope-box ${includeAllProducts ? "warning" : ""}`}>
         <div>
           <div className="title">Square product scope</div>
           <div className="small">
-            Default: Deck Family Farm, Hyland Processing, and Full Farm CSA tote bags.
+            {matchesOnly ? "Default: Deck Family Farm." : "Default: Deck Family Farm, Hyland Processing, and Full Farm CSA tote bags."}
           </div>
           {includeAllProducts ? (
             <div className="small square-scope-warning">
@@ -461,7 +466,7 @@ export function AdminSquareSection({
         )}
       </div>
 
-      <div className="admin-subsection">
+      {!matchesOnly && <div className="admin-subsection">
         <div className="admin-section-header">
           <div>
             <h4>Price Audit</h4>
@@ -546,7 +551,7 @@ export function AdminSquareSection({
             </tbody>
           </table>
         </div>
-      </div>
+      </div>}
     </section>
   );
 }

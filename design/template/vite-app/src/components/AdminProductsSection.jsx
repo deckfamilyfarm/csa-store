@@ -255,6 +255,7 @@ export function AdminProductsSection({
   onAddProduct,
   onDuplicateProduct,
   onDeleteProduct,
+  onOpenProductSync,
 }) {
   const [view, setView] = useState("overview");
   const [columnsByView, setColumnsByView] = useState(() =>
@@ -285,25 +286,13 @@ export function AdminProductsSection({
   const requestId = useRef(0);
   const [reload, setReload] = useState(0);
   const [saveResults, setSaveResults] = useState([]);
-  const [review, setReview] = useState(null);
-  const [pushResults, setPushResults] = useState({});
   const [batches, setBatches] = useState([]);
-  const [schedule, setSchedule] = useState(null);
   const pendingDrafts = Object.values(drafts).filter(
     (entry) => dirtyFields(entry).length,
   );
   const columns = (columnsByView[view] || VIEW_COLUMNS[view])
     .map((key) => COLUMN_MAP.get(key))
     .filter(Boolean);
-
-  useEffect(() => {
-    if (!review && !schedule) return;
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previous;
-    };
-  }, [Boolean(review), Boolean(schedule)]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -357,9 +346,9 @@ export function AdminProductsSection({
   useEffect(() => {
     if (!capabilities.schedule) return;
     let cancelled = false;
-    adminGet("pricelist/scheduled-batches?limit=30", token)
+    adminGet("product-sync/releases", token)
       .then((response) => {
-        if (!cancelled) setBatches(response.batches || []);
+        if (!cancelled) setBatches([...(response.legacy || []).map(batch => ({ ...batch, id: `legacy-${batch.id}` })), ...(response.releases || []).map(batch => ({ ...batch, items: batch.actions }))]);
       })
       .catch((error) => {
         if (!cancelled)
@@ -407,224 +396,38 @@ export function AdminProductsSection({
     setMessage(
       results.some((result) => !result.ok)
         ? "Some changes could not be saved. The remaining edits are still available below."
-        : "Local changes saved. Review & Push when ready.",
+        : "Local changes saved. Review & Sync when ready.",
     );
     setReload((value) => value + 1);
   }
-  async function pendingRows() {
-    const rows = [];
-    let nextPage = 1;
-    let pages = 1;
-    while (nextPage <= pages) {
-      const response = await adminGet(
-        `pricelist?status=needsApply&pageSize=200&page=${nextPage}`,
-        token,
-      );
-      rows.push(...(response.rows || []));
-      pages = response.pagination?.totalPages || 1;
-      nextPage += 1;
-    }
-    return rows;
-  }
   async function openReview(row = null) {
-    if (!capabilities.push || busy) return;
-    setBusy(true);
-    setMessage("");
-    try {
-      // Refetch selected products too; the grid cache can predate a local save.
-      const ids = row ? [row.productId] : selected;
-      const rows = ids.length
-        ? await Promise.all(
-            ids.map(async (id) => {
-              const response = await adminGet(`products/${id}`, token);
-              const product = response.product;
-              if (!product)
-                throw new Error(`Product ${id} is no longer available.`);
-              return {
-                ...rowCache.current.get(id),
-                ...product,
-                productId: id,
-                packageRecords: product.packages,
-                localLineProductId:
-                  product.localLineMeta?.localLineProductId || 0,
-              };
-            }),
-          )
-        : await pendingRows();
-      setReview({ rows, selected: rows.map((item) => item.productId) });
-    } catch (error) {
-      setMessage(error.message || "Unable to load push review.");
-    } finally {
-      setBusy(false);
-    }
-  }
-  async function push() {
-    if (!capabilities.push || !review?.selected.length || busy) return;
-    if (review.selected.some((id) => dirtyFields(drafts[id]).length)) {
-      setMessage("Save the selected products' local changes before pushing.");
+    if (!capabilities.sync || busy) return;
+    const ids = row ? [row.productId] : selected;
+    if ((ids.length ? ids : Object.keys(drafts).map(Number)).some(id => dirtyFields(drafts[id]).length)) {
+      setMessage("Save local changes before auditing saved products, or use Schedule Changes for supported staged drafts.");
       return;
     }
-    setBusy(true);
-    try {
-      for (const id of review.selected) {
-        const row = review.rows.find((item) => item.productId === id);
-        setPushResults((prev) => ({
-          ...prev,
-          [id]: { productName: row.name, running: true },
-        }));
-        try {
-          const result = await adminPost(
-            `products/${id}/push-to-localline`,
-            token,
-            {},
-          );
-          if (!result.ok || !(Number(result.localLineProductId) > 0))
-            throw new Error(
-              result.message || "Local Line did not confirm the push.",
-            );
-          setPushResults((prev) => ({
-            ...prev,
-            [id]: { ...result, productName: row.name },
-          }));
-          setReview((prev) => ({
-            ...prev,
-            selected: prev.selected.filter((value) => value !== id),
-            rows: prev.rows.map((item) =>
-              item.productId === id
-                ? { ...item, localLineProductId: result.localLineProductId }
-                : item,
-            ),
-          }));
-        } catch (error) {
-          // Creation may have linked successfully before a price/image step failed.
-          let localLineProductId = row.localLineProductId;
-          try {
-            const response = await adminGet(`products/${id}`, token);
-            localLineProductId =
-              response.product?.localLineMeta?.localLineProductId ||
-              localLineProductId;
-          } catch {
-            /* Keep the push error even if refreshing the link fails. */
-          }
-          setReview((prev) => ({
-            ...prev,
-            rows: prev.rows.map((item) =>
-              item.productId === id ? { ...item, localLineProductId } : item,
-            ),
-          }));
-          setPushResults((prev) => ({
-            ...prev,
-            [id]: {
-              ok: false,
-              localLineProductId,
-              productName: row.name,
-              message: error.message,
-            },
-          }));
-        }
-      }
-      await refresh();
-    } finally {
-      setBusy(false);
-    }
+    onOpenProductSync({ productIds: ids, staged: [], entries: [] });
   }
   async function openSchedule(saved = false) {
     if (!capabilities.schedule || busy) return;
-    if (
-      pendingDrafts.some((entry) => unsupportedScheduleFields(entry).length) ||
-      (saved && pendingDrafts.length)
-    ) {
-      setMessage(
-        "Save formula, package, and Details changes locally first, then use Schedule Pending Pushes. Scheduling unsaved changes supports only stock, tracking, visibility, and sales.",
-      );
+    if (pendingDrafts.some(entry => unsupportedScheduleFields(entry).length) || (saved && pendingDrafts.length)) {
+      setMessage("Save formula, package, and Details changes locally first. Only stock, tracking, visibility, and sales can be staged.");
       return;
     }
-    setBusy(true);
-    try {
-      const entries = saved
-        ? (await pendingRows()).map((row) => hydrateProductDraft(null, row))
-        : pendingDrafts;
-      if (!entries.length) {
-        setMessage("No changes to schedule.");
-        return;
-      }
-      const next = new Date();
-      next.setHours(next.getHours() + 1, 0, 0, 0);
-      const localDate = new Date(
-        next.getTime() - next.getTimezoneOffset() * 60000,
-      )
-        .toISOString()
-        .slice(0, 16);
-      setSchedule({
-        entries,
-        saved,
-        name: saved ? "Pending Local Line push" : "Product changes",
-        at: localDate,
-      });
-    } catch (error) {
-      setMessage(error.message);
-    } finally {
-      setBusy(false);
-    }
-  }
-  async function submitSchedule() {
-    const at = new Date(schedule.at);
-    if (
-      !Number.isFinite(at.getTime()) ||
-      at.getMinutes() !== 0 ||
-      at <= new Date()
-    ) {
-      setMessage("Choose a future release time at the top of the hour.");
+    if (saved) {
+      onOpenProductSync({ productIds: selected, staged: [], entries: [] });
       return;
     }
-    setBusy(true);
-    try {
-      await adminPost("pricelist/scheduled-batches", token, {
-        name: schedule.name,
-        scheduledAt: at.toISOString(),
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        rows: schedule.entries.map(buildScheduleUpdate),
-      });
-      if (!schedule.saved)
-        setDrafts((prev) => {
-          const next = { ...prev };
-          for (const entry of schedule.entries) {
-            const id = entry.meta.productId;
-            // Scheduling has not saved the local values. Discard only the exact staged draft.
-            if (JSON.stringify(next[id]) === JSON.stringify(entry))
-              delete next[id];
-          }
-          return next;
-        });
-      setSchedule(null);
-      setMessage("Release scheduled.");
-      setReload((value) => value + 1);
-    } catch (error) {
-      setMessage(error.message);
-    } finally {
-      setBusy(false);
-    }
-  }
-  async function batchAction(batch, action) {
-    if (
-      !window.confirm(
-        `${action === "cancel" ? "Cancel" : "Run"} release “${batch.name}”${action === "cancel" ? "?" : " now? This applies local changes and pushes to Local Line."}`,
-      )
-    )
-      return;
-    setBusy(true);
-    try {
-      await adminPost(
-        `pricelist/scheduled-batches/${batch.id}/${action}`,
-        token,
-        {},
-      );
-      await refresh();
-    } catch (error) {
-      setMessage(error.message);
-    } finally {
-      setBusy(false);
-    }
+    const entries = pendingDrafts;
+    onOpenProductSync({ productIds: entries.map(entry => entry.meta.productId), entries,
+      staged: entries.map(entry => {
+        const update = buildScheduleUpdate(entry);
+        const changed = new Set(dirtyFields(entry));
+        update.changes = Object.fromEntries(Object.entries(update.changes).filter(([key]) => changed.has(key)));
+        return update;
+      })
+    });
   }
   async function deleteRow(row) {
     setBusy(true);
@@ -809,9 +612,9 @@ export function AdminProductsSection({
             </button>
             <details>
               <summary>More</summary>
-              {capabilities.push ? (
+              {capabilities.sync ? (
                 <button disabled={disabled} onClick={() => openReview(row)}>
-                  Review & Push
+                  Review & Sync
                 </button>
               ) : null}
               {capabilities.edit ? (
@@ -846,27 +649,6 @@ export function AdminProductsSection({
             );
     }
   }
-  function pushReviewValues(row) {
-    const values = hydrateProductDraft(null, row).values;
-    const prices = previewProductPrices(
-      { ...row, ...row.pricingProfile },
-      values,
-    );
-    return (
-      <div className="small">
-        Base {money(prices.basePrice)} · Member {money(prices.memberPrice)}
-        <br />
-        {values.packages.length} package(s) · Stock {values.inventory} ·{" "}
-        {values.visible ? "Visible" : "Hidden"}
-        <br />
-        Inventory tracking {values.trackInventory ? "on" : "off"} · Sale{" "}
-        {values.onSale ? `${values.saleDiscount}%` : "off"}
-      </div>
-    );
-  }
-  const reviewHasDrafts = review?.selected.some(
-    (id) => dirtyFields(drafts[id]).length,
-  );
   return (
     <section className="admin-section products-workspace">
       <h2 className="h2">Products</h2>
@@ -885,7 +667,7 @@ export function AdminProductsSection({
       </div>
       <p className="small">
         All views share filters, selections, and drafts. Save locally, then
-        review changes for Local Line.
+        review Local Line and Square changes in Product Sync.
       </p>
       <div className="admin-filters">
         <label>
@@ -1031,16 +813,16 @@ export function AdminProductsSection({
             </button>
           </>
         ) : null}
-        {capabilities.push ? (
+        {capabilities.sync ? (
           <button
             className="button alt"
             disabled={saving || busy}
             onClick={() => openReview()}
           >
-            Review & Push{" "}
+            Review & Sync{" "}
             {selected.length
               ? `(${selected.length} selected)`
-              : `(${data.summary?.pendingRemoteApplyRows || 0} pending)`}
+              : "(all products)"}
           </button>
         ) : null}
         <button
@@ -1063,7 +845,7 @@ export function AdminProductsSection({
               disabled={saving || busy}
               onClick={() => openSchedule(true)}
             >
-              Schedule Pending Pushes
+              Schedule Saved Products
             </button>
           </>
         ) : null}
@@ -1283,216 +1065,7 @@ export function AdminProductsSection({
           ))}
         </details>
       ) : null}
-      {Object.keys(pushResults).length ? (
-        <details open>
-          <summary>Local Line push results</summary>
-          {Object.entries(pushResults).map(([id, result]) => (
-            <p key={id} className="small">
-              {result.productName}:{" "}
-              {result.running ? "Pushing…" : result.ok ? "Synced" : "Failed"}
-              {result.localLineProductId
-                ? ` · Local Line #${result.localLineProductId}`
-                : ""}{" "}
-              · {result.message}
-            </p>
-          ))}
-        </details>
-      ) : null}
-      {capabilities.schedule ? (
-        <details className="products-schedules">
-          <summary>Scheduled releases ({batches.length})</summary>
-          <p className="small">
-            Schedules are separate from unsaved changes and pending sync status.
-          </p>
-          {batches.map((batch) => (
-            <div key={batch.id} className="response-card">
-              <strong>{batch.name}</strong>
-              <div>
-                {dateTime(batch.scheduledAt)} · {batch.status}
-              </div>
-              {batch.items?.map((item) => (
-                <div className="small" key={item.id || item.productId}>
-                  {item.productName || `Product ${item.productId}`} ·{" "}
-                  {item.status}
-                  {item.errorMessage ? ` · ${item.errorMessage}` : ""}
-                </div>
-              ))}
-              <div className="admin-actions">
-                {batch.status === "scheduled" ? (
-                  <button
-                    disabled={busy}
-                    onClick={() => batchAction(batch, "cancel")}
-                  >
-                    Cancel release
-                  </button>
-                ) : null}
-                {capabilities.push && batch.status === "scheduled" ? (
-                  <button
-                    disabled={busy}
-                    onClick={() => batchAction(batch, "run-now")}
-                  >
-                    Run now
-                  </button>
-                ) : null}
-                {capabilities.push &&
-                ["failed", "partial", "completed_with_errors"].includes(
-                  batch.status,
-                ) ? (
-                  <button
-                    disabled={busy}
-                    onClick={() => batchAction(batch, "retry")}
-                  >
-                    Retry failed
-                  </button>
-                ) : null}
-              </div>
-            </div>
-          ))}
-        </details>
-      ) : null}
-      {review ? (
-        <div className="modal-backdrop">
-          <div
-            className="modal response-modal products-review"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Review Local Line push"
-          >
-            <h3>Review & Push to Local Line</h3>
-            <p>
-              Choose the products to send. Local-only products will be created;
-              linked products will be updated.
-            </p>
-            {reviewHasDrafts ? (
-              <p role="alert">
-                Save the selected products' local changes before pushing.
-              </p>
-            ) : null}
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Push</th>
-                  <th>Product</th>
-                  <th>Action</th>
-                  <th>Local values to send</th>
-                  <th>Result</th>
-                </tr>
-              </thead>
-              <tbody>
-                {review.rows.map((row) => (
-                  <tr key={row.productId}>
-                    <td>
-                      <input
-                        type="checkbox"
-                        aria-label={`Push ${row.name}`}
-                        disabled={busy}
-                        checked={review.selected.includes(row.productId)}
-                        onChange={() =>
-                          setReview((prev) => ({
-                            ...prev,
-                            selected: toggleId(prev.selected, row.productId),
-                          }))
-                        }
-                      />
-                    </td>
-                    <td>{row.name}</td>
-                    <td>
-                      {row.localLineProductId > 0
-                        ? `Update #${row.localLineProductId}`
-                        : "Create product"}
-                    </td>
-                    <td>{pushReviewValues(row)}</td>
-                    <td>
-                      {pushResults[row.productId]?.running
-                        ? "Pushing…"
-                        : pushResults[row.productId]?.message || "Ready"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {!review.rows.length ? <p>No pending products.</p> : null}
-            <div className="admin-actions">
-              <button
-                className="button alt"
-                disabled={busy}
-                onClick={() => setReview(null)}
-              >
-                Close
-              </button>
-              <button
-                className="button"
-                disabled={
-                  busy || saving || reviewHasDrafts || !review.selected.length
-                }
-                onClick={push}
-              >
-                {busy ? "Pushing…" : `Push ${review.selected.length} products`}
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
-      {schedule ? (
-        <div className="modal-backdrop">
-          <div
-            className="modal response-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Schedule product release"
-          >
-            <h3>Schedule release</h3>
-            <label>
-              Name
-              <input
-                className="input"
-                value={schedule.name}
-                onChange={(event) =>
-                  setSchedule({ ...schedule, name: event.target.value })
-                }
-              />
-            </label>
-            <label>
-              Release time
-              <input
-                className="input"
-                type="datetime-local"
-                step="3600"
-                value={schedule.at}
-                onChange={(event) =>
-                  setSchedule({ ...schedule, at: event.target.value })
-                }
-              />
-            </label>
-            <p className="small">
-              Timezone: {Intl.DateTimeFormat().resolvedOptions().timeZone}. The
-              release applies local changes and pushes the selected products to
-              Local Line.
-            </p>
-            {schedule.entries.map((entry) => (
-              <p className="small" key={entry.meta.productId}>
-                {entry.values.name} · Stock {entry.values.inventory} · Visible{" "}
-                {entry.values.visible ? "yes" : "no"} · Track inventory{" "}
-                {entry.values.trackInventory ? "yes" : "no"} · Sale{" "}
-                {entry.values.onSale ? `${entry.values.saleDiscount}%` : "off"}
-              </p>
-            ))}
-            {message ? <p role="status">{message}</p> : null}
-            <div className="admin-actions">
-              <button disabled={busy} onClick={() => setSchedule(null)}>
-                Cancel
-              </button>
-              <button
-                className="button"
-                disabled={busy}
-                onClick={submitSchedule}
-              >
-                Schedule Release
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      {capabilities.sync || capabilities.schedule ? <button className="button alt" onClick={() => onOpenProductSync({ history: true })}>View releases in Product Sync</button> : null}
     </section>
   );
 }

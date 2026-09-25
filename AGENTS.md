@@ -54,9 +54,9 @@ Store → Products combines the former Pricelist, Local Pricelist, and Inventory
 - Inline controls edit formula inputs, stock, visibility, sales, and standard single-package prices.
 - `Details` shares the grid draft and edits metadata, descriptions, images, package prices, and cached Local Line price-list entries.
 - `Save Local Changes` uses the shared coordinator in `design/template/vite-app/src/components/productWorkspace.js`. Acknowledge only successful fields/packages and preserve failures for retry. It must never push to Local Line.
-- `Review & Push` selects products for the common manual create/update endpoint and keeps per-product results with remote IDs.
+- `Review & Sync` opens Store → Product Sync with the selected products. Audit first, then explicitly approve platform actions. The old direct push endpoints remain compatible for existing clients.
 - Unsaved scheduled changes support only stock, tracking, visibility, and sales. Save other fields locally before scheduling pending pushes.
-- Preserve role keys and assignments. UI actions use backend grants; only `pricing_admin` fetches scheduled batches, and manual pushes require `localline_push`. `local_pricelist_admin` remains the local product pricing role.
+- Preserve role keys and assignments. Unified publications require every selected platform’s push grant; scheduling also requires `pricing_admin`. Staging requires a local editing grant. Incoming repairs require `localline_pull`. `local_pricelist_admin` remains the local product pricing role.
 - The workspace uses `/api/admin/pricelist` and `/api/admin/products/:id`. The old local-pricelist and inventory read endpoints remain compatible for other callers.
 
 Admin access uses Timesheets as the credential authority when `TIMESHEETS_API_URL` is configured. CSA Store still owns authorization: the local `users` table stores the CSA user record and Timesheets link fields, while `admin_roles` and `admin_user_roles` store backend permissions. The full `admin` role grants every permission. Granular backend roles are `user_admin`, `inventory_admin`, `pricing_admin`, `localline_pull`, `localline_push`, `square_pull`, `square_push`, `dropsite_admin`, `membership_admin`, and `member_admin`. Do not infer CSA admin permissions from the Timesheets role; Timesheets only proves identity.
@@ -77,3 +77,14 @@ Key implementation points:
 - Local Line pull/audit behavior lives in `apps/api/scripts/auditLocalLineSync.js`.
 - Local Line cache/full-sync behavior lives in `apps/api/scripts/syncLocalLineCache.js` and `apps/api/scripts/syncLocalLineFull.js`.
 - Square cache, match approval, price audit, and apply behavior lives in `apps/api/lib/squareStoreSync.js` and `apps/api/routes/admin.js`.
+
+## Product Sync
+
+- Store → Product Sync combines outgoing Local Line and Square audits, explicit action selection, incoming Local Line repairs, product matches, and release history. Local Line Data holds operational pulls.
+- `apps/api/lib/productSync.js` coordinates database-backed audits and releases; `productSyncCore.js` owns permission and preflight rules; `productSyncAdapters.js` prepares and executes platform payloads; `productSyncIncoming.js` handles individual supported incoming repairs.
+- New tables are bootstrapped by `productSyncSchema.js`. Never execute client-supplied remote payloads: release requests contain persisted audit action IDs only.
+- Release payloads and local/remote/mapping baselines are frozen at audit time. Drift holds the affected action; unrelated actions continue. Retries verify remote state, preserve Square idempotency requests, skip completed actions, and apply local staging once per product.
+- A confirmed Local Line create ID is checkpointed before further steps. An uncertain create is held for reconciliation and must never be automatically resent, even through a replacement audit.
+- The existing `run:scheduled-pricelist` hourly runner handles both legacy Local Line-only batches and new platform releases. Database timestamps are UTC; the UI explicitly uses Pacific time.
+- Audit reads refresh caches only. Incoming formula price drift is review-only. Membership remains excluded. Square scope in Product Sync defaults to Deck Family Farm, with an explicit all-vendors option.
+- Test the core with `node --test apps/api/lib/productSyncCore.test.js apps/api/lib/productSyncAdapters.test.js`. The opt-in integration test requires a disposable MySQL socket under `/tmp/csa-product-sync-*`: `PRODUCT_SYNC_TEST_SOCKET=... node --test apps/api/lib/productSync.integration.test.js`. It creates an isolated test schema, mocks all platform requests, and never reads `.env`.

@@ -1,3 +1,4 @@
+import { runDueProductSyncReleases } from "../lib/productSync.js";
 import { fileURLToPath } from "url";
 import path from "path";
 import { getPool } from "../db.js";
@@ -43,7 +44,8 @@ async function main() {
 
   try {
     const result = await runDueScheduledPricelistBatches();
-    console.log(JSON.stringify({ ok: true, ...result }, null, 2));
+    const productSync = await runDueProductSyncReleases({ lockConnection });
+    console.log(JSON.stringify({ ok: true, ...result, productSync }, null, 2));
   } finally {
     await releaseLock(lockConnection);
   }

@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import fs from "fs";
 import os from "os";
 import path from "path";
@@ -340,7 +341,7 @@ async function downloadLocalLineExport(baseUrl, token) {
   }
 
   const arrayBuffer = await response.arrayBuffer();
-  const filePath = path.join(os.tmpdir(), "localline-products-export.xlsx");
+  const filePath = path.join(os.tmpdir(), `localline-products-export-${randomUUID()}.xlsx`);
   fs.writeFileSync(filePath, Buffer.from(arrayBuffer));
   return filePath;
 }
@@ -425,6 +426,7 @@ async function fetchStoreCatalog(connection) {
       package_code AS packageCode,
       unit,
       num_of_items AS numOfItems,
+      visible,
       track_inventory AS trackInventory,
       inventory
     FROM packages
@@ -1644,6 +1646,7 @@ export async function runLocalLineAudit(options = {}) {
   };
 
   const storeConnection = await mysql.createConnection(storeConfig);
+  let exportFilePath = null;
   const killdeerConnection = skipPricelist ? null : await mysql.createConnection(killdeerConfig);
 
   try {
@@ -1662,7 +1665,7 @@ export async function runLocalLineAudit(options = {}) {
       percent: 6,
       message: "Downloading Local Line export"
     });
-    const exportFilePath = await downloadLocalLineExport(baseUrl, token);
+    exportFilePath = await downloadLocalLineExport(baseUrl, token);
     const exportCatalog = parseLocalLineExport(exportFilePath);
     reportProgress({
       phaseKey: "catalog-sync",
@@ -1793,8 +1796,10 @@ export async function runLocalLineAudit(options = {}) {
       applyResult
     };
 
-    fs.mkdirSync(path.dirname(reportFile), { recursive: true });
-    writeReport(reportFile, report);
+    if (options.writeReport !== false) {
+      fs.mkdirSync(path.dirname(reportFile), { recursive: true });
+      writeReport(reportFile, report);
+    }
 
     const summary = {
       mode: report.mode,
@@ -1857,6 +1862,7 @@ export async function runLocalLineAudit(options = {}) {
     return { report, summary };
   } finally {
     await Promise.allSettled([storeConnection.end(), killdeerConnection?.end?.()]);
+    if (options.writeReport === false && exportFilePath) await fs.promises.unlink(exportFilePath).catch(() => {});
   }
 }
 

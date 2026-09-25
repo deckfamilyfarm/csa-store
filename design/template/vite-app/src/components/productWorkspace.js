@@ -31,6 +31,7 @@ export function productCapabilities(roles = []) {
     pricing: has("pricing_admin", "local_pricelist_admin"),
     cachedPricing: has("pricing_admin"),
     push: has("localline_push"),
+    sync: has("localline_push", "square_push", "localline_pull", "square_pull", "pricing_admin"),
     schedule: has("pricing_admin"),
   };
 }

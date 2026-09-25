@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 import {
+  categories,
   localLineProductMeta,
   localLinePackageMeta,
   packages,
@@ -237,7 +238,7 @@ async function createLocalLineProduct(accessToken, payload) {
   });
   if (!response.ok) {
     const body = await response.text();
-    throw new Error(`LocalLine POST failed: ${response.status} ${body}`);
+    throw Object.assign(new Error(`LocalLine POST failed: ${response.status} ${body}`), { remoteRejected: response.status >= 400 && response.status < 500 && response.status !== 408 });
   }
   return response.json();
 }
@@ -733,6 +734,19 @@ async function updateLocalLinePrices(db, productId, changes) {
     return { ok: null };
   }
 
+  const context = await loadLocalLineSyncContext(db, productId);
+  const token = await getLocalLineAccessToken();
+  const metaRow = await getLocalLineMetaRow(db, productId);
+  const remoteProductId = resolveRemoteProductId(metaRow, productId);
+  if (!Number.isFinite(remoteProductId) || remoteProductId <= 0) return { ok: null };
+  const remote = await fetchLocalLineProduct(remoteProductId, token);
+  const payload = buildLocalLinePricePayload(context, remote, changes);
+  if (isTestMode) return { ok: null, payload };
+  await patchLocalLineProduct(remoteProductId, token, payload);
+  return { ok: true };
+}
+
+export async function loadLocalLineSyncContext(db, productId) {
   const productRows = await db.select().from(products).where(eq(products.id, productId));
   if (!productRows.length) {
     throw new Error(`Product ${productId} not found`);
@@ -756,15 +770,36 @@ async function updateLocalLinePrices(db, productId, changes) {
         .catch(() => [])
     : [];
 
-  const packageMetaByPackageId = new Map(
-    packageMetaRows.map((row) => [Number(row.packageId), row])
-  );
-  const remotePackageIdByPackageId = new Map(
-    packageMetaRows
-      .map((row) => [Number(row.packageId), Number(row.localLinePackageId)])
-      .filter(([, remoteId]) => Number.isFinite(remoteId) && remoteId > 0)
-  );
+  const saleRows = await db.select().from(productSales).where(eq(productSales.productId, productId));
+  const meta = await getLocalLineMetaRow(db, productId);
+  const categoryRows = product.categoryId ? await db.select().from(categories).where(eq(categories.id, product.categoryId)) : [];
+  return { product, categoryName: categoryRows[0]?.name || "", vendor: vendorRows[0] || null, profile: profileRows[0] || null,
+    packages: packageRows, packageMeta: packageMetaRows, sale: saleRows[0] || {},
+    remoteId: Number(meta?.localLineProductId) || null,
+    imageUrls: await getLocalProductImageSources(db, productId) };
+}
 
+export function stageLocalLineContext(context, changes = {}) {
+  const next = structuredClone(context);
+  for (const key of ["visible", "trackInventory", "inventory"]) {
+    if (Object.hasOwn(changes, key)) next.product[key] = changes[key];
+  }
+  for (const key of ["onSale", "saleDiscount"]) {
+    if (Object.hasOwn(changes, key)) next.sale[key] = changes[key];
+  }
+  if (next.profile) Object.assign(next.profile, next.sale);
+  return next;
+}
+
+export function buildLocalLinePricePayload(context, llProduct, changes = {}) {
+  const { product, vendor, profile, packages: packageRows, packageMeta: packageMetaRows, sale: saleRow } = context;
+  const productId = product.id;
+  const profileRows = profile ? [profile] : [];
+  const vendorRows = vendor ? [vendor] : [];
+  const packageMetaByPackageId = new Map(packageMetaRows.map(row => [Number(row.packageId), row]));
+  const remotePackageIdByPackageId = new Map(packageMetaRows
+    .map(row => [Number(row.packageId), Number(row.localLinePackageId)])
+    .filter(([, id]) => Number.isFinite(id) && id > 0));
   const resolvedProfile = resolvePricingProfile({
     profile: profileRows[0] || null,
     product,
@@ -786,8 +821,6 @@ async function updateLocalLinePrices(db, productId, changes) {
     });
   }
 
-  const saleRows = await db.select().from(productSales).where(eq(productSales.productId, productId));
-  const saleRow = saleRows[0] || {};
   const saleEnabled =
     typeof changes.onSale !== "undefined"
       ? Boolean(changes.onSale)
@@ -813,13 +846,6 @@ async function updateLocalLinePrices(db, productId, changes) {
     throw new Error("Product must have at least one package before pushing prices to Local Line.");
   }
 
-  const token = await getLocalLineAccessToken();
-  const metaRow = await getLocalLineMetaRow(db, productId);
-  const remoteProductId = resolveRemoteProductId(metaRow, productId);
-  if (!Number.isFinite(remoteProductId) || remoteProductId <= 0) {
-    return { ok: null };
-  }
-  const llProduct = await fetchLocalLineProduct(remoteProductId, token);
   const llEntries = Array.isArray(llProduct?.product_price_list_entries)
     ? llProduct.product_price_list_entries
     : [];
@@ -853,8 +879,8 @@ async function updateLocalLinePrices(db, productId, changes) {
         packageMeta
       ) ??
       Number(pkg.price);
-    if (!Number.isFinite(purchasePrice)) {
-      continue;
+    if (!Number.isFinite(purchasePrice) || purchasePrice < 0) {
+      throw new Error(`Package ${pkg.name || pkg.id} has no valid nonnegative price.`);
     }
     const llPackage = Array.isArray(llProduct?.packages)
       ? llProduct.packages.find((item) => {
@@ -862,6 +888,7 @@ async function updateLocalLinePrices(db, productId, changes) {
           return Number(item.id) === Number(remotePackageId);
         })
       : null;
+    if (!llPackage) throw new Error(`Package ${pkg.name || pkg.id} has no matching Local Line package. Review its link first.`);
     const packageEntryByListId = new Map(productEntryByListId);
     if (Array.isArray(llPackage?.price_list_entries)) {
       llPackage.price_list_entries.forEach((entry) => {
@@ -921,96 +948,25 @@ async function updateLocalLinePrices(db, productId, changes) {
     package_codes_enabled: true,
     packages: packagePayloads
   };
-  if (isTestMode) {
-    return { ok: null, payload };
-  }
-
-  await patchLocalLineProduct(remoteProductId, token, payload);
-  return { ok: true };
+  return payload;
 }
 
-export async function createLocalLineProductFromStoreProduct(db, productId) {
-  if (!isLocalLineEnabled()) {
-    throw new Error("Local Line authentication is not configured");
-  }
-  if (isTestMode) {
-    throw new Error("Local Line test mode is enabled (LOCALLINE_TEST=true). No changes were sent to Local Line.");
-  }
-  if (!updatePrices) {
-    throw new Error("Local Line price updates are disabled (LOCALLINE_UPDATE_PRICES=false).");
-  }
-
-  const productRows = await db.select().from(products).where(eq(products.id, productId));
-  if (!productRows.length) {
-    throw new Error(`Product ${productId} not found`);
-  }
-  const product = productRows[0];
-
-  const existingMeta = await getLocalLineMetaRow(db, productId);
-  const existingRemoteProductId = Number(existingMeta?.localLineProductId);
-  const saleRows = await db.select().from(productSales).where(eq(productSales.productId, productId));
-  const saleRow = saleRows[0] || null;
-  if (Number.isFinite(existingRemoteProductId) && existingRemoteProductId > 0) {
-    const updateResult = await updateLocalLineForProduct(db, productId, {
-      visible: product.visible,
-      trackInventory: product.trackInventory,
-      inventory: product.inventory,
-      onSale: saleRow?.onSale ?? 0,
-      saleDiscount:
-        saleRow?.saleDiscount === null || typeof saleRow?.saleDiscount === "undefined"
-          ? 0
-          : Number(saleRow.saleDiscount),
-      forcePriceSync: true,
-      forceImageSync: true
-    });
-    const failureMessage = getLocalLineUpdateFailureMessage(updateResult);
-    if (failureMessage) {
-      throw new Error(failureMessage);
-    }
-    return {
-      ok: true,
-      ...updateResult,
-      alreadyLinked: true,
-      localLineProductId: existingRemoteProductId
-    };
-  }
-
-  const vendorRows = product.vendorId
-    ? await db.select().from(vendors).where(eq(vendors.id, product.vendorId))
-    : [];
-  const profileRows = await db
-    .select()
-    .from(productPricingProfiles)
-    .where(eq(productPricingProfiles.productId, productId));
-  const packageRows = await db.select().from(packages).where(eq(packages.productId, productId));
-  const packageMetaRows = packageRows.length
-    ? await db
-        .select()
-        .from(localLinePackageMeta)
-        .where(eq(localLinePackageMeta.productId, productId))
-        .catch(() => [])
-    : [];
-  if (!packageRows.length) {
-    throw new Error("Product must have at least one package before pushing to Local Line");
-  }
-
-  const packageMetaByPackageId = new Map(
-    packageMetaRows.map((row) => [Number(row.packageId), row])
-  );
+export function buildLocalLineCreatePayload(context, productUnits) {
+  const { product, packages: packageRows } = context;
+  if (!packageRows.length) throw new Error("Product must have at least one package before pushing to Local Line");
+  const packageMetaByPackageId = new Map(context.packageMeta.map(row => [Number(row.packageId), row]));
   const resolvedProfile = resolvePricingProfile({
-    profile: profileRows[0] || null,
+    profile: context.profile,
     product,
     packages: packageRows,
     packageMetaByPackageId,
-    vendor: vendorRows[0] || null
+    vendor: context.vendor
   });
   const priceLists = getPriceListDefinitions(resolvedProfile);
   if (!priceLists.length) {
     throw new Error("No Local Line price lists are configured for this product.");
   }
 
-  const token = await getLocalLineAccessToken();
-  const productUnits = await fetchLocalLineProductUnits(token);
   const { baseUnitId, chargeUnitId } = resolveLocalLineUnitIds(
     productUnits,
     resolvedProfile,
@@ -1059,6 +1015,60 @@ export async function createLocalLineProductFromStoreProduct(db, productId) {
       valid_for_storecredits: true
     }))
   };
+
+  return payload;
+}
+
+export async function createLocalLineProductFromStoreProduct(db, productId) {
+  if (!isLocalLineEnabled()) {
+    throw new Error("Local Line authentication is not configured");
+  }
+  if (isTestMode) {
+    throw new Error("Local Line test mode is enabled (LOCALLINE_TEST=true). No changes were sent to Local Line.");
+  }
+  if (!updatePrices) {
+    throw new Error("Local Line price updates are disabled (LOCALLINE_UPDATE_PRICES=false).");
+  }
+
+  const productRows = await db.select().from(products).where(eq(products.id, productId));
+  if (!productRows.length) {
+    throw new Error(`Product ${productId} not found`);
+  }
+  const product = productRows[0];
+
+  const existingMeta = await getLocalLineMetaRow(db, productId);
+  const existingRemoteProductId = Number(existingMeta?.localLineProductId);
+  const saleRows = await db.select().from(productSales).where(eq(productSales.productId, productId));
+  const saleRow = saleRows[0] || null;
+  if (Number.isFinite(existingRemoteProductId) && existingRemoteProductId > 0) {
+    const updateResult = await updateLocalLineForProduct(db, productId, {
+      visible: product.visible,
+      trackInventory: product.trackInventory,
+      inventory: product.inventory,
+      onSale: saleRow?.onSale ?? 0,
+      saleDiscount:
+        saleRow?.saleDiscount === null || typeof saleRow?.saleDiscount === "undefined"
+          ? 0
+          : Number(saleRow.saleDiscount),
+      forcePriceSync: true,
+      forceImageSync: true
+    });
+    const failureMessage = getLocalLineUpdateFailureMessage(updateResult);
+    if (failureMessage) {
+      throw new Error(failureMessage);
+    }
+    return {
+      ok: true,
+      ...updateResult,
+      alreadyLinked: true,
+      localLineProductId: existingRemoteProductId
+    };
+  }
+
+  const context = await loadLocalLineSyncContext(db, productId);
+  const packageRows = context.packages;
+  const token = await getLocalLineAccessToken();
+  const payload = buildLocalLineCreatePayload(context, await fetchLocalLineProductUnits(token));
 
   const createdProduct = await createLocalLineProduct(token, payload);
   const createdProductId = Number(createdProduct?.id);
@@ -1138,3 +1148,8 @@ export async function deleteLocalLineProductById(productId) {
   await deleteLocalLineProduct(remoteProductId, token);
   return { ok: true, localLineProductId: remoteProductId };
 }
+
+// Shared adapter primitives. Callers must enforce reviewed payloads and permissions.
+export { buildInventoryPayload, fetchLocalLineProduct, patchLocalLineProduct,
+  createLocalLineProduct, fetchLocalLineProductUnits, createLocalLineProductImage,
+  upsertLocalLineProductMeta, upsertLocalLinePackageMetaRows };

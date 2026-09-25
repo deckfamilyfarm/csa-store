@@ -1,3 +1,4 @@
+import productSyncRouter from "./productSync.js";
 import { buildPricelistWhereClause, PRICELIST_PENDING_REMOTE_APPLY_SQL } from "../lib/productWorkspaceFilters.js";
 import express from "express";
 import bcrypt from "bcryptjs";
@@ -187,6 +188,8 @@ router.use(async (_req, _res, next) => {
   });
   next();
 });
+
+router.use("/product-sync", productSyncRouter);
 
 let spacesClient = null;
 

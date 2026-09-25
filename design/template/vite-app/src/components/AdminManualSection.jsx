@@ -4,7 +4,7 @@ const MANUAL_TOPICS = [
   { key: "overview", label: "Overview" },
   { key: "pricing", label: "Pricing Model" },
   { key: "formula", label: "Deck / Hyland / Creamy Cow" },
-  { key: "sync", label: "Sync With Local Line" },
+  { key: "sync", label: "Product Sync" },
   { key: "workflow", label: "Daily Workflow" }
 ];
 
@@ -94,8 +94,8 @@ export function AdminManualSection({ focusTopic = "overview" }) {
         <p>
           Edit formula inputs, stock, visibility, sales, and single-package prices in the grid.
           Details opens the shared editor for descriptions, images, and multiple package prices.
-          Closing Details keeps your draft. Save Local Changes saves locally; Review &amp; Push lets
-          you choose which products to create or update in Local Line and shows each result.
+          Closing Details keeps your draft. Save Local Changes saves locally; Review &amp; Sync opens
+          Product Sync to compare the selected products with Local Line and Square.
         </p>
         <p>
           Columns are saved separately for each view. Your previous pricelist column preferences
@@ -103,8 +103,8 @@ export function AdminManualSection({ focusTopic = "overview" }) {
         </p>
         <p>
           Schedule Changes supports stock, tracking, visibility, and sales. Save formula, package,
-          and Details changes first, then use Schedule Pending Pushes. Scheduled releases apply the
-          saved product values and push to Local Line at the chosen time. Available actions depend on
+          and Details changes first, then use Schedule Saved Products. Audit, select platform actions, and
+          schedule the approved values at an hourly Pacific time. Available actions depend on
           your existing roles; access to local pricing does not grant manual push permission.
         </p>
       </article>
@@ -240,30 +240,23 @@ export function AdminManualSection({ focusTopic = "overview" }) {
       </article>
 
       <article className="admin-manual-card" ref={setSectionRef("sync")}>
-        <h4>How Syncing With Local Line Works</h4>
+        <h4>Product Sync: Local Line and Square</h4>
         <p>
-          The local system and Local Line are connected, but they do not behave like two identical
-          copies of the same database. This app intentionally keeps the pricing workflow under local
-          admin review.
+          Open Store → Product Sync. Choose Local Line, Square, or both, then Run audit.
+          Auditing refreshes remote data without publishing changes or changing local prices.
         </p>
         <ul className="admin-manual-list">
-          <li>
-            <strong>Pull From Local Line</strong> refreshes the local cache and can repair missing
-            local products, packages, and supported local catalog fields.
-          </li>
-          <li>
-            <strong>Review Local Line</strong> shows warnings, mismatches, and supported repair
-            actions before local writes are approved.
-          </li>
-          <li>
-            <strong>Save Local Changes</strong> stores local pricing and product changes in this
-            application only.
-          </li>
-          <li>
-            <strong>Review &amp; Push</strong> sends selected local product and pricing changes to
-            the remote Local Line store.
-          </li>
+          <li>Outgoing Changes groups each product’s platform actions. Expand the comparison to review current and proposed values, then select the actions you want.</li>
+          <li>Apply Now publishes approved values. Schedule Release saves them for an hourly Pacific release. Only stock, tracking, visibility, and sale drafts remain staged locally until the release runs.</li>
+          <li>Product Matches contains Square variation approvals and Local Line links. New Local Line products are explicitly marked as create proposals. Square only receives variation price updates.</li>
+          <li>Incoming Local Line Changes offers individual supported local catalog repairs. Formula price drift and unsupported changes are review only.</li>
+          <li>Scheduled Releases &amp; History shows newest releases first and records each platform’s outcome. Retry unfinished actions after a failure. Review again when inputs, remote values, or matches have changed.</li>
         </ul>
+        <p>
+          Local Line Data contains orders, subscribers, and fulfillment pulls. Existing scheduled
+          releases remain Local Line only. To include Square, create a new audit and approve its actions.
+          Publishing requires the destination’s Push permission; scheduling also requires Pricing Admin.
+        </p>
         <p>
           For Deck Family Farm, Hyland, and Creamy Cow products, local formula inputs remain the
           source of truth. Remote Local Line prices can be reviewed, but they should not silently
@@ -292,9 +285,9 @@ export function AdminManualSection({ focusTopic = "overview" }) {
           </li>
           <li>Review the calculated prices and any sale settings.</li>
           <li>Save local changes first.</li>
-          <li>Push to Local Line only after the local values look correct.</li>
+          <li>Audit and approve outgoing platform changes in Product Sync after the local values look correct.</li>
           <li>
-            If there is a question about remote data, run a review or pull from Local Line instead
+            If there is a question about remote data, review Incoming Local Line Changes instead
             of manually guessing what changed.
           </li>
         </ol>

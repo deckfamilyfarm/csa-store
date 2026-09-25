@@ -311,6 +311,18 @@ export async function getActiveScheduledPricelistProductChangeMap(connection = g
     throw error;
   }
 
+  try {
+    const [shared] = await connection.query(`SELECT rp.product_id AS productId, p.name AS productName,
+      rp.staged_json AS stagedJson, r.id AS batchId, r.name AS batchName,
+      DATE_FORMAT(r.scheduled_at, '%Y-%m-%d %H:%i:%s') AS scheduledAtUtc
+      FROM product_sync_release_products rp JOIN product_sync_releases r ON r.id=rp.release_id
+      JOIN products p ON p.id=rp.product_id
+      WHERE r.status IN ('scheduled','running','partial','failed','held') AND rp.local_applied_at IS NULL
+        AND EXISTS (SELECT 1 FROM product_sync_release_actions ra JOIN product_sync_actions a ON a.id=ra.action_id
+          WHERE ra.release_id=rp.release_id AND a.product_id=rp.product_id AND ra.status IN ('pending','working','failed','held'))`);
+    rows.push(...shared.map(row => ({ ...row, payloadJson: JSON.stringify({ changes: safeJsonParse(row.stagedJson, {}) }) })));
+  } catch (error) { if (error.code !== "ER_NO_SUCH_TABLE") throw error; }
+
   return rows.reduce((acc, row) => {
     const productId = Number(row.productId);
     if (!Number.isFinite(productId)) return acc;
@@ -412,7 +424,15 @@ export async function createScheduledPricelistBatch({
   const connection = await getPool().getConnection();
   try {
     await connection.beginTransaction();
+    await connection.query("SELECT id FROM products WHERE id IN (?) FOR UPDATE", [productIds]);
     const conflicts = await findActiveProductConflicts(connection, productIds);
+    try {
+      const [shared] = await connection.query(`SELECT a.product_name AS productName, r.name AS batchName
+        FROM product_sync_release_actions ra JOIN product_sync_actions a ON a.id=ra.action_id
+        JOIN product_sync_releases r ON r.id=ra.release_id WHERE a.product_id IN (?)
+        AND ra.status IN ('pending','working','held','failed') AND r.status<>'cancelled'`, [productIds]);
+      conflicts.push(...shared);
+    } catch (error) { if (error.code !== "ER_NO_SUCH_TABLE") throw error; }
     if (conflicts.length) {
       throw new Error(
         `Product ${conflicts[0].productName} is already scheduled in ${conflicts[0].batchName}.`

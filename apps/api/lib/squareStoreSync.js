@@ -57,6 +57,7 @@ function configuredCurrency() {
 }
 
 function dollarsToCents(value) {
+  if (value === null || value === undefined || value === "") return null;
   const numeric = Number(value);
   if (!Number.isFinite(numeric)) return null;
   return Math.round(numeric * 100);
@@ -141,7 +142,7 @@ async function fetchSquare(path, options = {}) {
       Array.isArray(body?.errors) && body.errors.length
         ? body.errors.map((error) => error.detail || error.code).filter(Boolean).join("; ")
         : body?.raw || text || response.statusText;
-    throw new Error(`Square request failed (${response.status}): ${detail}`);
+    throw Object.assign(new Error(`Square request failed (${response.status}): ${detail}`), { remoteRejected: response.status >= 400 && response.status < 500 && response.status !== 408 });
   }
 
   return body;
@@ -855,6 +856,7 @@ async function loadApprovedSquarePricingRows(packageIds = [], { includeAllProduc
     `
       SELECT
         l.id AS linkId,
+        DATE_FORMAT(l.approved_at, '%Y-%m-%d %H:%i:%s') AS linkApprovedAt,
         l.product_id AS productId,
         l.package_id AS packageId,
         l.square_item_id AS squareItemId,
@@ -895,7 +897,7 @@ async function loadApprovedSquarePricingRows(packageIds = [], { includeAllProduc
         sv.raw_json AS squareRawJson
       FROM square_variation_links l
       JOIN products p ON p.id = l.product_id
-      JOIN packages pkg ON pkg.id = l.package_id
+      JOIN packages pkg ON pkg.id = l.package_id AND pkg.product_id = p.id
       LEFT JOIN categories c ON c.id = p.category_id
       LEFT JOIN vendors v ON v.id = p.vendor_id
       LEFT JOIN product_pricing_profiles pp ON pp.product_id = p.id
@@ -1092,7 +1094,7 @@ function buildSquarePriceAuditRow(row, packagesByProductId, metaByPackageId) {
       )
     : { price: null, regularPrice: null, basis: "unknown" };
   const proposedAmount = dollarsToCents(squareRetail.price);
-  if (!Number.isFinite(Number(proposedAmount))) {
+  if (proposedAmount === null || !Number.isFinite(Number(proposedAmount)) || proposedAmount < 0) {
     issues.push("CSA Store price for Square could not be calculated.");
   }
 
@@ -1332,4 +1334,13 @@ export async function applySquarePrices({ packageIds = [], userId = null, includ
       nextConnection.release();
     }
   }
+}
+
+// The unified release service freezes amounts at audit time and supplies a durable request key.
+export { loadApprovedSquarePricingRows, loadPackagesByProduct, buildSquarePriceAuditRow,
+  buildVariationUpdateObject, batchRetrieveSquareObjects, upsertReturnedSquareObjects };
+export async function pushReviewedSquareVariation(object, idempotencyKey) {
+  return fetchSquare("/v2/catalog/batch-upsert", {
+    method: "POST", body: JSON.stringify({ idempotency_key: idempotencyKey, batches: [{ objects: [object] }] })
+  });
 }

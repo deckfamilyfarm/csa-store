@@ -7,7 +7,8 @@ import { AdminMembershipSection } from "./AdminMembershipSection.jsx";
 import { AdminOrdersSection } from "./AdminOrdersSection.jsx";
 import { AdminProductsSection } from "./AdminProductsSection.jsx";
 import { productCapabilities, buildProductDraftFromProduct, createDraftPackage, hydrateProductDraft, dirtyFields, hasDraftChanges, acknowledgeSave, saveProductDraft } from "./productWorkspace.js";
-import { AdminSquareSection } from "./AdminSquareSection.jsx";
+import { AdminProductSyncSection } from "./AdminProductSyncSection.jsx";
+import { acknowledgeSyncDrafts } from "./productSyncView.js";
 import {
   AdminMemberCreditsSection,
   AdminSubscriptionLeadsSection
@@ -39,8 +40,10 @@ function canAccessAdminSection(roleKeys, section) {
       );
     case "localLine":
       return roleKeys.includes("localline_pull") || roleKeys.includes("dropsite_admin");
-    case "square":
+    case "productSync":
       return (
+        roleKeys.includes("localline_pull") ||
+        roleKeys.includes("localline_push") ||
         roleKeys.includes("square_pull") ||
         roleKeys.includes("square_push") ||
         roleKeys.includes("pricing_admin")
@@ -87,7 +90,7 @@ function getDefaultAdminSection(roleKeys = []) {
     "products",
     "googleDrive",
     "localLine",
-    "square",
+    "productSync",
     "orders",
     "content",
     "marketing",
@@ -111,8 +114,8 @@ const ADMIN_NAV_GROUPS = [
     label: "Store",
     items: [
       { section: "products", label: "Products" },
-      { section: "localLine", label: "Local Line" },
-      { section: "square", label: "Square" },
+      { section: "localLine", label: "Local Line Data" },
+      { section: "productSync", label: "Product Sync" },
       { section: "orders", label: "Orders" }
     ]
   },
@@ -605,6 +608,8 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
   const [selectedProductDetail, setSelectedProductDetail] = useState(null);
   const [productEditorMode, setProductEditorMode] = useState("existing");
   const [workspaceDrafts, setWorkspaceDrafts] = useState({});
+  const [syncHandoff, setSyncHandoff] = useState(null);
+  function openProductSync(handoff = null) { setSyncHandoff(handoff); setActiveSection("productSync"); }
   const [newProductDraft, setNewProductDraft] = useState(null);
   const productDraft = productEditorMode === "new" ? newProductDraft : workspaceDrafts[selectedProductId]?.values || null;
   const capabilities = productCapabilities(currentAdmin?.adminRoles || []);
@@ -805,6 +810,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
 
   function clearAdminSession(message = "Your admin session expired. Please sign in again.") {
     localStorage.removeItem("adminToken");
+    setSyncHandoff(null);
     setToken("");
     setCurrentAdmin(null);
     setProductsLoading(false);
@@ -2771,7 +2777,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
   const canManageUsers = hasRole(currentAdminRoles, "user_admin");
   const canManageGoogleDrive = canAccessAdminSection(currentAdminRoles, "googleDrive");
   const canManageLocalLine = canAccessAdminSection(currentAdminRoles, "localLine");
-  const canManageSquare = canAccessAdminSection(currentAdminRoles, "square");
+  const canManageProductSync = canAccessAdminSection(currentAdminRoles, "productSync");
   const canPullSquare = hasRole(currentAdminRoles, "square_pull");
   const canPushSquare = hasRole(currentAdminRoles, "square_push");
   const canManageOrders = canAccessAdminSection(currentAdminRoles, "orders");
@@ -4406,6 +4412,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                 onAddProduct={startNewProductDraft}
                 onDuplicateProduct={handleDuplicateProduct}
                 onDeleteProduct={handleDeleteProduct}
+                onOpenProductSync={openProductSync}
                 onOpenPricingGuide={() => openAdminManual("pricing")}
                 onOpenProductDetails={(productId) => {
                   setProductEditorMode("existing");
@@ -4416,12 +4423,19 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
             </>
           )}
 
-          {activeSection === "square" && canManageSquare && (
-            <AdminSquareSection
-              token={token}
-              canPullSquare={canPullSquare}
-              canPushSquare={canPushSquare}
-            />
+          {activeSection === "productSync" && canManageProductSync && (
+            <AdminProductSyncSection token={token} roles={currentAdminRoles} handoff={syncHandoff}
+              onAuditCreated={(auditId) => setSyncHandoff(prev => prev ? { ...prev, auditId } : null)}
+              onClearScope={() => setSyncHandoff(null)}
+              onReleaseCreated={(release, entries) => {
+                const ids = [...new Set((release.actions || []).map(action => action.productId))];
+                setWorkspaceDrafts(prev => acknowledgeSyncDrafts(prev, entries, ids));
+                setSyncHandoff(prev => prev ? { ...prev,
+                  staged: (prev.staged || []).filter(row => !ids.includes(row.productId)),
+                  entries: (prev.entries || []).filter(entry => !ids.includes(entry.meta.productId))
+                } : null);
+                setPricelistRefreshNonce(value => value + 1);
+              }} />
           )}
 
           {activeSection === "manual" && currentAdmin && (
@@ -4524,9 +4538,9 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
 
           {activeSection === "localLine" && canManageLocalLine && (
             <section className="admin-section">
-              <h3>Local Line</h3>
+              <h3>Local Line Data</h3>
               <div className="small">
-                Run dataset pulls for products, fulfillments, orders, and subscribers from one place.
+                Pull fulfillments, orders, and subscribers. Product audits and releases are in Product Sync.
               </div>
               {localLineStatusState.loading && !localLineStatus ? (
                 <div className="small">Loading Local Line status...</div>
@@ -4549,24 +4563,8 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                 </div>
                 <div className="response-card">
                   <div className="title">Products</div>
-                  <div className="small">Rows stored locally: {Number(localLineStatus?.products?.cachedProducts || 0)}</div>
-                  <div className="small">Sync issues: {Number(localLineStatus?.products?.syncIssues || 0)}</div>
-                  <div className="small">Last synced: {localLineStatus?.products?.lastSyncedAt || "Never"}</div>
-                  <div className="small">Latest sync status: {localLineStatus?.products?.latestJob?.status || "Never run"}</div>
-                  <div className="admin-actions">
-                    <button
-                      className="button"
-                      type="button"
-                      onClick={handleLocalLineFullSync}
-                      disabled={!canPullFromLocalLine || localLineCacheState.loading || fullSyncRunning}
-                    >
-                      {localLineCacheState.loading
-                        ? "Starting Pull..."
-                        : fullSyncRunning
-                          ? "Pull Running..."
-                          : "Pull Products"}
-                    </button>
-                  </div>
+                  <p className="small">Review incoming catalog changes and outgoing releases together.</p>
+                  <button className="button" disabled={!canManageProductSync} onClick={() => openProductSync({ incoming: true })}>Open Product Sync</button>
                 </div>
                 <div className="response-card">
                   <div className="title">Fulfillments</div>
