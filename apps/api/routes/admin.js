@@ -1725,7 +1725,17 @@ const WIX_SUBSCRIPTION_LEAD_EXPORT_COLUMNS = [
   { label: "Company", value: () => "" },
   { label: "custom field 1", value: (row) => row.selectedPlanLabel || row.selectedPlan },
   { label: "custom field 2", value: (row) => row.selectedDropSite },
-  { label: "Labels", value: (row, context) => buildWixLabels(row, context.dropSiteDayLookup) }
+  { label: "Labels", value: (row, context) => buildWixLabels(row, context.dropSiteDayLookup) },
+  { label: "Referral Source", value: (row) => row.referralSource },
+  { label: "Notes", value: (row) => row.adminNotes },
+  { label: "Customer Notes", value: (row) => row.notes },
+  {
+    label: "Flags",
+    value: (row) => [
+      row.hasCurrentSnapEbtCard ? "SNAP/EBT" : "",
+      row.isFarmEmployee ? "Employee" : ""
+    ].filter(Boolean).join(", ")
+  }
 ];
 
 function buildSubscriptionLeadsCsv(rows = [], context = {}) {
