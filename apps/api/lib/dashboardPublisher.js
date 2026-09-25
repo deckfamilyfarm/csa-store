@@ -12,6 +12,7 @@ import {
   isHerdSharePriceListConfigured
 } from "./localLinePriceListMembers.js";
 import { loadDashboardQboPeriodMetrics } from "./qboDashboard.js";
+import { recordGoogleDrivePublish } from "./googleDrivePublishing.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -36,7 +37,7 @@ function getDashboardEnv(key, fallback = "") {
   return fallback;
 }
 
-const DASHBOARD_SHEET_ID =
+export const DASHBOARD_SHEET_ID =
   getDashboardEnv("GOOGLE_SHEETS_ID") ||
   getDashboardEnv("DASHBOARD_SHEET_ID") ||
   "1plDSzQo8PZqQbCAt9Xb1BRd-cdJmkpoGwSmCFQvolUc";
@@ -8014,6 +8015,7 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
     const finishedAt = new Date();
     const summary = {
       spreadsheetId: DASHBOARD_SHEET_ID,
+      publishedAt: finishedAt.toISOString(),
       targetTitle: DASHBOARD_TARGET_TITLE,
       v2TargetTitle: DASHBOARD_V2_TARGET_TITLE,
       employeeCreditsTargetTitle: DASHBOARD_EMPLOYEE_CREDITS_TARGET_TITLE,
@@ -8070,6 +8072,8 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       missingSubscriberWeeks,
       timesheetStatus: timesheetResult.status
     };
+
+    await recordGoogleDrivePublish("dashboard", summary, finishedAt);
 
     await upsertSyncCursor(connection, "dashboard", {
       cursorValue: availability.publishableThroughWeekStart

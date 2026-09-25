@@ -510,10 +510,7 @@ export async function listScheduledPricelistBatches({ limit = 25 } = {}) {
       LEFT JOIN users u ON u.id = b.created_by_user_id
       LEFT JOIN pricelist_change_items i ON i.batch_id = b.id
       GROUP BY b.id
-      ORDER BY
-        FIELD(b.status, 'running', 'scheduled', 'partial', 'failed', 'completed', 'cancelled'),
-        b.scheduled_at DESC,
-        b.id DESC
+      ORDER BY b.scheduled_at DESC, b.id DESC
       LIMIT ?
     `,
     [safeLimit]

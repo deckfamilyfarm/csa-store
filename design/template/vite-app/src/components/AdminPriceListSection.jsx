@@ -1774,12 +1774,14 @@ export function AdminPriceListSection({
           Warning: {activeScheduledProductCount} product{activeScheduledProductCount === 1 ? "" : "s"} have active scheduled pricelist changes. Pull From Local Line will skip scheduled local fields for those products so pending release changes are not overwritten.
         </div>
       ) : null}
-      <div className="scheduled-pricelist-panel">
+      <details className="scheduled-pricelist-panel">
+        <summary className="scheduled-pricelist-toggle">
+          <span>
+            <span className="title">Scheduled Releases</span>
+            <span className="small">Hourly release checks run at the top of the hour.</span>
+          </span>
+        </summary>
         <div className="scheduled-pricelist-header">
-          <div>
-            <div className="title">Scheduled Releases</div>
-            <div className="small">Hourly release checks run at the top of the hour.</div>
-          </div>
           <button className="button alt" type="button" onClick={loadScheduledBatches} disabled={scheduledLoading}>
             {scheduledLoading ? "Reloading..." : "Reload Scheduled Releases"}
           </button>
@@ -1873,7 +1875,7 @@ export function AdminPriceListSection({
             </tbody>
           </table>
         </div>
-      </div>
+      </details>
       {scheduleState.open ? (
         <div className="modal-backdrop" onClick={closeScheduleModal}>
           <div className="modal response-modal scheduled-pricelist-modal" onClick={(event) => event.stopPropagation()}>

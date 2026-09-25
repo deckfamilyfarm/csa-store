@@ -256,16 +256,6 @@ function parseJsonArray(value) {
   }
 }
 
-function parseJsonObject(value) {
-  if (!value) return null;
-  try {
-    const parsed = JSON.parse(value);
-    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : null;
-  } catch (_error) {
-    return null;
-  }
-}
-
 function formatMonthLabel(value) {
   const match = String(value || "").match(/^(\d{4})-(\d{2})$/);
   if (!match) return value || "Unknown month";
@@ -844,6 +834,11 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
     jobId: ""
   });
   const [exportingGooglePricelist, setExportingGooglePricelist] = useState(false);
+  const [googleDriveStatusState, setGoogleDriveStatusState] = useState({
+    loading: false,
+    error: "",
+    data: null
+  });
   const [localLineProductDetail, setLocalLineProductDetail] = useState(null);
   const [priceListEntryDrafts, setPriceListEntryDrafts] = useState([]);
   const [priceListSaveLoading, setPriceListSaveLoading] = useState(false);
@@ -1018,6 +1013,31 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
     }
   }
 
+  async function loadGoogleDriveStatusData(isCurrent = () => true) {
+    setGoogleDriveStatusState((prev) => ({ ...prev, loading: true }));
+    try {
+      const response = await adminGet("google-drive/status", token);
+      if (!isCurrent()) return;
+      setGoogleDriveStatusState({ loading: false, error: "", data: response });
+      setLocalLineDashboardState((prev) => ({
+        ...prev,
+        data: response.dashboardJob || null,
+        jobId: response.dashboardJob?.jobId || ""
+      }));
+    } catch (error) {
+      if (!isCurrent()) return;
+      if (isUnauthorizedAdminError(error)) {
+        clearAdminSession();
+        return;
+      }
+      setGoogleDriveStatusState((prev) => ({
+        ...prev,
+        loading: false,
+        error: error?.message || "Failed to load Google Drive publish status."
+      }));
+    }
+  }
+
   async function loadLocalLineStatusData() {
     setLocalLineStatusState((prev) => ({ ...prev, loading: true, error: "" }));
     try {
@@ -1095,6 +1115,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
       if (reviewsLoaded || activeSection === "reviews") loaders.push(loadReviewsData());
       if (dropSitesLoaded || activeSection === "dropSites") loaders.push(loadDropSitesData());
       if (activeSection === "localLine") loaders.push(loadLocalLineStatusData());
+      if (activeSection === "googleDrive") loaders.push(loadGoogleDriveStatusData());
       await Promise.all(loaders);
       if (selectedProductId && productEditorMode !== "new") {
         await refreshSelectedProductDetail(selectedProductId);
@@ -1350,6 +1371,31 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
         data: null
       });
     });
+  }, [token, activeSection]);
+
+  useEffect(() => {
+    if (!token || activeSection !== "googleDrive") return undefined;
+    let cancelled = false;
+    let refreshing = false;
+    const refresh = async () => {
+      if (refreshing || document.visibilityState === "hidden") return;
+      refreshing = true;
+      try {
+        await loadGoogleDriveStatusData(() => !cancelled);
+      } finally {
+        refreshing = false;
+      }
+    };
+    refresh();
+    const intervalId = window.setInterval(refresh, 30000);
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refresh);
+    return () => {
+      cancelled = true;
+      window.clearInterval(intervalId);
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", refresh);
+    };
   }, [token, activeSection]);
 
   useEffect(() => {
@@ -1674,7 +1720,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
 
         if (response.job?.status === "completed") {
           setMessage("Dashboard publish completed.");
-          await loadLocalLineStatusData();
+          await loadGoogleDriveStatusData();
         }
       } catch (error) {
         if (cancelled) return;
@@ -2663,6 +2709,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
       setMessage(error?.message || "Failed to export Google pricelist.");
     } finally {
       setExportingGooglePricelist(false);
+      await loadGoogleDriveStatusData();
     }
   }
 
@@ -3036,28 +3083,31 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
   const automationRunning =
     automationJob?.status === "queued" || automationJob?.status === "running";
   const automationMode = automationJob?.result?.mode || "Not run yet";
-  const dashboardCursorSummary = parseJsonObject(localLineStatus?.dashboard?.cursor?.summaryJson);
-  const dashboardWarnings = Array.isArray(dashboardCursorSummary?.warnings)
-    ? dashboardCursorSummary.warnings
+  const dashboardPublication = googleDriveStatusState.data?.dashboard;
+  const pricelistPublication = googleDriveStatusState.data?.pricelist;
+  const googleDriveLinks = googleDriveStatusState.data?.links || {};
+  const publicationEmptyLabel = googleDriveStatusState.data
+    ? "No publish recorded"
+    : googleDriveStatusState.error ? "Status unavailable" : "Loading...";
+  const publishedWeekLabel = (publication) => {
+    if (!publication) return publicationEmptyLabel;
+    if (publication.latestWeekStart && publication.latestWeekEnd) {
+      return `${publication.latestWeekStart} – ${publication.latestWeekEnd}`;
+    }
+    return publication.latestWeekEnd || publication.latestWeekStart || "No completed week published";
+  };
+  const lastPublishLabel = (publication) => publication?.publishedAt
+    ? new Date(publication.publishedAt).toLocaleString(undefined, {
+        year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "2-digit"
+      })
+    : publicationEmptyLabel;
+  const dashboardWarnings = Array.isArray(dashboardPublication?.summary?.warnings)
+    ? dashboardPublication.summary.warnings
     : [];
-  const dashboardLatestWeekLabel =
-    localLineStatus?.dashboard?.cursor?.cursorValue ||
-    dashboardJob?.result?.latestWeekEnd ||
-    dashboardJob?.result?.latestWeekStart ||
-    dashboardCursorSummary?.latestWeekEnd ||
-    dashboardCursorSummary?.latestWeekStart ||
-    "Not published yet";
-  const dashboardLastPublishLabel =
-    localLineStatus?.dashboard?.cursor?.lastFinishedAt ||
-    dashboardJob?.finishedAt ||
-    dashboardJob?.startedAt ||
-    "Not published yet";
   const dashboardPublishStatusLabel =
-    localLineStatus?.dashboard?.cursor?.lastStatus ||
     dashboardJob?.status ||
-    "Not started";
+    (dashboardPublication ? "completed" : publicationEmptyLabel);
   const dashboardStatusMessage =
-    localLineStatus?.dashboard?.cursor?.lastMessage ||
     dashboardJob?.error?.message ||
     dashboardJob?.progress?.message ||
     "";
@@ -5284,13 +5334,29 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
             <section className="admin-section">
               <h3>Google Drive</h3>
               <div className="small">
-                Run Google Drive publishing tasks for the shared pricelist and dashboard sheets from one place.
+                Publish the shared pricelist and dashboard.
               </div>
-              <div className="audit-summary-grid">
+              {googleDriveStatusState.error ? (
+                <div className="small subscribe-error" role="alert">
+                  {googleDriveStatusState.error} {googleDriveStatusState.data ? "Showing last loaded publish status." : ""}
+                </div>
+              ) : null}
+              <div className="audit-summary-grid google-drive-publish-grid">
                 <div className="response-card">
-                  <div className="title">Google Pricelist</div>
-                  <div className="small">Target: shared Google pricelist workbook</div>
-                  <div className="small">Action: push the current local pricelist export</div>
+                  <div className="title">
+                    {googleDriveLinks.pricelist ? (
+                      <a href={googleDriveLinks.pricelist} target="_blank" rel="noopener noreferrer"
+                        aria-label="Google Pricelist (opens in a new tab)">
+                        Google Pricelist
+                      </a>
+                    ) : "Google Pricelist"}
+                  </div>
+                  <dl className="google-drive-publish-meta small">
+                    <dt title="Week of the successful export, Monday–Sunday in Pacific time.">Latest week</dt>
+                    <dd>{publishedWeekLabel(pricelistPublication)}</dd>
+                    <dt>Last publish</dt>
+                    <dd>{lastPublishLabel(pricelistPublication)}</dd>
+                  </dl>
                   <div className="admin-actions">
                     <button
                       className="button"
@@ -5298,20 +5364,34 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                       onClick={handleGooglePricelistExport}
                       disabled={!canManagePricing || exportingGooglePricelist}
                     >
-                      {exportingGooglePricelist ? "Exporting..." : "Push Google Pricelist"}
+                      {exportingGooglePricelist ? "Exporting..." : "Push Pricelist"}
                     </button>
                   </div>
                 </div>
                 <div className="response-card">
-                  <div className="title">Dashboard</div>
-                  <div className="small">
-                    Target tabs: Dashboard-auto-26, Dashboard-auto-26v2, Dashboard-auto-employee-credits26
+                  <div className="google-drive-card-heading">
+                    <div className="title">
+                      {googleDriveLinks.dashboard ? (
+                        <a href={googleDriveLinks.dashboard} target="_blank" rel="noopener noreferrer"
+                          aria-label="Dashboard (opens in a new tab)">
+                          Dashboard
+                        </a>
+                      ) : "Dashboard"}
+                    </div>
+                    <span className="small" aria-label={`Publish status: ${dashboardPublishStatusLabel}`}>
+                      {dashboardPublishStatusLabel}
+                    </span>
                   </div>
-                  <div className="small">Latest week: {dashboardLatestWeekLabel}</div>
-                  <div className="small">Last publish: {dashboardLastPublishLabel}</div>
-                  <div className="small">Publish status: {dashboardPublishStatusLabel}</div>
-                  {dashboardStatusMessage ? (
-                    <div className="small">Message: {dashboardStatusMessage}</div>
+                  <dl className="google-drive-publish-meta small">
+                    <dt>Latest week</dt>
+                    <dd>{publishedWeekLabel(dashboardPublication)}</dd>
+                    <dt>Last publish</dt>
+                    <dd>{lastPublishLabel(dashboardPublication)}</dd>
+                  </dl>
+                  {localLineDashboardState.error || dashboardJob?.error?.message ? (
+                    <div className="small subscribe-error" role="alert">
+                      {localLineDashboardState.error || dashboardJob.error.message}
+                    </div>
                   ) : null}
                   {dashboardWarnings.length ? (
                     <div className="small">Warning: {dashboardWarnings[0]}</div>
@@ -5328,13 +5408,19 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                   </div>
                 </div>
               </div>
-              <div className="audit-section">
-                <h4>Push Dashboard</h4>
-                {renderLocalLinePullJobContent(
-                  localLineDashboardState,
-                  "No dashboard publish has run yet."
-                )}
-              </div>
+              <details className="google-drive-publish-details">
+                <summary>Dashboard publish details</summary>
+                <div className="audit-section">
+                  <div className="small">
+                    Target tabs: Dashboard-auto-26, Dashboard-auto-26v2, Dashboard-auto-employee-credits26
+                  </div>
+                  {dashboardStatusMessage ? <div className="small">{dashboardStatusMessage}</div> : null}
+                  {renderLocalLinePullJobContent(
+                    localLineDashboardState,
+                    "No dashboard publish has run yet."
+                  )}
+                </div>
+              </details>
             </section>
           )}
 

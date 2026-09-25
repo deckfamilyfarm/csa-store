@@ -53,6 +53,7 @@ import {
   vendors
 } from "../schema.js";
 import { requireAdmin, requireAdminPermission } from "../middleware/auth.js";
+import { getGoogleDrivePublishStatus } from "../lib/googleDrivePublishing.js";
 import {
   createLocalLineProductFromStoreProduct,
   deleteLocalLineProductById,
@@ -99,6 +100,7 @@ import {
   isGooglePricelistVendorName
 } from "../scripts/exportMasterPricelist.js";
 import {
+  DASHBOARD_SHEET_ID,
   importLocalLineSubscriberHistory,
   publishLocalLineDashboard,
   syncLocalLineSubscriberSnapshotCache
@@ -6978,6 +6980,32 @@ router.post("/pricelist/apply-remote", requireAdminPermission("localline_push"),
   }
 
   res.json({ results });
+});
+
+router.get("/google-drive/status", requireAdminPermission(["pricing_admin", "localline_pull", "localline_push"]), async (_req, res) => {
+  try {
+    const publications = await getGoogleDrivePublishStatus();
+    const dashboardJob = await getLatestPersistedLocalLineJobRun("dashboard", "pull");
+    const pricelistSummary = publications.pricelist?.summary;
+    const pricelistSpreadsheetId = pricelistSummary?.spreadsheetId ||
+      pricelistSummary?.spreadsheetSummary?.match(/^([A-Za-z0-9_-]+) \(tab:/)?.[1] ||
+      process.env.GOOGLE_SHEETS_SPREADSHEET_ID;
+    const dashboardSpreadsheetId = publications.dashboard?.summary?.spreadsheetId || DASHBOARD_SHEET_ID;
+    const spreadsheetUrl = (id) => id
+      ? `https://docs.google.com/spreadsheets/d/${encodeURIComponent(id)}/edit`
+      : null;
+    res.set("Cache-Control", "no-store");
+    res.json({
+      ...publications,
+      dashboardJob,
+      links: {
+        pricelist: spreadsheetUrl(pricelistSpreadsheetId),
+        dashboard: spreadsheetUrl(dashboardSpreadsheetId)
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error?.message || "Unable to load Google Drive publish status." });
+  }
 });
 
 router.post("/pricelist/export-google", requireAdminPermission("pricing_admin"), async (_req, res) => {

@@ -17,6 +17,7 @@ import {
   isSourcePricingVendor
 } from "../lib/productPricing.js";
 import { ensureLocalLineSyncSchema, ensureProductPricingSchema, getDb, isMissingTableError } from "../db.js";
+import { getPricelistPublishWeek, recordGoogleDrivePublish } from "../lib/googleDrivePublishing.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -50,6 +51,20 @@ const ORDERED_COLUMN_NAMES = [
   "visible",
   "remoteSyncStatus",
   "remoteSyncedAt"
+];
+const SIMPLE_PRICES_SHEET_NAME = "simple prices";
+const SIMPLE_PRICE_COLUMN_NAMES = [
+  "category",
+  "vendor",
+  "productName",
+  "retailSalesPrice",
+  "dff_unit_of_measure",
+  "packageName",
+  "sale",
+  "saleDiscount",
+  "squareSalePrice",
+  "ffcsaMemberSalesPrice",
+  "id"
 ];
 const INTRO_NOTE_ROW_INDEX = 14;
 const COLUMN_INDEX_BY_NAME = new Map(ORDERED_COLUMN_NAMES.map((name, index) => [name, index]));
@@ -113,6 +128,28 @@ function getColumnLetterByName(columnName) {
     throw new Error(`Unknown Google pricelist column: ${columnName}`);
   }
   return columnIndexToLetter(index + 1);
+}
+
+export function buildSimplePricelistValues(sheetValues, sourceSheetName) {
+  const sourceColumns = SIMPLE_PRICE_COLUMN_NAMES.map((name) => {
+    const index = sheetValues[0].indexOf(name);
+    if (index < 0) throw new Error(`Missing source pricelist column: ${name}`);
+    return columnIndexToLetter(index + 1);
+  });
+  const source = `'${sourceSheetName.replace(/'/g, "''")}'`;
+  const values = [
+    [...SIMPLE_PRICE_COLUMN_NAMES],
+    ...sheetValues.slice(1).map((_row, index) => sourceColumns.map((column) => {
+      const reference = `${source}!$${column}$${index + 2}`;
+      // Reference the calculated source cells instead of copying formulas whose
+      // inputs are intentionally absent from this simpler view. Preserve blanks.
+      return `=IF(${reference}="","",${reference})`;
+    }))
+  ];
+  Object.defineProperty(values, "highlightedRowIndices", {
+    value: sheetValues.highlightedRowIndices || []
+  });
+  return values;
 }
 
 function toNumber(value) {
@@ -187,7 +224,7 @@ function buildIntroductionValues(metadata) {
     ["Source", "Store tables: products, packages, product_pricing_profiles, product_sales"],
     ["Sort order", "category, productName"],
     ["Google sheet", metadata.spreadsheetSummary],
-    ["Sheets included", "Introduction, prices"],
+    ["Sheets included", `Introduction, prices, ${SIMPLE_PRICES_SHEET_NAME}`],
     ["Vendor filter", metadata.vendorSummary],
     [],
     ["Notes"],
@@ -200,7 +237,7 @@ function buildIntroductionValues(metadata) {
     ["squareSalePrice", "Shown only for sale items. It is the Square / farmers-market sell price and is calculated from retailSalesPrice with the sale discount only."],
     ["ffcsaPurchasePrice", "Derived base package price before list markups"],
     ["ffcsaMemberSalesPrice", "Derived FFCSA online-store member-facing price"],
-    ["Sync behavior", "Google sync replaces all data in the configured prices tab"]
+    ["Sync behavior", "Google sync refreshes the configured prices tab and its simple prices view"]
   ];
 }
 
@@ -264,7 +301,7 @@ async function googleSheetRequest(url, options) {
   throw new Error(`Google Sheets request failed: ${response.status} ${response.statusText} ${text}`);
 }
 
-async function getGoogleSheetInfo({ accessToken, spreadsheetId, sheetName }) {
+async function getGoogleSheetInfo({ accessToken, spreadsheetId, sheetName, createIfMissing = false }) {
   const response = await googleSheetRequest(
     `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?fields=sheets.properties`,
     {
@@ -279,12 +316,25 @@ async function getGoogleSheetInfo({ accessToken, spreadsheetId, sheetName }) {
   const exactMatch = sheets.find(
     (sheet) => String(sheet?.properties?.title || "") === String(sheetName)
   );
-  const matchingSheet =
+  let matchingSheet =
     exactMatch ||
     sheets.find(
       (sheet) =>
         normalizeSheetTitle(sheet?.properties?.title) === normalizeSheetTitle(sheetName)
     );
+
+  if (!matchingSheet && createIfMissing) {
+    const createResponse = await googleSheetRequest(
+      `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}:batchUpdate`,
+      {
+        method: "POST",
+        headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ requests: [{ addSheet: { properties: { title: sheetName } } }] })
+      }
+    );
+    const created = await createResponse.json();
+    matchingSheet = { properties: created.replies?.[0]?.addSheet?.properties };
+  }
 
   if (!matchingSheet?.properties?.sheetId && matchingSheet?.properties?.sheetId !== 0) {
     const availableTabs = sheets
@@ -360,14 +410,17 @@ async function formatGooglePricelistColumns({
   accessToken,
   spreadsheetId,
   sheetName,
-  rowCount
+  rowCount,
+  columnNames = ORDERED_COLUMN_NAMES
 }) {
   const { sheetId } = await getGoogleSheetInfo({ accessToken, spreadsheetId, sheetName });
   const safeRowCount = Math.max(Number(rowCount) || 1, 1);
+  if (safeRowCount <= 1) return;
+  const columnIndexByName = new Map(columnNames.map((name, index) => [name, index]));
   const requests = [];
 
   PRICE_SHEET_CURRENCY_COLUMNS.forEach((columnName) => {
-    const index = COLUMN_INDEX_BY_NAME.get(columnName);
+    const index = columnIndexByName.get(columnName);
     if (!Number.isFinite(index)) return;
     requests.push({
       repeatCell: {
@@ -392,7 +445,7 @@ async function formatGooglePricelistColumns({
   });
 
   PRICE_SHEET_PERCENT_COLUMNS.forEach((columnName) => {
-    const index = COLUMN_INDEX_BY_NAME.get(columnName);
+    const index = columnIndexByName.get(columnName);
     if (!Number.isFinite(index)) return;
     requests.push({
       repeatCell: {
@@ -417,7 +470,7 @@ async function formatGooglePricelistColumns({
   });
 
   PRICE_SHEET_NUMBER_COLUMNS.forEach(({ key, pattern }) => {
-    const index = COLUMN_INDEX_BY_NAME.get(key);
+    const index = columnIndexByName.get(key);
     if (!Number.isFinite(index)) return;
     requests.push({
       repeatCell: {
@@ -537,6 +590,35 @@ async function formatGoogleSheetHighlightedRows({
   });
 }
 
+async function formatSimplePricelistLayout({ accessToken, spreadsheetId, sheetName, rowCount }) {
+  const { sheetId } = await getGoogleSheetInfo({ accessToken, spreadsheetId, sheetName });
+  const range = {
+    sheetId, startRowIndex: 0, endRowIndex: rowCount,
+    startColumnIndex: 0, endColumnIndex: SIMPLE_PRICE_COLUMN_NAMES.length
+  };
+  const columnWidths = [190, 200, 240, 110, 120, 230, 65, 100, 115, 150, 90];
+  const requests = [
+    { repeatCell: {
+      range,
+      cell: { userEnteredFormat: { wrapStrategy: "WRAP", verticalAlignment: "MIDDLE" } },
+      fields: "userEnteredFormat.wrapStrategy,userEnteredFormat.verticalAlignment"
+    } },
+    ...columnWidths.map((pixelSize, index) => ({ updateDimensionProperties: {
+      range: { sheetId, dimension: "COLUMNS", startIndex: index, endIndex: index + 1 },
+      properties: { pixelSize }, fields: "pixelSize"
+    } })),
+    { setBasicFilter: { filter: { range } } },
+    { autoResizeDimensions: { dimensions: {
+      sheetId, dimension: "ROWS", startIndex: 0, endIndex: rowCount
+    } } }
+  ];
+  await googleSheetRequest(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}:batchUpdate`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ requests })
+  });
+}
+
 async function formatGoogleSheetNoteRow({
   accessToken,
   spreadsheetId,
@@ -585,14 +667,15 @@ async function formatGoogleSheetNoteRow({
   });
 }
 
-async function updateGoogleSheet({ accessToken, spreadsheetId, sheetName, values }) {
-  const sheetInfo = await getGoogleSheetInfo({ accessToken, spreadsheetId, sheetName });
+async function updateGoogleSheet({ accessToken, spreadsheetId, sheetName, values, createIfMissing = false }) {
+  const sheetInfo = await getGoogleSheetInfo({ accessToken, spreadsheetId, sheetName, createIfMissing });
   const resolvedSheetName = sheetInfo.sheetName;
-  const encodedSheet = encodeURIComponent(resolvedSheetName);
+  const quotedSheetName = `'${resolvedSheetName.replace(/'/g, "''")}'`;
+  const encodedSheet = encodeURIComponent(quotedSheetName);
   const columnCount = values.reduce((max, row) => Math.max(max, row?.length || 0), 1);
   const rowCount = values.length || 1;
   const endColumn = columnIndexToLetter(columnCount);
-  const range = `${resolvedSheetName}!A1:${endColumn}${rowCount}`;
+  const range = `${quotedSheetName}!A1:${endColumn}${rowCount}`;
   const baseUrl = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values`;
 
   await googleSheetRequest(`${baseUrl}/${encodedSheet}:clear`, {
@@ -661,6 +744,33 @@ async function syncPricelistToGoogleSheet(sheetValues, introductionValues) {
   });
   console.log(`Google Sheet updated: ${spreadsheetId} (${sheetName})`);
 
+  const simpleValues = buildSimplePricelistValues(sheetValues, priceSheetUpdate.sheetName);
+  const simpleSheetUpdate = await updateGoogleSheet({
+    accessToken,
+    spreadsheetId,
+    sheetName: SIMPLE_PRICES_SHEET_NAME,
+    values: simpleValues,
+    createIfMissing: true
+  });
+  await formatGoogleSheetHeader({
+    accessToken, spreadsheetId, sheetName: simpleSheetUpdate.sheetName,
+    columnCount: simpleSheetUpdate.columnCount
+  });
+  await formatGooglePricelistColumns({
+    accessToken, spreadsheetId, sheetName: simpleSheetUpdate.sheetName,
+    rowCount: simpleSheetUpdate.rowCount, columnNames: SIMPLE_PRICE_COLUMN_NAMES
+  });
+  await formatGoogleSheetHighlightedRows({
+    accessToken, spreadsheetId, sheetName: simpleSheetUpdate.sheetName,
+    columnCount: simpleSheetUpdate.columnCount, rowCount: simpleSheetUpdate.rowCount,
+    highlightedRowIndices: simpleValues.highlightedRowIndices
+  });
+  await formatSimplePricelistLayout({
+    accessToken, spreadsheetId, sheetName: simpleSheetUpdate.sheetName,
+    rowCount: simpleSheetUpdate.rowCount
+  });
+  console.log(`Google Sheet updated: ${spreadsheetId} (${simpleSheetUpdate.sheetName})`);
+
   const introSheetName = process.env.GOOGLE_SHEETS_INTRO_TAB_NAME || "Introduction";
   const introSheetUpdate = await updateGoogleSheet({
     accessToken,
@@ -676,6 +786,7 @@ async function syncPricelistToGoogleSheet(sheetValues, introductionValues) {
     columnCount: introSheetUpdate.columnCount
   });
   console.log(`Google Sheet updated: ${spreadsheetId} (${introSheetName})`);
+  return { spreadsheetId };
 }
 
 async function buildSheetValues({ vendorNameMatcher = null } = {}) {
@@ -884,19 +995,26 @@ export async function exportMasterPricelist({
       vendorNames,
       rowCount,
       highlightedRowCount,
-      sampleRows: sheetValues.slice(0, 6)
+      sampleRows: sheetValues.slice(0, 6),
+      simpleSampleRows: buildSimplePricelistValues(sheetValues, tabName).slice(0, 6)
     };
   }
 
-  await syncPricelistToGoogleSheet(sheetValues, introductionValues);
-  return {
+  const { spreadsheetId: publishedSpreadsheetId } = await syncPricelistToGoogleSheet(sheetValues, introductionValues);
+  const publishedAt = new Date();
+  const summary = {
     mode: "google-sync",
     nodeEnv,
+    spreadsheetId: publishedSpreadsheetId,
     spreadsheetSummary,
     vendorNames,
     rowCount,
-    highlightedRowCount
+    highlightedRowCount,
+    publishedAt: publishedAt.toISOString(),
+    ...getPricelistPublishWeek(publishedAt)
   };
+  await recordGoogleDrivePublish("pricelist", summary, publishedAt);
+  return summary;
 }
 
 async function main() {

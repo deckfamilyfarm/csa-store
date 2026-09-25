@@ -3803,16 +3803,42 @@ img {
 }
 
 .scheduled-pricelist-panel {
-  display: grid;
-  gap: 8px;
   margin: 12px 0;
+}
+
+.scheduled-pricelist-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  list-style: none;
+  padding: 8px 0;
+}
+
+.scheduled-pricelist-toggle::-webkit-details-marker {
+  display: none;
+}
+
+.scheduled-pricelist-toggle::before {
+  content: "▸";
+  font-size: 20px;
+}
+
+.scheduled-pricelist-panel[open] > .scheduled-pricelist-toggle::before {
+  content: "▾";
+}
+
+.scheduled-pricelist-toggle .title,
+.scheduled-pricelist-toggle .small {
+  display: block;
 }
 
 .scheduled-pricelist-header {
   display: flex;
   align-items: flex-end;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 12px;
+  margin-bottom: 8px;
 }
 
 .scheduled-pricelist-table-shell {
@@ -5469,6 +5495,90 @@ img {
 .response-card .title {
   font-weight: 700;
   margin-bottom: 6px;
+}
+
+.audit-summary-grid.google-drive-publish-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  max-width: 760px;
+  margin-top: 8px;
+}
+
+.google-drive-publish-grid .response-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+}
+
+.google-drive-publish-grid .title {
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.google-drive-publish-grid .title a {
+  color: var(--barn);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.google-drive-publish-grid .small {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.google-drive-card-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0 8px;
+}
+
+.google-drive-publish-meta {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 2px 8px;
+  margin: 0;
+}
+
+.google-drive-publish-meta dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+.google-drive-publish-grid .admin-actions {
+  justify-content: center;
+  margin: auto 0 0;
+  padding-top: 8px;
+}
+
+.google-drive-publish-grid .button {
+  justify-content: center;
+  min-height: 34px;
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.google-drive-publish-details {
+  margin-top: 10px;
+}
+
+.google-drive-publish-details > summary {
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.google-drive-publish-details > .audit-section {
+  margin-top: 8px;
+}
+
+@media (max-width: 600px) {
+  .audit-summary-grid.google-drive-publish-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .marketing-summary-list {

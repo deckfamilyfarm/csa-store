@@ -1829,6 +1829,17 @@ const LOCAL_LINE_TABLE_STATEMENTS = [
     )
   `,
   `
+    CREATE TABLE IF NOT EXISTS google_drive_publish_history (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      publication_key VARCHAR(64) NOT NULL,
+      published_at DATETIME NOT NULL,
+      latest_week_start VARCHAR(10),
+      latest_week_end VARCHAR(10),
+      summary_json LONGTEXT,
+      KEY idx_google_drive_publish_latest (publication_key, published_at, id)
+    )
+  `,
+  `
     CREATE TABLE IF NOT EXISTS local_line_sync_cursors (
       sync_key VARCHAR(64) PRIMARY KEY,
       cursor_value VARCHAR(255),
