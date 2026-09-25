@@ -1,0 +1,134 @@
+.products-workspace .admin-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: end;
+}
+.products-workspace .admin-filters label {
+  display: grid;
+  gap: 4px;
+}
+.products-toolbar {
+  margin: 18px 0 12px;
+  flex-wrap: wrap;
+}
+.products-message {
+  min-height: 24px;
+}
+.products-table-scroll {
+  overflow: auto;
+  max-height: 70vh;
+  margin: 12px 0;
+  border: 1px solid #ddd;
+}
+.products-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.products-table th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #f5f4ee;
+}
+.products-table td,
+.products-table th {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+  vertical-align: top;
+}
+.products-table th button {
+  background: transparent;
+  border: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.products-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.products-name img {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+.products-number {
+  width: 100px;
+}
+.products-columns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px;
+  background: #f5f4ee;
+}
+.products-columns label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.products-row-actions {
+  display: grid;
+  gap: 8px;
+}
+.products-row-actions details button {
+  display: block;
+  margin: 6px 0;
+}
+.products-review {
+  width: min(1000px, 95vw);
+  max-height: 85vh;
+  overflow: auto;
+}
+.products-schedules {
+  margin-top: 24px;
+}
+.products-workspace button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.products-editor-fields {
+  border: 0;
+  padding: 0;
+  min-width: 0;
+}
+.products-column-option {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+@media (min-width: 900px) {
+  .products-table td:first-child,
+  .products-table th:first-child {
+    position: sticky;
+    left: 0;
+    min-width: 36px;
+    background: #fff;
+    z-index: 1;
+  }
+  .products-table td:nth-child(2),
+  .products-table th:nth-child(2) {
+    position: sticky;
+    left: 36px;
+    background: #fff;
+    z-index: 1;
+  }
+  .products-table td:last-child,
+  .products-table th:last-child {
+    position: sticky;
+    right: 0;
+    background: #fff;
+    z-index: 1;
+  }
+  .products-table th:first-child,
+  .products-table th:nth-child(2),
+  .products-table th:last-child {
+    z-index: 3;
+    background: #f5f4ee;
+  }
+}

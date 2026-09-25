@@ -12,17 +12,17 @@ export const ADMIN_ROLE_DEFINITIONS = [
   {
     key: "inventory_admin",
     label: "Inventory Admin",
-    description: "Manage inventory, visibility, stock, and sale status."
+    description: "Manage product details, images, inventory, visibility, stock, and sales in Products."
   },
   {
     key: "pricing_admin",
-    label: "Remote Pricing Admin",
-    description: "Manage the remote pricelist workflow, formulas, and Local Line pricing adjustments."
+    label: "Pricing Admin",
+    description: "Manage Products pricing, formulas, cached Local Line entries, and scheduled releases. Manual pushes require Local Line Push."
   },
   {
     key: "local_pricelist_admin",
-    label: "Local Pricelist",
-    description: "Manage local products, package pricing, and local pricing inputs."
+    label: "Local Product Pricing",
+    description: "Manage local product details, package prices, and formula inputs in Products."
   },
   {
     key: "localline_pull",

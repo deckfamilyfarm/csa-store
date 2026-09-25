@@ -87,10 +87,25 @@ export function AdminManualSection({ focusTopic = "overview" }) {
           inventory-related settings, and Local Line sync decisions.
         </p>
         <p>
-          The pricelist screen is the main pricing workspace. It shows the local rule values,
-          previews calculated prices, tracks what still needs to be pushed to Local Line, and opens
-          the full product editor when admins need to change descriptions, packages, images, or
-          Local Line cache data.
+          Open Store → Products for the whole catalog. Overview, Pricing, and Inventory are views
+          of the same products. Search, filters, selections, and unsaved edits stay together when
+          you switch views or pages. Membership levels remain in the Membership section.
+        </p>
+        <p>
+          Edit formula inputs, stock, visibility, sales, and single-package prices in the grid.
+          Details opens the shared editor for descriptions, images, and multiple package prices.
+          Closing Details keeps your draft. Save Local Changes saves locally; Review &amp; Push lets
+          you choose which products to create or update in Local Line and shows each result.
+        </p>
+        <p>
+          Columns are saved separately for each view. Your previous pricelist column preferences
+          carry over to Pricing. Use the Deck / Hyland / Creamy Cow shortcut to filter formula vendors.
+        </p>
+        <p>
+          Schedule Changes supports stock, tracking, visibility, and sales. Save formula, package,
+          and Details changes first, then use Schedule Pending Pushes. Scheduled releases apply the
+          saved product values and push to Local Line at the chosen time. Available actions depend on
+          your existing roles; access to local pricing does not grant manual push permission.
         </p>
       </article>
 
@@ -241,11 +256,11 @@ export function AdminManualSection({ focusTopic = "overview" }) {
             actions before local writes are approved.
           </li>
           <li>
-            <strong>Apply Local Changes</strong> stores local pricing and product changes in this
+            <strong>Save Local Changes</strong> stores local pricing and product changes in this
             application only.
           </li>
           <li>
-            <strong>Push To Local Line</strong> sends approved local product and pricing changes to
+            <strong>Review &amp; Push</strong> sends selected local product and pricing changes to
             the remote Local Line store.
           </li>
         </ul>
@@ -264,7 +279,7 @@ export function AdminManualSection({ focusTopic = "overview" }) {
       <article className="admin-manual-card" ref={setSectionRef("workflow")}>
         <h4>Recommended Daily Workflow</h4>
         <ol className="admin-manual-list admin-manual-numbered">
-          <li>Open the pricelist and filter to the vendor or category you want to work on.</li>
+          <li>Open Store → Products and filter to the vendor or category you want to work on.</li>
           <li>
             Use <strong>Add Product</strong> for a new local item, or <strong>Duplicate</strong> to
             copy an existing item and adjust it.

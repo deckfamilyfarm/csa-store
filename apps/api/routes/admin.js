@@ -1,3 +1,4 @@
+import { buildPricelistWhereClause, PRICELIST_PENDING_REMOTE_APPLY_SQL } from "../lib/productWorkspaceFilters.js";
 import express from "express";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
@@ -6050,13 +6051,6 @@ const PRICELIST_SQL_SORT_MAP = Object.freeze({
   status: "COALESCE(pp.remote_sync_status, 'not-applied')",
   lastRemote: "pp.remote_synced_at"
 });
-const PRICELIST_PENDING_REMOTE_APPLY_SQL =
-  "(" +
-    "pp.product_id IS NOT NULL AND (" +
-    "pp.remote_sync_status IN ('pending', 'failed') " +
-    "OR COALESCE(pp.updated_at, '1970-01-01 00:00:00') > COALESCE(pp.remote_synced_at, '1970-01-01 00:00:00')" +
-    ")" +
-  ")";
 const PRICELIST_COMPUTED_SORT_KEYS = new Set([
   "pricingRule",
   "basePrice",
@@ -6083,74 +6077,6 @@ function normalizePricelistSortKey(value) {
 
 function normalizePricelistSortDirection(value) {
   return String(value || "").trim().toLowerCase() === "desc" ? "desc" : "asc";
-}
-
-function buildPricelistWhereClause({
-  search,
-  categoryId,
-  vendorId,
-  saleFilter,
-  statusFilter,
-  membershipCategoryIds = []
-}) {
-  const clauses = [];
-  const params = [];
-
-  if (membershipCategoryIds.length) {
-    clauses.push("(p.category_id IS NULL OR p.category_id NOT IN (?))");
-    params.push(membershipCategoryIds);
-  }
-
-  if (search) {
-    clauses.push("LOWER(TRIM(p.name)) LIKE ?");
-    params.push(`%${String(search).trim().toLowerCase()}%`);
-  }
-
-  if (Number.isFinite(categoryId)) {
-    clauses.push("p.category_id = ?");
-    params.push(categoryId);
-  }
-
-  if (Number.isFinite(vendorId)) {
-    clauses.push("p.vendor_id = ?");
-    params.push(vendorId);
-  }
-
-  if (saleFilter === "onSale") {
-    clauses.push("COALESCE(ps.on_sale, 0) = 1");
-  } else if (saleFilter === "notOnSale") {
-    clauses.push("COALESCE(ps.on_sale, 0) = 0");
-  }
-
-  switch (statusFilter) {
-    case "needsApply":
-      clauses.push(PRICELIST_PENDING_REMOTE_APPLY_SQL);
-      break;
-    case "applied":
-    case "pending":
-    case "failed":
-      clauses.push("COALESCE(pp.remote_sync_status, 'not-applied') = ?");
-      params.push(statusFilter);
-      break;
-    case "not-applied":
-      clauses.push(
-        "(" +
-          "pp.product_id IS NULL " +
-          "OR pp.remote_sync_status IS NULL " +
-          "OR TRIM(pp.remote_sync_status) = '' " +
-          "OR pp.remote_sync_status = 'not-applied'" +
-        ")"
-      );
-      break;
-    default:
-      break;
-  }
-
-  return {
-    clauses,
-    whereSql: clauses.length ? `WHERE ${clauses.join(" AND ")}` : "",
-    params
-  };
 }
 
 function buildPendingPricelistClauses(clauses = [], statusFilter = "all") {
@@ -6422,6 +6348,9 @@ function buildPricelistRows(productRows, supportingRows) {
     return {
       productId,
       name: product.name,
+      description: product.description || "",
+      thumbnailUrl: product.thumbnailUrl || null,
+      packageRecords: packagesByProductId.get(productId) || [],
       categoryId: product.categoryId,
       categoryName: product.categoryName || "Uncategorized",
       vendorId: product.vendorId,
@@ -6471,7 +6400,7 @@ function buildPricelistRows(productRows, supportingRows) {
       updatedAt: mergedProfile?.updatedAt || product.pricingUpdatedAt || null,
       saleUpdatedAt: saleRow?.updatedAt || null,
       hasRecentPriceOrSaleChange: hasRecentPriceOrSaleChange(mergedProfile, saleRow),
-      hasPendingRemoteApply: hasPendingRemoteApply(mergedProfile, snapshot.profile)
+      hasPendingRemoteApply: !(Number(productMeta?.localLineProductId) > 0) || hasPendingRemoteApply(mergedProfile, snapshot.profile)
     };
   });
 }
@@ -6510,6 +6439,8 @@ router.get("/pricelist", requireAdmin, async (req, res) => {
     vendorId,
     saleFilter,
     statusFilter,
+    visibility: String(req.query?.visibility || "all"),
+    pricingType: String(req.query?.pricingType || "all"),
     membershipCategoryIds
   });
 
@@ -6676,6 +6607,8 @@ router.get("/pricelist/pending-remote", requireAdmin, async (req, res) => {
     vendorId,
     saleFilter,
     statusFilter,
+    visibility: String(req.query?.visibility || "all"),
+    pricingType: String(req.query?.pricingType || "all"),
     membershipCategoryIds
   });
   const pendingClauses = buildPendingPricelistClauses(clauses, statusFilter);
@@ -6708,6 +6641,7 @@ router.get("/pricelist/pending-remote", requireAdmin, async (req, res) => {
       LEFT JOIN categories c ON c.id = p.category_id
       LEFT JOIN vendors v ON v.id = p.vendor_id
       LEFT JOIN product_pricing_profiles pp ON pp.product_id = p.id
+      LEFT JOIN product_sales ps ON ps.product_id = p.id
       ${pendingWhereSql}
       ORDER BY p.name ASC
     `,
@@ -10695,8 +10629,8 @@ router.put("/products/:id", requireAdminPermission(["inventory_admin", "pricing_
       visible: updates.visible ?? undefined,
       trackInventory: updates.trackInventory ?? undefined,
       inventory: updates.inventory ?? undefined,
-      categoryId: updates.categoryId ?? undefined,
-      vendorId: updates.vendorId ?? undefined,
+      categoryId: updates.categoryId,
+      vendorId: updates.vendorId,
       thumbnailUrl: updates.thumbnailUrl ?? undefined
     })
     .where(eq(products.id, id));
@@ -10706,7 +10640,9 @@ router.put("/products/:id", requireAdminPermission(["inventory_admin", "pricing_
     String(nextDescription ?? "") !== String(existing.description ?? "") ||
     Number(nextVisible ?? 0) !== Number(existing.visible ?? 0) ||
     Number(nextTrackInventory ?? 0) !== Number(existing.trackInventory ?? 0) ||
-    Number(nextInventory ?? 0) !== Number(existing.inventory ?? 0);
+    Number(nextInventory ?? 0) !== Number(existing.inventory ?? 0) ||
+    (updates.vendorId !== undefined && Number(updates.vendorId) !== Number(existing.vendorId)) ||
+    (updates.categoryId !== undefined && Number(updates.categoryId) !== Number(existing.categoryId));
 
   if (remoteRelevantChanged) {
     await markProductRemoteSyncPending(
@@ -10776,11 +10712,9 @@ router.post("/products/:id/push-to-localline", requireAdminPermission("localline
     const message = result.alreadyLinked
       ? `Updated Local Line product ${result.localLineProductId}.`
       : `Created Local Line product ${result.localLineProductId}.`;
-    await db.update(productPricingProfiles).set({
-      remoteSyncStatus: "applied",
-      remoteSyncMessage: message,
-      remoteSyncedAt: new Date()
-    }).where(eq(productPricingProfiles.productId, productId));
+    const syncValues = { remoteSyncStatus: "applied", remoteSyncMessage: message, remoteSyncedAt: new Date() };
+    await db.insert(productPricingProfiles).values({ productId, ...syncValues })
+      .onDuplicateKeyUpdate({ set: syncValues });
     return res.json({
       ok: true,
       alreadyLinked: Boolean(result.alreadyLinked),
@@ -10788,10 +10722,9 @@ router.post("/products/:id/push-to-localline", requireAdminPermission("localline
       message
     });
   } catch (error) {
-    await db.update(productPricingProfiles).set({
-      remoteSyncStatus: "failed",
-      remoteSyncMessage: error?.message || "Unable to push product to Local Line"
-    }).where(eq(productPricingProfiles.productId, productId)).catch((statusError) => {
+    const syncValues = { remoteSyncStatus: "failed", remoteSyncMessage: error?.message || "Unable to push product to Local Line" };
+    await db.insert(productPricingProfiles).values({ productId, ...syncValues })
+      .onDuplicateKeyUpdate({ set: syncValues }).catch((statusError) => {
       console.error("Unable to record Local Line push failure:", statusError.message);
     });
     return res.status(400).json({ error: error?.message || "Unable to push product to Local Line" });

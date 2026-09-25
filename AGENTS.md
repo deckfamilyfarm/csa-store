@@ -49,10 +49,15 @@ Products whose product name contains `deposit` are deposit products and must use
 
 Products in the `Membership` category are membership levels, not pricelist or inventory items. Keep them out of the admin pricelist/formula-pricing workflow and the admin inventory workflow. Manage them from the dedicated admin `Membership` section, which tracks the membership-level product/package records without treating them as normal price-list rows.
 
-The admin pricelist intentionally has two edit paths:
+Store → Products combines the former Pricelist, Local Pricelist, and Inventory screens. Overview, Pricing, and Inventory are views of the same catalog with shared filters, selection, and drafts. The default is Overview with all vendors; Membership products remain excluded.
 
-- `Edit Row` edits formula/pricelist fields inline for the row.
-- `Details` opens the same product detail editor used by the Products section for product metadata, descriptions, images, package prices, and cached Local Line price-list entries.
+- Inline controls edit formula inputs, stock, visibility, sales, and standard single-package prices.
+- `Details` shares the grid draft and edits metadata, descriptions, images, package prices, and cached Local Line price-list entries.
+- `Save Local Changes` uses the shared coordinator in `design/template/vite-app/src/components/productWorkspace.js`. Acknowledge only successful fields/packages and preserve failures for retry. It must never push to Local Line.
+- `Review & Push` selects products for the common manual create/update endpoint and keeps per-product results with remote IDs.
+- Unsaved scheduled changes support only stock, tracking, visibility, and sales. Save other fields locally before scheduling pending pushes.
+- Preserve role keys and assignments. UI actions use backend grants; only `pricing_admin` fetches scheduled batches, and manual pushes require `localline_push`. `local_pricelist_admin` remains the local product pricing role.
+- The workspace uses `/api/admin/pricelist` and `/api/admin/products/:id`. The old local-pricelist and inventory read endpoints remain compatible for other callers.
 
 Admin access uses Timesheets as the credential authority when `TIMESHEETS_API_URL` is configured. CSA Store still owns authorization: the local `users` table stores the CSA user record and Timesheets link fields, while `admin_roles` and `admin_user_roles` store backend permissions. The full `admin` role grants every permission. Granular backend roles are `user_admin`, `inventory_admin`, `pricing_admin`, `localline_pull`, `localline_push`, `square_pull`, `square_push`, `dropsite_admin`, `membership_admin`, and `member_admin`. Do not infer CSA admin permissions from the Timesheets role; Timesheets only proves identity.
 

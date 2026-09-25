@@ -162,11 +162,19 @@ Store pricelist sync
 - Dry-run the store sync with `npm run sync:killdeer-pricelist`.
 - Apply the sync only when ready with `npm run sync:killdeer-pricelist -- --write`.
 
+Products workspace
+- Open **Store → Products** for Overview, Pricing, and Inventory views. They share filters, selections, paging, and drafts; Membership levels remain separate.
+- Use inline controls for formula inputs, stock, visibility, sales, and single-package prices. **Details** shares those edits and manages descriptions, images, and multiple packages.
+- **Save Local Changes** saves to CSA Store and retains failed fields for retry. **Review & Push** lets you select products and review whether each creates or updates a Local Line record. Results retain errors and Local Line IDs.
+- **Schedule Changes** supports stock, tracking, visibility, and sales. Save formula/package/Details changes first, then use **Schedule Pending Pushes**. Scheduled releases apply local values and push at the selected time.
+- Column preferences are saved per view; old pricelist preferences carry into Pricing. Existing role keys and assignments are unchanged. Scheduling requires Pricing Admin; manual pushing requires Local Line Push.
+- Focused regression checks: `node --test design/template/vite-app/src/components/productWorkspace.test.js apps/api/lib/productWorkspaceFilters.test.js apps/api/lib/scheduledPricelistReleases.test.js apps/api/localLine.test.js apps/api/lib/productImageUpload.test.js` (Node 22.13+ for the in-memory SQLite filter fixtures).
+
 Local Line sync
 - Intended workflow: Local Line can be pulled into this app for review, and locally approved/priced changes can be pushed back to Local Line. Pull and push are explicit admin actions, not silent background source-of-truth swaps.
 - The Local Line API target is Backoffice v2: `LL_BASEURL` defaults to `https://localline.ca/api/backoffice/v2/`, auth posts to `/token/`, product export reads `/products/export/`, product detail reads `/products/{id}/?expand=packages,product_price_list_entries`, and product writes PATCH `/products/{id}/`.
 - Dry-run the Local Line catalog and pricelist audit with `npm run audit:localline-sync`.
-- In the admin UI, use the `Local Line Sync` button in the Products section to run the same analysis and review warnings/errors before applying any local-store changes.
+- In the admin UI, use the **Store → Local Line** section to review remote data and supported local-store changes.
 - In the admin UI, use `Local Line Full Sync` to apply the csa-store catalog updates and then populate the Local Line price-list/media/image data in one pass.
 - After the audit finishes, each actionable suggested fix in the admin audit panel gets its own `Apply` button. There is no global apply while the audit is still running.
 - The audit downloads the full Local Line products export, compares it to local `products` and `packages`, then fetches live Local Line details for the current pricelist-mapped products.

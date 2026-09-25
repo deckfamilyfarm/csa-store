@@ -1,5 +1,5 @@
 import { ensureScheduledPricelistSchema, getDb, getPool } from "../db.js";
-import { isLocalLineEnabled, updateLocalLineForProduct } from "../localLine.js";
+import { createLocalLineProductFromStoreProduct } from "../localLine.js";
 
 const DEFAULT_TIMEZONE = "America/Los_Angeles";
 const BATCH_STATUS_SCHEDULED = "scheduled";
@@ -843,20 +843,16 @@ async function applyItemLocally(item) {
   }
 }
 
-async function pushItemRemote(item) {
-  const changes = normalizeChangePayload(item.payload?.changes || {});
-  const remoteChanges = { ...changes };
-  if (hasChange(changes, "onSale") || hasChange(changes, "saleDiscount")) {
-    remoteChanges.forcePriceSync = true;
-  }
-
+export async function pushItemRemote(item, {
+  db = getDb(), pool = getPool(), pushProduct = createLocalLineProductFromStoreProduct
+} = {}) {
   try {
-    const remoteResult = await updateLocalLineForProduct(getDb(), item.productId, remoteChanges);
-    const remoteFailed =
-      isLocalLineEnabled() &&
-      (remoteResult.inventoryOk === false || remoteResult.priceOk === false || remoteResult.imagesOk === false);
+    // The local stage has already applied the scheduled fields. Use the same
+    // confirmed create/update path as manual pushes, including pending images.
+    const remoteResult = await pushProduct(db, item.productId);
+    const remoteFailed = !remoteResult.ok || !(Number(remoteResult.localLineProductId) > 0);
 
-    const connection = await getPool().getConnection();
+    const connection = await pool.getConnection();
     try {
       if (remoteFailed) {
         await markProductRemoteStatus(
@@ -877,7 +873,7 @@ async function pushItemRemote(item) {
         connection,
         item.productId,
         "applied",
-        "Scheduled pricelist release applied to Local Line."
+        `Scheduled release applied to Local Line product ${remoteResult.localLineProductId}.`
       );
       await markItemRemoteApplied(connection, item.id, {
         stage: "remote",
@@ -889,7 +885,7 @@ async function pushItemRemote(item) {
       connection.release();
     }
   } catch (error) {
-    const connection = await getPool().getConnection();
+    const connection = await pool.getConnection();
     try {
       await markProductRemoteStatus(
         connection,
