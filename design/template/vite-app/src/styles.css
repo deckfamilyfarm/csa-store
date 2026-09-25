@@ -5621,6 +5621,12 @@ img {
   width: min(880px, 96vw);
 }
 
+.product-push-result-modal,
+.pricelist-push-review-modal {
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+}
+
 .pricelist-push-note {
   background: #fff7e8;
 }

@@ -713,6 +713,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
   const [productDeleteLoading, setProductDeleteLoading] = useState(false);
   const [pushToLocalLineOnSave, setPushToLocalLineOnSave] = useState(false);
   const [pushProductLoading, setPushProductLoading] = useState(false);
+  const [productPushResult, setProductPushResult] = useState(null);
   const [products, setProducts] = useState([]);
   const [productsLoaded, setProductsLoaded] = useState(false);
   const [productsLoading, setProductsLoading] = useState(false);
@@ -843,6 +844,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
   const [priceListEntryDrafts, setPriceListEntryDrafts] = useState([]);
   const [priceListSaveLoading, setPriceListSaveLoading] = useState(false);
   const [imageUploadLoading, setImageUploadLoading] = useState(false);
+  const [imageUploadFeedback, setImageUploadFeedback] = useState(null);
   const [imageDeleteLoadingKey, setImageDeleteLoadingKey] = useState("");
   const isLocalPricelistView = activeSection === "localPricelist";
   const activeProductSource = isLocalPricelistView ? localPricelistProducts : products;
@@ -1945,6 +1947,8 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
   }
 
   function startNewProductDraft() {
+    setMessage("");
+    setImageUploadFeedback(null);
     setProductEditorMode("new");
     setSelectedProductId(null);
     setSelectedProductDetail(null);
@@ -1956,6 +1960,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
   }
 
   function closeProductEditor() {
+    setImageUploadFeedback(null);
     setProductEditorMode("existing");
     setSelectedProductId(null);
     setSelectedProductDetail(null);
@@ -2087,13 +2092,29 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
     }
   }
 
+  async function pushProductToLocalLine(productId) {
+    setProductPushResult({ active: true, ok: false, message: "Pushing product to Local Line..." });
+    try {
+      const result = await adminPost(`products/${productId}/push-to-localline`, token, {});
+      if (!result.ok || !(Number(result.localLineProductId) > 0)) {
+        throw new Error(result.message || "Local Line did not confirm the product push.");
+      }
+      const message = result.message || `Pushed Local Line product ${result.localLineProductId}.`;
+      setProductPushResult({ active: false, ok: true, message });
+      return { ...result, message };
+    } catch (error) {
+      setProductPushResult({ active: false, ok: false, message: error?.message || "Local Line push failed." });
+      throw error;
+    }
+  }
+
   async function handlePushProductToLocalLine(productId) {
     if (!productId) return;
     setPushProductLoading(true);
     setMessage("");
     try {
-      await adminPost(`products/${productId}/push-to-localline`, token, {});
-      setMessage("Product pushed to Local Line.");
+      const result = await pushProductToLocalLine(productId);
+      setMessage(result.message);
       await loadAll();
       await refreshLocalPricelistIfNeeded();
       await refreshCatalogFromAdmin();
@@ -2207,8 +2228,19 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
         });
 
         const newProductId = response.productId;
+        // Creation is complete even if the separate remote push fails.
+        // Retrying Save must edit this record, not create a second local product.
+        setProductEditorMode("existing");
+        setSelectedProductDetail(null);
+        setSelectedProductId(newProductId);
+        let pushResult = null;
+        let pushError = null;
         if (pushToLocalLineOnSave) {
-          await adminPost(`products/${newProductId}/push-to-localline`, token, {});
+          try {
+            pushResult = await pushProductToLocalLine(newProductId);
+          } catch (error) {
+            pushError = error;
+          }
         }
 
         await loadAll();
@@ -2222,7 +2254,9 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
           closeProductEditor();
         }
         setPushToLocalLineOnSave(false);
-        setMessage(pushToLocalLineOnSave ? "Product created and pushed to Local Line." : "Product created.");
+        setMessage(pushError
+          ? `Product ${newProductId} was saved locally, but the Local Line push failed: ${pushError.message}`
+          : pushResult ? `Product created. ${pushResult.message}` : "Product created locally. Push to Local Line when ready.");
         return;
       }
 
@@ -2260,6 +2294,8 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
       );
 
       await adminPost("products/bulk-update", token, {
+        applyRemote: false,
+        queueRemoteSync: true,
         syncPricingProfileSale: true,
         updates: [
           {
@@ -2276,9 +2312,9 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
         await adminPut(`products/${activeProduct.id}/pricing-profile`, token, sourcePricingPayload);
       }
 
-      if (pushToLocalLineOnSave) {
-        await adminPost(`products/${activeProduct.id}/push-to-localline`, token, {});
-      }
+      const pushResult = pushToLocalLineOnSave
+        ? await pushProductToLocalLine(activeProduct.id)
+        : null;
 
       await loadAll();
       await refreshLocalPricelistIfNeeded();
@@ -2286,7 +2322,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
       setPricelistRefreshNonce((prev) => prev + 1);
       await refreshSelectedProductDetail(activeProduct.id);
       setPushToLocalLineOnSave(false);
-      setMessage(pushToLocalLineOnSave ? "Product updated and pushed to Local Line." : "Product updated.");
+      setMessage(pushResult ? `Product updated. ${pushResult.message}` : "Product updated.");
     } catch (err) {
       setMessage(err?.message || "Product update failed.");
     } finally {
@@ -2325,25 +2361,48 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
 
     setMessage("");
     setImageUploadLoading(true);
+    let uploadedCount = 0;
+    let currentFilename = "";
     try {
       for (const file of fileList) {
+        currentFilename = file.name || "Image";
+        setImageUploadFeedback({
+          productId,
+          status: "uploading",
+          message: `Uploading ${uploadedCount + 1} of ${fileList.length}: ${currentFilename}`
+        });
         await adminUploadImage(productId, token, file);
+        uploadedCount += 1;
       }
-      setMessage(
-        fileList.length === 1
-          ? "Image uploaded. Local Line push pending."
-          : `${fileList.length} images uploaded. Local Line push pending.`
-      );
-      if (isLocalPricelistView) {
-        await loadLocalPricelistData();
-      } else {
-        await loadAll();
-      }
-      await refreshCatalogFromAdmin();
-      await refreshSelectedProductDetail(productId);
+      const message = uploadedCount === 1
+        ? "Image uploaded. Local Line push pending."
+        : `${uploadedCount} images uploaded. Local Line push pending.`;
+      setMessage(message);
+      setImageUploadFeedback({ productId, status: "success", message });
     } catch (err) {
-      setMessage("Image upload failed.");
+      const message = `${currentFilename}: ${err?.message || "Image upload failed."}${
+        uploadedCount ? ` ${uploadedCount} of ${fileList.length} images were uploaded before this failure.` : ""
+      }`;
+      setMessage(message);
+      setImageUploadFeedback({ productId, status: "error", message });
     } finally {
+      if (uploadedCount > 0) {
+        try {
+          if (isLocalPricelistView) {
+            await loadLocalPricelistData();
+          } else {
+            await loadAll();
+          }
+          await refreshCatalogFromAdmin();
+          await refreshSelectedProductDetail(productId);
+        } catch (_error) {
+          const refreshMessage = " Refresh the page to see the uploaded images.";
+          setMessage((current) => `${current}${refreshMessage}`);
+          setImageUploadFeedback((current) => current?.productId === productId
+            ? { ...current, message: `${current.message}${refreshMessage}` }
+            : current);
+        }
+      }
       setImageUploadLoading(false);
     }
   }
@@ -4959,6 +5018,15 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                       event.target.value = "";
                     }}
                   />
+                  {imageUploadFeedback?.productId === activeProduct.id ? (
+                    <div
+                      className={`small${imageUploadFeedback.status === "error" ? " form-error" : ""}`}
+                      role={imageUploadFeedback.status === "error" ? "alert" : "status"}
+                      style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}
+                    >
+                      {imageUploadFeedback.message}
+                    </div>
+                  ) : null}
                 </div>
               ) : null}
               {productEditorMode === "new" && isLocalPricelistView ? (
@@ -4990,11 +5058,30 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                     )}
                 </button>
               </div>
+              {message ? <div className="small" role="status">{message}</div> : null}
                   </section>
                 </div>
               </div>
             </div>
           )}
+
+          {productPushResult ? (
+            <div className="modal-backdrop">
+              <div className="modal response-modal product-push-result-modal" role="dialog" aria-modal="true" aria-labelledby="product-push-title">
+                <h3 id="product-push-title">
+                  {productPushResult.active ? "Pushing to Local Line" : productPushResult.ok ? "Local Line Push Complete" : "Local Line Push Failed"}
+                </h3>
+                <div role={productPushResult.ok || productPushResult.active ? "status" : "alert"}>
+                  {productPushResult.message}
+                </div>
+                <div className="response-actions">
+                  <button className="button" type="button" disabled={productPushResult.active} onClick={() => setProductPushResult(null)}>
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : null}
 
           {activeSection === "dropSites" && canManageDropSites && (
             <section className="admin-section">

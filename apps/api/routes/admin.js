@@ -2,7 +2,6 @@ import express from "express";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import multer from "multer";
-import sharp from "sharp";
 import xlsx from "xlsx";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { DeleteObjectCommand, S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
@@ -85,6 +84,7 @@ import {
   isSourcePricingVendor
 } from "../lib/productPricing.js";
 import { hasAdminPermission } from "../lib/adminRoles.js";
+import { prepareProductImageUpload } from "../lib/productImageUpload.js";
 import {
   authenticateLocalAdminWithTimesheets,
   issueAdminToken,
@@ -6920,9 +6920,8 @@ router.post("/pricelist/apply-remote", requireAdminPermission("localline_push"),
         onSale: snapshot.profile.onSale ? 1 : 0,
         saleDiscount: snapshot.profile.saleDiscount,
         priceChangedAt: profileRows[0]?.priceChangedAt || profileRows[0]?.updatedAt || now,
-        remoteSyncStatus: "applied",
-        remoteSyncMessage: "Applied to store pricing and remote sync completed.",
-        remoteSyncedAt: now,
+        remoteSyncStatus: "pending",
+        remoteSyncMessage: "Local pricing saved. Local Line push is in progress.",
         updatedAt: profileRows[0]?.updatedAt || now
       };
       if (profileRows.length) {
@@ -6938,39 +6937,30 @@ router.post("/pricelist/apply-remote", requireAdminPermission("localline_push"),
         });
       }
 
-      const remoteResult = await updateLocalLineForProduct(db, productId, {
-        visible: product.visible,
-        trackInventory: product.trackInventory,
-        inventory: product.inventory,
-        onSale: snapshot.profile.onSale ? 1 : 0,
-        saleDiscount: snapshot.profile.saleDiscount,
-        forcePriceSync: true,
-        forceImageSync: true
-      });
-      const remoteFailed =
-        isLocalLineEnabled() &&
-        (remoteResult.inventoryOk === false || remoteResult.priceOk === false);
-      if (remoteFailed) {
-        await db
-          .update(productPricingProfiles)
-          .set({
-            remoteSyncStatus: "failed",
-            remoteSyncMessage: "Local store updated, but Local Line sync failed.",
-            updatedAt: now
-          })
-          .where(eq(productPricingProfiles.productId, productId));
-      }
+      const remoteResult = await createLocalLineProductFromStoreProduct(db, productId);
+      const message = remoteResult.alreadyLinked
+        ? `Updated Local Line product ${remoteResult.localLineProductId}.`
+        : `Created Local Line product ${remoteResult.localLineProductId}.`;
+      await db
+        .update(productPricingProfiles)
+        .set({
+          remoteSyncStatus: "applied",
+          remoteSyncMessage: message,
+          remoteSyncedAt: new Date()
+        })
+        .where(eq(productPricingProfiles.productId, productId));
 
       results.push({
         productId,
-        ok: !remoteFailed,
+        ok: true,
+        localLineProductId: remoteResult.localLineProductId,
+        alreadyLinked: remoteResult.alreadyLinked,
         packageUpdates: pricedPackages.length,
         packageNameUpdates,
         remoteInventoryUpdate: remoteResult.inventoryOk,
         remotePriceUpdate: remoteResult.priceOk,
-        message: remoteFailed
-          ? "Local store updated, but Local Line sync failed."
-          : "Changes applied."
+        remoteImageUpdate: remoteResult.imagesOk,
+        message
       });
     } catch (error) {
       await db
@@ -10783,12 +10773,27 @@ router.post("/products/:id/push-to-localline", requireAdminPermission("localline
 
   try {
     const result = await createLocalLineProductFromStoreProduct(db, productId);
+    const message = result.alreadyLinked
+      ? `Updated Local Line product ${result.localLineProductId}.`
+      : `Created Local Line product ${result.localLineProductId}.`;
+    await db.update(productPricingProfiles).set({
+      remoteSyncStatus: "applied",
+      remoteSyncMessage: message,
+      remoteSyncedAt: new Date()
+    }).where(eq(productPricingProfiles.productId, productId));
     return res.json({
       ok: true,
       alreadyLinked: Boolean(result.alreadyLinked),
-      localLineProductId: result.localLineProductId || null
+      localLineProductId: result.localLineProductId,
+      message
     });
   } catch (error) {
+    await db.update(productPricingProfiles).set({
+      remoteSyncStatus: "failed",
+      remoteSyncMessage: error?.message || "Unable to push product to Local Line"
+    }).where(eq(productPricingProfiles.productId, productId)).catch((statusError) => {
+      console.error("Unable to record Local Line push failure:", statusError.message);
+    });
     return res.status(400).json({ error: error?.message || "Unable to push product to Local Line" });
   }
 });
@@ -11050,29 +11055,26 @@ router.post("/products/:id/images", requireAdminPermission(["inventory_admin", "
       console.warn("Local Line schema bootstrap skipped for /admin/products/:id/images:", error.message);
     });
 
+    // Finish decoding both images before uploading anything to Spaces.
+    const { buffer, metadata, thumbnailBuffer, normalized } = await prepareProductImageUpload(req.file.buffer);
     const ext = req.file.originalname.split(".").pop() || "jpg";
-    const safeExt = ext.toLowerCase();
+    const safeExt = normalized ? "jpg" : ext.toLowerCase();
+    const mimeType = normalized ? "image/jpeg" : req.file.mimetype || "image/jpeg";
     const baseName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
     const key = `products/${productId}/${baseName}.${safeExt}`;
     const thumbKey = `products/${productId}/${baseName}.thumbnail.jpg`;
-    const metadata = await sharp(req.file.buffer).metadata();
-    const contentHash = crypto.createHash("sha256").update(req.file.buffer).digest("hex");
+    const contentHash = crypto.createHash("sha256").update(buffer).digest("hex");
 
     await getSpacesClient().send(
       new PutObjectCommand({
         Bucket: process.env.DO_SPACES_BUCKET,
         Key: key,
-        Body: req.file.buffer,
+        Body: buffer,
         ACL: "public-read",
-        ContentType: req.file.mimetype,
+        ContentType: mimeType,
         CacheControl: "public, max-age=31536000, immutable"
       })
     );
-
-    const thumbnailBuffer = await sharp(req.file.buffer)
-      .resize({ width: 1200, height: 1200, fit: "inside", withoutEnlargement: true })
-      .jpeg({ quality: 85 })
-      .toBuffer();
 
     await getSpacesClient().send(
       new PutObjectCommand({
@@ -11122,7 +11124,7 @@ router.post("/products/:id/images", requireAdminPermission(["inventory_admin", "
       contentHash,
       width: metadata.width || null,
       height: metadata.height || null,
-      mimeType: req.file.mimetype || "image/jpeg",
+      mimeType,
       fetchedAt: now,
       createdAt: now,
       updatedAt: now,
@@ -11151,7 +11153,7 @@ router.post("/products/:id/images", requireAdminPermission(["inventory_admin", "
     res.json({ ok: true, url, thumbnailUrl });
   } catch (error) {
     console.error("Product image upload failed:", error);
-    res.status(500).json({
+    res.status(error.status || 500).json({
       error: "Image upload failed",
       detail: error?.message || "Unable to upload image to Spaces."
     });

@@ -879,11 +879,12 @@ export function AdminPriceListSection({
           const response = await adminPost("pricelist/apply-remote", token, { productIds: [productId] });
           const result = Array.isArray(response.results) && response.results.length
             ? response.results[0]
-            : { productId, ok: true, message: "Changes applied." };
-          nextResultsById[productId] = result;
+            : { productId, ok: false, message: "Local Line did not confirm the push result." };
+          nextResultsById[productId] = { ...result, productName: row?.name || `Product ${productId}` };
         } catch (error) {
           nextResultsById[productId] = {
             productId,
+            productName: row?.name || `Product ${productId}`,
             ok: false,
             message: error?.message || "Remote apply failed."
           };
@@ -1955,7 +1956,8 @@ export function AdminPriceListSection({
             </button>
             <h3>Review Local Line Push</h3>
             <div className="small">
-              Review all pending pricing updates before sending them to Local Line.
+              Review all pending pricing updates before sending them to Local Line. Products that
+              only exist locally will be created in Local Line.
             </div>
             <div className="response-card pricelist-push-note">
               <div className="title">Scheduling Note</div>
@@ -1973,6 +1975,19 @@ export function AdminPriceListSection({
             ) : pushState.completed > 0 ? (
               <div className="small">
                 Push complete: {pushState.completed} of {pushState.total} processed.
+              </div>
+            ) : null}
+            {Object.keys(pushState.resultsById).length > 0 ? (
+              <div className="response-card" aria-live="polite">
+                <div className="title">Push Results</div>
+                <ul>
+                  {Object.values(pushState.resultsById).map((result) => (
+                    <li key={`push-result-${result.productId}`}>
+                      <strong>{result.productName}:</strong>{" "}
+                      {result.ok ? "Success: " : "Failed: "}{result.message}
+                    </li>
+                  ))}
+                </ul>
               </div>
             ) : null}
             {pendingProductsOutsideVisibleRows > 0 ? (

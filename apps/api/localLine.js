@@ -218,7 +218,8 @@ async function deleteLocalLineProduct(productId, accessToken) {
 async function createLocalLineProduct(accessToken, payload) {
   const url = `${LL_BASEURL}products/`;
   const companyBaseUrl = process.env.LL_COMPANY_BASEURL || "";
-  const response = await fetchLocalLineWithRetry(url, {
+  // Retrying a POST after a lost response can create a duplicate product.
+  const response = await fetch(url, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -231,7 +232,9 @@ async function createLocalLineProduct(accessToken, payload) {
         : {})
     },
     body: JSON.stringify(payload)
-  }, "LocalLine POST product");
+  }).catch((error) => {
+    throw new Error(`Local Line create request failed: ${error.message}. Check Local Line for the product before retrying.`);
+  });
   if (!response.ok) {
     const body = await response.text();
     throw new Error(`LocalLine POST failed: ${response.status} ${body}`);
@@ -462,8 +465,7 @@ async function getLocalLineMetaRow(db, productId) {
   const rows = await db
     .select()
     .from(localLineProductMeta)
-    .where(eq(localLineProductMeta.productId, productId))
-    .catch(() => []);
+    .where(eq(localLineProductMeta.productId, productId));
   return rows[0] || null;
 }
 
@@ -717,6 +719,9 @@ async function updateLocalLineInventory(db, productId, changes) {
 
 async function updateLocalLinePrices(db, productId, changes) {
   if (!updatePrices) {
+    if (changes.forcePriceSync) {
+      throw new Error("Local Line price updates are disabled (LOCALLINE_UPDATE_PRICES=false).");
+    }
     return { ok: null };
   }
 
@@ -769,7 +774,7 @@ async function updateLocalLinePrices(db, productId, changes) {
   });
   const priceLists = getPriceListDefinitions(resolvedProfile);
   if (!priceLists || Object.keys(priceLists).length === 0) {
-    return { ok: null };
+    throw new Error("No Local Line price lists are configured for this product.");
   }
 
   if (debugEnabled(productId)) {
@@ -805,7 +810,7 @@ async function updateLocalLinePrices(db, productId, changes) {
     if (debugEnabled(productId)) {
       console.log("[LocalLine debug] no packages found for product.");
     }
-    return { ok: null };
+    throw new Error("Product must have at least one package before pushing prices to Local Line.");
   }
 
   const token = await getLocalLineAccessToken();
@@ -907,7 +912,7 @@ async function updateLocalLinePrices(db, productId, changes) {
     if (debugEnabled(productId)) {
       console.log("[LocalLine debug] no price list entries matched for payload.");
     }
-    return { ok: null };
+    throw new Error("No matching Local Line package price-list entries were found. Prices were not pushed.");
   }
 
   const payload = {
@@ -927,6 +932,12 @@ async function updateLocalLinePrices(db, productId, changes) {
 export async function createLocalLineProductFromStoreProduct(db, productId) {
   if (!isLocalLineEnabled()) {
     throw new Error("Local Line authentication is not configured");
+  }
+  if (isTestMode) {
+    throw new Error("Local Line test mode is enabled (LOCALLINE_TEST=true). No changes were sent to Local Line.");
+  }
+  if (!updatePrices) {
+    throw new Error("Local Line price updates are disabled (LOCALLINE_UPDATE_PRICES=false).");
   }
 
   const productRows = await db.select().from(products).where(eq(products.id, productId));
@@ -958,6 +969,7 @@ export async function createLocalLineProductFromStoreProduct(db, productId) {
     }
     return {
       ok: true,
+      ...updateResult,
       alreadyLinked: true,
       localLineProductId: existingRemoteProductId
     };
@@ -993,6 +1005,9 @@ export async function createLocalLineProductFromStoreProduct(db, productId) {
     vendor: vendorRows[0] || null
   });
   const priceLists = getPriceListDefinitions(resolvedProfile);
+  if (!priceLists.length) {
+    throw new Error("No Local Line price lists are configured for this product.");
+  }
 
   const token = await getLocalLineAccessToken();
   const productUnits = await fetchLocalLineProductUnits(token);
@@ -1045,14 +1060,6 @@ export async function createLocalLineProductFromStoreProduct(db, productId) {
     }))
   };
 
-  if (isTestMode) {
-    return {
-      ok: true,
-      testMode: true,
-      payload
-    };
-  }
-
   const createdProduct = await createLocalLineProduct(token, payload);
   const createdProductId = Number(createdProduct?.id);
   if (!Number.isFinite(createdProductId) || createdProductId <= 0) {
@@ -1060,33 +1067,15 @@ export async function createLocalLineProductFromStoreProduct(db, productId) {
   }
 
   try {
-    await syncLocalLineProductImages(db, productId, createdProductId, token);
-  } catch (error) {
-    console.error("LocalLine image sync failed:", error.message);
-  }
+    // Save the link before further API calls so a failed follow-up can be retried
+    // as an update rather than creating another remote product.
+    await upsertLocalLineProductMeta(db, productId, createdProductId, {
+      status: createdProduct.status || "created",
+      rawJson: JSON.stringify(createdProduct)
+    });
+    await upsertLocalLinePackageMetaRows(db, productId, packageRows, createdProduct.packages || []);
 
-  const remoteProduct = await fetchLocalLineProduct(createdProductId, token);
-
-  await upsertLocalLineProductMeta(db, productId, createdProductId, {
-    status: remoteProduct?.status || null,
-    visible: typeof remoteProduct?.visible === "boolean" ? (remoteProduct.visible ? 1 : 0) : null,
-    trackInventory:
-      typeof remoteProduct?.track_inventory === "boolean"
-        ? (remoteProduct.track_inventory ? 1 : 0)
-        : null,
-    inventoryType: remoteProduct?.inventory_type || null,
-    productInventory: parseNumber(remoteProduct?.inventory),
-    packageCodesEnabled:
-      typeof remoteProduct?.package_codes_enabled === "boolean"
-        ? (remoteProduct.package_codes_enabled ? 1 : 0)
-        : null,
-    rawJson: JSON.stringify(remoteProduct || {}),
-    lastSyncedAt: new Date()
-  });
-  await upsertLocalLinePackageMetaRows(db, productId, packageRows, remoteProduct?.packages || []);
-
-  try {
-    await updateLocalLineForProduct(db, productId, {
+    const updateResult = await updateLocalLineForProduct(db, productId, {
       visible: product.visible,
       trackInventory: product.trackInventory,
       inventory: product.inventory,
@@ -1098,20 +1087,30 @@ export async function createLocalLineProductFromStoreProduct(db, productId) {
       forcePriceSync: true,
       forceImageSync: true
     });
+    const failureMessage = getLocalLineUpdateFailureMessage(updateResult);
+    if (failureMessage) throw new Error(failureMessage);
+    return {
+      ok: true,
+      ...updateResult,
+      alreadyLinked: false,
+      localLineProductId: createdProductId
+    };
   } catch (error) {
-    console.error("LocalLine post-create sync failed:", error.message);
+    throw new Error(`Local Line product ${createdProductId} was created, but completing the push failed: ${error.message}`);
   }
-
-  return {
-    ok: true,
-    alreadyLinked: false,
-    localLineProductId: createdProductId
-  };
 }
 
 export async function updateLocalLineForProduct(db, productId, changes = {}) {
   if (!isLocalLineEnabled()) {
-    return { inventoryOk: null, priceOk: null, imagesOk: null };
+    throw new Error("Local Line authentication is not configured");
+  }
+  if (isTestMode) {
+    throw new Error("Local Line test mode is enabled (LOCALLINE_TEST=true). No changes were sent to Local Line.");
+  }
+  const metaRow = await getLocalLineMetaRow(db, productId);
+  const remoteProductId = resolveRemoteProductId(metaRow, productId);
+  if (!Number.isFinite(remoteProductId) || remoteProductId <= 0) {
+    throw new Error("This product only exists locally. Use Push Product to create it in Local Line first.");
   }
 
   const inventoryResult = await updateLocalLineInventory(db, productId, changes);
