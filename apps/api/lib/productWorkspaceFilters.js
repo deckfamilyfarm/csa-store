@@ -17,6 +17,7 @@ export function buildPricelistWhereClause({
   search,
   categoryId,
   vendorId,
+  vendorGroup = "",
   saleFilter,
   statusFilter,
   visibility = "all",
@@ -45,6 +46,8 @@ export function buildPricelistWhereClause({
     clauses.push("p.vendor_id = ?");
     params.push(vendorId);
   }
+
+  if (vendorGroup === "deck-enterprises") clauses.push(SOURCE_PRICING_VENDOR_SQL);
 
   if (visibility === "visible") clauses.push(`${PRODUCT_VISIBILITY_SQL} = 1`);
   if (visibility === "hidden") clauses.push(`${PRODUCT_VISIBILITY_SQL} = 0`);

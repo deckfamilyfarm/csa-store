@@ -14,6 +14,9 @@
 .sync-audit-controls fieldset { display: flex; gap: 1rem; border: 1px solid var(--sync-border); border-radius: 6px; padding: .35rem .65rem .55rem; }
 .sync-audit-controls legend { font-size: .75rem; }
 .sync-audit-controls > label { flex-wrap: wrap; font-size: .85rem; }
+.sync-audit-controls select { width: auto; max-width: 100%; }
+.sync-pending { padding: .25rem .75rem; margin: .8rem 0; border: 1px solid var(--sync-border); border-radius: 8px; }
+.sync-pending .sync-selection { background: transparent; padding: 0; justify-content: space-between; }
 .sync-tabs { display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--sync-border); gap: .5rem; margin-top: 1rem; }
 .sync-tabs button { padding: .65rem .85rem; border: 0; background: transparent; border-bottom: 3px solid transparent; }
 .sync-tabs button[aria-selected=true] { border-bottom-color: #3e6546; font-weight: 700; }

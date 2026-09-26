@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { adminGet } from "../adminApi.js";
+import { categoryLabel } from "../categoryLabel.js";
 
 const ORDER_DEFAULT_PAGE_SIZE = 50;
 const ORDER_PAGE_SIZE_OPTIONS = [25, 50, 100, 200];
@@ -81,7 +82,7 @@ function describeAppliedOrderFilters(filters = {}) {
   if (filters.orderType === "all") parts.push("Order type: All");
   if (filters.fulfillmentSite) parts.push(`Site: ${filters.fulfillmentSite}`);
   if (filters.vendor) parts.push(`Vendor: ${filters.vendor}`);
-  if (filters.category) parts.push(`Category: ${filters.category}`);
+  if (filters.category) parts.push(`Category: ${categoryLabel(filters.category)}`);
   if (filters.status) parts.push(`Status: ${filters.status}`);
   if (filters.paymentStatus) parts.push(`Payment: ${filters.paymentStatus}`);
   if (filters.month) parts.push(`Month: ${filters.month}`);
@@ -403,7 +404,7 @@ export function AdminOrdersSection({ token }) {
               <option value="">All categories</option>
               {filters.categories.map((value) => (
                 <option key={`orders-category-${value}`} value={value}>
-                  {value}
+                  {categoryLabel(value)}
                 </option>
               ))}
             </select>
@@ -772,7 +773,7 @@ export function AdminOrdersSection({ token }) {
                         <td>{entry.vendorName || "n/a"}</td>
                         <td>{entry.productName || "n/a"}</td>
                         <td>{entry.packageName || "n/a"}</td>
-                        <td>{entry.categoryName || "n/a"}</td>
+                        <td>{categoryLabel(entry.categoryName) || "n/a"}</td>
                         <td>{formatCount(entry.unitQuantity)}</td>
                         <td>{formatCount(entry.inventoryQuantity)}</td>
                         <td>{formatMoney(entry.price)}</td>

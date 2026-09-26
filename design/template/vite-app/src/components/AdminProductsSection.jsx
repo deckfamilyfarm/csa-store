@@ -1,29 +1,32 @@
 import React, { useEffect, useRef, useState } from "react";
-import { adminGet, adminPost } from "../adminApi.js";
+import { adminGet } from "../adminApi.js";
+import { categoryLabel } from "../categoryLabel.js";
+import { ProductActionsMenu } from "./ProductActionsMenu.jsx";
 import {
   dirtyFields,
   hydrateProductDraft,
   patchProductDraft,
-  unsupportedScheduleFields,
-  buildScheduleUpdate,
-  syncLabel,
   previewProductPrices,
 } from "./productWorkspace.js";
 import "./AdminProductsSection.css";
+
+const DECK_ENTERPRISES = "deck-enterprises";
 
 const PRODUCT_COLUMNS = [
   {
     key: "product",
     label: "Product",
-    width: 280,
+    width: 260,
     sticky: "left",
     required: true,
     defaultVisible: true,
   },
   {
     key: "sourceUnitPrice",
-    label: "Vendor's Retail Price",
-    width: 156,
+    label: "Retail Price",
+    description:
+      "Vendor retail price before CSA adjustments; standard products show their package prices.",
+    width: 164,
     defaultVisible: true,
   },
   {
@@ -35,32 +38,26 @@ const PRODUCT_COLUMNS = [
   {
     key: "basePrice",
     label: "CSA Base Price / Unit",
-    width: 170,
+    width: 126,
     defaultVisible: true,
   },
   {
     key: "memberPrice",
     label: "Member Adjusted $",
-    width: 152,
+    width: 126,
     defaultVisible: true,
   },
-  { key: "visible", label: "Visible", width: 96, defaultVisible: true },
+  { key: "visible", label: "Visible", width: 72, defaultVisible: true },
   {
     key: "trackInventory",
     label: "Track Inventory",
     width: 132,
     defaultVisible: true,
   },
-  { key: "inventory", label: "Stock", width: 90, defaultVisible: true },
+  { key: "inventory", label: "Stock", width: 92, defaultVisible: true },
   { key: "onSale", label: "Sale", width: 82, defaultVisible: true },
   { key: "saleDiscount", label: "Sale %", width: 96, defaultVisible: true },
-  {
-    key: "status",
-    label: "Sync status",
-    width: 170,
-    required: true,
-    defaultVisible: true,
-  },
+
   { key: "category", label: "Category", width: 160, defaultVisible: false },
   { key: "vendor", label: "Vendor", width: 170, defaultVisible: false },
   { key: "pricingRule", label: "Rule", width: 150, defaultVisible: false },
@@ -87,7 +84,7 @@ const PRODUCT_COLUMNS = [
   {
     key: "guestPrice",
     label: "Guest Adjusted $",
-    width: 142,
+    width: 126,
     defaultVisible: false,
   },
   {
@@ -115,17 +112,12 @@ const PRODUCT_COLUMNS = [
     width: 144,
     defaultVisible: false,
   },
-  { key: "packages", label: "Packages", width: 340, defaultVisible: false },
-  {
-    key: "lastRemote",
-    label: "Last Remote",
-    width: 260,
-    defaultVisible: false,
-  },
+  { key: "packages", label: "Packages", width: 220, defaultVisible: false },
+
   {
     key: "actions",
     label: "Actions",
-    width: 154,
+    width: 156,
     sticky: "right",
     required: true,
     defaultVisible: true,
@@ -133,19 +125,6 @@ const PRODUCT_COLUMNS = [
 ];
 
 const VIEW_COLUMNS = {
-  overview: [
-    "product",
-    "vendor",
-    "category",
-    "packages",
-    "basePrice",
-    "guestPrice",
-    "memberPrice",
-    "inventory",
-    "visible",
-    "status",
-    "actions",
-  ],
   pricing: [
     "product",
     "sourceUnitPrice",
@@ -157,7 +136,6 @@ const VIEW_COLUMNS = {
     "memberPrice",
     "onSale",
     "saleDiscount",
-    "status",
     "actions",
   ],
   inventory: [
@@ -168,15 +146,19 @@ const VIEW_COLUMNS = {
     "visible",
     "onSale",
     "saleDiscount",
-    "status",
     "actions",
   ],
 };
 const COLUMN_MAP = new Map(
   PRODUCT_COLUMNS.map((column) => [column.key, column]),
 );
+function columnRequired(column, view) {
+  return (
+    column.required || (view === "pricing" && column.key === "sourceUnitPrice")
+  );
+}
 function pinColumns(keys) {
-  const middle = [...new Set([...keys, "status"])].filter(
+  const middle = [...new Set(keys)].filter(
     (key) => COLUMN_MAP.has(key) && !["product", "actions"].includes(key),
   );
   return ["product", ...middle, "actions"];
@@ -211,7 +193,8 @@ function loadColumns(view, defaults = false) {
         order.filter(
           (key) =>
             COLUMN_MAP.has(key) &&
-            (COLUMN_MAP.get(key).required || value.visibleColumns?.[key]),
+            (columnRequired(COLUMN_MAP.get(key), view) ||
+              value.visibleColumns?.[key]),
         ),
       );
     }
@@ -235,7 +218,6 @@ const money = (value) =>
   value == null || value === "" || !Number.isFinite(Number(value))
     ? "—"
     : `$${Number(value).toFixed(2)}`;
-const dateTime = (value) => (value ? new Date(value).toLocaleString() : "—");
 const toggleId = (ids, id) =>
   ids.includes(id) ? ids.filter((value) => value !== id) : [...ids, id];
 
@@ -255,9 +237,10 @@ export function AdminProductsSection({
   onAddProduct,
   onDuplicateProduct,
   onDeleteProduct,
-  onOpenProductSync,
+  selected,
+  setSelected,
 }) {
-  const [view, setView] = useState("overview");
+  const [view, setView] = useState("pricing");
   const [columnsByView, setColumnsByView] = useState(() =>
     Object.fromEntries(
       Object.keys(VIEW_COLUMNS).map((key) => [key, loadColumns(key)]),
@@ -271,7 +254,6 @@ export function AdminProductsSection({
     vendorId: "",
     visibility: "all",
     sale: "all",
-    status: "all",
     pricingType: "all",
   });
   const [page, setPage] = useState(1);
@@ -281,12 +263,10 @@ export function AdminProductsSection({
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
-  const [selected, setSelected] = useState([]);
   const rowCache = useRef(new Map());
   const requestId = useRef(0);
   const [reload, setReload] = useState(0);
   const [saveResults, setSaveResults] = useState([]);
-  const [batches, setBatches] = useState([]);
   const pendingDrafts = Object.values(drafts).filter(
     (entry) => dirtyFields(entry).length,
   );
@@ -307,6 +287,9 @@ export function AdminProductsSection({
     let cancelled = false;
     const params = new URLSearchParams({
       ...filters,
+      vendorId: filters.vendorId === DECK_ENTERPRISES ? "" : filters.vendorId,
+      vendorGroup:
+        filters.vendorId === DECK_ENTERPRISES ? DECK_ENTERPRISES : "",
       search: debouncedSearch,
       page: String(page),
       pageSize: String(pageSize),
@@ -343,25 +326,14 @@ export function AdminProductsSection({
     reload,
   ]);
 
-  useEffect(() => {
-    if (!capabilities.schedule) return;
-    let cancelled = false;
-    adminGet("product-sync/releases", token)
-      .then((response) => {
-        if (!cancelled) setBatches([...(response.legacy || []).map(batch => ({ ...batch, id: `legacy-${batch.id}` })), ...(response.releases || []).map(batch => ({ ...batch, items: batch.actions }))]);
-      })
-      .catch((error) => {
-        if (!cancelled)
-          setMessage(error.message || "Unable to load scheduled releases.");
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [token, capabilities.schedule, reload, refreshNonce]);
-
   function filter(key, value) {
     setFilters((prev) => ({ ...prev, [key]: value }));
     setPage(1);
+  }
+  function changeView(nextView) {
+    if (nextView === view) return;
+    setView(nextView);
+    if (nextView === "inventory") filter("vendorId", DECK_ENTERPRISES);
   }
   function changeColumns(keys) {
     keys = pinColumns(keys);
@@ -396,38 +368,9 @@ export function AdminProductsSection({
     setMessage(
       results.some((result) => !result.ok)
         ? "Some changes could not be saved. The remaining edits are still available below."
-        : "Local changes saved. Review & Sync when ready.",
+        : "Local changes saved.",
     );
     setReload((value) => value + 1);
-  }
-  async function openReview(row = null) {
-    if (!capabilities.sync || busy) return;
-    const ids = row ? [row.productId] : selected;
-    if ((ids.length ? ids : Object.keys(drafts).map(Number)).some(id => dirtyFields(drafts[id]).length)) {
-      setMessage("Save local changes before auditing saved products, or use Schedule Changes for supported staged drafts.");
-      return;
-    }
-    onOpenProductSync({ productIds: ids, staged: [], entries: [] });
-  }
-  async function openSchedule(saved = false) {
-    if (!capabilities.schedule || busy) return;
-    if (pendingDrafts.some(entry => unsupportedScheduleFields(entry).length) || (saved && pendingDrafts.length)) {
-      setMessage("Save formula, package, and Details changes locally first. Only stock, tracking, visibility, and sales can be staged.");
-      return;
-    }
-    if (saved) {
-      onOpenProductSync({ productIds: selected, staged: [], entries: [] });
-      return;
-    }
-    const entries = pendingDrafts;
-    onOpenProductSync({ productIds: entries.map(entry => entry.meta.productId), entries,
-      staged: entries.map(entry => {
-        const update = buildScheduleUpdate(entry);
-        const changed = new Set(dirtyFields(entry));
-        update.changes = Object.fromEntries(Object.entries(update.changes).filter(([key]) => changed.has(key)));
-        return update;
-      })
-    });
   }
   async function deleteRow(row) {
     setBusy(true);
@@ -477,6 +420,21 @@ export function AdminProductsSection({
             ) : null}
             <div>
               <strong>{values.name}</strong>
+              <div className="small products-product-meta">
+                {[
+                  !columnsByView[view].includes("vendor") && row.vendorName,
+                  !columnsByView[view].includes("category") &&
+                    categoryLabel(row.categoryName),
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </div>
+              {!columnsByView[view].includes("packages") &&
+              row.packageSummary ? (
+                <div className="small products-product-meta">
+                  {row.packageSummary}
+                </div>
+              ) : null}
               {dirtyFields(drafts[row.productId]).length ? (
                 <div className="small">Unsaved changes</div>
               ) : null}
@@ -486,36 +444,7 @@ export function AdminProductsSection({
       case "vendor":
         return row.vendorName;
       case "category":
-        return row.categoryName;
-      case "status":
-        return (
-          <>
-            <strong>{syncLabel(row)}</strong>
-            {!(row.localLineProductId > 0) &&
-            row.remoteSyncStatus === "failed" ? (
-              <div className="small">Local-only</div>
-            ) : null}
-            {row.localLineProductId > 0 ? (
-              <div className="small">Local Line #{row.localLineProductId}</div>
-            ) : null}
-            {row.remoteSyncMessage ? (
-              <div className="small">{row.remoteSyncMessage}</div>
-            ) : null}
-            {batches
-              .filter(
-                (batch) =>
-                  ["scheduled", "running"].includes(batch.status) &&
-                  batch.items?.some(
-                    (item) => Number(item.productId) === row.productId,
-                  ),
-              )
-              .map((batch) => (
-                <div className="small" key={batch.id}>
-                  Scheduled: {dateTime(batch.scheduledAt)}
-                </div>
-              ))}
-          </>
-        );
+        return categoryLabel(row.categoryName);
       case "visible":
       case "trackInventory":
       case "onSale":
@@ -534,6 +463,35 @@ export function AdminProductsSection({
       case "saleDiscount":
         return numericInput(column.key);
       case "sourceUnitPrice":
+        if (row.usesSourcePricing) {
+          return (
+            <div className="products-retail-price">
+              <span aria-hidden="true">$</span>
+              {numericInput(column.key, true)}
+              <span className="small">
+                / {values.unitOfMeasure === "lbs" ? "lb" : "each"}
+              </span>
+            </div>
+          );
+        }
+        return values.packages.length ? (
+          <div>
+            {values.packages.map((pkg, index) => (
+              <div key={pkg.id ?? index}>
+                {money(pkg.price)}
+                <span className="small">
+                  {" "}
+                  /{" "}
+                  {pkg.chargeType === "unit"
+                    ? pkg.unit || "unit"
+                    : pkg.name || "package"}
+                </span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          "—"
+        );
       case "minWeight":
       case "maxWeight":
       case "avgWeightOverride":
@@ -593,13 +551,6 @@ export function AdminProductsSection({
             ) : null}
           </div>
         );
-      case "lastRemote":
-        return (
-          <>
-            {dateTime(row.remoteSyncedAt)}
-            <div className="small">{row.remoteSyncMessage}</div>
-          </>
-        );
       case "actions":
         return (
           <div className="products-row-actions">
@@ -610,33 +561,24 @@ export function AdminProductsSection({
             >
               Details
             </button>
-            <details>
-              <summary>More</summary>
-              {capabilities.sync ? (
-                <button disabled={disabled} onClick={() => openReview(row)}>
-                  Review & Sync
-                </button>
-              ) : null}
-              {capabilities.edit ? (
-                <>
-                  <button
-                    disabled={disabled}
-                    onClick={() => onDuplicateProduct(row.productId)}
-                  >
-                    Duplicate
-                  </button>
-                  <button
-                    disabled={
-                      disabled ||
-                      (row.localLineProductId > 0 && !capabilities.push)
-                    }
-                    onClick={() => deleteRow(row)}
-                  >
-                    Delete
-                  </button>
-                </>
-              ) : null}
-            </details>
+            {capabilities.edit ? (
+              <ProductActionsMenu
+                label={`More actions for ${values.name}`}
+                disabled={disabled}
+                items={[
+                  {
+                    label: "Duplicate",
+                    onClick: () => onDuplicateProduct(row.productId),
+                  },
+                  {
+                    label: "Delete",
+                    danger: true,
+                    disabled: row.localLineProductId > 0 && !capabilities.push,
+                    onClick: () => deleteRow(row),
+                  },
+                ]}
+              />
+            ) : null}
           </div>
         );
       default:
@@ -651,23 +593,44 @@ export function AdminProductsSection({
   }
   return (
     <section className="admin-section products-workspace">
-      <h2 className="h2">Products</h2>
-      <div className="admin-actions" role="tablist" aria-label="Product views">
+      <div className="products-heading">
+        <h2 className="h2">Products</h2>
+        <div className="products-button-group">
+          <button
+            className="button alt"
+            aria-expanded={columnsOpen}
+            aria-controls="products-columns"
+            onClick={() => setColumnsOpen(!columnsOpen)}
+          >
+            Columns
+          </button>
+          {capabilities.edit ? (
+            <button
+              className="button alt"
+              disabled={saving || busy}
+              onClick={onAddProduct}
+            >
+              Add Product
+            </button>
+          ) : null}
+        </div>
+      </div>
+      <div className="products-views" role="tablist" aria-label="Product views">
         {Object.keys(VIEW_COLUMNS).map((key) => (
           <button
-            className={`button ${view === key ? "" : "alt"}`}
+            className="products-view"
             role="tab"
             aria-selected={view === key}
             key={key}
-            onClick={() => setView(key)}
+            onClick={() => changeView(key)}
           >
             {key[0].toUpperCase() + key.slice(1)}
           </button>
         ))}
       </div>
       <p className="small">
-        All views share filters, selections, and drafts. Save locally, then
-        review Local Line and Square changes in Product Sync.
+        Manage product details, pricing, and inventory. Save changes locally;
+        syncing and scheduling are in Product Sync.
       </p>
       <div className="admin-filters">
         <label>
@@ -675,6 +638,7 @@ export function AdminProductsSection({
           <input
             className="input"
             type="search"
+            aria-label="Search"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
           />
@@ -683,10 +647,12 @@ export function AdminProductsSection({
           Vendor
           <select
             className="input"
+            aria-label="Vendor"
             value={filters.vendorId}
             onChange={(event) => filter("vendorId", event.target.value)}
           >
             <option value="">All vendors</option>
+            <option value={DECK_ENTERPRISES}>Deck Enterprises</option>
             {vendors.map((v) => (
               <option key={v.id} value={v.id}>
                 {v.name}
@@ -698,6 +664,7 @@ export function AdminProductsSection({
           Category
           <select
             className="input"
+            aria-label="Category"
             value={filters.categoryId}
             onChange={(event) => filter("categoryId", event.target.value)}
           >
@@ -706,7 +673,7 @@ export function AdminProductsSection({
               .filter((c) => c.name?.trim().toLowerCase() !== "membership")
               .map((c) => (
                 <option key={c.id} value={c.id}>
-                  {c.name}
+                  {categoryLabel(c.name)}
                 </option>
               ))}
           </select>
@@ -740,23 +707,12 @@ export function AdminProductsSection({
               ["deposit", "Deposit / no markup"],
             ],
           ],
-          [
-            "status",
-            "Sync status",
-            [
-              ["all", "All"],
-              ["local-only", "Local-only"],
-              ["needsApply", "Needs push"],
-              ["pending", "Pending"],
-              ["failed", "Failed"],
-              ["applied", "Synced"],
-            ],
-          ],
         ].map(([key, label, options]) => (
           <label key={key}>
             {label}
             <select
               className="input"
+              aria-label={label}
               value={filters[key]}
               onChange={(event) => filter(key, event.target.value)}
             >
@@ -768,90 +724,36 @@ export function AdminProductsSection({
             </select>
           </label>
         ))}
-        <button
-          className="button alt"
-          onClick={() => {
-            setFilters((prev) => ({
-              ...prev,
-              vendorId: "",
-              pricingType: "formula",
-            }));
-            setPage(1);
-          }}
-        >
-          Deck / Hyland / Creamy Cow
-        </button>
       </div>
-      <div className="admin-actions products-toolbar">
-        {capabilities.edit ? (
-          <>
-            <button
-              className="button"
-              disabled={saving || busy || !pendingDrafts.length}
-              onClick={save}
-            >
-              {saving
-                ? "Saving…"
-                : `Save Local Changes (${pendingDrafts.length})`}
-            </button>
-            <button
-              className="button alt"
-              disabled={saving || busy || !pendingDrafts.length}
-              onClick={() => {
-                if (window.confirm("Discard all unsaved product changes?"))
-                  setDrafts({});
-              }}
-            >
-              Discard Changes
-            </button>
-            <button
-              className="button alt"
-              disabled={saving || busy}
-              onClick={onAddProduct}
-            >
-              Add Product
-            </button>
-          </>
-        ) : null}
-        {capabilities.sync ? (
-          <button
-            className="button alt"
-            disabled={saving || busy}
-            onClick={() => openReview()}
-          >
-            Review & Sync{" "}
-            {selected.length
-              ? `(${selected.length} selected)`
-              : "(all products)"}
-          </button>
-        ) : null}
-        <button
-          className="button alt"
-          onClick={() => setColumnsOpen(!columnsOpen)}
-        >
-          Columns
-        </button>
-        {capabilities.schedule ? (
-          <>
-            <button
-              className="button alt"
-              disabled={saving || busy || !pendingDrafts.length}
-              onClick={() => openSchedule(false)}
-            >
-              Schedule Changes
-            </button>
-            <button
-              className="button alt"
-              disabled={saving || busy}
-              onClick={() => openSchedule(true)}
-            >
-              Schedule Saved Products
-            </button>
-          </>
-        ) : null}
+      <div className="products-toolbar">
+        <div className="products-button-group">
+          {capabilities.edit ? (
+            <>
+              <button
+                className="button"
+                disabled={saving || busy || !pendingDrafts.length}
+                onClick={save}
+              >
+                {saving
+                  ? "Saving…"
+                  : `Save Local Changes (${pendingDrafts.length})`}
+              </button>
+              <button
+                className="button alt products-discard"
+                disabled={saving || busy || !pendingDrafts.length}
+                onClick={() => {
+                  if (window.confirm("Discard all unsaved product changes?"))
+                    setDrafts({});
+                }}
+              >
+                Discard Changes
+              </button>
+            </>
+          ) : null}
+        </div>
       </div>
       {columnsOpen ? (
-        <div className="products-columns">
+        <div className="products-columns" id="products-columns">
           <strong>{view} columns</strong>
           {[
             ...columns,
@@ -864,7 +766,7 @@ export function AdminProductsSection({
                 <input
                   type="checkbox"
                   checked={columnsByView[view].includes(column.key)}
-                  disabled={column.required}
+                  disabled={columnRequired(column, view)}
                   onChange={() =>
                     changeColumns(toggleId(columnsByView[view], column.key))
                   }
@@ -890,15 +792,26 @@ export function AdminProductsSection({
               ) : null}
             </div>
           ))}
-          <button onClick={() => saveColumns(view, columnsByView[view], true)}>
-            Save as Default
-          </button>
-          <button onClick={() => changeColumns(loadColumns(view, true))}>
-            Reset to Saved Default
-          </button>
-          <button onClick={() => changeColumns(VIEW_COLUMNS[view])}>
-            App Default
-          </button>
+          <div className="products-button-group products-column-defaults">
+            <button
+              className="button alt"
+              onClick={() => saveColumns(view, columnsByView[view], true)}
+            >
+              Save as Default
+            </button>
+            <button
+              className="button alt"
+              onClick={() => changeColumns(loadColumns(view, true))}
+            >
+              Reset to Saved Default
+            </button>
+            <button
+              className="button alt"
+              onClick={() => changeColumns(VIEW_COLUMNS[view])}
+            >
+              App Default
+            </button>
+          </div>
         </div>
       ) : null}
       <div role="status" className="small products-message">
@@ -906,8 +819,14 @@ export function AdminProductsSection({
       </div>
       {selected.length ? (
         <div className="small">
-          {selected.length} selected across all pages and filters.{" "}
-          <button onClick={() => setSelected([])}>Clear selection</button>
+          {selected.length} selected across all pages and filters. Open Store →
+          Product Sync to review the selection.{" "}
+          <button
+            className="products-text-button"
+            onClick={() => setSelected([])}
+          >
+            Clear selection
+          </button>
         </div>
       ) : null}
       {pendingDrafts.length ? (
@@ -916,8 +835,30 @@ export function AdminProductsSection({
           {pendingDrafts.length === 1 ? "" : "s"} across all pages and filters.
         </div>
       ) : null}
-      <div className="products-table-scroll">
-        <table className="table products-table">
+      <div
+        className="products-table-scroll"
+        role="region"
+        aria-label="Products table, scroll for more columns"
+        tabIndex={0}
+      >
+        <table
+          className="table products-table"
+          style={{
+            minWidth:
+              44 + columns.reduce((sum, column) => sum + column.width, 0),
+          }}
+        >
+          <colgroup>
+            <col style={{ width: 44 }} />
+            {columns.map((column) => (
+              <col
+                key={column.key}
+                style={{
+                  width: column.key === "product" ? undefined : column.width,
+                }}
+              />
+            ))}
+          </colgroup>
           <thead>
             <tr>
               <th>
@@ -948,7 +889,7 @@ export function AdminProductsSection({
               {columns.map((column) => (
                 <th
                   key={column.key}
-                  style={{ minWidth: column.width }}
+                  title={column.description}
                   aria-sort={
                     sort.key === column.key
                       ? sort.direction === "asc"
@@ -1008,35 +949,45 @@ export function AdminProductsSection({
       {!loading && !data.rows.length ? (
         <p>No products match these filters.</p>
       ) : null}
-      <div className="admin-actions">
+      <div className="products-pagination">
         <span>
           {data.pagination?.totalRows || 0} products · Page {page} of{" "}
           {data.pagination?.totalPages || 1}
         </span>
-        <button disabled={loading || page <= 1} onClick={() => setPage(1)}>
-          First
-        </button>
-        <button
-          disabled={loading || page <= 1}
-          onClick={() => setPage(page - 1)}
-        >
-          Previous
-        </button>
-        <button
-          disabled={loading || page >= (data.pagination?.totalPages || 1)}
-          onClick={() => setPage(page + 1)}
-        >
-          Next
-        </button>
-        <button
-          disabled={loading || page >= (data.pagination?.totalPages || 1)}
-          onClick={() => setPage(data.pagination.totalPages)}
-        >
-          Last
-        </button>
+        <div className="products-button-group">
+          <button
+            className="button alt"
+            disabled={loading || page <= 1}
+            onClick={() => setPage(1)}
+          >
+            First
+          </button>
+          <button
+            className="button alt"
+            disabled={loading || page <= 1}
+            onClick={() => setPage(page - 1)}
+          >
+            Previous
+          </button>
+          <button
+            className="button alt"
+            disabled={loading || page >= (data.pagination?.totalPages || 1)}
+            onClick={() => setPage(page + 1)}
+          >
+            Next
+          </button>
+          <button
+            className="button alt"
+            disabled={loading || page >= (data.pagination?.totalPages || 1)}
+            onClick={() => setPage(data.pagination.totalPages)}
+          >
+            Last
+          </button>
+        </div>
         <label>
           Rows{" "}
           <select
+            className="input"
             value={pageSize}
             onChange={(event) => {
               setPageSize(Number(event.target.value));
@@ -1065,7 +1016,6 @@ export function AdminProductsSection({
           ))}
         </details>
       ) : null}
-      {capabilities.sync || capabilities.schedule ? <button className="button alt" onClick={() => onOpenProductSync({ history: true })}>View releases in Product Sync</button> : null}
     </section>
   );
 }

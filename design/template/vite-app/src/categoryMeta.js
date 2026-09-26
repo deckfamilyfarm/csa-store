@@ -1,3 +1,5 @@
+import { categoryLabel } from "./categoryLabel.js";
+
 const categoryMeta = {
   "Meat + Poultry": {
     icon: "M",
@@ -26,8 +28,9 @@ const categoryMeta = {
 };
 
 export function getCategoryMeta(name) {
-  return categoryMeta[name] || {
-    icon: name?.[0] || "C",
+  const label = categoryLabel(name);
+  return categoryMeta[label] || {
+    icon: label[0] || "C",
     note: "",
     image: ""
   };

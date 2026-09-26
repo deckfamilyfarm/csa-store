@@ -6,7 +6,8 @@ import { AdminManualSection } from "./AdminManualSection.jsx";
 import { AdminMembershipSection } from "./AdminMembershipSection.jsx";
 import { AdminOrdersSection } from "./AdminOrdersSection.jsx";
 import { AdminProductsSection } from "./AdminProductsSection.jsx";
-import { productCapabilities, buildProductDraftFromProduct, createDraftPackage, hydrateProductDraft, dirtyFields, hasDraftChanges, acknowledgeSave, saveProductDraft } from "./productWorkspace.js";
+import { categoryLabel } from "../categoryLabel.js";
+import { productCapabilities, buildProductDraftFromProduct, createDraftPackage, hydrateProductDraft, dirtyFields, hasDraftChanges, acknowledgeSave, saveProductDraft, unsupportedScheduleFields, buildScheduleUpdate } from "./productWorkspace.js";
 import { AdminProductSyncSection } from "./AdminProductSyncSection.jsx";
 import { acknowledgeSyncDrafts } from "./productSyncView.js";
 import {
@@ -608,6 +609,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
   const [selectedProductDetail, setSelectedProductDetail] = useState(null);
   const [productEditorMode, setProductEditorMode] = useState("existing");
   const [workspaceDrafts, setWorkspaceDrafts] = useState({});
+  const [workspaceSelection, setWorkspaceSelection] = useState([]);
   const [syncHandoff, setSyncHandoff] = useState(null);
   function openProductSync(handoff = null) { setSyncHandoff(handoff); setActiveSection("productSync"); }
   const [newProductDraft, setNewProductDraft] = useState(null);
@@ -811,6 +813,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
   function clearAdminSession(message = "Your admin session expired. Please sign in again.") {
     localStorage.removeItem("adminToken");
     setSyncHandoff(null);
+    setWorkspaceSelection([]);
     setToken("");
     setCurrentAdmin(null);
     setProductsLoading(false);
@@ -1800,6 +1803,29 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
     setOpenAdminNavGroup("");
     if (item.section === "manual") {
       openAdminManual(item.manualTopic || "overview");
+      return;
+    }
+    if (item.section === "productSync" && activeSection === "products") {
+      if (productSaveLoading) return;
+      const entries = Object.values(workspaceDrafts).filter(entry =>
+        dirtyFields(entry).length && (!workspaceSelection.length || workspaceSelection.includes(entry.meta.productId))
+      );
+      if (entries.some(entry => unsupportedScheduleFields(entry).length)) {
+        setMessage("Save formula, package, and Details changes locally before opening Product Sync. Stock, tracking, visibility, and sale drafts can be reviewed there.");
+        return;
+      }
+      if (!closeProductEditor()) return;
+      setMessage("");
+      openProductSync({
+        productIds: workspaceSelection.length ? workspaceSelection : entries.map(entry => entry.meta.productId),
+        entries,
+        staged: entries.map(entry => {
+          const update = buildScheduleUpdate(entry);
+          const changed = new Set(dirtyFields(entry));
+          update.changes = Object.fromEntries(Object.entries(update.changes).filter(([key]) => changed.has(key)));
+          return update;
+        })
+      });
       return;
     }
     if (!confirmLeaveProducts()) return;
@@ -3564,7 +3590,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                       <option value="">Select category</option>
                       {categories.filter((category) => String(category.name || "").trim().toLowerCase() !== "membership").map((category) => (
                         <option key={category.id} value={category.id}>
-                          {category.name}
+                          {categoryLabel(category.name)}
                         </option>
                       ))}
                       </select>
@@ -4405,6 +4431,8 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                 capabilities={capabilities}
                 drafts={workspaceDrafts}
                 setDrafts={setWorkspaceDrafts}
+                selected={workspaceSelection}
+                setSelected={setWorkspaceSelection}
                 saving={productSaveLoading}
                 onSave={saveWorkspaceChanges}
                 onDataRefresh={loadAll}
@@ -4412,7 +4440,6 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                 onAddProduct={startNewProductDraft}
                 onDuplicateProduct={handleDuplicateProduct}
                 onDeleteProduct={handleDeleteProduct}
-                onOpenProductSync={openProductSync}
                 onOpenPricingGuide={() => openAdminManual("pricing")}
                 onOpenProductDetails={(productId) => {
                   setProductEditorMode("existing");
@@ -4698,7 +4725,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                 <tbody>
                   {categories.map((category) => (
                     <tr key={category.id}>
-                      <td>{category.name}</td>
+                      <td>{categoryLabel(category.name)}</td>
                     </tr>
                   ))}
                 </tbody>

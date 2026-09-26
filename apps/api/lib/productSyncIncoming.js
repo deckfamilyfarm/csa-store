@@ -39,7 +39,8 @@ export async function readIncomingSnapshot(proposal, connection = getPool()) {
   };
 }
 export async function prepareIncomingActions(catalog, productIds = []) {
-  const { report } = await runLocalLineAudit({ write: false, writeReport: false, skipPricelist: true, limit: 0 });
+  const { report } = await runLocalLineAudit({ write: false, writeReport: false, skipPricelist: true, limit: 0,
+    productIds: productIds.length ? productIds : null });
   const actions = [];
   const protectedProducts = await getActiveScheduledPricelistProductChangeMap();
   for (const entry of incomingProposals(report, catalog)) {

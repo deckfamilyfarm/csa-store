@@ -64,6 +64,11 @@ test("pending review includes new products without a pricing profile and failed 
   assert.deepEqual(matches({ statusFilter: "local-only" }), [2]);
   assert.deepEqual(matches({ statusFilter: "applied" }), [4]);
 });
+test("Deck Enterprises limits both products and pending review to its three vendors", () => {
+  assert.deepEqual(matches({ vendorGroup: "deck-enterprises" }), [1, 2, 3]);
+  assert.deepEqual(matches({ vendorGroup: "deck-enterprises", statusFilter: "needsApply" }), [1, 2, 3]);
+  assert.deepEqual(matches({ vendorGroup: "deck-enterprises", vendorId: 4 }), []);
+});
 test("search remains a bound value even when it contains SQL punctuation", () => {
   assert.deepEqual(matches({ search: "Sausage" }), [1]);
   assert.deepEqual(matches({ search: "' OR 1=1 --" }), []);

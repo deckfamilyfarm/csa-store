@@ -6,6 +6,8 @@ import { prepareIncomingActions, applyIncomingAction } from "./productSyncIncomi
 import { ensureProductSyncSchema, parseJson, utcNow, isoUtc, withSyncLock } from "./productSyncSchema.js";
 import { listScheduledPricelistBatches } from "./scheduledPricelistReleases.js";
 import { normalizeIds, normalizeStaged, hasGrant, fail, authorizeRelease, releaseTime, same, executeProductActions, releaseStatus } from "./productSyncCore.js";
+import { auditVendorGroup, auditProducts } from "./productSyncScope.js";
+import { PRICELIST_PENDING_REMOTE_APPLY_SQL } from "./productWorkspaceFilters.js";
 
 export async function loadCurrentSnapshot(connection, productId) {
   const [rows] = await connection.query(`SELECT p.id AS productId, p.name AS productName, p.visible, p.track_inventory AS trackInventory, p.inventory,
@@ -57,7 +59,7 @@ export async function createProductSyncAudit(options, user) {
   if (options.incoming && (!platforms.includes("localline") || !hasGrant(roles, "localline_pull"))) fail("Incoming repairs require Local Line Pull.", 403);
   const productIds = options.productIds?.length ? normalizeIds(options.productIds) : [];
   if (Object.keys(staged).some(id => productIds.length && !productIds.includes(Number(id)))) fail("Staged products must be in the audit scope.");
-  const normalized = { platforms, staged, productIds, incoming: Boolean(options.incoming), includeAllProducts: Boolean(options.includeAllProducts) };
+  const normalized = { platforms, staged, productIds, incoming: Boolean(options.incoming), vendorGroup: auditVendorGroup(options) };
   const [result] = await getPool().query(`INSERT INTO product_sync_audits (status, options_json, created_by, created_at) VALUES ('running', ?, ?, UTC_TIMESTAMP())`, [JSON.stringify(normalized), user.userId || user.adminId || null]);
   const id = Number(result.insertId);
   // Work survives navigation. All progress and results are stored centrally.
@@ -68,11 +70,13 @@ export async function createProductSyncAudit(options, user) {
 }
 async function runProductSyncAudit(id, options, userId) {
   const catalog = await syncCatalog();
-  const products = catalog.filter(row => row.categoryName?.trim().toLowerCase() !== "membership" && (!options.productIds.length || options.productIds.includes(Number(row.id))));
+  const products = auditProducts(catalog, options);
+  const scopedIds = products.map(row => Number(row.id));
   const productSet = new Set(products.map(row => Number(row.id)));
-  if (Object.keys(options.staged).some(productId => !productSet.has(Number(productId)))) fail("A staged product is missing, deleted, or a Membership product.");
+  if (Object.keys(options.staged).some(productId => !productSet.has(Number(productId)))) fail("A staged product is outside the audit scope. Check the vendor selection; missing, deleted, and Membership products cannot be audited.");
   const snapshots = new Map();
   const save = async action => {
+    if ((action.direction === "outgoing" || options.vendorGroup === "deck-enterprises") && !productSet.has(Number(action.productId))) return;
     if (action.direction === "outgoing" && productSet.has(action.productId)) {
       if (!snapshots.has(action.productId)) snapshots.set(action.productId, await loadCurrentSnapshot(getPool(), action.productId));
       action.localSnapshot = snapshots.get(action.productId);
@@ -84,12 +88,13 @@ async function runProductSyncAudit(id, options, userId) {
   for (const platform of options.platforms) {
     try {
       if (platform === "square") {
+        if (!scopedIds.length) continue;
         await syncSquareCatalogCache({ userId });
         await getPool().query("UPDATE product_sync_audits SET square_refreshed_at=UTC_TIMESTAMP(), progress_at=UTC_TIMESTAMP() WHERE id=?", [id]);
-        for (const action of await prepareSquareActions(options)) await save(action);
-        const matches = await buildSquareMatchReview({ includeAllProducts: options.includeAllProducts });
+        for (const action of await prepareSquareActions({ ...options, productIds: scopedIds, includeAllProducts: true })) await save(action);
+        const matches = await buildSquareMatchReview({ includeAllProducts: true, productIds: scopedIds });
         for (const row of matches.rows || []) {
-          if (row.linked || !productSet.has(Number(row.productId)) || (!options.includeAllProducts && !/deck family farm/i.test(row.vendorName || ""))) continue;
+          if (row.linked || !productSet.has(Number(row.productId))) continue;
           await save({ direction: "outgoing", platform, kind: "unmatched", productId: Number(row.productId), productName: row.productName, packageId: row.packageId, packageName: row.packageName, vendorName: row.vendorName, status: "blocked", message: "Approve a Square variation match in Product Matches, then audit again." });
         }
       } else {
@@ -101,7 +106,10 @@ async function runProductSyncAudit(id, options, userId) {
             catch (error) { await save({ direction: "outgoing", platform, kind: "error", productId: Number(product.id), productName: product.name, vendorName: product.vendorName, status: "blocked", message: error.message }); }
           }
         }));
-        if (options.incoming) for (const action of await prepareIncomingActions(catalog, options.productIds)) await save(action);
+        const incomingIds = options.vendorGroup === "deck-enterprises" ? scopedIds : options.productIds;
+        if (options.incoming && (options.vendorGroup === "all" || incomingIds.length)) {
+          for (const action of await prepareIncomingActions(catalog, incomingIds)) await save(action);
+        }
       }
     } catch (error) { errors.push(`${PLATFORM_LABEL[platform]}: ${error.message}`); }
   }
@@ -332,6 +340,16 @@ export async function applyProductSyncIncoming(body, user) {
     }
     return { results };
   });
+}
+export async function pendingProductSync(options = {}) {
+  await ensureProductSyncSchema();
+  const [rows] = await getPool().query(`SELECT p.id, p.name, v.name AS vendorName, c.name AS categoryName,
+    lm.local_line_product_id AS localLineProductId
+    FROM products p LEFT JOIN vendors v ON v.id=p.vendor_id LEFT JOIN categories c ON c.id=p.category_id
+    LEFT JOIN product_pricing_profiles pp ON pp.product_id=p.id LEFT JOIN local_line_product_meta lm ON lm.product_id=p.id
+    WHERE COALESCE(p.is_deleted, 0)=0 AND ${PRICELIST_PENDING_REMOTE_APPLY_SQL} ORDER BY p.name, p.id`);
+  return { rows: auditProducts(rows, options).map(row => ({ productId: Number(row.id), productName: row.name,
+    vendorName: row.vendorName || "", kind: Number(row.localLineProductId) > 0 ? "update" : "create" })) };
 }
 export async function productSyncStatus() {
   await ensureProductSyncSchema();

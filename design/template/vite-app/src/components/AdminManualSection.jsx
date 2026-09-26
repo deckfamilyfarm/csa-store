@@ -87,24 +87,31 @@ export function AdminManualSection({ focusTopic = "overview" }) {
           inventory-related settings, and Local Line sync decisions.
         </p>
         <p>
-          Open Store → Products for the whole catalog. Overview, Pricing, and Inventory are views
+          Open Store → Products for the whole catalog. Pricing and Inventory are views
           of the same products. Search, filters, selections, and unsaved edits stay together when
           you switch views or pages. Membership levels remain in the Membership section.
         </p>
         <p>
           Edit formula inputs, stock, visibility, sales, and single-package prices in the grid.
           Details opens the shared editor for descriptions, images, and multiple package prices.
-          Closing Details keeps your draft. Save Local Changes saves locally; Review &amp; Sync opens
-          Product Sync to compare the selected products with Local Line and Square.
+          Closing Details keeps your draft. Save Local Changes saves locally. Use Store → Product Sync
+          in the menu to compare the selected products with Local Line and Square.
         </p>
         <p>
           Columns are saved separately for each view. Your previous pricelist column preferences
-          carry over to Pricing. Use the Deck / Hyland / Creamy Cow shortcut to filter formula vendors.
+          carry over to Pricing. Choose Deck Enterprises in the Vendor filter to include Deck Family
+          Farm, Hyland, and Creamy Cow together. Inventory selects this group by default when opened;
+          you can choose All vendors or an individual vendor afterward.
         </p>
         <p>
-          Schedule Changes supports stock, tracking, visibility, and sales. Save formula, package,
-          and Details changes first, then use Schedule Saved Products. Audit, select platform actions, and
-          schedule the approved values at an hourly Pacific time. Available actions depend on
+          Pricing always includes Retail Price. For formula-priced products, this is the vendor's
+          price per lb or per each before CSA adjustments. Standard products show their package prices.
+        </p>
+        <p>
+          Sync status, release history, and scheduling live in Store → Product Sync. Opening it from the menu
+          carries selected products and unsaved stock, tracking, visibility, and sale drafts. Save
+          formula, package, and Details changes locally first. In Product Sync, run an audit, select
+          platform actions, and use Schedule Release for an hourly Pacific time. Available actions depend on
           your existing roles; access to local pricing does not grant manual push permission.
         </p>
       </article>
@@ -243,6 +250,9 @@ export function AdminManualSection({ focusTopic = "overview" }) {
         <h4>Product Sync: Local Line and Square</h4>
         <p>
           Open Store → Product Sync. Choose Local Line, Square, or both, then Run audit.
+          Audit vendors defaults to Deck Enterprises: Deck Family Farm, Hyland, and Creamy Cow.
+          Choose All vendors when needed. New products and saved changes appear in Pending Local Line
+          sync immediately; use Audit pending products to compare them before approving publication.
           Auditing refreshes remote data without publishing changes or changing local prices.
         </p>
         <ul className="admin-manual-list">

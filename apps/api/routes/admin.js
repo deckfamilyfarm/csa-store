@@ -6444,6 +6444,7 @@ router.get("/pricelist", requireAdmin, async (req, res) => {
     statusFilter,
     visibility: String(req.query?.visibility || "all"),
     pricingType: String(req.query?.pricingType || "all"),
+    vendorGroup: String(req.query?.vendorGroup || ""),
     membershipCategoryIds
   });
 
@@ -6612,6 +6613,7 @@ router.get("/pricelist/pending-remote", requireAdmin, async (req, res) => {
     statusFilter,
     visibility: String(req.query?.visibility || "all"),
     pricingType: String(req.query?.pricingType || "all"),
+    vendorGroup: String(req.query?.vendorGroup || ""),
     membershipCategoryIds
   });
   const pendingClauses = buildPendingPricelistClauses(clauses, statusFilter);

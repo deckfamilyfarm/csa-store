@@ -26,6 +26,7 @@ import {
 } from "../api.js";
 import { trackGoogleAnalyticsPageView } from "../analytics.js";
 import { buildSiteContentLookup } from "../siteContent.js";
+import { categoryLabel } from "../categoryLabel.js";
 import { AccountPanelSection } from "./AccountPanelSection.jsx";
 import { CsaPlansSection } from "./CsaPlansSection.jsx";
 import { DeliverySection } from "./DeliverySection.jsx";
@@ -892,7 +893,7 @@ export function Storefront() {
                               <option value="">All categories</option>
                               {catalog.categories.map((category) => (
                                 <option key={category.id} value={category.id}>
-                                  {category.name}
+                                  {categoryLabel(category.name)}
                                 </option>
                               ))}
                             </select>
@@ -928,7 +929,7 @@ export function Storefront() {
                           products={filteredProducts}
                           showCartAction
                           onSelect={(product) => setSelectedProduct(product)}
-                          filterLabel={activeCategory ? activeCategory.name : "All"}
+                          filterLabel={activeCategory ? categoryLabel(activeCategory.name) : "All"}
                           sectionRef={productGridRef}
                           eyebrow="Catalog"
                           title="All products in this category."

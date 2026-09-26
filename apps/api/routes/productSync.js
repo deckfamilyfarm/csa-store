@@ -4,7 +4,7 @@ import { SYNC_ROLES } from "../lib/productSyncCore.js";
 import {
   createProductSyncAudit, getProductSyncAudit, listProductSyncActions, createProductSyncRelease,
   getProductSyncRelease, listProductSyncReleases, runProductSyncRelease, cancelProductSyncRelease,
-  reviewProductSyncRelease, applyProductSyncIncoming, productSyncStatus, syncCatalog, selectedActions
+  reviewProductSyncRelease, applyProductSyncIncoming, productSyncStatus, pendingProductSync, syncCatalog, selectedActions
 } from "../lib/productSync.js";
 
 const router = express.Router();
@@ -14,6 +14,7 @@ const route = fn => async (req, res) => {
   catch (error) { res.status(error.status || 400).json({ error: error.message }); }
 };
 router.get("/status", route(() => productSyncStatus()));
+router.get("/pending", route(req => pendingProductSync(req.query)));
 router.get("/matches/localline", route(async () => ({ rows: (await syncCatalog()).filter(row => row.categoryName?.trim().toLowerCase() !== "membership") })));
 router.post("/audits", route(req => createProductSyncAudit(req.body || {}, req.admin)));
 router.get("/audits/:id", route(req => getProductSyncAudit(req.params.id)));

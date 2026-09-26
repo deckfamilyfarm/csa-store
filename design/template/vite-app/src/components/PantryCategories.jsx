@@ -1,5 +1,6 @@
 import React from "react";
 import { getCategoryMeta } from "../categoryMeta.js";
+import { categoryLabel } from "../categoryLabel.js";
 
 export function PantryCategories({ categories, selectedKey, onSelect }) {
   return (
@@ -21,11 +22,11 @@ export function PantryCategories({ categories, selectedKey, onSelect }) {
             >
               {meta.image && (
                 <div className="category-image">
-                  <img src={meta.image} alt={category.name} loading="lazy" />
+                  <img src={meta.image} alt={categoryLabel(category.name)} loading="lazy" />
                 </div>
               )}
               <div className="icon">{meta.icon}</div>
-              <strong>{category.name}</strong>
+              <strong>{categoryLabel(category.name)}</strong>
               <span className="small">{meta.note}</span>
             </button>
           );})}

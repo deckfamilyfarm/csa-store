@@ -666,7 +666,7 @@ async function loadSquareLinks() {
   return rows;
 }
 
-export async function buildSquareMatchReview({ limitCandidates = 5, includeAllProducts = false } = {}) {
+export async function buildSquareMatchReview({ limitCandidates = 5, includeAllProducts = false, productIds = null } = {}) {
   await ensureSquareSyncSchema();
   const [localPackages, squareVariations, links] = await Promise.all([
     loadLocalPackagesForSquare({ includeAllProducts }),
@@ -677,7 +677,8 @@ export async function buildSquareMatchReview({ limitCandidates = 5, includeAllPr
   const linkByVariationId = new Map(links.map((link) => [String(link.squareVariationId), link]));
   const variationById = new Map(squareVariations.map((variation) => [variation.squareVariationId, variation]));
 
-  const rows = localPackages.map((localPackage) => {
+  const scopedIds = productIds === null ? null : new Set(productIds.map(Number));
+  const rows = localPackages.filter(row => scopedIds === null || scopedIds.has(Number(row.productId))).map((localPackage) => {
     const link = linkByPackageId.get(Number(localPackage.packageId)) || null;
     const linkedVariation = link ? variationById.get(link.squareVariationId) || null : null;
     const candidates = squareVariations

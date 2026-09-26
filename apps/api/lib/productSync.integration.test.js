@@ -85,8 +85,8 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
     await pool.query("INSERT INTO square_variation_links (product_id,package_id,square_item_id,square_variation_id,approved_at) VALUES (?,?,?,?,UTC_TIMESTAMP())", [id,id*10,item.id,variation.id]);
   }
   const user = { userId: 1, adminRoles: ["admin"] };
-  async function audit(ids, staged = []) {
-    const started = await service.createProductSyncAudit({ platforms: ["localline", "square"], productIds: ids, staged }, user);
+  async function audit(ids, staged = [], options = {}) {
+    const started = await service.createProductSyncAudit({ platforms: ["localline", "square"], productIds: ids, staged, ...options }, user);
     let result;
     for (let attempt = 0; attempt < 300; attempt++) {
       result = await service.getProductSyncAudit(started.id);
@@ -213,5 +213,26 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
   assert.equal(many.productCount,35); assert.equal(many.rows.length,60);
   const page2 = await service.listProductSyncActions(many.audit.id,{status:"changed",page:2}); assert.equal(page2.rows.length,10);
   const selected = await service.listProductSyncActions(many.audit.id,{status:"changed"},true,["square_push"]); assert.equal(selected.ids.length,35);
+  // The same vendor scope governs both destinations, including new local-only products.
+  await pool.query("INSERT INTO vendors (id,name) VALUES (2,'Creamy Cow, LLC'),(3,'Hyland Meats'),(4,'Other Farm')");
+  for (const id of [100, 101, 102, 103]) await product(id, false);
+  await pool.query("UPDATE products SET vendor_id=2 WHERE id=100");
+  await pool.query("UPDATE products SET vendor_id=3 WHERE id=101");
+  await pool.query("UPDATE products SET vendor_id=4 WHERE id=102");
+  await pool.query("UPDATE products SET category_id=2 WHERE id=103");
+  await pool.query("DELETE FROM product_pricing_profiles WHERE product_id=102");
+  const pending = await service.pendingProductSync();
+  assert.ok(pending.rows.some(row => row.productId===100 && row.kind==="create"));
+  assert.ok(pending.rows.some(row => row.productId===101 && row.kind==="create"));
+  assert.ok(!pending.rows.some(row => [102,103].includes(row.productId)));
+  assert.ok((await service.pendingProductSync({vendorGroup:"all"})).rows.some(row => row.productId===102), "New standard products need no pricing profile to be pending");
+  const scoped = await audit([100,101,102,103]);
+  assert.deepEqual([...new Set(scoped.rows.map(row => row.productId))].sort(), [100,101]);
+  assert.equal(scoped.rows.length,4, "Creamy Cow and Hyland are audited on both platforms");
+  const requestCount = requests.length;
+  const emptyScope = await audit([102]);
+  assert.equal(emptyScope.productCount,0);
+  assert.equal(requests.length,requestCount, "An empty vendor intersection cannot audit all Square products");
+  assert.equal((await audit([102],[],{vendorGroup:"all"})).rows.length,2);
   console.log(`Validated isolated MySQL database ${database}`);
 });

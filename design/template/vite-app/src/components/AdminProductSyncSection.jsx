@@ -35,7 +35,8 @@ export function AdminProductSyncSection({ token, roles = [], handoff = null, onA
   const has = role => hasSyncRole(roles, role);
   const allowed = ["localline", "square"].filter(platform => has(`${platform}_pull`) || has(`${platform}_push`) || has("pricing_admin"));
   const [platforms, setPlatforms] = useState(allowed);
-  const [includeAllProducts, setIncludeAllProducts] = useState(false);
+  const [vendorGroup, setVendorGroup] = useState("deck-enterprises");
+  const [pending, setPending] = useState(null);
   const [scope, setScope] = useState(handoff || null);
   const [audit, setAudit] = useState(null);
   const [status, setStatus] = useState([]);
@@ -59,6 +60,8 @@ export function AdminProductSyncSection({ token, roles = [], handoff = null, onA
   const auditing = audit?.status === "running";
   const groups = groupSyncActions(data.rows);
   const eligible = action => action.status === "changed" && !action.released && (action.direction === "incoming" ? has("localline_pull") : has(`${action.platform}_push`));
+  const pendingRows = (pending || []).filter(row => !scope?.productIds?.length || scope.productIds.includes(row.productId));
+  const auditScopeLabel = audit?.options?.vendorGroup === "deck-enterprises" ? "Deck Enterprises" : audit?.options?.vendorGroup === "all" ? "All vendors" : "Previous vendor scope";
 
   async function loadStatus() { const result = await adminGet("product-sync/status", token); setStatus(result.platforms || []); }
   async function loadHistory() {
@@ -79,6 +82,13 @@ export function AdminProductSyncSection({ token, roles = [], handoff = null, onA
       if (handoff.incoming) setFilters(prev => ({ ...prev, direction: "incoming", page: 1 }));
     }
   }, [handoff]);
+  useEffect(() => {
+    if (!allowed.includes("localline")) return;
+    let live = true;
+    setPending(null);
+    adminGet(`product-sync/pending?vendorGroup=${vendorGroup}`, token).then(result => { if (live) setPending(result.rows || []); }).catch(err => live && setError(err.message));
+    return () => { live = false; };
+  }, [token, vendorGroup, reload]);
   useEffect(() => {
     if (!audit?.id) return;
     let live = true;
@@ -105,11 +115,15 @@ export function AdminProductSyncSection({ token, roles = [], handoff = null, onA
     setBusy(key); setError(""); setMessage("");
     try { await fn(); } catch (err) { setError(err.message); } finally { setBusy(""); }
   }
-  async function runAudit() {
+  async function runAudit(pendingOnly = false) {
     await task("audit", async () => {
-      const result = await adminPost("product-sync/audits", token, { platforms, includeAllProducts, productIds: scope?.productIds || [], staged: scope?.staged || [], incoming: has("localline_pull") && platforms.includes("localline") });
+      const productIds = pendingOnly ? pendingRows.map(row => row.productId) : scope?.productIds || [];
+      if (pendingOnly && !productIds.length) return;
+      const result = await adminPost("product-sync/audits", token, { platforms, vendorGroup, productIds,
+        staged: (scope?.staged || []).filter(row => !pendingOnly || productIds.includes(row.productId)), incoming: has("localline_pull") && platforms.includes("localline") });
       setAudit(await adminGet(`product-sync/audits/${result.id}`, token));
-      setSelection([]); setData({ rows: [], total: 0, productCount: 0, vendors: [] }); setFilters(prev => ({ ...prev, page: 1 }));
+      setSelection([]); setData({ rows: [], total: 0, productCount: 0, vendors: [] });
+      setFilters(prev => ({ ...prev, ...(pendingOnly ? { direction: "outgoing", status: "changed", platform: "", search: "" } : {}), vendor: "", page: 1 }));
       onAuditCreated?.(result.id);
     });
   }
@@ -160,18 +174,24 @@ export function AdminProductSyncSection({ token, roles = [], handoff = null, onA
     {error && <div className="form-message error" role="alert">{error}</div>}{message && <div className="form-message success" role="status">{message}</div>}
     <div className="sync-audit-controls">
       <fieldset disabled={!!busy || auditing}><legend>Audit destinations</legend>{allowed.map(platform => <label key={platform}><input type="checkbox" checked={platforms.includes(platform)} onChange={() => setPlatforms(prev => prev.includes(platform) ? prev.filter(value => value !== platform) : [...prev, platform])} />{PLATFORM_NAMES[platform]}</label>)}</fieldset>
-      {platforms.includes("square") && <label><input type="checkbox" checked={includeAllProducts} disabled={!!busy || auditing} onChange={event => setIncludeAllProducts(event.target.checked)} />Square: include all vendors <span className="small">(default: Deck Family Farm)</span></label>}
-      <button className="button" disabled={!!busy || auditing || !platforms.length} onClick={runAudit}>{auditing ? "Auditing…" : "Run audit"}</button>
+      <label>Audit vendors<select className="input" aria-label="Audit vendors" value={vendorGroup} disabled={!!busy || auditing} onChange={event => setVendorGroup(event.target.value)}><option value="deck-enterprises">Deck Enterprises</option><option value="all">All vendors</option></select></label>
+      <button className="button" disabled={!!busy || auditing || !platforms.length} onClick={() => runAudit()}>{auditing ? "Auditing…" : "Run audit"}</button>
     </div>
-    {scope?.productIds?.length > 0 && <div className="sync-scope"><span>{scope.productIds.length} products from Products · {scope.staged?.length || 0} staged drafts. Drafts apply only when their release runs.</span><button className="button alt" disabled={!!busy || auditing} onClick={() => { onClearScope?.(); setScope(null); setAudit(null); setSelection([]); setData({ rows: [], total: 0, productCount: 0, vendors: [] }); }}>Clear scope</button></div>}
+    {vendorGroup === "deck-enterprises" && <p className="small">Deck Enterprises includes Deck Family Farm, Hyland, and Creamy Cow.</p>}
+    {scope?.productIds?.length > 0 && <div className="sync-scope"><span>{scope.productIds.length} products from Products · {scope.staged?.length || 0} staged drafts. Only products matching Audit vendors are included. Drafts apply only when their release runs.</span><button className="button alt" disabled={!!busy || auditing} onClick={() => { onClearScope?.(); setScope(null); setAudit(null); setSelection([]); setData({ rows: [], total: 0, productCount: 0, vendors: [] }); }}>Clear scope</button></div>}
+    {allowed.includes("localline") && <div className="sync-pending">
+      <div className="sync-selection"><strong>{pending === null ? "Loading pending products…" : `${pendingRows.length} local products pending Local Line sync`}</strong><button className="button alt" disabled={!pendingRows.length || !!busy || auditing || !platforms.includes("localline")} onClick={() => runAudit(true)}>Audit pending products</button></div>
+      <p className="small">New products and saved local changes appear here before an audit. Audit them, then review and approve the changes to publish.</p>
+      {!!pendingRows.length && <details><summary>View pending products ({pendingRows.length})</summary><div className="sync-match-list">{pendingRows.map(row => <div key={row.productId}><span><strong>{row.productName}</strong> · {row.vendorName}</span><span>{row.kind === "create" ? "New product — create in Local Line" : "Saved changes — update Local Line"}</span></div>)}</div></details>}
+    </div>}
     <p className="small">Auditing refreshes remote data. Changes require approval. Square publishes prices only; local formula pricing remains authoritative.</p>
-    {audit && <p className="small" role="status">Audit #{audit.id} · {pacificDateTime(audit.createdAt)} · {audit.status}{audit.error ? ` · ${audit.error}` : ""} · {audit.summary.map(row => `${PLATFORM_NAMES[row.platform]} ${row.direction}: ${row.count} ${row.status}`).join(" · ")}</p>}
+    {audit && <p className="small" role="status">Audit #{audit.id} · {auditScopeLabel} · {pacificDateTime(audit.createdAt)} · {audit.status}{audit.error ? ` · ${audit.error}` : ""} · {audit.summary.map(row => `${PLATFORM_NAMES[row.platform]} ${row.direction}: ${row.count} ${row.status}`).join(" · ")}</p>}
     <div className="sync-tabs" role="tablist" aria-label="Sync direction"><button role="tab" aria-selected={filters.direction === "outgoing"} onClick={() => changeFilter("direction", "outgoing")}>Outgoing Changes</button>{has("localline_pull") && <button role="tab" aria-selected={filters.direction === "incoming"} onClick={() => changeFilter("direction", "incoming")}>Incoming Local Line Changes</button>}</div>
     {filters.direction === "incoming" && <p className="small">Approve individual local catalog repairs. Pricing drift and unsupported fixes are review only.</p>}
     <div className="sync-filters">
       <input className="input" type="search" aria-label="Search product sync" placeholder="Search products or vendor" value={filters.search} onChange={event => changeFilter("search", event.target.value)} />
       <select className="input" aria-label="Platform" value={filters.platform} onChange={event => changeFilter("platform", event.target.value)}><option value="">Both platforms</option>{allowed.map(platform => <option key={platform} value={platform}>{PLATFORM_NAMES[platform]}</option>)}</select>
-      <select className="input" aria-label="Vendor" value={filters.vendor} onChange={event => changeFilter("vendor", event.target.value)}><option value="">All vendors</option>{data.vendors.map(name => <option key={name}>{name}</option>)}</select>
+      <select className="input" aria-label="Results vendor" value={filters.vendor} onChange={event => changeFilter("vendor", event.target.value)}><option value="">All audited vendors</option>{data.vendors.map(name => <option key={name}>{name}</option>)}</select>
       <select className="input" aria-label="Action status" value={filters.status} onChange={event => changeFilter("status", event.target.value)}>{["changed", "all", "synced", "blocked", "review", "held", "applied"].map(value => <option key={value} value={value}>{value === "all" ? "All statuses" : value[0].toUpperCase() + value.slice(1)}</option>)}</select>
     </div>
     <div className="sync-selection"><span>{selection.length} actions selected · {data.total} matching actions</span><button disabled={!audit || auditing || !!busy || !canSelect} onClick={selectFiltered}>Select eligible filtered actions</button><button disabled={!selection.length || !!busy} onClick={() => setSelection([])}>Clear selection</button>

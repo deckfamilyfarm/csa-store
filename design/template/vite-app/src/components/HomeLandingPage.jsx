@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { getSiteContentValue } from "../siteContent.js";
+import { categoryLabel } from "../categoryLabel.js";
 import { DeckPageHeader } from "./DeckPageHeader.jsx";
 import { SubscribeFooter } from "./SubscribeFooter.jsx";
 
@@ -128,7 +129,7 @@ export function HomeLandingPage({
   const groups = useMemo(() => {
     const categoryGroups = (catalog?.categories || []).map((category) => {
       const groupProducts = products.filter((product) => categoryMatchesProduct(category, product));
-      const name = cleanText(category.name, 80);
+      const name = cleanText(categoryLabel(category.name), 80);
       return {
         id: `category-${category.id}`,
         categoryId: category.id,
@@ -319,11 +320,11 @@ export function HomeLandingPage({
                         <img src={productImage(product)} alt={product.name} loading="lazy" />
                       </span>
                       <span className="home-product-meta">
-                        {product.category || product.vendor || "Full Farm"}
+                        {categoryLabel(product.category) || product.vendor || "Full Farm"}
                       </span>
                       <strong>{product.name}</strong>
                       <span className="home-product-copy">
-                        {cleanText(product.description || product.vendor || product.category, 94)}
+                        {cleanText(product.description || product.vendor || categoryLabel(product.category), 94)}
                       </span>
                       <span className="home-product-price">{displayPrice(product, getPrice)}</span>
                     </button>
@@ -368,10 +369,10 @@ export function HomeLandingPage({
                     <span className="home-box-card-image">
                       <img src={productImage(product, DEFAULT_PRODUCT_IMAGE)} alt={product.name} loading="lazy" />
                     </span>
-                    <span className="home-product-meta">{product.category || "Box"}</span>
+                    <span className="home-product-meta">{categoryLabel(product.category) || "Box"}</span>
                     <strong>{product.name}</strong>
                     <span className="home-product-copy">
-                      {cleanText(product.description || product.vendor || product.category, 130)}
+                      {cleanText(product.description || product.vendor || categoryLabel(product.category), 130)}
                     </span>
                     <span className="home-product-price">{displayPrice(product, getPrice)}</span>
                   </button>
@@ -420,10 +421,10 @@ export function HomeLandingPage({
                       <img src={productImage(product, DEFAULT_PRODUCT_IMAGE)} alt={product.name} loading="lazy" />
                     </span>
                     <span>
-                      <span className="home-product-meta">{product.category || "Side"}</span>
+                      <span className="home-product-meta">{categoryLabel(product.category) || "Side"}</span>
                       <strong>{product.name}</strong>
                       <span className="home-product-copy">
-                        {cleanText(product.description || product.vendor || product.category, 120)}
+                        {cleanText(product.description || product.vendor || categoryLabel(product.category), 120)}
                       </span>
                       <span className="home-product-price">{displayPrice(product, getPrice)}</span>
                     </span>

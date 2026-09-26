@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 import mysql from "mysql2/promise";
 import xlsx from "xlsx";
 import { getActiveScheduledPricelistProductChangeMap } from "../lib/scheduledPricelistReleases.js";
+import { scopeLocalLineCatalogs } from "../lib/productSyncScope.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -1666,7 +1667,7 @@ export async function runLocalLineAudit(options = {}) {
       message: "Downloading Local Line export"
     });
     exportFilePath = await downloadLocalLineExport(baseUrl, token);
-    const exportCatalog = parseLocalLineExport(exportFilePath);
+    let exportCatalog = parseLocalLineExport(exportFilePath);
     reportProgress({
       phaseKey: "catalog-sync",
       phaseLabel: "Catalog Sync",
@@ -1676,7 +1677,8 @@ export async function runLocalLineAudit(options = {}) {
         ? "Loading csa-store data"
         : "Loading csa-store and pricelist data"
     });
-    const storeCatalog = await fetchStoreCatalog(storeConnection);
+    let storeCatalog = await fetchStoreCatalog(storeConnection);
+    ({ exportCatalog, storeCatalog } = scopeLocalLineCatalogs(exportCatalog, storeCatalog, options.productIds ?? null));
     const pricelistState = skipPricelist
       ? {
           rows: [],
@@ -1684,7 +1686,8 @@ export async function runLocalLineAudit(options = {}) {
           warning: "Pricelist comparison skipped; running in store + Local Line only mode."
         }
       : await fetchCurrentPricelist(killdeerConnection, { includeInactive });
-    const pricelistRows = pricelistState.rows;
+    const pricelistRows = options.productIds == null ? pricelistState.rows
+      : pricelistState.rows.filter(row => exportCatalog.productsById.has(Number(row.localLineProductID)));
 
     const catalogComparison = buildCatalogComparison(exportCatalog, storeCatalog);
     const scheduledChangeMap = write
