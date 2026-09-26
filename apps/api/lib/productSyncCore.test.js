@@ -95,3 +95,16 @@ test("local drift holds all affected actions without applying staged values", as
   await executeProductActions(actions, h.io);
   assert.equal(actions[0].status, "held"); assert.equal(h.localApplies, 0); assert.deepEqual(h.calls, []);
 });
+test("publication checkpoints describe checking, sending, and confirmation before completion", async () => {
+  const actions = [action()];
+  const h = harness(actions);
+  const transitions = [];
+  const save = h.io.save;
+  h.io.save = async (a, result) => { transitions.push({ ...result }); await save(a, result); };
+  await executeProductActions(actions, h.io);
+  assert.deepEqual(transitions.map(row => row.status), ["working", "working", "working", "completed"]);
+  assert.match(transitions[0].message, /Checking/);
+  assert.match(transitions[1].message, /Applying/);
+  assert.match(transitions[2].message, /Confirming/);
+  assert.match(transitions[3].message, /confirmed/);
+});

@@ -7,7 +7,7 @@ import { AdminMembershipSection } from "./AdminMembershipSection.jsx";
 import { AdminOrdersSection } from "./AdminOrdersSection.jsx";
 import { AdminProductsSection } from "./AdminProductsSection.jsx";
 import { categoryLabel } from "../categoryLabel.js";
-import { productCapabilities, buildProductDraftFromProduct, createDraftPackage, hydrateProductDraft, dirtyFields, hasDraftChanges, acknowledgeSave, saveProductDraft, unsupportedScheduleFields, buildScheduleUpdate } from "./productWorkspace.js";
+import { productCapabilities, buildProductDraftFromProduct, createDraftPackage, hydrateProductDraft, dirtyFields, hasDraftChanges, acknowledgeSave, saveProductDraft, saveInventoryDraft, INVENTORY_FIELDS, unsupportedScheduleFields, buildScheduleUpdate } from "./productWorkspace.js";
 import { AdminProductSyncSection } from "./AdminProductSyncSection.jsx";
 import { acknowledgeSyncDrafts } from "./productSyncView.js";
 import {
@@ -1964,14 +1964,15 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
     }
   }
 
-  async function saveWorkspaceChanges(productIds = null) {
-    const entries = Object.values(workspaceDrafts).filter((entry) => dirtyFields(entry).length && (!productIds || productIds.includes(entry.meta.productId)));
+  async function saveWorkspaceChanges(productIds = null, options = {}) {
+    const entries = Object.values(workspaceDrafts).filter((entry) => dirtyFields(entry).some(key => !options.inventoryOnly || INVENTORY_FIELDS.includes(key)) && (!productIds || productIds.includes(entry.meta.productId)));
     setProductSaveLoading(true);
     const results = [];
     try {
       for (const entry of entries) {
+        options.onProgress?.(`${results.length} of ${entries.length} products processed — ${options.inventoryOnly ? "publishing inventory for" : "saving"} ${entry.values.name}…`);
         const submitted = { ...entry, values: { ...entry.values, description: sanitizeHtml(entry.values.description) } };
-        const result = await saveProductDraft(submitted, capabilities, {
+        const result = await (options.inventoryOnly ? saveInventoryDraft : saveProductDraft)(submitted, capabilities, {
           put: (path, payload) => adminPut(path, token, payload),
           post: (path, payload) => adminPost(path, token, payload)
         });

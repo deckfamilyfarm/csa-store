@@ -1,5 +1,28 @@
 export const PLATFORM_NAMES = { localline: "Local Line", square: "Square" };
 export const hasSyncRole = (roles, role) => roles.includes("admin") || roles.includes(role);
+export const countLabel = (count, noun) => `${count} ${noun}${count === 1 ? "" : "s"}`;
+export const isReleaseActive = release => ["queued", "running"].includes(release?.status);
+export function releaseProgress(release) {
+  const actions = release.actions || [];
+  const counts = { total: actions.length, completed: 0, failed: 0, held: 0, cancelled: 0, pending: 0, working: 0 };
+  for (const action of actions) if (Object.hasOwn(counts, action.status)) counts[action.status]++;
+  return { ...counts, processed: counts.completed + counts.failed + counts.held + counts.cancelled,
+    products: new Set(actions.map(action => action.productId)).size,
+    current: actions.filter(action => action.status === "working") };
+}
+export function elapsedText(start, end = Date.now()) {
+  const seconds = Math.max(0, Math.floor((Number(new Date(end)) - Number(new Date(start))) / 1000));
+  return Number.isFinite(seconds) ? seconds < 60 ? `${seconds}s` : `${Math.floor(seconds / 60)}m ${seconds % 60}s` : "0s";
+}
+export function auditScopeText(audit) {
+  const options = audit?.options || {};
+  const scope = options.productScope || (options.productIds?.length ? "selected" : "all");
+  const requested = options.productIds?.length || 0;
+  const products = scope === "all" ? `All ${options.auditedProductCount ?? ""} products`.replace("  ", " ")
+    : `${requested} ${scope} product${requested === 1 ? "" : "s"}${options.auditedProductCount != null && options.auditedProductCount !== requested ? ` (${options.auditedProductCount} in vendor scope)` : ""}`;
+  const vendors = options.vendorGroup === "deck-enterprises" ? "Deck Enterprises" : options.vendorGroup === "all" ? "All vendors" : "Previous vendor scope";
+  return `${products} · ${vendors} · ${(options.platforms || []).map(platform => PLATFORM_NAMES[platform]).join(" + ")}`;
+}
 export function pacificDateTime(value) {
   if (!value) return "Never";
   return new Intl.DateTimeFormat("en-US", { timeZone: "America/Los_Angeles", month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit", timeZoneName: "short" }).format(new Date(value));

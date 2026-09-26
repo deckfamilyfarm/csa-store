@@ -317,7 +317,7 @@ export async function getActiveScheduledPricelistProductChangeMap(connection = g
       DATE_FORMAT(r.scheduled_at, '%Y-%m-%d %H:%i:%s') AS scheduledAtUtc
       FROM product_sync_release_products rp JOIN product_sync_releases r ON r.id=rp.release_id
       JOIN products p ON p.id=rp.product_id
-      WHERE r.status IN ('scheduled','running','partial','failed','held') AND rp.local_applied_at IS NULL
+      WHERE r.status IN ('scheduled','queued','running','partial','failed','held') AND rp.local_applied_at IS NULL
         AND EXISTS (SELECT 1 FROM product_sync_release_actions ra JOIN product_sync_actions a ON a.id=ra.action_id
           WHERE ra.release_id=rp.release_id AND a.product_id=rp.product_id AND ra.status IN ('pending','working','failed','held'))`);
     rows.push(...shared.map(row => ({ ...row, payloadJson: JSON.stringify({ changes: safeJsonParse(row.stagedJson, {}) }) })));

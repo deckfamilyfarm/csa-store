@@ -6,7 +6,7 @@ import { prepareIncomingActions, applyIncomingAction } from "./productSyncIncomi
 import { ensureProductSyncSchema, parseJson, utcNow, isoUtc, withSyncLock } from "./productSyncSchema.js";
 import { listScheduledPricelistBatches } from "./scheduledPricelistReleases.js";
 import { normalizeIds, normalizeStaged, hasGrant, fail, authorizeRelease, releaseTime, same, executeProductActions, releaseStatus } from "./productSyncCore.js";
-import { auditVendorGroup, auditProducts } from "./productSyncScope.js";
+import { auditVendorGroup, auditProductScope, auditProducts } from "./productSyncScope.js";
 import { PRICELIST_PENDING_REMOTE_APPLY_SQL } from "./productWorkspaceFilters.js";
 
 export async function loadCurrentSnapshot(connection, productId) {
@@ -59,7 +59,7 @@ export async function createProductSyncAudit(options, user) {
   if (options.incoming && (!platforms.includes("localline") || !hasGrant(roles, "localline_pull"))) fail("Incoming repairs require Local Line Pull.", 403);
   const productIds = options.productIds?.length ? normalizeIds(options.productIds) : [];
   if (Object.keys(staged).some(id => productIds.length && !productIds.includes(Number(id)))) fail("Staged products must be in the audit scope.");
-  const normalized = { platforms, staged, productIds, incoming: Boolean(options.incoming), vendorGroup: auditVendorGroup(options) };
+  const normalized = { platforms, staged, productIds, productScope: auditProductScope(options, productIds), incoming: Boolean(options.incoming), vendorGroup: auditVendorGroup(options) };
   const [result] = await getPool().query(`INSERT INTO product_sync_audits (status, options_json, created_by, created_at) VALUES ('running', ?, ?, UTC_TIMESTAMP())`, [JSON.stringify(normalized), user.userId || user.adminId || null]);
   const id = Number(result.insertId);
   // Work survives navigation. All progress and results are stored centrally.
@@ -73,6 +73,7 @@ async function runProductSyncAudit(id, options, userId) {
   const products = auditProducts(catalog, options);
   const scopedIds = products.map(row => Number(row.id));
   const productSet = new Set(products.map(row => Number(row.id)));
+  await getPool().query("UPDATE product_sync_audits SET options_json=? WHERE id=?", [JSON.stringify({ ...options, auditedProductCount: products.length }), id]);
   if (Object.keys(options.staged).some(productId => !productSet.has(Number(productId)))) fail("A staged product is outside the audit scope. Check the vendor selection; missing, deleted, and Membership products cannot be audited.");
   const snapshots = new Map();
   const save = async action => {
@@ -124,7 +125,15 @@ export async function getProductSyncAudit(id) {
     FROM product_sync_audits ${id === "latest" ? "ORDER BY id DESC LIMIT 1" : "WHERE id=?"}`, id === "latest" ? [] : [id]);
   if (!rows.length) return null;
   const row = rows[0];
-  return { id: row.id, status: row.status, options: parseJson(row.options_json), summary: parseJson(row.summary_json, []), error: row.error_message, createdAt: isoUtc(row.createdUtc), finishedAt: isoUtc(row.finishedUtc) };
+  // Count products independently of package updates, including for older saved audits.
+  const [overview] = await getPool().query(`SELECT platform, direction, COUNT(DISTINCT product_id) AS productCount,
+    COUNT(DISTINCT CASE WHEN status='changed' AND released_at IS NULL THEN product_id END) AS changedProducts,
+    COUNT(DISTINCT CASE WHEN status IN ('blocked','review','held') THEN product_id END) AS attentionProducts,
+    COUNT(DISTINCT CASE WHEN status='synced' THEN product_id END) AS syncedProducts
+    FROM product_sync_actions WHERE audit_id=? GROUP BY platform, direction`, [row.id]);
+  return { id: row.id, status: row.status, options: parseJson(row.options_json), summary: parseJson(row.summary_json, []),
+    overview: overview.map(item => ({ ...item, productCount: Number(item.productCount), changedProducts: Number(item.changedProducts), attentionProducts: Number(item.attentionProducts), syncedProducts: Number(item.syncedProducts) })),
+    error: row.error_message, createdAt: isoUtc(row.createdUtc), finishedAt: isoUtc(row.finishedUtc) };
 }
 export function actionFilter(auditId, filters = {}) {
   const params = [auditId];
@@ -132,6 +141,7 @@ export function actionFilter(auditId, filters = {}) {
   for (const [input, column, values] of [["direction", "direction", ["incoming", "outgoing"]], ["platform", "platform", ["localline", "square"]], ["status", "status", ["changed", "synced", "blocked", "review", "applied", "held"]]]) {
     if (values.includes(filters[input])) { where.push(`${column}=?`); params.push(filters[input]); }
   }
+  if (filters.status === "changed") where.push("released_at IS NULL");
   if (filters.vendor) { where.push("vendor_name=?"); params.push(filters.vendor); }
   if (filters.search) { where.push("(product_name LIKE ? OR vendor_name LIKE ? OR product_id=?)"); params.push(`%${filters.search}%`, `%${filters.search}%`, Number(filters.search) || 0); }
   return { sql: where.join(" AND "), params };
@@ -145,14 +155,16 @@ export async function listProductSyncActions(id, filters, idsOnly = false, roles
   }
   const page = Math.max(1, Math.floor(Number(filters.page) || 1));
   const pageSize = Math.min(100, Math.max(1, Math.floor(Number(filters.pageSize) || 30)));
-  const [counts] = await getPool().query(`SELECT COUNT(*) AS count FROM product_sync_actions WHERE ${sql}`, params);
+  const [counts] = await getPool().query(`SELECT COUNT(*) AS count, COUNT(DISTINCT product_id) AS productCount FROM product_sync_actions WHERE ${sql}`, params);
+  const [platformCounts] = await getPool().query(`SELECT platform, COUNT(*) AS updateCount, COUNT(DISTINCT product_id) AS productCount FROM product_sync_actions WHERE ${sql} GROUP BY platform`, params);
   // Paginate by product so Local Line and Square actions for a product stay together.
   const [productRows] = await getPool().query(`SELECT product_id, MIN(product_name) AS name FROM product_sync_actions WHERE ${sql} GROUP BY product_id ORDER BY name, product_id LIMIT ? OFFSET ?`, [...params, pageSize, (page - 1) * pageSize]);
   const productIds = productRows.map(row => row.product_id);
   const [rows] = productIds.length ? await getPool().query(`SELECT * FROM product_sync_actions WHERE ${sql} AND product_id IN (?) ORDER BY product_name, product_id, platform, id`, [...params, productIds]) : [[]];
-  const [productCount] = await getPool().query(`SELECT COUNT(DISTINCT product_id) AS count FROM product_sync_actions WHERE ${sql}`, params);
   const [vendors] = await getPool().query("SELECT DISTINCT vendor_name AS name FROM product_sync_actions WHERE audit_id=? AND vendor_name<>'' ORDER BY vendor_name", [id]);
-  return { rows: rows.map(actionFromRow), total: Number(counts[0].count), productCount: Number(productCount[0].count), page, pageSize, vendors: vendors.map(row => row.name) };
+  return { rows: rows.map(actionFromRow), total: Number(counts[0].count), productCount: Number(counts[0].productCount),
+    platformCounts: platformCounts.map(row => ({ platform: row.platform, productCount: Number(row.productCount), updateCount: Number(row.updateCount) })),
+    page, pageSize, vendors: vendors.map(row => row.name) };
 }
 export async function selectedActions(auditId, ids, connection = getPool(), lock = false) {
   const clean = normalizeIds(ids);
@@ -183,16 +195,15 @@ export async function createProductSyncRelease(body, user) {
       const [result] = await connection.query(`INSERT INTO product_sync_releases (audit_id, name, status, scheduled_at, is_scheduled, created_by, created_at)
         VALUES (?, ?, 'scheduled', ?, ?, ?, UTC_TIMESTAMP())`, [body.auditId, String(body.name || "Product release").slice(0, 255), scheduledAt || utcNow(), Number(Boolean(scheduledAt)), user.userId || user.adminId || null]);
       const releaseId = Number(result.insertId);
-      for (const productId of productIds) {
+      const productValues = productIds.map(productId => {
         const productActions = actions.filter(action => action.productId === productId);
         const first = productActions[0];
         if (productActions.some(action => !same(action.staged || {}, first.staged || {}) || !same(action.localSnapshot, first.localSnapshot))) fail("Selected actions have different staged changes; audit again.");
-        await connection.query("INSERT INTO product_sync_release_products (release_id, product_id, staged_json, original_json) VALUES (?, ?, ?, ?)", [releaseId, productId, JSON.stringify(first.staged || {}), JSON.stringify(first.localSnapshot)]);
-      }
-      for (const action of actions) {
-        await connection.query("INSERT INTO product_sync_release_actions (release_id, action_id) VALUES (?, ?)", [releaseId, action.id]);
-        await connection.query("UPDATE product_sync_actions SET released_at=UTC_TIMESTAMP() WHERE id=?", [action.id]);
-      }
+        return [releaseId, productId, JSON.stringify(first.staged || {}), JSON.stringify(first.localSnapshot)];
+      });
+      await connection.query("INSERT INTO product_sync_release_products (release_id, product_id, staged_json, original_json) VALUES ?", [productValues]);
+      await connection.query("INSERT INTO product_sync_release_actions (release_id, action_id) VALUES ?", [actions.map(action => [releaseId, action.id])]);
+      await connection.query("UPDATE product_sync_actions SET released_at=UTC_TIMESTAMP() WHERE id IN (?)", [actions.map(action => action.id)]);
       await connection.commit();
       return { id: releaseId, scheduled: Boolean(scheduledAt) };
     } catch (error) { await connection.rollback(); throw error; }
@@ -209,6 +220,70 @@ export async function getProductSyncRelease(id) {
   const row = rows[0];
   return { id: row.id, auditId: row.audit_id, name: row.name, status: row.status, isScheduled: Boolean(row.is_scheduled), scheduledAt: isoUtc(row.scheduledUtc), startedAt: isoUtc(row.startedUtc), createdAt: isoUtc(row.createdUtc),
     actions: actions.map(a => ({ ...actionFromRow(a), releaseActionId: a.releaseActionId, status: a.releaseStatus, message: a.releaseMessage, checkpoint: parseJson(a.checkpoint_json, {}) })) };
+}
+// Progress reads omit the frozen payloads and baselines, which can include large catalogs/images.
+export async function getProductSyncReleaseProgress(id) {
+  await ensureProductSyncSchema();
+  const [rows] = await getPool().query(`SELECT id, audit_id AS auditId, name, status, is_scheduled AS isScheduled,
+    DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS createdUtc,
+    DATE_FORMAT(started_at, '%Y-%m-%d %H:%i:%s') AS startedUtc,
+    DATE_FORMAT(finished_at, '%Y-%m-%d %H:%i:%s') AS finishedUtc
+    FROM product_sync_releases WHERE id=?`, [id]);
+  if (!rows.length) fail("Release not found.", 404);
+  const [actions] = await getPool().query(`SELECT a.id, a.product_id AS productId, a.product_name AS productName, a.platform,
+    ra.status, ra.message, JSON_UNQUOTE(JSON_EXTRACT(a.data_json, '$.packageName')) AS packageName,
+    DATE_FORMAT(ra.updated_at, '%Y-%m-%d %H:%i:%s') AS updatedUtc
+    FROM product_sync_release_actions ra JOIN product_sync_actions a ON a.id=ra.action_id
+    WHERE ra.release_id=? ORDER BY a.product_id, a.platform, a.id`, [id]);
+  const row = rows[0];
+  return { id: Number(row.id), auditId: Number(row.auditId), name: row.name, status: row.status, isScheduled: Boolean(row.isScheduled),
+    createdAt: isoUtc(row.createdUtc), startedAt: isoUtc(row.startedUtc), finishedAt: isoUtc(row.finishedUtc),
+    actions: actions.map(({ updatedUtc, ...action }) => ({ ...action, updatedAt: isoUtc(updatedUtc) })) };
+}
+export async function activeProductSyncReleases() {
+  await ensureProductSyncSchema();
+  const [rows] = await getPool().query("SELECT id FROM product_sync_releases WHERE status IN ('queued','running') ORDER BY id DESC");
+  return { releases: await Promise.all(rows.map(row => getProductSyncReleaseProgress(row.id))) };
+}
+
+const backgroundReleases = new Map();
+export async function queueProductSyncRelease(id, user) {
+  await ensureProductSyncSchema();
+  const release = await getProductSyncRelease(id);
+  authorizeRelease(user.adminRoles || [], release.actions.filter(action => !["completed", "cancelled"].includes(action.status)), release.isScheduled);
+  if (release.status === "cancelled") fail("This release was cancelled.");
+  if (release.status === "completed") return getProductSyncReleaseProgress(id);
+  // The shared execution lock still serializes publications, including the hourly runner.
+  await getPool().query("UPDATE product_sync_releases SET status='queued', finished_at=NULL, scheduled_at=LEAST(scheduled_at, UTC_TIMESTAMP()) WHERE id=? AND status NOT IN ('running','completed','cancelled')", [id]);
+  await getPool().query(`UPDATE product_sync_release_actions ra JOIN product_sync_releases r ON r.id=ra.release_id
+    SET ra.status='pending', ra.message='Waiting to retry approved values.', ra.updated_at=UTC_TIMESTAMP()
+    WHERE r.id=? AND r.status='queued' AND ra.status IN ('failed','working')`, [id]);
+  if (backgroundReleases.has(Number(id))) {
+    // A retry can arrive after terminal status is saved but before the worker returns.
+    backgroundReleases.get(Number(id)).again = true;
+  } else {
+    const worker = { again: false };
+    backgroundReleases.set(Number(id), worker);
+    const attempt = async () => {
+      try {
+        await runProductSyncRelease(id, { user, allowFuture: true });
+      } catch (error) {
+        if (error.status === 409) {
+          // A previous release owns the lock. Keep durable queued work visible and try again.
+          setTimeout(attempt, 2000).unref();
+          return;
+        }
+        await getPool().query(`UPDATE product_sync_release_actions SET status='failed', message=?, updated_at=UTC_TIMESTAMP()
+          WHERE release_id=? AND status IN ('pending','working')`, [error.message, id]).catch(() => {});
+        await getPool().query("UPDATE product_sync_releases SET status='failed', finished_at=UTC_TIMESTAMP() WHERE id=? AND status IN ('queued','running')", [id]).catch(() => {});
+        console.error(`Product release ${id}:`, error.message);
+      }
+      if (worker.again) { worker.again = false; setTimeout(attempt, 0); }
+      else backgroundReleases.delete(Number(id));
+    };
+    setTimeout(attempt, 0);
+  }
+  return getProductSyncReleaseProgress(id);
 }
 export async function listProductSyncReleases() {
   await ensureProductSyncSchema();
@@ -288,7 +363,7 @@ async function runReleaseLocked(id, connection, { user, allowFuture }) {
 }
 export async function runDueProductSyncReleases({ lockConnection = null } = {}) {
   await ensureProductSyncSchema();
-  const [rows] = await getPool().query("SELECT id FROM product_sync_releases WHERE status IN ('scheduled','running') AND scheduled_at <= UTC_TIMESTAMP() ORDER BY scheduled_at, id");
+  const [rows] = await getPool().query("SELECT id FROM product_sync_releases WHERE status IN ('scheduled','queued','running') AND scheduled_at <= UTC_TIMESTAMP() ORDER BY scheduled_at, id");
   const results = [];
   for (const row of rows) {
     try { results.push(lockConnection ? await runReleaseLocked(row.id, lockConnection, { user: null, allowFuture: false }) : await runProductSyncRelease(row.id)); }
@@ -302,7 +377,7 @@ export async function cancelProductSyncRelease(id, user) {
   return withSyncLock("csa-store:scheduled-pricelist-releases", async connection => {
     await connection.beginTransaction();
     try {
-      const [result] = await connection.query("UPDATE product_sync_releases SET status='cancelled', finished_at=UTC_TIMESTAMP() WHERE id=? AND started_at IS NULL AND status='scheduled'", [id]);
+      const [result] = await connection.query("UPDATE product_sync_releases SET status='cancelled', finished_at=UTC_TIMESTAMP() WHERE id=? AND started_at IS NULL AND status IN ('scheduled','queued')", [id]);
       if (!result.affectedRows) fail("Only unstarted releases can be cancelled.");
       await connection.query("UPDATE product_sync_release_actions SET status='cancelled' WHERE release_id=?", [id]);
       await connection.commit();
@@ -315,7 +390,7 @@ export async function reviewProductSyncRelease(id, user) {
   const release = await getProductSyncRelease(id);
   authorizeRelease(user.adminRoles || [], release.actions.filter(action => ["held", "failed"].includes(action.status)), release.isScheduled);
   await withSyncLock("csa-store:scheduled-pricelist-releases", async connection => {
-    if (["scheduled", "running"].includes(release.status)) fail("Wait for this release to finish, or cancel it before auditing again.");
+    if (["scheduled", "queued", "running"].includes(release.status)) fail("Wait for this release to finish, or cancel it before auditing again.");
     await connection.query("UPDATE product_sync_release_actions SET status='cancelled', message='Superseded by a new review.' WHERE release_id=? AND status IN ('held','failed')", [id]);
   });
   const unfinished = release.actions.filter(action => ["held", "failed"].includes(action.status));

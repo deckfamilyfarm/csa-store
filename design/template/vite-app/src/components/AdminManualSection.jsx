@@ -98,8 +98,17 @@ export function AdminManualSection({ focusTopic = "overview" }) {
           in the menu to compare the selected products with Local Line and Square.
         </p>
         <p>
-          Columns are saved separately for each view. Your previous pricelist column preferences
-          carry over to Pricing. Choose Deck Enterprises in the Vendor filter to include Deck Family
+          In Inventory, Save Inventory to Local Line publishes stock, tracking, and visibility immediately and
+          confirms the result before saving local inventory. It leaves pricing, sale,
+          and image changes for the Pricing and Product Sync workflow. Inventory saves never send
+          Square updates or mark pricing as pending. Failed inventory edits remain available to retry.
+          Local editing and Local Line Push permissions are required.
+        </p>
+        <p>
+          Inventory always shows Product, Vendor, Stock, Track Inventory, and Visible. Turn on
+          Track Inventory to edit stock; Visible controls storefront availability. Pricing has
+          customizable columns and keeps your previous pricelist column preferences.
+          Choose Deck Enterprises in the Vendor filter to include Deck Family
           Farm, Hyland, and Creamy Cow together. Inventory selects this group by default when opened;
           you can choose All vendors or an individual vendor afterward.
         </p>
@@ -251,13 +260,17 @@ export function AdminManualSection({ focusTopic = "overview" }) {
         <p>
           Open Store → Product Sync. Choose Local Line, Square, or both, then Run audit.
           Audit vendors defaults to Deck Enterprises: Deck Family Farm, Hyland, and Creamy Cow.
-          Choose All vendors when needed. New products and saved changes appear in Pending Local Line
-          sync immediately; use Audit pending products to compare them before approving publication.
-          Auditing refreshes remote data without publishing changes or changing local prices.
+          Choose All vendors when needed. Products to compare defaults to pending local products:
+          new products and saved changes awaiting Local Line sync. The same products are checked
+          on both selected destinations; Square may need fewer changes because it syncs prices only.
+          Choose All products to check the wider catalog for remote differences. Run audit refreshes
+          remote data without publishing changes or changing local products.
         </p>
         <ul className="admin-manual-list">
-          <li>Outgoing Changes groups each product’s platform actions. Expand the comparison to review current and proposed values, then select the actions you want.</li>
-          <li>Apply Now publishes approved values. Schedule Release saves them for an hourly Pacific release. Only stock, tracking, visibility, and sale drafts remain staged locally until the release runs.</li>
+          <li>Outgoing Changes counts unique products per destination. Local Line has one result per product; Square has one per package price, so update counts can exceed product counts. Expand the comparison to review current and proposed values, then select the updates you want.</li>
+          <li>The connection cards show already-approved updates waiting to publish or needing attention. The audit results show changes awaiting your approval. View saved results reopens the last audit with its original product and vendor scope.</li>
+          <li>Apply Now saves your approval, then shows live progress with confirmed, failed, and held counts, the current product and step, and elapsed time. Progress resumes when you return to the page. Schedule Release saves changes for an hourly Pacific release.</li>
+          <li>Audits show a steady progress panel until comparison finishes. Filtering keeps previous rows visible while refreshing and disables selection until current results arrive.</li>
           <li>Product Matches contains Square variation approvals and Local Line links. New Local Line products are explicitly marked as create proposals. Square only receives variation price updates.</li>
           <li>Incoming Local Line Changes offers individual supported local catalog repairs. Formula price drift and unsupported changes are review only.</li>
           <li>Scheduled Releases &amp; History shows newest releases first and records each platform’s outcome. Retry unfinished actions after a failure. Review again when inputs, remote values, or matches have changed.</li>

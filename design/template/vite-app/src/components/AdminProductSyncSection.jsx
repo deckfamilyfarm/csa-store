@@ -1,14 +1,43 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { adminGet, adminPost } from "../adminApi.js";
 import { AdminSquareSection } from "./AdminSquareSection.jsx";
-import { PLATFORM_NAMES, hasSyncRole, pacificDateTime, pacificInput, pacificCandidates, groupSyncActions, comparisonRows } from "./productSyncView.js";
+import { PLATFORM_NAMES, hasSyncRole, countLabel, auditScopeText, pacificDateTime, pacificInput, pacificCandidates, groupSyncActions, comparisonRows, isReleaseActive, releaseProgress, elapsedText } from "./productSyncView.js";
 import "./AdminProductSyncSection.css";
 
 const valueText = value => value == null ? "—" : typeof value === "boolean" ? value ? "Yes" : "No" : String(value);
 const fieldLabel = value => value.replaceAll("_", " ").replace(/([a-z])([A-Z])/g, "$1 $2").replace(/^fields · /, "");
+const emptyResults = () => ({ rows: [], total: 0, productCount: 0, platformCounts: [], vendors: [] });
+function ReleaseProgress({ release, error, onDismiss }) {
+  const [now, setNow] = useState(Date.now());
+  const active = isReleaseActive(release);
+  useEffect(() => {
+    if (!active) return;
+    const timer = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, [active]);
+  const progress = releaseProgress(release);
+  const updated = Math.max(Date.parse(release.startedAt || release.createdAt) || now, ...(release.actions || []).map(action => Date.parse(action.updatedAt) || 0));
+  return <div className="sync-publish-progress" aria-label={`Publication progress: ${release.name}`}>
+    <header><strong>{active ? release.status === "queued" ? "Waiting to publish" : "Publishing approved changes" : release.status === "completed" ? "Publication complete" : "Publication needs review"} · {release.name}</strong>
+      <span>{elapsedText(release.startedAt || release.createdAt, release.finishedAt || now)} elapsed</span>{!active && <button onClick={onDismiss}>Dismiss</button>}</header>
+    <progress max={Math.max(progress.total, 1)} value={progress.processed} aria-label="Updates processed" />
+    <p role="status">{progress.processed} of {progress.total} updates processed · {progress.completed} confirmed · {progress.failed} failed · {progress.held} held{progress.cancelled ? ` · ${progress.cancelled} cancelled` : ""}</p>
+    <div className="sync-platform-results">{["localline", "square"].map(platform => {
+      const actions = (release.actions || []).filter(action => action.platform === platform);
+      return actions.length ? <span key={platform}>{PLATFORM_NAMES[platform]}: {actions.filter(action => action.status === "completed").length}/{actions.length} confirmed</span> : null;
+    })}</div>
+    <div className="sync-current-work">{progress.current.map(action => <p key={action.id}><strong>{action.productName} · {PLATFORM_NAMES[action.platform]}{action.packageName ? ` · ${action.packageName}` : ""}</strong> — {action.message}</p>)}
+      {active && !progress.current.length && <p>{release.status === "queued" ? "Your approval is saved. Waiting for the publishing worker or another release to finish." : "Preparing the next update…"}</p>}
+      {!active && progress.failed + progress.held > 0 && <p>Open Scheduled Releases &amp; History below for details and retry or review options.</p>}
+    </div>
+    {active && <p className="small">Each update is checked before publishing and confirmed afterward. You can leave this page and return to follow progress.</p>}
+    {active && now - updated > 60000 && <p className="small">This step is taking longer than a minute. The last saved status is shown above; checking continues.</p>}
+    {error && <p className="small" role="status">Progress connection interrupted. Showing the last saved status and reconnecting… {error}</p>}
+  </div>;
+}
 function Comparison({ action, all = false }) {
   const rows = comparisonRows(action, !all);
-  return <div className="sync-comparison"><table><thead><tr><th>Field</th><th>Current</th><th>Approved value</th></tr></thead>
+  return <div className="sync-comparison"><table><thead><tr><th>Field</th><th>Current</th><th>Proposed value</th></tr></thead>
     <tbody>{rows.map(row => <tr key={row.key}><th scope="row">{fieldLabel(row.key)}</th><td>{valueText(row.current)}</td><td>{valueText(row.proposed)}</td></tr>)}</tbody></table>
     {!rows.length && <p className="small">Remote values match. {Object.keys(action.staged || {}).length ? "Staged local changes will apply at release." : "No changes."}</p>}
     {Object.keys(action.staged || {}).length > 0 && <p className="small">Staged locally: {Object.entries(action.staged).map(([key, value]) => `${fieldLabel(key)}: ${value}`).join(" · ")}</p>}
@@ -36,13 +65,20 @@ export function AdminProductSyncSection({ token, roles = [], handoff = null, onA
   const allowed = ["localline", "square"].filter(platform => has(`${platform}_pull`) || has(`${platform}_push`) || has("pricing_admin"));
   const [platforms, setPlatforms] = useState(allowed);
   const [vendorGroup, setVendorGroup] = useState("deck-enterprises");
+  const [productScope, setProductScope] = useState("pending");
   const [pending, setPending] = useState(null);
   const [scope, setScope] = useState(handoff || null);
   const [audit, setAudit] = useState(null);
+  const [previousAudit, setPreviousAudit] = useState(null);
   const [status, setStatus] = useState([]);
-  const [data, setData] = useState({ rows: [], total: 0, productCount: 0, vendors: [] });
+  const [data, setData] = useState(emptyResults);
+  const [resultsLoading, setResultsLoading] = useState(false);
+  const [loadedResultsKey, setLoadedResultsKey] = useState("");
   const [filters, setFilters] = useState({ direction: handoff?.incoming ? "incoming" : "outgoing", status: "changed", platform: "", vendor: "", search: "", page: 1 });
   const [selection, setSelection] = useState([]);
+  const [search, setSearch] = useState("");
+  const [trackedReleases, setTrackedReleases] = useState([]);
+  const [progressError, setProgressError] = useState("");
   const [history, setHistory] = useState([]);
   const [historyOpen, setHistoryOpen] = useState(Boolean(handoff?.history));
   const [matchesOpen, setMatchesOpen] = useState(false);
@@ -56,12 +92,18 @@ export function AdminProductSyncSection({ token, roles = [], handoff = null, onA
   const [releaseAt, setReleaseAt] = useState(() => pacificInput(Math.ceil((Date.now() + 1000) / 3600000) * 3600000));
   const [foldChoice, setFoldChoice] = useState(0);
   const candidates = pacificCandidates(releaseAt);
-  const query = useMemo(() => new URLSearchParams(Object.entries(filters).filter(([, value]) => value !== "")).toString(), [filters]);
+  useEffect(() => { const timer = setTimeout(() => setSearch(filters.search), 250); return () => clearTimeout(timer); }, [filters.search]);
+  const query = useMemo(() => new URLSearchParams(Object.entries({ ...filters, search }).filter(([, value]) => value !== "")).toString(), [filters, search]);
+  const resultsKey = `${audit?.id}:${query}`;
+  const resultsStale = resultsLoading || loadedResultsKey !== resultsKey || search !== filters.search;
+  const activeReleaseIds = trackedReleases.filter(isReleaseActive).map(release => release.id).join(",");
   const auditing = audit?.status === "running";
   const groups = groupSyncActions(data.rows);
   const eligible = action => action.status === "changed" && !action.released && (action.direction === "incoming" ? has("localline_pull") : has(`${action.platform}_push`));
-  const pendingRows = (pending || []).filter(row => !scope?.productIds?.length || scope.productIds.includes(row.productId));
-  const auditScopeLabel = audit?.options?.vendorGroup === "deck-enterprises" ? "Deck Enterprises" : audit?.options?.vendorGroup === "all" ? "All vendors" : "Previous vendor scope";
+  const pendingRows = pending || [];
+  const selectedScope = Boolean(scope?.productIds?.length);
+  const effectiveScope = selectedScope ? "selected" : productScope;
+  const auditDisabled = !!busy || auditing || !platforms.length || (effectiveScope === "pending" && (pending === null || !pendingRows.length));
 
   async function loadStatus() { const result = await adminGet("product-sync/status", token); setStatus(result.platforms || []); }
   async function loadHistory() {
@@ -70,8 +112,13 @@ export function AdminProductSyncSection({ token, roles = [], handoff = null, onA
   }
   useEffect(() => {
     let live = true;
-    adminGet("product-sync/audits/latest", token).then(result => { if (live && !handoff) setAudit(result); }).catch(err => live && setError(err.message));
+    adminGet("product-sync/audits/latest", token).then(result => {
+      if (!live) return;
+      setPreviousAudit(result);
+      if (!handoff && result?.status === "running") setAudit(result);
+    }).catch(err => live && setError(err.message));
     loadStatus().catch(err => live && setError(err.message));
+    adminGet("product-sync/releases/active", token).then(result => { if (live) setTrackedReleases(prev => [...prev, ...(result.releases || []).filter(release => !prev.some(row => row.id === release.id))]); }).catch(err => live && setProgressError(err.message));
     return () => { live = false; };
   }, [token]);
   useEffect(() => {
@@ -83,29 +130,54 @@ export function AdminProductSyncSection({ token, roles = [], handoff = null, onA
     }
   }, [handoff]);
   useEffect(() => {
-    if (!allowed.includes("localline")) return;
     let live = true;
-    setPending(null);
     adminGet(`product-sync/pending?vendorGroup=${vendorGroup}`, token).then(result => { if (live) setPending(result.rows || []); }).catch(err => live && setError(err.message));
     return () => { live = false; };
   }, [token, vendorGroup, reload]);
   useEffect(() => {
-    if (!audit?.id) return;
+    if (!audit?.id || auditing) { setResultsLoading(false); return; }
     let live = true;
-    adminGet(`product-sync/audits/${audit.id}/actions?${query}`, token).then(result => { if (live) setData(result); }).catch(err => live && setError(err.message));
+    setResultsLoading(true);
+    adminGet(`product-sync/audits/${audit.id}/actions?${query}`, token).then(result => { if (live) { setData(result); setLoadedResultsKey(resultsKey); } }).catch(err => live && setError(err.message)).finally(() => { if (live) setResultsLoading(false); });
     return () => { live = false; };
   }, [audit?.id, audit?.status, query, token, reload]);
   useEffect(() => {
     if (!auditing) return;
-    const timer = setInterval(async () => {
+    let live = true, timer;
+    async function poll() {
       try {
         const next = await adminGet(`product-sync/audits/${audit.id}`, token);
-        setAudit(next); setReload(value => value + 1);
-        if (next.status !== "running") await loadStatus();
+        if (!live) return;
+        setAudit(next);
+        if (next.status !== "running") { setPreviousAudit(next); setReload(value => value + 1); await loadStatus(); return; }
       } catch (err) { setError(err.message); }
-    }, 2500);
-    return () => clearInterval(timer);
+      if (live) timer = setTimeout(poll, 2500);
+    }
+    timer = setTimeout(poll, 1000);
+    return () => { live = false; clearTimeout(timer); };
   }, [audit?.id, auditing, token]);
+  useEffect(() => {
+    if (!activeReleaseIds) return;
+    let live = true, timer;
+    const ids = activeReleaseIds.split(",");
+    async function poll() {
+      const responses = await Promise.allSettled(ids.map(id => adminGet(`product-sync/releases/${id}/progress`, token)));
+      if (!live) return;
+      const updates = responses.filter(result => result.status === "fulfilled").map(result => result.value);
+      setProgressError(responses.find(result => result.status === "rejected")?.reason?.message || "");
+      if (updates.some(release => !isReleaseActive(release))) {
+        const refreshed = await Promise.allSettled([adminGet("product-sync/status", token), audit?.id ? adminGet(`product-sync/audits/${audit.id}`, token) : Promise.resolve(null)]);
+        if (!live) return;
+        if (refreshed[0].status === "fulfilled") setStatus(refreshed[0].value.platforms || []);
+        if (refreshed[1].status === "fulfilled" && refreshed[1].value) setAudit(refreshed[1].value);
+        setReload(value => value + 1);
+      }
+      setTrackedReleases(prev => prev.map(release => updates.find(row => row.id === release.id) || release));
+      if (live) timer = setTimeout(poll, 1500);
+    }
+    poll();
+    return () => { live = false; clearTimeout(timer); };
+  }, [activeReleaseIds, token, audit?.id]);
   useEffect(() => { if (historyOpen) loadHistory().catch(err => setError(err.message)); }, [historyOpen, token, reload]);
   useEffect(() => {
     if (matchesOpen && allowed.includes("localline")) adminGet("product-sync/matches/localline", token).then(result => setLocalMatches(result.rows || [])).catch(err => setError(err.message));
@@ -115,15 +187,19 @@ export function AdminProductSyncSection({ token, roles = [], handoff = null, onA
     setBusy(key); setError(""); setMessage("");
     try { await fn(); } catch (err) { setError(err.message); } finally { setBusy(""); }
   }
-  async function runAudit(pendingOnly = false) {
+  function clearAuditResults() {
+    if (audit) setPreviousAudit(audit);
+    setAudit(null); setSelection([]); setData(emptyResults());
+  }
+  async function runAudit() {
     await task("audit", async () => {
-      const productIds = pendingOnly ? pendingRows.map(row => row.productId) : scope?.productIds || [];
-      if (pendingOnly && !productIds.length) return;
-      const result = await adminPost("product-sync/audits", token, { platforms, vendorGroup, productIds,
-        staged: (scope?.staged || []).filter(row => !pendingOnly || productIds.includes(row.productId)), incoming: has("localline_pull") && platforms.includes("localline") });
+      const productIds = selectedScope ? scope.productIds : productScope === "pending" ? pendingRows.map(row => row.productId) : [];
+      if (effectiveScope !== "all" && !productIds.length) return;
+      const result = await adminPost("product-sync/audits", token, { platforms, vendorGroup, productIds, productScope: effectiveScope,
+        staged: scope?.staged || [], incoming: has("localline_pull") && platforms.includes("localline") });
       setAudit(await adminGet(`product-sync/audits/${result.id}`, token));
-      setSelection([]); setData({ rows: [], total: 0, productCount: 0, vendors: [] });
-      setFilters(prev => ({ ...prev, ...(pendingOnly ? { direction: "outgoing", status: "changed", platform: "", search: "" } : {}), vendor: "", page: 1 }));
+      setSelection([]); setData(emptyResults());
+      setFilters({ direction: "outgoing", status: "changed", platform: "", search: "", vendor: "", page: 1 });
       onAuditCreated?.(result.id);
     });
   }
@@ -147,59 +223,95 @@ export function AdminProductSyncSection({ token, roles = [], handoff = null, onA
       } else {
         const scheduledAt = approval.mode === "schedule" ? candidates[foldChoice] : null;
         if (approval.mode === "schedule" && (!scheduledAt || Date.parse(scheduledAt) <= Date.now())) throw new Error("Choose a future hourly Pacific time. This time may fall in the daylight-saving gap.");
-        const result = await adminPost("product-sync/releases", token, { auditId: audit.id, actionIds: selection, name: releaseName, scheduledAt });
+        const result = await adminPost("product-sync/releases", token, { auditId: audit.id, actionIds: selection, name: releaseName, scheduledAt, background: !scheduledAt });
         onReleaseCreated?.(result, scope?.entries || []);
         const releasedProducts = new Set((result.actions || []).map(action => action.productId));
         setScope(prev => prev ? { ...prev, staged: (prev.staged || []).filter(row => !releasedProducts.has(row.productId)), entries: (prev.entries || []).filter(entry => !releasedProducts.has(entry.meta.productId)) } : null);
-        setMessage(`Release “${result.name}”: ${result.status}.`); setHistoryOpen(true);
+        if (!scheduledAt) {
+          setTrackedReleases(prev => [result, ...prev.filter(release => release.id !== result.id)]);
+          setProgressError("");
+        } else { setMessage(`Release “${result.name}”: ${result.status}.`); setHistoryOpen(true); }
       }
       setApproval(null); setSelection([]); setReload(value => value + 1); await loadStatus();
+      setAudit(await adminGet(`product-sync/audits/${audit.id}`, token));
     });
   }
   async function releaseAction(release, action) {
     await task(`release-${release.id}`, async () => {
       const path = release.legacy ? `pricelist/scheduled-batches/${release.id}/${action}` : `product-sync/releases/${release.id}/${action}`;
-      const result = await adminPost(path, token, {});
+      const background = !release.legacy && ["run-now", "retry"].includes(action);
+      const result = await adminPost(path, token, { background });
+      if (background) { setTrackedReleases(prev => [result, ...prev.filter(row => row.id !== result.id)]); setProgressError(""); }
       if (action === "review") { setAudit(await adminGet(`product-sync/audits/${result.id}`, token)); setSelection([]); setFilters(prev => ({ ...prev, direction: "outgoing", status: "changed", page: 1 })); }
       setReload(value => value + 1); await loadStatus();
     });
   }
-  const canSelect = filters.direction === "incoming" ? has("localline_pull") : platforms.some(platform => has(`${platform}_push`));
+  const canSelect = filters.direction === "incoming" ? has("localline_pull") : allowed.some(platform => has(`${platform}_push`));
   return <section className="admin-section product-sync">
-    <div className="admin-section-header"><div><h3>Product Sync</h3><p className="small">Audit → select changes → apply now or schedule a release.</p></div><button className="button alt" disabled={!!busy} onClick={() => task("refresh", async () => { await loadStatus(); setReload(value => value + 1); })}>Refresh status</button></div>
+    <div className="admin-section-header"><div><h3>Product Sync</h3><p className="small">Compare products, review the differences, then approve what to publish.</p></div><button className="button alt" disabled={!!busy} onClick={() => task("refresh", async () => { await loadStatus(); setReload(value => value + 1); })}>Refresh status</button></div>
     <div className="sync-platforms">{status.filter(item => allowed.includes(item.platform)).map(item => <div className="sync-platform" key={item.platform}>
       <strong>{item.label}</strong><span className="small">{item.enabled ? "Connected" : "Not configured"}</span>
-      <dl><dt>Last refresh</dt><dd>{pacificDateTime(item.lastRefresh)}</dd><dt>Last successful push</dt><dd>{pacificDateTime(item.lastPush)}</dd><dt>Release actions</dt><dd>{item.pending} pending · {item.failed} need attention</dd></dl>
+      <dl><dt>Last comparison refresh</dt><dd>{pacificDateTime(item.lastRefresh)}</dd><dt>Last published</dt><dd>{pacificDateTime(item.lastPush)}</dd><dt>Approved updates</dt><dd>{item.pending} waiting to publish · {item.failed} failed or held</dd></dl>
     </div>)}</div>
     {error && <div className="form-message error" role="alert">{error}</div>}{message && <div className="form-message success" role="status">{message}</div>}
-    <div className="sync-audit-controls">
-      <fieldset disabled={!!busy || auditing}><legend>Audit destinations</legend>{allowed.map(platform => <label key={platform}><input type="checkbox" checked={platforms.includes(platform)} onChange={() => setPlatforms(prev => prev.includes(platform) ? prev.filter(value => value !== platform) : [...prev, platform])} />{PLATFORM_NAMES[platform]}</label>)}</fieldset>
-      <label>Audit vendors<select className="input" aria-label="Audit vendors" value={vendorGroup} disabled={!!busy || auditing} onChange={event => setVendorGroup(event.target.value)}><option value="deck-enterprises">Deck Enterprises</option><option value="all">All vendors</option></select></label>
-      <button className="button" disabled={!!busy || auditing || !platforms.length} onClick={() => runAudit()}>{auditing ? "Auditing…" : "Run audit"}</button>
+    {trackedReleases.map(release => <ReleaseProgress key={release.id} release={release} error={isReleaseActive(release) ? progressError : ""} onDismiss={() => setTrackedReleases(prev => prev.filter(row => row.id !== release.id))} />)}
+    <div className="sync-audit-setup">
+      <h4>1. Compare products</h4>
+      <p className="small">An audit reads the latest Local Line and Square data and compares it with CSA Store. It shows proposed changes without publishing or changing your local products.</p>
+      <div className="sync-audit-controls">
+        <label>Products to compare<select className="input" aria-label="Products to compare" value={effectiveScope} disabled={!!busy || auditing || selectedScope} onChange={event => { setProductScope(event.target.value); clearAuditResults(); }}>
+          {selectedScope && <option value="selected">{countLabel(scope.productIds.length, "selected product")} from Products</option>}
+          <option value="pending">Pending local products{pending !== null ? ` (${pendingRows.length})` : ""}</option><option value="all">All products — include remote differences</option>
+        </select></label>
+        <label>Vendors<select className="input" aria-label="Audit vendors" value={vendorGroup} disabled={!!busy || auditing} onChange={event => { setVendorGroup(event.target.value); setPending(null); clearAuditResults(); }}><option value="deck-enterprises">Deck Enterprises</option><option value="all">All vendors</option></select></label>
+        <fieldset disabled={!!busy || auditing}><legend>Compare with</legend>{allowed.map(platform => <label key={platform}><input type="checkbox" checked={platforms.includes(platform)} onChange={() => { setPlatforms(prev => prev.includes(platform) ? prev.filter(value => value !== platform) : [...prev, platform]); clearAuditResults(); }} />{PLATFORM_NAMES[platform]}</label>)}</fieldset>
+        <button className="button" disabled={auditDisabled} onClick={runAudit}>{auditing ? "Auditing…" : "Run audit"}</button>
+      </div>
+      {vendorGroup === "deck-enterprises" && <p className="small">Deck Enterprises includes Deck Family Farm, Hyland, and Creamy Cow.</p>}
+      {selectedScope && <div className="sync-scope"><span>{countLabel(scope.productIds.length, "product")} from Products · {countLabel(scope.staged?.length || 0, "staged draft")}. Only products matching the vendor selection are included. Drafts apply when their release runs.</span><button className="button alt" disabled={!!busy || auditing} onClick={() => { onClearScope?.(); setScope(null); setProductScope("pending"); clearAuditResults(); }}>Clear selection from Products</button></div>}
+      {effectiveScope === "pending" && <div className="sync-pending">
+        <strong>{pending === null ? "Loading pending products…" : `${countLabel(pendingRows.length, "pending local product")} to compare`}</strong>
+        <p className="small">This list tracks new products and saved changes awaiting Local Line sync. The audit checks these same products on each selected destination. Square may need fewer updates because it syncs prices only. Choose All products to check for differences elsewhere in the catalog.</p>
+        {!!pendingRows.length && <details><summary>View the {countLabel(pendingRows.length, "product")} to compare</summary><div className="sync-match-list">{pendingRows.map(row => <div key={row.productId}><span><strong>{row.productName}</strong> · {row.vendorName} · #{row.productId}</span><span>{row.kind === "create" ? "New to Local Line" : "Saved local changes"}</span></div>)}</div></details>}
+      </div>}
+      {effectiveScope === "all" && <p className="small">This compares the entire catalog within the selected vendors, including products with no pending local edits. It can find additional remote differences.</p>}
     </div>
-    {vendorGroup === "deck-enterprises" && <p className="small">Deck Enterprises includes Deck Family Farm, Hyland, and Creamy Cow.</p>}
-    {scope?.productIds?.length > 0 && <div className="sync-scope"><span>{scope.productIds.length} products from Products · {scope.staged?.length || 0} staged drafts. Only products matching Audit vendors are included. Drafts apply only when their release runs.</span><button className="button alt" disabled={!!busy || auditing} onClick={() => { onClearScope?.(); setScope(null); setAudit(null); setSelection([]); setData({ rows: [], total: 0, productCount: 0, vendors: [] }); }}>Clear scope</button></div>}
-    {allowed.includes("localline") && <div className="sync-pending">
-      <div className="sync-selection"><strong>{pending === null ? "Loading pending products…" : `${pendingRows.length} local products pending Local Line sync`}</strong><button className="button alt" disabled={!pendingRows.length || !!busy || auditing || !platforms.includes("localline")} onClick={() => runAudit(true)}>Audit pending products</button></div>
-      <p className="small">New products and saved local changes appear here before an audit. Audit them, then review and approve the changes to publish.</p>
-      {!!pendingRows.length && <details><summary>View pending products ({pendingRows.length})</summary><div className="sync-match-list">{pendingRows.map(row => <div key={row.productId}><span><strong>{row.productName}</strong> · {row.vendorName}</span><span>{row.kind === "create" ? "New product — create in Local Line" : "Saved changes — update Local Line"}</span></div>)}</div></details>}
-    </div>}
-    <p className="small">Auditing refreshes remote data. Changes require approval. Square publishes prices only; local formula pricing remains authoritative.</p>
-    {audit && <p className="small" role="status">Audit #{audit.id} · {auditScopeLabel} · {pacificDateTime(audit.createdAt)} · {audit.status}{audit.error ? ` · ${audit.error}` : ""} · {audit.summary.map(row => `${PLATFORM_NAMES[row.platform]} ${row.direction}: ${row.count} ${row.status}`).join(" · ")}</p>}
+    {!audit && previousAudit && <div className="sync-previous"><span className="small">Last saved audit: {auditScopeText(previousAudit)} · {pacificDateTime(previousAudit.createdAt)}</span><button disabled={!!busy} onClick={() => task("load-audit", async () => { setSelection([]); setAudit(await adminGet(`product-sync/audits/${previousAudit.id}`, token)); })}>View saved results</button></div>}
+    {audit && <>
+    <div className="sync-results-heading"><h4>2. Review audit results</h4><p><strong>{auditScopeText(audit)}</strong></p><p className="small" role="status">Audit #{audit.id} · {pacificDateTime(audit.createdAt)} · {audit.status}{audit.error ? ` · ${audit.error}` : ""}. These results reflect the products and destinations recorded for this audit.</p></div>
+    {auditing ? <div className="sync-audit-loading" role="status">
+      <strong><span className="sync-spinner" aria-hidden="true" /> Comparing products…</strong>
+      <p>The review list will appear when the audit finishes. Nothing is being published.</p>
+      {(audit.options?.platforms || []).map(platform => {
+        const count = (audit.overview || []).find(row => row.platform === platform && row.direction === "outgoing")?.productCount || 0;
+        return <p key={platform}>{PLATFORM_NAMES[platform]}: {count}{audit.options?.auditedProductCount != null ? ` of ${audit.options.auditedProductCount}` : ""} products compared</p>;
+      })}
+      <p className="small">Includes current prices, product matches, and any requested Local Line catalog checks. You can leave this page while it runs.</p>
+    </div> : <>
     <div className="sync-tabs" role="tablist" aria-label="Sync direction"><button role="tab" aria-selected={filters.direction === "outgoing"} onClick={() => changeFilter("direction", "outgoing")}>Outgoing Changes</button>{has("localline_pull") && <button role="tab" aria-selected={filters.direction === "incoming"} onClick={() => changeFilter("direction", "incoming")}>Incoming Local Line Changes</button>}</div>
     {filters.direction === "incoming" && <p className="small">Approve individual local catalog repairs. Pricing drift and unsupported fixes are review only.</p>}
+    <div className="sync-audit-totals">{(audit.overview || []).filter(row => row.direction === filters.direction && allowed.includes(row.platform)).map(row => <div key={row.platform}>
+      <strong>{PLATFORM_NAMES[row.platform]}</strong><span>{countLabel(row.productCount, "product")} {filters.direction === "incoming" ? "with findings" : "compared"}{auditing ? " so far" : ""}</span>
+      <span>{countLabel(row.changedProducts, "product")} with changes to approve · {countLabel(row.attentionProducts, "product")} need review</span>
+      {row.syncedProducts > 0 && <span>{countLabel(row.syncedProducts, "product")} with matching values</span>}
+    </div>)}</div>
     <div className="sync-filters">
       <input className="input" type="search" aria-label="Search product sync" placeholder="Search products or vendor" value={filters.search} onChange={event => changeFilter("search", event.target.value)} />
-      <select className="input" aria-label="Platform" value={filters.platform} onChange={event => changeFilter("platform", event.target.value)}><option value="">Both platforms</option>{allowed.map(platform => <option key={platform} value={platform}>{PLATFORM_NAMES[platform]}</option>)}</select>
+      <select className="input" aria-label="Platform" value={filters.platform} onChange={event => changeFilter("platform", event.target.value)}><option value="">All audited destinations</option>{allowed.map(platform => <option key={platform} value={platform}>{PLATFORM_NAMES[platform]}</option>)}</select>
       <select className="input" aria-label="Results vendor" value={filters.vendor} onChange={event => changeFilter("vendor", event.target.value)}><option value="">All audited vendors</option>{data.vendors.map(name => <option key={name}>{name}</option>)}</select>
-      <select className="input" aria-label="Action status" value={filters.status} onChange={event => changeFilter("status", event.target.value)}>{["changed", "all", "synced", "blocked", "review", "held", "applied"].map(value => <option key={value} value={value}>{value === "all" ? "All statuses" : value[0].toUpperCase() + value.slice(1)}</option>)}</select>
+      <select className="input" aria-label="Action status" value={filters.status} onChange={event => changeFilter("status", event.target.value)}>{["changed", "all", "synced", "blocked", "review", "held", "applied"].map(value => <option key={value} value={value}>{value === "all" ? "All results" : value === "changed" ? "Changes awaiting approval" : value === "synced" ? "Already matching" : value[0].toUpperCase() + value.slice(1)}</option>)}</select>
     </div>
-    <div className="sync-selection"><span>{selection.length} actions selected · {data.total} matching actions</span><button disabled={!audit || auditing || !!busy || !canSelect} onClick={selectFiltered}>Select eligible filtered actions</button><button disabled={!selection.length || !!busy} onClick={() => setSelection([])}>Clear selection</button>
-      {filters.direction === "incoming" ? <button className="button" disabled={!selection.length || !!busy || auditing} onClick={() => openApproval("incoming")}>Review selected repairs</button> : <><button className="button" disabled={!selection.length || !!busy || auditing} onClick={() => openApproval("now")}>Apply Now</button>{has("pricing_admin") && <button className="button alt" disabled={!selection.length || !!busy || auditing} onClick={() => openApproval("schedule")}>Schedule Release</button>}</>}
+    <div className="sync-result-count"><strong>{countLabel(data.productCount, "product")} in this filtered view</strong><span>{(data.platformCounts || []).map(row => `${PLATFORM_NAMES[row.platform]}: ${countLabel(row.productCount, "product")}, ${countLabel(row.updateCount, filters.direction === "incoming" ? "finding" : row.platform === "square" ? "package price result" : "product result")}`).join(" · ")}</span></div>
+    <p className="small">{filters.direction === "outgoing" ? "Each checkbox selects one destination update. Local Line groups changes by product; Square lists each package price separately. A product can appear under both destinations, so update counts can exceed product counts." : "Each checkbox selects one supported repair. A product can have several findings."}</p>
+    <div className="sync-selection"><span>{countLabel(selection.length, filters.direction === "incoming" ? "repair" : "update")} selected</span><button disabled={resultsStale || !!busy || !canSelect} onClick={selectFiltered}>Select all eligible {filters.direction === "incoming" ? "repairs" : "updates"} in this view</button><button disabled={!selection.length || !!busy} onClick={() => setSelection([])}>Clear selection</button>
+      {filters.direction === "incoming" ? <button className="button" disabled={!selection.length || !!busy || resultsStale} onClick={() => openApproval("incoming")}>Review selected repairs</button> : <><button className="button" disabled={!selection.length || !!busy || resultsStale} onClick={() => openApproval("now")}>Apply Now</button>{has("pricing_admin") && <button className="button alt" disabled={!selection.length || !!busy || resultsStale} onClick={() => openApproval("schedule")}>Schedule Release</button>}</>}
     </div>
-    <div aria-busy={auditing}>{groups.map(group => <article className="sync-product" key={group.productId}><header><strong>{group.productName}</strong><span className="small">{group.vendorName} · #{group.productId}</span></header>{group.actions.map(action => <ActionRow key={action.id} action={action} selected={selection.includes(action.id)} eligible={eligible(action)} busy={!!busy || auditing} onToggle={() => setSelection(prev => prev.includes(action.id) ? prev.filter(id => id !== action.id) : [...prev, action.id])} />)}</article>)}</div>
-    {!groups.length && <p className="sync-empty">{auditing ? "The audit is running. Results will appear here." : audit ? "No actions match these filters." : "Run an audit to compare CSA Store with your selected platforms."}</p>}
-    {data.productCount > 30 && <div className="sync-pagination"><button disabled={filters.page <= 1} onClick={() => setFilters(prev => ({ ...prev, page: prev.page - 1 }))}>Previous</button><span>Page {filters.page} of {Math.ceil(data.productCount / 30)}</span><button disabled={filters.page * 30 >= data.productCount} onClick={() => setFilters(prev => ({ ...prev, page: prev.page + 1 }))}>Next</button></div>}
+    <div className="sync-refresh-status" role="status">{resultsStale ? <><span className="sync-spinner" aria-hidden="true" />{resultsLoading || search !== filters.search ? "Loading results…" : "Results could not refresh. Use Refresh status to try again."}{!!groups.length && " Previous results remain visible."}</> : null}</div>
+    <div className={`sync-results-list${resultsStale ? " refreshing" : ""}`} aria-busy={resultsStale}>{groups.map(group => <article className="sync-product" key={group.productId}><header><strong>{group.productName}</strong><span className="small">{group.vendorName} · #{group.productId}</span></header>{group.actions.map(action => <ActionRow key={action.id} action={action} selected={selection.includes(action.id)} eligible={eligible(action)} busy={!!busy || resultsStale} onToggle={() => setSelection(prev => prev.includes(action.id) ? prev.filter(id => id !== action.id) : [...prev, action.id])} />)}</article>)}</div>
+    {!groups.length && !resultsStale && <p className="sync-empty">No products match these result filters.</p>}
+    {data.productCount > 30 && <div className="sync-pagination"><button disabled={resultsStale || filters.page <= 1} onClick={() => setFilters(prev => ({ ...prev, page: prev.page - 1 }))}>Previous</button><span>Page {filters.page} of {Math.ceil(data.productCount / 30)}</span><button disabled={resultsStale || filters.page * 30 >= data.productCount} onClick={() => setFilters(prev => ({ ...prev, page: prev.page + 1 }))}>Next</button></div>}
+    </>}
+    </>}
     <details className="sync-fold" open={matchesOpen} onToggle={event => setMatchesOpen(event.currentTarget.open)}><summary>Product Matches</summary>
       {matchesOpen && <>{allowed.includes("localline") && <details><summary>Local Line links and create proposals ({localMatches.length})</summary><div className="sync-match-list">{localMatches.map(row => <div key={row.id}><strong>{row.name}</strong><span>{row.localLineProductId ? `Linked to Local Line #${row.localLineProductId}` : "Create proposal — requires an audit and approval"}</span></div>)}</div></details>}
         {allowed.includes("square") && <AdminSquareSection token={token} canPullSquare={has("square_pull")} canPushSquare={false} matchesOnly onMatchesChanged={() => { setSelection([]); setMessage("Square matches changed. Run a new audit before selecting these products."); }} />}</>}
@@ -224,11 +336,12 @@ export function AdminProductSyncSection({ token, roles = [], handoff = null, onA
     </details>
     {approval && <div className="modal-backdrop"><div className="modal sync-approval" role="dialog" aria-modal="true" aria-label="Approve product sync actions">
       <h3>{approval.mode === "incoming" ? "Approve local repairs" : approval.mode === "schedule" ? "Schedule approved changes" : "Apply approved changes now"}</h3>
-      <p>{approval.actions.length} selected actions for {[...new Set(approval.actions.map(action => PLATFORM_NAMES[action.platform]))].join(" and ")}. Changed inputs or matches will be held for review.</p>
+      <p>{countLabel(new Set(approval.actions.map(action => action.productId)).size, "product")} · {countLabel(approval.actions.length, approval.mode === "incoming" ? "repair" : "update")} selected for {[...new Set(approval.actions.map(action => PLATFORM_NAMES[action.platform]))].join(" and ")}. Changed inputs or matches will be held for review.</p>
       {approval.mode !== "incoming" && <label>Release name<input className="input" value={releaseName} onChange={event => setReleaseName(event.target.value)} /></label>}
       {approval.mode === "schedule" && <><label>Release time — Pacific<input className="input" type="datetime-local" step="3600" value={releaseAt} onChange={event => { setReleaseAt(event.target.value); setFoldChoice(0); }} /></label>{candidates.length > 1 && <label>Daylight-saving time occurs twice<select className="input" value={foldChoice} onChange={event => setFoldChoice(Number(event.target.value))}>{candidates.map((value, index) => <option key={value} value={index}>{pacificDateTime(value)}</option>)}</select></label>}<p className="small">{candidates[foldChoice] ? pacificDateTime(candidates[foldChoice]) : "Choose a valid Pacific time at the top of an hour."}</p></>}
       <div className="sync-approval-actions">{approval.actions.map(action => <details key={action.id}><summary>{action.productName} · {PLATFORM_NAMES[action.platform]} · {action.packageName || action.kind}</summary><Comparison action={action} all /></details>)}</div>
       {error && <p role="alert">{error}</p>}
+      {busy === "publish" && <div className="sync-submitting" role="status"><span className="sync-spinner" aria-hidden="true" />{approval.mode === "incoming" ? "Rechecking and applying the selected local repairs…" : approval.mode === "schedule" ? "Saving your scheduled release…" : "Saving your approval. Live publishing progress will appear shortly…"}</div>}
       <div className="admin-actions"><button className="button alt" disabled={!!busy} onClick={() => setApproval(null)}>Back to audit</button><button className="button" disabled={!!busy || (approval.mode === "schedule" && !candidates[foldChoice])} onClick={approve}>{busy === "publish" ? "Applying…" : approval.mode === "schedule" ? "Approve & schedule" : "Approve & apply"}</button></div>
     </div></div>}
   </section>;

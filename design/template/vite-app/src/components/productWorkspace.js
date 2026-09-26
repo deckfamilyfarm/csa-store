@@ -15,6 +15,24 @@ export const SCHEDULE_FIELDS = [
   "saleDiscount",
 ];
 const METADATA_FIELDS = ["name", "description", "vendorId", "categoryId"];
+export const INVENTORY_FIELDS = ["inventory", "trackInventory", "visible"];
+
+export async function saveInventoryDraft(entry, capabilities, api) {
+  const fields = dirtyFields(entry).filter(key => INVENTORY_FIELDS.includes(key));
+  const result = { productId: entry.meta.productId, productName: entry.values.name, inventoryOnly: true, ok: false, savedFields: [], savedPackageIds: [], errors: [] };
+  try {
+    if (!capabilities.edit || !capabilities.push) throw new Error("Product editing and Local Line Push permissions are required.");
+    const changes = Object.fromEntries(fields.map(key => [key, Number(entry.values[key])]));
+    if (Object.hasOwn(changes, "inventory") && (!Number.isInteger(changes.inventory) || changes.inventory < 0)) throw new Error("Stock must be a nonnegative whole number.");
+    if (fields.length) {
+      const response = await api.post(`products/${entry.meta.productId}/inventory`, { changes });
+      if (!response?.ok || !response?.localLineUpdate) throw new Error(response?.message || "Local Line inventory was not confirmed.");
+      result.savedFields = fields;
+    }
+    result.ok = true;
+  } catch (error) { result.errors.push(error.message || "Inventory update failed."); }
+  return result;
+}
 
 export function productCapabilities(roles = []) {
   const has = (...keys) =>

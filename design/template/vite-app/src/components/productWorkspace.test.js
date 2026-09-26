@@ -7,6 +7,7 @@ import {
   dirtyFields,
   acknowledgeSave,
   saveProductDraft,
+  saveInventoryDraft,
   unsupportedScheduleFields,
   syncLabel,
   previewProductPrices,
@@ -189,6 +190,24 @@ test("acknowledging a save preserves changes made while its request was running"
   assert.equal(result.defaults.inventory, 5);
   assert.equal(result.values.inventory, 6);
   assert.deepEqual(dirtyFields(result), ["inventory"]);
+});
+test("Inventory saves push only dirty stock, tracking, and visibility fields and preserve other drafts", async () => {
+  const entry=patchProductDraft({},product,{inventory:5,trackInventory:false,sourceUnitPrice:"12",onSale:true,visible:false})[7];
+  const result=await saveInventoryDraft(entry,productCapabilities(["admin"]),{
+    post:async(path,body)=>{
+      assert.equal(path,"products/7/inventory");
+      assert.deepEqual(body,{changes:{inventory:5,trackInventory:0,visible:0}});
+      return {ok:true,localLineUpdate:true};
+    }
+  });
+  assert.equal(result.ok,true);
+  const remaining=acknowledgeSave(entry,entry,result.savedFields);
+  assert.deepEqual(dirtyFields(remaining).sort(),["onSale","sourceUnitPrice"]);
+  const failure=await saveInventoryDraft(entry,productCapabilities(["admin"]),{post:async()=>{throw new Error("Local Line unavailable");}});
+  assert.equal(failure.ok,false); assert.deepEqual(failure.savedFields,[]);
+  assert.ok(dirtyFields(acknowledgeSave(entry,entry,failure.savedFields)).includes("inventory"));
+  const denied=await saveInventoryDraft(entry,productCapabilities(["inventory_admin"]),{post:()=>assert.fail("No remote permission")});
+  assert.equal(denied.ok,false);
 });
 
 test("only supported unsaved fields can be scheduled", () => {

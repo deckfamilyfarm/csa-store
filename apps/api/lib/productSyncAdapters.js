@@ -18,10 +18,10 @@ const number = value => value == null ? null : Number(value);
 const normalized = row => Object.fromEntries(Object.entries(row).map(([key, value]) => [key,
   value != null && !["name", "description", "unitOfMeasure", "packageCode", "unit", "trackType", "chargeType"].includes(key) && Number.isFinite(Number(value)) ? Number(value) : value]));
 const sortById = rows => rows.slice().sort((a, b) => Number(a.id ?? a.packageId) - Number(b.id ?? b.packageId));
-export function localLineInputs(context) {
+export function localLineInputs(context, includeInventory = true, includeVisibility = true) {
   return {
     categoryName: context.categoryName || "",
-    product: normalized(pick(context.product, ["id", "name", "description", "visible", "trackInventory", "inventory", "vendorId", "categoryId", "isDeleted"])),
+    product: normalized(pick(context.product, ["id", "name", "description", ...(includeVisibility ? ["visible"] : []), ...(includeInventory ? ["trackInventory", "inventory"] : []), "vendorId", "categoryId", "isDeleted"])),
     vendor: normalized(pick(context.vendor, ["id", "name", "sourceMultiplier", "priceListMarkup", "guestMarkup", "memberMarkup"])),
     profile: normalized(pick(context.profile, ["unitOfMeasure", "sourceUnitPrice", "minWeight", "maxWeight", "avgWeightOverride", "sourceMultiplier", "guestMarkup", "memberMarkup", "herdShareMarkup", "snapMarkup"])),
     sale: { onSale: Number(context.sale?.onSale ?? context.profile?.onSale ?? 0), saleDiscount: Number(context.sale?.saleDiscount ?? context.profile?.saleDiscount ?? 0) },
@@ -124,15 +124,21 @@ export async function prepareLocalLineAction(product, staged = {}, { onRefresh }
   }
   if (context.categoryName?.trim().toLowerCase() === "membership" || context.product.isDeleted) throw new Error("Membership and deleted products are excluded from product sync.");
   const next = stageLocalLineContext(context, staged);
+  const includeInventory = !context.remoteId || ["inventory", "trackInventory"].some(key => Object.hasOwn(staged, key));
   const token = await getLocalLineAccessToken();
   const remote = context.remoteId ? await fetchLocalLineProduct(context.remoteId, token) : null;
+  // A pricing/image approval should not freeze visibility when no visibility change was reviewed.
+  const includeVisibility = !remote || Object.hasOwn(staged, "visible") || Boolean(remote.visible) !== Boolean(next.product.visible);
   if (remote?.is_deleted) throw new Error("The Local Line product was deleted. Review its link first.");
   if (remote) await onRefresh?.();
   // Cache only: never overwrite products, packages, sales, formulas, or approved package links.
   if (remote) await upsertLocalLineProductMeta(getDb(), product.id, context.remoteId, { rawJson: JSON.stringify(remote), lastSyncedAt: new Date() });
   let payload, createPayload = null;
   if (remote) {
-    payload = { ...buildLocalLinePricePayload(next, remote, next.sale), ...buildInventoryPayload(next.product) };
+    payload = { ...buildLocalLinePricePayload(next, remote, next.sale), ...buildInventoryPayload({
+      ...(includeInventory ? { inventory: next.product.inventory, trackInventory: next.product.trackInventory } : {}),
+      ...(includeVisibility ? { visible: next.product.visible } : {})
+    }) };
   } else {
     createPayload = buildLocalLineCreatePayload(next, await fetchLocalLineProductUnits(token));
     const fake = { packages: next.packages.map(pkg => ({ id: Number(pkg.id), price_list_entries: createPayload.product_price_list_entries.map(entry => ({ price_list: entry.price_list, product_price_list_entry: -entry.price_list, adjustment_type: 2 })) })) };
@@ -144,8 +150,8 @@ export async function prepareLocalLineAction(product, staged = {}, { onRefresh }
   const imagesMatch = !imageSources.length || (receipt && same(parseJson(receipt.sources_json), imageSources) && same(parseJson(receipt.remote_json), imagesOf(remote)));
   const action = {
     direction: "outgoing", platform: "localline", kind: remote ? "update" : "create", productId: Number(product.id), productName: product.name,
-    vendorName: product.vendorName, staged, mapping: localLineMapping(context),
-    localBefore: localLineInputs(context), localAfter: localLineInputs(next),
+    vendorName: product.vendorName, staged, includeInventory, includeVisibility, mapping: localLineMapping(context),
+    localBefore: localLineInputs(context, includeInventory, includeVisibility), localAfter: localLineInputs(next, includeInventory, includeVisibility),
     payload, createPayload, imageSources: imagesMatch ? [] : imageSources,
     remoteBefore: remote ? { fields: localLineProjection(remote, payload), images: imageSources.length && !imagesMatch ? imagesOf(remote) : null } : null,
     desired: { fields: localLineProjection(payload, payload, true), images: imageSources.length && !imagesMatch ? { sources: imageSources } : null }
@@ -185,7 +191,7 @@ export async function inspectAction(action, saveCheckpoint = async () => {}) {
   const payload = checkpoint.payload || action.payload;
   const approvedImages = checkpoint.images?.length === action.imageSources.length ? checkpoint.images : null;
   return {
-    local: localLineInputs(context), mapping,
+    local: localLineInputs(context, action.includeInventory !== false, action.includeVisibility !== false), mapping,
     remote: remote ? { fields: localLineProjection(remote, payload), images: action.imageSources.length ? imagesOf(remote) : null } : null,
     desired: { fields: localLineProjection(payload, payload, true), images: action.imageSources.length ? approvedImages || { sources: action.imageSources } : null },
     resumeBaseline: ownedCreate ? checkpoint.remoteBefore : undefined,

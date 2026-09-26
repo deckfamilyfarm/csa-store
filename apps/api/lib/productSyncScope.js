@@ -7,6 +7,14 @@ export function auditVendorGroup(options = {}) {
   return group;
 }
 
+export function auditProductScope(options, productIds) {
+  const scope = options.productScope || (productIds.length ? "selected" : "all");
+  if (!["pending", "selected", "all"].includes(scope)) fail("Choose pending, selected, or all products for the audit.");
+  if (scope !== "all" && !productIds.length) fail("There are no products in this audit scope.");
+  if (scope === "all" && productIds.length) fail("An all-products audit cannot include a product selection.");
+  return scope;
+}
+
 export function auditProducts(catalog, { productIds = [], ...options } = {}) {
   const group = auditVendorGroup(options);
   const ids = new Set(productIds.map(Number));

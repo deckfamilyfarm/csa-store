@@ -7,6 +7,7 @@ import {
   hydrateProductDraft,
   patchProductDraft,
   previewProductPrices,
+  INVENTORY_FIELDS,
 } from "./productWorkspace.js";
 import "./AdminProductsSection.css";
 
@@ -144,9 +145,6 @@ const VIEW_COLUMNS = {
     "inventory",
     "trackInventory",
     "visible",
-    "onSale",
-    "saleDiscount",
-    "actions",
   ],
 };
 const COLUMN_MAP = new Map(
@@ -164,6 +162,7 @@ function pinColumns(keys) {
   return ["product", ...middle, "actions"];
 }
 function loadColumns(view, defaults = false) {
+  if (view === "inventory") return VIEW_COLUMNS.inventory;
   try {
     const key = `adminProducts.columns.${view}${defaults ? ".default" : ""}.v1`;
     const raw =
@@ -270,7 +269,11 @@ export function AdminProductsSection({
   const pendingDrafts = Object.values(drafts).filter(
     (entry) => dirtyFields(entry).length,
   );
-  const columns = (columnsByView[view] || VIEW_COLUMNS[view])
+  const inventoryDrafts = pendingDrafts.filter(entry => dirtyFields(entry).some(key => INVENTORY_FIELDS.includes(key)));
+  const saveCount = view === "inventory" ? inventoryDrafts.length : pendingDrafts.length;
+  const otherDrafts = pendingDrafts.filter(entry => dirtyFields(entry).some(key => !INVENTORY_FIELDS.includes(key)));
+  const columnKeys = view === "inventory" ? VIEW_COLUMNS.inventory : columnsByView[view] || VIEW_COLUMNS[view];
+  const columns = columnKeys
     .map((key) => COLUMN_MAP.get(key))
     .filter(Boolean);
 
@@ -333,6 +336,7 @@ export function AdminProductsSection({
   function changeView(nextView) {
     if (nextView === view) return;
     setView(nextView);
+    setColumnsOpen(false);
     if (nextView === "inventory") filter("vendorId", DECK_ENTERPRISES);
   }
   function changeColumns(keys) {
@@ -363,12 +367,13 @@ export function AdminProductsSection({
     await onCatalogRefresh?.();
   }
   async function save() {
-    const results = await onSave();
+    const inventoryOnly = view === "inventory";
+    const results = await onSave(null, { inventoryOnly, onProgress: setMessage });
     setSaveResults(results);
     setMessage(
       results.some((result) => !result.ok)
         ? "Some changes could not be saved. The remaining edits are still available below."
-        : "Local changes saved.",
+        : inventoryOnly ? "Inventory saved locally and confirmed in Local Line." : "Local changes saved.",
     );
     setReload((value) => value + 1);
   }
@@ -392,17 +397,18 @@ export function AdminProductsSection({
     const values =
       drafts[row.productId]?.values || hydrateProductDraft(null, row).values;
     const prices = previewProductPrices(row, values);
-    const disabled = saving || busy;
+    const disabled = saving || busy || (view === "inventory" && ![...INVENTORY_FIELDS, "actions"].includes(column.key));
     const numericInput = (key, pricing = false) => (
       <input
         aria-label={`${column.label}: ${row.name}`}
         className="input products-number"
         type="number"
-        step="any"
+        step={key === "inventory" ? "1" : "any"}
         min="0"
         disabled={
-          disabled || !(pricing ? capabilities.pricing : capabilities.edit)
+          disabled || !(pricing ? capabilities.pricing : capabilities.edit) || (view === "inventory" && key === "inventory" && !values.trackInventory)
         }
+        title={view === "inventory" && key === "inventory" && !values.trackInventory ? "Enable Track Inventory to edit stock." : undefined}
         value={values[key]}
         onChange={(event) =>
           patch(row, {
@@ -422,14 +428,14 @@ export function AdminProductsSection({
               <strong>{values.name}</strong>
               <div className="small products-product-meta">
                 {[
-                  !columnsByView[view].includes("vendor") && row.vendorName,
-                  !columnsByView[view].includes("category") &&
+                  !columnKeys.includes("vendor") && row.vendorName,
+                  !columnKeys.includes("category") &&
                     categoryLabel(row.categoryName),
                 ]
                   .filter(Boolean)
                   .join(" · ")}
               </div>
-              {!columnsByView[view].includes("packages") &&
+              {!columnKeys.includes("packages") &&
               row.packageSummary ? (
                 <div className="small products-product-meta">
                   {row.packageSummary}
@@ -596,14 +602,14 @@ export function AdminProductsSection({
       <div className="products-heading">
         <h2 className="h2">Products</h2>
         <div className="products-button-group">
-          <button
+          {view === "pricing" && <button
             className="button alt"
             aria-expanded={columnsOpen}
             aria-controls="products-columns"
             onClick={() => setColumnsOpen(!columnsOpen)}
           >
             Columns
-          </button>
+          </button>}
           {capabilities.edit ? (
             <button
               className="button alt"
@@ -629,9 +635,11 @@ export function AdminProductsSection({
         ))}
       </div>
       <p className="small">
-        Manage product details, pricing, and inventory. Save changes locally;
-        syncing and scheduling are in Product Sync.
+        {view === "inventory" ? "Save updates stock, tracking, and visibility locally and in Local Line. Track Inventory enables stock limits; Visible controls storefront availability. Pricing, sales, and images stay in Product Sync."
+          : "Manage product details and pricing. Save changes locally; syncing and scheduling are in Product Sync. Use Inventory to send stock, tracking, and visibility changes directly to Local Line."}
       </p>
+      {view === "inventory" && !capabilities.push && <p className="small">Local Line Push permission is required to save inventory to Local Line.</p>}
+      {view === "inventory" && otherDrafts.length > 0 && <p className="small">{otherDrafts.length} products have other unsaved changes. Switch to Pricing to save those separately.</p>}
       <div className="admin-filters">
         <label>
           Search
@@ -731,12 +739,12 @@ export function AdminProductsSection({
             <>
               <button
                 className="button"
-                disabled={saving || busy || !pendingDrafts.length}
+                disabled={saving || busy || !saveCount || (view === "inventory" && !capabilities.push)}
                 onClick={save}
               >
                 {saving
-                  ? "Saving…"
-                  : `Save Local Changes (${pendingDrafts.length})`}
+                  ? view === "inventory" ? "Saving inventory to Local Line…" : "Saving…"
+                  : view === "inventory" ? `Save Inventory to Local Line (${saveCount})` : `Save Local Changes (${saveCount})`}
               </button>
               <button
                 className="button alt products-discard"
@@ -752,7 +760,7 @@ export function AdminProductsSection({
           ) : null}
         </div>
       </div>
-      {columnsOpen ? (
+      {view === "pricing" && columnsOpen ? (
         <div className="products-columns" id="products-columns">
           <strong>{view} columns</strong>
           {[
@@ -817,7 +825,7 @@ export function AdminProductsSection({
       <div role="status" className="small products-message">
         {loading ? "Loading products…" : message}
       </div>
-      {selected.length ? (
+      {view === "pricing" && selected.length ? (
         <div className="small">
           {selected.length} selected across all pages and filters. Open Store →
           Product Sync to review the selection.{" "}
@@ -838,18 +846,18 @@ export function AdminProductsSection({
       <div
         className="products-table-scroll"
         role="region"
-        aria-label="Products table, scroll for more columns"
+        aria-label={view === "inventory" ? "Inventory table" : "Products table, scroll for more columns"}
         tabIndex={0}
       >
         <table
-          className="table products-table"
+          className={`table products-table${view === "inventory" ? " products-inventory-table" : ""}`}
           style={{
             minWidth:
-              44 + columns.reduce((sum, column) => sum + column.width, 0),
+              (view === "inventory" ? 0 : 44) + columns.reduce((sum, column) => sum + column.width, 0),
           }}
         >
           <colgroup>
-            <col style={{ width: 44 }} />
+            {view === "pricing" && <col style={{ width: 44 }} />}
             {columns.map((column) => (
               <col
                 key={column.key}
@@ -861,7 +869,7 @@ export function AdminProductsSection({
           </colgroup>
           <thead>
             <tr>
-              <th>
+              {view === "pricing" && <th>
                 <input
                   type="checkbox"
                   aria-label="Select visible products"
@@ -885,7 +893,7 @@ export function AdminProductsSection({
                     )
                   }
                 />
-              </th>
+              </th>}
               {columns.map((column) => (
                 <th
                   key={column.key}
@@ -928,7 +936,7 @@ export function AdminProductsSection({
           <tbody>
             {data.rows.map((row) => (
               <tr key={row.productId}>
-                <td>
+                {view === "pricing" && <td>
                   <input
                     type="checkbox"
                     aria-label={`Select ${row.name}`}
@@ -937,7 +945,7 @@ export function AdminProductsSection({
                       setSelected((prev) => toggleId(prev, row.productId))
                     }
                   />
-                </td>
+                </td>}
                 {columns.map((column) => (
                   <td key={column.key}>{cell(column, row)}</td>
                 ))}
@@ -1002,12 +1010,12 @@ export function AdminProductsSection({
       </div>
       {saveResults.length ? (
         <details open>
-          <summary>Local save results</summary>
+          <summary>Save results</summary>
           {saveResults.map((result) => (
             <p key={result.productId} className="small">
               {result.productName}:{" "}
               {result.ok
-                ? "Saved locally"
+                ? result.inventoryOnly ? "Inventory saved locally and confirmed in Local Line" : "Saved locally"
                 : result.partial
                   ? "Partially saved"
                   : "Failed"}

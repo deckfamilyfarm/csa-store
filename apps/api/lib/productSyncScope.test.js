@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { auditVendorGroup, auditProducts, scopeLocalLineCatalogs } from "./productSyncScope.js";
+import { auditVendorGroup, auditProductScope, auditProducts, scopeLocalLineCatalogs } from "./productSyncScope.js";
 
 const catalog = [
   { id: 1, vendorName: "Deck Family Farm" },
@@ -10,6 +10,14 @@ const catalog = [
   { id: 5, vendorName: "Deck Family Farm", categoryName: " Membership " },
   { id: 6, vendorName: null }
 ];
+test("an empty pending or selected audit cannot become a full-catalog audit", () => {
+  assert.throws(() => auditProductScope({ productScope: "pending" }, []), /no products/);
+  assert.throws(() => auditProductScope({ productScope: "selected" }, []), /no products/);
+  assert.equal(auditProductScope({ productScope: "pending" }, [1, 2]), "pending");
+  assert.equal(auditProductScope({}, [1]), "selected");
+  assert.equal(auditProductScope({}, []), "all", "Existing API clients retain their full-catalog audits");
+  assert.throws(() => auditProductScope({ productScope: "all" }, [1]), /cannot include/);
+});
 test("audits default to the complete Deck Enterprises group and intersect product selections", () => {
   assert.equal(auditVendorGroup(), "deck-enterprises");
   assert.deepEqual(auditProducts(catalog).map(row => row.id), [1, 2, 3]);

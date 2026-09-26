@@ -1,4 +1,5 @@
 import productSyncRouter from "./productSync.js";
+import { saveInventoryToLocalLine } from "../lib/inventorySync.js";
 import { buildPricelistWhereClause, PRICELIST_PENDING_REMOTE_APPLY_SQL } from "../lib/productWorkspaceFilters.js";
 import express from "express";
 import bcrypt from "bcryptjs";
@@ -190,6 +191,10 @@ router.use(async (_req, _res, next) => {
 });
 
 router.use("/product-sync", productSyncRouter);
+router.post("/products/:id/inventory", requireAdminPermission(["inventory_admin", "pricing_admin", "local_pricelist_admin"]), async (req, res) => {
+  try { res.json(await saveInventoryToLocalLine(req.params.id, req.body?.changes, req.admin)); }
+  catch (error) { res.status(error.status || 400).json({ error: error.message }); }
+});
 
 let spacesClient = null;
 

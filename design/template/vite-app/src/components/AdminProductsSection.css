@@ -329,6 +329,17 @@
     z-index: 3;
     background: #f5f4ee;
   }
+  .products-inventory-table td:nth-child(2),
+  .products-inventory-table td:last-child {
+    position: static;
+    box-shadow: none;
+  }
+  .products-inventory-table th:nth-child(2),
+  .products-inventory-table th:last-child {
+    left: auto;
+    right: auto;
+    box-shadow: none;
+  }
 }
 @media (max-width: 600px) {
   .products-heading .h2 {

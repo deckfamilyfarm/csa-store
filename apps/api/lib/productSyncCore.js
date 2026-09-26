@@ -84,6 +84,7 @@ export async function executeProductActions(actions, io) {
   for (const action of actions) {
     if (["completed", "held", "cancelled"].includes(action.status)) continue;
     try {
+      await io.save(action, { status: "working", message: "Checking local values, product match, and current remote values." });
       const current = await io.inspect(action);
       const check = preflight(action, current, await io.isLocalApplied());
       if (check.status === "held") await io.save(action, check);
@@ -111,6 +112,7 @@ export async function executeProductActions(actions, io) {
       }
       await io.save(action, { status: "working", message: "Applying approved values." });
       await io.execute(action, current);
+      await io.save(action, { status: "working", message: "Confirming the published values with the destination." });
       const verified = await io.inspect(action);
       if (!same(verified.mapping, action.mapping)) throw new Error("Product match changed during publication; review required.");
       if (!same(verified.remote, verified.desired)) throw new Error("Remote confirmation is incomplete. Retry will verify the outcome before resending.");
