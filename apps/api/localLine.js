@@ -275,17 +275,7 @@ async function fetchLocalLineProductUnits(accessToken) {
     return cachedProductUnits;
   }
 
-  const url = `${LL_BASEURL}product-units/`;
-  const response = await fetchLocalLineWithRetry(url, {
-    headers: { Authorization: `Bearer ${accessToken}` }
-  }, "LocalLine product units");
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`LocalLine product units failed: ${response.status} ${body}`);
-  }
-
-  const payload = await response.json();
-  cachedProductUnits = Array.isArray(payload?.results) ? payload.results : [];
+  cachedProductUnits = await fetchLocalLineCollection("product-units/?page_size=100", accessToken);
   return cachedProductUnits;
 }
 
@@ -455,24 +445,22 @@ function resolveLocalLineUnitIds(productUnits, resolvedProfile, packageRows = []
   const packageUnitNames = packageRows
     .map((pkg) => normalizeUnitLabel(pkg?.unit))
     .filter(Boolean);
-  const usesWeight =
-    resolvedProfile?.unitOfMeasure === "lbs" ||
-    packageUnitNames.some((value) => /lb|lbs|pound|oz|ounce|kg|kilogram|g|gram/.test(value));
-
-  const itemFallback =
-    pickUnitByNames(itemUnits, ["ea", "each", "item"]) ||
-    itemUnits.find((unit) => Boolean(unit?.default)) ||
-    itemUnits[0] ||
-    null;
-  const weightFallback =
-    pickUnitByNames(weightUnits, ["pound", "lb", "lbs", "ounce", "oz"]) ||
-    weightUnits.find((unit) => Boolean(unit?.default)) ||
-    weightUnits[0] ||
-    null;
-
-  const chosenUnit = usesWeight ? weightFallback || itemFallback : itemFallback || weightFallback;
+  const weightAliases = [
+    ["pound", "pounds", "lb", "lbs"],
+    ["ounce", "ounces", "oz"],
+    ["kilogram", "kilograms", "kg"],
+    ["gram", "grams", "g"]
+  ];
+  // Match the actual measurement. API ordering must never choose ounces for pounds,
+  // and item labels such as "bag" must not match the weight abbreviation "g".
+  const requestedWeight = resolvedProfile?.unitOfMeasure === "lbs"
+    ? weightAliases[0]
+    : weightAliases.find(aliases => packageUnitNames.some(unit => aliases.includes(unit)));
+  const chosenUnit = requestedWeight
+    ? pickUnitByNames(weightUnits, requestedWeight)
+    : pickUnitByNames(itemUnits, ["ea", "each", "item"]);
   if (!chosenUnit?.id) {
-    throw new Error("Unable to determine Local Line product unit ids");
+    throw new Error(`Local Line is missing the required ${requestedWeight?.[0] || "each"} unit. Configure that unit before publishing; other units cannot be substituted.`);
   }
 
   return {

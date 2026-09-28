@@ -19,7 +19,51 @@ process.env.LL_PRICE_LIST_GUEST_ID = "1";
 process.env.LOCALLINE_TEST = "false";
 process.env.LOCALLINE_UPDATE_PRICES = "true";
 
-const { createLocalLineProductFromStoreProduct, updateLocalLineForProduct } = await import("./localLine.js");
+const { createLocalLineProductFromStoreProduct, updateLocalLineForProduct, buildLocalLineCreatePayload } = await import("./localLine.js");
+
+const productUnits = [
+  { id: 12591, name: "bag", unit_type: "item" },
+  { id: 12384, name: "ea", unit_type: "item" },
+  { id: 3, name: "gram", abbrieviation: "g", unit_type: "weight", default: true },
+  { id: 4, name: "ounce", abbrieviation: "oz", unit_type: "weight", default: true },
+  { id: 1, name: "pound", abbrieviation: "lb", unit_type: "weight", default: true }
+];
+function thighsContext() {
+  return {
+    product: { id: 42, name: "CRX Thighs", vendorId: 3153 },
+    vendor: { id: 3153, name: "Deck Family Farm" }, localLineVendorId: 3153,
+    profile: { unitOfMeasure: "lbs", sourceUnitPrice: 12, sourceMultiplier: 0.5412, minWeight: 1, maxWeight: 1.5 },
+    packages: [{ id: 43, name: "1.00 - 1.50 lbs", price: 8.12, unit: null, numOfItems: 1 }],
+    packageMeta: []
+  };
+}
+
+test("new pounds-based products choose pounds even when Local Line lists ounces first", () => {
+  for (const units of [productUnits, productUnits.toReversed()]) {
+    const payload = buildLocalLineCreatePayload(thighsContext(), units);
+    assert.equal(payload.base_unit_id, 1);
+    assert.equal(payload.charge_unit_id, 1);
+    assert.equal(payload.packages[0].unit_price, 8.12);
+    assert.equal(payload.charge_type, "package");
+  }
+});
+
+test("pounds-based products cannot silently fall back to ounces or item units", () => {
+  const units = productUnits.filter(unit => unit.id !== 1);
+  assert.throws(() => buildLocalLineCreatePayload(thighsContext(), units), /missing the required pound unit/);
+});
+
+test("explicit ounce packages retain ounces and bag labels do not imply grams", () => {
+  const context = thighsContext();
+  context.vendor.name = "Other Farm";
+  context.profile = null;
+  context.packages[0].unit = "oz";
+  assert.equal(buildLocalLineCreatePayload(context, productUnits).base_unit_id, 4);
+  context.packages[0].unit = "bag";
+  const payload = buildLocalLineCreatePayload(context, productUnits);
+  assert.equal(payload.base_unit_id, 12384);
+  assert.equal(payload.charge_unit_id, 12384);
+});
 
 // One local product, with independent local and remote package IDs. Writes update
 // the in-memory records so retries exercise the persisted link, not a fixed mock.
