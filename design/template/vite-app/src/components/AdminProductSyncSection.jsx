@@ -88,6 +88,9 @@ export function AdminProductSyncSection({ token, roles = [], handoff = null, onA
   const [message, setMessage] = useState("");
   const [reload, setReload] = useState(0);
   const [approval, setApproval] = useState(null);
+  const newLocalLineProducts = groupSyncActions((approval?.actions || []).filter(action =>
+    action.direction === "outgoing" && action.platform === "localline" && action.kind === "create"
+  ));
   const [releaseName, setReleaseName] = useState("Product release");
   const [releaseAt, setReleaseAt] = useState(() => pacificInput(Math.ceil((Date.now() + 1000) / 3600000) * 3600000));
   const [foldChoice, setFoldChoice] = useState(0);
@@ -334,9 +337,16 @@ export function AdminProductSyncSection({ token, roles = [], handoff = null, onA
       })}
       {historyOpen && !history.length && <p>No releases yet.</p>}
     </details>
-    {approval && <div className="modal-backdrop"><div className="modal sync-approval" role="dialog" aria-modal="true" aria-label="Approve product sync actions">
+    {approval && <div className="modal-backdrop"><div className="modal sync-approval" role="dialog" aria-modal="true" aria-label="Approve product sync actions" aria-describedby={newLocalLineProducts.length ? "new-localline-setup-notice" : undefined}>
       <h3>{approval.mode === "incoming" ? "Approve local repairs" : approval.mode === "schedule" ? "Schedule approved changes" : "Apply approved changes now"}</h3>
       <p>{countLabel(new Set(approval.actions.map(action => action.productId)).size, "product")} · {countLabel(approval.actions.length, approval.mode === "incoming" ? "repair" : "update")} selected for {[...new Set(approval.actions.map(action => PLATFORM_NAMES[action.platform]))].join(" and ")}. Changed inputs or matches will be held for review.</p>
+      {newLocalLineProducts.length > 0 && <div className="sync-new-product-notice" id="new-localline-setup-notice" role="note">
+        <strong>New Local Line items need manual setup</strong>
+        <p>{approval.mode === "schedule" ? "After the scheduled release runs and creates these items in Local Line" : "After these items are created in Local Line"}, open each item in Local Line and:</p>
+        <ul><li>Set its category manually.</li><li>Apply the <strong>Frozen</strong> or <strong>Dairy</strong> tags, as appropriate.</li></ul>
+        <p>Categories and these tags are not applied automatically when creating new items.</p>
+        <p className="small"><strong>New items:</strong> {newLocalLineProducts.map(product => product.productName || `Product #${product.productId}`).join(", ")}</p>
+      </div>}
       {approval.mode !== "incoming" && <label>Release name<input className="input" value={releaseName} onChange={event => setReleaseName(event.target.value)} /></label>}
       {approval.mode === "schedule" && <><label>Release time — Pacific<input className="input" type="datetime-local" step="3600" value={releaseAt} onChange={event => { setReleaseAt(event.target.value); setFoldChoice(0); }} /></label>{candidates.length > 1 && <label>Daylight-saving time occurs twice<select className="input" value={foldChoice} onChange={event => setFoldChoice(Number(event.target.value))}>{candidates.map((value, index) => <option key={value} value={index}>{pacificDateTime(value)}</option>)}</select></label>}<p className="small">{candidates[foldChoice] ? pacificDateTime(candidates[foldChoice]) : "Choose a valid Pacific time at the top of an hour."}</p></>}
       <div className="sync-approval-actions">{approval.actions.map(action => <details key={action.id}><summary>{action.productName} · {PLATFORM_NAMES[action.platform]} · {action.packageName || action.kind}</summary><Comparison action={action} all /></details>)}</div>

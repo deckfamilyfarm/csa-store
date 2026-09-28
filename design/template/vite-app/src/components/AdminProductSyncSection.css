@@ -74,6 +74,10 @@
 .sync-match-list { max-height: 380px; overflow: auto; }
 .sync-match-list > div { display: flex; justify-content: space-between; gap: .8rem; flex-wrap: wrap; border-bottom: 1px solid var(--sync-border); padding: .5rem 0; font-size: .85rem; }
 .sync-approval { width: min(900px, 94vw); max-height: 90vh; overflow: auto; }
+.sync-new-product-notice { margin: .9rem 0; padding: .85rem 1rem; border: 1px solid #c88d45; border-left: 4px solid #a5651b; border-radius: 6px; background: #fff4df; color: #663b10; overflow-wrap: anywhere; }
+.sync-new-product-notice > strong { display: block; margin-bottom: .5rem; }
+.sync-new-product-notice ul { margin: .4rem 0 .7rem; padding-left: 1.3rem; }
+.sync-new-product-notice p:last-child { margin-bottom: 0; }
 .sync-approval > label { display: flex; flex-direction: column; align-items: stretch; margin-bottom: .6rem; }
 .sync-approval-actions { margin: .75rem 0; }
 .sync-approval-actions > details { border-bottom: 1px solid var(--sync-border); }
