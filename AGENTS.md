@@ -28,6 +28,8 @@ The integration targets the Local Line Backoffice v2 API:
 - Product detail: `GET /products/{id}/?expand=packages,product_price_list_entries`.
 - Product update: `PATCH /products/{id}/`.
 
+Product saves require an existing, named local vendor, including creation, duplication, pricing, packages, and inventory. Reject missing or invalid vendors before saving. Local Line publication resolves the local vendor against `/vendors/` (matching ID and name, or a unique normalized name), includes the verified remote `vendor` ID in create/update payloads, and reads the product back to confirm it. Never assume a local vendor ID is a remote ID or create a remote vendor implicitly. Product Sync freezes the vendor in the audit; older approvals without a vendor must be audited again. Inventory only checks vendors and never changes them; repair vendor mismatches through Product Sync.
+
 The official Swagger at `https://localline.ca/swagger/backoffice/v2?format=openapi` confirms `/products/{id}/` supports GET/PATCH, `/products/export/` supports GET, and `/token/` supports POST.
 
 ## Formula Pricing Guardrail

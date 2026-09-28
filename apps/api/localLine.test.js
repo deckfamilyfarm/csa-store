@@ -46,6 +46,7 @@ function fixture(t, { linked = false, images = false } = {}) {
   };
   const remoteProduct = {
     id: 9001,
+    vendor: 101,
     name: "Test Sausage",
     visible: true,
     track_inventory: false,
@@ -53,6 +54,7 @@ function fixture(t, { linked = false, images = false } = {}) {
     product_price_list_entries: [{ id: 7001, price_list: 1 }]
   };
   const failures = {};
+  const remoteVendors = [{ id: 101, name: "Deck Family Farm" }];
   const requests = [];
   t.mock.method(globalThis, "fetch", async (url, options = {}) => {
     const method = options.method || "GET";
@@ -61,6 +63,7 @@ function fixture(t, { linked = false, images = false } = {}) {
     requests.push({ method, path, payload });
     const json = (body, status = 200) => new Response(JSON.stringify(body), { status });
     if (path.endsWith("/token/")) return json({ access: "test-token" });
+    if (path.endsWith("/vendors/")) return json({ results: remoteVendors });
     if (path.endsWith("/product-units/")) {
       return json({ results: [{ id: 1, name: "Each", abbrieviation: "ea", unit_type: "item" }] });
     }
@@ -76,6 +79,7 @@ function fixture(t, { linked = false, images = false } = {}) {
       }
       if (method === "PATCH") {
         if (payload.packages && failures.price) return json({ detail: "Pricing rejected" }, 400);
+        if (Object.hasOwn(payload, "vendor")) remoteProduct.vendor = failures.vendor ? null : payload.vendor;
         if (Object.hasOwn(payload, "visible")) remoteProduct.visible = failures.visibility ? false : payload.visible;
         if (Object.hasOwn(payload, "track_inventory")) remoteProduct.track_inventory = payload.track_inventory;
         return json(remoteProduct);
@@ -88,7 +92,7 @@ function fixture(t, { linked = false, images = false } = {}) {
     }
     throw new Error(`Unexpected request: ${method} ${path}`);
   });
-  return { db, records, requests, failures, remoteProduct };
+  return { db, records, requests, failures, remoteProduct, remoteVendors };
 }
 
 const productCreates = (requests) => requests.filter((r) => r.method === "POST" && r.path.endsWith("/products/"));
@@ -102,10 +106,12 @@ test("a local-only product is created, linked and priced using remote package ID
   assert.equal(result.localLineProductId, 9001);
   assert.equal(result.priceOk, true);
   assert.equal(productCreates(requests).length, 1);
+  assert.equal(productCreates(requests)[0].payload.vendor, 101);
   assert.equal(records.get(localLineProductMeta)[0].localLineProductId, 9001);
   assert.equal(records.get(localLinePackageMeta)[0].localLinePackageId, 9002);
   const priceRequest = requests.find((r) => r.method === "PATCH" && r.payload.packages);
   assert.equal(priceRequest.payload.packages[0].id, 9002);
+  assert.equal(priceRequest.payload.vendor, 101);
   assert.deepEqual(records.get(productPricingProfiles), originalPricing);
 });
 
@@ -136,7 +142,8 @@ for (const [failure, expected] of [
   ["read", /503.*Temporary read failure/],
   ["price", /400.*Pricing rejected/],
   ["image", /400.*Image rejected/],
-  ["visibility", /visibility\/inventory/]
+  ["visibility", /visibility\/inventory/],
+  ["vendor", /did not confirm the assigned vendor/]
 ]) {
   test(`a post-create ${failure} failure is reported and a retry reuses the link`, async (t) => {
     const { db, records, requests, failures } = fixture(t, { images: failure === "image" });
@@ -207,4 +214,34 @@ test("disabled price updates fail before creating a remote product", async (t) =
   process.env.LOCALLINE_UPDATE_PRICES = "true";
   await assert.rejects(disabledModule.createLocalLineProductFromStoreProduct(db, 42), /price updates are disabled/);
   assert.equal(requests.length, 0);
+});
+
+test("missing or nonexistent local vendors prevent all remote product writes", async (t) => {
+  const { db, records, requests } = fixture(t, { linked: true });
+  for (const vendorId of [null, "", 0, -1, 999]) {
+    records.get(products)[0].vendorId = vendorId;
+    await assert.rejects(updateLocalLineForProduct(db, 42, { visible: 1, forcePriceSync: true }), /vendor/i);
+  }
+  assert.equal(requests.filter(row => row.method === "PATCH").length, 0);
+  records.get(localLineProductMeta)[0].localLineProductId = 0;
+  await assert.rejects(createLocalLineProductFromStoreProduct(db, 42), /vendor/i);
+  assert.equal(productCreates(requests).length, 0);
+});
+
+test("an absent or ambiguous Local Line vendor blocks publishing", async (t) => {
+  const { db, requests, remoteVendors } = fixture(t);
+  remoteVendors.splice(0);
+  await assert.rejects(createLocalLineProductFromStoreProduct(db, 42), /no matching vendor/);
+  remoteVendors.push({ id: 101, name: "Deck Family Farm" }, { id: 102, name: "Deck Family Farm" });
+  await assert.rejects(createLocalLineProductFromStoreProduct(db, 42), /multiple matches/);
+  assert.equal(productCreates(requests).length, 0);
+});
+
+test("publishing repairs a missing remote vendor and fails when Local Line drops it", async (t) => {
+  const { db, failures, remoteProduct } = fixture(t, { linked: true });
+  remoteProduct.vendor = null;
+  assert.equal((await createLocalLineProductFromStoreProduct(db, 42)).ok, true);
+  assert.equal(remoteProduct.vendor, 101);
+  failures.vendor = true;
+  await assert.rejects(updateLocalLineForProduct(db, 42, { forcePriceSync: true }), /did not confirm the assigned vendor/);
 });

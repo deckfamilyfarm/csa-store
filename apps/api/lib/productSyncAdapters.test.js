@@ -4,6 +4,13 @@ import { localLineProjection, squareProjection, localLineInputs } from "./produc
 import { buildSquarePriceAuditRow, buildVariationUpdateObject } from "./squareStoreSync.js";
 import { incomingProposals } from "./productSyncIncoming.js";
 
+test("Local Line vendor drift is audited and missing or wrong vendors cannot confirm a publication", () => {
+  const payload = { name: "Milk", vendor: 7 };
+  const desired = localLineProjection(payload, payload, true);
+  for (const vendor of [7, "7", { id: 7 }]) assert.deepEqual(localLineProjection({ name: "Milk", vendor }, payload), desired);
+  for (const vendor of [null, undefined, 8]) assert.notDeepEqual(localLineProjection({ name: "Milk", vendor }, payload), desired);
+});
+
 test("Local Line confirms writable price inputs even when API-derived display fields are absent", () => {
   const payload = { name: "Milk", visible: true, set_inventory: 5, packages: [{ id: 4, name: "Bottle", unit_price: 7,
     package_price: 7, package_unit_price: 7, price_list_entries: [{ price_list: 1, product_price_list_entry: 9, adjustment: true, adjustment_type: 2, adjustment_value: 10, on_sale: true,

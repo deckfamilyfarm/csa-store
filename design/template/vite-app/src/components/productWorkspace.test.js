@@ -35,6 +35,32 @@ const product = {
   ],
 };
 
+test("vendorless drafts fail before any local save and retain every edit", async () => {
+  for (const vendorId of [null, "", 0]) {
+    const entry = patchProductDraft({}, { ...product, vendorId }, { sourceUnitPrice: "12", inventory: 5 })[7];
+    const api = { put: () => assert.fail("No writes allowed"), post: () => assert.fail("No writes allowed") };
+    const result = await saveProductDraft(entry, productCapabilities(["admin"]), api);
+    assert.equal(result.ok, false);
+    assert.match(result.errors[0], /vendor is required/);
+    assert.deepEqual(result.savedFields, []);
+    const inventory = await saveInventoryDraft(entry, productCapabilities(["admin"]), api);
+    assert.equal(inventory.ok, false);
+    assert.match(inventory.errors[0], /vendor is required/);
+  }
+});
+
+test("a failed vendor assignment stops all dependent saves", async () => {
+  const entry = patchProductDraft({}, product, { vendorId: "99", inventory: 5, sourceUnitPrice: "12" })[7];
+  const calls = [];
+  const result = await saveProductDraft(entry, productCapabilities(["admin"]), {
+    put: async path => { calls.push(path); throw new Error("Invalid vendor"); },
+    post: () => assert.fail("Stock must not save after vendor failure")
+  });
+  assert.deepEqual(calls, ["products/7"]);
+  assert.equal(result.ok, false);
+  assert.deepEqual(result.savedFields, []);
+});
+
 test("role combinations keep editing, scheduling, cached pricing, and pushing separate", () => {
   assert.equal(productCapabilities(["inventory_admin"]).pricing, false);
   assert.equal(productCapabilities(["inventory_admin"]).edit, true);

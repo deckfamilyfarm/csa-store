@@ -4,8 +4,10 @@ import { getLocalLineAccessToken } from "../localLineAuth.js";
 import {
   loadLocalLineSyncContext, stageLocalLineContext, buildLocalLinePricePayload, buildLocalLineCreatePayload,
   buildInventoryPayload, fetchLocalLineProduct, patchLocalLineProduct, createLocalLineProduct,
-  fetchLocalLineProductUnits, createLocalLineProductImage, upsertLocalLineProductMeta
+  fetchLocalLineProductUnits, createLocalLineProductImage, upsertLocalLineProductMeta,
+  resolveLocalLineVendor, verifyReviewedLocalLineVendor
 } from "../localLine.js";
+import { requireProductVendor, localLineVendorId, confirmLocalLineVendor } from "./productVendor.js";
 import {
   loadApprovedSquarePricingRows, loadPackagesByProduct, buildSquarePriceAuditRow,
   buildVariationUpdateObject, batchRetrieveSquareObjects, pushReviewedSquareVariation, upsertReturnedSquareObjects
@@ -64,6 +66,7 @@ export function localLineProjection(remote, payload, desired = false) {
       if (!desired && ["package_price", "package_unit_price"].includes(key)) value = remote[key] ?? remote.unit_price;
       if (!desired && key === "price_list") value = remote.price_list_id ?? remote.price_list;
       if (!desired && key === "product_price_list_entry") value = remote.product_price_list_entry ?? remote.id;
+      if (key === "vendor") value = localLineVendorId(desired ? { vendor: expected } : remote);
       if (numericFields.has(key) || key === "id") value = number(value);
       if (booleanFields.has(key)) value = Boolean(value);
       result[key] = value ?? null;
@@ -117,6 +120,7 @@ export async function prepareSquareActions({ productIds = [], staged = {}, inclu
 export async function prepareLocalLineAction(product, staged = {}, { onRefresh } = {}) {
   if (process.env.LOCALLINE_TEST === "true" || process.env.LOCALLINE_UPDATE_PRICES === "false") throw new Error("Local Line publishing is disabled by server configuration.");
   const context = await loadLocalLineSyncContext(getDb(), product.id);
+  requireProductVendor(context.product, context.vendor);
   if (!context.remoteId) {
     const [attempts] = await getPool().query(`SELECT ra.checkpoint_json FROM product_sync_release_actions ra
       JOIN product_sync_actions a ON a.id=ra.action_id WHERE a.product_id=? AND a.platform='localline' AND ra.checkpoint_json IS NOT NULL`, [product.id]);
@@ -126,6 +130,7 @@ export async function prepareLocalLineAction(product, staged = {}, { onRefresh }
   const next = stageLocalLineContext(context, staged);
   const includeInventory = !context.remoteId || ["inventory", "trackInventory"].some(key => Object.hasOwn(staged, key));
   const token = await getLocalLineAccessToken();
+  next.localLineVendorId = await resolveLocalLineVendor(next, token);
   const remote = context.remoteId ? await fetchLocalLineProduct(context.remoteId, token) : null;
   // A pricing/image approval should not freeze visibility when no visibility change was reviewed.
   const includeVisibility = !remote || Object.hasOwn(staged, "visible") || Boolean(remote.visible) !== Boolean(next.product.visible);
@@ -179,6 +184,11 @@ export async function inspectAction(action, saveCheckpoint = async () => {}) {
     await finishCreatedLink(action, checkpoint, await getLocalLineAccessToken(), saveCheckpoint);
   }
   const context = await loadLocalLineSyncContext(getDb(), action.productId);
+  try {
+    requireProductVendor(context.product, context.vendor);
+    if (!localLineVendorId(action.payload)) throw new Error("This approval does not include a vendor. Run a new audit and approve the vendor before publishing.");
+    await verifyReviewedLocalLineVendor(context, action.payload.vendor, await getLocalLineAccessToken());
+  } catch (error) { error.hold = true; throw error; }
   let mapping = localLineMapping(context);
   const ownedCreate = action.kind === "create" && checkpoint.remoteId && Number(context.remoteId) === Number(checkpoint.remoteId);
   if (ownedCreate && same(mapping, checkpoint.createdMapping)) mapping = action.mapping;
@@ -303,6 +313,7 @@ export async function executeAction(action, current, saveCheckpoint) {
     if (check.status === "held") throw Object.assign(new Error(check.message), { hold: true });
   }
   if (!same(current.remote?.fields, localLineProjection(payload, payload, true))) await patchLocalLineProduct(remoteId, token, payload);
+  confirmLocalLineVendor(await fetchLocalLineProduct(remoteId, token), payload.vendor);
   if (action.imageSources.length) {
     checkpoint.images ||= [];
     for (let i = checkpoint.images.length; i < action.imageSources.length; i += 1) {

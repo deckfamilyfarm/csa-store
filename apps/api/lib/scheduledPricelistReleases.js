@@ -1,5 +1,6 @@
 import { ensureScheduledPricelistSchema, getDb, getPool } from "../db.js";
 import { createLocalLineProductFromStoreProduct } from "../localLine.js";
+import { validateSavedProductVendor } from "./productVendor.js";
 
 const DEFAULT_TIMEZONE = "America/Los_Angeles";
 const BATCH_STATUS_SCHEDULED = "scheduled";
@@ -667,6 +668,7 @@ async function markBatchRunningForRetry(connection, batchId) {
 }
 
 async function applyLocalChanges(connection, productId, changes) {
+  await validateSavedProductVendor(connection, productId);
   const now = dateToMysqlUtc(new Date());
   const productSets = [];
   const productParams = [];

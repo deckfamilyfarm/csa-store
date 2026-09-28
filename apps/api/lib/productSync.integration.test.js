@@ -35,13 +35,17 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
   const remoteProducts = new Map();
   const squareObjects = new Map();
   const requests = [];
-  let failSquare = false, loseCreateResponse = false, failCreateReads = 0, pausePublication = null;
+  const remoteVendors = [{ id: 101, name: "Deck Family Farm" }, { id: 102, name: "Creamy Cow, LLC" }, { id: 103, name: "Hyland Meats" }, { id: 104, name: "Other Farm" }];
+  let failSquare = false, loseCreateResponse = false, failCreateReads = 0, pausePublication = null, dropVendor = false;
   t.mock.method(globalThis, "fetch", async (url, options = {}) => {
     const parsed = new URL(url); assert.ok(["localline.test", "square.test"].includes(parsed.hostname), `Unexpected external request: ${parsed.hostname}`);
     const method = options.method || "GET"; const body = options.body ? JSON.parse(options.body) : null;
     requests.push({ path: parsed.pathname, method, body });
     const json = (value, status = 200) => new Response(JSON.stringify(value), { status });
     if (parsed.pathname.endsWith("/token/")) return json({ access: "test" });
+    if (parsed.pathname.endsWith("/vendors/")) return json({ results: remoteVendors });
+    const vendorMatch = parsed.pathname.match(/\/vendors\/(\d+)\//);
+    if (vendorMatch) return json(remoteVendors.find(vendor => vendor.id === Number(vendorMatch[1])) || {}, remoteVendors.some(vendor => vendor.id === Number(vendorMatch[1])) ? 200 : 404);
     if (parsed.pathname.endsWith("/product-units/")) return json({ results: [{ id: 1, name: "Each", abbrieviation: "ea", unit_type: "item" }] });
     if (parsed.pathname.endsWith("/products/") && method === "POST") {
       if (loseCreateResponse) throw new Error("Lost create response");
@@ -58,6 +62,7 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
       if (method === "PATCH") {
         if (pausePublication?.id === id) { pausePublication.entered(); await pausePublication.wait; }
         Object.assign(remote, body); if (Object.hasOwn(body, "set_inventory")) remote.inventory = body.set_inventory;
+        if (dropVendor && Object.hasOwn(body, "vendor")) remote.vendor = null;
       }
       return json(remote);
     }
@@ -78,7 +83,7 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
     if (linked) {
       await pool.query("INSERT INTO local_line_product_meta (product_id,local_line_product_id) VALUES (?,?)", [id, id + 1000]);
       await pool.query("INSERT INTO local_line_package_meta (product_id,package_id,local_line_package_id) VALUES (?,?,?)", [id, id * 10, id + 2000]);
-      remoteProducts.set(id + 1000, { id: id + 1000, name: `Product ${id}`, description: "", visible: true, track_inventory: true, inventory: 20, package_codes_enabled: true,
+      remoteProducts.set(id + 1000, { id: id + 1000, vendor: 101, name: `Product ${id}`, description: "", visible: true, track_inventory: true, inventory: 20, package_codes_enabled: true,
         packages: [{ id: id + 2000, name: "ea", unit_price: 8, package_price: 8, package_unit_price: 8, inventory_per_unit: 1,
           price_list_entries: [{ id: id + 3000, product_price_list_entry: id + 3000, price_list: 1, adjustment_type: 2, adjustment_value: 0, on_sale: false, on_sale_toggle: false, calculated_value: 8, strikethrough_display_value: null, max_units_per_order: null, adjustment: true }] }] });
     } else await pool.query("INSERT INTO local_line_product_meta (product_id,local_line_product_id) VALUES (?,0)", [id]);
@@ -340,8 +345,83 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
   await product(131,false);
   await assert.rejects(saveInventoryToLocalLine(131,{inventory:1},user),/Create and link/);
   remoteProducts.delete(1130);
-  await assert.rejects(saveInventoryToLocalLine(130,{inventory:1},user),/PATCH failed/);
+  await assert.rejects(saveInventoryToLocalLine(130,{inventory:1},user),/GET failed/);
   const [[unchangedInventory]]=await pool.query("SELECT inventory FROM products WHERE id=130");
   assert.equal(unchangedInventory.inventory,6,"A failed remote update preserves the previously confirmed local inventory");
+
+  await product(140);
+  remoteProducts.get(1140).vendor = null;
+  const vendorAudit = await audit([140], [], { platforms: ["localline"] });
+  assert.equal(vendorAudit.rows[0].remoteBefore.fields.vendor, null);
+  assert.equal(vendorAudit.rows[0].payload.vendor, 101, "Use the verified remote vendor ID, not the local ID");
+  const vendorRelease = await service.createProductSyncRelease({ auditId: vendorAudit.audit.id, actionIds: vendorAudit.rows.map(row => row.id) }, user);
+  dropVendor = true;
+  const unconfirmedVendor = await service.runProductSyncRelease(vendorRelease.id, { user, allowFuture: true });
+  assert.equal(unconfirmedVendor.status, "failed");
+  assert.match(unconfirmedVendor.actions[0].message, /did not confirm the assigned vendor/);
+  dropVendor = false;
+  assert.equal((await service.runProductSyncRelease(vendorRelease.id, { user, allowFuture: true })).status, "completed");
+  assert.equal(remoteProducts.get(1140).vendor, 101);
+
+  // Vendor drift and old approvals must not bypass vendor review.
+  await product(141);
+  const vendorDriftAudit = await audit([141], [], { platforms: ["localline"] });
+  const vendorDriftRelease = await service.createProductSyncRelease({ auditId: vendorDriftAudit.audit.id, actionIds: vendorDriftAudit.rows.map(row => row.id) }, user);
+  remoteProducts.get(1141).vendor = 102;
+  const vendorDrift = await service.runProductSyncRelease(vendorDriftRelease.id, { user, allowFuture: true });
+  assert.equal(vendorDrift.status, "held");
+  assert.equal(remoteProducts.get(1141).vendor, 102);
+  await product(142);
+  const oldAction = await prepareLocalLineAction({ id: 142, name: "Product 142" });
+  delete oldAction.payload.vendor;
+  const { inspectAction } = await import("./productSyncAdapters.js");
+  await assert.rejects(inspectAction(oldAction), /approval does not include a vendor/);
+  remoteVendors[0].name = "Unrelated vendor";
+  const renamedAction = { ...oldAction, payload: { ...oldAction.payload, vendor: 101 } };
+  await assert.rejects(inspectAction(renamedAction), /no matching vendor/);
+  remoteVendors[0].name = "Deck Family Farm";
+
+  await product(143);
+  await pool.query("UPDATE products SET vendor_id=NULL WHERE id=143");
+  await assert.rejects(prepareLocalLineAction({ id: 143, name: "Product 143" }), /vendor is required/);
+  await assert.rejects(saveInventoryToLocalLine(143, { inventory: 1 }, user), /vendor is required/);
+  const [[noVendorStock]] = await pool.query("SELECT inventory FROM products WHERE id=143");
+  assert.equal(noVendorStock.inventory, 20);
+  remoteProducts.get(1140).vendor = null;
+  const beforeMissingVendor = requests.length;
+  await assert.rejects(saveInventoryToLocalLine(140, { inventory: 1 }, user), /did not confirm the assigned vendor/);
+  assert.equal(requests.slice(beforeMissingVendor).filter(row => row.method === "PATCH").length, 0);
+
+  // Exercise actual save handlers against the isolated database, bypassing only HTTP/auth middleware.
+  const { default: adminRouter } = await import("../routes/admin.js");
+  async function saveRoute(method, path, params, body) {
+    const handler = adminRouter.stack.find(layer => layer.route?.path === path && layer.route.methods[method]).route.stack.at(-1).handle;
+    const response = { statusCode: 200, status(code) { this.statusCode = code; return this; }, json(data) { this.body = data; return this; } };
+    await handler({ params, body, admin: user }, response);
+    return response;
+  }
+  for (const vendorId of [null, "", 0, 99999]) {
+    const result = await saveRoute("put", "/products/:id", { id: 142 }, { name: "Must not save", vendorId });
+    assert.equal(result.statusCode, 400);
+    assert.match(result.body.error, /vendor/i);
+  }
+  const [[notSaved]] = await pool.query("SELECT name, vendor_id FROM products WHERE id=142");
+  assert.deepEqual(notSaved, { name: "Product 142", vendor_id: 1 });
+  assert.equal((await saveRoute("put", "/products/:id", { id: 143 }, { name: "Must not save" })).statusCode, 400);
+  assert.equal((await saveRoute("put", "/packages/:id", { id: 1430 }, { price: 99 })).statusCode, 400);
+  assert.equal((await saveRoute("put", "/products/:id/pricing-profile", { id: 143 }, { sourceUnitPrice: 99 })).statusCode, 400);
+  const createRejected = await saveRoute("post", "/products", {}, { name: "Vendorless create", packages: [{ name: "ea", price: 10 }] });
+  assert.equal(createRejected.statusCode, 400);
+  assert.match(createRejected.body.error, /vendor is required/);
+  const duplicateRejected = await saveRoute("post", "/products/:id/duplicate", { id: 143 }, {});
+  assert.equal(duplicateRejected.statusCode, 400);
+  assert.match(duplicateRejected.body.error, /vendor is required/);
+  const bulkRejected = await saveRoute("post", "/products/bulk-update", {}, { applyRemote: false, updates: [{ productId: 143, changes: { inventory: 1 } }] });
+  assert.equal(bulkRejected.body.results[0].databaseUpdate, false);
+  assert.match(bulkRejected.body.results[0].message, /vendor is required/);
+  assert.equal((await saveRoute("post", "/pricelist/bulk-save", {}, { rows: [{ productId: 142, sourceUnitPrice: 99 }, { productId: 143, sourceUnitPrice: 99 }] })).statusCode, 400);
+  const [[notPartlySaved]] = await pool.query("SELECT source_unit_price FROM product_pricing_profiles WHERE product_id=142");
+  assert.equal(Number(notPartlySaved.source_unit_price), 10);
+  assert.equal((await saveRoute("put", "/products/:id", { id: 143 }, { vendorId: 1 })).statusCode, 200, "Allow repairing an existing vendorless product");
   console.log(`Validated isolated MySQL database ${database}`);
 });

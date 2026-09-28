@@ -1,4 +1,5 @@
 import { eq } from "drizzle-orm";
+import { requireProductVendor, requireVendorId, matchLocalLineVendor, confirmLocalLineVendor } from "./lib/productVendor.js";
 import {
   categories,
   localLineProductMeta,
@@ -291,6 +292,24 @@ async function fetchLocalLineProductUnits(accessToken) {
 export async function fetchAllLocalLineFulfillmentStrategies() {
   const accessToken = await getLocalLineAccessToken();
   return fetchLocalLineCollection("fulfillment-strategies/?page_size=100", accessToken);
+}
+
+export async function resolveLocalLineVendor(context, token) {
+  requireProductVendor(context.product, context.vendor);
+  return matchLocalLineVendor(context.product, context.vendor, await fetchLocalLineCollection("vendors/?page_size=100", token));
+}
+
+export async function verifyReviewedLocalLineVendor(context, vendorId, token) {
+  requireProductVendor(context.product, context.vendor);
+  const id = requireVendorId(vendorId);
+  const response = await fetchLocalLineWithRetry(`${LL_BASEURL}vendors/${id}/`, {
+    headers: { Authorization: `Bearer ${token}` }
+  }, "LocalLine vendor fetch");
+  if (!response.ok) throw new Error("The reviewed Local Line vendor is unavailable. Run a new audit before publishing.");
+  const vendor = await response.json();
+  if (matchLocalLineVendor(context.product, context.vendor, [vendor]) !== id) {
+    throw new Error("The reviewed Local Line vendor changed. Run a new audit before publishing.");
+  }
 }
 
 export async function fetchLocalLineOrdersPage(options = {}) {
@@ -718,7 +737,7 @@ async function updateLocalLineInventory(db, productId, changes) {
   return { ok: visibleMatches && trackInventoryMatches };
 }
 
-async function updateLocalLinePrices(db, productId, changes) {
+async function updateLocalLinePrices(db, productId, changes, context) {
   if (!updatePrices) {
     if (changes.forcePriceSync) {
       throw new Error("Local Line price updates are disabled (LOCALLINE_UPDATE_PRICES=false).");
@@ -734,7 +753,6 @@ async function updateLocalLinePrices(db, productId, changes) {
     return { ok: null };
   }
 
-  const context = await loadLocalLineSyncContext(db, productId);
   const token = await getLocalLineAccessToken();
   const metaRow = await getLocalLineMetaRow(db, productId);
   const remoteProductId = resolveRemoteProductId(metaRow, productId);
@@ -743,6 +761,7 @@ async function updateLocalLinePrices(db, productId, changes) {
   const payload = buildLocalLinePricePayload(context, remote, changes);
   if (isTestMode) return { ok: null, payload };
   await patchLocalLineProduct(remoteProductId, token, payload);
+  confirmLocalLineVendor(await fetchLocalLineProduct(remoteProductId, token), payload.vendor);
   return { ok: true };
 }
 
@@ -793,6 +812,8 @@ export function stageLocalLineContext(context, changes = {}) {
 
 export function buildLocalLinePricePayload(context, llProduct, changes = {}) {
   const { product, vendor, profile, packages: packageRows, packageMeta: packageMetaRows, sale: saleRow } = context;
+  requireProductVendor(product, vendor);
+  const vendorId = requireVendorId(context.localLineVendorId);
   const productId = product.id;
   const profileRows = profile ? [profile] : [];
   const vendorRows = vendor ? [vendor] : [];
@@ -944,6 +965,7 @@ export function buildLocalLinePricePayload(context, llProduct, changes = {}) {
 
   const payload = {
     name: product.name,
+    vendor: vendorId,
     description: product.description || "",
     package_codes_enabled: true,
     packages: packagePayloads
@@ -953,6 +975,8 @@ export function buildLocalLinePricePayload(context, llProduct, changes = {}) {
 
 export function buildLocalLineCreatePayload(context, productUnits) {
   const { product, packages: packageRows } = context;
+  requireProductVendor(product, context.vendor);
+  const vendorId = requireVendorId(context.localLineVendorId);
   if (!packageRows.length) throw new Error("Product must have at least one package before pushing to Local Line");
   const packageMetaByPackageId = new Map(context.packageMeta.map(row => [Number(row.packageId), row]));
   const resolvedProfile = resolvePricingProfile({
@@ -996,6 +1020,7 @@ export function buildLocalLineCreatePayload(context, productUnits) {
 
   const payload = {
     name: product.name,
+    vendor: vendorId,
     description: product.description || "",
     visible: toBooleanFlag(product.visible),
     track_inventory: toBooleanFlag(product.trackInventory),
@@ -1068,6 +1093,7 @@ export async function createLocalLineProductFromStoreProduct(db, productId) {
   const context = await loadLocalLineSyncContext(db, productId);
   const packageRows = context.packages;
   const token = await getLocalLineAccessToken();
+  context.localLineVendorId = await resolveLocalLineVendor(context, token);
   const payload = buildLocalLineCreatePayload(context, await fetchLocalLineProductUnits(token));
 
   const createdProduct = await createLocalLineProduct(token, payload);
@@ -1123,9 +1149,15 @@ export async function updateLocalLineForProduct(db, productId, changes = {}) {
     throw new Error("This product only exists locally. Use Push Product to create it in Local Line first.");
   }
 
+  const context = await loadLocalLineSyncContext(db, productId);
+  const token = await getLocalLineAccessToken();
+  context.localLineVendorId = await resolveLocalLineVendor(context, token);
+  const publishesPrices = updatePrices && (changes.forcePriceSync || Object.hasOwn(changes, "onSale") || Object.hasOwn(changes, "saleDiscount"));
+  if (!publishesPrices) confirmLocalLineVendor(await fetchLocalLineProduct(remoteProductId, token), context.localLineVendorId);
   const inventoryResult = await updateLocalLineInventory(db, productId, changes);
-  const priceResult = await updateLocalLinePrices(db, productId, changes);
+  const priceResult = await updateLocalLinePrices(db, productId, changes, context);
   const imageResult = await updateLocalLineImages(db, productId, changes);
+  confirmLocalLineVendor(await fetchLocalLineProduct(remoteProductId, token), context.localLineVendorId);
 
   return {
     inventoryOk: inventoryResult.ok ?? null,

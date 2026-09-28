@@ -1996,6 +1996,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
     }
     setProductSaveLoading(true);
     try {
+      if (!vendors.some(vendor => Number(vendor.id) === Number(productDraft.vendorId))) throw new Error("A vendor is required. Select a vendor before saving.");
       const pricingProfile = buildSourcePricingPayloadFromDraft();
       if (selectedDraftUsesSourcePricing && !(Number(pricingProfile.sourceUnitPrice) > 0)) throw new Error("Vendor retail price must be greater than zero.");
       const response = await adminPost("products", token, {
@@ -3548,10 +3549,11 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                     />
                   </label>
                   <label className="filter-field">
-                    <span className="small">Vendor</span>
+                    <span className="small">Vendor (required)</span>
                     <select
                       className="input"
                       aria-label="Vendor"
+                      required
                       value={productDraft.vendorId}
                       onChange={(event) => {
                         const nextVendorId = event.target.value;

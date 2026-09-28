@@ -22,6 +22,7 @@ export async function saveInventoryDraft(entry, capabilities, api) {
   const result = { productId: entry.meta.productId, productName: entry.values.name, inventoryOnly: true, ok: false, savedFields: [], savedPackageIds: [], errors: [] };
   try {
     if (!capabilities.edit || !capabilities.push) throw new Error("Product editing and Local Line Push permissions are required.");
+    if (!Number.isInteger(Number(entry.defaults.vendorId)) || Number(entry.defaults.vendorId) <= 0) throw new Error("A vendor is required. Select a vendor in Details and save it in Pricing before publishing inventory.");
     const changes = Object.fromEntries(fields.map(key => [key, Number(entry.values[key])]));
     if (Object.hasOwn(changes, "inventory") && (!Number.isInteger(changes.inventory) || changes.inventory < 0)) throw new Error("Stock must be a nonnegative whole number.");
     if (fields.length) {
@@ -219,6 +220,10 @@ export async function saveProductDraft(entry, capabilities, api) {
     result.errors.push("Product name is required.");
     return result;
   }
+  if (!Number.isInteger(Number(value.vendorId)) || Number(value.vendorId) <= 0) {
+    result.errors.push("A vendor is required. Select a vendor in Product Details before saving.");
+    return result;
+  }
   if (
     !Number.isFinite(Number(value.inventory)) ||
     Number(value.inventory) < 0 ||
@@ -245,6 +250,7 @@ export async function saveProductDraft(entry, capabilities, api) {
       ),
     );
   }
+  if (metadata.includes("vendorId") && !result.savedFields.includes("vendorId")) return result;
   const inventory = fields.filter((key) => SCHEDULE_FIELDS.includes(key));
   if (inventory.length) {
     await run("Stock / sale", inventory, async () => {

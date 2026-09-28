@@ -1,5 +1,6 @@
 import productSyncRouter from "./productSync.js";
 import { saveInventoryToLocalLine } from "../lib/inventorySync.js";
+import { validateVendorAssignment, validateSavedProductVendor } from "../lib/productVendor.js";
 import { buildPricelistWhereClause, PRICELIST_PENDING_REMOTE_APPLY_SQL } from "../lib/productWorkspaceFilters.js";
 import express from "express";
 import bcrypt from "bcryptjs";
@@ -2892,6 +2893,7 @@ async function upsertLocalOnlyProductMeta(db, productId, productRow = {}) {
 }
 
 async function createLocalProductRecord(connection, payload) {
+  const vendor = await validateVendorAssignment(connection, payload.vendorId);
   const now = new Date();
   const productId = await getNextManualId(connection, "products");
   const normalizedPackages = (Array.isArray(payload.packages) ? payload.packages : [])
@@ -2910,7 +2912,7 @@ async function createLocalProductRecord(connection, payload) {
     trackInventory: payload.trackInventory ? 1 : 0,
     inventory: toOptionalInteger(payload.inventory, 0) || 0,
     categoryId: toOptionalInteger(payload.categoryId, null),
-    vendorId: toOptionalInteger(payload.vendorId, null),
+    vendorId: Number(vendor.id),
     thumbnailUrl: toNullableString(payload.thumbnailUrl),
     createdAt: now,
     updatedAt: now,
@@ -3319,6 +3321,7 @@ async function duplicateLocalProductRecord(connection, sourceProductId) {
   if (!sourceProduct) {
     throw new Error("Product not found");
   }
+  await validateVendorAssignment(connection, sourceProduct.vendor_id);
 
   const [packageRows] = await connection.query(
     "SELECT * FROM packages WHERE product_id = ? ORDER BY id",
@@ -5960,6 +5963,9 @@ router.put("/localline/products/:id/price-list-entries", requireAdminPermission(
     return res.json({ ok: true, updated: 0 });
   }
 
+  try { await validateSavedProductVendor(getPool(), productId); }
+  catch (error) { return res.status(error.status || 500).json({ error: error.message }); }
+
   const updatedAt = new Date();
   let updated = 0;
 
@@ -6674,6 +6680,11 @@ router.post("/pricelist/bulk-save", requireAdminPermission("pricing_admin"), asy
   const now = new Date();
   const savedProductIds = [];
 
+  // Validate the whole batch before writing any pricing rows.
+  try {
+    for (const row of rows) await validateSavedProductVendor(getPool(), row?.productId);
+  } catch (error) { return res.status(error.status || 500).json({ error: error.message }); }
+
   for (const row of rows) {
     const productId = Number(row?.productId);
     if (!Number.isFinite(productId)) {
@@ -6762,6 +6773,7 @@ router.post("/pricelist/apply-remote", requireAdminPermission("localline_push"),
       }
 
       const product = productRows[0];
+      await validateVendorAssignment(getPool(), product.vendorId);
       const [packageRows, vendorRows, profileRows, saleRows] = await Promise.all([
         db.select().from(packages).where(eq(packages.productId, productId)),
         product.vendorId
@@ -10625,6 +10637,10 @@ router.put("/products/:id", requireAdminPermission(["inventory_admin", "pricing_
     return res.status(404).json({ error: "Product not found" });
   }
 
+  let vendor;
+  try { vendor = await validateVendorAssignment(pool, Object.hasOwn(updates, "vendorId") ? updates.vendorId : existing.vendorId); }
+  catch (error) { return res.status(error.status || 500).json({ error: error.message }); }
+
   const nextName = updates.name ?? existing.name ?? null;
   const nextDescription = updates.description ?? existing.description ?? null;
   const nextVisible = updates.visible ?? existing.visible ?? null;
@@ -10640,7 +10656,7 @@ router.put("/products/:id", requireAdminPermission(["inventory_admin", "pricing_
       trackInventory: updates.trackInventory ?? undefined,
       inventory: updates.inventory ?? undefined,
       categoryId: updates.categoryId,
-      vendorId: updates.vendorId,
+      vendorId: Object.hasOwn(updates, "vendorId") ? Number(vendor.id) : undefined,
       thumbnailUrl: updates.thumbnailUrl ?? undefined
     })
     .where(eq(products.id, id));
@@ -10683,11 +10699,7 @@ router.put("/products/:id/pricing-profile", requireAdminPermission(["pricing_adm
       return res.status(404).json({ error: "Product not found" });
     }
 
-    const [vendorRows] = await connection.query(
-      "SELECT name FROM vendors WHERE id = ? LIMIT 1",
-      [product.vendorId]
-    );
-    const vendor = vendorRows[0] || null;
+    const vendor = await validateVendorAssignment(connection, product.vendorId);
     if (!isSourcePricingVendor(vendor)) {
       return res.json({ ok: true, skipped: true });
     }
@@ -10758,6 +10770,7 @@ router.post("/products/bulk-update", requireAdminPermission(["inventory_admin", 
     }
 
     try {
+      await validateSavedProductVendor(getPool(), productId);
       await db
         .update(products)
         .set({
@@ -10909,7 +10922,8 @@ router.post("/products/bulk-update", requireAdminPermission(["inventory_admin", 
         productId,
         databaseUpdate: false,
         localLineUpdate: null,
-        localLinePriceUpdate: null
+        localLinePriceUpdate: null,
+        message: err.message
       });
     }
   }
@@ -10928,6 +10942,9 @@ router.put("/packages/:id", requireAdminPermission(["pricing_admin", "membership
   if (!existing) {
     return res.status(404).json({ error: "Package not found" });
   }
+
+  try { await validateSavedProductVendor(pool, existing.productId); }
+  catch (error) { return res.status(error.status || 500).json({ error: error.message }); }
 
   const nextName = updates.name ?? existing.name ?? null;
   const nextPrice = updates.price ?? existing.price ?? null;
@@ -10985,6 +11002,9 @@ router.post("/products/:id/images", requireAdminPermission(["inventory_admin", "
   if (!req.file) {
     return res.status(400).json({ error: "Missing image file" });
   }
+
+  try { await validateSavedProductVendor(getPool(), productId); }
+  catch (error) { return res.status(error.status || 500).json({ error: error.message }); }
 
   if (!hasSpacesUploadConfig()) {
     return res.status(500).json({
@@ -11116,6 +11136,9 @@ router.post("/products/:id/images/delete", requireAdminPermission(["inventory_ad
   if (!url && !thumbnailUrl) {
     return res.status(400).json({ error: "Image URL is required" });
   }
+
+  try { await validateSavedProductVendor(getPool(), productId); }
+  catch (error) { return res.status(error.status || 500).json({ error: error.message }); }
 
   await ensureLocalLineSyncSchema().catch((error) => {
     console.warn("Local Line schema bootstrap skipped for /admin/products/:id/images/delete:", error.message);

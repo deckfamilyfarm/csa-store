@@ -1,4 +1,5 @@
 import { getPool } from "../db.js";
+import { validateSavedProductVendor } from "./productVendor.js";
 import { isLocalLineEnabled } from "../localLine.js";
 import { isSquareEnabled, syncSquareCatalogCache, buildSquareMatchReview } from "./squareStoreSync.js";
 import { prepareLocalLineAction, prepareSquareActions, inspectAction, executeAction } from "./productSyncAdapters.js";
@@ -19,6 +20,7 @@ export async function loadCurrentSnapshot(connection, productId) {
   return row;
 }
 export async function applyLocalChanges(connection, productId, changes) {
+  await validateSavedProductVendor(connection, productId);
   const columns = { visible: "visible", trackInventory: "track_inventory", inventory: "inventory" };
   const fields = Object.keys(columns).filter(key => Object.hasOwn(changes, key));
   if (fields.length) await connection.query(`UPDATE products SET ${fields.map(key => `${columns[key]}=?`).join(", ")}, updated_at=UTC_TIMESTAMP() WHERE id=?`, [...fields.map(key => changes[key]), productId]);

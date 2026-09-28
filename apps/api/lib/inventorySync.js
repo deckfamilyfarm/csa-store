@@ -1,5 +1,6 @@
 import { getLocalLineAccessToken } from "../localLineAuth.js";
-import { isLocalLineEnabled, patchLocalLineProduct, fetchLocalLineProduct } from "../localLine.js";
+import { isLocalLineEnabled, patchLocalLineProduct, fetchLocalLineProduct, resolveLocalLineVendor } from "../localLine.js";
+import { validateSavedProductVendor, confirmLocalLineVendor } from "./productVendor.js";
 import { ensureProductSyncSchema, withSyncLock } from "./productSyncSchema.js";
 import { fail, hasGrant, normalizeIds } from "./productSyncCore.js";
 
@@ -34,13 +35,18 @@ export async function saveInventoryToLocalLine(productId, input, user) {
         WHERE p.id=? FOR UPDATE`, [id]);
       if (!product || product.is_deleted || product.categoryName?.trim().toLowerCase() === "membership") fail("This product is not available in Inventory.");
       if (!(Number(product.remoteId) > 0)) fail("Create and link this product through Product Sync before updating its Local Line inventory.");
+      const vendor = await validateSavedProductVendor(connection, id);
       const payload = {};
       if (Object.hasOwn(changes, "inventory")) payload.set_inventory = changes.inventory;
       if (Object.hasOwn(changes, "trackInventory")) payload.track_inventory = Boolean(changes.trackInventory);
       if (Object.hasOwn(changes, "visible")) payload.visible = Boolean(changes.visible);
       const token = await getLocalLineAccessToken();
+      const vendorId = await resolveLocalLineVendor({ product: { vendorId: vendor.id }, vendor }, token);
+      // Inventory never changes vendors; repair a mismatch through a reviewed Product Sync action.
+      confirmLocalLineVendor(await fetchLocalLineProduct(Number(product.remoteId), token), vendorId);
       await patchLocalLineProduct(Number(product.remoteId), token, payload);
       const remote = await fetchLocalLineProduct(Number(product.remoteId), token);
+      confirmLocalLineVendor(remote, vendorId);
       if ((Object.hasOwn(changes, "inventory") && (remote.inventory == null || Number(remote.inventory) !== changes.inventory)) ||
         (Object.hasOwn(changes, "trackInventory") && remote.track_inventory !== Boolean(changes.trackInventory)) ||
         (Object.hasOwn(changes, "visible") && remote.visible !== Boolean(changes.visible))) {
