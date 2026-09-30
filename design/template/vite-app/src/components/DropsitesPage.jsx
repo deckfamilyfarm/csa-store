@@ -6,7 +6,7 @@ import {
 } from "../api.js";
 import { getSiteContentValue } from "../siteContent.js";
 import { DeckPageHeader } from "./DeckPageHeader.jsx";
-import { buildSubscribeNavLinks } from "./subscribeNavigation.js";
+import { DELIVERY_MAP_URL, buildSubscribeNavLinks } from "./subscribeNavigation.js";
 
 const MEDIA_KIT_URL =
   "https://docs.google.com/document/d/16iVw310-q0OGkJhWaXyO4Tp7WLEtU8Sf/edit";
@@ -458,9 +458,15 @@ export function DropsitesPage({ siteContent = {} }) {
               <a className="button alt" href="#resources">Host resources</a>
             </div>
           </div>
-          <figure className="dropsites-hero-media">
+          <a
+            className="dropsites-hero-media"
+            href={DELIVERY_MAP_URL}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Open drop-site map in a new window"
+          >
             <img src="/images/subscribe-map.avif" alt="Full Farm drop-site map" />
-          </figure>
+          </a>
         </div>
       </section>
 

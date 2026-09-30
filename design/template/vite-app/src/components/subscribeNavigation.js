@@ -1,3 +1,6 @@
+export const DELIVERY_MAP_URL =
+  "https://berkeleymapper.berkeley.edu/index.html?tabfile=https://raw.githubusercontent.com/jdeck88/ffcsa_scripts/refs/heads/main/localline/data/delivery_data.tsv&configfile=https://raw.githubusercontent.com/jdeck88/ffcsa_scripts/refs/heads/main/dropsite_maps/dropsites2.xml&pointDisplay=markers&hideLegendItems=true";
+
 export function subscriptionStoreUrl() {
   return "https://fullfarmcsa.deckfamilyfarm.com/";
 }
