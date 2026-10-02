@@ -795,7 +795,7 @@ async function syncPricelistToGoogleSheet(sheetValues, introductionValues) {
   return { spreadsheetId };
 }
 
-async function buildSheetValues({ vendorNameMatcher = null } = {}) {
+async function buildSheetValues({ vendorNameMatcher = isGooglePricelistVendorName } = {}) {
   const db = getDb();
   await ensureLocalLineSyncSchema();
   await ensureProductPricingSchema();
@@ -839,7 +839,7 @@ export function buildPricelistSheetValues({
   categoryRows = [],
   vendorRows = [],
   packageMetaRows = [],
-  vendorNameMatcher = null
+  vendorNameMatcher = isGooglePricelistVendorName
 } = {}) {
   const categoryMap = new Map(categoryRows.map((row) => [Number(row.id), row.name || "Uncategorized"]));
   const vendorMap = new Map(vendorRows.map((row) => [Number(row.id), row]));
@@ -989,7 +989,7 @@ export async function exportMasterPricelist({
   nodeEnv = process.env.NODE_ENV || "production",
   dryRun = false,
   skipGoogle = false,
-  vendorNameMatcher = null,
+  vendorNameMatcher = isGooglePricelistVendorName,
   spreadsheetId = process.env.GOOGLE_SHEETS_SPREADSHEET_ID || "",
   tabName = process.env.GOOGLE_SHEETS_TAB_NAME || "prices"
 } = {}) {
@@ -998,7 +998,9 @@ export async function exportMasterPricelist({
     : "Not configured";
 
   const { sheetValues, rowCount, vendorNames, highlightedRowCount } = await buildSheetValues({ vendorNameMatcher });
-  const vendorSummary = vendorNames.length ? vendorNames.join(", ") : "All vendors";
+  const vendorSummary = vendorNames.length
+    ? vendorNames.join(", ")
+    : (typeof vendorNameMatcher === "function" ? "No matching vendors" : "All vendors");
   const introductionValues = buildIntroductionValues({
     syncTimeUtc: new Date().toISOString(),
     environment: nodeEnv,

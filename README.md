@@ -158,6 +158,7 @@ Token storage notes
 Store pricelist sync
 - Preview the store master pricelist export with `npm run export:master-pricelist:preview`.
 - Run the store master pricelist export with `npm run export:master-pricelist`.
+- The Google master pricelist export (Admin, CLI, and cron) includes only Deck Family Farm, Hyland, and Creamy Cow. Each export replaces the `prices` and `simple prices` contents, removing rows from other vendors. Other pricelist tools keep their own vendor scope.
 - The export wrapper loads this repo's `.env` by default and uses this app's configured store database. It does not call into a sibling Killdeer checkout.
 - Dry-run the store sync with `npm run sync:killdeer-pricelist`.
 - Apply the sync only when ready with `npm run sync:killdeer-pricelist -- --write`.

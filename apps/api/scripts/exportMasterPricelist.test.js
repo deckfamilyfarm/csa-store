@@ -60,6 +60,45 @@ function exportedProduct(result) {
   return Object.fromEntries(result.sheetValues[0].map((name, index) => [name, result.sheetValues[1][index]]));
 }
 
+test("Google master pricelist defaults to Deck Family Farm, Hyland, and Creamy Cow", () => {
+  const fixture = pricingFixture({
+    productRows: [
+      { id: 1, name: "Beef", vendorId: 1, categoryId: 1 },
+      { id: 2, name: "Cheese", vendorId: 2, categoryId: 1 },
+      { id: 3, name: "Milk", vendorId: 3, categoryId: 1 },
+      { id: 4, name: "Apples", vendorId: 4, categoryId: 1 },
+      { id: 5, name: "Unknown vendor", vendorId: 99, categoryId: 1 },
+      { id: 6, name: "Deleted beef", vendorId: 1, categoryId: 1, isDeleted: 1 },
+      { id: 7, name: "Membership", vendorId: 1, categoryId: 2 }
+    ],
+    vendorRows: [
+      { id: 1, name: "Deck Family Farm" },
+      { id: 2, name: "Hyland" },
+      { id: 3, name: "Creamy Cow" },
+      { id: 4, name: "Other Farm" }
+    ],
+    categoryRows: [{ id: 1, name: "Food" }, { id: 2, name: "Membership" }]
+  });
+  const result = buildPricelistSheetValues(fixture);
+  assert.deepEqual(result.sheetValues.slice(1).map(row => row[0]), [1, 2, 3]);
+  assert.deepEqual(result.vendorNames, ["Creamy Cow", "Deck Family Farm", "Hyland"]);
+  assert.equal(result.rowCount, 3);
+  assert.equal(buildSimplePricelistValues(result.sheetValues, "Prices").length, 4);
+
+  // Explicitly unfiltered callers can still build rows for other pricelist tools.
+  const allVendors = buildPricelistSheetValues({ ...fixture, vendorNameMatcher: null });
+  assert.deepEqual(allVendors.sheetValues.slice(1).map(row => row[0]), [4, 1, 2, 3, 5]);
+});
+
+test("a Google export with no matching vendors stays empty", () => {
+  const result = buildPricelistSheetValues(pricingFixture({
+    vendorRows: [{ id: 1, name: "Other Farm" }]
+  }));
+  assert.equal(result.rowCount, 0);
+  assert.deepEqual(result.vendorNames, []);
+  assert.equal(result.sheetValues.length, 1);
+});
+
 test("ended sales override stale profile sales and clear all sale-only cells", () => {
   for (const onSale of [false, 0, "false", "FALSE", "0", "", 2, "yes"]) {
     const result = buildPricelistSheetValues(pricingFixture({
