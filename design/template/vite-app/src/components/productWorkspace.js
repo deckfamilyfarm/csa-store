@@ -1,3 +1,5 @@
+import { canPublishInventory } from "../../../../../apps/api/lib/adminRoles.js";
+
 // Shared state and local-save rules for the Products grid and Details editor.
 export const FORMULA_FIELDS = [
   "unitOfMeasure",
@@ -21,7 +23,7 @@ export async function saveInventoryDraft(entry, capabilities, api) {
   const fields = dirtyFields(entry).filter(key => INVENTORY_FIELDS.includes(key));
   const result = { productId: entry.meta.productId, productName: entry.values.name, inventoryOnly: true, ok: false, savedFields: [], savedPackageIds: [], errors: [] };
   try {
-    if (!capabilities.edit || !capabilities.push) throw new Error("Product editing and Local Line Push permissions are required.");
+    if (!capabilities.edit || !capabilities.inventoryPush) throw new Error("Inventory Admin, or product editing and Local Line Push permissions, are required.");
     if (!Number.isInteger(Number(entry.defaults.vendorId)) || Number(entry.defaults.vendorId) <= 0) throw new Error("A vendor is required. Select a vendor in Details and save it in Pricing before publishing inventory.");
     const changes = Object.fromEntries(fields.map(key => [key, Number(entry.values[key])]));
     if (Object.hasOwn(changes, "inventory") && (!Number.isInteger(changes.inventory) || changes.inventory < 0)) throw new Error("Stock must be a nonnegative whole number.");
@@ -50,6 +52,7 @@ export function productCapabilities(roles = []) {
     pricing: has("pricing_admin", "local_pricelist_admin"),
     cachedPricing: has("pricing_admin"),
     push: has("localline_push"),
+    inventoryPush: canPublishInventory(roles),
     sync: has("localline_push", "square_push", "localline_pull", "square_pull", "pricing_admin"),
     schedule: has("pricing_admin"),
   };

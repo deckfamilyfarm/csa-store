@@ -2,7 +2,8 @@ import { getLocalLineAccessToken } from "../localLineAuth.js";
 import { isLocalLineEnabled, patchLocalLineProduct, fetchLocalLineProduct, resolveLocalLineVendor } from "../localLine.js";
 import { validateSavedProductVendor, confirmLocalLineVendor } from "./productVendor.js";
 import { ensureProductSyncSchema, withSyncLock } from "./productSyncSchema.js";
-import { fail, hasGrant, normalizeIds } from "./productSyncCore.js";
+import { fail, normalizeIds } from "./productSyncCore.js";
+import { canPublishInventory } from "./adminRoles.js";
 
 export function inventoryChanges(changes = {}) {
   const keys = Object.keys(changes);
@@ -23,7 +24,7 @@ export async function saveInventoryToLocalLine(productId, input, user) {
   const [id] = normalizeIds([productId]);
   const changes = inventoryChanges(input);
   const roles = user.adminRoles || [];
-  if (!hasGrant(roles, "localline_push") || !["inventory_admin", "pricing_admin", "local_pricelist_admin"].some(role => hasGrant(roles, role))) fail("Saving inventory requires product editing and Local Line Push permissions.", 403);
+  if (!canPublishInventory(roles)) fail("Saving inventory requires Inventory Admin, or product editing and Local Line Push permissions.", 403);
   if (!isLocalLineEnabled() || process.env.LOCALLINE_TEST === "true") fail("Local Line inventory publishing is not enabled.");
   await ensureProductSyncSchema();
   // Serialize with product publications, preserving their existing frozen approvals.

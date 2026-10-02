@@ -102,7 +102,8 @@ export function AdminManualSection({ focusTopic = "overview" }) {
           confirms the result before saving local inventory. It leaves pricing, sale,
           and image changes for the Pricing and Product Sync workflow. Inventory saves never send
           Square updates or mark pricing as pending. Failed inventory edits remain available to retry.
-          Local editing and Local Line Push permissions are required.
+          Inventory Admin allows these inventory saves without Local Line Push. Other product editors
+          need Local Line Push as well. All other Local Line publishing still requires Local Line Push.
         </p>
         <p>
           Inventory always shows Product, Vendor, Stock, Track Inventory, and Visible. Turn on

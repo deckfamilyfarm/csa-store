@@ -638,7 +638,7 @@ export function AdminProductsSection({
         {view === "inventory" ? "Save updates stock, tracking, and visibility locally and in Local Line. Track Inventory enables stock limits; Visible controls storefront availability. Pricing, sales, and images stay in Product Sync."
           : "Manage product details and pricing. Save changes locally; syncing and scheduling are in Product Sync. Use Inventory to send stock, tracking, and visibility changes directly to Local Line."}
       </p>
-      {view === "inventory" && !capabilities.push && <p className="small">Local Line Push permission is required to save inventory to Local Line.</p>}
+      {view === "inventory" && !capabilities.inventoryPush && <p className="small">Inventory Admin, or product editing and Local Line Push permissions, are required to save inventory to Local Line.</p>}
       {view === "inventory" && otherDrafts.length > 0 && <p className="small">{otherDrafts.length} products have other unsaved changes. Switch to Pricing to save those separately.</p>}
       <div className="admin-filters">
         <label>
@@ -739,7 +739,7 @@ export function AdminProductsSection({
             <>
               <button
                 className="button"
-                disabled={saving || busy || !saveCount || (view === "inventory" && !capabilities.push)}
+                disabled={saving || busy || !saveCount || (view === "inventory" && !capabilities.inventoryPush)}
                 onClick={save}
               >
                 {saving

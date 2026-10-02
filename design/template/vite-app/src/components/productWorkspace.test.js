@@ -64,11 +64,15 @@ test("a failed vendor assignment stops all dependent saves", async () => {
 test("role combinations keep editing, scheduling, cached pricing, and pushing separate", () => {
   assert.equal(productCapabilities(["inventory_admin"]).pricing, false);
   assert.equal(productCapabilities(["inventory_admin"]).edit, true);
+  assert.equal(productCapabilities(["inventory_admin"]).inventoryPush, true);
+  assert.equal(productCapabilities(["inventory_admin"]).push, false);
+  assert.equal(productCapabilities(["inventory_admin"]).sync, false);
   const local = productCapabilities(["local_pricelist_admin"]);
   assert.equal(local.pricing, true);
   assert.equal(local.schedule, false);
   assert.equal(local.cachedPricing, false);
   assert.equal(local.push, false);
+  assert.equal(local.inventoryPush, false);
   assert.equal(productCapabilities(["localline_pull"]).edit, false);
   assert.equal(productCapabilities(["localline_push"]).edit, false);
   assert.equal(productCapabilities(["pricing_admin"]).push, false);
@@ -219,7 +223,7 @@ test("acknowledging a save preserves changes made while its request was running"
 });
 test("Inventory saves push only dirty stock, tracking, and visibility fields and preserve other drafts", async () => {
   const entry=patchProductDraft({},product,{inventory:5,trackInventory:false,sourceUnitPrice:"12",onSale:true,visible:false})[7];
-  const result=await saveInventoryDraft(entry,productCapabilities(["admin"]),{
+  const result=await saveInventoryDraft(entry,productCapabilities(["inventory_admin"]),{
     post:async(path,body)=>{
       assert.equal(path,"products/7/inventory");
       assert.deepEqual(body,{changes:{inventory:5,trackInventory:0,visible:0}});
@@ -229,11 +233,27 @@ test("Inventory saves push only dirty stock, tracking, and visibility fields and
   assert.equal(result.ok,true);
   const remaining=acknowledgeSave(entry,entry,result.savedFields);
   assert.deepEqual(dirtyFields(remaining).sort(),["onSale","sourceUnitPrice"]);
-  const failure=await saveInventoryDraft(entry,productCapabilities(["admin"]),{post:async()=>{throw new Error("Local Line unavailable");}});
+  const failure=await saveInventoryDraft(entry,productCapabilities(["inventory_admin"]),{post:async()=>{throw new Error("Local Line unavailable");}});
   assert.equal(failure.ok,false); assert.deepEqual(failure.savedFields,[]);
   assert.ok(dirtyFields(acknowledgeSave(entry,entry,failure.savedFields)).includes("inventory"));
-  const denied=await saveInventoryDraft(entry,productCapabilities(["inventory_admin"]),{post:()=>assert.fail("No remote permission")});
-  assert.equal(denied.ok,false);
+});
+
+test("inventory saves preserve existing authorized editors and reject other role combinations", async () => {
+  const entry = patchProductDraft({}, product, { inventory: 5 })[7];
+  for (const roles of [["admin"], ["inventory_admin"], ["pricing_admin", "localline_push"], ["local_pricelist_admin", "localline_push"]]) {
+    const calls = [];
+    const result = await saveInventoryDraft(entry, productCapabilities(roles), {
+      post: async (path, body) => { calls.push({ path, body }); return { ok: true, localLineUpdate: true }; },
+    });
+    assert.equal(result.ok, true, roles.join(","));
+    assert.deepEqual(calls, [{ path: "products/7/inventory", body: { changes: { inventory: 5 } } }]);
+  }
+  for (const roles of [[], ["pricing_admin"], ["local_pricelist_admin"], ["localline_push"], ["localline_pull"], ["membership_admin", "localline_push"]]) {
+    const result = await saveInventoryDraft(entry, productCapabilities(roles), { post: () => assert.fail("No inventory publishing permission") });
+    assert.equal(result.ok, false, roles.join(","));
+    assert.deepEqual(result.savedFields, []);
+    assert.deepEqual(dirtyFields(acknowledgeSave(entry, entry, result.savedFields)), ["inventory"]);
+  }
 });
 
 test("only supported unsaved fields can be scheduled", () => {

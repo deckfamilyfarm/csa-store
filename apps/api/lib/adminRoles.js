@@ -12,7 +12,7 @@ export const ADMIN_ROLE_DEFINITIONS = [
   {
     key: "inventory_admin",
     label: "Inventory Admin",
-    description: "Manage product details, images, inventory, visibility, stock, and sales in Products."
+    description: "Manage product details, images, inventory, visibility, stock, and sales in Products. Publish stock, tracking, and visibility to Local Line from Inventory."
   },
   {
     key: "pricing_admin",
@@ -117,4 +117,13 @@ export function hasAdminPermission(roleKeys = [], required = []) {
   if (assigned.has("admin")) return true;
   const requiredList = Array.isArray(required) ? required : [required];
   return requiredList.some((role) => assigned.has(normalizeAdminRoleKey(role)));
+}
+
+// This grant applies only to the dedicated stock/tracking/visibility save.
+// Other Local Line publications still require localline_push.
+export function canPublishInventory(roleKeys = []) {
+  return hasAdminPermission(roleKeys, "inventory_admin") || (
+    hasAdminPermission(roleKeys, ["pricing_admin", "local_pricelist_admin"]) &&
+    hasAdminPermission(roleKeys, "localline_push")
+  );
 }

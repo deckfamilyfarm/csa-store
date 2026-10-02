@@ -308,6 +308,7 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
   assert.equal((await waitForRelease(nextApproval.id)).status,"completed");
   assert.equal(requests.filter(row=>row.path.endsWith('/products/1120/')&&row.method==='PATCH').length,1,"Retries and status polling never resend the confirmed Local Line change");
   const {saveInventoryToLocalLine}=await import('./inventorySync.js');
+  const inventoryUser = { userId: 1, adminRoles: ["inventory_admin"] };
   await product(130);
   await pool.query("UPDATE product_pricing_profiles SET remote_sync_status='synced', updated_at='2026-01-01', remote_synced_at='2026-01-02' WHERE product_id=130");
   const [[profileBefore]]=await pool.query("SELECT * FROM product_pricing_profiles WHERE product_id=130");
@@ -320,7 +321,7 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
   assert.ok(!Object.hasOwn(llPriceAction.payload,'track_inventory'));
   assert.ok(!Object.hasOwn(llPriceAction.payload,'visible'));
   const startRequests=requests.length;
-  const inventoryResult=await saveInventoryToLocalLine(130,{inventory:7,trackInventory:1,visible:0},user);
+  const inventoryResult=await saveInventoryToLocalLine(130,{inventory:7,trackInventory:1,visible:0},inventoryUser);
   assert.equal(inventoryResult.localLineUpdate,true);
   const inventoryRequests=requests.slice(startRequests);
   assert.deepEqual(inventoryRequests.filter(row=>row.method==='PATCH').map(row=>row.body),[{set_inventory:7,track_inventory:true,visible:false}]);
@@ -336,12 +337,13 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
   assert.equal(remoteProducts.get(1130).inventory,7,"Product Sync must not overwrite inventory");
   assert.equal(remoteProducts.get(1130).visible,false,"An unrelated pricing release must not overwrite visibility");
   await pool.query("UPDATE product_pricing_profiles SET remote_sync_status='pending' WHERE product_id=130");
-  await saveInventoryToLocalLine(130,{inventory:6},user);
-  await saveInventoryToLocalLine(130,{visible:1},user);
+  await saveInventoryToLocalLine(130,{inventory:6},inventoryUser);
+  await saveInventoryToLocalLine(130,{visible:1},inventoryUser);
   assert.equal(remoteProducts.get(1130).visible,true);
   assert.equal((await service.pendingProductSync()).rows.some(row=>row.productId===130),true,"Inventory does not clear pending pricing changes");
-  await assert.rejects(saveInventoryToLocalLine(130,{inventory:4},{adminRoles:['inventory_admin']}),/permissions/);
-  await assert.rejects(saveInventoryToLocalLine(130,{inventory:4,onSale:0},user),/stock, inventory tracking, and visibility only/);
+  await assert.rejects(saveInventoryToLocalLine(130,{inventory:4},{adminRoles:['pricing_admin']}), {status:403});
+  await assert.rejects(saveInventoryToLocalLine(130,{inventory:4},{adminRoles:['localline_push']}), {status:403});
+  await assert.rejects(saveInventoryToLocalLine(130,{inventory:4,onSale:0},inventoryUser),/stock, inventory tracking, and visibility only/);
   await product(131,false);
   await assert.rejects(saveInventoryToLocalLine(131,{inventory:1},user),/Create and link/);
   remoteProducts.delete(1130);

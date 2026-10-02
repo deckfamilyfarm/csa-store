@@ -167,7 +167,7 @@ Products workspace
 - Use inline controls for formula inputs, stock, visibility, sales, and single-package prices. **Details** shares those edits and manages descriptions, images, and multiple packages.
 - **Save Local Changes** saves to CSA Store and retains failed fields for retry. **Review & Push** lets you select products and review whether each creates or updates a Local Line record. Results retain errors and Local Line IDs.
 - **Schedule Changes** supports stock, tracking, visibility, and sales. Save formula/package/Details changes first, then use **Schedule Pending Pushes**. Scheduled releases apply local values and push at the selected time.
-- Column preferences are saved per view; old pricelist preferences carry into Pricing. Existing role keys and assignments are unchanged. Scheduling requires Pricing Admin; manual pushing requires Local Line Push.
+- Column preferences are saved per view; old pricelist preferences carry into Pricing. Existing role keys and assignments are unchanged. Scheduling requires Pricing Admin. Inventory Admin can use **Save Inventory to Local Line** to publish stock, tracking, and visibility; other product editors also need Local Line Push. All other Local Line publishing requires Local Line Push.
 - Focused regression checks: `node --test design/template/vite-app/src/components/productWorkspace.test.js apps/api/lib/productWorkspaceFilters.test.js apps/api/lib/scheduledPricelistReleases.test.js apps/api/localLine.test.js apps/api/lib/productImageUpload.test.js` (Node 22.13+ for the in-memory SQLite filter fixtures).
 
 Local Line sync

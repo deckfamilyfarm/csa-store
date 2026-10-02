@@ -29,6 +29,8 @@ test("approval requires every destination's push grant and separate local/schedu
   const square = { ...action(), staged: {} }, ll = { ...action("localline"), staged: {} };
   assert.doesNotThrow(() => authorizeRelease(["square_push"], [square]));
   assert.throws(() => authorizeRelease(["pricing_admin"], [square]), /Push permission/);
+  assert.throws(() => authorizeRelease(["inventory_admin"], [ll]), /Push permission/);
+  assert.throws(() => authorizeRelease(["inventory_admin"], [square]), /Push permission/);
   assert.throws(() => authorizeRelease(["square_push"], [square, ll]), /Push permission/);
   assert.throws(() => authorizeRelease(["square_push"], [square], true), /Scheduling/);
   assert.throws(() => authorizeRelease(["square_push"], [action()]), /local product editing/);
