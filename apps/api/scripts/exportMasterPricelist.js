@@ -16,7 +16,7 @@ import {
   computeProductPricingSnapshot,
   isSourcePricingVendor
 } from "../lib/productPricing.js";
-import { ensureLocalLineSyncSchema, ensureProductPricingSchema, getDb, isMissingTableError } from "../db.js";
+import { ensureLocalLineSyncSchema, ensureProductPricingSchema, getDb, getPool, isMissingTableError } from "../db.js";
 import { getPricelistPublishWeek, recordGoogleDrivePublish } from "../lib/googleDrivePublishing.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -159,6 +159,11 @@ function toNumber(value) {
 
 function toBooleanLabel(value) {
   return value ? "True" : "False";
+}
+
+function isSaleEnabled(value) {
+  return value === true || value === 1 ||
+    (typeof value === "string" && ["true", "1"].includes(value.trim().toLowerCase()));
 }
 
 function formatDateTime(value) {
@@ -667,7 +672,7 @@ async function formatGoogleSheetNoteRow({
   });
 }
 
-async function updateGoogleSheet({ accessToken, spreadsheetId, sheetName, values, createIfMissing = false }) {
+export async function updateGoogleSheet({ accessToken, spreadsheetId, sheetName, values, createIfMissing = false }) {
   const sheetInfo = await getGoogleSheetInfo({ accessToken, spreadsheetId, sheetName, createIfMissing });
   const resolvedSheetName = sheetInfo.sheetName;
   const quotedSheetName = `'${resolvedSheetName.replace(/'/g, "''")}'`;
@@ -678,6 +683,7 @@ async function updateGoogleSheet({ accessToken, spreadsheetId, sheetName, values
   const range = `${quotedSheetName}!A1:${endColumn}${rowCount}`;
   const baseUrl = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values`;
 
+  // Clear the entire tab, including rows beyond the new export and old sale formulas.
   await googleSheetRequest(`${baseUrl}/${encodedSheet}:clear`, {
     method: "POST",
     headers: {
@@ -819,6 +825,22 @@ async function buildSheetValues({ vendorNameMatcher = null } = {}) {
     }
   }
 
+  return buildPricelistSheetValues({
+    productRows, packageRows, profileRows, saleRows, categoryRows, vendorRows,
+    packageMetaRows, vendorNameMatcher
+  });
+}
+
+export function buildPricelistSheetValues({
+  productRows = [],
+  packageRows = [],
+  profileRows = [],
+  saleRows = [],
+  categoryRows = [],
+  vendorRows = [],
+  packageMetaRows = [],
+  vendorNameMatcher = null
+} = {}) {
   const categoryMap = new Map(categoryRows.map((row) => [Number(row.id), row.name || "Uncategorized"]));
   const vendorMap = new Map(vendorRows.map((row) => [Number(row.id), row]));
   const saleByProductId = new Map(saleRows.map((row) => [Number(row.productId), row]));
@@ -860,21 +882,24 @@ async function buildSheetValues({ vendorNameMatcher = null } = {}) {
 
   for (const product of filteredProducts) {
     const productId = Number(product.id);
+    const pricingProfile = profileByProductId.get(productId) || null;
+    const saleRow = saleByProductId.get(productId) || null;
     const snapshot = computeProductPricingSnapshot({
       product,
       packages: packagesByProductId.get(productId) || [],
       packageMetaByPackageId,
       vendor: vendorMap.get(Number(product.vendorId)) || null,
-      profile: profileByProductId.get(productId) || {
+      profile: {
+        ...pricingProfile,
         productId,
-        onSale: saleByProductId.get(productId)?.onSale ?? 0,
-        saleDiscount: saleByProductId.get(productId)?.saleDiscount ?? 0
+        // Match Products: an explicit sale record overrides the profile, including false.
+        onSale: isSaleEnabled(saleRow?.onSale ?? pricingProfile?.onSale ?? false),
+        saleDiscount: saleRow?.saleDiscount ?? pricingProfile?.saleDiscount ?? 0
       }
     });
 
     const vendor = vendorMap.get(Number(product.vendorId)) || null;
     const usesSourcePricing = isSourcePricingVendor(vendor);
-    const saleRow = saleByProductId.get(productId) || null;
     const chosenPackageRow =
       snapshot.packageRows
         .filter((row) => toNumber(row.basePrice) !== null)
@@ -1056,8 +1081,13 @@ const isDirectExecution =
   process.argv[1] && path.resolve(process.argv[1]) === __filename;
 
 if (isDirectExecution) {
-  main().catch((error) => {
-    console.error(error?.message || error);
-    process.exit(1);
-  });
+  main()
+    .finally(async () => {
+      // CLI runs own the pool; API imports must leave their shared pool open.
+      await getPool().end();
+    })
+    .catch((error) => {
+      console.error(error?.message || error);
+      process.exitCode = 1;
+    });
 }

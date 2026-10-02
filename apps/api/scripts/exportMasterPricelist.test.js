@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildSimplePricelistValues } from "./exportMasterPricelist.js";
+import {
+  buildPricelistSheetValues,
+  buildSimplePricelistValues,
+  updateGoogleSheet
+} from "./exportMasterPricelist.js";
 
 const columns = [
   "id", "localLineProductID", "category", "vendor", "productName", "retailSalesPrice",
@@ -36,4 +40,133 @@ test("source headers determine references and apostrophes in tab names are escap
 test("empty exports keep headers and incomplete source columns fail before publishing", () => {
   assert.equal(buildSimplePricelistValues([columns], "Prices").length, 1);
   assert.throws(() => buildSimplePricelistValues([["id"]], "Prices"), /Missing source pricelist column/);
+});
+
+function pricingFixture(overrides = {}) {
+  return {
+    productRows: [{ id: 42, name: "Milk", vendorId: 1, categoryId: 1 }],
+    packageRows: [{ id: 100, productId: 42, name: "Bottle", price: 10 }],
+    profileRows: [{
+      productId: 42, sourceUnitPrice: 10, unitOfMeasure: "each",
+      onSale: 1, saleDiscount: 0.25
+    }],
+    categoryRows: [{ id: 1, name: "Dairy" }],
+    vendorRows: [{ id: 1, name: "Deck Family Farm" }],
+    ...overrides
+  };
+}
+
+function exportedProduct(result) {
+  return Object.fromEntries(result.sheetValues[0].map((name, index) => [name, result.sheetValues[1][index]]));
+}
+
+test("ended sales override stale profile sales and clear all sale-only cells", () => {
+  for (const onSale of [false, 0, "false", "FALSE", "0", "", 2, "yes"]) {
+    const result = buildPricelistSheetValues(pricingFixture({
+      saleRows: [{ productId: 42, onSale, saleDiscount: 0.25 }]
+    }));
+    const row = exportedProduct(result);
+    assert.equal(row.sale, "", `sale flag ${JSON.stringify(onSale)}`);
+    assert.equal(row.saleDiscount, "");
+    assert.equal(row.squareSalePrice, "");
+    // Ended sales stay in the regular pricelist with their ordinary prices.
+    assert.equal(result.rowCount, 1);
+    assert.equal(row.retailSalesPrice, 10);
+    assert.ok(row.ffcsaMemberSalesPrice.startsWith("=IF("));
+  }
+});
+
+test("explicitly active sales use the current sale discount instead of the stale profile", () => {
+  for (const onSale of [true, 1, "true", " TRUE ", "1"]) {
+    const fixture = pricingFixture({ saleRows: [{ productId: 42, onSale, saleDiscount: "0.10" }] });
+    fixture.profileRows[0].onSale = 0;
+    const row = exportedProduct(buildPricelistSheetValues(fixture));
+    assert.equal(row.sale, "TRUE", `sale flag ${JSON.stringify(onSale)}`);
+    assert.equal(row.saleDiscount, 0.1);
+    assert.ok(row.squareSalePrice.startsWith('=IF(K2,'));
+    assert.ok(row.squareSalePrice.endsWith(',"")'));
+  }
+});
+
+test("profile-only sales remain supported but missing or false flags never enable a sale", () => {
+  const fixture = pricingFixture();
+  assert.equal(exportedProduct(buildPricelistSheetValues(fixture)).sale, "TRUE");
+  fixture.profileRows[0].onSale = "false";
+  assert.equal(exportedProduct(buildPricelistSheetValues(fixture)).sale, "");
+  delete fixture.profileRows[0].onSale;
+  assert.equal(exportedProduct(buildPricelistSheetValues(fixture)).saleDiscount, "");
+  fixture.profileRows = [];
+  fixture.saleRows = [{ productId: 42, onSale: true, saleDiscount: 0.15 }];
+  assert.equal(exportedProduct(buildPricelistSheetValues(fixture)).saleDiscount, 0.15);
+});
+
+test("refresh replaces ended sales and removes old rows from both Google pricelist tabs", async (t) => {
+  const tabs = new Map([
+    ["Prices", { sheetId: 0, values: [] }],
+    ["simple prices", { sheetId: 1, values: [] }]
+  ]);
+  const clears = [];
+  t.mock.method(globalThis, "fetch", async (url, options = {}) => {
+    const requestUrl = new URL(url);
+    if (!requestUrl.pathname.includes("/values/")) {
+      return { ok: true, json: async () => ({ sheets: [...tabs].map(([title, tab]) => ({
+        properties: { title, sheetId: tab.sheetId, gridProperties: { rowCount: 1000, columnCount: 30 } }
+      })) }) };
+    }
+    const range = decodeURIComponent(requestUrl.pathname.split("/values/")[1]);
+    if (options.method === "POST") {
+      // A whole-tab clear must reach rows/columns beyond the new export dimensions.
+      const match = range.match(/^'([^']+)':clear$/);
+      assert.ok(match, `Expected a whole-tab clear, received ${range}`);
+      tabs.get(match[1]).values = [];
+      clears.push(match[1]);
+    } else {
+      assert.equal(options.method, "PUT");
+      const title = range.match(/^'([^']+)'!/)[1];
+      const tab = tabs.get(title);
+      assert.deepEqual(tab.values, [], "Clear old values before writing the new export");
+      tab.values = JSON.parse(options.body).values;
+    }
+    return { ok: true };
+  });
+
+  const initial = buildPricelistSheetValues(pricingFixture()).sheetValues;
+  tabs.get("Prices").values = [...initial, [99, "Removed sale product", "old sale formula"]];
+  tabs.get("simple prices").values = [...buildSimplePricelistValues(initial, "Prices"), ["old row"]];
+
+  const refreshed = buildPricelistSheetValues(pricingFixture({
+    saleRows: [{ productId: 42, onSale: false, saleDiscount: 0.25 }]
+  })).sheetValues;
+  const simpleValues = buildSimplePricelistValues(refreshed, "Prices");
+  for (const [sheetName, values] of [["prices", refreshed], ["simple prices", simpleValues]]) {
+    await updateGoogleSheet({ accessToken: "test-token", spreadsheetId: "test-sheet", sheetName, values });
+  }
+  assert.deepEqual(clears, ["Prices", "simple prices"]);
+  assert.deepEqual(tabs.get("Prices").values, refreshed);
+  assert.deepEqual(tabs.get("simple prices").values, simpleValues);
+  assert.deepEqual(tabs.get("Prices").values[1].slice(10, 13), ["", "", ""]);
+  assert.equal(tabs.get("Prices").values.length, 2);
+  assert.equal(tabs.get("simple prices").values.length, 2);
+
+  // An empty catalog must remove the final product, too, leaving only headers.
+  const empty = buildPricelistSheetValues().sheetValues;
+  for (const [sheetName, values] of [["Prices", empty], ["simple prices", buildSimplePricelistValues(empty, "Prices")]]) {
+    await updateGoogleSheet({ accessToken: "test-token", spreadsheetId: "test-sheet", sheetName, values });
+    assert.equal(tabs.get(sheetName).values.length, 1);
+  }
+});
+
+test("a failed Google clear aborts the export instead of claiming stale rows were removed", async (t) => {
+  const methods = [];
+  t.mock.method(globalThis, "fetch", async (_url, options = {}) => {
+    methods.push(options.method || "GET");
+    if (!options.method) {
+      return { ok: true, json: async () => ({ sheets: [{ properties: { sheetId: 0, title: "prices" } }] }) };
+    }
+    return { ok: false, status: 403, statusText: "Forbidden", text: async () => "Clear failed" };
+  });
+  await assert.rejects(updateGoogleSheet({
+    accessToken: "test-token", spreadsheetId: "test-sheet", sheetName: "prices", values: [columns]
+  }), /Google Sheets request failed: 403 Forbidden Clear failed/);
+  assert.deepEqual(methods, ["GET", "POST"]);
 });
