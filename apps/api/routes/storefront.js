@@ -9,7 +9,8 @@ const wrap = fn => async (req, res) => {
   try { await fn(req, res, getStorefrontService()); }
   catch (error) {
     if (!error.status) console.error('Storefront request failed:', error.message);
-    res.status(error.status || 500).json({ error: error.status ? error.message : 'Unable to complete the request. Please try again.' });
+    res.status(error.status || 500).json({ error: error.status ? error.message : 'Unable to complete the request. Please try again.',
+      ...(error.checkoutRejected ? { checkoutRejected: true } : {}) });
   }
 };
 const token = req => String(req.headers.authorization || '').replace(/^Bearer /, '');
@@ -26,7 +27,7 @@ function limitCheckout(req, res, next) {
 }
 storefrontRouter.get('/sale', wrap(async (_req, res, service) => res.json(await service.catalog())));
 storefrontRouter.get('/settings', wrap(async (_req, res, service) => res.set('Cache-Control', 'no-store').json(await service.storeSettings())));
-storefrontRouter.post('/checkout', limitCheckout, wrap(async (req, res, service) => res.json(await service.checkout(req.body))));
+storefrontRouter.post('/checkout', limitCheckout, wrap(async (req, res, service) => res.json(await service.checkout(req.body, req.get('origin')))));
 storefrontRouter.get('/orders/:id', wrap(async (req, res, service) => res.json(await service.guestOrder(req.params.id, token(req)))));
 storefrontRouter.post('/orders/:id/reconcile', limitCheckout, wrap(async (req, res, service) => {
   res.json(await service.reconcile(req.params.id, token(req)));

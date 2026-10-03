@@ -8,16 +8,11 @@
 .turkey-banner .subscribe-title { max-width:12ch; }
 .turkey-banner .subscribe-lede { white-space:pre-line; max-width:46ch; }
 .turkey-banner .eyebrow { color:#e7ddbd; }
-.turkey-farm-story { display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:48px; align-items:center; margin-top:50px; padding:38px; background:#f6f1e780; border-radius:24px; }
-.turkey-farm-story > div { max-width:440px; }
-.turkey-holiday-photo { min-width:0; margin:0; overflow:hidden; border-radius:20px; box-shadow:0 16px 35px #26301e20; }
-.turkey-holiday-photo img { display:block; width:100%; height:auto; }
 .turkey-eyebrow { display:block; font-size:11px; font-weight:bold; letter-spacing:1.8px; text-transform:uppercase; margin-bottom:14px; }
-.turkey-date { font-weight:bold; font-size:15px; color:white; }
 .turkey-page .turkey-button { background:var(--barn); color:white; border:0; font-weight:bold; border-radius:999px; padding:16px 22px; display:inline-flex; justify-content:center; gap:25px; text-decoration:none; cursor:pointer; }
 .turkey-page button:disabled { opacity:.55; cursor:not-allowed; }
 .turkey-page main button:not(.turkey-button),.turkey-admin button { border:1px solid #b8bdb0; border-radius:8px; padding:9px 12px; cursor:pointer; background:#fff; color:var(--ink); }
-.turkey-content { max-width:1320px; padding:48px 40px 0; margin:auto; }
+.turkey-content { max-width:1320px; padding:32px 40px 56px; margin:auto; }
 .turkey-card { border:1px solid var(--line); background:white; padding:28px; border-radius:18px; margin-bottom:24px; }
 .turkey-page h2 { font:600 36px/1.15 var(--subscribe-serif); margin:10px 0 20px; }
 .turkey-page h3 { font:600 29px/1.2 var(--subscribe-serif); margin:0 0 10px; }
@@ -44,9 +39,9 @@
 .turkey-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; }
 .turkey-fields > * { min-width:0; }
 .turkey-fields label { display:flex; flex-direction:column; gap:8px; font-size:14px; }
-.turkey-page input,.turkey-admin input,.turkey-admin textarea,.turkey-admin select { font:inherit; border:1px solid #b8bdb0; border-radius:4px; padding:11px; background:white; color:#203c30; max-width:100%; min-width:0; }
+.turkey-page input,.turkey-page select,.turkey-admin input,.turkey-admin textarea,.turkey-admin select { font:inherit; border:1px solid #b8bdb0; border-radius:4px; padding:11px; background:white; color:#203c30; max-width:100%; min-width:0; }
 .turkey-page input[type=radio],.turkey-admin input[type=checkbox] { accent-color:#203c30; }
-.turkey-page input:focus-visible,.turkey-page button:focus-visible,.turkey-page a:focus-visible,.turkey-admin :focus-visible { outline:3px solid #b87c37; outline-offset:3px; }
+.turkey-page input:focus-visible,.turkey-page select:focus-visible,.turkey-page button:focus-visible,.turkey-page a:focus-visible,.turkey-admin :focus-visible { outline:3px solid #b87c37; outline-offset:3px; }
 .turkey-wide { grid-column:1 / -1; }
 .turkey-checkout { position:sticky; top:140px; background:var(--cream); box-shadow:var(--shadow); }
 .turkey-checkout h2 { font-size:30px; }
@@ -60,7 +55,7 @@
 .turkey-confirmation { max-width:760px; margin:0 auto 40px; }
 .turkey-pickup-summary { border-top:1px solid #d8dace; margin-top:20px; padding-top:22px; }
 .turkey-actions { display:flex; gap:10px; flex-wrap:wrap; margin:16px 0; }
-.turkey-footer-note { padding:45px 0 60px; border-top:1px solid #d8dace; margin-top:40px; text-align:center; }
+.turkey-order-reference { overflow-wrap:anywhere; }
 .turkey-admin-tabs { display:flex; gap:10px; margin:20px 0; }
 .turkey-admin-tabs button.active { background:#203c30; color:white; }
 .turkey-admin h4 { font-size:19px; margin:24px 0 14px; }
@@ -91,7 +86,68 @@
 .turkey-stock-totals > div { border:1px solid var(--line); border-radius:12px; padding:20px; background:white; }
 .turkey-stock-totals strong,.turkey-stock-totals span { display:block; }
 .turkey-stock-totals strong { font-size:30px; color:var(--field); }
-@media (max-width:950px) { .turkey-order-layout { grid-template-columns:1fr; } .turkey-checkout { position:static; } .turkey-farm-story { gap:24px; padding:24px; } }
-@media (max-width:650px) { .turkey-banner { padding:0; } .turkey-banner-image { position:relative; z-index:0; height:290px; object-position:65% center; } .turkey-banner::after { display:none; } .turkey-banner .subscribe-hero-copy { padding:28px 0 36px; } .turkey-farm-story { grid-template-columns:1fr; padding:20px; } .turkey-content { padding:25px 18px 0; } .turkey-card { padding:22px; } .turkey-options,.turkey-fields { grid-template-columns:1fr; } .turkey-page h2 { font-size:30px; } .turkey-stock-totals { grid-template-columns:repeat(2,minmax(0,1fr)); } }
-@media (max-width:640px) { .turkey-page .subscribe-header-utility { position:static; align-self:center; } }
+@media (max-width:950px) { .turkey-order-layout { grid-template-columns:1fr; } .turkey-checkout { position:static; } }
+@media (max-width:650px) { .turkey-banner { padding:0; } .turkey-banner-image { position:relative; z-index:0; height:290px; object-position:65% center; } .turkey-banner::after { display:none; } .turkey-banner .subscribe-hero-copy { padding:28px 0 36px; } .turkey-content { padding:25px 18px 0; } .turkey-card { padding:22px; } .turkey-options,.turkey-fields { grid-template-columns:1fr; } .turkey-page h2 { font-size:30px; } .turkey-stock-totals { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media print { body:has(.turkey-print-orders) * { visibility:hidden; } body:has(.turkey-print-orders) .turkey-print-orders,body:has(.turkey-print-orders) .turkey-print-orders * { visibility:visible; } body:has(.turkey-print-orders) .turkey-print-orders { position:absolute; top:0; left:0; width:100%; overflow:visible; font-size:10pt; } .turkey-print-orders .no-print { display:none; } .turkey-print-orders tr { break-inside:avoid; } }
+
+/* Product listing, details, and cart share the farm's public-page typography. */
+.turkey-shop-nav { display:flex; justify-content:space-between; gap:20px; border-bottom:1px solid var(--line); padding:0 0 20px; margin-bottom:36px; }
+.turkey-shop-nav a { color:var(--ink); font-weight:600; text-underline-offset:5px; }
+.turkey-shop-nav a[aria-current=page] { color:var(--barn); }
+.turkey-listing { max-width:1020px; margin:0 auto; }
+.turkey-listing-card { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:48px; align-items:center; padding:28px 0; }
+.turkey-listing-card .turkey-product-photo { aspect-ratio:1; margin:0; }
+.turkey-listing-card h2 { font-size:48px; }
+.turkey-detail { max-width:1060px; margin:0 auto; }
+.turkey-detail h1,.turkey-cart-page h1 { font:600 clamp(38px,5vw,60px)/1.1 var(--subscribe-serif); margin:24px 0 34px; }
+.turkey-back-link { display:inline-block; margin-bottom:20px; text-underline-offset:4px; color:var(--ink); }
+.turkey-detail-intro { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); align-items:start; gap:48px; margin-bottom:36px; }
+.turkey-detail-photo { width:100%; aspect-ratio:1; object-fit:cover; border-radius:14px; }
+.turkey-detail-intro h2 { font-size:34px; }
+.turkey-detail-pickup { padding-top:20px; border-top:1px solid var(--line); font-weight:600; }
+.turkey-selections { padding:32px; }
+.turkey-selections .turkey-fields { grid-template-columns:1fr 1fr 120px; }
+.turkey-selections select { width:100%; min-height:48px; }
+.turkey-breed-description { margin-top:28px; max-width:760px; }
+.turkey-selection-price { margin:24px 0; }
+.turkey-selection-price .turkey-price { margin-bottom:4px; }
+.turkey-selection-price p { margin-top:4px; }
+.turkey-product-description p { white-space:pre-line; }
+.turkey-product-description ul,.turkey-product-description ol { padding-left:24px; line-height:1.7; }
+.turkey-cart-item { display:grid; grid-template-columns:90px minmax(0,1fr) auto; align-items:start; gap:18px; }
+.turkey-cart-item > img { width:90px; aspect-ratio:1; object-fit:cover; border-radius:8px; }
+.turkey-cart-item > div { grid-column:2; min-width:0; }
+.turkey-cart-item > strong { grid-column:3; white-space:nowrap; }
+.turkey-cart-item h2 { font-size:26px; margin:0 0 10px; }
+.turkey-cart-item p { margin:8px 0; }
+.turkey-cart-controls { display:flex; gap:12px; align-items:end; flex-wrap:wrap; margin-top:18px; }
+.turkey-cart-controls label { display:flex; flex-direction:column; gap:6px; font-size:14px; }
+.turkey-cart-controls input { width:90px; }
+.turkey-customer-form { border:0; margin:0; padding:0; min-width:0; }
+.turkey-page main .turkey-refresh { display:block; margin:14px auto 0; font-size:13px; }
+@media (max-width:750px) {
+  .turkey-listing-card,.turkey-detail-intro { grid-template-columns:1fr; gap:24px; }
+  .turkey-listing-card { padding:0; }
+  .turkey-listing-card h2 { font-size:38px; }
+  .turkey-selections .turkey-fields { grid-template-columns:1fr; }
+  .turkey-selections { padding:22px; }
+  .turkey-detail-photo { max-height:440px; }
+  .turkey-cart-item { grid-template-columns:64px minmax(0,1fr); padding:18px; gap:12px; }
+  .turkey-cart-item > img { width:64px; }
+  .turkey-cart-item > strong { grid-column:2; }
+  .turkey-cart-item h2 { font-size:24px; }
+}
+
+.turkey-pickup-info { margin-top:56px; padding-top:40px; border-top:1px solid var(--line); scroll-margin-top:140px; }
+.turkey-pickup-intro { max-width:880px; margin-bottom:28px; }
+.turkey-location-cards { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; }
+.turkey-location-card { margin:0; }
+.turkey-location-address,.turkey-location-instructions { white-space:pre-line; }
+.turkey-pickup-notes { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:32px; margin-top:28px; padding:28px; border-radius:18px; background:var(--cream); }
+.turkey-pickup-notes h3 { font-size:26px; }
+.turkey-pickup-notes p { margin-bottom:0; }
+.turkey-pickup-notes a { text-decoration:underline; text-underline-offset:3px; font-weight:600; }
+@media (max-width:750px) {
+  .turkey-location-cards,.turkey-pickup-notes { grid-template-columns:1fr; }
+  .turkey-pickup-notes { padding:22px; gap:24px; }
+}

@@ -114,9 +114,6 @@ export function HomeLandingPage({
   catalogError = "",
   getPrice,
   onSelectProduct,
-  isLoggedIn = false,
-  isAdmin = false,
-  onAuthAction = null,
   subscribeUrl = "#/subscribe",
   siteContent = {}
 }) {
@@ -227,17 +224,12 @@ export function HomeLandingPage({
     [subscribeUrl, showProducts]
   );
 
-  const authLabel = isLoggedIn ? (isAdmin ? "Admin" : "Account") : "Log in";
   const copy = (section, field, fallback) =>
     getSiteContentValue(siteContent, "home", section, field, fallback);
 
   return (
     <div className={`subscribe-page home-landing-page${showProducts ? '' : ' home-coming-soon'}`}>
-      <DeckPageHeader
-        navLinks={navLinks}
-        authLabel={onAuthAction ? authLabel : ""}
-        onAuthAction={onAuthAction}
-      />
+      <DeckPageHeader navLinks={navLinks} />
 
       {staffPreview || previewError ? <div className="container home-store-preview" role="status">
         {staffPreview ? <>Staff preview — visitors still see the saved store visibility. <a href="/?experience=store#/admin">Return to admin</a></> : <>{previewError} <a href="/?experience=store#/admin">Sign in to admin</a></>}

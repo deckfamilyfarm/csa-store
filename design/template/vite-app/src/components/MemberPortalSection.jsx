@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { DeckPageHeader } from "./DeckPageHeader.jsx";
+import { SubscribeFooter } from "./SubscribeFooter.jsx";
 import { MEMBER_PORTAL_LINK_ENABLED } from "../portalFeatureFlags.js";
 import {
   cancelMemberSubscription,
@@ -965,53 +966,7 @@ export function MemberPortalSection({
       </div>
       </section>
 
-      <footer className="subscribe-footer">
-        <div className="container subscribe-footer-row">
-          <div className="subscribe-footer-brand">
-            <div className="subscribe-footer-brand-top">
-              <img
-                className="subscribe-footer-logo"
-                src="/images/subscribe-footer-logo.avif"
-                alt="Deck Family Farm icon logo"
-              />
-              <strong className="subscribe-footer-wordmark">Deck Family Farm</strong>
-            </div>
-            <div className="small">
-              Full Farm CSA is Deck Family Farm’s CSA membership program, featuring
-              pasture-raised food from our farm and trusted local partners, with convenient
-              neighborhood pickup sites and home delivery.
-            </div>
-          </div>
-          <div className="subscribe-footer-contact">
-            <div>25362 High Pass Road</div>
-            <div>Junction City, OR 97448</div>
-            <div>
-              <a href="tel:15413210925">541-321-0925</a>
-            </div>
-            <div>
-              <a href="mailto:fullfarmcsa@deckfamilyfarm.com">fullfarmcsa@deckfamilyfarm.com</a>
-            </div>
-          </div>
-          <div className="subscribe-footer-links">
-            <a
-              className="subscribe-review-link"
-              href="https://app.goodreviews.io/mode?type=link&grid=GRI_ZN9UOZ3YIM5"
-              target="_blank"
-              rel="noreferrer"
-            >
-              <span className="subscribe-review-link-star" aria-hidden="true">
-                ☆
-              </span>
-              <span>Leave us a Review!</span>
-            </a>
-          </div>
-        </div>
-        {canAccessAdmin && adminUrl ? (
-          <div className="container member-portal-footer-admin">
-            <a href={adminUrl}>Admin portal</a>
-          </div>
-        ) : null}
-      </footer>
+      <SubscribeFooter />
     </div>
   );
 }

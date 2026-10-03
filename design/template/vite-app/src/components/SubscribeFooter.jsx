@@ -20,7 +20,7 @@ export function SubscribeFooter({
           <div className="small">
             Full Farm is Deck Family Farm's membership program, featuring pasture-raised food from
             our farm and trusted local partners, with convenient neighborhood pickup sites and home
-            delivery.
+            delivery. (<a className="subscribe-footer-staff-login" href="/#/admin">staff login</a>)
           </div>
         </div>
         <div className="subscribe-footer-contact">

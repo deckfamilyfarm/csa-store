@@ -1,6 +1,29 @@
 import { isSourcePricingVendor } from './productPricing.js';
 import { turkeyBreed } from './storefrontDescriptions.js';
 
+// Sizes are catalog package names, never guessed from Small/Medium/Large or price.
+export function turkeyVariant(product, packages = []) {
+  const preorderBreed = turkeyBreed(product.name);
+  const ranges = packages.map(pkg => String(pkg.name || '').trim().match(/^(\d+(?:\.\d+)?)\s*[-–—]\s*(\d+(?:\.\d+)?)\s*(?:lbs?\.?|pounds?)$/i));
+  const sizes = new Map(ranges.filter(Boolean).filter(match => Number(match[1]) > 0 && Number(match[2]) >= Number(match[1]))
+    .map(match => [`${Number(match[1])}-${Number(match[2])}`, `${match[1]}–${match[2]} lb`]));
+  const sizeLabel = sizes.size === 1 && ranges.length && ranges.every(match => match && Number(match[1]) > 0 && Number(match[2]) >= Number(match[1])) ? [...sizes.values()][0] : '';
+  const typeLabel = preorderBreed === 'heritage' ? 'Heritage' : preorderBreed === 'broad-breasted-white' ? 'White' : '';
+  return { preorderBreed, typeLabel, sizeLabel,
+    variantKey: typeLabel && sizeLabel ? `${preorderBreed}:${[...sizes.keys()][0]}` : null,
+    variantError: !typeLabel ? 'Use a catalog turkey named Heritage or Broad Breasted White.'
+      : !sizeLabel ? 'Set one unambiguous weight range in this product’s package names (for example, 9–12 lbs).' : '' };
+}
+
+export function duplicateTurkeyVariants(options, products) {
+  const counts = new Map();
+  for (const option of options.filter(option => option.active)) {
+    const key = products.get(option.product_id)?.variantKey;
+    if (key) counts.set(key, (counts.get(key) || 0) + 1);
+  }
+  return new Set([...counts].filter(([, count]) => count > 1).map(([key]) => key));
+}
+
 // Retail prices are the local Products retail column, without CSA factors or markups.
 // Preorder checkout sells whole birds. Never interpret a per-pound value as a bird price.
 export function storefrontRetailPrice(product, packages = []) {
@@ -43,7 +66,7 @@ export async function readStorefrontProducts(connection) {
     const photos = [...new Set(images.filter(image => image.product_id === product.id).map(image => image.url).filter(Boolean))];
     if (!photos.length && product.thumbnail_url) photos.push(product.thumbnail_url);
     return { id: product.id, name: product.name, vendor: product.vendor, category: product.category,
-      description: product.description || '', preorderBreed: turkeyBreed(product.name), imageUrl: photos[0] || '', images: photos,
+      description: product.description || '', ...turkeyVariant(product, productPackages), imageUrl: photos[0] || '', images: photos,
       ...storefrontRetailPrice(product, productPackages),
       sizeDescription: [...new Set(productPackages.map(pack => pack.name).filter(Boolean))].join(' / '),
       wholeTurkey: /thanksgiving.*turkey/i.test(product.category || '') || /(?:heritage|broad breasted).*turkey/i.test(product.name)

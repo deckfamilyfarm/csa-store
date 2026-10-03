@@ -31,7 +31,7 @@ import { categoryLabel } from "../categoryLabel.js";
 import { AccountPanelSection } from "./AccountPanelSection.jsx";
 import { CsaPlansSection } from "./CsaPlansSection.jsx";
 import { DeliverySection } from "./DeliverySection.jsx";
-import { FooterSection } from "./FooterSection.jsx";
+import { SubscribeFooter } from "./SubscribeFooter.jsx";
 import { HerdshareBanner } from "./HerdshareBanner.jsx";
 import { HeroSection } from "./HeroSection.jsx";
 import { PlanChooser } from "./PlanChooser.jsx";
@@ -438,6 +438,12 @@ export function Storefront() {
   const isResetPasswordView = view === "resetPassword";
   const isDropsitesView = view === "dropsites" || experienceMode === "dropsites";
   const isPublicHomeView = experienceMode === "store" && view === "home";
+  // Match the page selection below so every public view renders exactly one shared footer.
+  const hasPageFooter = isLiabilityView ? false
+    : isDropsitesView ? true
+    : isResetPasswordView ? false
+    : isAccountView ? isMember || experienceMode === "subscribe"
+    : isPublicHomeView || experienceMode === "subscribe" || view === "subscribe";
   const showMemberCart = showProducts && isMember && !isAdminView && !isResetPasswordView;
 
   useEffect(() => {
@@ -884,12 +890,6 @@ export function Storefront() {
               catalogError={catalogError}
               getPrice={getDisplayPrice}
               onSelectProduct={(product) => setSelectedProduct(product)}
-              isLoggedIn={isMember}
-              isAdmin={isAdmin}
-              onAuthAction={() => {
-                if (isMember) window.location.hash = isAdmin ? '#/admin' : '#/account';
-                else setLoginOpen(true);
-              }}
               subscribeUrl={`${subscribeAppUrl}#/subscribe`}
               siteContent={siteContent}
             />
@@ -1100,8 +1100,8 @@ export function Storefront() {
         </div>
       )}
 
-      {experienceMode !== "subscribe" && !isDropsitesView && !isAccountView && !isAdminView && !isPublicHomeView ? (
-        <FooterSection brand={brand} />
+      {!isAdminView && !hasPageFooter ? (
+        <SubscribeFooter />
       ) : null}
 
       {showProducts && selectedProduct && (

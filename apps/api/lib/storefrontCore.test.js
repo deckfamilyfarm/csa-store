@@ -1,9 +1,24 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { integer, recordId, normalizeCheckout, tokenHash, parsePacificInput, pacificInput, validatePublish, csvCell } from './storefrontCore.js';
+import { integer, recordId, normalizeCheckout, tokenHash, checkoutReturnOrigin, parsePacificInput, pacificInput, validatePublish, csvCell } from './storefrontCore.js';
 import { hasAdminPermission } from './adminRoles.js';
 
 const customer = { name: 'Turkey Buyer', email: 'buyer@example.com', phone: '541-555-0100', addressLine1: '123 Main St', city: 'Eugene', state: 'OR', postalCode: '97401' };
+test('Stripe returns to the same trusted storefront origin without accepting open redirects', () => {
+  const store = 'https://store.deckfamilyfarm.com';
+  const turkeys = 'https://turkeys.deckfamilyfarm.com';
+  assert.equal(checkoutReturnOrigin(store, turkeys), turkeys);
+  assert.equal(checkoutReturnOrigin(turkeys, store), store);
+  assert.equal(checkoutReturnOrigin(store), store);
+  assert.equal(checkoutReturnOrigin('http://localhost:5176', 'http://localhost:5176'), 'http://localhost:5176');
+  assert.equal(checkoutReturnOrigin('https://staging.example.com', 'https://staging.example.com'), 'https://staging.example.com');
+  for (const origin of ['null', 'https://evil.example', 'https://store.deckfamilyfarm.com.evil.example', 'https://evil.example@store.deckfamilyfarm.com', 'https://store.deckfamilyfarm.com/evil', 'http://store.deckfamilyfarm.com']) {
+    assert.throws(() => checkoutReturnOrigin(store, origin), /store website/);
+  }
+  for (const configured of ['not a URL', 'http://evil.example', 'ftp://localhost', 'https://user:password@example.com']) {
+    assert.throws(() => checkoutReturnOrigin(configured), error => error.status === 503);
+  }
+});
 test('record IDs support the database range without relaxing inventory or quantity limits', () => {
   for (const value of [1, 1000001, '2000000001', 2147483647]) assert.equal(recordId(value, 'Catalog product'), Number(value));
   for (const value of [0, -1, 1.5, 2147483648, Number.MAX_SAFE_INTEGER, null, '', true, [], {}]) assert.throws(() => recordId(value, 'Catalog product'), /whole number/);

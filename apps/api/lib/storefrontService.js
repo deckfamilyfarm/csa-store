@@ -1,9 +1,9 @@
 import crypto from 'node:crypto';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { ensureStorefrontSchema } from './storefrontSchema.js';
-import { readStorefrontProducts } from './storefrontProducts.js';
+import { readStorefrontProducts, duplicateTurkeyVariants } from './storefrontProducts.js';
 import { preorderDescriptions, turkeyDescription } from './storefrontDescriptions.js';
-import { HOLD_MS, hash, parse, fail, integer, recordId, text, email, tokenHash, normalizeCheckout, parsePacificInput, pacificInput, validatePublish, csvCell } from './storefrontCore.js';
+import { HOLD_MS, hash, parse, fail, integer, recordId, text, email, tokenHash, checkoutReturnOrigin, normalizeCheckout, parsePacificInput, pacificInput, validatePublish, csvCell } from './storefrontCore.js';
 
 // All writes are confined to storefront_* tables. Never use catalog inventory here.
 export function createStorefrontService({ pool, stripe, sendEmail, now = Date.now, config = {} }) {
@@ -11,11 +11,6 @@ export function createStorefrontService({ pool, stripe, sendEmail, now = Date.no
   const db = () => connections.getStore() || pool;
   const ready = () => ensureStorefrontSchema(pool);
   const enabled = () => config.enabled === true;
-  const origin = () => {
-    const url = new URL(config.baseUrl || 'https://turkeys.deckfamilyfarm.com');
-    if (url.protocol !== 'https:' && !['localhost', '127.0.0.1'].includes(url.hostname)) fail('Storefront URL must use HTTPS.', 503);
-    return url.origin;
-  };
   async function transaction(fn) {
     const inherited = connections.getStore();
     const connection = inherited || await pool.getConnection();
@@ -55,7 +50,8 @@ export function createStorefrontService({ pool, stripe, sendEmail, now = Date.no
       collectedMs: row.collected_ms && Number(row.collected_ms), expiresMs: Number(row.expires_ms),
       refundStatus: row.refund_status, refundedCents: row.refunded_cents,
       contactEmail: row.contact_email,
-      items: row.items.map(item => ({ optionId: item.option_id, label: item.label, quantity: item.quantity, priceCents: item.price_cents }))
+      items: row.items.map(item => ({ optionId: item.option_id, productId: item.product_id, typeLabel: item.turkey_type,
+        sizeLabel: item.size_label, label: item.label, quantity: item.quantity, priceCents: item.price_cents }))
     };
     if (admin) Object.assign(view, { lastError: row.last_error, stripeSessionId: row.stripe_session_id, stripePaymentId: row.stripe_payment_id,
       refundRequestedBy: row.refund_requested_by, refundRequestedMs: row.refund_requested_ms && Number(row.refund_requested_ms) });
@@ -90,6 +86,11 @@ export function createStorefrontService({ pool, stripe, sendEmail, now = Date.no
       readStorefrontProducts(db())
     ]);
     const byProduct = new Map(products.map(product => [product.id, product]));
+    const duplicates = duplicateTurkeyVariants(options, byProduct);
+    const variantError = option => {
+      const product = byProduct.get(option.product_id);
+      return product?.variantError || (duplicates.has(product?.variantKey) ? 'Another active offering has the same turkey type and weight range. Deactivate the duplicate.' : '');
+    };
     const activeGroupIds = new Set(groups.filter(group => group.active).map(group => group.id));
     const sale = saleRows[0];
     const descriptions = preorderDescriptions(sale);
@@ -98,10 +99,11 @@ export function createStorefrontService({ pool, stripe, sendEmail, now = Date.no
       sale: { id: sale.id, title: sale.title, description: sale.description, imageUrl: sale.image_url,
         pickupDate: sale.pickup_date, closesMs: sale.closes_ms && Number(sale.closes_ms), contactEmail: sale.contact_email,
         status: sale.status, open },
-      options: options.filter(option => admin || (option.active && byProduct.get(option.product_id)?.retailPriceCents != null)).map(option => ({ id: option.id, label: byProduct.get(option.product_id)?.name || option.label,
+      options: options.filter(option => admin || (option.active && byProduct.get(option.product_id)?.retailPriceCents != null && !variantError(option))).map(option => ({ id: option.id, label: byProduct.get(option.product_id)?.name || option.label,
         productId: option.product_id, imageUrl: byProduct.get(option.product_id)?.imageUrl || '',
         images: byProduct.get(option.product_id)?.images || [], productAvailable: byProduct.has(option.product_id),
         preorderBreed: byProduct.get(option.product_id)?.preorderBreed || null,
+        typeLabel: byProduct.get(option.product_id)?.typeLabel || '', sizeLabel: byProduct.get(option.product_id)?.sizeLabel || '', variantError: variantError(option),
         description: turkeyDescription(byProduct.get(option.product_id)?.preorderBreed, descriptions), priceCents: byProduct.get(option.product_id)?.retailPriceCents ?? null,
         priceError: byProduct.get(option.product_id)?.priceError || '', available: option.on_hand - option.reserved,
         ...(admin ? { active: Boolean(option.active), onHand: option.on_hand, reserved: option.reserved, purchased: Number(option.purchased) } : {}) })),
@@ -109,8 +111,11 @@ export function createStorefrontService({ pool, stripe, sendEmail, now = Date.no
       pickups: pickups.filter(p => admin || (p.active && activeGroupIds.has(p.group_id))).map(p => ({ id: p.id, groupId: p.group_id,
         active: Boolean(p.active), name: p.name, address: p.address, hours: p.hours, instructions: p.instructions }))
     };
+    const firstPhoto = [...result.options].sort((a, b) => (a.preorderBreed === 'heritage') - (b.preorderBreed === 'heritage') || a.priceCents - b.priceCents).find(option => option.imageUrl)?.imageUrl;
+    result.product = { title: 'Thanksgiving Turkey', shortDescription: sale.description,
+      aboutDescription: sale.about_description ?? sale.description, imageUrl: sale.product_image_url || firstPhoto || sale.image_url || '/images/turkey-home/holiday-turkey.jpg' };
     if (admin) Object.assign(result, { catalogProducts: products, readiness: { checkoutEnabled: enabled(), stripeConfigured: Boolean(stripe), webhookConfigured: Boolean(config.webhookSecret), emailConfigured: Boolean(config.emailReady) },
-      sale: { ...result.sale, ...descriptions, notifyEmail: sale.notify_email, version: sale.version, closesPacific: pacificInput(sale.closes_ms) } });
+      sale: { ...result.sale, ...descriptions, aboutDescription: sale.about_description ?? sale.description, productImageUrl: sale.product_image_url || '', notifyEmail: sale.notify_email, version: sale.version, closesPacific: pacificInput(sale.closes_ms) } });
     else if (sale.status === 'draft') Object.assign(result, { options: [], pickups: result.pickups.map(p => ({ id: p.id, groupId: p.groupId, name: p.name })) });
     return result;
   }
@@ -134,6 +139,9 @@ export function createStorefrontService({ pool, stripe, sendEmail, now = Date.no
       const [[sale]] = await c.query('SELECT * FROM storefront_sales WHERE id=1 FOR UPDATE');
       if (Number(body.version) !== sale.version) fail('Sale setup changed. Reload before saving.', 409);
       const currentDescriptions = preorderDescriptions(sale);
+      const aboutDescription = text(body.aboutDescription ?? sale.about_description ?? description, 'About our turkeys', 10000);
+      const productImageUrl = text(body.productImageUrl ?? sale.product_image_url ?? '', 'product photo URL', 2048, false);
+      if (productImageUrl && !/^https:\/\//.test(productImageUrl) && !/^\/(?!\/)/.test(productImageUrl)) fail('Use an HTTPS product photo URL or a local image path.');
       const heritageDescription = text(body.heritageDescription ?? currentDescriptions.heritageDescription, 'Heritage Black preorder description', 10000);
       const broadBreastedDescription = text(body.broadBreastedDescription ?? currentDescriptions.broadBreastedDescription, 'Broad Breasted White preorder description', 10000);
       const [existing] = await c.query('SELECT * FROM storefront_options WHERE sale_id=1 FOR UPDATE');
@@ -211,10 +219,16 @@ export function createStorefrontService({ pool, stripe, sendEmail, now = Date.no
       if (status === 'open') {
         if (!enabled() || !stripe || !config.webhookSecret || !config.emailReady) fail('Enable checkout and configure Stripe, its storefront webhook, and email before publishing.');
         const [[options], [pickups], [groups]] = await Promise.all([c.query('SELECT * FROM storefront_options WHERE sale_id=1'), c.query('SELECT * FROM storefront_pickups WHERE sale_id=1'), c.query('SELECT * FROM storefront_pickup_groups WHERE sale_id=1')]);
+        const duplicates = duplicateTurkeyVariants(options, products);
+        for (const option of options.filter(option => option.active)) {
+          const product = products.get(option.product_id);
+          if (product?.variantError) fail(`${product.name}: ${product.variantError}`);
+          if (duplicates.has(product?.variantKey)) fail('Each turkey type and weight range must have only one active offering.');
+        }
         validatePublish({ title, description, contact_email: contact, notify_email: notify, pickup_date: pickupDate, closes_ms: closes }, options, pickups, now(), groups);
       }
-      await c.query(`UPDATE storefront_sales SET title=?,description=?,image_url=?,status=?,pickup_date=?,closes_ms=?,contact_email=?,notify_email=?,heritage_description=?,broad_breasted_description=?,updated_ms=?,updated_by=?,version=version+1 WHERE id=1`,
-        [title, description, imageUrl, status, pickupDate, closes, contact, notify, heritageDescription, broadBreastedDescription, now(), actorId]);
+      await c.query(`UPDATE storefront_sales SET title=?,description=?,image_url=?,status=?,pickup_date=?,closes_ms=?,contact_email=?,notify_email=?,heritage_description=?,broad_breasted_description=?,about_description=?,product_image_url=?,updated_ms=?,updated_by=?,version=version+1 WHERE id=1`,
+        [title, description, imageUrl, status, pickupDate, closes, contact, notify, heritageDescription, broadBreastedDescription, aboutDescription, productImageUrl, now(), actorId]);
     });
     return catalog(true);
   }
@@ -284,17 +298,27 @@ export function createStorefrontService({ pool, stripe, sendEmail, now = Date.no
     }
     await applySession(id, session);
   }
-  async function checkout(body) {
+  async function checkout(body, requestOrigin) {
     await ready();
-    if (!enabled() || !stripe || !config.webhookSecret) fail('Preorders are not open yet.', 503);
     const token = tokenHash(body.token);
-    const input = normalizeCheckout(body);
+    let input, returnOrigin;
+    try {
+      if (!enabled() || !stripe || !config.webhookSecret) fail('Preorders are not open yet.', 503);
+      input = normalizeCheckout(body);
+      returnOrigin = checkoutReturnOrigin(config.baseUrl, requestOrigin);
+    } catch (error) {
+      const [existing] = await db().query('SELECT id FROM storefront_orders WHERE token_hash=?', [token]);
+      if (!existing.length && error.status) error.checkoutRejected = true;
+      throw error;
+    }
     const requestHash = hash(JSON.stringify(input));
+    let existingOrder = false;
     const id = await transaction(async c => {
       // Serializes reservation creation and publication changes; stock rows are locked in ID order.
       const [[sale]] = await c.query('SELECT * FROM storefront_sales WHERE id=1 FOR UPDATE');
       const [previous] = await c.query('SELECT id,request_hash FROM storefront_orders WHERE token_hash=?', [token]);
       if (previous.length) {
+        existingOrder = true;
         if (previous[0].request_hash !== requestHash) fail('This checkout already contains a different order. Start a new order.', 409);
         return previous[0].id;
       }
@@ -310,14 +334,16 @@ export function createStorefrontService({ pool, stripe, sendEmail, now = Date.no
       const number = `TK-${crypto.randomBytes(8).toString('hex').toUpperCase()}`;
       const items = [];
       const products = new Map((await readStorefrontProducts(c)).map(product => [product.id, product]));
+      const [activeOptions] = await c.query('SELECT product_id,active FROM storefront_options WHERE sale_id=1 AND active=1');
+      const duplicates = duplicateTurkeyVariants(activeOptions, products);
       for (const inputItem of input.items) {
         const [[option]] = await c.query('SELECT * FROM storefront_options WHERE id=? AND sale_id=1 FOR UPDATE', [inputItem.optionId]);
         const product = products.get(option?.product_id);
-        if (!option?.active || product?.retailPriceCents == null) fail('That turkey size is unavailable.', 409);
+        if (!option?.active || product?.retailPriceCents == null || product.variantError || duplicates.has(product.variantKey)) fail('That turkey size is unavailable.', 409);
         if (inputItem.expectedPriceCents !== undefined && inputItem.expectedPriceCents !== product.retailPriceCents) fail('The retail price changed. Refresh the turkey page and start checkout again.', 409);
         if (option.on_hand - option.reserved < inputItem.quantity) fail(`${option.label} does not have enough turkeys available.`, 409);
         await stock(c, option.id, 0, inputItem.quantity, 'Checkout reservation', id);
-        items.push({ ...inputItem, label: product.name, priceCents: product.retailPriceCents });
+        items.push({ ...inputItem, label: product.name, productId: product.id, typeLabel: product.typeLabel, sizeLabel: product.sizeLabel, priceCents: product.retailPriceCents });
       }
       const total = items.reduce((sum, item) => sum + item.priceCents * item.quantity, 0);
       integer(total, 'Order total', 50, 99999999);
@@ -328,17 +354,23 @@ export function createStorefrontService({ pool, stripe, sendEmail, now = Date.no
         client_reference_id: id, metadata: { storefront_order_id: id },
         payment_intent_data: { metadata: { storefront_order_id: id }, receipt_email: input.customer.email },
         line_items: items.map(item => ({ quantity: item.quantity, price_data: { currency: 'usd', unit_amount: item.priceCents,
-          product_data: { name: `${sale.title} — ${item.label}` } } })),
-        expires_at: expires, success_url: `${origin()}/#/turkeys?order=${id}`,
-        cancel_url: `${origin()}/#/turkeys?order=${id}&cancelled=1`
+          product_data: { name: `Thanksgiving Turkey — ${item.typeLabel}, ${item.sizeLabel}`,
+            metadata: { variant_id: String(item.optionId), catalog_product_id: String(item.productId), turkey_type: item.typeLabel, size_label: item.sizeLabel } } } })),
+        expires_at: expires, success_url: `${returnOrigin}/#/turkeys?order=${id}`,
+        cancel_url: `${returnOrigin}/#/turkeys?order=${id}&cancelled=1`
       };
       const pickupSnapshot = { id: pickup.id, groupId: pickup.group_id, groupName: pickup.group_name, name: pickup.name, address: pickup.address, hours: pickup.hours,
         instructions: pickup.instructions, date: sale.pickup_date, timezone: 'America/Los_Angeles' };
       await c.query(`INSERT INTO storefront_orders
         (id,number,sale_id,token_hash,request_hash,status,customer_json,pickup_json,total_cents,stripe_request_json,expires_ms,created_ms,contact_email,notify_email)
         VALUES (?,?,1,?,?,'creating',?,?,?,?,?,?,?,?)`, [id, number, token, requestHash, JSON.stringify(input.customer), JSON.stringify(pickupSnapshot), total, JSON.stringify(checkoutRequest), expires * 1000, now(), sale.contact_email, sale.notify_email]);
-      for (const item of items) await c.query('INSERT INTO storefront_order_items (order_id,option_id,label,quantity,price_cents) VALUES (?,?,?,?,?)', [id, item.optionId, item.label, item.quantity, item.priceCents]);
+      for (const item of items) await c.query('INSERT INTO storefront_order_items (order_id,option_id,label,quantity,price_cents,product_id,turkey_type,size_label) VALUES (?,?,?,?,?,?,?,?)', [id, item.optionId, item.label, item.quantity, item.priceCents, item.productId, item.typeLabel, item.sizeLabel]);
       return id;
+    }).catch(error => {
+      // Only a known rejection of a new, rolled-back checkout allows cart edits.
+      // Lost responses and existing sessions must keep their original retry token.
+      if (error.status && !existingOrder) error.checkoutRejected = true;
+      throw error;
     });
     try { await locked(id, () => syncSession(id)); }
     catch (error) {
@@ -466,10 +498,10 @@ export function createStorefrontService({ pool, stripe, sendEmail, now = Date.no
   }
   async function exportOrders(filters) {
     const rows = await orders(filters);
-    const header = ['Order','Status','Name','Email','Phone','Address','Pickup group','Pickup location','Pickup date','Pickup address','Pickup hours','Turkey size','Quantity','Unit price USD','Order total USD'];
+    const header = ['Order','Status','Name','Email','Phone','Address','Pickup group','Pickup location','Pickup date','Pickup address','Pickup hours','Turkey size','Quantity','Unit price USD','Order total USD','Variant ID','Catalog product ID','Turkey type','Weight range'];
     return [header, ...rows.flatMap(row => row.items.map(item => [row.number, row.status, row.customer.name, row.customer.email,
       row.customer.phone, [row.customer.addressLine1,row.customer.addressLine2,row.customer.city,row.customer.state,row.customer.postalCode,row.customer.country].filter(Boolean).join(', '),
-      row.pickup.groupName,row.pickup.name,row.pickup.date,row.pickup.address,row.pickup.hours,item.label,item.quantity,(item.priceCents / 100).toFixed(2),(row.totalCents / 100).toFixed(2)]))].map(row => row.map(csvCell).join(',')).join('\r\n');
+      row.pickup.groupName,row.pickup.name,row.pickup.date,row.pickup.address,row.pickup.hours,item.label,item.quantity,(item.priceCents / 100).toFixed(2),(row.totalCents / 100).toFixed(2),item.optionId,item.productId,item.typeLabel,item.sizeLabel]))].map(row => row.map(csvCell).join(',')).join('\r\n');
   }
   async function webhook(event) {
     await ready();

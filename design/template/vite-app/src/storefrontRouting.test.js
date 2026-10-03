@@ -11,3 +11,9 @@ test('admin, accounts, password resets, liability and subscription routes stay a
     for (const path of ['/#/admin', '/#/account', '/#/reset-password?token=abc', '/#/subscribe', '/#/dropsites', '/#/liability/farm-visit', '/liability/farm-visit', '/subscribe', '/dropsites', '/?experience=subscribe']) assert.equal(usesTurkeyStorefront(`${host}${path}`), false, path);
   }
 });
+
+test('turkey detail and cart routes work on local, turkey, and legacy store URLs', () => {
+  for (const host of ['https://store.deckfamilyfarm.com','https://turkeys.deckfamilyfarm.com','http://localhost:5176']) {
+    for (const route of ['product','cart']) assert.equal(usesTurkeyStorefront(`${host}/#/turkeys/${route}?preview=1`), true);
+  }
+});

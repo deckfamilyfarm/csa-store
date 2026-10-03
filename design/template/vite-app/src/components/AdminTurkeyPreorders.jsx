@@ -139,14 +139,26 @@ export function AdminTurkeyPreorders({ token }) {
         <div className="turkey-card turkey-fields">
           <label>Sale title<input required value={draft.title} onChange={e => update('title', e.target.value)} /></label>
           <label>Sale status<select value={draft.status} onChange={e => update('status', e.target.value)}><option value="draft">Draft / coming soon</option><option value="open">Published / accepting orders</option><option value="closed">Closed</option></select></label>
-          <label className="turkey-wide">Description<textarea required rows="4" value={draft.description} onChange={e => update('description', e.target.value)} /></label>
-          <label className="turkey-wide">Photo URL<input placeholder="https://… or /images/…" value={draft.imageUrl} onChange={e => update('imageUrl', e.target.value)} /></label>
+          <label className="turkey-wide">Short listing description<textarea required rows="4" value={draft.description} onChange={e => update('description', e.target.value)} /></label>
+          <label className="turkey-wide">Banner photo URL<input placeholder="https://… or /images/…" value={draft.imageUrl} onChange={e => update('imageUrl', e.target.value)} /></label>
           <label>Pickup date<input required type="date" value={draft.pickupDate} onChange={e => update('pickupDate', e.target.value)} /></label>
           <label>Sales cutoff (Pacific time)<input type="datetime-local" value={draft.closesPacific} onChange={e => update('closesPacific', e.target.value)} /></label>
           <label>Customer contact email<input type="email" value={draft.contactEmail} onChange={e => update('contactEmail', e.target.value)} /></label>
           <label>Staff order notification email<input type="email" value={draft.notifyEmail} onChange={e => update('notifyEmail', e.target.value)} /></label>
         </div>
-        <h4>Local preorder descriptions</h4><p>These descriptions appear on this turkey storefront for every size of the matching breed. Save them with preorder setup. Product and Local Line descriptions stay separate.</p>
+        <div className="turkey-card"><h4>Thanksgiving Turkey product</h4>
+          <p>Shared content for the turkey product page. Catalog and Local Line descriptions stay separate.</p>
+          <div className="turkey-fields">
+            <label className="turkey-wide">About our turkeys<textarea aria-label="About our turkeys" required rows="8" maxLength="10000" value={draft.aboutDescription ?? draft.description} onChange={e => update('aboutDescription', e.target.value)} aria-describedby="turkey-about-help" /></label>
+            <p id="turkey-about-help" className="small turkey-wide">Separate paragraphs with a blank line. Start each bullet with “- ”. Supported existing HTML formatting is also preserved.</p>
+            <label className="turkey-wide">Product photo<select aria-label="Product photo" value={draft.productImageUrl || ''} onChange={e => update('productImageUrl', e.target.value)}>
+              <option value="">Use the first available catalog turkey photo</option>
+              {[...new Set([draft.productImageUrl, ...(data.catalogProducts || []).flatMap(product => product.images || [])].filter(Boolean))].map(url => <option key={url} value={url}>{data.catalogProducts.find(product => product.images?.includes(url))?.name || 'Saved product photo'} — {url.split('/').pop()}</option>)}
+            </select></label>
+          </div>
+          <h4>About our turkeys preview</h4><ProductDescription description={draft.aboutDescription ?? draft.description} />
+        </div>
+        <h4>Local preorder descriptions</h4><p>These descriptions appear when a turkey type is selected. Save them with preorder setup. Product and Local Line descriptions stay separate.</p>
         <div className="turkey-card turkey-fields">
           <label>Heritage Black description<textarea required rows="10" maxLength="10000" value={draft.heritageDescription ?? ''} onChange={e => update('heritageDescription', e.target.value)} /></label>
           <label>Broad Breasted White description<textarea required rows="10" maxLength="10000" value={draft.broadBreastedDescription ?? ''} onChange={e => update('broadBreastedDescription', e.target.value)} /></label>
@@ -173,7 +185,9 @@ export function AdminTurkeyPreorders({ token }) {
                 {stale && <p role="status">Inventory changed since you edited this count. <button type="button" onClick={() => setDraft(prev => ({ ...prev, options: prev.options.map((item, i) => i === index ? { ...item, onHand: current.onHand, reserved: current.reserved, inventoryCount: String(current.onHand) } : item) }))}>Use current inventory</button></p>}</>;
             })()}
           </div>
-          <div className="turkey-wide"><strong>Local preorder description</strong><ProductDescription description={optionDescription(option)} /><small>Edit the shared description for this breed above.</small></div>
+          <div className="turkey-wide"><strong>Variant: {retailProduct(option)?.typeLabel || option.typeLabel || 'Unknown type'} · {retailProduct(option)?.sizeLabel || option.sizeLabel || 'Missing weight range'}</strong>
+            {(retailProduct(option)?.variantError || option.variantError) && <p className="turkey-error">{retailProduct(option)?.variantError || option.variantError}</p>}
+            <p><strong>Local preorder description</strong></p><ProductDescription description={optionDescription(option)} /><small>Edit the shared description for this breed above.</small></div>
           <label><span><input type="checkbox" checked={option.active} onChange={e => updateOption(index, 'active', e.target.checked)} /> Offer this size</span></label>
           {!option.id && <button type="button" onClick={() => setDraft(prev => ({ ...prev, options: prev.options.filter((_, i) => i !== index) }))}>Remove unsaved size</button>}
         </div>)}
@@ -218,7 +232,7 @@ export function AdminTurkeyPreorders({ token }) {
         <div className="turkey-table-wrap turkey-print-orders"><table><thead><tr><th>Order / status</th><th>Customer</th><th>Turkeys / total</th><th>Pickup</th><th className="no-print">Actions</th></tr></thead><tbody>{orders.map(order => <tr key={order.id}>
           <td><strong>{order.number}</strong><div>{order.status.replaceAll('_',' ')}</div><small>{pacific(order.createdMs)} PT</small>{order.refundStatus && <p>Refund: {order.refundStatus} ({money(order.refundedCents)})</p>}{order.lastError && <p className="turkey-error no-print">{order.lastError}</p>}</td>
           <td><strong>{order.customer.name}</strong><div>{order.customer.email}</div><div>{order.customer.phone}</div><details className="no-print"><summary>Address</summary><p>{[order.customer.addressLine1,order.customer.addressLine2,order.customer.city,order.customer.state,order.customer.postalCode,order.customer.country].filter(Boolean).join(', ')}</p></details></td>
-          <td>{order.items.map(item => <div key={item.optionId}>{item.quantity} × {item.label}</div>)}<strong>{money(order.totalCents)}</strong></td>
+          <td>{order.items.map(item => <div key={item.optionId}>{item.quantity} × {item.typeLabel && item.sizeLabel ? `${item.typeLabel}, ${item.sizeLabel}` : item.label}</div>)}<strong>{money(order.totalCents)}</strong></td>
           <td><small>{order.pickup.groupName}</small><div>{order.pickup.name}</div><div>{order.pickup.date}</div><small>{order.pickup.hours}</small>{order.collectedMs && <div>Collected {pacific(order.collectedMs)} PT</div>}</td>
           <td className="no-print"><div className="turkey-order-actions">{order.status === 'paid' && !order.refundedCents && !order.refundStatus && <button disabled={busy} onClick={() => orderAction(order, 'collect')}>Mark collected</button>}{['paid','refund_pending'].includes(order.status) && !order.collectedMs && <button disabled={busy} onClick={() => orderAction(order, 'refund')}>{order.status === 'refund_pending' ? 'Check refund' : 'Cancel & refund'}</button>}<button disabled={busy} onClick={() => orderAction(order, 'reconcile')}>Reconcile payment</button>{order.status === 'review' && !order.stripeSessionId && <button disabled={busy} onClick={() => attachReceipt(order)}>Link Stripe receipt</button>}</div></td>
         </tr>)}</tbody></table></div>

@@ -3,7 +3,7 @@ import test from 'node:test';
 import crypto from 'node:crypto';
 import mysql from 'mysql2/promise';
 import { createStorefrontService } from './storefrontService.js';
-import { DEFAULT_HERITAGE_DESCRIPTION, DEFAULT_BROAD_BREASTED_DESCRIPTION, TURKEY_PICKUP_DESCRIPTION } from './storefrontDescriptions.js';
+import { DEFAULT_HERITAGE_DESCRIPTION, DEFAULT_BROAD_BREASTED_DESCRIPTION } from './storefrontDescriptions.js';
 
 // Never load .env. This suite only accepts a disposable socket under /tmp.
 const socket = process.env.STOREFRONT_TEST_SOCKET;
@@ -75,7 +75,7 @@ test('turkey checkout, inventory, fulfillment and refunds on isolated MySQL', { 
   await pool.query('CREATE TABLE product_images (id INT PRIMARY KEY, product_id INT, url TEXT)');
   await pool.query("INSERT INTO vendors VALUES (1,'Deck Family Farm')");
   await pool.query("INSERT INTO categories VALUES (1,'Thanksgiving Turkeys'),(2,'Membership')");
-  await pool.query("INSERT INTO products VALUES (1,'Small turkey','<p>Pasture-raised <strong>small turkey</strong>.</p>','https://example.com/small-thumb.jpg',1,1,0,88),(2,'Large turkey','<p>Our large turkey.</p>',NULL,1,1,0,88),(3,'Turkey club membership',NULL,NULL,1,2,0,88)");
+  await pool.query("INSERT INTO products VALUES (1,'Heritage Turkey, Small','<p>Pasture-raised <strong>small turkey</strong>.</p>','https://example.com/small-thumb.jpg',1,1,0,88),(2,'Broad Breasted White Turkey, Large','<p>Our large turkey.</p>',NULL,1,1,0,88),(3,'Turkey club membership',NULL,NULL,1,2,0,88)");
   await pool.query("INSERT INTO packages VALUES (1,1,'9–12 lbs',77,54.12,1,1,'package','ea'),(2,2,'14–16 lbs',77,81.18,1,1,'package','ea')");
   await pool.query("INSERT INTO product_pricing_profiles VALUES (1,100.00,'each'),(2,150.00,'each')");
   await pool.query("INSERT INTO product_images VALUES (1,1,'https://example.com/small.jpg'),(2,2,'https://example.com/large.jpg')");
@@ -134,7 +134,7 @@ test('turkey checkout, inventory, fulfillment and refunds on isolated MySQL', { 
     assert.deepEqual(saved.options.map(option => option.priceCents), [10000,15000]);
     firstId = saved.options[0].id; secondId = saved.options[1].id;
     assert.deepEqual(saved.options.map(option => option.onHand), [1,10]);
-    assert.equal(saved.options[0].description, TURKEY_PICKUP_DESCRIPTION);
+    assert.equal(saved.options[0].description, DEFAULT_HERITAGE_DESCRIPTION);
     const [initialHistory] = await pool.query('SELECT delta_on_hand,actor_id FROM storefront_stock_history ORDER BY id');
     assert.deepEqual(initialHistory.map(row => [row.delta_on_hand, row.actor_id]), [[1,1],[10,1]]);
     await assert.rejects(service.saveSetup({ ...setup, status: 'open' }, 1), /changed/);
@@ -151,9 +151,20 @@ test('turkey checkout, inventory, fulfillment and refunds on isolated MySQL', { 
     assert.equal(repeated.orderId, firstResult.orderId); assert.equal(sessions.size, 1);
     const info = await service.guestOrder(firstResult.orderId, firstBody.token);
     assert.equal(info.totalCents, 10000);
+    assert.equal(info.items[0].optionId, firstId);
+    assert.equal(info.items[0].productId, 1);
+    assert.equal(info.items[0].typeLabel, 'Heritage');
+    assert.equal(info.items[0].sizeLabel, '9–12 lb');
+    const [[snapshot]] = await pool.query('SELECT stripe_request_json FROM storefront_orders WHERE id=?', [firstResult.orderId]);
+    const stripeItem = JSON.parse(snapshot.stripe_request_json).line_items[0].price_data.product_data;
+    assert.equal(stripeItem.name, 'Thanksgiving Turkey — Heritage, 9–12 lb');
+    assert.deepEqual(stripeItem.metadata, {variant_id:String(firstId),catalog_product_id:'1',turkey_type:'Heritage',size_label:'9–12 lb'});
     await assert.rejects(service.guestOrder(firstResult.orderId, crypto.randomBytes(32).toString('hex')), { status: 404 });
     await assert.rejects(service.adjustStock(firstId, { delta: -1, reason: 'Cannot consume reserved stock' }, 1), /Insufficient/);
     await assert.rejects(service.checkout({ ...firstBody, pickupId: 2 }), /different order/);
+    await assert.rejects(service.checkout({ ...firstBody, customer: {...firstBody.customer, phone:'bad'} }), error => /phone/.test(error.message) && !error.checkoutRejected);
+    const invalidCustomer = body(secondId); invalidCustomer.customer.phone = 'bad';
+    await assert.rejects(service.checkout(invalidCustomer), error => /phone/.test(error.message) && error.checkoutRejected === true);
   });
   await t.test('verified payment and duplicate webhooks deduct stock only once', async () => {
     const session = await pay(firstResult);
@@ -286,7 +297,11 @@ test('turkey checkout, inventory, fulfillment and refunds on isolated MySQL', { 
     const updated = await service.catalog();
     assert.equal(updated.options.find(option => option.productId === 1).label, 'Small heritage turkey');
     assert.equal(updated.options.find(option => option.productId === 1).imageUrl, 'https://example.com/new-photo.jpg');
-    assert.equal((await service.guestOrder(firstResult.orderId, firstBody.token)).items[0].label, 'Small turkey');
+    assert.equal((await service.guestOrder(firstResult.orderId, firstBody.token)).items[0].label, 'Heritage Turkey, Small');
+    await pool.query("UPDATE packages SET name='10–11 lbs' WHERE product_id=1");
+    assert.equal((await service.catalog()).options.find(option => option.productId === 1).sizeLabel, '10–11 lb');
+    assert.equal((await service.guestOrder(firstResult.orderId, firstBody.token)).items[0].sizeLabel, '9–12 lb');
+    await pool.query("UPDATE packages SET name='9–12 lbs' WHERE product_id=1");
     await pool.query('UPDATE products SET is_deleted=1 WHERE id=2');
     assert.equal((await service.catalog()).options.some(option => option.productId === 2), false);
     await assert.rejects(service.checkout(body(secondId)), /unavailable/);
@@ -409,7 +424,7 @@ test('turkey checkout, inventory, fulfillment and refunds on isolated MySQL', { 
     assert.equal((await service.guestOrder(result.orderId, input.token)).totalCents, 16000);
     const stale = body(secondId); stale.items[0].expectedPriceCents = 16000;
     const before = await stock(secondId);
-    await assert.rejects(service.checkout(stale), /retail price changed/);
+    await assert.rejects(service.checkout(stale), error => error.checkoutRejected === true && /retail price changed/.test(error.message));
     assert.equal((await stock(secondId)).reserved, before.reserved);
     const current = body(secondId); current.items[0].expectedPriceCents = 17000; current.items[0].priceCents = 1;
     const next = await service.checkout(current);
@@ -420,6 +435,7 @@ test('turkey checkout, inventory, fulfillment and refunds on isolated MySQL', { 
     const productId = 2000000001;
     await pool.query("INSERT INTO products VALUES (?,'Heritage turkey with large ID','<p>Catalog turkey.</p>',NULL,1,1,0,88)", [productId]);
     await pool.query("INSERT INTO product_pricing_profiles VALUES (?,125.00,'each')", [productId]);
+    await pool.query("INSERT INTO packages VALUES (3,?,'12.01–14 lbs',77,125.00,1,1,'package','ea')", [productId]);
     const payload = setupPayload(await service.catalog(true));
     payload.options.push({ productId: String(productId), active: true, inventory: { onHand: 8 } });
     const saved = await service.saveSetup(payload, 1);
@@ -442,6 +458,64 @@ test('turkey checkout, inventory, fulfillment and refunds on isolated MySQL', { 
     const invalid = setupPayload(await service.catalog(true));
     invalid.options.push({ productId: 2000000002, active: true });
     await assert.rejects(service.saveSetup(invalid, 1), /existing turkey product/);
+  });
+  await t.test('checkout returns to its trusted starting host and keeps retry URLs frozen', async () => {
+    const before = await stock(secondId);
+    for (const origin of ['https://turkeys.deckfamilyfarm.com', 'https://store.deckfamilyfarm.com']) {
+      const input = body(secondId);
+      const result = await service.checkout(input, origin);
+      const [[row]] = await pool.query('SELECT stripe_request_json FROM storefront_orders WHERE id=?', [result.orderId]);
+      const frozen = JSON.parse(row.stripe_request_json);
+      assert.equal(frozen.success_url, `${origin}/#/turkeys?order=${result.orderId}`);
+      assert.equal(frozen.cancel_url, `${origin}/#/turkeys?order=${result.orderId}&cancelled=1`);
+      assert.equal(frozen.success_url.includes(input.token), false);
+      assert.equal((await service.checkout(input, 'http://localhost:5176')).orderId, result.orderId);
+      const [[retry]] = await pool.query('SELECT stripe_request_json FROM storefront_orders WHERE id=?', [result.orderId]);
+      assert.equal(retry.stripe_request_json, row.stripe_request_json);
+      await assert.rejects(service.guestOrder(result.orderId, 'b'.repeat(64)), error => error.status === 404);
+      await service.cancelReservation(result.orderId, input.token);
+    }
+    await assert.rejects(service.checkout(body(secondId), 'https://evil.example'), /store website/);
+    assert.deepEqual(await stock(secondId), before);
+  });
+  await t.test('grouped product content persists independently and older setup clients preserve it', async () => {
+    const before = await service.catalog(true);
+    assert.equal(before.product.title, 'Thanksgiving Turkey');
+    const content = 'Raised on our farm.\n\n- Pasture-raised\n- Saturday pickup';
+    const saved = await service.saveSetup({ ...setupPayload(before), aboutDescription: content, productImageUrl: 'https://example.com/turkey.jpg' }, 1);
+    assert.equal(saved.product.aboutDescription, content);
+    assert.equal(saved.product.imageUrl, 'https://example.com/turkey.jpg');
+    const older = setupPayload(saved); delete older.aboutDescription; delete older.productImageUrl;
+    const retained = await service.saveSetup(older, 1);
+    assert.equal(retained.product.aboutDescription, content);
+    const [[product]] = await pool.query('SELECT description FROM products WHERE id=1');
+    assert.equal(product.description, 'Updated Local Line copy');
+    await assert.rejects(service.saveSetup({...setupPayload(retained),productImageUrl:'javascript:alert(1)'},1), /HTTPS/);
+  });
+  await t.test('unmapped and duplicate variants are blocked without reserving stock', async () => {
+    const before = await stock(secondId);
+    await pool.query("UPDATE packages SET name='Large' WHERE product_id=2");
+    assert.equal((await service.catalog()).options.some(option=>option.id===secondId),false);
+    assert.match((await stock(secondId)).variantError,/weight range/);
+    await assert.rejects(service.checkout(body(secondId)), error=>error.checkoutRejected===true && /unavailable/.test(error.message));
+    await assert.rejects(service.saveSetup(setupPayload(await service.catalog(true)),1), /weight range/);
+    await pool.query("UPDATE packages SET name='14–16 lbs' WHERE product_id=2");
+    assert.equal((await stock(secondId)).reserved,before.reserved);
+    const [[duplicate]] = await pool.query('SELECT * FROM products WHERE id=1');
+    await pool.query("UPDATE products SET name='Broad Breasted White Turkey' WHERE id=1");
+    await pool.query("UPDATE packages SET name='14.00 - 16.00 lbs' WHERE product_id=1");
+    assert.equal((await service.catalog()).options.some(option=>[firstId,secondId].includes(option.id)),false);
+    await assert.rejects(service.checkout(body(secondId)), /unavailable/);
+    await assert.rejects(service.saveSetup(setupPayload(await service.catalog(true)),1), /only one active offering/);
+    await pool.query('UPDATE products SET name=? WHERE id=1',[duplicate.name]);
+    await pool.query("UPDATE packages SET name='9–12 lbs' WHERE product_id=1");
+  });
+  await t.test('old order items without variant snapshots still return their saved labels', async () => {
+    await pool.query('UPDATE storefront_order_items SET product_id=NULL,turkey_type=NULL,size_label=NULL WHERE order_id=?',[firstResult.orderId]);
+    const old = await service.guestOrder(firstResult.orderId,firstBody.token);
+    assert.equal(old.items[0].label,'Heritage Turkey, Small');
+    assert.equal(old.items[0].sizeLabel,null);
+    assert.equal(old.items[0].optionId,firstId);
   });
   await t.test('cutoff enforcement, CSV and stock isolation from Local Line', async () => {
     const [[product]] = await pool.query('SELECT inventory FROM products WHERE id=1');

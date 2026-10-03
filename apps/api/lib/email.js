@@ -81,7 +81,7 @@ export async function sendStorefrontEmail(order) {
   const lines = [
     `Hello ${order.customer.name},`, "",
     refunded ? `Your payment of ${money(order.totalCents)} has been refunded.${order.collectedMs ? '' : ' Your preorder is cancelled.'}` : "Thank you! Your turkey preorder is paid and confirmed.",
-    `Order: ${order.number}`, ...order.items.map(item => `${item.quantity} × ${item.label} — ${money(item.priceCents)} each`),
+    `Order: ${order.number}`, ...order.items.map(item => `${item.quantity} × ${item.typeLabel && item.sizeLabel ? `Thanksgiving Turkey — ${item.typeLabel}, ${item.sizeLabel}` : item.label} — ${money(item.priceCents)} each`),
     `Total paid: ${money(order.totalCents)}`, "",
     ...(refunded ? [] : [
       `Pickup: ${[order.pickup.groupName, order.pickup.name].filter(Boolean).join(' — ')}`, `Date: ${order.pickup.date}`, `Hours: ${order.pickup.hours} (Pacific time)`,

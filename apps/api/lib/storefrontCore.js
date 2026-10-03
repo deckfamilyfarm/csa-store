@@ -26,6 +26,22 @@ export function tokenHash(token) {
   if (!/^[a-f0-9]{64}$/.test(String(token || ''))) fail('Invalid order access token.', 401);
   return hash(token);
 }
+
+// Guest access is saved on the checkout origin. Keep Stripe's return on that
+// same trusted origin; never accept an arbitrary redirect supplied by a client.
+export function checkoutReturnOrigin(configuredUrl, requestOrigin) {
+  let configured;
+  try { configured = new URL(configuredUrl || 'https://turkeys.deckfamilyfarm.com'); }
+  catch { fail('Configure a valid storefront URL.', 503); }
+  const local = ['localhost', '127.0.0.1', '[::1]'].includes(configured.hostname);
+  if (configured.username || configured.password || (configured.protocol !== 'https:' && !(local && configured.protocol === 'http:'))) {
+    fail('Storefront URL must use HTTPS.', 503);
+  }
+  if (!requestOrigin) return configured.origin;
+  const allowed = new Set([configured.origin, 'https://store.deckfamilyfarm.com', 'https://turkeys.deckfamilyfarm.com']);
+  if (!allowed.has(requestOrigin)) fail('Please open the turkey page on the store website before starting checkout.');
+  return requestOrigin;
+}
 export function normalizeCheckout(body) {
   const customer = body.customer || {};
   const phone = text(customer.phone, 'phone', 40);

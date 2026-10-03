@@ -6,6 +6,7 @@ import {
 } from "../api.js";
 import { getSiteContentValue } from "../siteContent.js";
 import { DeckPageHeader } from "./DeckPageHeader.jsx";
+import { SubscribeFooter } from "./SubscribeFooter.jsx";
 import { DELIVERY_MAP_URL, buildSubscribeNavLinks } from "./subscribeNavigation.js";
 
 const MEDIA_KIT_URL =
@@ -841,29 +842,7 @@ export function DropsitesPage({ siteContent = {} }) {
         </div>
       </section>
 
-      <footer className="subscribe-footer">
-        <div className="container subscribe-footer-row">
-          <div className="subscribe-footer-brand">
-            <div className="subscribe-footer-brand-top">
-              <img className="subscribe-footer-logo" src="/images/subscribe-footer-logo.avif" alt="Deck Family Farm icon logo" />
-              <strong className="subscribe-footer-wordmark">Deck Family Farm</strong>
-            </div>
-            <div className="small">Drop-site resources for Full Farm hosts and neighbors.</div>
-          </div>
-          <div className="subscribe-footer-contact">
-            <div>25362 High Pass Road</div>
-            <div>Junction City, OR 97448</div>
-            <div><a href="tel:15413210925">541-321-0925</a></div>
-            <div><a href="mailto:fullfarmcsa@deckfamilyfarm.com">Email Full Farm</a></div>
-          </div>
-          <div className="subscribe-footer-links">
-            <a className="subscribe-review-link" href="https://subscribe.deckfamilyfarm.com/">
-              <span className="subscribe-review-link-star" aria-hidden="true">+</span>
-              <span>Subscribe</span>
-            </a>
-          </div>
-        </div>
-      </footer>
+      <SubscribeFooter />
       {shareModal ? (
         <div className="modal-backdrop dropsite-share-modal-backdrop" onClick={closeShareModal}>
           <div

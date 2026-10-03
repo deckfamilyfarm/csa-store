@@ -1480,6 +1480,7 @@ img {
 }
 
 .subscribe-footer {
+  --subscribe-serif: "Cormorant Garamond", "Fraunces", "Times New Roman", serif;
   padding: 26px 0 34px;
   border-top: 1px solid rgba(31, 27, 23, 0.08);
   background: rgba(91, 42, 57, 1);
@@ -1536,6 +1537,13 @@ img {
 
 .subscribe-footer-contact a {
   color: #ffffff;
+}
+
+.subscribe-footer-staff-login {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  white-space: nowrap;
 }
 
 .subscribe-footer-links {
@@ -6304,25 +6312,6 @@ img {
   justify-content: space-between;
   gap: 24px;
   align-items: flex-start;
-}
-
-.member-portal-footer-admin {
-  padding-top: 8px;
-  padding-bottom: 18px;
-  text-align: center;
-}
-
-.member-portal-footer-admin a {
-  font-size: 12px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.88);
-  text-decoration: none;
-  font-weight: 700;
-}
-
-.member-portal-footer-admin a:hover {
-  color: #ffffff;
 }
 
 .member-portal-card-columns {

@@ -1,22 +1,33 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { DeckPageHeader } from './DeckPageHeader.jsx';
 import { SubscribeFooter } from './SubscribeFooter.jsx';
-import { ProductDescription } from './ProductDescription.jsx';
-import { buildSubscribeNavLinks, getSubscribeHostUrl } from './subscribeNavigation.js';
+import { TurkeyShopping } from './TurkeyShopping.jsx';
+import { TurkeyPickupInfo } from './TurkeyPickupInfo.jsx';
+import { pickupDateLabel, turkeyPickupIntro } from './turkeyPickup.js';
+import { CART_KEY, readCart, saveCart, cartLines, addToCart, turkeyRoute, turkeyLink, rememberCheckoutCart, settleCheckoutCart } from './turkeyCart.js';
+import { buildSubscribeNavLinks } from './subscribeNavigation.js';
+import { readOrderAccess, rememberOrderAccess } from './turkeyOrderAccess.js';
 import './turkey.css';
 
 const base = import.meta.env.VITE_API_BASE || '/api';
 export const money = cents => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(cents / 100);
-export const pickupDateLabel = date => date ? new Date(`${date}T12:00:00`).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : '';
 async function request(path, { body, token, method } = {}) {
-  const response = await fetch(`${base}/storefront/${path}`, {
-    method: method || (body ? 'POST' : 'GET'), cache: 'no-store',
-    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-    ...(body ? { body: JSON.stringify(body) } : {})
-  });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error || 'Unable to complete your request.');
-  return data;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 20000);
+  try {
+    const response = await fetch(`${base}/storefront/${path}`, {
+      signal: controller.signal,
+      method: method || (body ? 'POST' : 'GET'), cache: 'no-store',
+      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      ...(body ? { body: JSON.stringify(body) } : {})
+    });
+    const data = await response.json();
+    if (!response.ok) throw Object.assign(new Error(data.error || 'Unable to complete your request.'), { status: response.status, checkoutRejected: data.checkoutRejected === true });
+    return data;
+  } catch (error) {
+    if (error.name === 'AbortError') throw new Error('The connection timed out. Please try again.');
+    throw error;
+  } finally { clearTimeout(timeout); }
 }
 function storage(key, fallback = null) {
   try { return JSON.parse(sessionStorage.getItem(key)) || fallback; } catch { return fallback; }
@@ -28,103 +39,170 @@ const emptyCustomer = { name: '', email: '', phone: '', addressLine1: '', addres
 
 export function TurkeyStorefront() {
   const [catalog, setCatalog] = useState(null);
+  const [catalogError, setCatalogError] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
-  const [quantities, setQuantities] = useState({});
-  const [customer, setCustomer] = useState(emptyCustomer);
-  const [pickupId, setPickupId] = useState('');
+  const [cart, setCart] = useState(() => readCart());
+  const [checking, setChecking] = useState(false);
+  const checkoutBusy = useRef(false);
+  const catalogVersion = useRef(0);
+  const [customer, setCustomer] = useState(() => ({ ...emptyCustomer, ...storage('turkeyPending')?.customer }));
+  const [pickupId, setPickupId] = useState(() => storage('turkeyPending')?.pickupId || '');
   const [order, setOrder] = useState(null);
+  const [orderState, setOrderState] = useState('checking');
+  const [orderRefresh, setOrderRefresh] = useState(0);
   const [pending, setPending] = useState(() => storage('turkeyPending'));
   const [route, setRoute] = useState(window.location.hash);
   const params = new URLSearchParams(route.split('?')[1] || '');
   const preview = params.get('preview') === '1';
   const orderId = params.get('order');
   const cancelled = params.get('cancelled') === '1';
+  const view = turkeyRoute(route);
   const sale = catalog?.sale;
-  const items = (catalog?.options || []).filter(option => Number(quantities[option.id]) > 0).map(option => ({ optionId: option.id, quantity: Number(quantities[option.id]) }));
-  const total = items.reduce((sum, item) => sum + catalog.options.find(option => option.id === item.optionId).priceCents * item.quantity, 0);
+  const saleTitle = !sale?.title || sale.title.toLowerCase() === 'thanksgiving turkey preorders'
+    ? 'Thanksgiving Turkey Preorders' : sale.title;
   const soldOut = catalog && catalog.options.every(option => option.available <= 0);
-  const token = orderId ? storage(`turkeyOrder:${orderId}`) : null;
+  const token = readOrderAccess(orderId);
   const heroImage = sale?.imageUrl || '/images/turkey-home/turkey-banner.jpg';
 
-  useEffect(() => {
-    document.title = 'Thanksgiving turkey preorders | Deck Family Farm';
-    const listener = () => { setRoute(window.location.hash); setOrder(null); setError(''); };
-    window.addEventListener('hashchange', listener);
-    let active = true;
-    const load = () => (preview ? fetch(`${base}/admin/storefront/setup`, { headers: { Authorization: `Bearer ${localStorage.getItem('adminToken') || ''}` } }).then(async response => {
+  const refreshCatalog = useCallback(async () => {
+    const version = ++catalogVersion.current;
+    setChecking(true);
+    try {
+      const data = await (preview ? fetch(`${base}/admin/storefront/setup`, { headers: { Authorization: `Bearer ${localStorage.getItem('adminToken') || ''}` } }).then(async response => {
       if (!response.ok) throw new Error('Sign in with Storefront Admin access to preview the sale.');
       const data = await response.json();
       const pickupGroups = data.pickupGroups.filter(group => group.active);
       return { ...data, pickupGroups, pickups: data.pickups.filter(pickup => pickup.active && pickupGroups.some(group => group.id === pickup.groupId)),
-        options: data.options.filter(option => option.active && option.productAvailable && option.priceCents != null), sale: { ...data.sale, open: true } };
-    }) : request('sale')).then(data => { if (active) setCatalog(data); }).catch(err => { if (active) setError(err.message); });
-    load(); const timer = setInterval(load, 30000);
-    return () => { active = false; clearInterval(timer); window.removeEventListener('hashchange', listener); };
+        options: data.options.filter(option => option.active && option.productAvailable && option.priceCents != null && !option.variantError), sale: { ...data.sale, open: true } };
+      }) : request('sale'));
+      if (version === catalogVersion.current) { setCatalog(data); setCatalogError(''); }
+      return data;
+    } catch (err) { if (version === catalogVersion.current) setCatalogError(err.message); throw err; }
+    finally { if (version === catalogVersion.current) setChecking(false); }
   }, [preview]);
   useEffect(() => {
+    const listener = () => { setRoute(window.location.hash); setOrder(null); setError(''); window.scrollTo(0, 0); };
+    window.addEventListener('hashchange', listener);
+    return () => window.removeEventListener('hashchange', listener);
+  }, []);
+  useEffect(() => {
+    document.title = `${orderId ? 'Your turkey order' : view === 'cart' ? 'Your cart' : view === 'product' ? 'Thanksgiving Turkey' : 'Thanksgiving Turkey Preorders'} | Deck Family Farm`;
+    refreshCatalog().catch(() => {});
+    const timer = setInterval(() => refreshCatalog().catch(() => {}), 30000);
+    return () => { ++catalogVersion.current; clearInterval(timer); };
+  }, [refreshCatalog, view, orderId]);
+  useEffect(() => { saveCart(cart); }, [cart]);
+  useEffect(() => {
+    const listener = event => { if (event.key === CART_KEY && !pending) setCart(readCart()); };
+    window.addEventListener('storage', listener);
+    return () => window.removeEventListener('storage', listener);
+  }, [pending]);
+  function clearPending() {
+    try { sessionStorage.removeItem('turkeyPending'); } catch { /* Keep the current tab usable. */ }
+    setPending(null);
+  }
+  function receiveOrder(data) {
+    setOrder(data); setOrderState('ready');
+    if (settleCheckoutCart(data)) setCart([]);
+    if (['paid', 'collected', 'refunded', 'expired'].includes(data.status) && storage('turkeyPending')?.token === readOrderAccess(data.id)) clearPending();
+  }
+  useEffect(() => {
     if (!orderId) return undefined;
-    if (!token) { setError('Open this order in the browser used for checkout, or contact the farm with your confirmation email.'); return undefined; }
+    if (!token) { setOrderState('missing'); return undefined; }
     let active = true;
-    const load = () => request(`orders/${orderId}`, { token }).then(data => {
-      if (!active) return;
-      setOrder(data);
-      if (['paid', 'collected', 'refunded', 'expired'].includes(data.status)) {
-        sessionStorage.removeItem('turkeyPending'); setPending(null);
+    let timer;
+    let requestVersion = 0;
+    setOrderState('checking');
+    async function load() {
+      const version = ++requestVersion;
+      clearTimeout(timer);
+      try {
+        const data = await request(`orders/${orderId}`, { token });
+        if (!active || version !== requestVersion) return;
+        receiveOrder(data);
+        if (!['paid', 'collected', 'refunded', 'expired'].includes(data.status)) timer = setTimeout(load, 5000);
+      } catch (err) {
+        if (active && version === requestVersion) setOrderState([401, 403, 404].includes(err.status) ? 'missing' : 'error');
       }
-    }).catch(err => { if (active) setError(err.message); });
-    request(`orders/${orderId}/reconcile`, { token, method: 'POST' }).catch(() => {}).finally(load);
-    const timer = setInterval(load, 5000);
-    return () => { active = false; clearInterval(timer); };
-  }, [orderId, token]);
+    }
+    // Read the receipt immediately; Stripe reconciliation must not hold up the page.
+    load();
+    request(`orders/${orderId}/reconcile`, { token, method: 'POST' }).then(() => {
+      if (active) { clearTimeout(timer); load(); }
+    }).catch(() => {});
+    return () => { active = false; clearTimeout(timer); };
+  }, [orderId, token, orderRefresh]);
 
   async function startCheckout(event, retry = false) {
-    event?.preventDefault(); if (preview) return; setBusy(true); setError('');
-    const body = retry && pending ? pending : { token: newToken(), customer, pickupId: Number(pickupId),
-      items: items.map(item => ({ ...item, expectedPriceCents: catalog.options.find(option => option.id === item.optionId).priceCents })) };
+    event?.preventDefault(); if (preview || checkoutBusy.current) return;
+    checkoutBusy.current = true; setBusy(true); setError('');
+    let body;
     try {
+      if (pending && !retry) throw new Error('Resume or cancel your existing checkout before changing this order.');
+      if (retry && pending) body = pending;
+      else {
+        const current = await refreshCatalog();
+        if (!current.sale.open) throw new Error('Turkey preorders are currently closed.');
+        if (!cart.length || cartLines(cart, current).some(line => line.issue)) throw new Error('Your cart has changed. Review its prices and available quantities before checkout.');
+        if (!current.pickups.some(pickup => pickup.id === Number(pickupId))) throw new Error('Choose an available pickup location.');
+        body = { token: newToken(), customer, pickupId: Number(pickupId), items: cart };
+      }
       sessionStorage.setItem('turkeyPending', JSON.stringify(body)); setPending(body);
       const result = await request('checkout', { body });
-      sessionStorage.setItem(`turkeyOrder:${result.orderId}`, JSON.stringify(body.token));
+      if (!rememberOrderAccess(result.orderId, body.token)) throw new Error('This browser could not save your checkout. Enable browser storage and resume this order.');
+      rememberCheckoutCart(result.orderId, body.items);
       if (result.url) window.location.assign(result.url);
       else window.location.hash = `#/turkeys?order=${result.orderId}`;
-    } catch (err) { setError(`${err.message} If you already started checkout, use “Resume checkout” to retry the same order.`); }
-    finally { setBusy(false); }
+    } catch (err) {
+      if (err.checkoutRejected) { clearPending(); refreshCatalog().catch(() => {}); }
+      setError(`${err.message}${body && !err.checkoutRejected ? ' Use “Resume checkout” to retry the same order.' : ''}`);
+    }
+    finally { checkoutBusy.current = false; setBusy(false); }
   }
   async function orderAction(action) {
     setBusy(true); setError('');
-    try { setOrder(await request(`orders/${orderId}/${action}`, { token, method: 'POST' })); }
+    try { receiveOrder(await request(`orders/${orderId}/${action}`, { token, method: 'POST' })); }
     catch (err) { setError(err.message); }
     finally { setBusy(false); }
   }
-  const field = (key, label, type = 'text', required = true, autoComplete = key) => <label key={key}>
-    {label}<input name={key} type={type} required={required} autoComplete={autoComplete} maxLength={key === 'email' ? 254 : 200}
-      value={customer[key]} onChange={event => setCustomer(prev => ({ ...prev, [key]: event.target.value }))} />
-  </label>;
+  function add(option, quantity) {
+    if (pending || busy) return;
+    try { setCart(addToCart(cart, option, quantity)); setError(''); window.location.hash = turkeyLink('cart', preview); }
+    catch (err) { setError(err.message); }
+  }
   return <div className="subscribe-page turkey-page">
-    <DeckPageHeader navLinks={buildSubscribeNavLinks()} authLabel="Staff login" onAuthAction={() => { window.location.href = '/#/admin'; }} />
+    <DeckPageHeader navLinks={buildSubscribeNavLinks()} />
     <main>
-      <section className="subscribe-hero turkey-banner">
+      {view === 'listing' && !orderId && <section className="subscribe-hero turkey-banner">
         <img className="turkey-banner-image" src={heroImage} width="1580" height="1053" fetchPriority="high"
           alt="A flock of white and heritage turkeys in the sunshine at Deck Family Farm" />
         <div className="container">
-        <div className="subscribe-hero-copy"><span className="eyebrow">Deck Family Farm · Thanksgiving</span><h1 className="subscribe-title">{sale?.title || 'Thanksgiving turkey preorders'}</h1>
-          <p className="subscribe-lede">{sale?.description || 'A special gathering starts with something grown close to home.'}</p>
-          {sale?.pickupDate && <p className="turkey-date">Pickup · {pickupDateLabel(sale.pickupDate)}</p>}
-          {!orderId && sale?.open && !soldOut && <a className="turkey-button" href="#turkey-order" onClick={event => { event.preventDefault(); document.getElementById('turkey-order')?.scrollIntoView({ behavior: 'smooth' }); }}>Reserve your turkey <span aria-hidden="true">↗</span></a>}
+        <div className="subscribe-hero-copy"><span className="eyebrow">Deck Family Farm · Thanksgiving</span><h1 className="subscribe-title">{saleTitle}</h1>
+          <p className="subscribe-lede">{turkeyPickupIntro(sale?.description, sale?.pickupDate)}</p>
+          {!orderId && sale?.open && !soldOut && <a className="turkey-button" href={turkeyLink('product', preview)}>Reserve your turkey <span aria-hidden="true">↗</span></a>}
         </div>
         </div>
-      </section>
+      </section>}
       <div className="turkey-content">
         {preview && <div className="turkey-alert" role="status">Staff preview of saved setup. Checkout is disabled.</div>}
-        {error && <div className="turkey-alert" role="alert">{error}</div>}
-        {!catalog && !error && <p role="status">Loading turkey availability…</p>}
+        {(error || (!orderId && catalogError)) && <div className="turkey-alert" role="alert">{error || catalogError}</div>}
+        {!orderId && !catalog && !catalogError && <p role="status">Loading turkey availability…</p>}
         {orderId ? <section className="turkey-card turkey-confirmation" aria-live="polite">
-          {!order ? <h2>Checking your order…</h2> : <>
+          {(!token || ['missing', 'error'].includes(orderState)) ? <>
+            <h2>We couldn’t display your order details.</h2>
+            <p>{!token || orderState === 'missing' ? 'We couldn’t reconnect this page to your checkout.' : 'We couldn’t reach the store to load your order.'} This does not mean your payment failed.</p>
+            <p>Check your confirmation email or contact the farm before placing another order.</p>
+            <p className="turkey-order-reference">Order reference: <strong>{orderId}</strong></p>
+            <div className="turkey-actions">
+              <button type="button" className="turkey-button" onClick={() => setOrderRefresh(value => value + 1)}>Try again</button>
+              {sale?.contactEmail && <a className="turkey-button" href={`mailto:${sale.contactEmail}?subject=${encodeURIComponent(`Turkey order ${orderId}`)}`}>Contact the farm</a>}
+            </div>
+          </> : !order ? <><h2>Loading your order…</h2><p>Please wait while we retrieve your confirmation.</p></> : <>
             <span className="turkey-eyebrow">{order.number}</span>
             <h2>{['paid','collected'].includes(order.status) ? 'Your turkey is reserved.' : order.status === 'refunded' ? 'Your order has been refunded.' : order.status === 'expired' ? 'Your reservation has ended.' : order.status.startsWith('refund') ? 'Your refund is being reviewed.' : cancelled ? 'Checkout was not completed.' : 'Confirming your payment…'}</h2>
             <p>{['paid','collected'].includes(order.status) ? `Thank you, ${order.customer.name}. A confirmation email is on its way to ${order.customer.email}.` : order.status === 'expired' ? 'No payment was completed. You can start a new order if turkeys are still available.' : order.status === 'refunded' ? 'Your cancellation is complete.' : 'Your order is not confirmed until payment has been verified.'}</p>
-            <ul className="turkey-summary">{order.items.map(item => <li key={item.optionId}><span>{item.quantity} × {item.label}</span><strong>{money(item.priceCents * item.quantity)}</strong></li>)}</ul>
+            <ul className="turkey-summary">{order.items.map(item => <li key={item.optionId}><span>{item.quantity} × {item.typeLabel && item.sizeLabel ? `${item.typeLabel}, ${item.sizeLabel}` : item.label}</span><strong>{money(item.priceCents * item.quantity)}</strong></li>)}</ul>
             <p><strong>Total: {money(order.totalCents)}</strong></p>
             <div className="turkey-pickup-summary"><span className="turkey-eyebrow">{order.pickup.groupName}</span><h3>{order.pickup.name}</h3><p>{pickupDateLabel(order.pickup.date)}<br />{order.pickup.hours} · Pacific time<br />{order.pickup.address}</p><p>{order.pickup.instructions}</p></div>
             {['creating','reserved','review'].includes(order.status) && <div className="turkey-actions">
@@ -132,40 +210,16 @@ export function TurkeyStorefront() {
               <button disabled={busy} onClick={() => orderAction('reconcile')}>Check payment status</button>
               <button disabled={busy} onClick={() => orderAction('cancel')}>Cancel unpaid reservation</button>
             </div>}
-            {['expired','refunded'].includes(order.status) && <a className="turkey-button" href="/#/turkeys">Back to turkeys</a>}
+            {['expired','refunded'].includes(order.status) && <a className="turkey-button" href={turkeyLink('cart')}>Return to cart</a>}
           </>}
         </section> : catalog && <>
-          {!sale.open || (soldOut && !preview) ? <section className="turkey-card"><h2>{soldOut && sale.status !== 'draft' ? 'Our turkey preorders are sold out.' : sale.status === 'draft' ? 'Preorders are coming soon.' : 'Preorders are currently closed.'}</h2><p>{sale.contactEmail ? <>For questions, email <a href={`mailto:${sale.contactEmail}`}>{sale.contactEmail}</a>.</> : 'Check back here for turkey sizes, prices, and pickup details.'}</p></section> :
-            <form id="turkey-order" onSubmit={event => startCheckout(event)} className="turkey-order-layout">
-              <div><div className="turkey-section-title"><span className="turkey-eyebrow">01 · Choose your turkeys</span><h2>Make room for something special.</h2><p>Fixed prices. Pay in full today, then pick up on {pickupDateLabel(sale.pickupDate)}.</p></div>
-                <div className="turkey-options">{catalog.options.map(option => <article className={`turkey-card ${!option.available ? 'turkey-sold-out' : ''}`} key={option.id}>
-                  {option.imageUrl && <img className="turkey-product-photo" src={option.imageUrl} alt={option.label} loading="lazy" />}
-                  <h3>{option.label}</h3><ProductDescription description={option.description} /><strong className="turkey-price">{money(option.priceCents)}<small> per turkey</small></strong>
-                  <div className="turkey-option-bottom"><span>{option.available > 0 ? `${option.available} available` : 'Sold out'}</span><label>Quantity<input type="number" aria-label={`${option.label} quantity`} min="0" max={Math.min(1000, option.available)} step="1" disabled={!option.available || busy} value={quantities[option.id] || 0} onChange={event => setQuantities(prev => ({ ...prev, [option.id]: event.target.value }))} /></label></div>
-                </article>)}</div>
-                <section className="turkey-card"><span className="turkey-eyebrow">02 · Choose your pickup</span><h2>We’ll meet you there.</h2>
-                  <div className="turkey-pickups">{catalog.pickupGroups?.map(group => <fieldset className="turkey-pickup-group" key={group.id}><legend>{group.name}</legend>{catalog.pickups.filter(pickup => pickup.groupId === group.id).map(pickup => <label key={pickup.id} className="turkey-pickup-option"><input type="radio" name="pickup" value={pickup.id} required checked={String(pickupId) === String(pickup.id)} onChange={event => setPickupId(event.target.value)} /><span><strong>{pickup.name}</strong><span>{pickup.address}</span><span>{pickup.hours} · Pacific time</span><small>{pickup.instructions}</small></span></label>)}</fieldset>)}</div>
-                </section>
-                <section className="turkey-card"><span className="turkey-eyebrow">03 · Your details</span><h2>Who’s coming to pick up?</h2><p>We’ll email your confirmation and contact you if pickup details change.</p>
-                  <div className="turkey-fields">{field('name','Full name','text',true,'name')}{field('email','Email','email',true,'email')}{field('phone','Phone','tel',true,'tel')}{field('addressLine1','Street address','text',true,'address-line1')}{field('addressLine2','Apartment / suite (optional)','text',false,'address-line2')}{field('city','City','text',true,'address-level2')}{field('state','State / province','text',true,'address-level1')}{field('postalCode','ZIP / postal code','text',true,'postal-code')}{field('country','Country code','text',true,'country')}</div>
-                </section>
-              </div>
-              <aside className="turkey-card turkey-checkout"><span className="turkey-eyebrow">Your Thanksgiving order</span><h2>A turkey with your name on it.</h2>
-                <ul className="turkey-summary">{items.map(item => <li key={item.optionId}><span>{item.quantity} × {catalog.options.find(option => option.id === item.optionId).label}</span><strong>{money(item.quantity * catalog.options.find(option => option.id === item.optionId).priceCents)}</strong></li>)}</ul>
-                {!items.length && <p>Choose a turkey size to get started.</p>}<div className="turkey-total"><span>Total</span><strong>{money(total)}</strong></div>
-                <p>Pickup only · {pickupDateLabel(sale.pickupDate)}</p><button className="turkey-button" type="submit" disabled={preview || busy || !items.length}>{preview ? 'Preview — checkout disabled' : busy ? 'Preparing checkout…' : 'Continue to secure payment'}</button><small>Pay securely with Stripe. No account needed. Stock is reserved while you complete payment.</small>
-              </aside>
-            </form>}
-          {pending && <div className="turkey-card"><p>You have a checkout in progress.</p><button className="turkey-button" disabled={busy} onClick={event => startCheckout(event, true)}>Resume checkout</button></div>}
+          {pending && <div className="turkey-alert" role="status"><p>You have a checkout in progress. Its items are held until payment or cancellation is confirmed.</p><button className="turkey-button" disabled={busy || preview} onClick={event => startCheckout(event, true)}>Resume checkout</button></div>}
+          <TurkeyShopping view={view} catalog={catalog} cart={cart} onAdd={add}
+            onCartChange={next => { if (!pending && !busy) setCart(next); }} preview={preview} locked={Boolean(pending)} busy={busy}
+            checking={checking || Boolean(catalogError)} customer={customer} setCustomer={setCustomer} pickupId={pickupId} setPickupId={setPickupId}
+            onCheckout={startCheckout} onRefresh={() => refreshCatalog().catch(() => {})} />
         </>}
-        {!orderId && <section className="turkey-farm-story">
-          <div><span className="turkey-eyebrow">A Deck Family Farm Thanksgiving</span><h2>A place at your table.</h2><p>Choose your turkey, reserve it online, and collect it at your selected pickup location. Then gather your favorite people around the table.</p></div>
-          <figure className="turkey-holiday-photo">
-            <img src="/images/turkey-home/holiday-turkey.jpg" loading="lazy"
-              width="1500" height="1125" alt="Roasted Thanksgiving turkey on a platter with grapes, apples, and greenery" />
-          </figure>
-        </section>}
-        <section className="turkey-footer-note"><h2>Find your pickup location.</h2><p>{(catalog?.pickups || []).map(pickup => pickup.name).join(' · ')}</p><p>For the rest of the year, explore our <a href={getSubscribeHostUrl()}>Full Farm CSA subscriptions</a>.</p></section>
+        {!orderId && view !== 'cart' && catalog && <TurkeyPickupInfo catalog={catalog} />}
       </div>
     </main><SubscribeFooter />
   </div>;

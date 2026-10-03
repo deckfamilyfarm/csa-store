@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { descriptionBlocks } from './productDescriptionText.js';
 
 const allowedTags = new Set(['p', 'div', 'br', 'strong', 'b', 'em', 'i', 'u', 's', 'ul', 'ol', 'li', 'blockquote', 'h3', 'h4', 'h5', 'h6', 'a']);
 const blockedTags = new Set(['script', 'style', 'iframe', 'object', 'embed', 'svg', 'math', 'template', 'form', 'input', 'button', 'textarea', 'select']);
@@ -8,6 +9,9 @@ const blockedTags = new Set(['script', 'style', 'iframe', 'object', 'embed', 'sv
 export function ProductDescription({ description }) {
   const content = useMemo(() => {
     if (!description) return null;
+    if (!/<\/?[a-z][^>]*>/i.test(description)) return descriptionBlocks(description).map((block, index) => block.type === 'list'
+      ? <ul key={index}>{block.lines.map((line, i) => <li key={i}>{line}</li>)}</ul>
+      : <p key={index}>{block.lines.join('\n')}</p>);
     const template = document.createElement('template');
     template.innerHTML = description;
     function render(node, key) {

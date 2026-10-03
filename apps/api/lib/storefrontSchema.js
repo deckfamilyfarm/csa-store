@@ -20,6 +20,7 @@ async function bootstrap(pool) {
       image_url VARCHAR(2048) NOT NULL DEFAULT '', status VARCHAR(16) NOT NULL DEFAULT 'draft',
       pickup_date VARCHAR(10) NOT NULL, closes_ms BIGINT, contact_email VARCHAR(254) NOT NULL DEFAULT '',
       heritage_description TEXT, broad_breasted_description TEXT,
+      about_description TEXT, product_image_url VARCHAR(2048),
       notify_email VARCHAR(254) NOT NULL DEFAULT '', updated_ms BIGINT NOT NULL,
       version INT NOT NULL DEFAULT 1, updated_by INT
     ) ENGINE=InnoDB`,
@@ -75,6 +76,11 @@ async function bootstrap(pool) {
   for (const [table, column, definition] of [
     ['storefront_sales', 'heritage_description', 'TEXT'],
     ['storefront_sales', 'broad_breasted_description', 'TEXT'],
+    ['storefront_sales', 'about_description', 'TEXT'],
+    ['storefront_sales', 'product_image_url', 'VARCHAR(2048)'],
+    ['storefront_order_items', 'product_id', 'INT'],
+    ['storefront_order_items', 'turkey_type', 'VARCHAR(40)'],
+    ['storefront_order_items', 'size_label', 'VARCHAR(120)'],
     ['storefront_options', 'product_id', 'INT'],
     ['storefront_pickups', 'group_id', 'INT NOT NULL DEFAULT 1'],
     ['storefront_pickups', 'active', 'TINYINT NOT NULL DEFAULT 1']
@@ -92,7 +98,7 @@ async function bootstrap(pool) {
   }
   await pool.query(`INSERT IGNORE INTO storefront_sales
     (id,title,description,pickup_date,updated_ms) VALUES (1,?,?,?,?)`, [
-    'Thanksgiving turkey preorders', 'Reserve your Deck Family Farm turkey for Saturday pickup.', '2026-11-21', Date.now()
+    'Thanksgiving Turkey Preorders', 'Reserve your Deck Family Farm turkey for Saturday pickup.', '2026-11-21', Date.now()
   ]);
   await pool.query("INSERT IGNORE INTO storefront_pickup_groups (id,sale_id,name) VALUES (1,1,'Thanksgiving pickup')");
   for (const [index, name] of ['PSU Farmers Market', 'Hollywood Farmers Market', 'Lane County Farmers Market', 'Farm Pickup'].entries()) {
