@@ -5,6 +5,8 @@ import { AdminMarketingSection } from "./AdminMarketingSection.jsx";
 import { AdminManualSection } from "./AdminManualSection.jsx";
 import { AdminMembershipSection } from "./AdminMembershipSection.jsx";
 import { AdminOrdersSection } from "./AdminOrdersSection.jsx";
+import { AdminTurkeyPreorders } from "./AdminTurkeyPreorders.jsx";
+import { AdminStorefront } from "./AdminStorefront.jsx";
 import { AdminProductsSection } from "./AdminProductsSection.jsx";
 import { categoryLabel } from "../categoryLabel.js";
 import { productCapabilities, buildProductDraftFromProduct, createDraftPackage, hydrateProductDraft, dirtyFields, hasDraftChanges, acknowledgeSave, saveProductDraft, saveInventoryDraft, INVENTORY_FIELDS, unsupportedScheduleFields, buildScheduleUpdate } from "./productWorkspace.js";
@@ -33,6 +35,9 @@ function hasRole(roleKeys, roleKey) {
 function canAccessAdminSection(roleKeys, section) {
   if (roleKeys.includes("admin")) return true;
   switch (section) {
+    case "storefront":
+    case "turkeyPreorders":
+      return roleKeys.includes("storefront_admin");
     case "googleDrive":
       return (
         roleKeys.includes("pricing_admin") ||
@@ -89,6 +94,8 @@ function canAccessAdminSection(roleKeys, section) {
 function getDefaultAdminSection(roleKeys = []) {
   const order = [
     "products",
+    "turkeyPreorders",
+    "storefront",
     "googleDrive",
     "localLine",
     "productSync",
@@ -115,6 +122,8 @@ const ADMIN_NAV_GROUPS = [
     label: "Store",
     items: [
       { section: "products", label: "Products" },
+      { section: "storefront", label: "Storefront" },
+      { section: "turkeyPreorders", label: "Turkey Preorders" },
       { section: "localLine", label: "Local Line Data" },
       { section: "productSync", label: "Product Sync" },
       { section: "orders", label: "Orders" }
@@ -4677,6 +4686,12 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
 
           {activeSection === "orders" && canManageOrders && (
             <AdminOrdersSection token={token} />
+          )}
+          {activeSection === "turkeyPreorders" && canAccessAdminSection(currentAdminRoles, "turkeyPreorders") && (
+            <AdminTurkeyPreorders token={token} />
+          )}
+          {activeSection === "storefront" && canAccessAdminSection(currentAdminRoles, "storefront") && (
+            <AdminStorefront token={token} onVisibilityChange={() => window.dispatchEvent(new Event('store-visibility-changed'))} />
           )}
 
           {activeSection === "membership" && canManageMembership && (

@@ -68,6 +68,34 @@ function getSenderAddress() {
   );
 }
 
+export function storefrontEmailConfigured() {
+  return Boolean(createTransporter() && getSenderAddress());
+}
+
+export async function sendStorefrontEmail(order) {
+  const transporter = createTransporter();
+  if (!transporter || !getSenderAddress()) throw new Error("Storefront email delivery is not configured.");
+  const money = cents => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(cents / 100);
+  const refunded = order.kind === "refund";
+  const title = refunded ? `Turkey preorder refunded — ${order.number}` : `Your turkey preorder — ${order.number}`;
+  const lines = [
+    `Hello ${order.customer.name},`, "",
+    refunded ? `Your payment of ${money(order.totalCents)} has been refunded.${order.collectedMs ? '' : ' Your preorder is cancelled.'}` : "Thank you! Your turkey preorder is paid and confirmed.",
+    `Order: ${order.number}`, ...order.items.map(item => `${item.quantity} × ${item.label} — ${money(item.priceCents)} each`),
+    `Total paid: ${money(order.totalCents)}`, "",
+    ...(refunded ? [] : [
+      `Pickup: ${[order.pickup.groupName, order.pickup.name].filter(Boolean).join(' — ')}`, `Date: ${order.pickup.date}`, `Hours: ${order.pickup.hours} (Pacific time)`,
+      `Address: ${order.pickup.address}`, order.pickup.instructions, "Bring your order number when you pick up your turkey."
+    ]), "", `Questions or changes? Contact ${order.contactEmail}.`, "",
+    `Customer: ${order.customer.name}`, `Phone: ${order.customer.phone}`
+  ];
+  await transporter.sendMail({
+    from: getSenderAddress(), to: order.customer.email, bcc: order.notifyEmail,
+    replyTo: order.contactEmail, subject: title, messageId: order.messageId,
+    text: lines.join("\n"), html: `<div>${lines.map(line => `<p>${escapeHtml(line)}</p>`).join("")}</div>`
+  });
+}
+
 function displayValue(value, fallback = "Not provided") {
   const text = String(value ?? "").trim();
   return text || fallback;

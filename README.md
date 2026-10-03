@@ -14,6 +14,11 @@ API location
 - The API lives in `apps/api` (Express + Drizzle + MySQL).
 - Local Line schema additions for the store DB are in `apps/api/sql/localline_sync.sql`.
 
+Turkey preorders
+- `store.deckfamilyfarm.com` and the local root show the original landing page with **Coming Soon, Full Farm Version 2 store**. **Store → Storefront** controls public product visibility and provides a staff preview.
+- `turkeys.deckfamilyfarm.com` (locally `/turkeys`) has a turkey preorder storefront with independent stock, guest Stripe checkout, and **Store → Turkey Preorders** administration.
+- The sale starts as a draft with checkout disabled. See [configuration, launch, maintenance, and tests](docs/turkey-preorders.md).
+
 How To Edit The Site Directly
 - This site is not edited through Wix or a visual CMS. It is edited directly in this repo using normal files.
 - The current subscribe page is a React page. If you want to change wording, images, layout, or styling, you edit the files below and rebuild the frontend.

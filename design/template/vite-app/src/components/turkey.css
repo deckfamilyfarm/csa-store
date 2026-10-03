@@ -1,0 +1,97 @@
+.turkey-page { color:var(--ink); min-height:100vh; }
+.turkey-admin { min-width:0; }
+.turkey-page * { box-sizing:border-box; }
+.turkey-banner { position:relative; isolation:isolate; padding:58px 0 68px; background:#526046; }
+.turkey-banner-image { position:absolute; inset:0; z-index:-2; display:block; width:100%; height:100%; object-fit:cover; object-position:center 55%; }
+.turkey-banner::after { content:''; position:absolute; inset:0; z-index:-1; background:linear-gradient(90deg,#0e2015e6 0%,#0e2015be 31%,#0e20155c 54%,#0e20150a 80%); }
+.turkey-banner .subscribe-hero-copy { max-width:570px; padding:30px 0; }
+.turkey-banner .subscribe-title { max-width:12ch; }
+.turkey-banner .subscribe-lede { white-space:pre-line; max-width:46ch; }
+.turkey-banner .eyebrow { color:#e7ddbd; }
+.turkey-farm-story { display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:48px; align-items:center; margin-top:50px; padding:38px; background:#f6f1e780; border-radius:24px; }
+.turkey-farm-story > div { max-width:440px; }
+.turkey-holiday-photo { min-width:0; margin:0; overflow:hidden; border-radius:20px; box-shadow:0 16px 35px #26301e20; }
+.turkey-holiday-photo img { display:block; width:100%; height:auto; }
+.turkey-eyebrow { display:block; font-size:11px; font-weight:bold; letter-spacing:1.8px; text-transform:uppercase; margin-bottom:14px; }
+.turkey-date { font-weight:bold; font-size:15px; color:white; }
+.turkey-page .turkey-button { background:var(--barn); color:white; border:0; font-weight:bold; border-radius:999px; padding:16px 22px; display:inline-flex; justify-content:center; gap:25px; text-decoration:none; cursor:pointer; }
+.turkey-page button:disabled { opacity:.55; cursor:not-allowed; }
+.turkey-page main button:not(.turkey-button),.turkey-admin button { border:1px solid #b8bdb0; border-radius:8px; padding:9px 12px; cursor:pointer; background:#fff; color:var(--ink); }
+.turkey-content { max-width:1320px; padding:48px 40px 0; margin:auto; }
+.turkey-card { border:1px solid var(--line); background:white; padding:28px; border-radius:18px; margin-bottom:24px; }
+.turkey-page h2 { font:600 36px/1.15 var(--subscribe-serif); margin:10px 0 20px; }
+.turkey-page h3 { font:600 29px/1.2 var(--subscribe-serif); margin:0 0 10px; }
+.turkey-page p { line-height:1.6; }
+.turkey-order-layout { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:32px; align-items:start; scroll-margin-top:140px; }
+.turkey-section-title { margin-bottom:25px; }
+.turkey-options { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+.turkey-options .turkey-card { display:flex; flex-direction:column; }
+.turkey-options .turkey-card p { flex:1; white-space:pre-line; }
+.turkey-product-photo { width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:12px; margin-bottom:20px; }
+.turkey-price { display:block; font-size:26px; margin:15px 0; }
+.turkey-price small { font:normal 13px var(--sans); }
+.turkey-option-bottom { display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:12px; }
+.turkey-option-bottom label { display:flex; align-items:center; gap:8px; }
+.turkey-option-bottom input { width:65px; }
+.turkey-sold-out { opacity:.65; }
+.turkey-pickups { display:grid; gap:14px; }
+.turkey-pickup-group { min-width:0; padding:0; border:0; display:grid; gap:12px; }
+.turkey-pickup-group legend { font-weight:600; padding:10px 0; }
+.turkey-pickup-option { display:flex; align-items:start; gap:12px; padding:16px; border:1px solid #d8dace; border-radius:4px; cursor:pointer; }
+.turkey-pickup-option:has(input:checked) { border-color:#203c30; background:#edf0e7; }
+.turkey-pickup-option input { margin-top:4px; }
+.turkey-pickup-option span span,.turkey-pickup-option small { display:block; margin-top:6px; line-height:1.4; }
+.turkey-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; }
+.turkey-fields > * { min-width:0; }
+.turkey-fields label { display:flex; flex-direction:column; gap:8px; font-size:14px; }
+.turkey-page input,.turkey-admin input,.turkey-admin textarea,.turkey-admin select { font:inherit; border:1px solid #b8bdb0; border-radius:4px; padding:11px; background:white; color:#203c30; max-width:100%; min-width:0; }
+.turkey-page input[type=radio],.turkey-admin input[type=checkbox] { accent-color:#203c30; }
+.turkey-page input:focus-visible,.turkey-page button:focus-visible,.turkey-page a:focus-visible,.turkey-admin :focus-visible { outline:3px solid #b87c37; outline-offset:3px; }
+.turkey-wide { grid-column:1 / -1; }
+.turkey-checkout { position:sticky; top:140px; background:var(--cream); box-shadow:var(--shadow); }
+.turkey-checkout h2 { font-size:30px; }
+.turkey-checkout .turkey-button { width:100%; }
+.turkey-checkout small { display:block; line-height:1.5; margin-top:18px; color:#51604f; }
+.turkey-summary { padding:0; list-style:none; }
+.turkey-summary li { display:flex; justify-content:space-between; gap:18px; padding:12px 0; border-bottom:1px solid #d8dace; }
+.turkey-summary strong { white-space:nowrap; }
+.turkey-total { display:flex; justify-content:space-between; font-size:24px; padding:18px 0; }
+.turkey-alert { padding:18px; border:1px solid #bd745b; border-radius:5px; background:#fff0e6; color:#7c2e20; margin-bottom:22px; }
+.turkey-confirmation { max-width:760px; margin:0 auto 40px; }
+.turkey-pickup-summary { border-top:1px solid #d8dace; margin-top:20px; padding-top:22px; }
+.turkey-actions { display:flex; gap:10px; flex-wrap:wrap; margin:16px 0; }
+.turkey-footer-note { padding:45px 0 60px; border-top:1px solid #d8dace; margin-top:40px; text-align:center; }
+.turkey-admin-tabs { display:flex; gap:10px; margin:20px 0; }
+.turkey-admin-tabs button.active { background:#203c30; color:white; }
+.turkey-admin h4 { font-size:19px; margin:24px 0 14px; }
+.turkey-admin .turkey-card { padding:20px; }
+.turkey-admin fieldset { min-width:0; }
+.turkey-admin legend { font-weight:bold; padding:0 10px; }
+.turkey-table-wrap { overflow:auto; }
+.turkey-admin table { border-collapse:collapse; width:100%; text-align:left; }
+.turkey-admin th,.turkey-admin td { padding:14px 10px; border-bottom:1px solid #d8dace; vertical-align:top; }
+.turkey-admin th { background:#edf0e7; }
+.turkey-stock-adjust { display:flex; flex-wrap:wrap; gap:8px; }
+.turkey-stock-adjust input[type=number] { width:110px; }
+.turkey-order-actions { display:flex; flex-direction:column; gap:8px; min-width:125px; }
+.turkey-error { color:#9b3020; max-width:260px; overflow-wrap:anywhere; }
+.turkey-admin-product { display:flex; align-items:center; gap:16px; min-width:180px; }
+.turkey-admin-product img { width:90px; height:80px; border-radius:10px; object-fit:cover; flex-shrink:0; }
+.turkey-admin-product p { margin:8px 0; }
+.turkey-retail-price { display:block; font-size:24px; font-weight:600; margin:8px 0; color:var(--field); }
+.turkey-product-description { white-space:pre-line; overflow-wrap:anywhere; line-height:1.6; }
+.turkey-product-description p { margin:0 0 12px; }
+.turkey-options .turkey-product-description { flex:1; }
+.turkey-option-stock { color:#51604f; font-size:14px; }
+.turkey-catalog-picker { display:flex; flex-wrap:wrap; align-items:end; gap:12px; }
+.turkey-catalog-picker label { display:flex; flex-direction:column; gap:8px; flex:1 1 300px; }
+.turkey-location-editor { margin-top:20px; background:var(--cream); }
+.turkey-inventory-section { margin-top:40px; border-top:1px solid var(--line); padding-top:12px; }
+.turkey-stock-totals { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; }
+.turkey-stock-totals > div { border:1px solid var(--line); border-radius:12px; padding:20px; background:white; }
+.turkey-stock-totals strong,.turkey-stock-totals span { display:block; }
+.turkey-stock-totals strong { font-size:30px; color:var(--field); }
+@media (max-width:950px) { .turkey-order-layout { grid-template-columns:1fr; } .turkey-checkout { position:static; } .turkey-farm-story { gap:24px; padding:24px; } }
+@media (max-width:650px) { .turkey-banner { padding:0; } .turkey-banner-image { position:relative; z-index:0; height:290px; object-position:65% center; } .turkey-banner::after { display:none; } .turkey-banner .subscribe-hero-copy { padding:28px 0 36px; } .turkey-farm-story { grid-template-columns:1fr; padding:20px; } .turkey-content { padding:25px 18px 0; } .turkey-card { padding:22px; } .turkey-options,.turkey-fields { grid-template-columns:1fr; } .turkey-page h2 { font-size:30px; } .turkey-stock-totals { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width:640px) { .turkey-page .subscribe-header-utility { position:static; align-self:center; } }
+@media print { body:has(.turkey-print-orders) * { visibility:hidden; } body:has(.turkey-print-orders) .turkey-print-orders,body:has(.turkey-print-orders) .turkey-print-orders * { visibility:visible; } body:has(.turkey-print-orders) .turkey-print-orders { position:absolute; top:0; left:0; width:100%; overflow:visible; font-size:10pt; } .turkey-print-orders .no-print { display:none; } .turkey-print-orders tr { break-inside:avoid; } }

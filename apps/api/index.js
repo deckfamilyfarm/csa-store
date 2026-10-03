@@ -18,6 +18,7 @@ import { ensureSeedAdmin } from "./scripts/seedAdmin.js";
 import { ensureSeedUser } from "./scripts/seedUser.js";
 import authRoutes from "./routes/auth.js";
 import memberRoutes, { stripeWebhookHandler } from "./routes/member.js";
+import { storefrontRouter, storefrontAdminRouter, storefrontStripeWebhook } from "./routes/storefront.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,6 +42,7 @@ const port = Number(process.env.PORT || (serveFrontend ? 5176 : 5177));
 app.set("etag", false);
 app.use(cors());
 app.post("/api/member/stripe/webhook", express.raw({ type: "application/json" }), stripeWebhookHandler);
+app.post("/api/storefront/stripe/webhook", express.raw({ type: "application/json", limit: "2mb" }), storefrontStripeWebhook);
 app.use(express.json({ limit: "2mb" }));
 app.use("/api", (_req, res, next) => {
   res.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
@@ -83,6 +85,8 @@ app.use("/api", catalogRoutes);
 app.use("/api/liability", liabilityRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/member", memberRoutes);
+app.use("/api/storefront", storefrontRouter);
+app.use("/api/admin/storefront", storefrontAdminRouter);
 app.use("/api/admin", adminRoutes);
 
 if (serveFrontend) {

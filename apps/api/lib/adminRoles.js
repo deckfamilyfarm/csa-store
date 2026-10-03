@@ -1,5 +1,10 @@
 export const ADMIN_ROLE_DEFINITIONS = [
   {
+    key: "storefront_admin",
+    label: "Storefront Admin",
+    description: "Manage store visibility, turkey preorders, independent storefront stock, pickup lists, and refunds."
+  },
+  {
     key: "admin",
     label: "Admin",
     description: "Full access to all CSA Store administration."

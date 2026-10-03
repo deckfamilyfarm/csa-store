@@ -2,6 +2,10 @@ const base = import.meta.env.VITE_API_BASE || "/api";
 const inflightGetRequests = new Map();
 const DEFAULT_POST_TIMEOUT_MS = 20000;
 
+export function fetchStoreVisibility(token = '', preview = false) {
+  return fetchJsonGet(`${base}/${preview ? 'admin/' : ''}storefront/settings`, token, 'Unable to load store visibility.');
+}
+
 function getRequestKey(url, token = "") {
   return `${url}::${token}`;
 }

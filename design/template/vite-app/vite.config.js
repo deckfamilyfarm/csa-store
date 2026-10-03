@@ -6,6 +6,7 @@ export default defineConfig({
   server: {
     port: 5176,
     host: true,
+    allowedHosts: ["store.deckfamilyfarm.com", "subscribe.deckfamilyfarm.com", "dropsites.deckfamilyfarm.com", "turkeys.deckfamilyfarm.com"],
     proxy: {
       "/api": {
         target: "http://127.0.0.1:5177",
@@ -16,6 +17,6 @@ export default defineConfig({
   preview: {
     port: 5176,
     host: true,
-    allowedHosts: ["store.deckfamilyfarm.com", "dropsites.deckfamilyfarm.com"],
+    allowedHosts: ["store.deckfamilyfarm.com", "subscribe.deckfamilyfarm.com", "dropsites.deckfamilyfarm.com", "turkeys.deckfamilyfarm.com"],
   },
 });

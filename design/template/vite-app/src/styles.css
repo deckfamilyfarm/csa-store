@@ -1557,6 +1557,22 @@ img {
   background: #fffaf1;
 }
 
+.home-coming-soon .home-store-title {
+  max-width: 16ch;
+  white-space: normal;
+  font-size: clamp(42px, 6.5vw, 82px);
+  line-height: 1;
+}
+
+.home-store-preview {
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
+.home-store-version {
+  white-space: nowrap;
+}
+
 .home-store-hero {
   position: relative;
   min-height: clamp(480px, 58vh, 620px);

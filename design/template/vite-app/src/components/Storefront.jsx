@@ -18,6 +18,7 @@ import {
   fetchMe,
   fetchMyReviews,
   fetchSiteContent,
+  fetchStoreVisibility,
   requestPasswordReset,
   resetPasswordWithToken,
   submitReview,
@@ -86,6 +87,7 @@ function getExperienceMode() {
   if (typeof window === "undefined") return "store";
   const url = new URL(window.location.href);
   const queryMode = String(url.searchParams.get("experience") || "").trim().toLowerCase();
+  if (queryMode === "store") return "store";
   if (queryMode === "subscribe") return "subscribe";
   if (queryMode === "dropsites") return "dropsites";
   const host = String(window.location.host || "").trim().toLowerCase();
@@ -217,6 +219,10 @@ export function Storefront() {
   });
   const [catalogError, setCatalogError] = useState("");
   const [siteContentRows, setSiteContentRows] = useState([]);
+  const previewRequested = new URLSearchParams(window.location.search).get('storePreview') === '1';
+  const [storeVisibility, setStoreVisibility] = useState({ showProducts: false, preview: false });
+  const [previewError, setPreviewError] = useState('');
+  const showProducts = storeVisibility.showProducts || storeVisibility.preview;
   const productGridRef = useRef(null);
   const categoryRef = useRef(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -233,6 +239,7 @@ export function Storefront() {
   );
 
   async function reloadCatalog() {
+    if (!showProducts || experienceMode !== 'store') return;
     const data = await fetchCatalog();
     writeCachedSubscribeDropSites(data.dropSites || []);
     setCatalog({
@@ -343,29 +350,52 @@ export function Storefront() {
   }, [experienceMode]);
 
   useEffect(() => {
-    reloadCatalog()
-      .catch((err) => {
-        console.error(err);
-        setCatalogError("Unable to load catalog.");
-      });
-  }, []);
+    if (experienceMode !== 'store') return;
+    let cancelled = false;
+    async function refreshVisibility() {
+      try {
+        const token = previewRequested ? localStorage.getItem('adminToken') || userToken : '';
+        const settings = await fetchStoreVisibility(token, previewRequested);
+        if (!cancelled) {
+          setStoreVisibility({ showProducts: settings.showProducts === true, preview: previewRequested });
+          setPreviewError('');
+        }
+      } catch {
+        if (!cancelled) {
+          setStoreVisibility({ showProducts: false, preview: false });
+          setPreviewError(previewRequested ? 'Sign in with Storefront Admin access to preview products.' : '');
+        }
+      }
+    }
+    refreshVisibility();
+    window.addEventListener('focus', refreshVisibility);
+    window.addEventListener('store-visibility-changed', refreshVisibility);
+    return () => {
+      cancelled = true;
+      window.removeEventListener('focus', refreshVisibility);
+      window.removeEventListener('store-visibility-changed', refreshVisibility);
+    };
+  }, [experienceMode, previewRequested, userToken]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const includeProducts = showProducts && experienceMode === 'store';
+    if (!includeProducts) {
+      setCatalog(current => ({ ...current, products: [], categories: [], vendors: [], recipes: [] }));
+      setSelectedProduct(null); setSelectedRecipe(null);
+    }
+    (includeProducts ? fetchCatalog() : fetchDropSites()).then(data => {
+      if (cancelled) return;
+      writeCachedSubscribeDropSites(data.dropSites || []);
+      setCatalog({ products: [], categories: [], vendors: [], recipes: [], ...data });
+      setCatalogError('');
+    }).catch(() => { if (!cancelled && includeProducts) setCatalogError('Unable to load catalog.'); });
+    return () => { cancelled = true; };
+  }, [showProducts, experienceMode]);
 
   useEffect(() => {
     reloadSiteContent();
   }, []);
-
-  useEffect(() => {
-    if (experienceMode !== "subscribe") return;
-    fetchDropSites()
-      .then((data) => {
-        const nextDropSites = data?.dropSites || [];
-        setCatalog((current) => ({ ...current, dropSites: nextDropSites }));
-        writeCachedSubscribeDropSites(nextDropSites);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, [experienceMode]);
 
   useEffect(() => {
     let cancelled = false;
@@ -383,15 +413,8 @@ export function Storefront() {
       .then((data) => {
         if (cancelled) return;
         setUser(data.user || null);
-        const route = getHashRoute();
-        const isStandaloneExperience = experienceMode === "subscribe" || experienceMode === "dropsites";
         if (hasBackendAccess(data.user)) {
           localStorage.setItem("adminToken", userToken);
-          if (!route && !isStandaloneExperience) {
-            window.location.hash = "#/admin";
-          }
-        } else if (!route && !isStandaloneExperience) {
-          window.location.hash = "#/subscribe";
         }
       })
       .catch(() => {
@@ -414,8 +437,8 @@ export function Storefront() {
   const isLiabilityView = view === "liability";
   const isResetPasswordView = view === "resetPassword";
   const isDropsitesView = view === "dropsites" || experienceMode === "dropsites";
-  const isPublicHomeView = experienceMode === "store" && view === "home" && !isMember;
-  const showMemberCart = isMember && !isAdminView && !isResetPasswordView;
+  const isPublicHomeView = experienceMode === "store" && view === "home";
+  const showMemberCart = showProducts && isMember && !isAdminView && !isResetPasswordView;
 
   useEffect(() => {
     let title = "Full Farm CSA";
@@ -854,13 +877,19 @@ export function Storefront() {
             )
           ) : isPublicHomeView ? (
             <HomeLandingPage
+              showProducts={showProducts}
+              staffPreview={storeVisibility.preview}
+              previewError={previewError}
               catalog={catalog}
               catalogError={catalogError}
               getPrice={getDisplayPrice}
               onSelectProduct={(product) => setSelectedProduct(product)}
               isLoggedIn={isMember}
               isAdmin={isAdmin}
-              onAuthAction={() => (isMember ? handleLogout() : setLoginOpen(true))}
+              onAuthAction={() => {
+                if (isMember) window.location.hash = isAdmin ? '#/admin' : '#/account';
+                else setLoginOpen(true);
+              }}
               subscribeUrl={`${subscribeAppUrl}#/subscribe`}
               siteContent={siteContent}
             />
@@ -1075,7 +1104,7 @@ export function Storefront() {
         <FooterSection brand={brand} />
       ) : null}
 
-      {selectedProduct && (
+      {showProducts && selectedProduct && (
         <div className="modal-backdrop" onClick={() => setSelectedProduct(null)}>
           <div className="modal" onClick={(event) => event.stopPropagation()}>
             <button

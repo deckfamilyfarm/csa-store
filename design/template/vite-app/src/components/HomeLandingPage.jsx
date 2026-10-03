@@ -3,6 +3,7 @@ import { getSiteContentValue } from "../siteContent.js";
 import { categoryLabel } from "../categoryLabel.js";
 import { DeckPageHeader } from "./DeckPageHeader.jsx";
 import { SubscribeFooter } from "./SubscribeFooter.jsx";
+import { getTurkeyHostUrl, subscriptionStoreUrl } from './subscribeNavigation.js';
 
 const DEFAULT_PRODUCT_IMAGE = "/images/subscribe-products.jpg";
 
@@ -106,6 +107,9 @@ function useActiveGroup(groups) {
 }
 
 export function HomeLandingPage({
+  showProducts = false,
+  staffPreview = false,
+  previewError = '',
   catalog,
   catalogError = "",
   getPrice,
@@ -204,7 +208,7 @@ export function HomeLandingPage({
           { label: "Plans", href: subscribeUrl },
           { label: "Locations", href: "#pickup" },
           { label: "Herdshare", href: subscribeUrl },
-          { label: "Vendors", href: "#shop" },
+          { label: "Vendors", href: showProducts ? "#shop" : subscribeUrl },
           { label: "Frequently Asked Questions", href: subscribeUrl }
         ]
       },
@@ -213,13 +217,14 @@ export function HomeLandingPage({
       {
         label: "Shop",
         children: [
-          { label: "CSA Shopping", href: "#shop" },
-          { label: "Sides", href: "#sides" },
+          { label: "Turkeys", href: getTurkeyHostUrl() },
+          { label: "CSA Shopping", href: showProducts ? "#shop" : subscriptionStoreUrl() },
+          ...(showProducts ? [{ label: "Sides", href: "#sides" }] : []),
           { label: "Merchandise", href: "https://www.deckfamilyfarm.com/merchandise" }
         ]
       }
     ],
-    [subscribeUrl]
+    [subscribeUrl, showProducts]
   );
 
   const authLabel = isLoggedIn ? (isAdmin ? "Admin" : "Account") : "Log in";
@@ -227,36 +232,40 @@ export function HomeLandingPage({
     getSiteContentValue(siteContent, "home", section, field, fallback);
 
   return (
-    <div className="subscribe-page home-landing-page">
+    <div className={`subscribe-page home-landing-page${showProducts ? '' : ' home-coming-soon'}`}>
       <DeckPageHeader
         navLinks={navLinks}
         authLabel={onAuthAction ? authLabel : ""}
         onAuthAction={onAuthAction}
       />
 
+      {staffPreview || previewError ? <div className="container home-store-preview" role="status">
+        {staffPreview ? <>Staff preview — visitors still see the saved store visibility. <a href="/?experience=store#/admin">Return to admin</a></> : <>{previewError} <a href="/?experience=store#/admin">Sign in to admin</a></>}
+      </div> : null}
       <section className="home-store-hero">
         <div className="container home-store-hero-content">
-          <div className="home-draft-label">{copy("hero", "draftLabel", "DRAFT STORE")}</div>
+          <div className="home-draft-label">{showProducts ? copy("hero", "draftLabel", "DRAFT STORE") : 'Coming Soon'}</div>
           <div className="eyebrow">{copy("hero", "eyebrow", "Deck Family Farm")}</div>
-          <h1 className="home-store-title">{copy("hero", "title", "Full Farm Direct")}</h1>
+          <h1 className="home-store-title">{showProducts ? copy("hero", "title", "Full Farm Direct") : <>Full Farm <span className="home-store-version">Version 2</span> store</>}</h1>
           <p className="home-store-lede">
-            {copy(
+            {showProducts ? copy(
               "hero",
               "body",
               "Shop pasture-raised meat, raw dairy, seasonal produce, pantry staples, and partner-farm foods in one weekly catalog."
-            )}
+            ) : 'A new way to shop from Deck Family Farm and our community of local producers is on its way. In the meantime, explore Full Farm CSA or reserve your holiday turkey.'}
           </p>
           <div className="home-store-actions">
-            <a className="button" href="#shop">
-              {copy("hero", "primaryButton", "Shop the catalog")}
+            <a className="button" href={showProducts ? '#shop' : getTurkeyHostUrl()}>
+              {showProducts ? copy("hero", "primaryButton", "Shop the catalog") : 'Turkey preorders'}
             </a>
-            <a className="button home-store-hero-button-alt" href="#boxes">
-              {copy("hero", "secondaryButton", "Build a box")}
+            <a className="button home-store-hero-button-alt" href={showProducts ? '#boxes' : subscribeUrl}>
+              {showProducts ? copy("hero", "secondaryButton", "Build a box") : 'Explore Full Farm CSA'}
             </a>
           </div>
         </div>
       </section>
 
+      {showProducts ? <>
       {catalogError ? (
         <section className="home-store-section home-store-alert-section">
           <div className="container">
@@ -436,6 +445,7 @@ export function HomeLandingPage({
         </section>
       ) : null}
 
+      </> : null}
       <section className="home-store-section home-pickup-section" id="pickup">
         <div className="container home-pickup-grid">
           <div>
