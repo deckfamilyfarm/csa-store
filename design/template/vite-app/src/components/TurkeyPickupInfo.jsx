@@ -19,7 +19,7 @@ export function TurkeyPickupInfo({ catalog }) {
       {pickup.instructions && <p className="turkey-location-instructions">{pickup.instructions}</p>}
     </article>)}</div> : <p>Pickup locations will be listed here when they are available at checkout.</p>}
     <div className="turkey-pickup-notes">
-      <section><h3>CSA member delivery</h3><p>CSA members can have their turkey delivered with their next CSA order cycle by shopping in the <a href={subscriptionStoreUrl()}>CSA store</a>. <strong>Orders placed on this turkey site are for pickup at the locations listed above on Saturday, November 21st, 2026</strong></p></section>
+      <section><h3>CSA member delivery</h3><p>CSA members can order through the <a href={subscriptionStoreUrl()}>CSA store</a> as usual for delivery now, with their next CSA order. You’ll need to store your turkey in your home freezer until Thanksgiving.</p><p><strong>Orders placed on this turkey site are for pickup at the locations listed above on {date || 'the Saturday before Thanksgiving'}. Member credit cannot be applied here.</strong></p></section>
       {farmPickup && <section><h3>Need a later farm pickup?</h3><p>Choose Farm Pickup at checkout, then {sale.contactEmail ? <a href={`mailto:${sale.contactEmail}?subject=${encodeURIComponent('Turkey preorder — farm pickup hold request')}`}>email the farm</a> : 'email the farm'} to request a hold and arrange a pickup time. With the farm’s confirmation, your turkey can be held after Saturday for collection through <strong>{holdDate || 'the day before Thanksgiving'}</strong>{holdDate ? ', the day before Thanksgiving' : ''}.</p></section>}
     </div>
   </section>;

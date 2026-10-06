@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ProductDescription } from './ProductDescription.jsx';
 import { cartLines, sortTurkeyOptions, turkeyLink } from './turkeyCart.js';
-import { DEFAULT_TURKEY_INTRO, turkeyPickupIntro, pickupDateLabel } from './turkeyPickup.js';
+import { pickupDateLabel } from './turkeyPickup.js';
 
 const money = cents => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(cents / 100);
 const dateLabel = date => new Date(`${date}T12:00:00`).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
@@ -14,7 +14,6 @@ export function TurkeyShopping({ view, catalog, cart, onAdd, onCartChange, previ
   const options = sortTurkeyOptions(catalog.options);
   const product = catalog.product;
   const sale = catalog.sale;
-  const defaultAbout = String(product.aboutDescription || '').trim() === DEFAULT_TURKEY_INTRO;
   const selected = options.find(option => String(option.id) === variantId && option.preorderBreed === type);
   const breedOptions = options.filter(option => option.preorderBreed === type);
   const inCart = cart.find(item => item.optionId === selected?.id)?.quantity || 0;
@@ -41,7 +40,7 @@ export function TurkeyShopping({ view, catalog, cart, onAdd, onCartChange, previ
       <article className="turkey-listing-card">
         <a href={link('product')} tabIndex={-1} aria-hidden="true"><img src={product.imageUrl} alt="" className="turkey-product-photo" /></a>
         <div><span className="turkey-eyebrow">Pasture-raised at Deck Family Farm</span><h2>{product.title}</h2>
-          <ProductDescription description={turkeyPickupIntro(product.shortDescription, sale.pickupDate)} />
+          <ProductDescription description={product.aboutDescription} />
           {options.length > 0 && <p className="turkey-price">From {money(Math.min(...options.map(option => option.priceCents)))}</p>}
           <a className="turkey-button" href={link('product')}>Choose options <span aria-hidden="true">↗</span></a>
         </div>
@@ -52,8 +51,8 @@ export function TurkeyShopping({ view, catalog, cart, onAdd, onCartChange, previ
       <div className="turkey-detail-intro">
         <img className="turkey-detail-photo" src={selected?.imageUrl || product.imageUrl} alt={selected?.label || product.title} />
         <section><span className="turkey-eyebrow">Raised here. Shared around your table.</span><h2>About our turkeys</h2>
-          <ProductDescription description={defaultAbout ? turkeyPickupIntro(product.aboutDescription, sale.pickupDate) : product.aboutDescription} />
-          {!defaultAbout && sale.pickupDate && <p className="turkey-detail-pickup">Pickup · {pickupDateLabel(sale.pickupDate)} — the Saturday before Thanksgiving. See below for available pickup locations.</p>}
+          <ProductDescription description={product.aboutDescription} />
+          {sale.pickupDate && <p className="turkey-detail-pickup">Pickup · {pickupDateLabel(sale.pickupDate)} — the Saturday before Thanksgiving. See below for available pickup locations.</p>}
         </section>
       </div>
       <form className="turkey-card turkey-selections" onSubmit={event => { event.preventDefault(); if (canAdd) onAdd(selected, Number(quantity)); }}>

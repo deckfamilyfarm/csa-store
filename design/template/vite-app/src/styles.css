@@ -268,6 +268,7 @@ img {
 
 .subscribe-page {
   --subscribe-serif: "Cormorant Garamond", "Fraunces", "Times New Roman", serif;
+  --subscribe-background: #8d9475;
   min-height: 100vh;
   background: #fff;
 }
@@ -501,7 +502,7 @@ img {
 
 .subscribe-hero {
   padding: 34px 0 62px;
-  background: rgba(141, 148, 117, 1);
+  background: var(--subscribe-background);
 }
 
 .subscribe-hero-grid {
@@ -934,7 +935,7 @@ img {
 }
 
 .subscribe-location-section {
-  background: rgba(141, 148, 117, 1);
+  background: var(--subscribe-background);
   padding-top: 72px;
   padding-bottom: 72px;
 }

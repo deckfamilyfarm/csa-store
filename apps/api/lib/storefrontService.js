@@ -2,7 +2,7 @@ import crypto from 'node:crypto';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { ensureStorefrontSchema } from './storefrontSchema.js';
 import { readStorefrontProducts, duplicateTurkeyVariants } from './storefrontProducts.js';
-import { preorderDescriptions, turkeyDescription } from './storefrontDescriptions.js';
+import { preorderDescriptions, turkeyDescription, turkeyAboutDescription } from './storefrontDescriptions.js';
 import { HOLD_MS, hash, parse, fail, integer, recordId, text, email, tokenHash, checkoutReturnOrigin, normalizeCheckout, parsePacificInput, pacificInput, validatePublish, csvCell } from './storefrontCore.js';
 
 // All writes are confined to storefront_* tables. Never use catalog inventory here.
@@ -113,9 +113,9 @@ export function createStorefrontService({ pool, stripe, sendEmail, now = Date.no
     };
     const firstPhoto = [...result.options].sort((a, b) => (a.preorderBreed === 'heritage') - (b.preorderBreed === 'heritage') || a.priceCents - b.priceCents).find(option => option.imageUrl)?.imageUrl;
     result.product = { title: 'Thanksgiving Turkey', shortDescription: sale.description,
-      aboutDescription: sale.about_description ?? sale.description, imageUrl: sale.product_image_url || firstPhoto || sale.image_url || '/images/turkey-home/holiday-turkey.jpg' };
+      aboutDescription: turkeyAboutDescription(sale), imageUrl: sale.product_image_url || firstPhoto || sale.image_url || '/images/turkey-home/holiday-turkey.jpg' };
     if (admin) Object.assign(result, { catalogProducts: products, readiness: { checkoutEnabled: enabled(), stripeConfigured: Boolean(stripe), webhookConfigured: Boolean(config.webhookSecret), emailConfigured: Boolean(config.emailReady) },
-      sale: { ...result.sale, ...descriptions, aboutDescription: sale.about_description ?? sale.description, productImageUrl: sale.product_image_url || '', notifyEmail: sale.notify_email, version: sale.version, closesPacific: pacificInput(sale.closes_ms) } });
+      sale: { ...result.sale, ...descriptions, aboutDescription: turkeyAboutDescription(sale), productImageUrl: sale.product_image_url || '', notifyEmail: sale.notify_email, version: sale.version, closesPacific: pacificInput(sale.closes_ms) } });
     else if (sale.status === 'draft') Object.assign(result, { options: [], pickups: result.pickups.map(p => ({ id: p.id, groupId: p.groupId, name: p.name })) });
     return result;
   }
@@ -139,7 +139,7 @@ export function createStorefrontService({ pool, stripe, sendEmail, now = Date.no
       const [[sale]] = await c.query('SELECT * FROM storefront_sales WHERE id=1 FOR UPDATE');
       if (Number(body.version) !== sale.version) fail('Sale setup changed. Reload before saving.', 409);
       const currentDescriptions = preorderDescriptions(sale);
-      const aboutDescription = text(body.aboutDescription ?? sale.about_description ?? description, 'About our turkeys', 10000);
+      const aboutDescription = text(body.aboutDescription ?? turkeyAboutDescription(sale), 'About our turkeys', 10000);
       const productImageUrl = text(body.productImageUrl ?? sale.product_image_url ?? '', 'product photo URL', 2048, false);
       if (productImageUrl && !/^https:\/\//.test(productImageUrl) && !/^\/(?!\/)/.test(productImageUrl)) fail('Use an HTTPS product photo URL or a local image path.');
       const heritageDescription = text(body.heritageDescription ?? currentDescriptions.heritageDescription, 'Heritage Black preorder description', 10000);
