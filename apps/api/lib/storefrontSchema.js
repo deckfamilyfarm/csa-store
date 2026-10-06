@@ -43,7 +43,7 @@ async function bootstrap(pool) {
       token_hash CHAR(64) NOT NULL UNIQUE, request_hash CHAR(64) NOT NULL,
       status VARCHAR(24) NOT NULL, customer_json TEXT NOT NULL, pickup_json TEXT NOT NULL,
       total_cents INT NOT NULL, currency CHAR(3) NOT NULL DEFAULT 'usd',
-      stripe_request_json MEDIUMTEXT NOT NULL, stripe_session_id VARCHAR(255) UNIQUE,
+      stripe_request_json MEDIUMTEXT NOT NULL, stripe_mode VARCHAR(8), stripe_session_id VARCHAR(255) UNIQUE,
       stripe_payment_id VARCHAR(255) UNIQUE, checkout_url TEXT, expires_ms BIGINT NOT NULL,
       created_ms BIGINT NOT NULL, paid_ms BIGINT, collected_ms BIGINT, collected_by INT,
       refund_key CHAR(36), refund_id VARCHAR(255), refund_status VARCHAR(40), refunded_cents INT NOT NULL DEFAULT 0,
@@ -74,6 +74,7 @@ async function bootstrap(pool) {
   await pool.query('INSERT IGNORE INTO storefront_settings (id) VALUES (1)');
   // Upgrade the first preorder schema without losing allocations or order snapshots.
   for (const [table, column, definition] of [
+    ['storefront_orders', 'stripe_mode', 'VARCHAR(8)'],
     ['storefront_sales', 'heritage_description', 'TEXT'],
     ['storefront_sales', 'broad_breasted_description', 'TEXT'],
     ['storefront_sales', 'about_description', 'TEXT'],

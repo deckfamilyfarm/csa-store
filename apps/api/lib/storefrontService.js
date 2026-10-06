@@ -3,14 +3,37 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 import { ensureStorefrontSchema } from './storefrontSchema.js';
 import { readStorefrontProducts, duplicateTurkeyVariants } from './storefrontProducts.js';
 import { preorderDescriptions, turkeyDescription, turkeyAboutDescription } from './storefrontDescriptions.js';
+import { stripeOrderMode, stripeModeError, storefrontStripeError } from './storefrontStripe.js';
 import { HOLD_MS, hash, parse, fail, integer, recordId, text, email, tokenHash, checkoutReturnOrigin, normalizeCheckout, parsePacificInput, pacificInput, validatePublish, csvCell } from './storefrontCore.js';
 
 // All writes are confined to storefront_* tables. Never use catalog inventory here.
-export function createStorefrontService({ pool, stripe, sendEmail, now = Date.now, config = {} }) {
+export function createStorefrontService({ pool, stripe, stripeClients = {}, sendEmail, now = Date.now, config = {} }) {
   const connections = new AsyncLocalStorage();
   const db = () => connections.getStore() || pool;
   const ready = () => ensureStorefrontSchema(pool);
   const enabled = () => config.enabled === true;
+  function stripeForOrder(row) {
+    const mode = stripeOrderMode(row);
+    if (mode) {
+      const client = stripeClients[mode] || (config.stripeMode === mode ? stripe : null);
+      if (!client) throw stripeModeError(mode);
+      return client;
+    }
+    if (!stripe) fail('Stripe is not configured.', 503);
+    // Never resend an older uncertain create using a potentially different mode.
+    if (config.stripeMode && !row.stripe_session_id && !row.stripe_payment_id) {
+      throw Object.assign(new Error('This older checkout has no recorded Stripe mode. Link its existing Stripe receipt before retrying; its stock remains held.'),
+        { status: 409, code: 'storefront_stripe_unknown_mode' });
+    }
+    return stripe;
+  }
+  async function confirmStripeMode(row, object) {
+    if (typeof object.livemode !== 'boolean') return;
+    const mode = object.livemode ? 'live' : 'test';
+    const expected = stripeOrderMode(row);
+    if (expected && expected !== mode) fail('Stripe payment mode does not match this order. Review the original payment before retrying.', 409);
+    if (!row.stripe_mode) await db().query('UPDATE storefront_orders SET stripe_mode=? WHERE id=? AND stripe_mode IS NULL', [mode, row.id]);
+  }
   async function transaction(fn) {
     const inherited = connections.getStore();
     const connection = inherited || await pool.getConnection();
@@ -32,6 +55,14 @@ export function createStorefrontService({ pool, stripe, sendEmail, now = Date.no
       if (!acquired) fail('This order is being updated. Please try again shortly.', 409);
       // Reuse this connection for all work under the lock, avoiding pool starvation.
       return await connections.run(connection, fn);
+    } catch (original) {
+      const error = storefrontStripeError(original);
+      if (acquired && error.code === 'storefront_stripe_mode') {
+        await connection.query('UPDATE storefront_orders SET last_error=? WHERE id=?', [error.message, id]);
+      } else if (acquired && error.code === 'storefront_stripe_unknown_mode') {
+        await connection.query("UPDATE storefront_orders SET status='review',last_error=? WHERE id=? AND status IN ('creating','review') AND stripe_mode IS NULL AND stripe_session_id IS NULL", [error.message, id]);
+      }
+      throw error;
     } finally {
       if (acquired) await connection.query('SELECT RELEASE_LOCK(?)', [name]).catch(() => {});
       connection.release();
@@ -53,7 +84,7 @@ export function createStorefrontService({ pool, stripe, sendEmail, now = Date.no
       items: row.items.map(item => ({ optionId: item.option_id, productId: item.product_id, typeLabel: item.turkey_type,
         sizeLabel: item.size_label, label: item.label, quantity: item.quantity, priceCents: item.price_cents }))
     };
-    if (admin) Object.assign(view, { lastError: row.last_error, stripeSessionId: row.stripe_session_id, stripePaymentId: row.stripe_payment_id,
+    if (admin) Object.assign(view, { lastError: row.last_error, stripeMode: stripeOrderMode(row), stripeSessionId: row.stripe_session_id, stripePaymentId: row.stripe_payment_id,
       refundRequestedBy: row.refund_requested_by, refundRequestedMs: row.refund_requested_ms && Number(row.refund_requested_ms) });
     return view;
   }
@@ -275,24 +306,26 @@ export function createStorefrontService({ pool, stripe, sendEmail, now = Date.no
   }
   async function syncSession(id) {
     let row = await order(id);
-    if (!stripe) fail('Stripe is not configured.', 503);
+    const orderStripe = stripeForOrder(row);
     if (!row.stripe_session_id && ['creating', 'review'].includes(row.status)) {
       // Stripe may prune idempotency keys after 24h. Never recreate an uncertain older checkout.
       if (now() - Number(row.created_ms) > 23 * 3600000) {
         await db().query("UPDATE storefront_orders SET status='review',last_error=? WHERE id=?", ['Uncertain checkout older than 23 hours. Reconcile with Stripe before releasing stock.', id]);
         return;
       }
-      const session = await stripe.checkout.sessions.create(parse(row.stripe_request_json), { idempotencyKey: `storefront-checkout-${id}` });
+      const session = await orderStripe.checkout.sessions.create(parse(row.stripe_request_json), { idempotencyKey: `storefront-checkout-${id}` });
+      await confirmStripeMode(row, session);
       await db().query("UPDATE storefront_orders SET stripe_session_id=?,checkout_url=?,expires_ms=?,status='reserved',last_error=NULL WHERE id=?", [session.id, session.url || '', session.expires_at * 1000, id]);
       row = await order(id);
     }
     if (!row.stripe_session_id) return;
-    let session = await stripe.checkout.sessions.retrieve(row.stripe_session_id);
+    let session = await orderStripe.checkout.sessions.retrieve(row.stripe_session_id);
+    await confirmStripeMode(row, session);
     if (session.status === 'open' && (row.cancel_requested || now() >= Number(row.expires_ms))) {
-      try { session = await stripe.checkout.sessions.expire(session.id); }
+      try { session = await orderStripe.checkout.sessions.expire(session.id); }
       catch (error) {
         // Payment can win the race against expiry. Read back rather than returning stock blindly.
-        session = await stripe.checkout.sessions.retrieve(row.stripe_session_id);
+        session = await orderStripe.checkout.sessions.retrieve(row.stripe_session_id);
         if (session.status === 'open') throw error;
       }
     }
@@ -362,8 +395,8 @@ export function createStorefrontService({ pool, stripe, sendEmail, now = Date.no
       const pickupSnapshot = { id: pickup.id, groupId: pickup.group_id, groupName: pickup.group_name, name: pickup.name, address: pickup.address, hours: pickup.hours,
         instructions: pickup.instructions, date: sale.pickup_date, timezone: 'America/Los_Angeles' };
       await c.query(`INSERT INTO storefront_orders
-        (id,number,sale_id,token_hash,request_hash,status,customer_json,pickup_json,total_cents,stripe_request_json,expires_ms,created_ms,contact_email,notify_email)
-        VALUES (?,?,1,?,?,'creating',?,?,?,?,?,?,?,?)`, [id, number, token, requestHash, JSON.stringify(input.customer), JSON.stringify(pickupSnapshot), total, JSON.stringify(checkoutRequest), expires * 1000, now(), sale.contact_email, sale.notify_email]);
+        (id,number,sale_id,token_hash,request_hash,status,customer_json,pickup_json,total_cents,stripe_request_json,expires_ms,created_ms,contact_email,notify_email,stripe_mode)
+        VALUES (?,?,1,?,?,'creating',?,?,?,?,?,?,?,?,?)`, [id, number, token, requestHash, JSON.stringify(input.customer), JSON.stringify(pickupSnapshot), total, JSON.stringify(checkoutRequest), expires * 1000, now(), sale.contact_email, sale.notify_email, config.stripeMode || null]);
       for (const item of items) await c.query('INSERT INTO storefront_order_items (order_id,option_id,label,quantity,price_cents,product_id,turkey_type,size_label) VALUES (?,?,?,?,?,?,?,?)', [id, item.optionId, item.label, item.quantity, item.priceCents, item.productId, item.typeLabel, item.sizeLabel]);
       return id;
     }).catch(error => {
@@ -401,6 +434,7 @@ export function createStorefrontService({ pool, stripe, sendEmail, now = Date.no
     await locked(id, async () => {
       const row = await order(id);
       if (!['creating', 'reserved', 'review'].includes(row.status)) fail('Only unpaid reservations can be cancelled.', 409);
+      stripeForOrder(row);
       await db().query('UPDATE storefront_orders SET cancel_requested=1 WHERE id=?', [id]);
       await syncSession(id);
     });
@@ -408,13 +442,17 @@ export function createStorefrontService({ pool, stripe, sendEmail, now = Date.no
   }
   async function attachSession(id, sessionId) {
     await ready();
-    if (!stripe) fail('Stripe is not configured.', 503);
     await locked(id, async () => {
       const row = await order(id);
       if (!['creating', 'reserved', 'review'].includes(row.status)) fail('Only unresolved checkouts can be reconciled with a receipt.', 409);
       if (row.stripe_session_id && row.stripe_session_id !== sessionId) fail('This order already has a different Stripe checkout.', 409);
-      const session = await stripe.checkout.sessions.retrieve(text(sessionId, 'Stripe Checkout Session ID', 255));
+      sessionId = text(sessionId, 'Stripe Checkout Session ID', 255);
+      const sessionMode = stripeOrderMode({ stripe_session_id: sessionId });
+      if (stripeOrderMode(row) && sessionMode && stripeOrderMode(row) !== sessionMode) fail('The Stripe checkout mode does not match this order.', 409);
+      const orderStripe = stripeForOrder({ ...row, stripe_session_id: sessionId });
+      const session = await orderStripe.checkout.sessions.retrieve(sessionId);
       if (session.metadata?.storefront_order_id !== id || session.amount_total !== row.total_cents || session.currency !== 'usd') fail('The Stripe checkout does not belong to this order.', 409);
+      await confirmStripeMode(row, session);
       await db().query("UPDATE storefront_orders SET stripe_session_id=?,checkout_url=?,expires_ms=?,status='reserved',last_error=NULL WHERE id=?", [session.id, session.url || '', session.expires_at * 1000, id]);
       await syncSession(id);
     });
@@ -423,7 +461,8 @@ export function createStorefrontService({ pool, stripe, sendEmail, now = Date.no
   async function syncRefunds(id) {
     const row = await order(id);
     if (!row.stripe_payment_id) return;
-    const refunds = await stripe.refunds.list({ payment_intent: row.stripe_payment_id, limit: 100 });
+    const orderStripe = stripeForOrder(row);
+    const refunds = await orderStripe.refunds.list({ payment_intent: row.stripe_payment_id, limit: 100 });
     if (refunds.has_more) fail('Refund history requires manual review.', 409);
     const refunded = refunds.data.filter(r => r.status === 'succeeded').reduce((sum, r) => sum + r.amount, 0);
     const requested = refunds.data.find(r => r.id === row.refund_id || (row.refund_key && r.metadata?.storefront_refund_key === row.refund_key));
@@ -445,11 +484,11 @@ export function createStorefrontService({ pool, stripe, sendEmail, now = Date.no
   }
   async function issueRefund(id, actorId) {
     await ready();
-    if (!stripe) fail('Stripe is not configured.', 503);
     await locked(id, async () => {
       let row = await order(id);
       if (row.collected_ms) fail('Collected orders cannot be cancelled and restocked.', 409);
       if (!row.paid_ms) fail('Only paid orders can be refunded.', 409);
+      const orderStripe = stripeForOrder(row);
       await syncRefunds(id);
       row = await order(id);
       if (row.status === 'refunded') return;
@@ -462,7 +501,7 @@ export function createStorefrontService({ pool, stripe, sendEmail, now = Date.no
         row = await order(id);
       }
       if (!row.refund_id) {
-        const refund = await stripe.refunds.create({ payment_intent: row.stripe_payment_id, amount: row.total_cents,
+        const refund = await orderStripe.refunds.create({ payment_intent: row.stripe_payment_id, amount: row.total_cents,
           metadata: { storefront_order_id: id, storefront_refund_key: row.refund_key } }, { idempotencyKey: `storefront-refund-${row.refund_key}` });
         await db().query('UPDATE storefront_orders SET refund_id=?,refund_status=? WHERE id=?', [refund.id, refund.status, id]);
       }
@@ -517,8 +556,12 @@ export function createStorefrontService({ pool, stripe, sendEmail, now = Date.no
       id = rows[0]?.id;
     }
     if (id) {
-      const [exists] = await db().query('SELECT id FROM storefront_orders WHERE id=?', [id]);
-      if (exists.length) await reconcile(id);
+      const [exists] = await db().query('SELECT id,stripe_mode,stripe_session_id FROM storefront_orders WHERE id=?', [id]);
+      if (exists.length) {
+        const mode = stripeOrderMode(exists[0]);
+        if (mode && typeof event.livemode === 'boolean' && event.livemode !== (mode === 'live')) fail('Stripe webhook mode does not match this order.', 409);
+        await reconcile(id);
+      }
     }
     await db().query('INSERT IGNORE INTO storefront_webhooks (event_id,event_type,processed_ms) VALUES (?,?,?)', [event.id, event.type, now()]);
   }

@@ -517,6 +517,128 @@ test('turkey checkout, inventory, fulfillment and refunds on isolated MySQL', { 
     assert.equal(old.items[0].sizeLabel,null);
     assert.equal(old.items[0].optionId,firstId);
   });
+  await t.test('Stripe mode changes preserve refund, checkout retry and webhook safety', async t => {
+    const before = await stock(secondId);
+    await service.adjustStock(secondId, { onHand: before.onHand + 10, expectedOnHand: before.onHand, expectedReserved: before.reserved, reason: 'Mode regression fixtures' }, 1);
+    function modeClient(mode) {
+      const state = { sessions: new Map(), refunds: new Map(), checkoutKeys: new Map(), refundKeys: new Map(), calls: 0, loseCheckout: false, loseRefund: false };
+      const read = id => { const session = state.sessions.get(id); assert.ok(session, `${mode} client must access only its own sessions`); return session; };
+      const checkPayment = id => assert.ok([...state.sessions.values()].some(session => session.payment_intent === id), `${mode} client must access only its own payments`);
+      const client = {
+        checkout: { sessions: {
+          create: async (payload, { idempotencyKey }) => {
+            state.calls++;
+            let session = state.checkoutKeys.get(idempotencyKey);
+            if (!session) {
+              session = { id: `cs_${mode}_mode_${state.sessions.size + 1}`, livemode: mode === 'live', metadata: payload.metadata,
+                status: 'open', payment_status: 'unpaid', expires_at: payload.expires_at, currency: 'usd',
+                amount_total: payload.line_items.reduce((sum, item) => sum + item.quantity * item.price_data.unit_amount, 0) };
+              state.sessions.set(session.id, session); state.checkoutKeys.set(idempotencyKey, session);
+            }
+            if (state.loseCheckout) { state.loseCheckout = false; throw new Error('Lost mode checkout response'); }
+            return structuredClone(session);
+          },
+          retrieve: async id => { state.calls++; return structuredClone(read(id)); },
+          expire: async id => { state.calls++; const session = read(id); session.status = 'expired'; return structuredClone(session); }
+        } },
+        refunds: {
+          list: async ({ payment_intent }) => { state.calls++; checkPayment(payment_intent); return { data: [...state.refunds.values()].filter(refund => refund.payment_intent === payment_intent).map(refund => structuredClone(refund)), has_more: false }; },
+          create: async (payload, { idempotencyKey }) => {
+            state.calls++; checkPayment(payload.payment_intent);
+            let refund = state.refundKeys.get(idempotencyKey);
+            if (!refund) {
+              refund = { ...payload, id: `re_${mode}_${state.refunds.size + 1}`, status: 'pending', livemode: mode === 'live' };
+              state.refunds.set(refund.id, refund); state.refundKeys.set(idempotencyKey, refund);
+            }
+            if (state.loseRefund) { state.loseRefund = false; throw new Error('Lost mode refund response'); }
+            return structuredClone(refund);
+          }
+        }
+      };
+      const paidSession = orderId => {
+        const session = state.checkoutKeys.get(`storefront-checkout-${orderId}`);
+        Object.assign(session, { status: 'complete', payment_status: 'paid', payment_intent: `pi_${session.id}` });
+        return session;
+      };
+      return { client, state, paidSession };
+    }
+    const testStripe = modeClient('test'), liveStripe = modeClient('live');
+    const modeConfig = { enabled: true, webhookSecret: 'test-secret', emailReady: true, baseUrl: 'http://localhost:5176' };
+    const testService = createStorefrontService({ pool, stripe: testStripe.client, now: () => clock, config: { ...modeConfig, stripeMode: 'test' } });
+    const liveOnly = createStorefrontService({ pool, stripe: liveStripe.client, now: () => clock, config: { ...modeConfig, stripeMode: 'live' } });
+    const liveWithTest = createStorefrontService({ pool, stripe: liveStripe.client, stripeClients: { test: testStripe.client }, now: () => clock, config: { ...modeConfig, stripeMode: 'live' } });
+    await t.test('legacy test refunds use the test key and restock once after verified success', async () => {
+      const result = await testService.checkout(body(secondId));
+      testStripe.paidSession(result.orderId); await testService.reconcile(result.orderId);
+      // Existing orders predate the mode column, but retain a mode-specific session ID.
+      await pool.query('UPDATE storefront_orders SET stripe_mode=NULL WHERE id=?', [result.orderId]);
+      const sold = await stock(secondId), liveCalls = liveStripe.state.calls;
+      await assert.rejects(liveOnly.issueRefund(result.orderId, 1), error => error.status === 409 && /test-mode order/.test(error.message));
+      assert.equal(liveStripe.state.calls, liveCalls);
+      assert.deepEqual(await stock(secondId), sold);
+      const [[blocked]] = await pool.query('SELECT status,refund_key,last_error FROM storefront_orders WHERE id=?', [result.orderId]);
+      assert.equal(blocked.status, 'paid'); assert.equal(blocked.refund_key, null); assert.match(blocked.last_error, /test-mode order/);
+      assert.equal((await liveWithTest.orders({})).find(order => order.id === result.orderId).stripeMode, 'test');
+      testStripe.state.loseRefund = true;
+      await assert.rejects(liveWithTest.issueRefund(result.orderId, 1), /Lost mode refund response/);
+      await liveWithTest.issueRefund(result.orderId, 1);
+      assert.equal(testStripe.state.refunds.size, 1);
+      assert.equal((await stock(secondId)).onHand, sold.onHand);
+      const refund = [...testStripe.state.refunds.values()][0]; refund.status = 'succeeded';
+      const event = { id: 'evt_mode_refund', type: 'refund.updated', livemode: false, data: { object: refund } };
+      await liveWithTest.webhook(event); await liveWithTest.webhook(event); await liveWithTest.issueRefund(result.orderId, 1);
+      assert.equal((await stock(secondId)).onHand, sold.onHand + 1);
+      assert.equal(liveStripe.state.calls, liveCalls);
+      const liveOrder = await liveWithTest.checkout(body(secondId));
+      const [[liveRow]] = await pool.query('SELECT stripe_mode,stripe_session_id FROM storefront_orders WHERE id=?', [liveOrder.orderId]);
+      assert.equal(liveRow.stripe_mode, 'live'); assert.match(liveRow.stripe_session_id, /^cs_live_/);
+      liveStripe.paidSession(liveOrder.orderId); await liveWithTest.reconcile(liveOrder.orderId);
+      await liveWithTest.issueRefund(liveOrder.orderId, 1);
+      const liveRefund = [...liveStripe.state.refunds.values()][0]; liveRefund.status = 'succeeded';
+      await liveWithTest.reconcile(liveOrder.orderId);
+      assert.equal(liveStripe.state.refunds.size, 1); assert.equal(testStripe.state.refunds.size, 1);
+    });
+    await t.test('uncertain checkout retries remain in their original mode after switching to live', async () => {
+      const input = body(secondId); testStripe.state.loseCheckout = true;
+      const result = await testService.checkout(input);
+      assert.equal(result.status, 'processing');
+      const count = testStripe.state.sessions.size, liveCalls = liveStripe.state.calls;
+      await assert.rejects(liveOnly.checkout(input), error => error.status === 409 && !error.checkoutRejected);
+      assert.equal(liveStripe.state.calls, liveCalls);
+      const retry = await liveWithTest.checkout(input);
+      assert.equal(retry.orderId, result.orderId); assert.equal(testStripe.state.sessions.size, count);
+      await liveWithTest.cancelReservation(result.orderId, input.token);
+      const legacyInput = body(secondId); testStripe.state.loseCheckout = true;
+      const legacy = await testService.checkout(legacyInput);
+      await pool.query('UPDATE storefront_orders SET stripe_mode=NULL WHERE id=?', [legacy.orderId]);
+      await assert.rejects(liveWithTest.checkout(legacyInput), /no recorded Stripe mode/);
+      assert.equal(liveStripe.state.calls, liveCalls);
+      assert.equal((await liveWithTest.orders({})).find(order => order.id === legacy.orderId).status, 'review');
+      const original = testStripe.state.checkoutKeys.get(`storefront-checkout-${legacy.orderId}`);
+      await liveWithTest.attachSession(legacy.orderId, original.id);
+      await liveWithTest.cancelReservation(legacy.orderId, legacyInput.token);
+    });
+    await t.test('wrong-mode webhooks cannot update an order and lock conflicts stay retryable', async () => {
+      const input = body(secondId), result = await testService.checkout(input);
+      const session = testStripe.paidSession(result.orderId);
+      const event = { id: 'evt_mode_locked', type: 'checkout.session.completed', livemode: false, data: { object: session } };
+      const reserved = await stock(secondId);
+      await assert.rejects(liveWithTest.webhook({ ...event, livemode: true }), /webhook mode does not match/);
+      const connection = await pool.getConnection();
+      try {
+        await connection.query('SELECT GET_LOCK(?,0)', [`storefront:${result.orderId}`]);
+        await assert.rejects(liveWithTest.webhook(event), error => error.status === 409 && /being updated/.test(error.message));
+        const [seen] = await pool.query('SELECT event_id FROM storefront_webhooks WHERE event_id=?', [event.id]);
+        assert.equal(seen.length, 0); assert.deepEqual(await stock(secondId), reserved);
+      } finally { await connection.query('SELECT RELEASE_LOCK(?)', [`storefront:${result.orderId}`]); connection.release(); }
+      await liveWithTest.webhook(event); await liveWithTest.webhook(event);
+      const paid = await stock(secondId);
+      assert.equal(paid.reserved, reserved.reserved - 1); assert.equal(paid.onHand, reserved.onHand - 1);
+      await liveWithTest.issueRefund(result.orderId, 1);
+      const refund = [...testStripe.state.refunds.values()].find(refund => refund.payment_intent === session.payment_intent);
+      refund.status = 'succeeded'; await liveWithTest.reconcile(result.orderId);
+    });
+  });
   await t.test('cutoff enforcement, CSV and stock isolation from Local Line', async () => {
     const [[product]] = await pool.query('SELECT inventory FROM products WHERE id=1');
     const [[pkg]] = await pool.query('SELECT inventory FROM packages WHERE id=1');

@@ -2,6 +2,7 @@ import express from 'express';
 import { requireAdminPermission } from '../middleware/auth.js';
 import { getStorefrontService } from '../lib/storefrontRuntime.js';
 import { getStripeClient } from '../lib/memberPortal.js';
+import { storefrontWebhookEvent } from '../lib/storefrontStripe.js';
 
 export const storefrontRouter = express.Router();
 export const storefrontAdminRouter = express.Router();
@@ -57,11 +58,9 @@ storefrontAdminRouter.post('/orders/:id/stripe-receipt', wrap(async (req, res, s
 
 export async function storefrontStripeWebhook(req, res) {
   const stripe = getStripeClient();
-  const secret = process.env.STOREFRONT_STRIPE_WEBHOOK_SECRET;
-  if (!stripe || !secret) return res.status(503).send('Storefront webhook is not configured.');
   let event;
-  try { event = stripe.webhooks.constructEvent(req.body, req.headers['stripe-signature'], secret); }
-  catch { return res.status(400).send('Invalid Stripe signature.'); }
+  try { event = storefrontWebhookEvent(stripe, req.body, req.headers['stripe-signature']); }
+  catch (error) { return res.status(error.status || 400).send(error.message); }
   try {
     const service = getStorefrontService();
     await service.webhook(event);
