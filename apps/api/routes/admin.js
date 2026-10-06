@@ -148,6 +148,7 @@ import {
   syncSquareCatalogCache,
   unlinkSquareVariation
 } from "../lib/squareStoreSync.js";
+import { previewSquareProductCreation, applySquareProductCreation } from "../lib/squareProductCreation.js";
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -8447,6 +8448,22 @@ router.get("/square/matches", requireAdminPermission(["square_pull", "square_pus
   } catch (error) {
     console.error("Square match review failed:", error);
     return res.status(500).json({ error: error?.message || "Unable to load Square matches." });
+  }
+});
+
+router.post("/square/products/preview", requireAdminPermission("square_push"), requireAdminPermission("square_pull"), async (req, res) => {
+  try {
+    return res.json(await previewSquareProductCreation(Number(req.body?.productId), req.admin?.userId || req.admin?.adminId || null));
+  } catch (error) {
+    return res.status(error.status || 400).json({ error: error.message || "Unable to preview Square creation." });
+  }
+});
+
+router.post("/square/products/:id/create", requireAdminPermission("square_push"), requireAdminPermission("square_pull"), async (req, res) => {
+  try {
+    return res.json(await applySquareProductCreation(req.params.id, req.admin?.userId || req.admin?.adminId || null));
+  } catch (error) {
+    return res.status(error.status || 400).json({ error: error.message || "Unable to finish Square creation. Retry the same request." });
   }
 });
 

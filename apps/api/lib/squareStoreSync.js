@@ -1339,7 +1339,8 @@ export async function applySquarePrices({ packageIds = [], userId = null, includ
 
 // The unified release service freezes amounts at audit time and supplies a durable request key.
 export { loadApprovedSquarePricingRows, loadPackagesByProduct, buildSquarePriceAuditRow,
-  buildVariationUpdateObject, batchRetrieveSquareObjects, upsertReturnedSquareObjects };
+  buildVariationUpdateObject, batchRetrieveSquareObjects, upsertReturnedSquareObjects,
+  computeSquareRetailPackagePrice, getSquareConfig, fetchSquare, listSquareCatalogItems };
 export async function pushReviewedSquareVariation(object, idempotencyKey) {
   return fetchSquare("/v2/catalog/batch-upsert", {
     method: "POST", body: JSON.stringify({ idempotency_key: idempotencyKey, batches: [{ objects: [object] }] })

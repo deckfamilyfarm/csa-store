@@ -73,6 +73,8 @@
 .sync-release-result { padding: .4rem 0; border-top: 1px solid var(--sync-border); font-size: .85rem; }
 .sync-match-list { max-height: 380px; overflow: auto; }
 .sync-match-list > div { display: flex; justify-content: space-between; gap: .8rem; flex-wrap: wrap; border-bottom: 1px solid var(--sync-border); padding: .5rem 0; font-size: .85rem; }
+.sync-match-actions { display: inline-flex; align-items: center; flex-wrap: wrap; gap: .65rem; }
+.sync-square-matches { scroll-margin-top: 6rem; }
 .sync-approval { width: min(900px, 94vw); max-height: 90vh; overflow: auto; }
 .sync-new-product-notice { margin: .9rem 0; padding: .85rem 1rem; border: 1px solid #c88d45; border-left: 4px solid #a5651b; border-radius: 6px; background: #fff4df; color: #663b10; overflow-wrap: anywhere; }
 .sync-new-product-notice > strong { display: block; margin-bottom: .5rem; }

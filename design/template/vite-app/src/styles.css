@@ -5388,6 +5388,12 @@ img {
   width: min(520px, 92vw);
 }
 
+.modal.square-creation-modal {
+  width: min(800px, 100%);
+  min-width: 0;
+  overflow: auto;
+}
+
 .admin-product-modal {
   width: min(920px, 94vw);
   padding: 20px 22px;

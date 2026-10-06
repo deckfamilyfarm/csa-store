@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { adminGet, adminPost } from "../adminApi.js";
 import { AdminSquareSection } from "./AdminSquareSection.jsx";
 import { PLATFORM_NAMES, hasSyncRole, countLabel, auditScopeText, pacificDateTime, pacificInput, pacificCandidates, groupSyncActions, comparisonRows, isReleaseActive, releaseProgress, elapsedText } from "./productSyncView.js";
@@ -82,6 +82,8 @@ export function AdminProductSyncSection({ token, roles = [], handoff = null, onA
   const [history, setHistory] = useState([]);
   const [historyOpen, setHistoryOpen] = useState(Boolean(handoff?.history));
   const [matchesOpen, setMatchesOpen] = useState(false);
+  const [squareMatchRequest, setSquareMatchRequest] = useState(null);
+  const squareMatchesRef = useRef(null);
   const [localMatches, setLocalMatches] = useState([]);
   const [busy, setBusy] = useState("");
   const [error, setError] = useState("");
@@ -185,6 +187,15 @@ export function AdminProductSyncSection({ token, roles = [], handoff = null, onA
   useEffect(() => {
     if (matchesOpen && allowed.includes("localline")) adminGet("product-sync/matches/localline", token).then(result => setLocalMatches(result.rows || [])).catch(err => setError(err.message));
   }, [matchesOpen, reload, token]);
+  useEffect(() => {
+    if (!matchesOpen || !squareMatchRequest) return;
+    squareMatchesRef.current?.focus({ preventScroll: true });
+    squareMatchesRef.current?.scrollIntoView({ block: "start" });
+  }, [matchesOpen, squareMatchRequest]);
+  function openSquareMatches(product = null) {
+    setSquareMatchRequest({ product });
+    setMatchesOpen(true);
+  }
   function changeFilter(key, value) { setFilters(prev => ({ ...prev, [key]: value, page: 1 })); setSelection([]); }
   async function task(key, fn) {
     setBusy(key); setError(""); setMessage("");
@@ -255,6 +266,7 @@ export function AdminProductSyncSection({ token, roles = [], handoff = null, onA
     <div className="sync-platforms">{status.filter(item => allowed.includes(item.platform)).map(item => <div className="sync-platform" key={item.platform}>
       <strong>{item.label}</strong><span className="small">{item.enabled ? "Connected" : "Not configured"}</span>
       <dl><dt>Last comparison refresh</dt><dd>{pacificDateTime(item.lastRefresh)}</dd><dt>Last published</dt><dd>{pacificDateTime(item.lastPush)}</dd><dt>Approved updates</dt><dd>{item.pending} waiting to publish · {item.failed} failed or held</dd></dl>
+      {item.platform === "square" && <button className="button alt" onClick={() => openSquareMatches()}>Manage Square matches</button>}
     </div>)}</div>
     {error && <div className="form-message error" role="alert">{error}</div>}{message && <div className="form-message success" role="status">{message}</div>}
     {trackedReleases.map(release => <ReleaseProgress key={release.id} release={release} error={isReleaseActive(release) ? progressError : ""} onDismiss={() => setTrackedReleases(prev => prev.filter(row => row.id !== release.id))} />)}
@@ -274,8 +286,8 @@ export function AdminProductSyncSection({ token, roles = [], handoff = null, onA
       {selectedScope && <div className="sync-scope"><span>{countLabel(scope.productIds.length, "product")} from Products · {countLabel(scope.staged?.length || 0, "staged draft")}. Only products matching the vendor selection are included. Drafts apply when their release runs.</span><button className="button alt" disabled={!!busy || auditing} onClick={() => { onClearScope?.(); setScope(null); setProductScope("pending"); clearAuditResults(); }}>Clear selection from Products</button></div>}
       {effectiveScope === "pending" && <div className="sync-pending">
         <strong>{pending === null ? "Loading pending products…" : `${countLabel(pendingRows.length, "pending local product")} to compare`}</strong>
-        <p className="small">This list tracks new products and saved changes awaiting Local Line sync. The audit checks these same products on each selected destination. Square may need fewer updates because it syncs prices only. Choose All products to check for differences elsewhere in the catalog.</p>
-        {!!pendingRows.length && <details><summary>View the {countLabel(pendingRows.length, "product")} to compare</summary><div className="sync-match-list">{pendingRows.map(row => <div key={row.productId}><span><strong>{row.productName}</strong> · {row.vendorName} · #{row.productId}</span><span>{row.kind === "create" ? "New to Local Line" : "Saved local changes"}</span></div>)}</div></details>}
+        <p className="small">These products have saved changes awaiting Local Line sync. Click Run audit to compare them with each selected destination and review proposed updates. Square compares prices for linked products.{allowed.includes("square") && " Use Link to Square below to review and approve a product’s match first."} Choose All products to check the rest of the catalog.</p>
+        {!!pendingRows.length && <details><summary>View the {countLabel(pendingRows.length, "product")} to compare</summary><div className="sync-match-list">{pendingRows.map(row => <div key={row.productId}><span><strong>{row.productName}</strong> · {row.vendorName} · #{row.productId}</span><span className="sync-match-actions">{row.kind === "create" ? "New to Local Line" : "Saved local changes"}{allowed.includes("square") && <button className="button alt" aria-label={`Link ${row.productName} to Square`} onClick={() => openSquareMatches(row)}>Link to Square</button>}</span></div>)}</div></details>}
       </div>}
       {effectiveScope === "all" && <p className="small">This compares the entire catalog within the selected vendors, including products with no pending local edits. It can find additional remote differences.</p>}
     </div>
@@ -317,7 +329,7 @@ export function AdminProductSyncSection({ token, roles = [], handoff = null, onA
     </>}
     <details className="sync-fold" open={matchesOpen} onToggle={event => setMatchesOpen(event.currentTarget.open)}><summary>Product Matches</summary>
       {matchesOpen && <>{allowed.includes("localline") && <details><summary>Local Line links and create proposals ({localMatches.length})</summary><div className="sync-match-list">{localMatches.map(row => <div key={row.id}><strong>{row.name}</strong><span>{row.localLineProductId ? `Linked to Local Line #${row.localLineProductId}` : "Create proposal — requires an audit and approval"}</span></div>)}</div></details>}
-        {allowed.includes("square") && <AdminSquareSection token={token} canPullSquare={has("square_pull")} canPushSquare={false} matchesOnly onMatchesChanged={() => { setSelection([]); setMessage("Square matches changed. Run a new audit before selecting these products."); }} />}</>}
+        {allowed.includes("square") && <div className="sync-square-matches" ref={squareMatchesRef} tabIndex={-1} aria-label="Square product matches"><AdminSquareSection token={token} canPullSquare={has("square_pull")} canPushSquare={has("square_push")} matchesOnly focusedProduct={squareMatchRequest?.product} onClearFocusedProduct={() => setSquareMatchRequest(null)} onMatchesChanged={() => { setSelection([]); setMessage("Square matches changed. Run a new audit before selecting these products."); }} /></div>}</>}
     </details>
     <details className="sync-fold" open={historyOpen} onToggle={event => setHistoryOpen(event.currentTarget.open)}><summary>Scheduled Releases &amp; History</summary>
       <p className="small">Newest releases first. Times are Pacific. Held actions need a new audit; retries process unfinished actions only.</p>

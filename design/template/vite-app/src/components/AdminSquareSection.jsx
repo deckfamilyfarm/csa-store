@@ -49,6 +49,8 @@ export function AdminSquareSection({
   canPullSquare = false,
   canPushSquare = false,
   matchesOnly = false,
+  focusedProduct = null,
+  onClearFocusedProduct,
   onMatchesChanged
 }) {
   const [status, setStatus] = useState(null);
@@ -66,6 +68,8 @@ export function AdminSquareSection({
   const [loadingAction, setLoadingAction] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [creation, setCreation] = useState(null);
+  const [creationError, setCreationError] = useState("");
 
   async function loadStatus() {
     const response = await adminGet("square/status", token);
@@ -74,12 +78,11 @@ export function AdminSquareSection({
 
   async function loadMatches() {
     const response = await adminGet(
-      `square/matches${includeAllProducts ? "?includeAllProducts=1" : ""}`,
+      `square/matches${matchesOnly || includeAllProducts ? "?includeAllProducts=1" : ""}`,
       token
     );
-    const visibleRows = (response.rows || []).filter(row => !matchesOnly || includeAllProducts || /deck family farm/i.test(row.vendorName || ""));
-    setMatches(visibleRows);
-    setMatchSummary(matchesOnly ? { linked: visibleRows.filter(row => row.linked).length, unmatched: visibleRows.filter(row => !row.linked).length } : response.summary || null);
+    setMatches(response.rows || []);
+    setMatchSummary(response.summary || null);
   }
 
   async function refreshAll() {
@@ -99,7 +102,15 @@ export function AdminSquareSection({
   useEffect(() => {
     refreshAll();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, includeAllProducts]);
+  }, [token, includeAllProducts, matchesOnly]);
+
+  useEffect(() => {
+    setSearch("");
+    setMatchFilter("all");
+    setCandidateSelections({});
+    setMatchesCollapsed(false);
+    setMessage("");
+  }, [focusedProduct]);
 
   useEffect(() => {
     setAuditRows([]);
@@ -166,6 +177,32 @@ export function AdminSquareSection({
     }
   }
 
+  async function handleCreationPreview(row) {
+    setError(""); setMessage(""); setCreationError("");
+    setLoadingAction(`preview-${row.productId}`);
+    try {
+      const preview = await adminPost("square/products/preview", token, { productId: row.productId });
+      if (preview.status === "completed") {
+        setMessage(`${preview.productName} was already created in Square. Refresh the catalog to review its existing links.`);
+        await Promise.all([loadMatches(), loadStatus()]);
+      } else setCreation(preview);
+    } catch (nextError) { setError(nextError.message || "Unable to preview Square creation."); }
+    finally { setLoadingAction(""); }
+  }
+
+  async function handleCreate() {
+    setCreationError(""); setLoadingAction("create");
+    try {
+      const result = await adminPost(`square/products/${creation.id}/create`, token, {});
+      setCreation(null);
+      setMessage(`Created ${result.productName} in Square and linked ${result.variations.length} package${result.variations.length === 1 ? "" : "s"}.`);
+      onMatchesChanged?.();
+      await Promise.all([loadMatches(), loadStatus()]);
+    } catch (nextError) {
+      setCreationError(nextError.message || "Unable to finish creation. Retry to check the same request.");
+    } finally { setLoadingAction(""); }
+  }
+
   async function handleAudit() {
     setError("");
     setMessage("");
@@ -213,9 +250,16 @@ export function AdminSquareSection({
     }
   }
 
+  const scopedMatches = useMemo(() => matches.filter(row => {
+    if (focusedProduct) return Number(row.productId) === Number(focusedProduct.productId);
+    return !matchesOnly || includeAllProducts || /deck family farm|hyland|creamy cow/i.test(row.vendorName || "");
+  }), [matches, matchesOnly, includeAllProducts, focusedProduct]);
+  const visibleMatchSummary = matchesOnly || focusedProduct
+    ? { linked: scopedMatches.filter(row => row.linked).length, unmatched: scopedMatches.filter(row => !row.linked).length }
+    : matchSummary;
   const filteredMatches = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
-    return matches.filter((row) => {
+    return scopedMatches.filter((row) => {
       if (matchFilter === "linked" && !row.linked) return false;
       if (matchFilter === "unlinked" && row.linked) return false;
       if (matchFilter === "suggested" && (row.linked || !(row.candidates || []).length)) return false;
@@ -239,7 +283,7 @@ export function AdminSquareSection({
         .toLowerCase();
       return haystack.includes(normalizedSearch);
     });
-  }, [matches, matchFilter, search]);
+  }, [scopedMatches, matchFilter, search]);
 
   const filteredAuditRows = useMemo(() => {
     return auditRows.filter((row) => auditFilter === "all" || row.status === auditFilter);
@@ -274,6 +318,8 @@ export function AdminSquareSection({
 
       {message ? <div className="form-message success">{message}</div> : null}
       {error ? <div className="form-message error">{error}</div> : null}
+      {matchesOnly && <p className="small">Choose the existing Square item and variation for each CSA package, then click Approve link. If the product is missing in Square, use Create in Square to review and add it. After linking, run a new audit with Square selected to review and approve any price changes.</p>}
+      {!canPullSquare && <p className="small">Approving or changing links requires Square Pull access. Ask an administrator to grant that permission.</p>}
 
       {!matchesOnly && <div className="admin-metric-grid">
         <div className="metric-card">
@@ -296,11 +342,14 @@ export function AdminSquareSection({
         </div>
       </div>}
 
-      <div className={`square-scope-box ${includeAllProducts ? "warning" : ""}`}>
+      {focusedProduct ? <div className="square-scope-box">
+        <div><div className="title">Square match for {focusedProduct.productName}</div><div className="small">Showing this product’s packages · #{focusedProduct.productId}</div></div>
+        <button className="button alt" type="button" onClick={onClearFocusedProduct} disabled={busy}>Show all matches</button>
+      </div> : <div className={`square-scope-box ${includeAllProducts ? "warning" : ""}`}>
         <div>
           <div className="title">Square product scope</div>
           <div className="small">
-            {matchesOnly ? "Default: Deck Family Farm." : "Default: Deck Family Farm, Hyland Processing, and Full Farm CSA tote bags."}
+            {matchesOnly ? "Default: Deck Enterprises (Deck Family Farm, Hyland, and Creamy Cow)." : "Default: Deck Family Farm, Hyland Processing, and Full Farm CSA tote bags."}
           </div>
           {includeAllProducts ? (
             <div className="small square-scope-warning">
@@ -316,14 +365,14 @@ export function AdminSquareSection({
           />
           <span>Include all products</span>
         </label>
-      </div>
+      </div>}
 
       <div className="admin-subsection">
         <div className="admin-section-header">
           <div>
             <h4>Matches</h4>
             <div className="small">
-              {matchSummary?.linked || 0} linked · {matchSummary?.unmatched || 0} unlinked
+              {visibleMatchSummary?.linked || 0} linked · {visibleMatchSummary?.unmatched || 0} unlinked
             </div>
           </div>
           <div className="admin-actions">
@@ -333,12 +382,14 @@ export function AdminSquareSection({
                   className="input"
                   type="search"
                   placeholder="Search"
+                  aria-label="Search Square matches"
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
                 />
                 <select
                   className="input"
                   value={matchFilter}
+                  aria-label="Square match status"
                   onChange={(event) => setMatchFilter(event.target.value)}
                 >
                   <option value="all">All</option>
@@ -368,7 +419,7 @@ export function AdminSquareSection({
               <tr>
                 <th>CSA Package</th>
                 <th>Square Link</th>
-                <th>Best Candidate</th>
+                <th>Suggested Square variation</th>
                 <th>Score</th>
                 <th>Price</th>
                 <th>Actions</th>
@@ -406,6 +457,7 @@ export function AdminSquareSection({
                             <select
                               className="input compact-input"
                               value={candidate.squareVariationId}
+                              aria-label={`Square variation for ${row.productName} / ${row.packageName}`}
                               onChange={(event) =>
                                 setCandidateSelections((prev) => ({
                                   ...prev,
@@ -425,7 +477,7 @@ export function AdminSquareSection({
                           ) : null}
                         </>
                       ) : (
-                        <span className="small">No candidate</span>
+                        <span className="small">No suggested match. Refresh Square Catalog to check for new items, or use Create in Square if this product has not been added yet.</span>
                       )}
                     </td>
                     <td>{candidate ? formatScore(candidate.score) : ""}</td>
@@ -438,8 +490,9 @@ export function AdminSquareSection({
                           onClick={() => handleApprove(row, candidate)}
                           disabled={busy || rowBusy || !candidate || !canPullSquare}
                         >
-                          {row.linked ? "Relink" : "Approve"}
+                          {row.linked ? "Relink" : "Approve link"}
                         </button>
+                        {!row.linked && <button className="button" type="button" onClick={() => handleCreationPreview(row)} disabled={busy || !canPullSquare || !canPushSquare || !status?.enabled}>Create in Square</button>}
                         {row.linked ? (
                           <button
                             className="button text"
@@ -451,6 +504,8 @@ export function AdminSquareSection({
                           </button>
                         ) : null}
                       </div>
+                      {!canPullSquare ? <div className="small">Square Pull access required.</div> : !candidate ? <div className="small">A Square match is required before approval.</div> : null}
+                      {!row.linked && !canPushSquare && <div className="small">Creating an item requires Square Push access.</div>}
                     </td>
                   </tr>
                 );
@@ -465,6 +520,17 @@ export function AdminSquareSection({
         </div>
         )}
       </div>
+
+      {creation && <div className="modal-backdrop"><div className="modal square-creation-modal" role="dialog" aria-modal="true" aria-label="Create product in Square">
+        <h3>{creation.resuming ? "Finish Square creation" : "Create in Square"}</h3>
+        <p>Create <strong>{creation.productName}</strong> with these variations in Square ({creation.environment}), then link each CSA package.</p>
+        {creation.presentAtAllLocations && <p className="small">The item and all variations will be available at all Square locations.</p>}
+        <div className="table-wrap"><table className="admin-table"><thead><tr><th>Variation</th><th>SKU</th><th>Price</th><th>Price basis</th></tr></thead><tbody>{creation.variations.map(row => <tr key={row.packageId}><td>{row.name}</td><td>{row.sku || "—"}</td><td>{formatCents(row.amount, row.currency)}</td><td>{formatPriceBasis(row.priceBasis)}</td></tr>)}</tbody></table></div>
+        <p className="small">This adds a catalog item with all of this product’s packages. Manage photos, taxes, inventory, and online availability in Square.</p>
+        {creation.resuming && <p className="small">A previous creation is awaiting confirmation. Continue to finish that same request.</p>}
+        {(creationError || creation.error) && <div className="form-message error" role="alert">{creationError || creation.error}</div>}
+        <div className="admin-actions"><button className="button alt" type="button" disabled={busy} onClick={() => setCreation(null)}>Close</button><button className="button" type="button" disabled={busy || !canPullSquare || !canPushSquare} onClick={handleCreate}>{loadingAction === "create" ? "Creating and linking…" : creation.resuming ? "Continue creation and linking" : "Approve creation and link"}</button></div>
+      </div></div>}
 
       {!matchesOnly && <div className="admin-subsection">
         <div className="admin-section-header">
