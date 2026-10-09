@@ -1,4 +1,17 @@
 .product-sync { --sync-border: #d8e2d6; }
+.sync-destination { border: 1px solid var(--sync-border); border-radius: 10px; margin: 1rem 0; overflow: hidden; }
+.product-sync .sync-destination > summary { padding: 1rem; background: #f3f6f1; font-size: 1.12rem; }
+.sync-destination-body { padding: 1rem; min-width: 0; }
+.sync-destination-review { border-top: 2px solid var(--sync-border); padding-top: 1rem; margin-top: 1.2rem; scroll-margin-top: 6rem; }
+.sync-local-table td { vertical-align: top; min-width: 130px; }
+.sync-local-table td:first-child { min-width: 210px; }
+.sync-local-table details { max-width: 460px; }
+.sync-local-table details table { font-size: .8rem; }
+.sync-local-table details th, .sync-local-table details td { min-width: 95px; padding: .4rem; }
+.sync-comparison > div { margin-bottom: .8rem; }
+.sync-destination .table-wrap { overflow-x: auto; }
+.sync-destination .sync-local-products > .table-wrap, .sync-destination .sync-square-matches .admin-subsection > .table-wrap { max-height: 620px; overflow: auto; }
+.sync-destination .admin-table > thead { position: sticky; top: 0; background: #f3f6f1; z-index: 1; }
 .product-sync h3, .product-sync p { margin: 0 0 .55rem; }
 .product-sync button { cursor: pointer; }
 .product-sync button:disabled { cursor: default; opacity: .55; }

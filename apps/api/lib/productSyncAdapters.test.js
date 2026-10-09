@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { localLineProjection, squareProjection, localLineInputs } from "./productSyncAdapters.js";
-import { buildSquarePriceAuditRow, buildVariationUpdateObject } from "./squareStoreSync.js";
+import { buildSquarePriceAuditRow, buildVariationUpdateObject, buildSquareMatchRetailPrice } from "./squareStoreSync.js";
 import { incomingProposals } from "./productSyncIncoming.js";
 
 test("Local Line vendor drift is audited and missing or wrong vendors cannot confirm a publication", () => {
@@ -34,6 +34,31 @@ test("Square uses source unit price for formulas, package price for standard pro
   const formula=buildSquarePriceAuditRow(row,packages,new Map()); assert.equal(formula.proposedAmount,900);
   const standard=buildSquarePriceAuditRow({...row,vendorName:"Other"},packages,new Map()); assert.equal(standard.proposedAmount,3780);
   const invalid=buildSquarePriceAuditRow({...row,sourceUnitPrice:null},new Map([[1,[{id:2,name:"ea",price:null}]]]),new Map()); assert.equal(invalid.status,"blocked");
+});
+test("match review exposes Lamb Neck retail per pound and the same sale price as the Square audit", () => {
+  const row={productId:1,packageId:2,productName:"Lamb Neck Slices",vendorName:"Deck Family Farm",unitOfMeasure:"lbs",sourceUnitPrice:15.5,sourceMultiplier:.5412,minWeight:1.1,maxWeight:1.5,guestMarkup:.6574,
+    profileOnSale:1,profileSaleDiscount:.2,saleOnSale:0,saleSaleDiscount:0,squareVariationId:"V",squareItemId:"I",squarePricingType:"FIXED_PRICING",squarePriceAmount:2150,squareCurrency:"USD"};
+  const packages=new Map([[1,[{id:2,productId:1,name:"1.10–1.50 lbs",price:10.91,numOfItems:1}]]]);
+  const regular=buildSquareMatchRetailPrice(row,packages,new Map());
+  assert.equal(regular.regularAmount,1550); assert.equal(regular.amount,1550); assert.equal(regular.unit,"lb"); assert.equal(regular.saleApplied,false);
+  const saleRow={...row,saleOnSale:1,saleSaleDiscount:.2};
+  const sale=buildSquareMatchRetailPrice(saleRow,packages,new Map());
+  assert.equal(sale.regularAmount,1550); assert.equal(sale.amount,1240); assert.equal(sale.saleApplied,true);
+  assert.equal(sale.amount,buildSquarePriceAuditRow(saleRow,packages,new Map()).proposedAmount);
+  const standard=buildSquareMatchRetailPrice({...row,vendorName:"Other Farm"},packages,new Map());
+  assert.equal(standard.regularAmount,1091); assert.equal(standard.unit,"package");
+});
+test("every formula vendor publishes Retail Price regardless of CSA multipliers, weights, quantities, or customer markups", () => {
+  const packages=new Map([[1,[{id:2,productId:1,name:"Large package",price:88,numOfItems:6}]]]);
+  for(const vendorName of ["Deck Family Farm","Hyland Meats","Creamy Cow, LLC"]){
+    for(const factor of [.5412,1,2]){
+      const row={productId:1,packageId:2,productName:"Retail item",vendorName,unitOfMeasure:"lbs",sourceUnitPrice:15.5,sourceMultiplier:factor,minWeight:3,maxWeight:7,avgWeightOverride:9,
+        guestMarkup:4,memberMarkup:2,herdShareMarkup:3,snapMarkup:.5,vendorPriceListMarkup:5,saleOnSale:0,squareVariationId:"V",squareItemId:"I",squarePricingType:"FIXED_PRICING",squarePriceAmount:2150,squareCurrency:"USD"};
+      assert.equal(buildSquareMatchRetailPrice(row,packages,new Map()).regularAmount,1550);
+      assert.equal(buildSquareMatchRetailPrice(row,packages,new Map()).amount,1550);
+      assert.equal(buildSquarePriceAuditRow(row,packages,new Map()).proposedAmount,1550);
+    }
+  }
 });
 test("incoming formula price drift is review only, catalog fixes remain selectable, and Membership is excluded", () => {
   const report={proposedUpdates:{storePackageUpdates:[{action:"update-store-package-from-localline",productId:1,packageId:2,changes:{price:{from:10,to:20},name:{from:"old",to:"new"}}}, {action:"update-store-package-from-localline",productId:3,packageId:4,changes:{price:{from:10,to:20}}}],pricelistRowUpdates:[{action:"update-pricelist-row-from-localline",productId:1,changes:{sourceUnitPrice:{from:10,to:20}}}]}};

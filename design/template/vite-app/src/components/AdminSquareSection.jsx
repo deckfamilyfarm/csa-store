@@ -1,5 +1,14 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { adminGet, adminPost } from "../adminApi.js";
+import { localRetailPriceForMatch, squareMatchPriceIssue, newSquareMatchPublication, publishSquareMatch, squareMatchChoices } from "./squareMatchPublication.js";
+
+const PUBLICATION_STORAGE = "csa-square-match-publications-v1";
+function readPublications() {
+  try {
+    const value = JSON.parse(localStorage.getItem(PUBLICATION_STORAGE) || "{}");
+    return value && typeof value === "object" && !Array.isArray(value) ? value : {};
+  } catch { return {}; }
+}
 
 function toNumber(value) {
   if (value === null || typeof value === "undefined" || value === "") return null;
@@ -49,9 +58,17 @@ export function AdminSquareSection({
   canPullSquare = false,
   canPushSquare = false,
   matchesOnly = false,
+  embedded = false,
+  vendorGroup = "deck-enterprises",
+  scopeProductIds = null,
+  selectedProductIds = [],
+  onSelectedProductsChange,
+  refreshVersion = 0,
+  externalBusy = false,
   focusedProduct = null,
   onClearFocusedProduct,
-  onMatchesChanged
+  onMatchesChanged,
+  onReleaseStarted
 }) {
   const [status, setStatus] = useState(null);
   const [matches, setMatches] = useState([]);
@@ -64,12 +81,26 @@ export function AdminSquareSection({
   const [auditFilter, setAuditFilter] = useState("changed");
   const [candidateSelections, setCandidateSelections] = useState({});
   const [matchesCollapsed, setMatchesCollapsed] = useState(false);
+  const [matchPage, setMatchPage] = useState(1);
   const [includeAllProducts, setIncludeAllProducts] = useState(false);
   const [loadingAction, setLoadingAction] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [creation, setCreation] = useState(null);
   const [creationError, setCreationError] = useState("");
+  const [publications, setPublications] = useState(readPublications);
+  const publicationController = useRef(null);
+  const lastRefreshVersion = useRef(refreshVersion);
+
+  useEffect(() => () => publicationController.current?.abort(), [token]);
+
+  function savePublication(packageId, progress) {
+    const next = readPublications();
+    if (progress) next[packageId] = progress;
+    else delete next[packageId];
+    localStorage.setItem(PUBLICATION_STORAGE, JSON.stringify(next));
+    if (!publicationController.current?.signal.aborted) setPublications(next);
+  }
 
   async function loadStatus() {
     const response = await adminGet("square/status", token);
@@ -103,6 +134,14 @@ export function AdminSquareSection({
     refreshAll();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, includeAllProducts, matchesOnly]);
+
+  useEffect(() => {
+    if (lastRefreshVersion.current === refreshVersion) return;
+    lastRefreshVersion.current = refreshVersion;
+    // Refresh rows after a publication without erasing its confirmation or
+    // replacing the in-flight link operation's busy state.
+    Promise.all([loadStatus(), loadMatches()]).catch(nextError => setError(nextError.message));
+  }, [refreshVersion]);
 
   useEffect(() => {
     setSearch("");
@@ -149,13 +188,48 @@ export function AdminSquareSection({
         squareVariationId: candidate.squareVariationId,
         matchScore: candidate.score
       });
-      setMessage(`Linked ${row.productName} / ${row.packageName}.`);
+      setMessage(`Link confirmed for ${row.productName} / ${row.packageName}. Square’s price is unchanged; publishing prices requires Square Push access.`);
       onMatchesChanged?.();
       await Promise.all([loadMatches(), loadStatus()]);
     } catch (nextError) {
       setError(nextError?.message || "Unable to approve Square match.");
     } finally {
       setLoadingAction("");
+    }
+  }
+
+  async function handleLinkAndUpdate(row, candidate) {
+    if (!canPullSquare || !canPushSquare) return;
+    setError(""); setMessage("");
+    setLoadingAction(`publish-${row.packageId}`);
+    const controller = new AbortController();
+    publicationController.current = controller;
+    try {
+      const existing = publications[row.packageId];
+      const operation = existing || newSquareMatchPublication(row, candidate);
+      // An approval response may have been lost even though the link was saved.
+      if (row.linked?.squareVariationId === operation.squareVariationId) operation.linked = true;
+      const result = await publishSquareMatch(operation, {
+        get: path => adminGet(path, token), post: (path, body) => adminPost(path, token, body),
+        checkpoint: progress => savePublication(row.packageId, progress),
+        onRelease: receipt => { if (!controller.signal.aborted) onReleaseStarted?.(receipt); },
+        signal: controller.signal
+      });
+      savePublication(row.packageId, null);
+      if (controller.signal.aborted) return;
+      setCandidateSelections(prev => { const next = { ...prev }; delete next[row.packageId]; return next; });
+      const retail = localRetailPriceForMatch(row);
+      setMessage(`Link confirmed for ${row.productName}. Square ${result.alreadyMatched ? "already matches" : "confirmed"} ${formatCents(result.expectedProposedAmount, result.currency)}${retail?.unit ? ` / ${retail.unit}` : ""}.`);
+      onMatchesChanged?.();
+      await Promise.all([loadMatches(), loadStatus()]);
+    } catch (nextError) {
+      if (nextError.needsReview) savePublication(row.packageId, null);
+      if (!controller.signal.aborted) {
+        setError(nextError.message || "Unable to finish the Square update. Resume to check the saved progress.");
+        await Promise.allSettled([loadMatches(), loadStatus()]);
+      }
+    } finally {
+      if (!controller.signal.aborted) setLoadingAction("");
     }
   }
 
@@ -251,9 +325,10 @@ export function AdminSquareSection({
   }
 
   const scopedMatches = useMemo(() => matches.filter(row => {
+    if (scopeProductIds?.length && !scopeProductIds.includes(Number(row.productId))) return false;
     if (focusedProduct) return Number(row.productId) === Number(focusedProduct.productId);
-    return !matchesOnly || includeAllProducts || /deck family farm|hyland|creamy cow/i.test(row.vendorName || "");
-  }), [matches, matchesOnly, includeAllProducts, focusedProduct]);
+    return !matchesOnly || (embedded ? vendorGroup === "all" : includeAllProducts) || /deck family farm|hyland|creamy cow/i.test(row.vendorName || "");
+  }), [matches, matchesOnly, includeAllProducts, focusedProduct, embedded, vendorGroup, scopeProductIds]);
   const visibleMatchSummary = matchesOnly || focusedProduct
     ? { linked: scopedMatches.filter(row => row.linked).length, unmatched: scopedMatches.filter(row => !row.linked).length }
     : matchSummary;
@@ -266,6 +341,8 @@ export function AdminSquareSection({
       if (!normalizedSearch) return true;
       const haystack = [
         row.productName,
+        row.productId,
+        row.packageId,
         row.packageName,
         row.packageCode,
         row.vendorName,
@@ -284,23 +361,27 @@ export function AdminSquareSection({
       return haystack.includes(normalizedSearch);
     });
   }, [scopedMatches, matchFilter, search]);
+  useEffect(() => { setMatchPage(1); }, [search, matchFilter, vendorGroup, includeAllProducts, scopeProductIds]);
+  const matchPages = Math.max(1, Math.ceil(filteredMatches.length / 30));
+  const currentMatchPage = Math.min(matchPage, matchPages);
+  const displayedMatches = filteredMatches.slice((currentMatchPage - 1) * 30, currentMatchPage * 30);
 
   const filteredAuditRows = useMemo(() => {
     return auditRows.filter((row) => auditFilter === "all" || row.status === auditFilter);
   }, [auditRows, auditFilter]);
 
   const changedAuditCount = auditRows.filter((row) => row.status === "changed").length;
-  const busy = Boolean(loadingAction);
+  const busy = Boolean(loadingAction) || externalBusy;
 
   return (
     <section className="admin-section">
       <div className="admin-section-header">
-        <div>
+        {!embedded && <div>
           <h3>Square</h3>
           <div className="small">
             {status?.enabled ? "Connected" : "Not configured"} · {status?.environment || "production"} · {status?.currency || "USD"}
           </div>
-        </div>
+        </div>}
         <div className="admin-actions">
           <button className="button alt" type="button" onClick={refreshAll} disabled={busy}>
             Refresh
@@ -318,8 +399,9 @@ export function AdminSquareSection({
 
       {message ? <div className="form-message success">{message}</div> : null}
       {error ? <div className="form-message error">{error}</div> : null}
-      {matchesOnly && <p className="small">Choose the existing Square item and variation for each CSA package, then click Approve link. If the product is missing in Square, use Create in Square to review and add it. After linking, run a new audit with Square selected to review and approve any price changes.</p>}
+      <p className="small">Compare <strong>Local store retail price</strong> with the <strong>Square price</strong>, choose the matching Square variation, then click <strong>Link &amp; update Square price</strong>. This uses the Retail Price shown in Products, with any active sale applied. Guest, member, Herd Share and SNAP markups do not affect the Square price. The result is confirmed after Square responds.</p>
       {!canPullSquare && <p className="small">Approving or changing links requires Square Pull access. Ask an administrator to grant that permission.</p>}
+      {canPullSquare && !canPushSquare && <p className="small">You can confirm a link with your current access. Updating Square prices also requires Square Push access.</p>}
 
       {!matchesOnly && <div className="admin-metric-grid">
         <div className="metric-card">
@@ -342,7 +424,7 @@ export function AdminSquareSection({
         </div>
       </div>}
 
-      {focusedProduct ? <div className="square-scope-box">
+      {!embedded && (focusedProduct ? <div className="square-scope-box">
         <div><div className="title">Square match for {focusedProduct.productName}</div><div className="small">Showing this product’s packages · #{focusedProduct.productId}</div></div>
         <button className="button alt" type="button" onClick={onClearFocusedProduct} disabled={busy}>Show all matches</button>
       </div> : <div className={`square-scope-box ${includeAllProducts ? "warning" : ""}`}>
@@ -365,17 +447,18 @@ export function AdminSquareSection({
           />
           <span>Include all products</span>
         </label>
-      </div>}
+      </div>)}
 
       <div className="admin-subsection">
         <div className="admin-section-header">
           <div>
-            <h4>Matches</h4>
+            <h4>{embedded ? "Products & prices" : "Matches"}</h4>
             <div className="small">
               {visibleMatchSummary?.linked || 0} linked · {visibleMatchSummary?.unmatched || 0} unlinked
             </div>
           </div>
           <div className="admin-actions">
+            {onSelectedProductsChange && <><button disabled={busy || !displayedMatches.length} onClick={() => onSelectedProductsChange([...new Set([...selectedProductIds, ...displayedMatches.map(row => Number(row.productId))])])}>Select this page</button><button disabled={busy || !selectedProductIds.length} onClick={() => onSelectedProductsChange([])}>Clear selection</button></>}
             {!matchesCollapsed ? (
               <div className="filters compact">
                 <input
@@ -417,35 +500,46 @@ export function AdminSquareSection({
           <table className="admin-table">
             <thead>
               <tr>
-                <th>CSA Package</th>
+                <th>Local product / package</th>
                 <th>Square Link</th>
                 <th>Suggested Square variation</th>
                 <th>Score</th>
-                <th>Price</th>
+                <th>Local store retail price</th>
+                <th>Square price</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {filteredMatches.map((row) => {
-                const selectedCandidateId = candidateSelections[row.packageId];
+              {displayedMatches.map((row) => {
+                const progress = publications[row.packageId];
+                const choices = squareMatchChoices(row);
+                const selectedCandidateId = progress?.squareVariationId || candidateSelections[row.packageId] || row.linked?.squareVariationId;
                 const candidate =
-                  (row.candidates || []).find(
+                  choices.find(
                     (entry) => entry.squareVariationId === selectedCandidateId
                   ) ||
-                  row.candidates?.[0] ||
+                  choices[0] ||
                   null;
+                const retail = localRetailPriceForMatch(row);
+                const priceIssue = squareMatchPriceIssue(row, candidate);
+                const selectedIsLinked = candidate?.squareVariationId === row.linked?.squareVariationId && Boolean(row.linked);
+                const priceMatches = selectedIsLinked && Number.isInteger(retail?.amount) && candidate.priceAmount === retail.amount && candidate.currency === retail.currency;
+                const canPublishPrice = !priceIssue;
                 const rowBusy =
                   loadingAction === `approve-${row.packageId}` ||
+                  loadingAction === `publish-${row.packageId}` ||
                   loadingAction === `unlink-${row.packageId}`;
                 return (
                   <tr key={`square-match-${row.packageId}`}>
                     <td>
-                      <div className="title">{row.productName}</div>
+                      <label>{onSelectedProductsChange && <input type="checkbox" aria-label={`Check Square product ${row.productName} / ${row.packageName}`} checked={selectedProductIds.includes(Number(row.productId))} disabled={busy} onChange={() => onSelectedProductsChange(selectedProductIds.includes(Number(row.productId)) ? selectedProductIds.filter(id => id !== Number(row.productId)) : [...selectedProductIds, Number(row.productId)])} />}<strong>{row.productName}</strong></label>
                       <div className="small">{row.packageName || "Package"}</div>
+                      <div className="small">Product #{row.productId} · Package #{row.packageId}</div>
                       {row.vendorName ? <div className="small">{row.vendorName}</div> : null}
                     </td>
                     <td>
                       <div>{getLinkedLabel(row.linked)}</div>
+                      {row.linked && <div className="small">Confirmed link</div>}
                       {row.linked?.sku ? <div className="small">SKU {row.linked.sku}</div> : null}
                     </td>
                     <td>
@@ -453,10 +547,11 @@ export function AdminSquareSection({
                         <>
                           <div>{getCandidateLabel(candidate)}</div>
                           {candidate.sku ? <div className="small">SKU {candidate.sku}</div> : null}
-                          {(row.candidates || []).length > 1 ? (
+                          {choices.length > 1 ? (
                             <select
                               className="input compact-input"
                               value={candidate.squareVariationId}
+                              disabled={busy || Boolean(progress)}
                               aria-label={`Square variation for ${row.productName} / ${row.packageName}`}
                               onChange={(event) =>
                                 setCandidateSelections((prev) => ({
@@ -465,7 +560,7 @@ export function AdminSquareSection({
                                 }))
                               }
                             >
-                              {row.candidates.map((entry) => (
+                              {choices.map((entry) => (
                                 <option
                                   key={`${row.packageId}-${entry.squareVariationId}`}
                                   value={entry.squareVariationId}
@@ -481,29 +576,36 @@ export function AdminSquareSection({
                       )}
                     </td>
                     <td>{candidate ? formatScore(candidate.score) : ""}</td>
+                    <td>
+                      {formatCents(retail?.regularAmount, retail?.currency)}
+                      {retail?.unit && <div className="small">per {retail.unit}</div>}
+                      {retail?.saleApplied && <div className="small">Sale price sent to Square: {formatCents(retail.amount, retail.currency)}</div>}
+                    </td>
                     <td>{candidate ? formatCents(candidate.priceAmount, candidate.currency) : ""}</td>
                     <td>
                       <div className="admin-actions">
                         <button
                           className="button alt"
                           type="button"
-                          onClick={() => handleApprove(row, candidate)}
-                          disabled={busy || rowBusy || !candidate || !canPullSquare}
+                          onClick={() => canPushSquare ? handleLinkAndUpdate(row, candidate) : handleApprove(row, candidate)}
+                          disabled={busy || rowBusy || !canPullSquare || (canPushSquare ? (!status?.enabled || (!progress && (!canPublishPrice || priceMatches))) : (Boolean(progress) || !candidate || selectedIsLinked))}
                         >
-                          {row.linked ? "Relink" : "Approve link"}
+                          {rowBusy ? "Working…" : progress ? "Resume link & price update" : !canPushSquare ? selectedIsLinked ? "Link confirmed" : "Confirm link only" : priceMatches ? "Linked · price matches" : selectedIsLinked ? "Update Square price" : row.linked ? "Relink & update Square price" : "Link & update Square price"}
                         </button>
-                        {!row.linked && <button className="button" type="button" onClick={() => handleCreationPreview(row)} disabled={busy || !canPullSquare || !canPushSquare || !status?.enabled}>Create in Square</button>}
+                        {!row.linked && <button className="button" type="button" onClick={() => handleCreationPreview(row)} disabled={busy || Boolean(progress) || !canPullSquare || !canPushSquare || !status?.enabled}>Create in Square</button>}
                         {row.linked ? (
                           <button
                             className="button text"
                             type="button"
                             onClick={() => handleUnlink(row)}
-                            disabled={busy || rowBusy || !canPullSquare}
+                            disabled={busy || rowBusy || Boolean(progress) || !canPullSquare}
                           >
                             Unlink
                           </button>
                         ) : null}
                       </div>
+                      {progress && <div className="small" role="status">{progress.phase}{progress.releaseId ? ` · Release #${progress.releaseId}` : ""}</div>}
+                      {canPushSquare && candidate && priceIssue && <div className="small">{priceIssue}</div>}
                       {!canPullSquare ? <div className="small">Square Pull access required.</div> : !candidate ? <div className="small">A Square match is required before approval.</div> : null}
                       {!row.linked && !canPushSquare && <div className="small">Creating an item requires Square Push access.</div>}
                     </td>
@@ -512,13 +614,14 @@ export function AdminSquareSection({
               })}
               {!filteredMatches.length ? (
                 <tr>
-                  <td colSpan={6}>No Square match rows found.</td>
+                  <td colSpan={7}>No Square match rows found.</td>
                 </tr>
               ) : null}
             </tbody>
           </table>
         </div>
         )}
+        {!matchesCollapsed && matchPages > 1 && <div className="sync-pagination"><button disabled={currentMatchPage === 1} onClick={() => setMatchPage(currentMatchPage - 1)}>Previous products</button><span>Page {currentMatchPage} of {matchPages}</span><button disabled={currentMatchPage === matchPages} onClick={() => setMatchPage(currentMatchPage + 1)}>Next products</button></div>}
       </div>
 
       {creation && <div className="modal-backdrop"><div className="modal square-creation-modal" role="dialog" aria-modal="true" aria-label="Create product in Square">
@@ -582,7 +685,7 @@ export function AdminSquareSection({
                 <th>CSA Package</th>
                 <th>Square Variation</th>
                 <th>Square Price</th>
-                <th>CSA Store Price</th>
+                <th>Local retail price for Square</th>
                 <th>Status</th>
               </tr>
             </thead>

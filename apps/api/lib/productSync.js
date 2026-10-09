@@ -119,12 +119,17 @@ async function runProductSyncAudit(id, options, userId) {
   const [counts] = await getPool().query("SELECT platform, direction, status, COUNT(*) AS count FROM product_sync_actions WHERE audit_id=? GROUP BY platform, direction, status", [id]);
   await getPool().query("UPDATE product_sync_audits SET status=?, summary_json=?, error_message=?, finished_at=UTC_TIMESTAMP() WHERE id=?", [errors.length ? "partial" : "completed", JSON.stringify(counts), errors.join(" ") || null, id]);
 }
-export async function getProductSyncAudit(id) {
+export async function getProductSyncAudit(id, { platform, incoming } = {}) {
   await ensureProductSyncSchema();
   await getPool().query("UPDATE product_sync_audits SET status='failed', error_message='Audit was interrupted. Run a new audit.', finished_at=UTC_TIMESTAMP() WHERE status='running' AND COALESCE(progress_at, created_at)<UTC_TIMESTAMP()-INTERVAL 1 HOUR");
+  if (platform && !PLATFORM_LABEL[platform]) fail("Choose Local Line or Square.");
+  const latestWhere = [];
+  const latestParams = [];
+  if (platform) { latestWhere.push("JSON_CONTAINS(JSON_EXTRACT(options_json, '$.platforms'), JSON_QUOTE(?))"); latestParams.push(platform); }
+  if (incoming != null) { latestWhere.push("COALESCE(JSON_EXTRACT(options_json, '$.incoming'), false)=?"); latestParams.push(incoming === true || incoming === "true" ? 1 : 0); }
   const [rows] = await getPool().query(`SELECT id, status, options_json, summary_json, error_message,
     DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS createdUtc, DATE_FORMAT(finished_at, '%Y-%m-%d %H:%i:%s') AS finishedUtc
-    FROM product_sync_audits ${id === "latest" ? "ORDER BY id DESC LIMIT 1" : "WHERE id=?"}`, id === "latest" ? [] : [id]);
+    FROM product_sync_audits ${id === "latest" ? `${latestWhere.length ? `WHERE ${latestWhere.join(" AND ")}` : ""} ORDER BY (status='running') DESC, id DESC LIMIT 1` : "WHERE id=?"}`, id === "latest" ? latestParams : [id]);
   if (!rows.length) return null;
   const row = rows[0];
   // Count products independently of package updates, including for older saved audits.
@@ -173,6 +178,12 @@ export async function selectedActions(auditId, ids, connection = getPool(), lock
   const [rows] = await connection.query(`SELECT * FROM product_sync_actions WHERE audit_id=? AND id IN (?) ${lock ? "FOR UPDATE" : ""}`, [auditId, clean]);
   if (rows.length !== clean.length) fail("Some selected actions do not belong to this audit.");
   return rows.map(actionFromRow);
+}
+export async function productSyncActionRelease(auditId, actionId) {
+  await ensureProductSyncSchema();
+  const [rows] = await getPool().query(`SELECT ra.release_id FROM product_sync_release_actions ra
+    JOIN product_sync_actions a ON a.id=ra.action_id WHERE a.audit_id=? AND a.id=?`, [auditId, actionId]);
+  return rows.length ? getProductSyncReleaseProgress(rows[0].release_id) : null;
 }
 export async function createProductSyncRelease(body, user) {
   await ensureProductSyncSchema();
@@ -432,7 +443,7 @@ export async function productSyncStatus() {
   await ensureProductSyncSchema();
   const [counts] = await getPool().query(`SELECT a.platform,
     SUM(ra.status IN ('pending','working')) AS pending, SUM(ra.status IN ('failed','held')) AS failed,
-    DATE_FORMAT(MAX(ra.completed_at), '%Y-%m-%d %H:%i:%s') AS lastPush
+    DATE_FORMAT(MAX(CASE WHEN ra.status='completed' THEN ra.completed_at END), '%Y-%m-%d %H:%i:%s') AS lastPush
     FROM product_sync_release_actions ra JOIN product_sync_actions a ON a.id=ra.action_id GROUP BY a.platform`);
   const [refreshes] = await getPool().query(`SELECT 'localline' AS platform, DATE_FORMAT(MAX(localline_refreshed_at), '%Y-%m-%d %H:%i:%s') AS lastRefresh FROM product_sync_audits
     UNION ALL SELECT 'square' AS platform, DATE_FORMAT(MAX(square_refreshed_at), '%Y-%m-%d %H:%i:%s') AS lastRefresh FROM product_sync_audits`);

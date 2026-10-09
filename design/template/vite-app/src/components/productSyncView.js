@@ -1,4 +1,28 @@
 export const PLATFORM_NAMES = { localline: "Local Line", square: "Square" };
+export const inSyncVendorScope = (row, vendorGroup) => vendorGroup === "all" || /deck family farm|hyland|creamy cow/i.test(row.vendorName || "");
+export function localLineUpdateLabel(row) {
+  if (row.publicationStatus === "working") return "Publishing";
+  if (row.publicationStatus === "pending") return "Approved / scheduled";
+  if (row.publicationStatus === "attention" || row.remoteDeleted || ["blocked", "held", "review"].includes(row.latestComparison?.status)) return "Needs attention";
+  if (row.pending) return "Local changes pending";
+  if (row.latestComparison?.status === "changed") return "Differences found";
+  if (row.latestComparison?.status === "synced") return "Matched at last check";
+  if (row.latestComparison?.status === "applied") return "Published — check for new differences";
+  return "Not checked";
+}
+
+export function comparisonGroups(action, changedOnly = true) {
+  const labels = { unit_price: "Base price", package_price: "Package price", package_unit_price: "Price per unit", adjustment_value: "Markup / adjustment", adjustment_type: "Adjustment type", price_list: "Price list ID", product_price_list_entry: "Price list entry ID", on_sale_toggle: "On sale", strikethrough_display_value: "Regular price", set_inventory: "Stock", track_inventory: "Track inventory", inventory_per_unit: "Quantity / weight", package_codes_enabled: "Package codes enabled", max_units_per_order: "Order limit" };
+  const groups = new Map();
+  for (const row of comparisonRows(action, changedOnly)) {
+    const group = /image/i.test(row.key) ? "Images" : /sale|strikethrough/i.test(row.key) ? "Sales"
+      : /visible|inventory/i.test(row.key) ? "Visibility & inventory" : /price|adjustment|packages/i.test(row.key) ? "Prices & packages" : "Product details";
+    const label = row.key.replace(/^fields · /, "").split(" · ").map(part => labels[part] || part.replaceAll("_", " ").replace(/([a-z])([A-Z])/g, "$1 $2")).join(" · ");
+    if (!groups.has(group)) groups.set(group, []);
+    groups.get(group).push({ ...row, label });
+  }
+  return [...groups].map(([title, rows]) => ({ title, rows }));
+}
 export const hasSyncRole = (roles, role) => roles.includes("admin") || roles.includes(role);
 export const countLabel = (count, noun) => `${count} ${noun}${count === 1 ? "" : "s"}`;
 export const isReleaseActive = release => ["queued", "running"].includes(release?.status);

@@ -4464,7 +4464,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
 
           {activeSection === "productSync" && canManageProductSync && (
             <AdminProductSyncSection token={token} roles={currentAdminRoles} handoff={syncHandoff}
-              onAuditCreated={(auditId) => setSyncHandoff(prev => prev ? { ...prev, auditId } : null)}
+              onAuditCreated={(auditId, platform) => setSyncHandoff(prev => prev ? { ...prev, auditIds: { ...prev.auditIds, [platform]: auditId } } : null)}
               onClearScope={() => setSyncHandoff(null)}
               onReleaseCreated={(release, entries) => {
                 const ids = [...new Set((release.actions || []).map(action => action.productId))];
@@ -4579,7 +4579,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
             <section className="admin-section">
               <h3>Local Line Data</h3>
               <div className="small">
-                Pull fulfillments, orders, and subscribers. Product audits and releases are in Product Sync.
+                Pull fulfillments, orders, and subscribers. Review incoming product repairs here; publish local products from Product Sync.
               </div>
               {localLineStatusState.loading && !localLineStatus ? (
                 <div className="small">Loading Local Line status...</div>
@@ -4602,8 +4602,8 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                 </div>
                 <div className="response-card">
                   <div className="title">Products</div>
-                  <p className="small">Review incoming catalog changes and outgoing releases together.</p>
-                  <button className="button" disabled={!canManageProductSync} onClick={() => openProductSync({ incoming: true })}>Open Product Sync</button>
+                  <p className="small">Review incoming Local Line catalog repairs before changing local products. Publishing local changes is separate in Product Sync.</p>
+                  <button className="button" disabled={!canManageProductSync} onClick={() => openProductSync({ incoming: true })}>Review incoming product repairs</button>
                 </div>
                 <div className="response-card">
                   <div className="title">Fulfillments</div>

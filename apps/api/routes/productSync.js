@@ -1,11 +1,12 @@
 import express from "express";
 import { requireAdminPermission } from "../middleware/auth.js";
 import { SYNC_ROLES } from "../lib/productSyncCore.js";
+import { localLineMatches } from "../lib/productSyncMatches.js";
 import {
   createProductSyncAudit, getProductSyncAudit, listProductSyncActions, createProductSyncRelease,
   getProductSyncRelease, listProductSyncReleases, runProductSyncRelease, cancelProductSyncRelease,
-  reviewProductSyncRelease, applyProductSyncIncoming, productSyncStatus, pendingProductSync, syncCatalog, selectedActions,
-  queueProductSyncRelease, getProductSyncReleaseProgress, activeProductSyncReleases
+  reviewProductSyncRelease, applyProductSyncIncoming, productSyncStatus, pendingProductSync, selectedActions,
+  queueProductSyncRelease, getProductSyncReleaseProgress, activeProductSyncReleases, productSyncActionRelease
 } from "../lib/productSync.js";
 
 const router = express.Router();
@@ -16,10 +17,11 @@ const route = fn => async (req, res) => {
 };
 router.get("/status", route(() => productSyncStatus()));
 router.get("/pending", route(req => pendingProductSync(req.query)));
-router.get("/matches/localline", route(async () => ({ rows: (await syncCatalog()).filter(row => row.categoryName?.trim().toLowerCase() !== "membership") })));
+router.get("/matches/localline", route(() => localLineMatches()));
 router.post("/audits", route(req => createProductSyncAudit(req.body || {}, req.admin)));
-router.get("/audits/:id", route(req => getProductSyncAudit(req.params.id)));
+router.get("/audits/:id", route(req => getProductSyncAudit(req.params.id, req.query)));
 router.get("/audits/:id/actions", route(req => listProductSyncActions(req.params.id, req.query)));
+router.get("/audits/:id/actions/:actionId/release", route(req => productSyncActionRelease(req.params.id, req.params.actionId)));
 router.get("/audits/:id/action-ids", route(req => listProductSyncActions(req.params.id, req.query, true, req.admin.adminRoles || [])));
 router.post("/audits/:id/selection", route(async req => ({ actions: await selectedActions(req.params.id, req.body?.actionIds) })));
 router.post("/incoming/apply", route(req => applyProductSyncIncoming(req.body || {}, req.admin)));

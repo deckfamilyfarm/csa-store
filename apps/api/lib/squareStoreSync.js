@@ -604,6 +604,24 @@ async function loadLocalPackagesForSquare({ includeAllProducts = false } = {}) {
         p.vendor_id AS vendorId,
         c.name AS categoryName,
         v.name AS vendorName,
+        v.price_list_markup AS vendorPriceListMarkup,
+        v.source_multiplier AS vendorSourceMultiplier,
+        v.guest_markup AS vendorGuestMarkup,
+        v.member_markup AS vendorMemberMarkup,
+        pp.unit_of_measure AS unitOfMeasure,
+        pp.source_unit_price AS sourceUnitPrice,
+        pp.min_weight AS minWeight,
+        pp.max_weight AS maxWeight,
+        pp.avg_weight_override AS avgWeightOverride,
+        pp.source_multiplier AS sourceMultiplier,
+        pp.guest_markup AS guestMarkup,
+        pp.member_markup AS memberMarkup,
+        pp.herd_share_markup AS herdShareMarkup,
+        pp.snap_markup AS snapMarkup,
+        pp.on_sale AS profileOnSale,
+        pp.sale_discount AS profileSaleDiscount,
+        ps.on_sale AS saleOnSale,
+        ps.sale_discount AS saleSaleDiscount,
         pkg.id AS packageId,
         pkg.name AS packageName,
         pkg.package_code AS packageCode,
@@ -612,6 +630,8 @@ async function loadLocalPackagesForSquare({ includeAllProducts = false } = {}) {
       JOIN products p ON p.id = pkg.product_id
       LEFT JOIN categories c ON c.id = p.category_id
       LEFT JOIN vendors v ON v.id = p.vendor_id
+      LEFT JOIN product_pricing_profiles pp ON pp.product_id = p.id
+      LEFT JOIN product_sales ps ON ps.product_id = p.id
       WHERE COALESCE(p.is_deleted, 0) = 0
         AND (c.name IS NULL OR LOWER(TRIM(c.name)) <> 'membership')
       ORDER BY p.name ASC, pkg.name ASC, pkg.id ASC
@@ -678,7 +698,9 @@ export async function buildSquareMatchReview({ limitCandidates = 5, includeAllPr
   const variationById = new Map(squareVariations.map((variation) => [variation.squareVariationId, variation]));
 
   const scopedIds = productIds === null ? null : new Set(productIds.map(Number));
-  const rows = localPackages.filter(row => scopedIds === null || scopedIds.has(Number(row.productId))).map((localPackage) => {
+  const scopedPackages = localPackages.filter(row => scopedIds === null || scopedIds.has(Number(row.productId)));
+  const { packagesByProductId, metaByPackageId } = await loadPackagesByProduct([...new Set(scopedPackages.map(row => Number(row.productId)))]);
+  const rows = scopedPackages.map((localPackage) => {
     const link = linkByPackageId.get(Number(localPackage.packageId)) || null;
     const linkedVariation = link ? variationById.get(link.squareVariationId) || null : null;
     const candidates = squareVariations
@@ -700,6 +722,7 @@ export async function buildSquareMatchReview({ limitCandidates = 5, includeAllPr
       .filter((candidate) => candidate.score >= 0.18)
       .sort((left, right) => right.score - left.score)
       .slice(0, limitCandidates);
+    const localRetailPrice = buildSquareMatchRetailPrice(localPackage, packagesByProductId, metaByPackageId);
 
     return {
       productId: Number(localPackage.productId),
@@ -709,6 +732,9 @@ export async function buildSquareMatchReview({ limitCandidates = 5, includeAllPr
       packageCode: localPackage.packageCode || "",
       categoryName: localPackage.categoryName || "",
       vendorName: localPackage.vendorName || "",
+      localRetailPrice,
+      // Retain the previous response key for already-open clients.
+      csaRetailPrice: localRetailPrice,
       linked: link
         ? {
             id: Number(link.id),
@@ -1057,6 +1083,35 @@ function computeSquareRetailPackagePrice(profile, pkg) {
   };
 }
 
+function resolveSquareRetailPricing(row, productPackages, packageMetaByPackageId, targetPackage) {
+  const profile = resolvePricingProfile({
+    profile: buildProfileFromPricingRow(row),
+    product: buildProductFromPricingRow(row),
+    packages: productPackages,
+    packageMetaByPackageId,
+    vendor: buildVendorFromPricingRow(row)
+  });
+  const retail = targetPackage
+    ? computeSquareRetailPackagePrice({ ...profile, saleDiscount: getCustomerFacingSaleDiscount(profile) }, targetPackage)
+    : { price: null, regularPrice: null, basis: "unknown" };
+  return { profile, retail };
+}
+
+// Matching and publication use the same retail calculation, including sales.
+export function buildSquareMatchRetailPrice(row, packagesByProductId, metaByPackageId) {
+  const packages = packagesByProductId.get(Number(row.productId)) || [];
+  const meta = new Map(packages.map(pkg => [Number(pkg.id), metaByPackageId.get(Number(pkg.id)) || null]));
+  const { profile, retail } = resolveSquareRetailPricing(row, packages, meta, packages.find(pkg => Number(pkg.id) === Number(row.packageId)));
+  return {
+    regularAmount: dollarsToCents(retail.regularPrice),
+    amount: dollarsToCents(retail.price),
+    currency: configuredCurrency(),
+    unit: profile.usesSourcePricing ? (profile.unitOfMeasure === "lbs" ? "lb" : "each") : "package",
+    priceBasis: retail.basis,
+    saleApplied: Boolean(profile.onSale) && Number(profile.saleDiscount || 0) > 0
+  };
+}
+
 function buildSquarePriceAuditRow(row, packagesByProductId, metaByPackageId) {
   const productPackages = packagesByProductId.get(Number(row.productId)) || [];
   const packageMetaByPackageId = new Map(
@@ -1078,25 +1133,10 @@ function buildSquarePriceAuditRow(row, packagesByProductId, metaByPackageId) {
     issues.push("Square variation is not fixed-price.");
   }
 
-  const resolvedProfile = resolvePricingProfile({
-    profile: buildProfileFromPricingRow(row),
-    product: buildProductFromPricingRow(row),
-    packages: productPackages,
-    packageMetaByPackageId,
-    vendor: buildVendorFromPricingRow(row)
-  });
-  const squareRetail = targetPackage
-    ? computeSquareRetailPackagePrice(
-        {
-          ...resolvedProfile,
-          saleDiscount: getCustomerFacingSaleDiscount(resolvedProfile)
-        },
-        targetPackage
-      )
-    : { price: null, regularPrice: null, basis: "unknown" };
+  const { profile: resolvedProfile, retail: squareRetail } = resolveSquareRetailPricing(row, productPackages, packageMetaByPackageId, targetPackage);
   const proposedAmount = dollarsToCents(squareRetail.price);
   if (proposedAmount === null || !Number.isFinite(Number(proposedAmount)) || proposedAmount < 0) {
-    issues.push("CSA Store price for Square could not be calculated.");
+    issues.push("Local store retail price for Square could not be calculated.");
   }
 
   const currency = normalizeCurrency(row.squareCurrency || configuredCurrency());

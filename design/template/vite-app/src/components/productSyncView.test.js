@@ -1,6 +1,22 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { pacificCandidates, pacificInput, acknowledgeSyncDrafts, groupSyncActions, releaseProgress, isReleaseActive, elapsedText } from "./productSyncView.js";
+import { pacificCandidates, pacificInput, acknowledgeSyncDrafts, groupSyncActions, releaseProgress, isReleaseActive, elapsedText, localLineUpdateLabel, inSyncVendorScope, comparisonGroups } from "./productSyncView.js";
+test("connection status distinguishes pending changes and failed publications from old matching comparisons", () => {
+  const synced = { latestComparison: { status: "synced" } };
+  assert.equal(localLineUpdateLabel(synced), "Matched at last check");
+  assert.equal(localLineUpdateLabel({ ...synced, pending: true }), "Local changes pending");
+  assert.equal(localLineUpdateLabel({ ...synced, publicationStatus: "working" }), "Publishing");
+  assert.equal(localLineUpdateLabel({ ...synced, publicationStatus: "attention" }), "Needs attention");
+  assert.equal(localLineUpdateLabel({ cachedAt: "2026-10-08" }), "Not checked");
+  assert.equal(inSyncVendorScope({ vendorName: "Hyland Meats" }, "deck-enterprises"), true);
+  assert.equal(inSyncVendorScope({ vendorName: "Other Farm" }, "deck-enterprises"), false);
+  assert.equal(inSyncVendorScope({ vendorName: "Other Farm" }, "all"), true);
+});
+test("comparison details group sale and package price changes without losing current or proposed values", () => {
+  const groups = comparisonGroups({ display: { current: { fields: { unit_price: 10, on_sale_toggle: false, visible: true } }, proposed: { fields: { unit_price: 11, on_sale_toggle: true, visible: true } } } });
+  assert.deepEqual(groups.map(row => row.title), ["Prices & packages", "Sales"]);
+  assert.deepEqual(groups[0].rows[0], { key: "fields · unit_price", label: "Base price", current: 10, proposed: 11 });
+});
 test("Pacific scheduling is independent of browser time zone and handles DST", () => {
   assert.deepEqual(pacificCandidates("2026-09-25T14:00"), ["2026-09-25T21:00:00.000Z"]);
   assert.deepEqual(pacificCandidates("2026-12-25T14:00"), ["2026-12-25T22:00:00.000Z"]);
