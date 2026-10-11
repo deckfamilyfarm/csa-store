@@ -1,3 +1,5 @@
+import { normalizeCustomerPriceOverrides, findCustomerPriceOverride, customerOverridePrice } from './customerPriceOverrides.js';
+
 function toNumber(value) {
   if (value === null || typeof value === "undefined" || value === "") return null;
   const numeric = Number(value);
@@ -170,6 +172,10 @@ export function resolvePricingProfile({
   const sourcePricingVendor = isSourcePricingVendor(vendor);
   const usesNoMarkupPricing = isNoMarkupProduct(product);
   const vendorPriceListMarkup = toNumber(vendor?.priceListMarkup);
+  // Only an explicit override changes vendor-controlled pricing. Formula vendors
+  // and deposits retain their existing pricing rules.
+  const markupOverride = sourcePricingVendor || usesNoMarkupPricing
+    ? null : toNumber(profile?.markupOverride);
   const vendorSourceMultiplier = toNumber(vendor?.sourceMultiplier);
   const sourceMultiplier =
     usesNoMarkupPricing
@@ -220,6 +226,7 @@ export function resolvePricingProfile({
 
   const memberMarkup = usesNoMarkupPricing
     ? 0
+    : markupOverride !== null ? markupOverride
     : vendorPriceListMarkup !== null && vendorPriceListMarkup > 0
       ? vendorPriceListMarkup
     : sourcePricingVendor
@@ -227,6 +234,7 @@ export function resolvePricingProfile({
       : (toNumber(profile?.memberMarkup) ?? toNumber(vendor?.memberMarkup) ?? 0.4);
   const guestMarkup = usesNoMarkupPricing
     ? 0
+    : markupOverride !== null ? markupOverride
     : vendorPriceListMarkup !== null && vendorPriceListMarkup > 0
       ? vendorPriceListMarkup
     : sourcePricingVendor
@@ -234,6 +242,7 @@ export function resolvePricingProfile({
       : (toNumber(profile?.guestMarkup) ?? toNumber(vendor?.guestMarkup) ?? 0.55);
   const herdShareMarkup = usesNoMarkupPricing
     ? 0
+    : markupOverride !== null ? markupOverride
     : vendorPriceListMarkup !== null && vendorPriceListMarkup > 0
       ? vendorPriceListMarkup
     : sourcePricingVendor
@@ -241,6 +250,7 @@ export function resolvePricingProfile({
       : (toNumber(profile?.herdShareMarkup) ?? memberMarkup);
   const snapMarkup = usesNoMarkupPricing
     ? 0
+    : markupOverride !== null ? markupOverride
     : vendorPriceListMarkup !== null && vendorPriceListMarkup > 0
       ? vendorPriceListMarkup
     : sourcePricingVendor
@@ -258,6 +268,8 @@ export function resolvePricingProfile({
     maxWeight,
     avgWeightOverride,
     sourceMultiplier,
+    markupOverride,
+    customerPriceOverrides: sourcePricingVendor || usesNoMarkupPricing ? [] : normalizeCustomerPriceOverrides(profile?.customerPriceOverrides ?? profile?.customerPriceOverridesJson),
     guestMarkup,
     memberMarkup,
     herdShareMarkup,
@@ -343,6 +355,13 @@ export function getPriceListDefinitions(profile) {
   ].filter((entry) => entry.id !== null && entry.markup !== null);
 }
 
+export function computeCustomerPrice(basePrice, profile, packageId, list) {
+  const override = findCustomerPriceOverride(profile, packageId, list.id);
+  if (override) return customerOverridePrice(basePrice, override);
+  return { ...computeFinalPrice(basePrice, list.markup, profile.onSale, getCustomerFacingSaleDiscount(profile)),
+    onSale: Boolean(profile.onSale && getCustomerFacingSaleDiscount(profile) > 0), overridden: false };
+}
+
 export function computeProductPricingSnapshot({
   product = null,
   packages = [],
@@ -361,6 +380,7 @@ export function computeProductPricingSnapshot({
   const packageRows = getVisiblePackages(packages).map((pkg) => {
     const packageMeta = packageMetaByPackageId.get(pkg.id) || null;
     const basePrice = computePackageBasePrice(resolvedProfile, pkg, packageMeta);
+    const customerPrices = Object.fromEntries(getPriceListDefinitions(resolvedProfile).map(list => [list.key, computeCustomerPrice(basePrice, resolvedProfile, pkg.id, list)]));
     return {
       id: pkg.id,
       name: pkg.name || "",
@@ -369,7 +389,8 @@ export function computeProductPricingSnapshot({
       chargeUnit: getPackageChargeUnit(pkg, packageMeta, resolvedProfile),
       quantity: getPackageQuantity(pkg, packageMeta),
       averageWeight: computeAverageWeight(resolvedProfile, packageMeta),
-      basePrice
+      basePrice,
+      customerPrices
     };
   });
 
@@ -377,35 +398,37 @@ export function computeProductPricingSnapshot({
     .map((row) => row.basePrice)
     .filter((value) => value !== null);
   const basePrice = basePrices.length ? Math.min(...basePrices) : null;
-  const guest = computeFinalPrice(
+  const chooseCustomerPrice = (kind, fallback) => packageRows.map(row => row.customerPrices[kind]).filter(row => row?.final != null).sort((a,b) => a.final - b.final)[0] || fallback;
+  const guest = chooseCustomerPrice('guest', computeFinalPrice(
     basePrice,
     resolvedProfile.guestMarkup,
     resolvedProfile.onSale,
     getCustomerFacingSaleDiscount(resolvedProfile)
-  );
-  const member = computeFinalPrice(
+  ));
+  const member = chooseCustomerPrice('member', computeFinalPrice(
     basePrice,
     resolvedProfile.memberMarkup,
     resolvedProfile.onSale,
     getCustomerFacingSaleDiscount(resolvedProfile)
-  );
-  const herdShare = computeFinalPrice(
+  ));
+  const herdShare = chooseCustomerPrice('herdShare', computeFinalPrice(
     basePrice,
     resolvedProfile.herdShareMarkup,
     resolvedProfile.onSale,
     getCustomerFacingSaleDiscount(resolvedProfile)
-  );
-  const snap = computeFinalPrice(
+  ));
+  const snap = chooseCustomerPrice('snap', computeFinalPrice(
     basePrice,
     resolvedProfile.snapMarkup,
     resolvedProfile.onSale,
     getCustomerFacingSaleDiscount(resolvedProfile)
-  );
+  ));
 
   return {
     profile: resolvedProfile,
     packageRows,
     basePrice,
+    customerPrices: { guest, member, herdShare, snap },
     guestPrice: guest.final,
     memberPrice: member.final,
     herdSharePrice: herdShare.final,

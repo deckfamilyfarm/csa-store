@@ -4,6 +4,7 @@ export const LOCAL_ONLY_PRODUCT_SQL =
 const SOURCE_PRICING_VENDOR_SQL =
   "(LOWER(COALESCE(v.name, '')) LIKE '%deck family farm%' OR LOWER(COALESCE(v.name, '')) LIKE '%hyland%' OR LOWER(COALESCE(v.name, '')) LIKE '%creamy cow%')";
 const PRODUCT_VISIBILITY_SQL = "COALESCE(p.visible, (SELECT lm.visible FROM local_line_product_meta lm WHERE lm.product_id = p.id), 1)";
+export const PRODUCT_ON_SALE_SQL = `(COALESCE(ps.on_sale, 0) = 1 OR EXISTS (SELECT 1 FROM product_pricing_profiles sale_profile WHERE sale_profile.product_id=p.id AND JSON_CONTAINS(COALESCE(sale_profile.customer_price_overrides_json, '[]'), '{"onSale":true}'))) `;
 export const PRICELIST_PENDING_REMOTE_APPLY_SQL =
   "(" +
   "pp.product_id IS NOT NULL AND (" +
@@ -60,9 +61,9 @@ export function buildPricelistWhereClause({
     clauses.push("LOWER(COALESCE(p.name, '')) LIKE '%deposit%'");
 
   if (saleFilter === "onSale") {
-    clauses.push("COALESCE(ps.on_sale, 0) = 1");
+    clauses.push(PRODUCT_ON_SALE_SQL);
   } else if (saleFilter === "notOnSale") {
-    clauses.push("COALESCE(ps.on_sale, 0) = 0");
+    clauses.push(`NOT ${PRODUCT_ON_SALE_SQL}`);
   }
 
   switch (statusFilter) {

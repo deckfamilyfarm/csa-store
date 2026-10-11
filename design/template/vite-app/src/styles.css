@@ -2876,6 +2876,14 @@ img {
   width: min(1800px, 98vw);
 }
 
+.admin-session-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
 .admin-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr);

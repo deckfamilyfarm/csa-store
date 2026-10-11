@@ -87,9 +87,11 @@ Practical examples
   - edit `styles.css`
 
 Admin panel
-- Visit `/#/admin` to log in as an admin.
+- `https://admin.deckfamilyfarm.com/` opens the staff admin login directly. Local previews use `http://localhost:5176/admin` or `?experience=admin`; existing `/#/admin` links still work.
+- Staff sign in with the existing admin credentials and see the sections allowed by their assigned CSA roles, including Products/Inventory and Membership/Subscriptions. **Sign out** clears the session and returns to the same admin login.
+- Point the admin hostname at the same app/upstream as Subscribe and Dropsites, including `/api` and static assets. The server must have an HTTPS certificate covering `admin.deckfamilyfarm.com`; redirect HTTP to HTTPS. Rebuild the frontend on the server to activate the hostname routing.
 - Backend admin access is local to this app. Full admins can use the admin `Users` section to add backend users and assign one or more roles: `admin`, `user_admin`, `inventory_admin`, `pricing_admin`, `localline_pull`, `localline_push`, `square_pull`, `square_push`, `dropsite_admin`, `membership_admin`, and `member_admin`.
-- Timesheets identity is not currently the CSA Store permission authority. Optional Timesheets user/employee ids are reserved for future linking only.
+- When `TIMESHEETS_API_URL` is configured, Timesheets authenticates staff credentials; CSA Store's local role assignments remain the permission authority.
 - Admin login uses a unique `username`. Password reset email is stored separately and can be shared by multiple users, for example `deckfamilyfarm@gmail.com`.
 - Admin user setup and recovery use password reset emails. Creating a backend user sends a one-time setup link to that user's reset email instead of requiring an admin-entered password; existing users can be sent reset links from the `Users` screen or from login forgot-password by username.
 - Signed-in admins can also change their own password directly in the `Users` screen with `Change My Password`, which requires their current password and does not send email.
@@ -165,6 +167,7 @@ Store pricelist sync
 - Run the store master pricelist export with `npm run export:master-pricelist`.
 - The Google master pricelist export (Admin, CLI, and cron) includes only Deck Family Farm, Hyland, and Creamy Cow. Each export replaces the `prices` and `simple prices` contents, removing rows from other vendors. Other pricelist tools keep their own vendor scope.
 - The export wrapper loads this repo's `.env` by default and uses this app's configured store database. It does not call into a sibling Killdeer checkout.
+- Scheduled master-pricelist exports run Thursday and Friday at 4 AM Pacific. Replace the old 5 AM entry with [`scripts/master-pricelist.cron`](scripts/master-pricelist.cron); the wrapper's `--scheduled` mode handles daylight-saving changes. See [setup instructions](docs/localline-automation.md#master-pricelist-thursday-and-friday-at-4-am-pacific).
 - Dry-run the store sync with `npm run sync:killdeer-pricelist`.
 - Apply the sync only when ready with `npm run sync:killdeer-pricelist -- --write`.
 

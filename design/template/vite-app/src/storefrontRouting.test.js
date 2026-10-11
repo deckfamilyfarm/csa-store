@@ -1,6 +1,38 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { usesTurkeyStorefront } from './storefrontRouting.js';
+import { usesAdminPortal, usesTurkeyStorefront } from './storefrontRouting.js';
+
+test('the admin host and local entry points open the staff portal', () => {
+  for (const url of [
+    'https://admin.deckfamilyfarm.com/',
+    'https://admin.deckfamilyfarm.com/#/admin',
+    'https://admin.deckfamilyfarm.com/#/home',
+    'https://admin.deckfamilyfarm.com/#/turkeys',
+    'https://admin.deckfamilyfarm.com/?experience=subscribe',
+    'http://localhost:5176/admin',
+    'http://localhost:5176/admin/',
+    'http://localhost:5176/?experience=admin',
+    'http://127.0.0.1:5176/?experience=admin#/admin?adminToken=launch'
+  ]) {
+    assert.equal(usesAdminPortal(url), true, url);
+    assert.equal(usesTurkeyStorefront(url), false, url);
+  }
+});
+
+test('admin routing preserves public sites, legacy admin links and password recovery', () => {
+  for (const url of [
+    'https://store.deckfamilyfarm.com/',
+    'https://store.deckfamilyfarm.com/#/admin',
+    'https://subscribe.deckfamilyfarm.com/',
+    'https://dropsites.deckfamilyfarm.com/',
+    'https://turkeys.deckfamilyfarm.com/',
+    'http://localhost:5176/',
+    'http://localhost:5176/administrator',
+    'https://admin.deckfamilyfarm.com.evil.example/',
+    'https://admin.deckfamilyfarm.com/#/reset-password?token=reset',
+    'http://localhost:5176/admin#/reset-password?token=reset'
+  ]) assert.equal(usesAdminPortal(url), false, url);
+});
 
 test('turkeys have a dedicated host and local path; the main store keeps its landing page', () => {
   for (const url of ['https://turkeys.deckfamilyfarm.com/', 'https://turkeys.deckfamilyfarm.com/#/turkeys?order=123', 'http://localhost:5176/turkeys', 'http://localhost:5176/?experience=turkeys', 'http://localhost:5176/#/turkeys?order=123', 'https://store.deckfamilyfarm.com/#/turkeys']) assert.equal(usesTurkeyStorefront(url), true, url);

@@ -8,6 +8,7 @@ import { AdminOrdersSection } from "./AdminOrdersSection.jsx";
 import { AdminTurkeyPreorders } from "./AdminTurkeyPreorders.jsx";
 import { AdminStorefront } from "./AdminStorefront.jsx";
 import { AdminProductsSection } from "./AdminProductsSection.jsx";
+import { CustomerPricingEditor } from './CustomerPricingEditor.jsx';
 import { categoryLabel } from "../categoryLabel.js";
 import { productCapabilities, buildProductDraftFromProduct, createDraftPackage, hydrateProductDraft, dirtyFields, hasDraftChanges, acknowledgeSave, saveProductDraft, saveInventoryDraft, INVENTORY_FIELDS, unsupportedScheduleFields, buildScheduleUpdate } from "./productWorkspace.js";
 import { AdminProductSyncSection } from "./AdminProductSyncSection.jsx";
@@ -1771,6 +1772,15 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
     return activeSection !== "products" || !hasDraftChanges(workspaceDrafts) || window.confirm("You have unsaved product changes. Leave Products? Your drafts remain available until you reload or sign out.");
   }
 
+  function handleSignOut() {
+    if (hasDraftChanges(workspaceDrafts) && !window.confirm("Sign out and discard unsaved product changes?")) return;
+    if (!closeProductEditor()) return;
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("userToken");
+    // A fresh page clears all cached account data and returns to this login URL.
+    window.location.reload();
+  }
+
   function openAdminManual(topic = "overview") {
     if (!confirmLeaveProducts()) return;
     if (!closeProductEditor()) return;
@@ -3443,6 +3453,10 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
 
   return (
     <div className="container admin-panel">
+      <div className="admin-session-bar">
+        <span className="small">{currentAdmin?.name || currentAdmin?.username || "Admin"}</span>
+        <button className="button alt" type="button" onClick={handleSignOut}>Sign out</button>
+      </div>
       {message && <div className="small">{message}</div>}
       {loading && <div className="small">Loading...</div>}
 
@@ -3734,6 +3748,20 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                         </label>
                     </>
                   ) : null}
+                  {productEditorMode !== "new" && !selectedDraftUsesSourcePricing && !String(productDraft.name).toLowerCase().includes("deposit") ? (
+                    <label className="filter-field">
+                      <span className="small">Product Markup %</span>
+                      <input className="input" type="number" min="0" step="0.01"
+                        disabled={!capabilities.pricing} value={productDraft.markupOverride ?? ""}
+                        onChange={event => setProductDraft(prev => ({ ...prev, markupOverride: event.target.value }))} />
+                      <span className="small">Applies to all customer price lists for this product. Leave blank to use the vendor default.</span>
+                    </label>
+                  ) : null}
+                  {productEditorMode !== 'new' && !selectedDraftUsesSourcePricing && !String(productDraft.name).toLowerCase().includes('deposit') ? (
+                    <CustomerPricingEditor rows={productDraft.customerPriceOverrides || []} packages={productDraft.packages || []}
+                      lists={activeProduct?.pricingProfile?.customerPriceLists || activeProduct?.customerPriceLists || []}
+                      disabled={!capabilities.pricing} onChange={customerPriceOverrides => setProductDraft(prev => ({ ...prev, customerPriceOverrides }))} />
+                  ) : null}
                   <fieldset className="admin-price-list products-editor-fields" disabled={productEditorMode !== "new" && !capabilities.pricing}>
                     <div className="admin-actions">
                       <div className="small">Packages</div>
@@ -3965,11 +3993,13 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                     </label>
                   </>
                   <div className="admin-sale-fields">
+                    {productDraft.customerPriceOverrides?.length ? <p className="small">Sales are managed in Customer-group prices and sales above. Remove those settings to use a product-wide sale.</p> : null}
                     <label className="admin-inline-toggle-field">
                       <span className="small">On sale</span>
                       <button
                         className={`toggle-switch ${productDraft.onSale ? "active" : ""}`}
                         type="button"
+                        disabled={Boolean(productDraft.customerPriceOverrides?.length)}
                         onClick={() =>
                           setProductDraft((prev) => ({ ...prev, onSale: !prev.onSale }))
                         }
@@ -3985,6 +4015,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                           max="100"
                           step="1"
                           value={productDraft.saleDiscount}
+                          disabled={Boolean(productDraft.customerPriceOverrides?.length)}
                           onChange={(event) =>
                             setProductDraft((prev) => ({
                               ...prev,

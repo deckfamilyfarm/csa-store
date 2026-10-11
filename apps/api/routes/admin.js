@@ -1,7 +1,7 @@
 import productSyncRouter from "./productSync.js";
 import { saveInventoryToLocalLine } from "../lib/inventorySync.js";
 import { validateVendorAssignment, validateSavedProductVendor } from "../lib/productVendor.js";
-import { buildPricelistWhereClause, PRICELIST_PENDING_REMOTE_APPLY_SQL } from "../lib/productWorkspaceFilters.js";
+import { buildPricelistWhereClause, PRICELIST_PENDING_REMOTE_APPLY_SQL, PRODUCT_ON_SALE_SQL } from "../lib/productWorkspaceFilters.js";
 import express from "express";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
@@ -84,10 +84,14 @@ import {
 } from "../lib/localLineFullSyncJobs.js";
 import {
   computeProductPricingSnapshot,
+  getPriceListDefinitions,
   isNoMarkupProduct,
   isSourcePricingVendor
 } from "../lib/productPricing.js";
 import { hasAdminPermission } from "../lib/adminRoles.js";
+import { saveProductMarkupOverride } from "../lib/productMarkup.js";
+import { saveCustomerPriceOverrides } from '../lib/customerPriceOverrideSave.js';
+import { assertProductWideSaleAllowed } from '../lib/customerPriceOverrides.js';
 import { prepareProductImageUpload } from "../lib/productImageUpload.js";
 import {
   authenticateLocalAdminWithTimesheets,
@@ -310,11 +314,12 @@ async function syncVendorPricingDefaultsForProducts(connection, vendorRecord, de
   const params = [];
 
   if (priceListMarkup !== null) {
+    const markup = isSourceVendor ? "?" : "COALESCE(pp.markup_override, ?)";
     updates.push(
-      "pp.guest_markup = CASE WHEN LOWER(p.name) LIKE '%deposit%' THEN 0 ELSE ? END",
-      "pp.member_markup = CASE WHEN LOWER(p.name) LIKE '%deposit%' THEN 0 ELSE ? END",
-      "pp.herd_share_markup = CASE WHEN LOWER(p.name) LIKE '%deposit%' THEN 0 ELSE ? END",
-      "pp.snap_markup = CASE WHEN LOWER(p.name) LIKE '%deposit%' THEN 0 ELSE ? END"
+      `pp.guest_markup = CASE WHEN LOWER(p.name) LIKE '%deposit%' THEN 0 ELSE ${markup} END`,
+      `pp.member_markup = CASE WHEN LOWER(p.name) LIKE '%deposit%' THEN 0 ELSE ${markup} END`,
+      `pp.herd_share_markup = CASE WHEN LOWER(p.name) LIKE '%deposit%' THEN 0 ELSE ${markup} END`,
+      `pp.snap_markup = CASE WHEN LOWER(p.name) LIKE '%deposit%' THEN 0 ELSE ${markup} END`
     );
     params.push(priceListMarkup, priceListMarkup, priceListMarkup, priceListMarkup);
   }
@@ -380,8 +385,11 @@ function resolveAdminProductPricingProfile({
   vendor = null
 }) {
   const productId = Number(product?.id ?? pricingProfile?.productId);
-  if (!Number.isFinite(productId) || !isSourcePricingVendor(vendor)) {
-    return pricingProfile || null;
+  if (!Number.isFinite(productId)) return pricingProfile || null;
+  if (!isSourcePricingVendor(vendor)) {
+    const snapshot = computeProductPricingSnapshot({ product, vendor, packages: packageRows, profile: pricingProfile });
+    return { ...pricingProfile, customerPriceOverrides: snapshot.profile.customerPriceOverrides,
+      customerPriceLists: getPriceListDefinitions(snapshot.profile).map(({id,key,name}) => ({id,key,name})) };
   }
 
   const mergedProfile = {
@@ -5630,9 +5638,9 @@ router.get("/local-pricelist-products", requireAdmin, async (req, res) => {
     whereClauses.push("COALESCE(p.visible, 0) = 0");
   }
   if (saleFilter === "onSale") {
-    whereClauses.push("COALESCE(ps.on_sale, 0) = 1");
+    whereClauses.push(PRODUCT_ON_SALE_SQL);
   } else if (saleFilter === "notOnSale") {
-    whereClauses.push("COALESCE(ps.on_sale, 0) = 0");
+    whereClauses.push(`NOT ${PRODUCT_ON_SALE_SQL}`);
   }
 
   const whereSql = `WHERE ${whereClauses.join(" AND ")}`;
@@ -6396,6 +6404,10 @@ function buildPricelistRows(productRows, supportingRows) {
       avgWeightOverride: usesSourcePricing ? snapshot.profile.avgWeightOverride : null,
       sourceMultiplier: usesSourcePricing ? snapshot.profile.sourceMultiplier : null,
       localLineProductId: Number(productMeta?.localLineProductId || 0),
+      markupOverride: snapshot.profile.markupOverride,
+      customerPriceOverrides: snapshot.profile.customerPriceOverrides,
+      customerPriceLists: getPriceListDefinitions(snapshot.profile).map(({id,key,name}) => ({id,key,name})),
+      vendorPriceListMarkup: toNumber(vendor?.priceListMarkup),
       guestMarkup: snapshot.profile.guestMarkup,
       memberMarkup: snapshot.profile.memberMarkup,
       herdShareMarkup: snapshot.profile.herdShareMarkup,
@@ -6683,7 +6695,11 @@ router.post("/pricelist/bulk-save", requireAdminPermission("pricing_admin"), asy
 
   // Validate the whole batch before writing any pricing rows.
   try {
-    for (const row of rows) await validateSavedProductVendor(getPool(), row?.productId);
+    for (const row of rows) {
+      await validateSavedProductVendor(getPool(), row?.productId);
+      const [profile] = await db.select().from(productPricingProfiles).where(eq(productPricingProfiles.productId, Number(row?.productId)));
+      if (Boolean(row.onSale) !== Boolean(profile?.onSale) || Number(row.saleDiscount || 0) !== Number(profile?.saleDiscount || 0)) assertProductWideSaleAllowed(profile, {onSale:row.onSale,saleDiscount:row.saleDiscount});
+    }
   } catch (error) { return res.status(error.status || 500).json({ error: error.message }); }
 
   for (const row of rows) {
@@ -6702,6 +6718,10 @@ router.post("/pricelist/bulk-save", requireAdminPermission("pricing_admin"), asy
     const vendorPriceListMarkup = normalizeVendorMarkupInput(vendor?.priceListMarkup);
     const vendorSourceMultiplier = normalizeVendorSourceMultiplierInput(vendor?.sourceMultiplier);
 
+    const existing = await db.select().from(productPricingProfiles).where(eq(productPricingProfiles.productId, productId));
+    const markupOverride = !forceNoMarkup && !isSourcePricingVendor(vendor)
+      ? toNumber(existing[0]?.markupOverride) : null;
+
     const payload = {
       unitOfMeasure: String(row.unitOfMeasure || "each").toLowerCase() === "lbs" ? "lbs" : "each",
       sourceUnitPrice: toDbDecimal(row.sourceUnitPrice),
@@ -6716,10 +6736,10 @@ router.post("/pricelist/bulk-save", requireAdminPermission("pricing_admin"), asy
                 ? vendorSourceMultiplier
                 : toDbDecimal(row.sourceMultiplier)
             ),
-      guestMarkup: forceNoMarkup ? 0 : (vendorPriceListMarkup ?? toDbDecimal(row.guestMarkup)),
-      memberMarkup: forceNoMarkup ? 0 : (vendorPriceListMarkup ?? toDbDecimal(row.memberMarkup)),
-      herdShareMarkup: forceNoMarkup ? 0 : (vendorPriceListMarkup ?? toDbDecimal(row.herdShareMarkup)),
-      snapMarkup: forceNoMarkup ? 0 : (vendorPriceListMarkup ?? toDbDecimal(row.snapMarkup)),
+      guestMarkup: forceNoMarkup ? 0 : (markupOverride ?? vendorPriceListMarkup ?? toDbDecimal(row.guestMarkup)),
+      memberMarkup: forceNoMarkup ? 0 : (markupOverride ?? vendorPriceListMarkup ?? toDbDecimal(row.memberMarkup)),
+      herdShareMarkup: forceNoMarkup ? 0 : (markupOverride ?? vendorPriceListMarkup ?? toDbDecimal(row.herdShareMarkup)),
+      snapMarkup: forceNoMarkup ? 0 : (markupOverride ?? vendorPriceListMarkup ?? toDbDecimal(row.snapMarkup)),
       onSale: row.onSale ? 1 : 0,
       saleDiscount: toDbDecimal(row.saleDiscount),
       priceChangedAt: now,
@@ -6727,11 +6747,6 @@ router.post("/pricelist/bulk-save", requireAdminPermission("pricing_admin"), asy
       remoteSyncMessage: "Local pricing updated. Apply to remote store pending.",
       updatedAt: now
     };
-
-    const existing = await db
-      .select()
-      .from(productPricingProfiles)
-      .where(eq(productPricingProfiles.productId, productId));
 
     if (existing.length) {
       await db
@@ -10698,6 +10713,24 @@ router.put("/products/:id", requireAdminPermission(["inventory_admin", "pricing_
   res.json({ ok: true });
 });
 
+router.put('/products/:id/customer-prices', requireAdminPermission(['pricing_admin', 'local_pricelist_admin']), async (req, res) => {
+  try {
+    await ensureProductPricingSchema();
+    return res.json(await saveCustomerPriceOverrides(getPool(), Number(req.params.id), req.body?.customerPriceOverrides));
+  } catch (error) {
+    return res.status(error.status || 500).json({ error: error.message || 'Unable to save customer prices.' });
+  }
+});
+
+router.put("/products/:id/markup", requireAdminPermission(["pricing_admin", "local_pricelist_admin"]), async (req, res) => {
+  try {
+    await ensureProductPricingSchema();
+    return res.json(await saveProductMarkupOverride(getPool(), Number(req.params.id), req.body?.markupOverride));
+  } catch (error) {
+    return res.status(error.status || 500).json({ error: error.message || "Unable to save product markup." });
+  }
+});
+
 router.put("/products/:id/pricing-profile", requireAdminPermission(["pricing_admin", "local_pricelist_admin"]), async (req, res) => {
   const pool = getPool();
   const productId = Number(req.params.id);
@@ -10788,6 +10821,10 @@ router.post("/products/bulk-update", requireAdminPermission(["inventory_admin", 
 
     try {
       await validateSavedProductVendor(getPool(), productId);
+      if (Object.hasOwn(changes, 'onSale') || Object.hasOwn(changes, 'saleDiscount')) {
+        const [profile] = await db.select().from(productPricingProfiles).where(eq(productPricingProfiles.productId, productId));
+        assertProductWideSaleAllowed(profile, changes);
+      }
       await db
         .update(products)
         .set({
@@ -10798,17 +10835,17 @@ router.post("/products/bulk-update", requireAdminPermission(["inventory_admin", 
         })
         .where(eq(products.id, productId));
 
-      const salePayload = {
-        productId,
-        onSale: changes.onSale ?? 0,
-        saleDiscount: typeof changes.saleDiscount === "number" ? changes.saleDiscount : null,
-        updatedAt: new Date()
-      };
-
       const existingSale = await db
         .select()
         .from(productSales)
         .where(eq(productSales.productId, productId));
+
+      const salePayload = {
+        productId,
+        onSale: changes.onSale ?? existingSale[0]?.onSale ?? 0,
+        saleDiscount: Object.hasOwn(changes, 'saleDiscount') ? changes.saleDiscount : existingSale[0]?.saleDiscount ?? null,
+        updatedAt: new Date()
+      };
 
       const existingOnSale = existingSale.length ? Number(existingSale[0].onSale || 0) : 0;
       const nextOnSale = Number(salePayload.onSale || 0);

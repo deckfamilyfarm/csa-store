@@ -39,6 +39,16 @@ const PRODUCT_PRICING_COLUMN_STATEMENTS = [
     tableName: "product_pricing_profiles",
     columnName: "price_changed_at",
     definition: "price_changed_at DATETIME"
+  },
+  {
+    tableName: "product_pricing_profiles",
+    columnName: "markup_override",
+    definition: "markup_override DECIMAL(10, 4) DEFAULT NULL"
+  },
+  {
+    tableName: "product_pricing_profiles",
+    columnName: "customer_price_overrides_json",
+    definition: "customer_price_overrides_json TEXT DEFAULT NULL"
   }
 ];
 
@@ -1445,6 +1455,8 @@ const LOCAL_LINE_TABLE_STATEMENTS = [
       member_markup DECIMAL(10, 4),
       herd_share_markup DECIMAL(10, 4),
       snap_markup DECIMAL(10, 4),
+      markup_override DECIMAL(10, 4) DEFAULT NULL,
+      customer_price_overrides_json TEXT DEFAULT NULL,
       on_sale TINYINT(1) DEFAULT 0,
       sale_discount DECIMAL(5, 4),
       price_changed_at DATETIME,
@@ -2898,7 +2910,7 @@ async function runProductPricingSchemaBootstrap(connection) {
     await connection.query(
       `ALTER TABLE ${columnDefinition.tableName} ADD COLUMN ${columnDefinition.definition}`
     );
-    addedColumn = true;
+    if (columnDefinition.columnName === "price_changed_at") addedColumn = true;
   }
 
   if (addedColumn) {
@@ -3255,7 +3267,7 @@ export function getPool() {
 export async function ensureLocalLineSyncSchema(connection = getPool()) {
   if (connection === getPool()) {
     if (!localLineSchemaPromise) {
-      localLineSchemaPromise = runLocalLineSchemaBootstrap(connection).catch((error) => {
+      localLineSchemaPromise = runLocalLineSchemaBootstrap(connection).then(() => ensureProductPricingSchema(connection)).catch((error) => {
         localLineSchemaPromise = null;
         throw error;
       });
@@ -3263,7 +3275,8 @@ export async function ensureLocalLineSyncSchema(connection = getPool()) {
     return localLineSchemaPromise;
   }
 
-  return runLocalLineSchemaBootstrap(connection);
+  await runLocalLineSchemaBootstrap(connection);
+  return ensureProductPricingSchema(connection);
 }
 
 export async function ensureSquareSyncSchema(connection = getPool()) {

@@ -1,0 +1,5 @@
+# Replace the existing 5 AM CSA Store master-pricelist entry with this line.
+# Keep the old Killdeer export_master_pricelist.js entry commented out.
+# Server cron is UTC: 4 AM Pacific is 11:00 UTC in PDT or 12:00 UTC in PST.
+# --scheduled checks Pacific weekday/time and skips the alternate UTC hour.
+0 11,12 * * 4,5 cd /home/jdeck/code/csa-store && /usr/bin/node --env-file=.env scripts/runStoreExportMasterPricelist.js --scheduled >> /home/jdeck/.pm2/logs/csa-store-pricelist-export.log 2>&1

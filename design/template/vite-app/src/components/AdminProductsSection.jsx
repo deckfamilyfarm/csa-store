@@ -62,6 +62,7 @@ const PRODUCT_COLUMNS = [
   { key: "category", label: "Category", width: 160, defaultVisible: false },
   { key: "vendor", label: "Vendor", width: 170, defaultVisible: false },
   { key: "pricingRule", label: "Rule", width: 150, defaultVisible: false },
+  { key: "markupOverride", label: "Product Markup %", description: "Leave blank to use the vendor default.", width: 150, defaultVisible: false },
   { key: "minWeight", label: "Min Wt", width: 100, defaultVisible: false },
   { key: "maxWeight", label: "Max Wt", width: 100, defaultVisible: false },
   {
@@ -454,6 +455,7 @@ export function AdminProductsSection({
       case "visible":
       case "trackInventory":
       case "onSale":
+        if (column.key === 'onSale' && values.customerPriceOverrides?.length) return <span className="small">By group · Details</span>;
         return (
           <input
             type="checkbox"
@@ -467,6 +469,7 @@ export function AdminProductsSection({
         );
       case "inventory":
       case "saleDiscount":
+        if (column.key === 'saleDiscount' && values.customerPriceOverrides?.length) return <span className="small">By group</span>;
         return numericInput(column.key);
       case "sourceUnitPrice":
         if (row.usesSourcePricing) {
@@ -504,6 +507,8 @@ export function AdminProductsSection({
         return row.usesSourcePricing ? numericInput(column.key, true) : "—";
       case "sourceMultiplier":
         return row.usesSourcePricing ? values.sourceMultiplier : "—";
+      case "markupOverride":
+        return row.usesSourcePricing || row.usesNoMarkupPricing ? "—" : numericInput(column.key, true);
       case "unit":
         return row.usesSourcePricing ? (
           <select
@@ -526,7 +531,7 @@ export function AdminProductsSection({
           ? "Deposit / no markup"
           : row.usesSourcePricing
             ? "Formula"
-            : "Standard";
+            : values.markupOverride !== "" ? "Product markup" : "Standard";
       case "basePrice":
         if (!row.usesSourcePricing && values.packages.length === 1)
           return (

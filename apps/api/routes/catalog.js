@@ -1767,6 +1767,8 @@ router.get("/catalog", async (_req, res) => {
         profile: pricingProfileByProductId.get(row.id) || null
       });
       const hasResolvedPricingProfile =
+        pricingSnapshot.profile.customerPriceOverrides.length > 0 ||
+        pricingSnapshot.profile.markupOverride !== null ||
         (Boolean(pricingProfileByProductId.get(row.id)) ||
           Boolean(pricingSnapshot.profile.usesNoMarkupPricing)) &&
         Number.isFinite(Number(pricingSnapshot.profile.sourceUnitPrice));
@@ -1798,8 +1800,10 @@ router.get("/catalog", async (_req, res) => {
           );
       const effectiveSaleMeta = hasResolvedPricingProfile
         ? {
-            onSale: Boolean(pricingSnapshot.profile.onSale),
-            saleDiscount: pricingSnapshot.profile.saleDiscount
+            onSale: pricingSnapshot.customerPrices.guest.onSale ?? Boolean(pricingSnapshot.profile.onSale),
+            saleDiscount: pricingSnapshot.profile.customerPriceOverrides.length
+              ? Math.max(0, 1 - pricingSnapshot.guestPrice / pricingSnapshot.guestRegularPrice)
+              : pricingSnapshot.profile.saleDiscount
           }
         : saleMeta;
 
@@ -1842,6 +1846,7 @@ router.get("/catalog", async (_req, res) => {
         featured: featuredSet.has(row.id),
         onSale: effectiveSaleMeta ? Boolean(effectiveSaleMeta.onSale) : saleSet.has(row.id),
         saleDiscount: effectiveSaleMeta ? effectiveSaleMeta.saleDiscount : null,
+        customerPrices: hasResolvedPricingProfile ? pricingSnapshot.customerPrices : null,
         rating: avgRating ? Math.round(avgRating * 10) / 10 : 0,
         reviews: productReviews
       };

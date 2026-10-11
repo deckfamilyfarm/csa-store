@@ -1,4 +1,14 @@
+export function usesAdminPortal(href) {
+  const url = new URL(href);
+  const route = url.hash.replace(/^#\/?/, '').split('?')[0];
+  // Emailed password-reset links still use the shared account recovery screen.
+  if (route === 'reset-password') return false;
+  const pathRoute = url.pathname.replace(/^\//, '').split('/')[0];
+  return url.hostname === 'admin.deckfamilyfarm.com' || pathRoute === 'admin' || url.searchParams.get('experience') === 'admin';
+}
+
 export function usesTurkeyStorefront(href) {
+  if (usesAdminPortal(href)) return false;
   const url = new URL(href);
   const route = url.hash.replace(/^#\/?/, '').split('?')[0];
   const reserved = ['admin', 'account', 'subscribe', 'dropsites', 'reset-password'];

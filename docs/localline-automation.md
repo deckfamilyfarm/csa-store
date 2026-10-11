@@ -34,6 +34,21 @@ The deployed crontab is currently written in UTC with Pacific daylight-time comm
 35 11 * * 1 cd /home/jdeck/code/csa-store && /usr/bin/node --env-file=.env apps/api/scripts/runLocalLineAutomation.js --mode=dashboard >> /home/jdeck/code/csa-store/tmp/localline-automation.log 2>&1
 ```
 
+## Master pricelist: Thursday and Friday at 4 AM Pacific
+
+The CSA Store exporter publishes the configured Google master pricelist from this application's local database. It uses the same export as Admin and `npm run export:master-pricelist`, including the existing Deck Family Farm, Hyland, and Creamy Cow scope. It does not invoke the old Killdeer exporter or publish catalog prices to Local Line or Square.
+
+After deploying the updated code, use `crontab -e` on the server to **replace** the existing 5 AM `exportMasterPricelist.js` entry with the entry in [`scripts/master-pricelist.cron`](../scripts/master-pricelist.cron):
+
+```cron
+# 4:00 AM Pacific every Thursday and Friday, including daylight-saving changes
+0 11,12 * * 4,5 cd /home/jdeck/code/csa-store && /usr/bin/node --env-file=.env scripts/runStoreExportMasterPricelist.js --scheduled >> /home/jdeck/.pm2/logs/csa-store-pricelist-export.log 2>&1
+```
+
+The server's cron runs in UTC. The wrapper checks `America/Los_Angeles` and invokes `apps/api/scripts/exportMasterPricelist.js` only during 04:00 on Thursday or Friday, skipping the alternate UTC hour. Keep the old Killdeer export line commented out and leave the hourly scheduled-pricelist-release job in place; that is a separate publication workflow. The existing Google credentials and spreadsheet configuration in this repository's `.env` are reused.
+
+Manual export and preview commands continue to work at any time. Check the schedule without publishing using `node --test scripts/runStoreExportMasterPricelist.test.js`, and inspect `/home/jdeck/.pm2/logs/csa-store-pricelist-export.log` after scheduled runs.
+
 ## Tracking
 
 - Admin > Local Line shows the latest automation job plus child job details.

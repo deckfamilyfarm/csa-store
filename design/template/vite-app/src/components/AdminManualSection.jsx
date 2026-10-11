@@ -145,6 +145,12 @@ export function AdminManualSection({ focusTopic = "overview" }) {
             used across the customer price lists for that vendor&apos;s products.
           </li>
           <li>
+            Standard products can set a <strong>Product Markup %</strong> in Details or the optional
+            Products column. This overrides the vendor default for that product across all customer
+            price lists. Leave it blank to inherit the vendor default. Save locally, then review and
+            publish through Product Sync. Formula vendors and deposits retain their pricing rules.
+          </li>
+          <li>
             After the CSA Package Price is known, the app applies the vendor markup to calculate
             the customer-facing Adjusted Price.
           </li>

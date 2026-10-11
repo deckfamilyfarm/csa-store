@@ -1202,6 +1202,8 @@ export const productPricingProfiles = mysqlTable("product_pricing_profiles", {
   memberMarkup: decimal("member_markup", { precision: 10, scale: 4 }),
   herdShareMarkup: decimal("herd_share_markup", { precision: 10, scale: 4 }),
   snapMarkup: decimal("snap_markup", { precision: 10, scale: 4 }),
+  markupOverride: decimal("markup_override", { precision: 10, scale: 4 }),
+  customerPriceOverridesJson: text("customer_price_overrides_json"),
   onSale: tinyint("on_sale").default(0),
   saleDiscount: decimal("sale_discount", { precision: 5, scale: 4 }),
   priceChangedAt: datetime("price_changed_at"),

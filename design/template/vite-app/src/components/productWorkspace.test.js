@@ -11,6 +11,7 @@ import {
   unsupportedScheduleFields,
   syncLabel,
   previewProductPrices,
+  buildScheduleUpdate,
 } from "./productWorkspace.js";
 import { computeProductPricingSnapshot } from "../../../../../apps/api/lib/productPricing.js";
 
@@ -34,6 +35,53 @@ const product = {
     { id: 70, name: "Each", price: 5, visible: true, numOfItems: 1 },
   ],
 };
+
+test('customer-group settings survive hydration, save locally, and preserve failed drafts', async () => {
+  const standard = { ...product, usesSourcePricing: false, markupOverride: .45, customerPriceLists: [{ id: 3124, key: 'guest' }] };
+  const rows = [{ packageId: 70, priceListId: 3124, adjustment: true, adjustmentType: 2, adjustmentValue: 40, onSale: true, strikethrough: 9 }];
+  const entry = patchProductDraft({}, standard, { customerPriceOverrides: rows })[7];
+  const hydrated = hydrateProductDraft(entry, { ...standard, pricingProfile: { customerPriceOverrides: [] } });
+  assert.deepEqual(hydrated.values.customerPriceOverrides, rows);
+  assert.equal(previewProductPrices(standard, hydrated.values).guestPrice, 7);
+  assert.equal(Object.hasOwn(buildScheduleUpdate(entry).changes, 'onSale'), false);
+  const calls = [], api = { put: async (path, body) => { calls.push({path,body}); return {ok:true}; } };
+  const denied = await saveProductDraft(entry, productCapabilities(['inventory_admin']), api);
+  assert.equal(denied.ok, false); assert.deepEqual(calls, []);
+  const failed = await saveProductDraft(entry, productCapabilities(['pricing_admin']), {put:async()=>{throw new Error('Save failed');}});
+  assert.ok(dirtyFields(acknowledgeSave(entry, entry, failed.savedFields)).includes('customerPriceOverrides'));
+  const saved = await saveProductDraft(entry, productCapabilities(['pricing_admin']), api);
+  assert.ok(saved.ok); assert.equal(calls[0].path, 'products/7/customer-prices');
+  assert.deepEqual(calls[0].body.customerPriceOverrides, rows);
+  assert.deepEqual(dirtyFields(acknowledgeSave(entry, entry, saved.savedFields)), []);
+});
+
+test("product markup saves locally and remains a draft on permission or save failure", async () => {
+  const standard = { ...product, usesSourcePricing: false, markupOverride: null };
+  const entry = patchProductDraft({}, standard, { markupOverride: "45" })[7];
+  const calls = [];
+  const api = { put: async (path, body) => { calls.push({ path, body }); return { ok: true }; } };
+  const denied = await saveProductDraft(entry, productCapabilities(["inventory_admin"]), api);
+  assert.equal(denied.ok, false);
+  assert.deepEqual(calls, []);
+  const saved = await saveProductDraft(entry, productCapabilities(["local_pricelist_admin"]), api);
+  assert.equal(saved.ok, true);
+  assert.deepEqual(calls, [{ path: "products/7/markup", body: { markupOverride: 0.45 } }]);
+  assert.deepEqual(saved.savedFields, ["markupOverride"]);
+  assert.ok(unsupportedScheduleFields(entry).includes("markupOverride"));
+  const failed = await saveProductDraft(entry, productCapabilities(["admin"]), { put: async () => { throw new Error("Save failed"); } });
+  assert.deepEqual(failed.savedFields, []);
+  assert.equal(entry.values.markupOverride, "45");
+});
+
+test("markup preview supports setting and clearing an override without changing vendor defaults", () => {
+  const standard = { ...product, usesSourcePricing: false, markupOverride: 0.45, vendorPriceListMarkup: 0.4,
+    guestMarkup: 0.45, memberMarkup: 0.45, herdShareMarkup: 0.45, snapMarkup: 0.45 };
+  const draft = hydrateProductDraft(null, standard).values;
+  assert.equal(draft.markupOverride, "45");
+  assert.equal(previewProductPrices(standard, draft).memberPrice, 7.25);
+  assert.equal(previewProductPrices(standard, { ...draft, markupOverride: "" }).memberPrice, 7);
+  assert.equal(previewProductPrices(standard, { ...draft, markupOverride: "0" }).memberPrice, 5);
+});
 
 test("vendorless drafts fail before any local save and retain every edit", async () => {
   for (const vendorId of [null, "", 0]) {

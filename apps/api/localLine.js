@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 import { requireProductVendor, requireVendorId, matchLocalLineVendor, confirmLocalLineVendor } from "./lib/productVendor.js";
+import { findCustomerPriceOverride, customerOverridePrice, assertProductWideSaleAllowed } from './lib/customerPriceOverrides.js';
 import {
   categories,
   localLineProductMeta,
@@ -787,6 +788,7 @@ export async function loadLocalLineSyncContext(db, productId) {
 }
 
 export function stageLocalLineContext(context, changes = {}) {
+  assertProductWideSaleAllowed(context.profile, changes);
   const next = structuredClone(context);
   for (const key of ["visible", "trackInventory", "inventory"]) {
     if (Object.hasOwn(changes, key)) next.product[key] = changes[key];
@@ -801,6 +803,7 @@ export function stageLocalLineContext(context, changes = {}) {
 export function buildLocalLinePricePayload(context, llProduct, changes = {}) {
   const { product, vendor, profile, packages: packageRows, packageMeta: packageMetaRows, sale: saleRow } = context;
   requireProductVendor(product, vendor);
+  assertProductWideSaleAllowed(profile, changes);
   const vendorId = requireVendorId(context.localLineVendorId);
   const productId = product.id;
   const profileRows = profile ? [profile] : [];
@@ -913,9 +916,21 @@ export function buildLocalLinePricePayload(context, llProduct, changes = {}) {
       const markup = list.markup;
       const existingEntry = packageEntryByListId.get(list.id);
       if (!existingEntry) {
+        if (findCustomerPriceOverride(resolvedProfile, pkg.id, list.id)) throw new Error(`Customer pricing for ${pkg.name || pkg.id} / ${list.name} has no existing Local Line listing. Review the listing before publishing.`);
         continue;
       }
-      const built = buildPriceListEntry(
+      const override = findCustomerPriceOverride(resolvedProfile, pkg.id, list.id);
+      const built = override ? {
+        adjustment: override.adjustment,
+        adjustment_type: override.adjustmentType,
+        adjustment_value: override.adjustmentValue,
+        price_list: list.id,
+        product_price_list_entry: Number(existingEntry.product_price_list_entry ?? existingEntry.id),
+        calculated_value: customerOverridePrice(purchasePrice, override).final,
+        on_sale_toggle: override.onSale,
+        strikethrough_display_value: override.strikethrough,
+        max_units_per_order: existingEntry.max_units_per_order ?? null
+      } : buildPriceListEntry(
         purchasePrice,
         regularPurchasePrice,
         existingEntry,

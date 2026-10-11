@@ -9,6 +9,7 @@ import { listScheduledPricelistBatches } from "./scheduledPricelistReleases.js";
 import { normalizeIds, normalizeStaged, hasGrant, fail, authorizeRelease, releaseTime, same, executeProductActions, releaseStatus } from "./productSyncCore.js";
 import { auditVendorGroup, auditProductScope, auditProducts } from "./productSyncScope.js";
 import { PRICELIST_PENDING_REMOTE_APPLY_SQL } from "./productWorkspaceFilters.js";
+import { assertProductWideSaleAllowed } from './customerPriceOverrides.js';
 
 export async function loadCurrentSnapshot(connection, productId) {
   const [rows] = await connection.query(`SELECT p.id AS productId, p.name AS productName, p.visible, p.track_inventory AS trackInventory, p.inventory,
@@ -21,6 +22,10 @@ export async function loadCurrentSnapshot(connection, productId) {
 }
 export async function applyLocalChanges(connection, productId, changes) {
   await validateSavedProductVendor(connection, productId);
+  if (Object.hasOwn(changes, 'onSale') || Object.hasOwn(changes, 'saleDiscount')) {
+    const [[profile]] = await connection.query('SELECT customer_price_overrides_json AS customerPriceOverridesJson FROM product_pricing_profiles WHERE product_id=? FOR UPDATE', [productId]);
+    assertProductWideSaleAllowed(profile, changes);
+  }
   const columns = { visible: "visible", trackInventory: "track_inventory", inventory: "inventory" };
   const fields = Object.keys(columns).filter(key => Object.hasOwn(changes, key));
   if (fields.length) await connection.query(`UPDATE products SET ${fields.map(key => `${columns[key]}=?`).join(", ")}, updated_at=UTC_TIMESTAMP() WHERE id=?`, [...fields.map(key => changes[key]), productId]);

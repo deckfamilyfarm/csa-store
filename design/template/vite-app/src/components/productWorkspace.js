@@ -1,4 +1,5 @@
 import { canPublishInventory } from "../../../../../apps/api/lib/adminRoles.js";
+import { normalizeCustomerPriceOverrides, customerOverridePrice } from '../../../../../apps/api/lib/customerPriceOverrides.js';
 
 // Shared state and local-save rules for the Products grid and Details editor.
 export const FORMULA_FIELDS = [
@@ -94,7 +95,10 @@ export function buildProductDraftFromProduct(
     maxWeight: field("maxWeight"),
     avgWeightOverride: field("avgWeightOverride"),
     sourceMultiplier: field("sourceMultiplier", "0.5412"),
+    markupOverride: product.pricingProfile?.markupOverride != null || product.markupOverride != null
+      ? String(Number(product.pricingProfile?.markupOverride ?? product.markupOverride) * 100) : "",
     onSale: Boolean(product.onSale),
+    customerPriceOverrides: product.pricingProfile?.customerPriceOverrides || product.customerPriceOverrides || [],
     saleDiscount: Math.round((Number(product.saleDiscount) || 0) * 100),
     packages: (product.packageRecords || product.packages || []).map(
       createDraftPackage,
@@ -181,8 +185,10 @@ export function buildScheduleUpdate(entry) {
       visible: Number(values.visible),
       trackInventory: Number(values.trackInventory),
       inventory: Number(values.inventory),
-      onSale: Number(values.onSale),
-      saleDiscount: Number(values.saleDiscount) / 100,
+      ...(!values.customerPriceOverrides?.length ? {
+        onSale: Number(values.onSale),
+        saleDiscount: Number(values.saleDiscount) / 100,
+      } : {}),
     },
   };
 }
@@ -254,6 +260,13 @@ export async function saveProductDraft(entry, capabilities, api) {
     );
   }
   if (metadata.includes("vendorId") && !result.savedFields.includes("vendorId")) return result;
+  if (fields.includes('customerPriceOverrides')) {
+    await run('Customer prices', ['customerPriceOverrides'], async () => {
+      if (!capabilities.pricing) throw new Error('Pricing permission is required.');
+      return api.put(`products/${productId}/customer-prices`, { customerPriceOverrides: normalizeCustomerPriceOverrides(value.customerPriceOverrides) });
+    });
+    if (!result.savedFields.includes('customerPriceOverrides')) return result;
+  }
   const inventory = fields.filter((key) => SCHEDULE_FIELDS.includes(key));
   if (inventory.length) {
     await run("Stock / sale", inventory, async () => {
@@ -272,6 +285,14 @@ export async function saveProductDraft(entry, capabilities, api) {
     });
   }
   const formula = fields.filter((key) => FORMULA_FIELDS.includes(key));
+  if (fields.includes("markupOverride")) {
+    await run("Product markup", ["markupOverride"], async () => {
+      if (!capabilities.pricing) throw new Error("Pricing permission is required.");
+      const markup = numeric(value.markupOverride);
+      if (markup !== null && (!Number.isFinite(markup) || markup < 0)) throw new Error("Product markup must be a nonnegative percentage.");
+      return api.put(`products/${productId}/markup`, { markupOverride: markup === null ? null : markup / 100 });
+    });
+  }
   if (formula.length) {
     await run("Formula pricing", formula, async () => {
       if (!capabilities.pricing)
@@ -402,7 +423,9 @@ export function previewProductPrices(row, values) {
   const basePrice = prices.length ? Math.min(...prices) : null;
   const result = { basePrice };
   for (const kind of ["guest", "member", "herdShare", "snap"]) {
-    const markup = noMarkup ? 0 : numeric(row[`${kind}Markup`]);
+    const override = !row.usesSourcePricing ? numeric(values.markupOverride) : null;
+    const defaultMarkup = row.markupOverride != null ? numeric(row.vendorPriceListMarkup) : numeric(row[`${kind}Markup`]);
+    const markup = noMarkup ? 0 : override !== null ? override / 100 : defaultMarkup;
     result[`${kind}Price`] =
       basePrice === null || markup === null
         ? null
@@ -411,6 +434,16 @@ export function previewProductPrices(row, values) {
               (1 + markup) *
               (values.onSale ? 1 - Number(values.saleDiscount) / 100 : 1),
           );
+    if (!row.usesSourcePricing && !noMarkup && values.customerPriceOverrides?.length) {
+      const listId = row.customerPriceLists?.find(list => list.key === kind)?.id;
+      const choices = packages.map(pkg => {
+        const setting = values.customerPriceOverrides.find(setting => Number(setting.packageId) === Number(pkg.id) && Number(setting.priceListId) === Number(listId));
+        try { return setting ? customerOverridePrice(pkg.price, normalizeCustomerPriceOverrides([setting])[0]).final
+          : numeric(pkg.price) === null || markup === null ? null : round(Number(pkg.price) * (1 + markup) * (values.onSale ? 1 - Number(values.saleDiscount) / 100 : 1)); }
+        catch { return null; }
+      }).filter(value => value !== null);
+      result[`${kind}Price`] = choices.length ? Math.min(...choices) : null;
+    }
   }
   return result;
 }

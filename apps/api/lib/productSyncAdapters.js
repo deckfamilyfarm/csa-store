@@ -14,6 +14,7 @@ import {
 } from "./squareStoreSync.js";
 import { same, preflight } from "./productSyncCore.js";
 import { parseJson } from "./productSyncSchema.js";
+import { normalizeCustomerPriceOverrides } from './customerPriceOverrides.js';
 
 const pick = (row, keys) => Object.fromEntries(keys.map(key => [key, row?.[key] ?? null]));
 const number = value => value == null ? null : Number(value);
@@ -25,7 +26,11 @@ export function localLineInputs(context, includeInventory = true, includeVisibil
     categoryName: context.categoryName || "",
     product: normalized(pick(context.product, ["id", "name", "description", ...(includeVisibility ? ["visible"] : []), ...(includeInventory ? ["trackInventory", "inventory"] : []), "vendorId", "categoryId", "isDeleted"])),
     vendor: normalized(pick(context.vendor, ["id", "name", "sourceMultiplier", "priceListMarkup", "guestMarkup", "memberMarkup"])),
-    profile: normalized(pick(context.profile, ["unitOfMeasure", "sourceUnitPrice", "minWeight", "maxWeight", "avgWeightOverride", "sourceMultiplier", "guestMarkup", "memberMarkup", "herdShareMarkup", "snapMarkup"])),
+    profile: normalized({ ...pick(context.profile, ["unitOfMeasure", "sourceUnitPrice", "minWeight", "maxWeight", "avgWeightOverride", "sourceMultiplier", "guestMarkup", "memberMarkup", "herdShareMarkup", "snapMarkup"]),
+      // Preserve pre-override audit baselines when no override is present.
+      ...(context.profile?.markupOverride != null ? { markupOverride: context.profile.markupOverride } : {}),
+      ...(context.profile?.customerPriceOverridesJson || context.profile?.customerPriceOverrides?.length
+        ? { customerPriceOverrides: normalizeCustomerPriceOverrides(context.profile.customerPriceOverrides ?? context.profile.customerPriceOverridesJson) } : {}) }),
     sale: { onSale: Number(context.sale?.onSale ?? context.profile?.onSale ?? 0), saleDiscount: Number(context.sale?.saleDiscount ?? context.profile?.saleDiscount ?? 0) },
     packages: sortById(context.packages).map(row => normalized(pick(row, ["id", "name", "price", "unit", "numOfItems", "packageCode", "trackType", "chargeType", "visible", "trackInventory", "inventory"]))),
     weights: sortById(context.packages).map(pkg => {
