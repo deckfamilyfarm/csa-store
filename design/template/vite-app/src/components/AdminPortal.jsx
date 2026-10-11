@@ -25,7 +25,7 @@ export function AdminPortal() {
   return (
     <div className="page">
       <main>
-        <div className="utility-bar">
+        <div className="utility-bar admin-header">
           <div className="brand">
             <img src="/images/full-farm-csa-logo.png" alt="Full Farm CSA" />
             <span className="brand-title">Full Farm CSA Admin</span>

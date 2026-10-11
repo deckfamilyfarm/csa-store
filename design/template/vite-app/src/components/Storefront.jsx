@@ -785,29 +785,16 @@ export function Storefront() {
     <div className="page">
       <main>
         {experienceMode !== "subscribe" && experienceMode !== "dropsites" && view !== "subscribe" && !isAccountView && !isLiabilityView && !isDropsitesView && !isPublicHomeView ? (
-          <div className="utility-bar">
+          <div className={`utility-bar${isAdminView ? " admin-header" : ""}`}>
             <div className="brand">
               <img src="/images/full-farm-csa-logo.png" alt={brand} />
               <span className="brand-title">Full Farm CSA</span>
             </div>
-            <div className="utility-actions">
-              {isMember ? (
-                <>
-                  {showMemberCart ? (
-                    <button className="button alt" type="button">
-                      Cart (2)
-                    </button>
-                  ) : null}
-                </>
-              ) : null}
-              <button
-                className="button"
-                type="button"
-                onClick={() => (isMember ? handleLogout() : setLoginOpen(true))}
-              >
-                {isMember ? "Log out" : "Log in"}
-              </button>
-            </div>
+            {showMemberCart ? (
+              <div className="utility-actions">
+                <button className="button alt" type="button">Cart (2)</button>
+              </div>
+            ) : null}
           </div>
         ) : null}
         <Suspense

@@ -2872,6 +2872,7 @@ img {
   padding: 20px 0 40px;
 }
 
+.utility-bar.admin-header,
 .container.admin-panel {
   width: min(1800px, 98vw);
 }
