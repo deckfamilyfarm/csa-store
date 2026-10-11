@@ -1,0 +1,281 @@
+{
+  "data": {
+    "id": 1058759,
+    "name": "Watercress",
+    "description": "<p dir=\"ltr\"><a href=\"https://www.google.com/search?q=Watercress&amp;newwindow=1&amp;rlz=1CAVNCX_enUS1049US1049&amp;sca_esv=89aaa52b873f06b6&amp;biw=1366&amp;bih=599&amp;sxsrf=ANbL-n7LkPzeMkZGjm88z605WABFd1KLkA%3A1770330933132&amp;ei=NRuFaablB7e60PEP4LnZ-QY&amp;oq=Watercress+informa&amp;gs_lp=Egxnd3Mtd2l6LXNlcnAiEldhdGVyY3Jlc3MgaW5mb3JtYSoCCAAyBhAAGBYYHjIGEAAYFhgeMgsQABiABBiGAxiKBTILEAAYgAQYhgMYigUyCxAAGIAEGIYDGIoFMgsQABiABBiGAxiKBTIIEAAYgAQYogQyCBAAGIAEGKIEMggQABiiBBiJBUjUJVDsBFjwGnABeAGQAQCYAcMBoAGRDaoBAzguN7gBA8gBAPgBAZgCD6AC-g3CAgoQABiwAxjWBBhHwgINEAAYgAQYsAMYQxiKBcICDhAAGLADGOQCGNYE2AEBwgITEC4YgAQYsAMYQxjIAxiKBdgBAcICChAjGIAEGCcYigXCAgoQABiABBgUGIcCwgIFEAAYgATCAgUQLhiABMICCBAAGIAEGLEDwgIIEC4YgAQYsQPCAgsQABiABBiRAhiKBcICCxAuGIAEGJECGIoFmAMAiAYBkAYSugYGCAEQARgJkgcENC4xMaAHzIoBsgcEMy4xMbgHxA3CBwYzLTEyLjPIB_cBgAgA&amp;sclient=gws-wiz-serp&amp;mstk=AUtExfAr5O0yBoM3gZmidpFM1QaibzXTKUJ766j1NFnjWS6eXtjz9O_z6nk9RBxuEN8tbz_odIPx9kfSLhqnKpXGWFX4uCwtaudUnDuUXzy1XelTUAFso5GrQNZKl3mH3__xAYoj_nIZp-zhMQ6YOswBxru_7jXbjkxEvEqlD1tpRDkdITIvEHe0sGIzZrfHT_8TB5kY-tGE5vvb8DoTz36K1hm2zuDLIgqxiO0FheQn6VEVNiSiZCpVoMyYkyym_UXuNY_vIcZyyoS4lZb1ZsmoxnlbnHJ6Ow3BUaeaiejlNuoA2w&amp;csui=3&amp;ved=2ahUKEwjkpKbatMOSAxUFEDQIHTXdBy8QgK4QegQIARAD\" class=\"lexical-text-editor--link\"><span style=\"white-space: pre-wrap;\">Watercress</span></a><span style=\"white-space: pre-wrap;\">&nbsp;(</span><i><em class=\"lexical-text-editor--italic\" style=\"white-space: pre-wrap;\">Nasturtium officinale</em></i><span style=\"white-space: pre-wrap;\">) is&nbsp;a nutrient-dense, semi-aquatic perennial herb in the mustard family, known for its peppery, pungent, and tangy flavor. It is a popular, nutrient-packed salad green, garnish, and ingredient in soups and sandwiches. Rich in vitamins K, A, and C, it supports bone health, immune function, and has high antioxidant properties, often cited for its potential to lower cancer and heart disease risk.&nbsp;</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Grown by: Groundwork Organic Farm</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2026-02-05T17:37:32.472845-05:00",
+    "updated": "2026-10-08T16:33:36.184058-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/4BNin.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 382461,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/4BNin.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/4BNin.jpeg",
+        "original_filename": "download (2).jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 865051,
+        "inventory_per_unit": 1,
+        "unit_price": 2.57,
+        "average_pack_weight": 0,
+        "package_price": 2.57,
+        "package_unit_price": 2.57,
+        "priority_order": 1,
+        "name": "bu",
+        "price_list_entries": [
+          {
+            "id": 797263,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 610789,
+            "subscription_setting": {
+              "id": 675742,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 797264,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 610790,
+            "subscription_setting": {
+              "id": 675743,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 797265,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 610791,
+            "subscription_setting": {
+              "id": 675744,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 797266,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 610792,
+            "subscription_setting": {
+              "id": 675745,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": null,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 1058759,
+        "product_name": "Watercress",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bu",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-02-05T17:37:32.877259-05:00",
+        "updated": "2026-10-08T16:33:35.441947-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 610789,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 911,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 504303,
+            "price_list_category": 15732,
+            "priority_order": 14,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": {
+          "id": 115885,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 610790,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 1074,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 504304,
+            "price_list_category": 15107,
+            "priority_order": 11,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": {
+          "id": 115886,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 610791,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1289,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 504305,
+            "price_list_category": 15119,
+            "priority_order": 14,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": {
+          "id": 115887,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 610792,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1290,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 504306,
+            "price_list_category": 28913,
+            "priority_order": 14,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": {
+          "id": 115888,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3168,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 1058759,
+  "remoteProductId": 1058759,
+  "checkedAt": "2026-10-11T18:10:10.190Z"
+}

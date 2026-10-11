@@ -1,0 +1,281 @@
+{
+  "data": {
+    "id": 1094879,
+    "name": "\"Sanitize Naturally\" Hand Sanitizer Spray w/ Lemongrass, Orange & Peppermint Essential Oils",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Preferable to the drying and harsh chemicals of typical hand sanitizers our “Sanitize Naturally” antiseptic spray leaves your hands moisturized and smelling wonderful!</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Ingredients -</span><br></p><ul class=\"lexical-text-editor--list-ul\"><li value=\"1\"><ul class=\"lexical-text-editor--list-ul\"><li value=\"1\"><span style=\"white-space: pre-wrap;\">Aloe vera gel - Its naturally moisturizing, and subsequently healing, properties commonly heal sore &amp; cracked skin.</span></li></ul></li></ul><p><br></p><ul class=\"lexical-text-editor--list-ul\"><li value=\"1\"><ul class=\"lexical-text-editor--list-ul\"><li value=\"1\"><span style=\"white-space: pre-wrap;\">Witch Hazel - Its unique properties offer medicinal anti-inflammatory and anti-viral qualities that are often used in skin care.&nbsp; Witch Hazel also reduces swelling and fights bacteria.</span></li></ul></li></ul><p><br></p><ul class=\"lexical-text-editor--list-ul\"><li value=\"1\"><ul class=\"lexical-text-editor--list-ul\"><li value=\"1\"><span style=\"white-space: pre-wrap;\">91% Ethanol Alcohol - is a&nbsp;natural bactericidal killing bacteria, fungus, and viruses!</span></li></ul></li></ul><p><br></p><ul class=\"lexical-text-editor--list-ul\"><li value=\"1\"><ul class=\"lexical-text-editor--list-ul\"><li value=\"1\"><span style=\"white-space: pre-wrap;\">Lemongrass, orange &amp; peppermint essential oils - are common &amp; leading natural disinfectants!</span></li></ul></li></ul><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Made in our home in Oregon - you can’t get any better than that!</span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2026-03-31T12:47:52.899751-04:00",
+    "updated": "2026-10-08T16:34:00.033361-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/FDBbI.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 408263,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/FDBbI.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/FDBbI.jpeg",
+        "original_filename": "travel bug repellent x 1 2.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 12,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 909473,
+        "inventory_per_unit": 1,
+        "unit_price": 4.9,
+        "average_pack_weight": 0,
+        "package_price": 4.9,
+        "package_unit_price": 4.9,
+        "priority_order": 1,
+        "name": "1 oz ea",
+        "price_list_entries": [
+          {
+            "id": 865887,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 669354,
+            "subscription_setting": {
+              "id": 744171,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1000431,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 771004,
+            "subscription_setting": {
+              "id": 879084,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 865888,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 669355,
+            "subscription_setting": {
+              "id": 744172,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 865889,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 669356,
+            "subscription_setting": {
+              "id": 744173,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 12,
+        "number_of_packages_available": 12,
+        "number_of_packages_total": 12,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 12,
+        "product_package_size": 1,
+        "product_id": 1094879,
+        "product_name": "\"Sanitize Naturally\" Hand Sanitizer Spray w/ Lemongrass, Orange & Peppermint Essential Oils",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-03-31T12:47:53.442035-04:00",
+        "updated": "2026-10-08T16:33:59.451755-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 669354,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 927,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 554302,
+            "price_list_category": 15746,
+            "priority_order": 16,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 139113,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 669355,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 1090,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 554303,
+            "price_list_category": 14598,
+            "priority_order": 2,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 139114,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 669356,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1305,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 554304,
+            "price_list_category": 15064,
+            "priority_order": 20,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 139115,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 771004,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1368,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 648871,
+            "price_list_category": 28909,
+            "priority_order": 22,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 179856,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 5745,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 12,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 12
+  },
+  "localProductId": 1094879,
+  "remoteProductId": 1094879,
+  "checkedAt": "2026-10-11T18:10:11.214Z"
+}

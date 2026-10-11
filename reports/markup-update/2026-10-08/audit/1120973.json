@@ -1,0 +1,45 @@
+{
+  "productId": 1120973,
+  "context": {
+    "product": {
+      "id": 1120973,
+      "name": "Dinner in a Box: Pork Shoulder Roast",
+      "description": "Ingredients: Pork shoulder, potatoes, salad turnips, spring onions, beets, lettuce, radish, farmer's cheese, bok choy, garlic, eggs Recipe 1: Pulled Pork Tacos Warm tortillas, pile on pulled pork shoulder, sliced radish, shredded lettuce, and spring onion. Add a spoonful of farmer's cheese and a squeeze of lime. Done. Recipe 2: Pork & Bok Choy Soup: Simmer pulled pork in broth with garlic, spring onion, and sliced crimini mushrooms. Stir in a spoonful of whole grain mustard. Add bok choy in the last few minutes until just wilted. Finish with sesame oil and a soft-boiled egg. Recipe 3: Roasted Beet & Pork Bowl Roast beets until tender, slice thin. Arrange over torn lettuce with pulled pork, sliced radish, and spring onion. Top with crumbled farmer's cheese. Dress with olive oil, vinegar, and salt. Recipe 4: Pork & Potato Hash: Dice pulled pork shoulder. Cook with cubed potatoes, sliced crimini mushrooms, salad turnips, and spring onions in butter until golden. Season with salt and pepper. Top with a fried egg. From the Full Farm CSA shop: Pork shoulder — 1 large (3–4 lbs, covers all four meals) Crimini mushrooms — 1 lb Potatoes — 4 medium Salad turnips — 3 medium Beets — 4 medium (red or yellow or chiogga) Bok choy — 2 heads Spring Mix Lettuce — 1 bag Radish — 1 bunch Spring onions — 1 bunch Garlic — how much? Farmer's cheese — 6 oz Eggs — one dozen",
+      "visible": 1,
+      "trackInventory": 0,
+      "inventory": null,
+      "categoryId": null,
+      "vendorId": 3148,
+      "thumbnailUrl": null,
+      "createdAt": "2026-05-18T04:51:13.000Z",
+      "updatedAt": "2026-07-03T19:41:35.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "",
+    "vendor": {
+      "id": 3148,
+      "name": "Full Farm CSA",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [],
+    "packageMeta": [],
+    "sale": {},
+    "remoteId": 1120973,
+    "imageUrls": []
+  },
+  "remote": null,
+  "payload": null,
+  "problems": [
+    "Local Line box/bundle: product endpoint does not support this item"
+  ],
+  "status": "exception",
+  "auditedAt": "2026-10-08T19:41:31.944Z",
+  "rows": [],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:41.042Z",
+  "connectionError": "Local Line box/bundle: product endpoint does not support this item"
+}

@@ -1,0 +1,470 @@
+{
+  "productId": 1157469,
+  "context": {
+    "product": {
+      "id": 1157469,
+      "name": "Fresh Frozen Elderberries",
+      "description": "Raw or unripe elderberries contain natural compounds that can cause stomach upset and must always be cooked or thoroughly dried/heated before consumption. Flavor Profile: Deep, earthy, sweet, and tart when cooked or steeped. Key Uses: Perfect for simmering homemade immune syrups, blending into herbal teas, or baking into jams, jellies, and pies. Nutritional Benefits: Loaded with natural anthocyanins and powerful antioxidants that support year-round immune wellness. #3 bag of 2026 fresh frozen, cleaned, destemed, organic elderberries.",
+      "visible": 1,
+      "trackInventory": 1,
+      "inventory": 5,
+      "categoryId": null,
+      "vendorId": 6886,
+      "thumbnailUrl": null,
+      "createdAt": "2026-08-25T10:40:21.000Z",
+      "updatedAt": "2026-10-09T19:18:39.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "",
+    "vendor": {
+      "id": 6886,
+      "name": "Falk Farm",
+      "priceListMarkup": null,
+      "sourceMultiplier": null,
+      "guestMarkup": "0.55",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 1001274,
+        "productId": 1157469,
+        "name": "3 lb bag",
+        "price": "45.00",
+        "packageCode": null,
+        "unit": null,
+        "numOfItems": 1,
+        "trackType": null,
+        "chargeType": null,
+        "visible": 1,
+        "trackInventory": 0,
+        "inventory": null
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 1001274,
+        "productId": 1157469,
+        "localLinePackageId": 1001274,
+        "liveName": "3 lb bag",
+        "livePrice": "45.00",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":1157469,\"Product\":\"Fresh Frozen Elderberries\",\"Track Inventory By\":\"package\",\"Item Unit\":\"bag\",\"Charge By\":\"package\",\"Charge Unit\":\"bag\",\"Package ID\":1001274,\"Package Name\":\"3 lb bag\",\"# of Items\":1,\"Package Price\":45,\"Inventory Type\":\"product\"},\"live\":{\"id\":1001274,\"inventory_per_unit\":1,\"unit_price\":45,\"average_pack_weight\":0,\"package_price\":45,\"package_unit_price\":45,\"priority_order\":0,\"name\":\"3 lb bag\",\"price_list_entries\":[{\"id\":1032786,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":796575,\"subscription_setting\":{\"id\":911451,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":1032787,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":796576,\"subscription_setting\":{\"id\":911452,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":1032788,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":796577,\"subscription_setting\":{\"id\":911453,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":5,\"number_of_packages_available\":5,\"number_of_packages_total\":5,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":5,\"product_package_size\":1,\"product_id\":1157469,\"product_name\":\"Fresh Frozen Elderberries\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"bag\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2026-08-24T20:34:30.851984-04:00\",\"updated\":\"2026-09-02T15:01:47.555833-04:00\"}}",
+        "createdAt": "2026-08-25T10:42:27.000Z",
+        "updatedAt": "2026-10-09T10:41:30.000Z",
+        "lastSyncedAt": "2026-10-09T10:41:30.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 1157469,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-09T10:41:30.000Z"
+    },
+    "remoteId": 1157469,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/1157469/localline/0fd65fee003145838bedc434.jpg"
+    ],
+    "localLineVendorId": 6886
+  },
+  "remote": {
+    "id": 1157469,
+    "name": "Fresh Frozen Elderberries",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Raw or unripe elderberries contain natural compounds that can cause stomach upset and must always be cooked or thoroughly dried/heated before consumption.</span></p><p dir=\"ltr\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Flavor Profile:</strong></b><span style=\"white-space: pre-wrap;\"> Deep, earthy, sweet, and tart when cooked or steeped.</span></p><ul class=\"lexical-text-editor--list-ul\"><li value=\"1\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Key Uses:</strong></b><span style=\"white-space: pre-wrap;\"> Perfect for simmering homemade immune syrups, blending into herbal teas, or baking into jams, jellies, and pies.</span></li><li value=\"2\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Nutritional Benefits:</strong></b><span style=\"white-space: pre-wrap;\"> Loaded with natural anthocyanins and powerful antioxidants that support year-round immune wellness. </span></li></ul><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">#3 bag of 2026 fresh frozen, cleaned, destemed, organic elderberries.</span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2026-08-24T20:34:30.524549-04:00",
+    "updated": "2026-10-06T13:57:53.120828-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/3tJ1r.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 468275,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/3tJ1r.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/3tJ1r.jpeg",
+        "original_filename": "images (6).jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 5,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12591,
+      "name": "bag",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12591,
+      "name": "bag",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [
+      {
+        "id": 2245,
+        "priority_order": 1,
+        "name": "Frozen"
+      }
+    ],
+    "packing_tag": 86,
+    "packages": [
+      {
+        "id": 1001274,
+        "inventory_per_unit": 1,
+        "unit_price": 45,
+        "average_pack_weight": 0,
+        "package_price": 45,
+        "package_unit_price": 45,
+        "priority_order": 0,
+        "name": "3 lb bag",
+        "price_list_entries": [
+          {
+            "id": 1032786,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 796575,
+            "subscription_setting": {
+              "id": 911451,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1032787,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 796576,
+            "subscription_setting": {
+              "id": 911452,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1032788,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 796577,
+            "subscription_setting": {
+              "id": 911453,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 5,
+        "number_of_packages_available": 5,
+        "number_of_packages_total": 5,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 5,
+        "product_package_size": 1,
+        "product_id": 1157469,
+        "product_name": "Fresh Frozen Elderberries",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bag",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-08-24T20:34:30.851984-04:00",
+        "updated": "2026-09-02T15:01:47.555833-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 796575,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 1008,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 674164,
+            "price_list_category": 15748,
+            "priority_order": 12,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": {
+          "id": 194925,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 796576,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1390,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 674165,
+            "price_list_category": 15063,
+            "priority_order": 12,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": {
+          "id": 194926,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 796577,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1408,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 674166,
+            "price_list_category": 28911,
+            "priority_order": 12,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": {
+          "id": 194927,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 6886,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 5,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 5
+  },
+  "payload": {
+    "vendor": 6886,
+    "packages": [
+      {
+        "id": 1001274,
+        "unit_price": 45,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 796575,
+            "calculated_value": 65.25,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 45
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 796576,
+            "calculated_value": 65.25,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 45
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 796577,
+            "calculated_value": 65.25,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 45
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "warnings": [],
+  "status": "ready",
+  "auditedAt": "2026-10-09T19:22:25.536Z",
+  "vendorOnly": false,
+  "rows": [
+    {
+      "productId": 1157469,
+      "product": "Fresh Frozen Elderberries",
+      "vendor": "Falk Farm",
+      "packageId": 1001274,
+      "package": "3 lb bag",
+      "priceList": "Guest Basket",
+      "visible": true,
+      "basePrice": 45,
+      "markupBefore": 55.00000000000001,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 69.75,
+      "localPriceAfter": 65.25,
+      "remoteBasePrice": 45,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 63,
+      "remotePriceAfter": 65.25
+    },
+    {
+      "productId": 1157469,
+      "product": "Fresh Frozen Elderberries",
+      "vendor": "Falk Farm",
+      "packageId": 1001274,
+      "package": "3 lb bag",
+      "priceList": "CSA Members",
+      "visible": true,
+      "basePrice": 45,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 63,
+      "localPriceAfter": 65.25,
+      "remoteBasePrice": 45,
+      "remoteAdjustmentType": null,
+      "remoteAdjustmentBefore": null,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": null,
+      "remotePriceAfter": null
+    },
+    {
+      "productId": 1157469,
+      "product": "Fresh Frozen Elderberries",
+      "vendor": "Falk Farm",
+      "packageId": 1001274,
+      "package": "3 lb bag",
+      "priceList": "Herd Share Members",
+      "visible": true,
+      "basePrice": 45,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 63,
+      "localPriceAfter": 65.25,
+      "remoteBasePrice": 45,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 63,
+      "remotePriceAfter": 65.25
+    },
+    {
+      "productId": 1157469,
+      "product": "Fresh Frozen Elderberries",
+      "vendor": "Falk Farm",
+      "packageId": 1001274,
+      "package": "3 lb bag",
+      "priceList": "SNAP",
+      "visible": true,
+      "basePrice": 45,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 63,
+      "localPriceAfter": 65.25,
+      "remoteBasePrice": 45,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 63,
+      "remotePriceAfter": 65.25
+    }
+  ]
+}

@@ -1,0 +1,279 @@
+{
+  "remote": {
+    "id": 1000029,
+    "name": "Heirloom Tomatoes",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Heirloom varieties include : Pruden's Purple, Striped German, Tiffen Mennonite, &amp; Oxheart. Heirloom tomatoes are known for their exceptional flavor, often described as sweet, juicy, and complex. They boast a wide array of colors, shapes, and sizes, making them visually appealing as well. Their delicate nature means they're best enjoyed fresh or lightly cooked, enhancing their vibrant taste.</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2025-08-15T16:41:23.802180-04:00",
+    "updated": "2025-11-13T14:31:56.124234-05:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/yCXbr.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 342722,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/yCXbr.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/yCXbr.jpg",
+        "original_filename": "top-tomato-varieties.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 1,
+      "name": "pound",
+      "abbrieviation": "lb",
+      "unit_type": "weight",
+      "default": true
+    },
+    "charge_unit": {
+      "id": 1,
+      "name": "pound",
+      "abbrieviation": "lb",
+      "unit_type": "weight",
+      "default": true
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 777061,
+        "inventory_per_unit": 1,
+        "unit_price": 3.25,
+        "average_pack_weight": 0,
+        "package_price": 3.25,
+        "package_unit_price": 3.25,
+        "priority_order": 1,
+        "name": "pound",
+        "price_list_entries": [
+          {
+            "id": 674462,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 522690,
+            "subscription_setting": {
+              "id": 553519,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": true,
+            "strikethrough_display_value": 6.66
+          },
+          {
+            "id": 674465,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 522693,
+            "subscription_setting": {
+              "id": 553522,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": true,
+            "strikethrough_display_value": 5.99
+          },
+          {
+            "id": 674464,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 522692,
+            "subscription_setting": {
+              "id": 553521,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": true,
+            "strikethrough_display_value": 5.99
+          },
+          {
+            "id": 674463,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 522691,
+            "subscription_setting": {
+              "id": 553520,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": true,
+            "strikethrough_display_value": 5.99
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 1000029,
+        "product_name": "Heirloom Tomatoes",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "lb",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-08-15T16:41:24.093733-04:00",
+        "updated": "2025-11-10T17:56:39.769135-05:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 522690,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 828,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 442793,
+            "price_list_category": 15750,
+            "priority_order": 16,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 70249,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 522691,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 992,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 442794,
+            "price_list_category": 15111,
+            "priority_order": 9,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 70250,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 522692,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1201,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 442795,
+            "price_list_category": 15120,
+            "priority_order": 16,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 70251,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 522693,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1202,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 442796,
+            "price_list_category": 28914,
+            "priority_order": 16,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 70252,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3149,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "fetchedAt": "2026-10-08T21:50:53.453Z"
+}

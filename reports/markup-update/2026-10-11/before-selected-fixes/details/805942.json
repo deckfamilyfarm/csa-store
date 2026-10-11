@@ -1,0 +1,261 @@
+{
+  "data": {
+    "id": 805942,
+    "name": "Candy Sweet Onion",
+    "description": "<p>Sweet onions contain less sulfur and more water than yellow, red and white onions. This makes the flavor mild, crisp and good for eating raw, stuffing (like you would a mushroom) and frying into onion rings.</p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-08-25T10:39:58.353899-04:00",
+    "updated": "2026-10-08T16:23:52.693068-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/vmhDV.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 297771,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/vmhDV.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/vmhDV.jpeg",
+        "original_filename": "download (1).jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "843",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 527002,
+        "inventory_per_unit": 1,
+        "unit_price": 1.5,
+        "average_pack_weight": null,
+        "package_price": 1.5,
+        "package_unit_price": 1.5,
+        "priority_order": null,
+        "name": "1 lb",
+        "price_list_entries": [
+          {
+            "id": 221674,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179277,
+            "subscription_setting": {
+              "id": 124376,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 595167,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 463227,
+            "subscription_setting": {
+              "id": 474272,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 207668,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 167840,
+            "subscription_setting": {
+              "id": 106844,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617850,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479743,
+            "subscription_setting": {
+              "id": 496966,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 805942,
+        "product_name": "Candy Sweet Onion",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "lb",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T10:39:58.364825-04:00",
+        "updated": "2026-10-08T16:23:51.991772-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 167840,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 349,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440532,
+            "price_list_category": 15105,
+            "priority_order": 405,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179277,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 349,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440740,
+            "price_list_category": 15118,
+            "priority_order": 403,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 463227,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 761,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440339,
+            "price_list_category": 15731,
+            "priority_order": 53,
+            "price_list_category_name": "Organic Vegetables - Roots 🧅🧄 🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479743,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 349,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 440948,
+            "price_list_category": 28905,
+            "priority_order": 407,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3177,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 805942,
+  "remoteProductId": 805942,
+  "checkedAt": "2026-10-11T17:26:45.135Z"
+}

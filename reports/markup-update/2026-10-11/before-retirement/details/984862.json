@@ -1,0 +1,261 @@
+{
+  "data": {
+    "id": 984862,
+    "name": "Walla Walla Onions",
+    "description": "<p>Walla Walla onions are prized for their consistently sweet and mild flavor when raw, and due to their high sugar and water content, they develop a deep, sweet, and warm flavor profile when cooked.</p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2025-06-23T12:48:08.005206-04:00",
+    "updated": "2026-10-08T16:31:33.154225-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/4XmGI.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 313558,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/4XmGI.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/4XmGI.jpg",
+        "original_filename": "account/322922/J84VP.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "464",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 754480,
+        "inventory_per_unit": 1,
+        "unit_price": 1.1,
+        "average_pack_weight": null,
+        "package_price": 1.1,
+        "package_unit_price": 1.1,
+        "priority_order": 1,
+        "name": "ea",
+        "price_list_entries": [
+          {
+            "id": 632524,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 490684,
+            "subscription_setting": {
+              "id": 511613,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 632527,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 490687,
+            "subscription_setting": {
+              "id": 511616,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 632525,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 490685,
+            "subscription_setting": {
+              "id": 511614,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 632526,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 490686,
+            "subscription_setting": {
+              "id": 511615,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": null,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 984862,
+        "product_name": "Walla Walla Onions",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-06-23T12:48:08.321181-04:00",
+        "updated": "2026-10-08T16:31:32.562402-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 490684,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 960,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440551,
+            "price_list_category": 15105,
+            "priority_order": 40,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 490685,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1167,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440759,
+            "price_list_category": 15118,
+            "priority_order": 39,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 490686,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1168,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 440967,
+            "price_list_category": 28905,
+            "priority_order": 43,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 490687,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 794,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440344,
+            "price_list_category": 15731,
+            "priority_order": 42,
+            "price_list_category_name": "Organic Vegetables - Roots 🧅🧄 🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3152,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 984862,
+  "remoteProductId": 984862,
+  "checkedAt": "2026-10-11T17:58:15.779Z"
+}

@@ -1,0 +1,527 @@
+{
+  "productId": 1057489,
+  "context": {
+    "product": {
+      "id": 1057489,
+      "name": "Shampoo Bar-  Lavender",
+      "description": "Our shampoo bars are gentle, soft, & moisturizing. Plus, the ingredients are completely natural! Made with saponified coconut, palm, olive, canola, neem, & castor oils, rain water, & lavender essential oil. Attention naturalists, backpackers, and campers! Here is a great biodegradable, earth-friendly & sustainable choice for you: our all-natural SHAMPOO BAR. It's shampoo in a bar form! We only use biodegradable shrink wrap on our soaps. Biolefin is formulated to be totally degradable in the environment. At the end of its useful life, it fragments and oxidizes by the effect of light and heat. It then becomes assimilable by s o i l m i c r o - o r g a n i s m s , a n d eventually disappears, leaving only water, carbon dioxide and biomass.",
+      "visible": 1,
+      "trackInventory": 1,
+      "inventory": 8,
+      "categoryId": null,
+      "vendorId": 5745,
+      "thumbnailUrl": null,
+      "createdAt": "2026-04-04T16:47:02.000Z",
+      "updatedAt": "2026-10-04T10:40:25.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "",
+    "vendor": {
+      "id": 5745,
+      "name": "Granny Smith All Natural",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 863250,
+        "productId": 1057489,
+        "name": "4.5 oz ea",
+        "price": "6.30",
+        "packageCode": null,
+        "unit": null,
+        "numOfItems": 1,
+        "trackType": null,
+        "chargeType": null,
+        "visible": 1,
+        "trackInventory": 0,
+        "inventory": null
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 863250,
+        "productId": 1057489,
+        "localLinePackageId": 863250,
+        "liveName": "4.5 oz ea",
+        "livePrice": "6.30",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":1057489,\"Product\":\"Shampoo Bar-  Lavender\",\"Track Inventory By\":\"package\",\"Item Unit\":\"ea\",\"Charge By\":\"package\",\"Charge Unit\":\"ea\",\"Package ID\":863250,\"Package Name\":\"4.5 oz ea\",\"# of Items\":1,\"Package Price\":6.3,\"Inventory Type\":\"product\"},\"live\":{\"id\":863250,\"inventory_per_unit\":1,\"unit_price\":6.3,\"average_pack_weight\":0,\"package_price\":6.3,\"package_unit_price\":6.3,\"priority_order\":1,\"name\":\"4.5 oz ea\",\"price_list_entries\":[{\"id\":794862,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":608855,\"subscription_setting\":{\"id\":673344,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":1000427,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":771000,\"subscription_setting\":{\"id\":879080,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":794863,\"adjustment\":true,\"adjustment_type\":3,\"adjustment_value\":8,\"price_list_id\":2718,\"product_price_list_entry\":608856,\"subscription_setting\":{\"id\":673345,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":794865,\"adjustment\":true,\"adjustment_type\":3,\"adjustment_value\":8,\"price_list_id\":2966,\"product_price_list_entry\":608857,\"subscription_setting\":{\"id\":673347,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":8,\"number_of_packages_available\":8,\"number_of_packages_total\":8,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":8,\"product_package_size\":1,\"product_id\":1057489,\"product_name\":\"Shampoo Bar-  Lavender\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"ea\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2026-02-03T12:36:55.841348-05:00\",\"updated\":\"2026-10-03T12:52:48.068213-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 1057489,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 1057489,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/1057489/localline/4ce3cb2a7cede7d021412479.jpg"
+    ],
+    "localLineVendorId": 5745
+  },
+  "remote": {
+    "id": 1057489,
+    "name": "Shampoo Bar-  Lavender",
+    "description": "<p dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">Our shampoo bars are gentle, soft, &amp; moisturizing.&nbsp;Plus, the ingredients are completely natural! Made with saponified coconut, palm, olive, canola, neem, &amp; castor oils, rain water, &amp; lavender essential oil.</span></p><p dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">Attention naturalists, backpackers, and campers! Here is a great biodegradable, earth-friendly &amp; sustainable choice for you: our&nbsp;all-natural SHAMPOO BAR. It's shampoo in a bar form!</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">We only use biodegradable shrink wrap on our soaps.</span></p><p dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">Biolefin is formulated to be totally degradable in the environment. At the end of its useful life, it fragments and oxidizes by the effect of light and heat. It then becomes assimilable by s o i l m i c r o - o r g a n i s m s , a n d eventually disappears, leaving only water, carbon dioxide and biomass.</span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2026-02-03T12:36:55.255705-05:00",
+    "updated": "2026-10-03T12:52:55.172011-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/Bnk0i.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 381383,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/Bnk0i.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/Bnk0i.jpeg",
+        "original_filename": "download.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 8,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 863250,
+        "inventory_per_unit": 1,
+        "unit_price": 6.3,
+        "average_pack_weight": 0,
+        "package_price": 6.3,
+        "package_unit_price": 6.3,
+        "priority_order": 1,
+        "name": "4.5 oz ea",
+        "price_list_entries": [
+          {
+            "id": 794862,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 608855,
+            "subscription_setting": {
+              "id": 673344,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1000427,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 771000,
+            "subscription_setting": {
+              "id": 879080,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 794863,
+            "adjustment": true,
+            "adjustment_type": 3,
+            "adjustment_value": 8,
+            "price_list_id": 2718,
+            "product_price_list_entry": 608856,
+            "subscription_setting": {
+              "id": 673345,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 794865,
+            "adjustment": true,
+            "adjustment_type": 3,
+            "adjustment_value": 8,
+            "price_list_id": 2966,
+            "product_price_list_entry": 608857,
+            "subscription_setting": {
+              "id": 673347,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 8,
+        "number_of_packages_available": 8,
+        "number_of_packages_total": 8,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 8,
+        "product_package_size": 1,
+        "product_id": 1057489,
+        "product_name": "Shampoo Bar-  Lavender",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-02-03T12:36:55.841348-05:00",
+        "updated": "2026-10-03T12:52:48.068213-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 608855,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 908,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 501309,
+            "price_list_category": 15746,
+            "priority_order": 19,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 115479,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 608856,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 1071,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 501310,
+            "price_list_category": 14598,
+            "priority_order": 7,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 115480,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 608857,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1286,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 501311,
+            "price_list_category": 15064,
+            "priority_order": 9,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 115481,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 771000,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1364,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 648868,
+            "price_list_category": 28909,
+            "priority_order": 25,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 179852,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 5745,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 8,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 8
+  },
+  "payload": {
+    "vendor": 5745,
+    "packages": [
+      {
+        "id": 863250,
+        "unit_price": 6.3,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 608855,
+            "calculated_value": 9.13,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 6.3
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 3,
+            "adjustment_value": 9.13,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 608856,
+            "calculated_value": 9.13,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 6.3
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 3,
+            "adjustment_value": 9.13,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 608857,
+            "calculated_value": 9.13,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 6.3
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 771000,
+            "calculated_value": 9.13,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 6.3
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:41:22.046Z",
+  "rows": [
+    {
+      "productId": 1057489,
+      "product": "Shampoo Bar-  Lavender",
+      "vendor": "Granny Smith All Natural",
+      "packageId": 863250,
+      "package": "4.5 oz ea",
+      "priceList": "Guest Basket",
+      "visible": true,
+      "basePrice": 6.3,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 8.82,
+      "localPriceAfter": 9.13,
+      "remoteBasePrice": 6.3,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 8.82,
+      "remotePriceAfter": 9.13
+    },
+    {
+      "productId": 1057489,
+      "product": "Shampoo Bar-  Lavender",
+      "vendor": "Granny Smith All Natural",
+      "packageId": 863250,
+      "package": "4.5 oz ea",
+      "priceList": "CSA Members",
+      "visible": true,
+      "basePrice": 6.3,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 8.82,
+      "localPriceAfter": 9.13,
+      "remoteBasePrice": 6.3,
+      "remoteAdjustmentType": 3,
+      "remoteAdjustmentBefore": 8,
+      "remoteAdjustmentAfter": 9.13,
+      "remotePriceBefore": 8,
+      "remotePriceAfter": 9.13
+    },
+    {
+      "productId": 1057489,
+      "product": "Shampoo Bar-  Lavender",
+      "vendor": "Granny Smith All Natural",
+      "packageId": 863250,
+      "package": "4.5 oz ea",
+      "priceList": "Herd Share Members",
+      "visible": true,
+      "basePrice": 6.3,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 8.82,
+      "localPriceAfter": 9.13,
+      "remoteBasePrice": 6.3,
+      "remoteAdjustmentType": 3,
+      "remoteAdjustmentBefore": 8,
+      "remoteAdjustmentAfter": 9.13,
+      "remotePriceBefore": 8,
+      "remotePriceAfter": 9.13
+    },
+    {
+      "productId": 1057489,
+      "product": "Shampoo Bar-  Lavender",
+      "vendor": "Granny Smith All Natural",
+      "packageId": 863250,
+      "package": "4.5 oz ea",
+      "priceList": "SNAP",
+      "visible": true,
+      "basePrice": 6.3,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 8.82,
+      "localPriceAfter": 9.13,
+      "remoteBasePrice": 6.3,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 8.82,
+      "remotePriceAfter": 9.13
+    }
+  ],
+  "warnings": [
+    "CSA Members: remote adjustment 8 (type 3) differed from local 40%; set to approved 45% pricing.",
+    "Herd Share Members: remote adjustment 8 (type 3) differed from local 40%; set to approved 45% pricing."
+  ],
+  "reviewedAt": "2026-10-08T19:48:41.031Z"
+}

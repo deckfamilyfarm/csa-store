@@ -1,0 +1,262 @@
+{
+  "verifiedAt": "2026-10-08T20:49:33.858Z",
+  "productId": 806036,
+  "priceConfirmed": true,
+  "otherFieldsUnchanged": true,
+  "remote": {
+    "id": 806036,
+    "name": "Mango Marigold Kombucha",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">\"A classic. This mild black tea brew refreshes the palate with a pronounced mango taste, finished off with a touch of floral coming from the Oregon grown calendula.\" - BNF</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">This brew is sweet and juicy with underlying herbal notes. Made with Oregon-grown calendula!</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-08-25T11:15:30.514610-04:00",
+    "updated": "2026-10-08T16:24:59.687942-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/eBOQc.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 350504,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/eBOQc.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/eBOQc.jpeg",
+        "original_filename": "mango.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "903",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 527098,
+        "inventory_per_unit": 1,
+        "unit_price": 3.34,
+        "average_pack_weight": null,
+        "package_price": 3.34,
+        "package_unit_price": 3.34,
+        "priority_order": 1,
+        "name": "16 fl. oz",
+        "price_list_entries": [
+          {
+            "id": 221732,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179335,
+            "subscription_setting": {
+              "id": 124480,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 220363,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 178281,
+            "subscription_setting": {
+              "id": 121268,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 238301,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 191976,
+            "subscription_setting": {
+              "id": 146064,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617899,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479792,
+            "subscription_setting": {
+              "id": 497015,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 806036,
+        "product_name": "Mango Marigold Kombucha",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T11:15:30.527917-04:00",
+        "updated": "2026-10-08T16:24:59.004643-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 178281,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 468,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440633,
+            "price_list_category": 31657,
+            "priority_order": 469,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179335,
+        "price_list_category": 17687,
+        "price_list": 2966,
+        "priority_order": 468,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440850,
+            "price_list_category": 31662,
+            "priority_order": 480,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 191976,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 368,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440412,
+            "price_list_category": 31656,
+            "priority_order": 95,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479792,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 468,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 441079,
+            "price_list_category": 31665,
+            "priority_order": 472,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3178,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  }
+}

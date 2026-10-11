@@ -1,0 +1,223 @@
+{
+  "data": {
+    "id": 897404,
+    "name": "Pepi Dwarf Iris Rhizome",
+    "description": "<p>11” Early to mid season bloomer.</p><br />\n<p>Spunky and colorful little dwarf iris! Smooth grayed purple standards (upper petals) give gentle contrast to the magenta rose falls (lower petals). Strong ruby red thumbprint is accentuated by the lavender and grayed yellow beards. Eye-catching!</p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2024-08-03T16:30:54.693496-04:00",
+    "updated": "2026-10-08T16:28:26.176447-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/ENNkp.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 223028,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/ENNkp.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/ENNkp.jpg",
+        "original_filename": "20240417_133824.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 638661,
+        "inventory_per_unit": 1,
+        "unit_price": 6,
+        "average_pack_weight": 0,
+        "package_price": 6,
+        "package_unit_price": 6,
+        "priority_order": null,
+        "name": "ea",
+        "price_list_entries": [
+          {
+            "id": 415324,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 332390,
+            "subscription_setting": {
+              "id": 295583,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 415325,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 332391,
+            "subscription_setting": {
+              "id": 295584,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 415326,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 332392,
+            "subscription_setting": {
+              "id": 295585,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 897404,
+        "product_name": "Pepi Dwarf Iris Rhizome",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2024-08-03T16:30:54.911695-04:00",
+        "updated": "2026-10-08T16:28:25.366113-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 332390,
+        "price_list_category": 14598,
+        "price_list": 2718,
+        "priority_order": 751,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 247902,
+            "price_list_category": 14598,
+            "priority_order": 789,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 332391,
+        "price_list_category": 15064,
+        "price_list": 2966,
+        "priority_order": 953,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 247903,
+            "price_list_category": 15064,
+            "priority_order": 998,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 332392,
+        "price_list_category": 15746,
+        "price_list": 3124,
+        "priority_order": 571,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 247904,
+            "price_list_category": 15746,
+            "priority_order": 614,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3181,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 897404,
+  "remoteProductId": 897404,
+  "checkedAt": "2026-10-11T17:58:05.708Z"
+}

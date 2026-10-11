@@ -1,0 +1,281 @@
+{
+  "data": {
+    "id": 1108430,
+    "name": "Baby Bok Choi",
+    "description": "<p></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2026-04-20T18:20:46.746242-04:00",
+    "updated": "2026-10-08T16:34:10.248850-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/VHU56.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 418275,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/VHU56.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/VHU56.jpeg",
+        "original_filename": "account/322922/8GmjJ.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 927191,
+        "inventory_per_unit": 1,
+        "unit_price": 2.25,
+        "average_pack_weight": null,
+        "package_price": 2.25,
+        "package_unit_price": 2.25,
+        "priority_order": null,
+        "name": "Bunch",
+        "price_list_entries": [
+          {
+            "id": 904197,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 698157,
+            "subscription_setting": {
+              "id": 782812,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 904199,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 698155,
+            "subscription_setting": {
+              "id": 782814,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 904200,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 698156,
+            "subscription_setting": {
+              "id": 782815,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 904198,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 698158,
+            "subscription_setting": {
+              "id": 782813,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": null,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 1108430,
+        "product_name": "Baby Bok Choi",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bu",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-04-20T18:20:47.113205-04:00",
+        "updated": "2026-10-08T16:34:09.176076-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 698155,
+        "price_list_category": 15110,
+        "price_list": 2718,
+        "priority_order": 1095,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 575274,
+            "price_list_category": 15107,
+            "priority_order": 5,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": {
+          "id": 147018,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 698156,
+        "price_list_category": 15122,
+        "price_list": 2966,
+        "priority_order": 1318,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 575275,
+            "price_list_category": 15119,
+            "priority_order": 8,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": {
+          "id": 147019,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 698157,
+        "price_list_category": 15732,
+        "price_list": 3124,
+        "priority_order": 934,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 575276,
+            "price_list_category": 15732,
+            "priority_order": 8,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": {
+          "id": 147020,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 698158,
+        "price_list_category": 28916,
+        "price_list": 5622,
+        "priority_order": 1319,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 575277,
+            "price_list_category": 28913,
+            "priority_order": 8,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": {
+          "id": 147021,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3152,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 1108430,
+  "remoteProductId": 1108430,
+  "checkedAt": "2026-10-11T17:27:27.511Z"
+}

@@ -1,0 +1,745 @@
+{
+  "savedAt": "2026-10-11T19:01:18.287Z",
+  "units": [
+    {
+      "type": "MEASUREMENT_UNIT",
+      "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+      "updated_at": "2019-09-27T19:16:18.281Z",
+      "created_at": "2019-09-27T19:16:18.281Z",
+      "version": 1569611778281,
+      "is_deleted": false,
+      "present_at_all_locations": true,
+      "measurement_unit_data": {
+        "measurement_unit": {
+          "weight_unit": "IMPERIAL_POUND",
+          "type": "TYPE_WEIGHT"
+        },
+        "precision": 2
+      }
+    },
+    {
+      "type": "MEASUREMENT_UNIT",
+      "id": "CBK75H5M2OTHJF4TNIUTLB5I",
+      "updated_at": "2019-12-07T17:29:46.354Z",
+      "created_at": "2019-12-07T17:29:46.354Z",
+      "version": 1575739786354,
+      "is_deleted": false,
+      "present_at_all_locations": true,
+      "measurement_unit_data": {
+        "measurement_unit": {
+          "weight_unit": "IMPERIAL_WEIGHT_OUNCE",
+          "type": "TYPE_WEIGHT"
+        },
+        "precision": 3
+      }
+    }
+  ],
+  "objects": [
+    {
+      "type": "ITEM_VARIATION",
+      "id": "PJUREPBRNPEO4OGFFYYA7Q7Z",
+      "updated_at": "2026-09-17T14:19:12.256Z",
+      "created_at": "2019-10-10T17:51:04.318Z",
+      "version": 1789654752256,
+      "is_deleted": false,
+      "catalog_v1_ids": [
+        {
+          "catalog_v1_id": "8DD4D256-8547-43DC-A0AB-97D86B5A116B",
+          "location_id": "C0T7DVZY5XVG5"
+        }
+      ],
+      "present_at_all_locations": false,
+      "present_at_location_ids": [
+        "C0T7DVZY5XVG5",
+        "L1MHNE83A8XPY",
+        "L307W0S4THZP3",
+        "L373VS1QADC37",
+        "LJGEXCF3N7XJ4",
+        "LJS8Z7FW504J5",
+        "LKX3NDPZ68H74",
+        "LP5542Q9WCHX2",
+        "LP8AY4081PK5E",
+        "LVKCGC3H1QMYX",
+        "LWREC814AB8A4"
+      ],
+      "item_variation_data": {
+        "item_id": "SHZS54JA7XZFU4WNB3O4CLSO",
+        "name": "Natural Beef Marrow Bones",
+        "ordinal": 1,
+        "pricing_type": "FIXED_PRICING",
+        "price_money": {
+          "amount": 1500,
+          "currency": "USD"
+        },
+        "location_overrides": [
+          {
+            "location_id": "C0T7DVZY5XVG5",
+            "track_inventory": false
+          },
+          {
+            "location_id": "L1MHNE83A8XPY",
+            "track_inventory": false
+          },
+          {
+            "location_id": "L373VS1QADC37",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LJGEXCF3N7XJ4",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LJS8Z7FW504J5",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LKX3NDPZ68H74",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LP5542Q9WCHX2",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LP8AY4081PK5E",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LVKCGC3H1QMYX",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LWREC814AB8A4",
+            "track_inventory": false
+          }
+        ],
+        "track_inventory": false,
+        "inventory_alert_type": "NONE",
+        "service_duration": 0,
+        "available_for_booking": false,
+        "transition_time": 0,
+        "sellable": true,
+        "stockable": true,
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ]
+      }
+    },
+    {
+      "type": "ITEM_VARIATION",
+      "id": "GVDPMOIBYDM7FPJUH6PKQPT2",
+      "updated_at": "2026-09-13T13:47:53.506Z",
+      "created_at": "2024-04-12T21:48:50.258Z",
+      "version": 1789307273506,
+      "is_deleted": false,
+      "catalog_v1_ids": [
+        {
+          "catalog_v1_id": "XUUVBGEEA6AVOZP62Q4A6QID",
+          "location_id": "C0T7DVZY5XVG5"
+        }
+      ],
+      "present_at_all_locations": true,
+      "item_variation_data": {
+        "item_id": "DSKZWD2Z6KSSTTADHICAXC5G",
+        "name": "Regular",
+        "ordinal": 1,
+        "pricing_type": "FIXED_PRICING",
+        "price_money": {
+          "amount": 1650,
+          "currency": "USD"
+        },
+        "location_overrides": [
+          {
+            "location_id": "C0T7DVZY5XVG5",
+            "track_inventory": false
+          },
+          {
+            "location_id": "L1MHNE83A8XPY",
+            "track_inventory": false
+          },
+          {
+            "location_id": "L373VS1QADC37",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LJGEXCF3N7XJ4",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LJS8Z7FW504J5",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LKX3NDPZ68H74",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LP5542Q9WCHX2",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LP8AY4081PK5E",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LVKCGC3H1QMYX",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LWREC814AB8A4",
+            "track_inventory": false
+          }
+        ],
+        "inventory_alert_type": "NONE",
+        "service_duration": 0,
+        "sellable": true,
+        "stockable": true,
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ]
+      }
+    },
+    {
+      "type": "ITEM_VARIATION",
+      "id": "LF5N3PXAP6GF6SPZA5R3RC2Z",
+      "updated_at": "2026-08-18T18:04:03.708Z",
+      "created_at": "2025-01-22T20:01:24.061Z",
+      "version": 1787076243708,
+      "is_deleted": false,
+      "present_at_all_locations": true,
+      "item_variation_data": {
+        "item_id": "56JW4CHELXLEOPRF7E4K4B4Z",
+        "name": "Regular",
+        "ordinal": 1,
+        "pricing_type": "FIXED_PRICING",
+        "price_money": {
+          "amount": 1650,
+          "currency": "USD"
+        },
+        "location_overrides": [
+          {
+            "location_id": "C0T7DVZY5XVG5",
+            "track_inventory": false
+          },
+          {
+            "location_id": "L1MHNE83A8XPY",
+            "track_inventory": false
+          },
+          {
+            "location_id": "L373VS1QADC37",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LJGEXCF3N7XJ4",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LJS8Z7FW504J5",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LKX3NDPZ68H74",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LP5542Q9WCHX2",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LP8AY4081PK5E",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LVKCGC3H1QMYX",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LWREC814AB8A4",
+            "track_inventory": false
+          }
+        ],
+        "track_inventory": false,
+        "inventory_alert_type": "NONE",
+        "sellable": true,
+        "stockable": true,
+        "channels": [
+          "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ]
+      }
+    },
+    {
+      "type": "ITEM_VARIATION",
+      "id": "WBDNBYBMRDK55JR6NCQG6FGD",
+      "updated_at": "2026-09-19T01:29:38.67Z",
+      "created_at": "2023-10-21T15:33:55.927Z",
+      "version": 1789781378670,
+      "is_deleted": false,
+      "catalog_v1_ids": [
+        {
+          "catalog_v1_id": "NIGKVXS7YRUIQD4NW27NAJ7E",
+          "location_id": "C0T7DVZY5XVG5"
+        }
+      ],
+      "present_at_all_locations": true,
+      "item_variation_data": {
+        "item_id": "BKII4YYPR7FUPZVKDYUHUXVD",
+        "name": "Regular",
+        "ordinal": 1,
+        "pricing_type": "FIXED_PRICING",
+        "price_money": {
+          "amount": 2000,
+          "currency": "USD"
+        },
+        "track_inventory": false,
+        "inventory_alert_type": "NONE",
+        "service_duration": 0,
+        "sellable": true,
+        "stockable": true,
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ]
+      }
+    },
+    {
+      "type": "ITEM_VARIATION",
+      "id": "7LHBXGXLCLG3OWB2BHSGAJUT",
+      "updated_at": "2026-09-19T01:34:44.712Z",
+      "created_at": "2025-11-14T20:56:25.8Z",
+      "version": 1789781684712,
+      "is_deleted": false,
+      "present_at_all_locations": true,
+      "item_variation_data": {
+        "item_id": "STOLBNKXICC2JBBIP4575AQW",
+        "name": "Beef",
+        "ordinal": 2,
+        "pricing_type": "FIXED_PRICING",
+        "price_money": {
+          "amount": 1450,
+          "currency": "USD"
+        },
+        "track_inventory": false,
+        "inventory_alert_type": "NONE",
+        "sellable": true,
+        "stockable": true,
+        "channels": [
+          "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ]
+      }
+    },
+    {
+      "type": "ITEM_VARIATION",
+      "id": "TCNUAREBJXQELVW3ODJGAW7W",
+      "updated_at": "2026-09-19T01:34:44.712Z",
+      "created_at": "2025-11-14T20:56:25.8Z",
+      "version": 1789781684712,
+      "is_deleted": false,
+      "present_at_all_locations": true,
+      "item_variation_data": {
+        "item_id": "STOLBNKXICC2JBBIP4575AQW",
+        "name": "Turkey",
+        "ordinal": 3,
+        "pricing_type": "FIXED_PRICING",
+        "price_money": {
+          "amount": 1450,
+          "currency": "USD"
+        },
+        "track_inventory": false,
+        "inventory_alert_type": "NONE",
+        "sellable": true,
+        "stockable": true,
+        "channels": [
+          "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ]
+      }
+    },
+    {
+      "type": "ITEM_VARIATION",
+      "id": "MJNI7UO6UHP7E4UPVVAAJFUT",
+      "updated_at": "2026-09-19T01:34:44.712Z",
+      "created_at": "2025-11-14T20:56:25.8Z",
+      "version": 1789781684712,
+      "is_deleted": false,
+      "present_at_all_locations": true,
+      "item_variation_data": {
+        "item_id": "STOLBNKXICC2JBBIP4575AQW",
+        "name": "Pork",
+        "ordinal": 4,
+        "pricing_type": "FIXED_PRICING",
+        "price_money": {
+          "amount": 1450,
+          "currency": "USD"
+        },
+        "track_inventory": false,
+        "inventory_alert_type": "NONE",
+        "sellable": true,
+        "stockable": true,
+        "channels": [
+          "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ]
+      }
+    },
+    {
+      "type": "ITEM_VARIATION",
+      "id": "U37CHXXOQNKCISKGN4INWKO3",
+      "updated_at": "2026-09-17T14:19:12.256Z",
+      "created_at": "2025-05-10T15:30:56.872Z",
+      "version": 1789654752256,
+      "is_deleted": false,
+      "catalog_v1_ids": [
+        {
+          "catalog_v1_id": "UW2FRJXFQSKQP6CGAS3ERCS5",
+          "location_id": "L1MHNE83A8XPY"
+        }
+      ],
+      "present_at_all_locations": true,
+      "item_variation_data": {
+        "item_id": "N7X3GEGY2OGLMSPQ4KCM4OGO",
+        "name": "Regular",
+        "ordinal": 1,
+        "pricing_type": "FIXED_PRICING",
+        "price_money": {
+          "amount": 2400,
+          "currency": "USD"
+        },
+        "track_inventory": false,
+        "inventory_alert_type": "NONE",
+        "sellable": true,
+        "stockable": true,
+        "channels": [
+          "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ]
+      }
+    },
+    {
+      "type": "ITEM_VARIATION",
+      "id": "7ONA7WTZJVR2U67PQAQ3GHDS",
+      "updated_at": "2026-07-21T16:34:08.081Z",
+      "created_at": "2026-07-10T17:30:04.093Z",
+      "version": 1784651648081,
+      "is_deleted": false,
+      "present_at_all_locations": true,
+      "item_variation_data": {
+        "item_id": "WWWJVCE57A35KUIF5UDYVR4Z",
+        "name": "Regular",
+        "ordinal": 0,
+        "pricing_type": "FIXED_PRICING",
+        "price_money": {
+          "amount": 1800,
+          "currency": "USD"
+        },
+        "track_inventory": false,
+        "inventory_alert_type": "NONE",
+        "sellable": true,
+        "stockable": true,
+        "channels": [
+          "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ]
+      }
+    },
+    {
+      "type": "ITEM_VARIATION",
+      "id": "VBA7QNBQN4DAJEBMIWY5BZ4I",
+      "updated_at": "2026-08-18T18:03:57.878Z",
+      "created_at": "2026-08-12T21:57:53.48Z",
+      "version": 1787076237878,
+      "is_deleted": false,
+      "catalog_v1_ids": [
+        {
+          "catalog_v1_id": "NW7I4MCM4SE7UT6VCCJNEGYG",
+          "location_id": "LP5542Q9WCHX2"
+        }
+      ],
+      "present_at_all_locations": false,
+      "item_variation_data": {
+        "item_id": "IRMSDE3RXXZRQ5RGXN5MAUFY",
+        "name": "Regular",
+        "ordinal": 1,
+        "pricing_type": "FIXED_PRICING",
+        "price_money": {
+          "amount": 2600,
+          "currency": "USD"
+        },
+        "sellable": true,
+        "stockable": true,
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ]
+      }
+    },
+    {
+      "type": "ITEM_VARIATION",
+      "id": "5L6WZFWO6HESVITXZYJELIQJ",
+      "updated_at": "2026-09-13T13:47:53.506Z",
+      "created_at": "2019-11-26T18:21:16.369Z",
+      "version": 1789307273506,
+      "is_deleted": false,
+      "catalog_v1_ids": [
+        {
+          "catalog_v1_id": "3ED8EBA8-6D3D-4B83-A9E1-96FC6947552F",
+          "location_id": "C0T7DVZY5XVG5"
+        }
+      ],
+      "present_at_all_locations": false,
+      "present_at_location_ids": [
+        "C0T7DVZY5XVG5",
+        "L1MHNE83A8XPY",
+        "L307W0S4THZP3",
+        "L373VS1QADC37",
+        "LJGEXCF3N7XJ4",
+        "LJS8Z7FW504J5",
+        "LKX3NDPZ68H74",
+        "LP5542Q9WCHX2",
+        "LP8AY4081PK5E",
+        "LVKCGC3H1QMYX",
+        "LWREC814AB8A4"
+      ],
+      "item_variation_data": {
+        "item_id": "UDZUFDD4BZQV4OKACAQ55ZGA",
+        "name": "Regular",
+        "ordinal": 1,
+        "pricing_type": "FIXED_PRICING",
+        "price_money": {
+          "amount": 1700,
+          "currency": "USD"
+        },
+        "location_overrides": [
+          {
+            "location_id": "C0T7DVZY5XVG5",
+            "track_inventory": false
+          },
+          {
+            "location_id": "L1MHNE83A8XPY",
+            "track_inventory": false
+          },
+          {
+            "location_id": "L373VS1QADC37",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LJGEXCF3N7XJ4",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LJS8Z7FW504J5",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LKX3NDPZ68H74",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LP5542Q9WCHX2",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LP8AY4081PK5E",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LVKCGC3H1QMYX",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LWREC814AB8A4",
+            "track_inventory": false
+          }
+        ],
+        "inventory_alert_type": "NONE",
+        "service_duration": 0,
+        "available_for_booking": false,
+        "transition_time": 0,
+        "sellable": true,
+        "stockable": true,
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ]
+      }
+    },
+    {
+      "type": "ITEM_VARIATION",
+      "id": "4HFME7B2JIQDOLKVUVLVS6F7",
+      "updated_at": "2026-09-13T13:47:53.506Z",
+      "created_at": "2023-07-14T21:19:38.669Z",
+      "version": 1789307273506,
+      "is_deleted": false,
+      "catalog_v1_ids": [
+        {
+          "catalog_v1_id": "RWPVNBUQN22VO4KLUSO3SWNB",
+          "location_id": "C0T7DVZY5XVG5"
+        }
+      ],
+      "present_at_all_locations": true,
+      "item_variation_data": {
+        "item_id": "HVG4VFTHE3RMCAWBXDGPTBKG",
+        "name": "Regular",
+        "ordinal": 1,
+        "pricing_type": "FIXED_PRICING",
+        "price_money": {
+          "amount": 1000,
+          "currency": "USD"
+        },
+        "location_overrides": [
+          {
+            "location_id": "C0T7DVZY5XVG5",
+            "track_inventory": false
+          },
+          {
+            "location_id": "L1MHNE83A8XPY",
+            "track_inventory": false
+          },
+          {
+            "location_id": "L373VS1QADC37",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LJGEXCF3N7XJ4",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LJS8Z7FW504J5",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LKX3NDPZ68H74",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LP5542Q9WCHX2",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LP8AY4081PK5E",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LVKCGC3H1QMYX",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LWREC814AB8A4",
+            "track_inventory": false
+          }
+        ],
+        "inventory_alert_type": "NONE",
+        "sellable": true,
+        "stockable": true,
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ]
+      }
+    },
+    {
+      "type": "ITEM_VARIATION",
+      "id": "HSN75FILHGFLQGROEUIIC2XC",
+      "updated_at": "2026-09-12T16:30:23.437Z",
+      "created_at": "2025-10-24T19:46:07.819Z",
+      "version": 1789230623437,
+      "is_deleted": false,
+      "present_at_all_locations": true,
+      "present_at_location_ids": [
+        "L307W0S4THZP3"
+      ],
+      "item_variation_data": {
+        "item_id": "4MJHJVJYDZNCHSKIFKWF553J",
+        "name": "Hock",
+        "ordinal": 1,
+        "pricing_type": "FIXED_PRICING",
+        "price_money": {
+          "amount": 1650,
+          "currency": "USD"
+        },
+        "track_inventory": false,
+        "inventory_alert_type": "NONE",
+        "service_duration": 0,
+        "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+        "sellable": true,
+        "stockable": true,
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ]
+      }
+    },
+    {
+      "type": "ITEM_VARIATION",
+      "id": "634VPLABW35HBLQMFSCMU6HA",
+      "updated_at": "2026-09-13T13:47:53.506Z",
+      "created_at": "2019-10-10T17:11:44.39Z",
+      "version": 1789307273506,
+      "is_deleted": false,
+      "catalog_v1_ids": [
+        {
+          "catalog_v1_id": "9185E106-B70C-4548-A12F-01AD7B8F6DB7",
+          "location_id": "C0T7DVZY5XVG5"
+        }
+      ],
+      "present_at_all_locations": true,
+      "item_variation_data": {
+        "item_id": "IGVW5XO7MRUVRIPCIM7VWN2Y",
+        "name": "Regular",
+        "ordinal": 1,
+        "pricing_type": "FIXED_PRICING",
+        "price_money": {
+          "amount": 1700,
+          "currency": "USD"
+        },
+        "location_overrides": [
+          {
+            "location_id": "C0T7DVZY5XVG5",
+            "track_inventory": false
+          },
+          {
+            "location_id": "L1MHNE83A8XPY",
+            "track_inventory": false
+          },
+          {
+            "location_id": "L373VS1QADC37",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LJGEXCF3N7XJ4",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LJS8Z7FW504J5",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LKX3NDPZ68H74",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LP5542Q9WCHX2",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LP8AY4081PK5E",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LVKCGC3H1QMYX",
+            "track_inventory": false
+          },
+          {
+            "location_id": "LWREC814AB8A4",
+            "track_inventory": false
+          }
+        ],
+        "inventory_alert_type": "NONE",
+        "service_duration": 0,
+        "available_for_booking": false,
+        "transition_time": 0,
+        "sellable": true,
+        "stockable": true,
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ]
+      }
+    }
+  ]
+}

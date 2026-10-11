@@ -1,0 +1,415 @@
+{
+  "productId": 1119870,
+  "context": {
+    "product": {
+      "id": 1119870,
+      "name": "Handmade Wooden Industrial Style 4\"x6\" Catch-all Tray",
+      "description": "Give old construction materials a new life! This unique jewelry and change holder is Handcrafted from heavy-duty, reclaimed pressure-treated timber off a local job site, this tray is designed to last. By sealing it with a protective poly coat, we’ve transformed rustic construction wood into a functional, rustic-modern home accessory. Sturdy, durable, and eco-friendly. Measures 4x6x2 inches.",
+      "visible": 1,
+      "trackInventory": 1,
+      "inventory": 1,
+      "categoryId": null,
+      "vendorId": 3181,
+      "thumbnailUrl": null,
+      "createdAt": "2026-05-14T17:37:57.000Z",
+      "updatedAt": "2026-10-08T10:40:24.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "",
+    "vendor": {
+      "id": 3181,
+      "name": "RL Plants & Home Goods",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 947706,
+        "productId": 1119870,
+        "name": "ea",
+        "price": "10.00",
+        "packageCode": null,
+        "unit": null,
+        "numOfItems": 1,
+        "trackType": null,
+        "chargeType": null,
+        "visible": 1,
+        "trackInventory": 0,
+        "inventory": null
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 947706,
+        "productId": 1119870,
+        "localLinePackageId": 947706,
+        "liveName": "ea",
+        "livePrice": "10.00",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":1119870,\"Product\":\"Handmade Wooden Industrial Style 4\\\"x6\\\" Catch-all Tray\",\"Track Inventory By\":\"package\",\"Item Unit\":\"ea\",\"Charge By\":\"package\",\"Charge Unit\":\"ea\",\"Package ID\":947706,\"Package Name\":\"ea\",\"# of Items\":1,\"Package Price\":10,\"Inventory Type\":\"product\"},\"live\":{\"id\":947706,\"inventory_per_unit\":1,\"unit_price\":10,\"average_pack_weight\":0,\"package_price\":10,\"package_unit_price\":10,\"priority_order\":1,\"name\":\"ea\",\"price_list_entries\":[{\"id\":931480,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":717154,\"subscription_setting\":{\"id\":810159,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":931481,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":717155,\"subscription_setting\":{\"id\":810160,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":1,\"number_of_packages_available\":1,\"number_of_packages_total\":1,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":1,\"product_package_size\":1,\"product_id\":1119870,\"product_name\":\"Handmade Wooden Industrial Style 4\\\"x6\\\" Catch-all Tray\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"ea\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2026-05-11T17:44:41.322306-04:00\",\"updated\":\"2026-05-11T17:44:41.362625-04:00\"}}",
+        "createdAt": "2026-05-14T17:40:39.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 1119870,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 1119870,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/1119870/localline/af8212207d2c95d38fad433c.jpg",
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/1119870/localline/9b3d1b4b16ce615b0086a1b4.jpg"
+    ],
+    "localLineVendorId": 3181
+  },
+  "remote": {
+    "id": 1119870,
+    "name": "Handmade Wooden Industrial Style 4\"x6\" Catch-all Tray",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Give old construction materials a new life! This unique jewelry and change holder is Handcrafted from heavy-duty, reclaimed pressure-treated timber off a local job site, this tray is designed to last. By sealing it with a protective poly coat, we’ve transformed rustic construction wood into a functional, rustic-modern home accessory. Sturdy, durable, and eco-friendly. Measures 4x6x2 inches.</span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2026-05-11T17:44:41.052936-04:00",
+    "updated": "2026-10-06T13:57:59.290989-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/dDDXB.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 427384,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/dDDXB.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/dDDXB.jpg",
+        "original_filename": "20260511_141207.jpg"
+      },
+      {
+        "id": 427385,
+        "priority_order": 1,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/bYY0h.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/bYY0h.jpg",
+        "original_filename": "20260511_141119.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 1,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 947706,
+        "inventory_per_unit": 1,
+        "unit_price": 10,
+        "average_pack_weight": 0,
+        "package_price": 10,
+        "package_unit_price": 10,
+        "priority_order": 1,
+        "name": "ea",
+        "price_list_entries": [
+          {
+            "id": 931480,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 717154,
+            "subscription_setting": {
+              "id": 810159,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 931481,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 717155,
+            "subscription_setting": {
+              "id": 810160,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 1,
+        "number_of_packages_available": 1,
+        "number_of_packages_total": 1,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 1,
+        "product_package_size": 1,
+        "product_id": 1119870,
+        "product_name": "Handmade Wooden Industrial Style 4\"x6\" Catch-all Tray",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-05-11T17:44:41.322306-04:00",
+        "updated": "2026-05-11T17:44:41.362625-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 717154,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 943,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 595429,
+            "price_list_category": 15746,
+            "priority_order": 647,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 154541,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 717155,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1326,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 595430,
+            "price_list_category": 15064,
+            "priority_order": 37,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 154542,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 3181,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 1,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 1
+  },
+  "payload": {
+    "vendor": 3181,
+    "packages": [
+      {
+        "id": 947706,
+        "unit_price": 10,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 717154,
+            "calculated_value": 14.5,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 10
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 717155,
+            "calculated_value": 14.5,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 10
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:41:31.225Z",
+  "rows": [
+    {
+      "productId": 1119870,
+      "product": "Handmade Wooden Industrial Style 4\"x6\" Catch-all Tray",
+      "vendor": "RL Plants & Home Goods",
+      "packageId": 947706,
+      "package": "ea",
+      "priceList": "Guest Basket",
+      "visible": true,
+      "basePrice": 10,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 14,
+      "localPriceAfter": 14.5,
+      "remoteBasePrice": 10,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 14,
+      "remotePriceAfter": 14.5
+    },
+    {
+      "productId": 1119870,
+      "product": "Handmade Wooden Industrial Style 4\"x6\" Catch-all Tray",
+      "vendor": "RL Plants & Home Goods",
+      "packageId": 947706,
+      "package": "ea",
+      "priceList": "CSA Members",
+      "visible": true,
+      "basePrice": 10,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 14,
+      "localPriceAfter": 14.5,
+      "remoteBasePrice": 10,
+      "remoteAdjustmentType": null,
+      "remoteAdjustmentBefore": null,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": null,
+      "remotePriceAfter": null
+    },
+    {
+      "productId": 1119870,
+      "product": "Handmade Wooden Industrial Style 4\"x6\" Catch-all Tray",
+      "vendor": "RL Plants & Home Goods",
+      "packageId": 947706,
+      "package": "ea",
+      "priceList": "Herd Share Members",
+      "visible": true,
+      "basePrice": 10,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 14,
+      "localPriceAfter": 14.5,
+      "remoteBasePrice": 10,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 14,
+      "remotePriceAfter": 14.5
+    },
+    {
+      "productId": 1119870,
+      "product": "Handmade Wooden Industrial Style 4\"x6\" Catch-all Tray",
+      "vendor": "RL Plants & Home Goods",
+      "packageId": 947706,
+      "package": "ea",
+      "priceList": "SNAP",
+      "visible": true,
+      "basePrice": 10,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 14,
+      "localPriceAfter": 14.5,
+      "remoteBasePrice": 10,
+      "remoteAdjustmentType": null,
+      "remoteAdjustmentBefore": null,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": null,
+      "remotePriceAfter": null
+    }
+  ],
+  "warnings": [
+    "CSA Members is not present for package ea; no listing created.",
+    "SNAP is not present for package ea; no listing created."
+  ],
+  "reviewedAt": "2026-10-08T19:48:41.041Z"
+}

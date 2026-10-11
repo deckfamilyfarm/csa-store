@@ -1,0 +1,268 @@
+{
+  "data": {
+    "id": 825306,
+    "name": "Chanterelle mushrooms",
+    "description": "<p>Pacific Golden Chanterelles&nbsp;</p>\n<p>Cantharellus formosus</p><br />\n<p>Foraged weekly in the Coastal Range, these bright orange funnel-shaped mushrooms have a mild, sweet smell. They have a mild sweetness and umami flavor as well as a subtle earthy, nutty undertone. Excellent in pasta, on toast, and can be used in most recipes requiring cooked mushrooms.</p><br />\n<p>Basic preparation: heat pan over medium heat, quarter the mushrooms lengthwise, put mushrooms in heated pan, allow moisture to release, add a pinch of salt and fat of your choice once most water has evaporated, continue to cook for another 5-8 minutes, can be added to other dishes.</p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-11-28T22:11:46.660744-05:00",
+    "updated": "2023-12-05T17:50:16.028451-05:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/LKO9l.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 158297,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/LKO9l.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/LKO9l.jpeg",
+        "original_filename": "CB67DD31-12FC-4523-BC13-9790529EC948.jpeg"
+      },
+      {
+        "id": 158331,
+        "priority_order": 1,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/p1b01.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/p1b01.jpeg",
+        "original_filename": "FC28B299-4154-48AF-8B9D-7B7591605657.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12601,
+      "name": "1/2 lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12601,
+      "name": "1/2 lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "weight",
+    "charge_type": "weight",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 549220,
+        "inventory_per_unit": 1,
+        "unit_price": 8.5,
+        "average_pack_weight": 1,
+        "package_price": 8.5,
+        "package_unit_price": 8.5,
+        "priority_order": 1,
+        "name": "1/2 lb",
+        "price_list_entries": [
+          {
+            "id": 245627,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 33,
+            "price_list_id": 2966,
+            "product_price_list_entry": 197861,
+            "subscription_setting": {
+              "id": 153798,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 245626,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 33,
+            "price_list_id": 2718,
+            "product_price_list_entry": 197860,
+            "subscription_setting": {
+              "id": 153799,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617988,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 33,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479880,
+            "subscription_setting": {
+              "id": 497104,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 245628,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 197862,
+            "subscription_setting": {
+              "id": 153797,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "weight",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 825306,
+        "product_name": "Chanterelle mushrooms",
+        "is_by_weight": true,
+        "is_charge_by_weight": true,
+        "product_charge_unit": "1/2 lb",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-11-28T22:11:46.858075-05:00",
+        "updated": "2023-11-29T09:59:48.143452-05:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 197860,
+        "price_list_category": 15108,
+        "price_list": 2718,
+        "priority_order": 591,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 163357,
+            "price_list_category": 15108,
+            "priority_order": 591,
+            "price_list_category_name": "Organic Mushrooms 🍄‍🟫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 197861,
+        "price_list_category": 15123,
+        "price_list": 2966,
+        "priority_order": 787,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 163358,
+            "price_list_category": 15123,
+            "priority_order": 787,
+            "price_list_category_name": "Organic Mushrooms 🍄‍🟫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 197862,
+        "price_list_category": 15737,
+        "price_list": 3124,
+        "priority_order": 373,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 163359,
+            "price_list_category": 15737,
+            "priority_order": 374,
+            "price_list_category_name": "Organic Mushrooms 🍄‍🟫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479880,
+        "price_list_category": 28919,
+        "price_list": 5622,
+        "priority_order": 787,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370153,
+            "price_list_category": 28919,
+            "priority_order": 787,
+            "price_list_category_name": "Organic Mushrooms 🍄‍🟫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": null,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "OWNED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 825306,
+  "remoteProductId": 825306,
+  "checkedAt": "2026-10-11T17:26:59.280Z"
+}

@@ -1,0 +1,524 @@
+{
+  "productId": 1082291,
+  "context": {
+    "product": {
+      "id": 1082291,
+      "name": "Winter Salad Mix",
+      "description": null,
+      "visible": 0,
+      "trackInventory": 1,
+      "inventory": 0,
+      "categoryId": null,
+      "vendorId": 3171,
+      "thumbnailUrl": null,
+      "createdAt": "2026-04-04T16:47:07.000Z",
+      "updatedAt": "2026-07-03T19:41:35.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "",
+    "vendor": {
+      "id": 3171,
+      "name": "Small is Beautiful Farm",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 894785,
+        "productId": 1082291,
+        "name": "1/2 lb",
+        "price": "4.00",
+        "packageCode": null,
+        "unit": null,
+        "numOfItems": 1,
+        "trackType": null,
+        "chargeType": null,
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": null
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 894785,
+        "productId": 1082291,
+        "localLinePackageId": 894785,
+        "liveName": "1/2 lb",
+        "livePrice": "4.00",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":1082291,\"Product\":\"Winter Salad Mix\",\"Track Inventory By\":\"package\",\"Item Unit\":\"bag\",\"Charge By\":\"package\",\"Charge Unit\":\"bag\",\"Package ID\":894785,\"Package Name\":\"1/2 lb\",\"# of Items\":1,\"Package Price\":4,\"Inventory Type\":\"product\"},\"live\":{\"id\":894785,\"inventory_per_unit\":1,\"unit_price\":4,\"average_pack_weight\":0,\"package_price\":4,\"package_unit_price\":4,\"priority_order\":1,\"name\":\"1/2 lb\",\"price_list_entries\":[{\"id\":831568,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":642509,\"subscription_setting\":{\"id\":709885,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":831569,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":642510,\"subscription_setting\":{\"id\":709886,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":831570,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":642508,\"subscription_setting\":{\"id\":709887,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":831571,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":642511,\"subscription_setting\":{\"id\":709888,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":1082291,\"product_name\":\"Winter Salad Mix\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"bag\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2026-03-16T12:42:09.780920-04:00\",\"updated\":\"2026-03-19T14:54:22.431790-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 1082291,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 1082291,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/1082291/localline/f2d04f14c7c8f4fbd5f88e9e.jpg"
+    ],
+    "localLineVendorId": 3171
+  },
+  "remote": {
+    "id": 1082291,
+    "name": "Winter Salad Mix",
+    "description": "<p></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2026-03-16T12:42:09.382457-04:00",
+    "updated": "2026-05-04T11:37:57.265260-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/4LmwW.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 402195,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/4LmwW.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/4LmwW.jpeg",
+        "original_filename": "account/322922/MgNSO.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": 1,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12591,
+      "name": "bag",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12591,
+      "name": "bag",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 894785,
+        "inventory_per_unit": 1,
+        "unit_price": 4,
+        "average_pack_weight": 0,
+        "package_price": 4,
+        "package_unit_price": 4,
+        "priority_order": 1,
+        "name": "1/2 lb",
+        "price_list_entries": [
+          {
+            "id": 831568,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 642509,
+            "subscription_setting": {
+              "id": 709885,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 831569,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 642510,
+            "subscription_setting": {
+              "id": 709886,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 831570,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 642508,
+            "subscription_setting": {
+              "id": 709887,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 831571,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 642511,
+            "subscription_setting": {
+              "id": 709888,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 1082291,
+        "product_name": "Winter Salad Mix",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bag",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-03-16T12:42:09.780920-04:00",
+        "updated": "2026-03-19T14:54:22.431790-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 642508,
+        "price_list_category": 15107,
+        "price_list": 2718,
+        "priority_order": 1082,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 530135,
+            "price_list_category": 15107,
+            "priority_order": 9,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": {
+          "id": 129466,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 642509,
+        "price_list_category": 15119,
+        "price_list": 2966,
+        "priority_order": 1297,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 530136,
+            "price_list_category": 15119,
+            "priority_order": 12,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": {
+          "id": 129467,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 642510,
+        "price_list_category": 15732,
+        "price_list": 3124,
+        "priority_order": 919,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 530137,
+            "price_list_category": 15732,
+            "priority_order": 12,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": {
+          "id": 129468,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 642511,
+        "price_list_category": 28913,
+        "price_list": 5622,
+        "priority_order": 1298,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 530138,
+            "price_list_category": 28913,
+            "priority_order": 12,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": {
+          "id": 129469,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3171,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3171,
+    "packages": [
+      {
+        "id": 894785,
+        "unit_price": 4,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 642510,
+            "calculated_value": 5.8,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 4
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 642508,
+            "calculated_value": 5.8,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 4
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 642509,
+            "calculated_value": 5.8,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 4
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 642511,
+            "calculated_value": 5.8,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 4
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:41:25.452Z",
+  "rows": [
+    {
+      "productId": 1082291,
+      "product": "Winter Salad Mix",
+      "vendor": "Small is Beautiful Farm",
+      "packageId": 894785,
+      "package": "1/2 lb",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 4,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 5.6,
+      "localPriceAfter": 5.8,
+      "remoteBasePrice": 4,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 5.6,
+      "remotePriceAfter": 5.8
+    },
+    {
+      "productId": 1082291,
+      "product": "Winter Salad Mix",
+      "vendor": "Small is Beautiful Farm",
+      "packageId": 894785,
+      "package": "1/2 lb",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 4,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 5.6,
+      "localPriceAfter": 5.8,
+      "remoteBasePrice": 4,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 5.6,
+      "remotePriceAfter": 5.8
+    },
+    {
+      "productId": 1082291,
+      "product": "Winter Salad Mix",
+      "vendor": "Small is Beautiful Farm",
+      "packageId": 894785,
+      "package": "1/2 lb",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 4,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 5.6,
+      "localPriceAfter": 5.8,
+      "remoteBasePrice": 4,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 5.6,
+      "remotePriceAfter": 5.8
+    },
+    {
+      "productId": 1082291,
+      "product": "Winter Salad Mix",
+      "vendor": "Small is Beautiful Farm",
+      "packageId": 894785,
+      "package": "1/2 lb",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 4,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 5.6,
+      "localPriceAfter": 5.8,
+      "remoteBasePrice": 4,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 5.6,
+      "remotePriceAfter": 5.8
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:41.034Z"
+}

@@ -1,0 +1,2420 @@
+{
+  "checkedAt": "2026-10-11T17:26:56.554Z",
+  "boxes": [
+    {
+      "id": 1173,
+      "created_at": "2025-10-27T14:52:03.762478-04:00",
+      "updated_at": "2026-05-11T14:52:16.480744-04:00",
+      "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/nlk8R.thumbnail.jpeg",
+      "inventory": 0,
+      "status": "Not visible",
+      "is_subscribable": false,
+      "ownership": "MANAGED",
+      "name": "Breakfast Bundle",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Planning to have a house full of people? Be ready for a breakfast feast with this box of locally produced, gourmet items. Products from Taylor’s Sausage, Lonesome Whistle, Hyland Processing and Deck Family Farm. All the meats, eggs and honey were raised at Deck Family Farm.&nbsp;</span></p>",
+      "custom_id": "",
+      "internal_id": "",
+      "track_inventory": true,
+      "visible": false,
+      "inventory_warning": 0,
+      "sold_out_notification": false,
+      "orders_require_approval": false,
+      "vendor": 3148,
+      "price": 48.33,
+      "package_code": null,
+      "images": [
+        {
+          "id": 1089923,
+          "priority_order": 1,
+          "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/nlk8R.thumbnail.jpeg",
+          "full": "https://localline-public-images.s3.amazonaws.com/account/322922/nlk8R.jpg",
+          "original_filename": "20251114_122646.jpg",
+          "product_image": 357553
+        }
+      ],
+      "tags": [],
+      "internal_tags": [
+        {
+          "id": 56947,
+          "priority_order": 6,
+          "name": "Frozen",
+          "product_internal_tag": 2245
+        }
+      ],
+      "product_price_list_entries": [
+        {
+          "id": 561050,
+          "price_list_category": null,
+          "price_list": 3124,
+          "priority_order": 879,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 96499,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "Guest Basket",
+          "box_package_entry": {
+            "id": 728727,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 55,
+            "max_units_per_order": 0,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 607587,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 450112,
+              "price_list_category": 31772,
+              "priority_order": 2,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        },
+        {
+          "id": 561051,
+          "price_list_category": null,
+          "price_list": 2718,
+          "priority_order": 1041,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 96500,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "CSA Members",
+          "box_package_entry": {
+            "id": 728728,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 55,
+            "max_units_per_order": 0,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 607588,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 450113,
+              "price_list_category": 31773,
+              "priority_order": 7,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        },
+        {
+          "id": 561052,
+          "price_list_category": null,
+          "price_list": 2966,
+          "priority_order": 1253,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 96501,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "Herd Share Members",
+          "box_package_entry": {
+            "id": 728729,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 55,
+            "max_units_per_order": 0,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 607589,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 450114,
+              "price_list_category": 31774,
+              "priority_order": 2,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        },
+        {
+          "id": 561053,
+          "price_list_category": null,
+          "price_list": 5622,
+          "priority_order": 1254,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 96502,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "SNAP",
+          "box_package_entry": {
+            "id": 728730,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 55,
+            "max_units_per_order": 0,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 607590,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 450115,
+              "price_list_category": 31775,
+              "priority_order": 2,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        }
+      ],
+      "box_contents": [
+        {
+          "id": 1173,
+          "content_product_packages": [
+            {
+              "id": 13273,
+              "product_package": 695001,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 13274,
+              "product_package": 526778,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 13276,
+              "product_package": 526731,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 13278,
+              "product_package": 659188,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 13279,
+              "product_package": 694994,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 14172,
+              "product_package": 535117,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 19082,
+              "product_package": 527168,
+              "quantity": 1,
+              "available_inventory": 7,
+              "swaps": []
+            }
+          ]
+        }
+      ],
+      "inventory_type": "static",
+      "show_box_contents": false,
+      "has_swaps": false,
+      "total_content_product_packages": 7,
+      "box_reserved_inventory": 0
+    },
+    {
+      "id": 1762,
+      "created_at": "2026-04-10T17:19:56.425778-04:00",
+      "updated_at": "2026-05-14T19:05:50.160646-04:00",
+      "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/sezsN.thumbnail.jpeg",
+      "inventory": null,
+      "status": "Not visible",
+      "is_subscribable": false,
+      "ownership": "MANAGED",
+      "name": "Dinner in a Box: Ground Lamb Bundle",
+      "description": "<p dir=\"ltr\" style=\"text-align: left;\"><span style=\"white-space: pre-wrap;\">Not sure what to make this week? Start here. This bundle is built around&nbsp;ground&nbsp;lamb&nbsp;from Deck Family Farm, paired with what's fresh right now: shiitake mushrooms, rainbow chard, beets, leeks, cabbage, potatoes, and pears. Add your&nbsp;yogurt&nbsp;and you've got a full week of dinners with no planning required.</span></p><p dir=\"ltr\"><br></p><p dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Lamb&nbsp;&amp; Mushroom Skillet</strong></b><span style=\"white-space: pre-wrap;\">&nbsp;Brown 1 lb&nbsp;ground&nbsp;lamb&nbsp;with sliced shiitakes and a leek. Add garlic and a big handful of rainbow chard. Season with salt, pepper, red pepper flake. Stir in raw yogurt off the heat. Serve over roasted potatoes. 25 minutes for a rich, clean meal.</span></p><p dir=\"ltr\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Lamb-Stuffed Cabbage Rolls</strong></b><span style=\"white-space: pre-wrap;\">&nbsp;Blanch cabbage leaves, fill with seasoned&nbsp;ground&nbsp;lamb&nbsp;and sautéed onion,&nbsp;arrange in baking dish and simmer in a simple tomato broth. A classic — raw cream makes a great finish on top.</span></p><p dir=\"ltr\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Pear &amp;&nbsp;Lamb&nbsp;Flatbread</strong></b><span style=\"white-space: pre-wrap;\">&nbsp;Spread raw yogurt on flatbread, add crumbled cooked&nbsp;lamb, sliced pear and beet, caramelized leeks, and your cheese pick from this week's dairy.&nbsp;Heat in the oven to melt the cheese. 15 minutes to assemble.</span></p><p style=\"text-align: start;\"><br></p><p dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">TIPS</strong></b><span style=\"white-space: pre-wrap;\">: 1. Roast the potatoes while you prepare the rest. Add some beets for variety. 2.&nbsp;Brown all the lamb at once to simplify later meal prep. 3.&nbsp;Sauté all the leeks at once so you can add them easily later.&nbsp;</span></p>",
+      "custom_id": "",
+      "internal_id": "",
+      "track_inventory": false,
+      "visible": false,
+      "inventory_warning": 0,
+      "sold_out_notification": false,
+      "orders_require_approval": false,
+      "vendor": 3148,
+      "price": 44.98,
+      "package_code": null,
+      "images": [
+        {
+          "id": 1257694,
+          "priority_order": 1,
+          "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/sezsN.thumbnail.jpeg",
+          "full": "https://localline-public-images.s3.amazonaws.com/account/322922/sezsN.png",
+          "original_filename": "1.png",
+          "product_image": 414700
+        }
+      ],
+      "tags": [],
+      "internal_tags": [
+        {
+          "id": 65111,
+          "priority_order": 4,
+          "name": "Dairy",
+          "product_internal_tag": 2244
+        },
+        {
+          "id": 65110,
+          "priority_order": 6,
+          "name": "Frozen",
+          "product_internal_tag": 2245
+        }
+      ],
+      "product_price_list_entries": [
+        {
+          "id": 684676,
+          "price_list_category": null,
+          "price_list": 2966,
+          "priority_order": 1313,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 143338,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "Herd Share Members",
+          "box_package_entry": {
+            "id": 886865,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 44,
+            "max_units_per_order": 0,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 765478,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 565868,
+              "price_list_category": 31774,
+              "priority_order": 5,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        },
+        {
+          "id": 684677,
+          "price_list_category": null,
+          "price_list": 5622,
+          "priority_order": 1314,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 143339,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "SNAP",
+          "box_package_entry": {
+            "id": 886866,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 44,
+            "max_units_per_order": 0,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 765479,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 565869,
+              "price_list_category": 31775,
+              "priority_order": 6,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        },
+        {
+          "id": 684678,
+          "price_list_category": null,
+          "price_list": 3124,
+          "priority_order": 929,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 143340,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "Guest Basket",
+          "box_package_entry": {
+            "id": 886867,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 44,
+            "max_units_per_order": 0,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 765480,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 565870,
+              "price_list_category": 31772,
+              "priority_order": 6,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        }
+      ],
+      "box_contents": [
+        {
+          "id": 1755,
+          "content_product_packages": [
+            {
+              "id": 20157,
+              "product_package": 535123,
+              "quantity": 2,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 20158,
+              "product_package": 526987,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 20159,
+              "product_package": 534494,
+              "quantity": 1,
+              "available_inventory": 0,
+              "swaps": []
+            },
+            {
+              "id": 20160,
+              "product_package": 588665,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 20161,
+              "product_package": 808786,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 20162,
+              "product_package": 526940,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 20163,
+              "product_package": 836559,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 20164,
+              "product_package": 526837,
+              "quantity": 3,
+              "available_inventory": 0,
+              "swaps": []
+            },
+            {
+              "id": 20165,
+              "product_package": 618310,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            }
+          ]
+        }
+      ],
+      "inventory_type": "static",
+      "show_box_contents": false,
+      "has_swaps": false,
+      "total_content_product_packages": 12,
+      "box_reserved_inventory": null
+    },
+    {
+      "id": 1799,
+      "created_at": "2026-04-23T18:06:04.422058-04:00",
+      "updated_at": "2026-05-14T19:05:51.045278-04:00",
+      "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/sezsN.thumbnail.jpeg",
+      "inventory": null,
+      "status": "Not visible",
+      "is_subscribable": false,
+      "ownership": "MANAGED",
+      "name": "Dinner in a Box: Ground Lamb Bundle No Yogurt",
+      "description": "<p dir=\"ltr\" style=\"text-align: left;\"><span style=\"white-space: pre-wrap;\">Not sure what to make this week? Start here. This bundle is built around&nbsp;ground&nbsp;lamb&nbsp;from Deck Family Farm, paired with what's fresh right now: shiitake mushrooms, rainbow chard, beets, leeks, cabbage, potatoes, and pears. Add your&nbsp;yogurt&nbsp;and you've got a full week of dinners with no planning required.</span></p><p><br></p><p dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Lamb&nbsp;&amp; Mushroom Skillet</strong></b><span style=\"white-space: pre-wrap;\">&nbsp;Brown 1 lb&nbsp;ground&nbsp;lamb&nbsp;with sliced shiitakes and a leek. Add garlic and a big handful of rainbow chard. Season with salt, pepper, red pepper flake. Stir in raw yogurt substitute  off the heat. Serve over roasted potatoes. 25 minutes for a rich, clean meal.</span></p><p dir=\"ltr\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Lamb-Stuffed Cabbage Rolls</strong></b><span style=\"white-space: pre-wrap;\">&nbsp;Blanch cabbage leaves, fill with seasoned&nbsp;ground&nbsp;lamb&nbsp;and sautéed onion,&nbsp;arrange in baking dish and simmer in a simple tomato broth. A classic — raw cream makes a great finish on top.</span></p><p dir=\"ltr\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Pear &amp;&nbsp;Lamb&nbsp;Flatbread</strong></b><span style=\"white-space: pre-wrap;\">&nbsp;Spread raw yogurt  substitute on flatbread, add crumbled cooked&nbsp;lamb, sliced pear and beet, caramelized leeks, and your cheese pick from this week's dairy.&nbsp;Heat in the oven to melt the cheese. 15 minutes to assemble.</span></p><p style=\"text-align: start;\"><br></p><p dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">TIPS</strong></b><span style=\"white-space: pre-wrap;\">: 1. Roast the potatoes while you prepare the rest. Add some beets for variety. 2.&nbsp;Brown all the lamb at once to simplify later meal prep. 3.&nbsp;Sauté all the leeks at once so you can add them easily later.&nbsp;</span></p>",
+      "custom_id": "",
+      "internal_id": "",
+      "track_inventory": false,
+      "visible": false,
+      "inventory_warning": 0,
+      "sold_out_notification": false,
+      "orders_require_approval": false,
+      "vendor": 3148,
+      "price": 35.98,
+      "package_code": null,
+      "images": [
+        {
+          "id": 1273836,
+          "priority_order": 0,
+          "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/sezsN.thumbnail.jpeg",
+          "full": "https://localline-public-images.s3.amazonaws.com/account/322922/sezsN.png",
+          "original_filename": "1.png",
+          "product_image": 414700
+        }
+      ],
+      "tags": [],
+      "internal_tags": [
+        {
+          "id": 65112,
+          "priority_order": 5,
+          "name": "Frozen",
+          "product_internal_tag": 2245
+        }
+      ],
+      "product_price_list_entries": [
+        {
+          "id": 702594,
+          "price_list_category": null,
+          "price_list": 2966,
+          "priority_order": 1312,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 143338,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "Herd Share Members",
+          "box_package_entry": {
+            "id": 910294,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 44,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 788988,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 579983,
+              "price_list_category": 31774,
+              "priority_order": 6,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        },
+        {
+          "id": 702595,
+          "price_list_category": null,
+          "price_list": 5622,
+          "priority_order": 1313,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 143339,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "SNAP",
+          "box_package_entry": {
+            "id": 910295,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 44,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 788989,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 579984,
+              "price_list_category": 31775,
+              "priority_order": 7,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        },
+        {
+          "id": 702596,
+          "price_list_category": null,
+          "price_list": 3124,
+          "priority_order": 928,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 143340,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "Guest Basket",
+          "box_package_entry": {
+            "id": 910296,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 44,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 788990,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 579985,
+              "price_list_category": 31772,
+              "priority_order": 7,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        }
+      ],
+      "box_contents": [
+        {
+          "id": 1792,
+          "content_product_packages": [
+            {
+              "id": 20677,
+              "product_package": 526837,
+              "quantity": 3,
+              "available_inventory": 0,
+              "swaps": []
+            },
+            {
+              "id": 20678,
+              "product_package": 526940,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 20679,
+              "product_package": 526987,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 20680,
+              "product_package": 534494,
+              "quantity": 1,
+              "available_inventory": 0,
+              "swaps": []
+            },
+            {
+              "id": 20681,
+              "product_package": 535123,
+              "quantity": 2,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 20682,
+              "product_package": 588665,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 20684,
+              "product_package": 808786,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 20685,
+              "product_package": 836559,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            }
+          ]
+        }
+      ],
+      "inventory_type": "static",
+      "show_box_contents": false,
+      "has_swaps": false,
+      "total_content_product_packages": 11,
+      "box_reserved_inventory": null
+    },
+    {
+      "id": 1875,
+      "created_at": "2026-05-11T15:10:42.428260-04:00",
+      "updated_at": "2026-06-20T16:18:39.088027-04:00",
+      "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/VxvaX.thumbnail.jpeg",
+      "inventory": 0,
+      "status": "Not visible",
+      "is_subscribable": false,
+      "ownership": "MANAGED",
+      "name": "Dinner in a Box: Pork Shoulder Roast",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Ingredients:&nbsp;Pork shoulder, potatoes, salad turnips, spring onions, beets, lettuce, radish, farmer's cheese, bok choy, garlic, eggs</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Recipe 1:&nbsp;</span></p><p dir=\"ltr\" style=\"text-align: left;\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Pulled Pork Tacos</strong></b><span style=\"white-space: pre-wrap;\">&nbsp;Warm tortillas, pile on pulled pork shoulder, sliced radish, shredded lettuce, and spring onion. Add a spoonful of farmer's cheese and a squeeze of lime. Done.</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Recipe 2:&nbsp;</span></p><p dir=\"ltr\" style=\"text-align: left;\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Pork &amp; Bok Choy Soup:</strong></b><span style=\"white-space: pre-wrap;\">&nbsp;Simmer pulled pork in broth with garlic, spring onion, and sliced crimini mushrooms. Stir in a spoonful of whole grain mustard. Add bok choy in the last few minutes until just wilted. Finish with sesame oil and a soft-boiled egg.</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Recipe 3:&nbsp;</span></p><p dir=\"ltr\" style=\"text-align: left;\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Roasted Beet &amp; Pork Bowl</strong></b><span style=\"white-space: pre-wrap;\">&nbsp;Roast beets until tender, slice thin. Arrange over torn lettuce with pulled pork, sliced radish, and spring onion. Top with crumbled farmer's cheese. Dress with olive oil, vinegar, and salt.</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Recipe 4:&nbsp;</span></p><p dir=\"ltr\" style=\"text-align: left;\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Pork &amp; Potato Hash:</strong></b><span style=\"white-space: pre-wrap;\">&nbsp;Dice pulled pork shoulder. Cook with cubed potatoes, sliced crimini mushrooms, salad turnips, and spring onions in butter until golden. Season with salt and pepper. Top with a fried egg.</span></p><p style=\"text-align: left;\"><br></p><p dir=\"ltr\" style=\"text-align: left;\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">From the Full Farm CSA shop:</strong></b></p><ul class=\"lexical-text-editor--list-ul\"><li value=\"1\"><span style=\"white-space: pre-wrap;\">Pork shoulder — 1 large (3–4 lbs, covers all four meals)</span></li><li value=\"2\"><span style=\"white-space: pre-wrap;\">Crimini mushrooms — 1 lb</span></li><li value=\"3\"><span style=\"white-space: pre-wrap;\">Potatoes — 4 medium</span></li><li value=\"4\"><span style=\"white-space: pre-wrap;\">Salad turnips — 3 medium</span></li><li value=\"5\"><span style=\"white-space: pre-wrap;\">Beets — 4 medium (red or yellow or chiogga)</span></li><li value=\"6\"><span style=\"white-space: pre-wrap;\">Bok choy — 2 heads</span></li><li value=\"7\"><span style=\"white-space: pre-wrap;\"> Lettuce Mix — 1 bag</span></li><li value=\"8\"><span style=\"white-space: pre-wrap;\">Radish — 1 bunch</span></li><li value=\"9\"><span style=\"white-space: pre-wrap;\">Spring onions — 1 bunch</span></li><li value=\"10\"><span style=\"white-space: pre-wrap;\">Garlic — </span><i><em class=\"lexical-text-editor--italic\" style=\"white-space: pre-wrap;\">1/2 lb</em></i></li><li value=\"11\"><span style=\"white-space: pre-wrap;\">Farmer's cheese — 6 oz</span></li><li value=\"12\"><span style=\"white-space: pre-wrap;\">Eggs — one dozen</span></li></ul>",
+      "custom_id": "",
+      "internal_id": "",
+      "track_inventory": true,
+      "visible": false,
+      "inventory_warning": 0,
+      "sold_out_notification": false,
+      "orders_require_approval": false,
+      "vendor": 3148,
+      "price": 70.1,
+      "package_code": null,
+      "images": [
+        {
+          "id": 1302115,
+          "priority_order": 1,
+          "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/VxvaX.thumbnail.jpeg",
+          "full": "https://localline-public-images.s3.amazonaws.com/account/322922/VxvaX.png",
+          "original_filename": "Screenshot 2026-05-14 at 4.03.27PM.png",
+          "product_image": 428393
+        }
+      ],
+      "tags": [],
+      "internal_tags": [
+        {
+          "id": 65251,
+          "priority_order": 5,
+          "name": "Dairy",
+          "product_internal_tag": 2244
+        },
+        {
+          "id": 65250,
+          "priority_order": 8,
+          "name": "Frozen",
+          "product_internal_tag": 2245
+        }
+      ],
+      "product_price_list_entries": [
+        {
+          "id": 717112,
+          "price_list_category": null,
+          "price_list": 3124,
+          "priority_order": 942,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 154507,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "Guest Basket",
+          "box_package_entry": {
+            "id": 931436,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 44,
+            "max_units_per_order": 0,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 810115,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 595393,
+              "price_list_category": 31772,
+              "priority_order": 8,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        },
+        {
+          "id": 717113,
+          "price_list_category": null,
+          "price_list": 2966,
+          "priority_order": 1325,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 154508,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "Herd Share Members",
+          "box_package_entry": {
+            "id": 931437,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 44,
+            "max_units_per_order": 0,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 810116,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 595394,
+              "price_list_category": 31774,
+              "priority_order": 7,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        },
+        {
+          "id": 717114,
+          "price_list_category": null,
+          "price_list": 5622,
+          "priority_order": 1326,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 154509,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "SNAP",
+          "box_package_entry": {
+            "id": 931438,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 44,
+            "max_units_per_order": 0,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 810117,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 595395,
+              "price_list_category": 31775,
+              "priority_order": 8,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        }
+      ],
+      "box_contents": [
+        {
+          "id": 1868,
+          "content_product_packages": [
+            {
+              "id": 21735,
+              "product_package": 694991,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 21736,
+              "product_package": 526933,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 21737,
+              "product_package": 526988,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 21738,
+              "product_package": 836559,
+              "quantity": 2,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 21739,
+              "product_package": 615271,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 21741,
+              "product_package": 905380,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 21742,
+              "product_package": 526879,
+              "quantity": 1,
+              "available_inventory": 1,
+              "swaps": []
+            },
+            {
+              "id": 21743,
+              "product_package": 818332,
+              "quantity": 1,
+              "available_inventory": 5,
+              "swaps": []
+            },
+            {
+              "id": 21744,
+              "product_package": 526478,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 21745,
+              "product_package": 695001,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 21746,
+              "product_package": 534494,
+              "quantity": 2,
+              "available_inventory": 0,
+              "swaps": []
+            },
+            {
+              "id": 22056,
+              "product_package": 736582,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            }
+          ]
+        }
+      ],
+      "inventory_type": "dynamic",
+      "show_box_contents": true,
+      "has_swaps": false,
+      "total_content_product_packages": 14,
+      "box_reserved_inventory": 0
+    },
+    {
+      "id": 1890,
+      "created_at": "2026-05-14T19:08:01.590080-04:00",
+      "updated_at": "2026-06-20T16:18:40.194044-04:00",
+      "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/VxvaX.thumbnail.jpeg",
+      "inventory": 0,
+      "status": "Not visible",
+      "is_subscribable": false,
+      "ownership": "MANAGED",
+      "name": "Dinner in a Box: Pork Shoulder Roast-No Dairy",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Ingredients:&nbsp;Pork shoulder, potatoes, salad turnips, spring onions, beets, lettuce, radish, farmer's cheese, bok choy, garlic, eggs</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Recipe 1:&nbsp;</span></p><p dir=\"ltr\" style=\"text-align: left;\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Pulled Pork Tacos</strong></b><span style=\"white-space: pre-wrap;\">&nbsp;Warm tortillas, pile on pulled pork shoulder, sliced radish, shredded lettuce, and spring onion. Add a spoonful of farmer's cheese and a squeeze of lime. Done.</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Recipe 2:&nbsp;</span></p><p dir=\"ltr\" style=\"text-align: left;\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Pork &amp; Bok Choy Soup:</strong></b><span style=\"white-space: pre-wrap;\">&nbsp;Simmer pulled pork in broth with garlic, spring onion, and sliced crimini mushrooms. Stir in a spoonful of whole grain mustard. Add bok choy in the last few minutes until just wilted. Finish with sesame oil and a soft-boiled egg.</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Recipe 3:&nbsp;</span></p><p dir=\"ltr\" style=\"text-align: left;\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Roasted Beet &amp; Pork Bowl</strong></b><span style=\"white-space: pre-wrap;\">&nbsp;Roast beets until tender, slice thin. Arrange over torn lettuce with pulled pork, sliced radish, and spring onion. Top with crumbled farmer's cheese. Dress with olive oil, vinegar, and salt.</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Recipe 4:&nbsp;</span></p><p dir=\"ltr\" style=\"text-align: left;\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Pork &amp; Potato Hash:</strong></b><span style=\"white-space: pre-wrap;\">&nbsp;Dice pulled pork shoulder. Cook with cubed potatoes, sliced crimini mushrooms, salad turnips, and spring onions in butter until golden. Season with salt and pepper. Top with a fried egg.</span></p><p style=\"text-align: left;\"><br></p><p dir=\"ltr\" style=\"text-align: left;\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">From the Full Farm CSA shop:</strong></b></p><ul class=\"lexical-text-editor--list-ul\"><li value=\"1\"><span style=\"white-space: pre-wrap;\">Pork shoulder — 1 large (3–4 lbs, covers all four meals)</span></li><li value=\"2\"><span style=\"white-space: pre-wrap;\">Crimini mushrooms — 1 lb</span></li><li value=\"3\"><span style=\"white-space: pre-wrap;\">Potatoes — 4 medium</span></li><li value=\"4\"><span style=\"white-space: pre-wrap;\">Salad turnips — 3 medium</span></li><li value=\"5\"><span style=\"white-space: pre-wrap;\">Beets — 4 medium (red or yellow or chiogga)</span></li><li value=\"6\"><span style=\"white-space: pre-wrap;\">Bok choy — 2 heads</span></li><li value=\"7\"><span style=\"white-space: pre-wrap;\"> Lettuce Mix — 1 bag</span></li><li value=\"8\"><span style=\"white-space: pre-wrap;\">Radish — 1 bunch</span></li><li value=\"9\"><span style=\"white-space: pre-wrap;\">Spring onions — 1 bunch</span></li><li value=\"10\"><span style=\"white-space: pre-wrap;\">Garlic — 1/2 lb</span></li><li value=\"11\"><span style=\"white-space: pre-wrap;\">Eggs — one dozen</span></li></ul>",
+      "custom_id": "",
+      "internal_id": "",
+      "track_inventory": true,
+      "visible": false,
+      "inventory_warning": 0,
+      "sold_out_notification": false,
+      "orders_require_approval": false,
+      "vendor": 3148,
+      "price": 60.1,
+      "package_code": null,
+      "images": [
+        {
+          "id": 1302116,
+          "priority_order": 0,
+          "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/VxvaX.thumbnail.jpeg",
+          "full": "https://localline-public-images.s3.amazonaws.com/account/322922/VxvaX.png",
+          "original_filename": "Screenshot 2026-05-14 at 4.03.27PM.png",
+          "product_image": 428393
+        }
+      ],
+      "tags": [],
+      "internal_tags": [
+        {
+          "id": 65334,
+          "priority_order": 6,
+          "name": "Frozen",
+          "product_internal_tag": 2245
+        }
+      ],
+      "product_price_list_entries": [
+        {
+          "id": 721752,
+          "price_list_category": null,
+          "price_list": 3124,
+          "priority_order": 941,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 154507,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "Guest Basket",
+          "box_package_entry": {
+            "id": 936854,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 44,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 815531,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 599517,
+              "price_list_category": 31772,
+              "priority_order": 9,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        },
+        {
+          "id": 721753,
+          "price_list_category": null,
+          "price_list": 2966,
+          "priority_order": 1324,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 154508,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "Herd Share Members",
+          "box_package_entry": {
+            "id": 936855,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 44,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 815532,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 599518,
+              "price_list_category": 31774,
+              "priority_order": 8,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        },
+        {
+          "id": 721754,
+          "price_list_category": null,
+          "price_list": 5622,
+          "priority_order": 1325,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 154509,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "SNAP",
+          "box_package_entry": {
+            "id": 936856,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 44,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 815533,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 599519,
+              "price_list_category": 31775,
+              "priority_order": 9,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        }
+      ],
+      "box_contents": [
+        {
+          "id": 1883,
+          "content_product_packages": [
+            {
+              "id": 21864,
+              "product_package": 526879,
+              "quantity": 1,
+              "available_inventory": 1,
+              "swaps": []
+            },
+            {
+              "id": 21865,
+              "product_package": 526933,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 21866,
+              "product_package": 526988,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 21868,
+              "product_package": 534494,
+              "quantity": 2,
+              "available_inventory": 0,
+              "swaps": []
+            },
+            {
+              "id": 21869,
+              "product_package": 615271,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 21870,
+              "product_package": 694991,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 21871,
+              "product_package": 695001,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 21872,
+              "product_package": 818332,
+              "quantity": 1,
+              "available_inventory": 5,
+              "swaps": []
+            },
+            {
+              "id": 21873,
+              "product_package": 836559,
+              "quantity": 2,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 21874,
+              "product_package": 905380,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 22057,
+              "product_package": 736582,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            }
+          ]
+        }
+      ],
+      "inventory_type": "dynamic",
+      "show_box_contents": true,
+      "has_swaps": false,
+      "total_content_product_packages": 13,
+      "box_reserved_inventory": 0
+    },
+    {
+      "id": 2032,
+      "created_at": "2026-06-18T18:01:51.083029-04:00",
+      "updated_at": "2026-08-06T16:44:10.830385-04:00",
+      "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/5OlLK.thumbnail.jpeg",
+      "inventory": null,
+      "status": "Not visible",
+      "is_subscribable": false,
+      "ownership": "MANAGED",
+      "name": "Dinner in a Box: Roasting Chicken",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Contents: Roast Chicken, Bacon, Farmer's cheese, zucchini, kale, scallions, cabbage, lettuce greens, cilantro, carrots, new potatoes</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">**Contents MAY change if vegetables become unavailable. In that case, we will make substitutions as similar as possible.</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">For the recipes listed below, go to this </span><a href=\"https://docs.google.com/document/d/11YiSfrWp3t6-XebzqdTN6MwXUTi8nzijTohqH8jIs8c/edit?usp=sharing\" target=\"_blank\" class=\"lexical-text-editor--link\"><span style=\"white-space: pre-wrap;\">linked document.</span></a><span style=\"white-space: pre-wrap;\"> </span></p><p><br></p><ul class=\"lexical-text-editor--list-ul\"><li value=\"1\"><span style=\"white-space: pre-wrap;\">Roast Chicken: Simple herb roast chicken with potatoes &amp; carrots</span></li><li value=\"2\"><span style=\"white-space: pre-wrap;\">Soup: Leftover chicken, kale &amp; potato soup</span></li><li value=\"3\"><span style=\"white-space: pre-wrap;\">Salad: Chicken, bacon &amp; farmer's cheese salad</span></li><li value=\"4\"><span style=\"white-space: pre-wrap;\">Stir-Fry: Chicken, bacon &amp; zucchini stir-fry with cabbage</span></li><li value=\"5\"><span style=\"white-space: pre-wrap;\">Bowl: Everything-in-the-fridge chicken grain bowl</span></li><li value=\"6\"><span style=\"white-space: pre-wrap;\">Mac &amp; Cheese: Chicken, bacon &amp; zucchini wholegrain mac</span></li></ul>",
+      "custom_id": "",
+      "internal_id": "",
+      "track_inventory": false,
+      "visible": false,
+      "inventory_warning": 0,
+      "sold_out_notification": false,
+      "orders_require_approval": false,
+      "vendor": 3148,
+      "price": 65.15,
+      "package_code": null,
+      "images": [
+        {
+          "id": 1321937,
+          "priority_order": 0,
+          "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/5OlLK.thumbnail.jpeg",
+          "full": "https://localline-public-images.s3.amazonaws.com/account/322922/5OlLK.png",
+          "original_filename": "1.png",
+          "product_image": 443033
+        }
+      ],
+      "tags": [],
+      "internal_tags": [
+        {
+          "id": 67459,
+          "priority_order": 0,
+          "name": "Dairy",
+          "product_internal_tag": 2244
+        },
+        {
+          "id": 67458,
+          "priority_order": 2,
+          "name": "Frozen",
+          "product_internal_tag": 2245
+        }
+      ],
+      "product_price_list_entries": [
+        {
+          "id": 749824,
+          "price_list_category": null,
+          "price_list": 3124,
+          "priority_order": 972,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 169739,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "Guest Basket",
+          "box_package_entry": {
+            "id": 972899,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 44,
+            "max_units_per_order": 0,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 851513,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 628201,
+              "price_list_category": 31772,
+              "priority_order": 10,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        },
+        {
+          "id": 749825,
+          "price_list_category": null,
+          "price_list": 2966,
+          "priority_order": 1354,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 169740,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "Herd Share Members",
+          "box_package_entry": {
+            "id": 972900,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 44,
+            "max_units_per_order": 0,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 851514,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 628202,
+              "price_list_category": 31774,
+              "priority_order": 9,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        },
+        {
+          "id": 749826,
+          "price_list_category": null,
+          "price_list": 5622,
+          "priority_order": 1350,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 169741,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "SNAP",
+          "box_package_entry": {
+            "id": 972901,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 44,
+            "max_units_per_order": 0,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 851515,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 628203,
+              "price_list_category": 31775,
+              "priority_order": 11,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        }
+      ],
+      "box_contents": [
+        {
+          "id": 2025,
+          "content_product_packages": [
+            {
+              "id": 24738,
+              "product_package": 526778,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 24739,
+              "product_package": 526478,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 24740,
+              "product_package": 527039,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 24741,
+              "product_package": 526906,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 24743,
+              "product_package": 526985,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 24747,
+              "product_package": 958135,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 24768,
+              "product_package": 710619,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 24769,
+              "product_package": 527152,
+              "quantity": 1,
+              "available_inventory": 11,
+              "swaps": []
+            },
+            {
+              "id": 25956,
+              "product_package": 927192,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 25957,
+              "product_package": 622470,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 25958,
+              "product_package": 741595,
+              "quantity": 1,
+              "available_inventory": 0,
+              "swaps": []
+            },
+            {
+              "id": 25963,
+              "product_package": 967065,
+              "quantity": 2,
+              "available_inventory": 19.5,
+              "swaps": []
+            }
+          ]
+        }
+      ],
+      "inventory_type": "static",
+      "show_box_contents": false,
+      "has_swaps": false,
+      "total_content_product_packages": 13,
+      "box_reserved_inventory": null
+    },
+    {
+      "id": 2033,
+      "created_at": "2026-06-18T18:02:08.190319-04:00",
+      "updated_at": "2026-08-06T16:44:12.171872-04:00",
+      "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/G7AsH.thumbnail.jpeg",
+      "inventory": null,
+      "status": "Not visible",
+      "is_subscribable": false,
+      "ownership": "MANAGED",
+      "name": "Dinner in a Box: Roasting Chicken - No Dairy",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Contents: Roast Chicken, Bacon, </span><s><span class=\"lexical-text-editor--strikethrough\" style=\"white-space: pre-wrap;\">Farmer's cheese</span></s><span style=\"white-space: pre-wrap;\">, zucchini, kale, scallions, cabbage, lettuce greens, </span><s><span class=\"lexical-text-editor--strikethrough\" style=\"white-space: pre-wrap;\">red radish</span></s><span style=\"white-space: pre-wrap;\">, cilantro, carrots, new potatoes</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">**Contents MAY change if vegetables become unavailable. In that case, we will make substitutions as similar as possible.</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">For the recipes listed below, go to this </span><a href=\"https://docs.google.com/document/d/11YiSfrWp3t6-XebzqdTN6MwXUTi8nzijTohqH8jIs8c/edit?usp=sharing\" target=\"_blank\" class=\"lexical-text-editor--link\"><span style=\"white-space: pre-wrap;\">linked document.</span></a><span style=\"white-space: pre-wrap;\"> </span></p><p><br></p><ul class=\"lexical-text-editor--list-ul\"><li value=\"1\"><span style=\"white-space: pre-wrap;\">Roast Chicken: Simple herb roast chicken with potatoes &amp; carrots</span></li><li value=\"2\"><span style=\"white-space: pre-wrap;\">Soup: Leftover chicken, kale &amp; potato soup</span></li><li value=\"3\"><span style=\"white-space: pre-wrap;\">Salad: Chicken, bacon &amp; farmer's cheese salad</span></li><li value=\"4\"><span style=\"white-space: pre-wrap;\">Stir-Fry: Chicken, bacon &amp; zucchini stir-fry with cabbage</span></li><li value=\"5\"><span style=\"white-space: pre-wrap;\">Bowl: Everything-in-the-fridge chicken grain bowl</span></li><li value=\"6\"><span style=\"white-space: pre-wrap;\">Mac &amp; Cheese: Chicken, bacon &amp; zucchini wholegrain mac</span></li></ul>",
+      "custom_id": "",
+      "internal_id": "",
+      "track_inventory": false,
+      "visible": false,
+      "inventory_warning": 0,
+      "sold_out_notification": false,
+      "orders_require_approval": false,
+      "vendor": 3148,
+      "price": 55.15,
+      "package_code": null,
+      "images": [
+        {
+          "id": 1321938,
+          "priority_order": 0,
+          "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/G7AsH.thumbnail.jpeg",
+          "full": "https://localline-public-images.s3.amazonaws.com/account/322922/G7AsH.png",
+          "original_filename": "1.png",
+          "product_image": 443035
+        }
+      ],
+      "tags": [],
+      "internal_tags": [
+        {
+          "id": 67460,
+          "priority_order": 5,
+          "name": "Frozen",
+          "product_internal_tag": 2245
+        }
+      ],
+      "product_price_list_entries": [
+        {
+          "id": 749827,
+          "price_list_category": null,
+          "price_list": 3124,
+          "priority_order": 973,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 169742,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "Guest Basket",
+          "box_package_entry": {
+            "id": 972902,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 44,
+            "max_units_per_order": 0,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 851516,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 628204,
+              "price_list_category": 31772,
+              "priority_order": 11,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        },
+        {
+          "id": 749828,
+          "price_list_category": null,
+          "price_list": 2966,
+          "priority_order": 1355,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 169743,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "Herd Share Members",
+          "box_package_entry": {
+            "id": 972903,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 44,
+            "max_units_per_order": 0,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 851517,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 628205,
+              "price_list_category": 31774,
+              "priority_order": 11,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        },
+        {
+          "id": 749829,
+          "price_list_category": null,
+          "price_list": 5622,
+          "priority_order": 1351,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 169744,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "SNAP",
+          "box_package_entry": {
+            "id": 972904,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 44,
+            "max_units_per_order": 0,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 851518,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 628206,
+              "price_list_category": 31775,
+              "priority_order": 13,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        }
+      ],
+      "box_contents": [
+        {
+          "id": 2026,
+          "content_product_packages": [
+            {
+              "id": 24750,
+              "product_package": 526778,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 24752,
+              "product_package": 526906,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 24753,
+              "product_package": 526985,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 24754,
+              "product_package": 527039,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 24758,
+              "product_package": 958135,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 24770,
+              "product_package": 710619,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 24771,
+              "product_package": 527152,
+              "quantity": 1,
+              "available_inventory": 11,
+              "swaps": []
+            },
+            {
+              "id": 25959,
+              "product_package": 927192,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 25960,
+              "product_package": 622470,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 25961,
+              "product_package": 741595,
+              "quantity": 1,
+              "available_inventory": 0,
+              "swaps": []
+            },
+            {
+              "id": 25962,
+              "product_package": 967065,
+              "quantity": 2,
+              "available_inventory": 19.5,
+              "swaps": []
+            }
+          ]
+        }
+      ],
+      "inventory_type": "static",
+      "show_box_contents": false,
+      "has_swaps": false,
+      "total_content_product_packages": 12,
+      "box_reserved_inventory": null
+    },
+    {
+      "id": 2260,
+      "created_at": "2026-09-07T14:07:29.511941-04:00",
+      "updated_at": "2026-10-05T12:54:06.506373-04:00",
+      "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/Tx5wR.thumbnail.jpeg",
+      "inventory": 3,
+      "status": "Available",
+      "is_subscribable": false,
+      "ownership": "MANAGED",
+      "name": "Ground Beef & Pork Bundle",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">2 lbs of Ground Beef and 2 lbs of Ground Pork.</span></p>",
+      "custom_id": "",
+      "internal_id": "",
+      "track_inventory": true,
+      "visible": true,
+      "inventory_warning": 0,
+      "sold_out_notification": false,
+      "orders_require_approval": false,
+      "vendor": 3148,
+      "price": 26.73,
+      "package_code": null,
+      "images": [
+        {
+          "id": 1354363,
+          "priority_order": 0,
+          "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/Tx5wR.thumbnail.jpeg",
+          "full": "https://localline-public-images.s3.amazonaws.com/account/322922/Tx5wR.jpg",
+          "original_filename": "20260908_112015.jpg",
+          "product_image": 472606
+        }
+      ],
+      "tags": [],
+      "internal_tags": [
+        {
+          "id": 71384,
+          "priority_order": 1,
+          "name": "Frozen",
+          "product_internal_tag": 2245
+        }
+      ],
+      "product_price_list_entries": [
+        {
+          "id": 802829,
+          "price_list_category": null,
+          "price_list": 3124,
+          "priority_order": 1010,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 198946,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "Guest Basket",
+          "box_package_entry": {
+            "id": 1041041,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 55,
+            "max_units_per_order": 0,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 919717,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 680399,
+              "price_list_category": 31772,
+              "priority_order": 24,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        },
+        {
+          "id": 802830,
+          "price_list_category": null,
+          "price_list": 2966,
+          "priority_order": 1392,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 198947,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "Herd Share Members",
+          "box_package_entry": {
+            "id": 1041042,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 55,
+            "max_units_per_order": 0,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 919718,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 680400,
+              "price_list_category": 31774,
+              "priority_order": 23,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        },
+        {
+          "id": 802831,
+          "price_list_category": null,
+          "price_list": 5622,
+          "priority_order": 1410,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 198948,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "SNAP",
+          "box_package_entry": {
+            "id": 1041043,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 55,
+            "max_units_per_order": 0,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 919719,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 680401,
+              "price_list_category": 31775,
+              "priority_order": 24,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        }
+      ],
+      "box_contents": [
+        {
+          "id": 2253,
+          "content_product_packages": [
+            {
+              "id": 31868,
+              "product_package": 526744,
+              "quantity": 2,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 31869,
+              "product_package": 526742,
+              "quantity": 2,
+              "available_inventory": null,
+              "swaps": []
+            }
+          ]
+        }
+      ],
+      "inventory_type": "static",
+      "show_box_contents": true,
+      "has_swaps": false,
+      "total_content_product_packages": 4,
+      "box_reserved_inventory": 0
+    },
+    {
+      "id": 1244,
+      "created_at": "2025-11-17T14:48:21.604644-05:00",
+      "updated_at": "2026-09-03T13:32:39.211303-04:00",
+      "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/CcWlT.thumbnail.jpeg",
+      "inventory": null,
+      "status": "Not visible",
+      "is_subscribable": false,
+      "ownership": "MANAGED",
+      "name": "Ground Meat Bundle",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Take care of shopping for the most versatile meat products we sell with one click: Ground beef, pork and lamb. Ground meats are easy to thaw and work well in a broad range of recipes.&nbsp;Our products come from pasture‑raised animals and are tended on pastures and forests with care. And since they are ground&nbsp;from cuts of the whole animal, this product is the embodiment of nose-to-tail eating.</span></p>",
+      "custom_id": "",
+      "internal_id": "",
+      "track_inventory": false,
+      "visible": false,
+      "inventory_warning": 0,
+      "sold_out_notification": false,
+      "orders_require_approval": false,
+      "vendor": 3148,
+      "price": 33.1,
+      "package_code": null,
+      "images": [
+        {
+          "id": 1089931,
+          "priority_order": 0,
+          "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/CcWlT.thumbnail.jpeg",
+          "full": "https://localline-public-images.s3.amazonaws.com/account/322922/CcWlT.jpg",
+          "original_filename": "20251114_125409.jpg",
+          "product_image": 357554
+        }
+      ],
+      "tags": [],
+      "internal_tags": [
+        {
+          "id": 56946,
+          "priority_order": 5,
+          "name": "Frozen",
+          "product_internal_tag": 2245
+        }
+      ],
+      "product_price_list_entries": [
+        {
+          "id": 562987,
+          "price_list_category": null,
+          "price_list": 3124,
+          "priority_order": 880,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 97638,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "Guest Basket",
+          "box_package_entry": {
+            "id": 731132,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 55,
+            "max_units_per_order": 0,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 609988,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 452287,
+              "price_list_category": 31772,
+              "priority_order": 24,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        },
+        {
+          "id": 562988,
+          "price_list_category": null,
+          "price_list": 2718,
+          "priority_order": 1042,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 97639,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "CSA Members",
+          "box_package_entry": {
+            "id": 731133,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 55,
+            "max_units_per_order": 0,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 609989,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 452288,
+              "price_list_category": 31773,
+              "priority_order": 8,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        },
+        {
+          "id": 562989,
+          "price_list_category": null,
+          "price_list": 2966,
+          "priority_order": 1255,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 97640,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "Herd Share Members",
+          "box_package_entry": {
+            "id": 731134,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 55,
+            "max_units_per_order": 0,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 609990,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 452289,
+              "price_list_category": 31774,
+              "priority_order": 24,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        },
+        {
+          "id": 562990,
+          "price_list_category": null,
+          "price_list": 5622,
+          "priority_order": 1256,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 97641,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "SNAP",
+          "box_package_entry": {
+            "id": 731135,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 55,
+            "max_units_per_order": 0,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 609991,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 452290,
+              "price_list_category": 31775,
+              "priority_order": 25,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        }
+      ],
+      "box_contents": [
+        {
+          "id": 1244,
+          "content_product_packages": [
+            {
+              "id": 14311,
+              "product_package": 535123,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 14312,
+              "product_package": 526741,
+              "quantity": 2,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 14313,
+              "product_package": 526744,
+              "quantity": 2,
+              "available_inventory": null,
+              "swaps": []
+            }
+          ]
+        }
+      ],
+      "inventory_type": "static",
+      "show_box_contents": true,
+      "has_swaps": false,
+      "total_content_product_packages": 5,
+      "box_reserved_inventory": null
+    },
+    {
+      "id": 1172,
+      "created_at": "2025-10-27T14:13:17.298674-04:00",
+      "updated_at": "2026-09-03T13:32:40.668578-04:00",
+      "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/ohiYP.thumbnail.jpeg",
+      "inventory": null,
+      "status": "Not visible",
+      "is_subscribable": false,
+      "ownership": "MANAGED",
+      "name": "Hyland Processing Variety Pack",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">New! We’ve done the shopping for you so you can get to know Hyland Processing’s delicious products. These are made on-farm in our commercial kitchen using Deck Family Farm meats and fresh, local ingredients. The sausages come fresh frozen and uncooked, ready for cooking on your stove or grill.&nbsp;</span></p>",
+      "custom_id": "",
+      "internal_id": "",
+      "track_inventory": false,
+      "visible": false,
+      "inventory_warning": 0,
+      "sold_out_notification": false,
+      "orders_require_approval": false,
+      "vendor": 3148,
+      "price": 43.34,
+      "package_code": null,
+      "images": [
+        {
+          "id": 1087024,
+          "priority_order": 0,
+          "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/ohiYP.thumbnail.jpeg",
+          "full": "https://localline-public-images.s3.amazonaws.com/account/322922/ohiYP.jpg",
+          "original_filename": "20251114_121629.jpg",
+          "product_image": 356957
+        }
+      ],
+      "tags": [],
+      "internal_tags": [
+        {
+          "id": 56948,
+          "priority_order": 5,
+          "name": "Frozen",
+          "product_internal_tag": 2245
+        }
+      ],
+      "product_price_list_entries": [
+        {
+          "id": 552288,
+          "price_list_category": null,
+          "price_list": 3124,
+          "priority_order": 867,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 91681,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "Guest Basket",
+          "box_package_entry": {
+            "id": 717354,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 55,
+            "max_units_per_order": 0,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 596370,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 450108,
+              "price_list_category": 31772,
+              "priority_order": 27,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        },
+        {
+          "id": 552289,
+          "price_list_category": null,
+          "price_list": 2718,
+          "priority_order": 1030,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 91682,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "CSA Members",
+          "box_package_entry": {
+            "id": 717355,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 55,
+            "max_units_per_order": 0,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 596371,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 450109,
+              "price_list_category": 31773,
+              "priority_order": 9,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        },
+        {
+          "id": 552290,
+          "price_list_category": null,
+          "price_list": 2966,
+          "priority_order": 1242,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 91683,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "Herd Share Members",
+          "box_package_entry": {
+            "id": 717356,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 55,
+            "max_units_per_order": 0,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 596372,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 450110,
+              "price_list_category": 31774,
+              "priority_order": 436,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        },
+        {
+          "id": 552291,
+          "price_list_category": null,
+          "price_list": 5622,
+          "priority_order": 1243,
+          "taxed": false,
+          "tax_configuration": {
+            "id": 91684,
+            "enabled": false,
+            "rate_type": "api",
+            "static_rate": 0
+          },
+          "price_list_name": "SNAP",
+          "box_package_entry": {
+            "id": 717357,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 55,
+            "max_units_per_order": 0,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": 0,
+            "packagepricelistentrysubscriptionsettings": {
+              "id": 596373,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            }
+          },
+          "product_entry_category_associations": [
+            {
+              "id": 450111,
+              "price_list_category": 31775,
+              "priority_order": 436,
+              "price_list_category_name": "Specials and Bundles📦💸"
+            }
+          ],
+          "valid_for_storecredits": true
+        }
+      ],
+      "box_contents": [
+        {
+          "id": 1172,
+          "content_product_packages": [
+            {
+              "id": 13267,
+              "product_package": 659188,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 13268,
+              "product_package": 568237,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 13270,
+              "product_package": 677954,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 13271,
+              "product_package": 541754,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            },
+            {
+              "id": 13272,
+              "product_package": 795004,
+              "quantity": 1,
+              "available_inventory": null,
+              "swaps": []
+            }
+          ]
+        }
+      ],
+      "inventory_type": "static",
+      "show_box_contents": false,
+      "has_swaps": false,
+      "total_content_product_packages": 5,
+      "box_reserved_inventory": null
+    }
+  ]
+}

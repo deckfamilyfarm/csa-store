@@ -1,0 +1,504 @@
+{
+  "productId": 821118,
+  "context": {
+    "product": {
+      "id": 821118,
+      "name": "Persimmon",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">A good persimmon at its peak will taste sweet, mild, and rich. Many people have described its flavor as “honey-like.” Its texture is similar to that of an apricot and its skin is a bit tougher than an apple's.</span></p>",
+      "visible": 0,
+      "trackInventory": 1,
+      "inventory": 0,
+      "categoryId": 10,
+      "vendorId": 3171,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/McCSL.thumbnail.jpeg",
+      "createdAt": "2023-11-02T23:23:54.000Z",
+      "updatedAt": "2025-12-15T17:16:09.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Fruit 🍒🍎🫐",
+    "vendor": {
+      "id": 3171,
+      "name": "Small is Beautiful Farm",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 544095,
+        "productId": 821118,
+        "name": "ea",
+        "price": "1.50",
+        "packageCode": null,
+        "unit": "ea",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 544095,
+        "productId": 821118,
+        "localLinePackageId": 544095,
+        "liveName": "ea",
+        "livePrice": "1.50",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":821118,\"Product\":\"Persimmon\",\"Track Inventory By\":\"package\",\"Item Unit\":\"ea\",\"Charge By\":\"package\",\"Charge Unit\":\"ea\",\"Package ID\":544095,\"Package Name\":\"ea\",\"# of Items\":1,\"Package Price\":1.5,\"Inventory Type\":\"product\"},\"live\":{\"id\":544095,\"inventory_per_unit\":1,\"unit_price\":1.5,\"average_pack_weight\":0,\"package_price\":1.5,\"package_unit_price\":1.5,\"priority_order\":null,\"name\":\"ea\",\"price_list_entries\":[{\"id\":235759,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":190038,\"subscription_setting\":{\"id\":143573,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":617977,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479869,\"subscription_setting\":{\"id\":497093,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":235761,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":190040,\"subscription_setting\":{\"id\":143571,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":238588,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":192257,\"subscription_setting\":{\"id\":146126,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":821118,\"product_name\":\"Persimmon\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"ea\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2023-11-02T19:23:54.681704-04:00\",\"updated\":\"2025-12-04T17:09:11.074811-05:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 821118,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 821118,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/821118/localline/a2590d61a32fbeec283875d0.jpg"
+    ],
+    "localLineVendorId": 3171
+  },
+  "remote": {
+    "id": 821118,
+    "name": "Persimmon",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">A good persimmon at its peak will taste sweet, mild, and rich. Many people have described its flavor as “honey-like.” Its texture is similar to that of an apricot and its skin is a bit tougher than an apple's.</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-11-02T19:23:54.586097-04:00",
+    "updated": "2025-12-15T12:16:09.217385-05:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/McCSL.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 151845,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/McCSL.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/McCSL.jpg",
+        "original_filename": "persimmon.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 544095,
+        "inventory_per_unit": 1,
+        "unit_price": 1.5,
+        "average_pack_weight": 0,
+        "package_price": 1.5,
+        "package_unit_price": 1.5,
+        "priority_order": null,
+        "name": "ea",
+        "price_list_entries": [
+          {
+            "id": 235759,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 190038,
+            "subscription_setting": {
+              "id": 143573,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617977,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479869,
+            "subscription_setting": {
+              "id": 497093,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 235761,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 190040,
+            "subscription_setting": {
+              "id": 143571,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 238588,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 192257,
+            "subscription_setting": {
+              "id": 146126,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 821118,
+        "product_name": "Persimmon",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-11-02T19:23:54.681704-04:00",
+        "updated": "2025-12-04T17:09:11.074811-05:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 190038,
+        "price_list_category": 14599,
+        "price_list": 2718,
+        "priority_order": 571,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 156050,
+            "price_list_category": 14599,
+            "priority_order": 608,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 190040,
+        "price_list_category": 15063,
+        "price_list": 2966,
+        "priority_order": 767,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 156051,
+            "price_list_category": 15063,
+            "priority_order": 820,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 192257,
+        "price_list_category": 15748,
+        "price_list": 3124,
+        "priority_order": 326,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 158133,
+            "price_list_category": 15748,
+            "priority_order": 379,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479869,
+        "price_list_category": 28911,
+        "price_list": 5622,
+        "priority_order": 767,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370150,
+            "price_list_category": 28911,
+            "priority_order": 820,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3171,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3171,
+    "packages": [
+      {
+        "id": 544095,
+        "unit_price": 1.5,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 192257,
+            "calculated_value": 2.17,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1.5
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 190038,
+            "calculated_value": 2.17,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1.5
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 190040,
+            "calculated_value": 2.17,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1.5
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 479869,
+            "calculated_value": 2.17,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1.5
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:39:51.153Z",
+  "rows": [
+    {
+      "productId": 821118,
+      "product": "Persimmon",
+      "vendor": "Small is Beautiful Farm",
+      "packageId": 544095,
+      "package": "ea",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 1.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.1,
+      "localPriceAfter": 2.17,
+      "remoteBasePrice": 1.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.1,
+      "remotePriceAfter": 2.17
+    },
+    {
+      "productId": 821118,
+      "product": "Persimmon",
+      "vendor": "Small is Beautiful Farm",
+      "packageId": 544095,
+      "package": "ea",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 1.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.1,
+      "localPriceAfter": 2.17,
+      "remoteBasePrice": 1.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.1,
+      "remotePriceAfter": 2.17
+    },
+    {
+      "productId": 821118,
+      "product": "Persimmon",
+      "vendor": "Small is Beautiful Farm",
+      "packageId": 544095,
+      "package": "ea",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 1.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.1,
+      "localPriceAfter": 2.17,
+      "remoteBasePrice": 1.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.1,
+      "remotePriceAfter": 2.17
+    },
+    {
+      "productId": 821118,
+      "product": "Persimmon",
+      "vendor": "Small is Beautiful Farm",
+      "packageId": 544095,
+      "package": "ea",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 1.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.1,
+      "localPriceAfter": 2.17,
+      "remoteBasePrice": 1.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.1,
+      "remotePriceAfter": 2.17
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.949Z"
+}

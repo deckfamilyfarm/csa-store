@@ -1,0 +1,261 @@
+{
+  "data": {
+    "id": 805938,
+    "name": "Sunchokes",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">The white flesh of Sunchokes are nutty, sweet and crunchy like chestnuts when raw. Baked in their skins, they become more like potatoes with a mild taste of artichoke hearts. Sunchokes can be served raw, roasted, fried, pureed into soups, or steamed.</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Grown by: Gathering Together Farm in Philomath OR</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-08-25T10:39:58.284910-04:00",
+    "updated": "2026-10-08T16:23:46.232303-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/OiYII.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 141915,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/OiYII.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/OiYII.jpg",
+        "original_filename": "876.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "876",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 526998,
+        "inventory_per_unit": 1,
+        "unit_price": 4.1,
+        "average_pack_weight": null,
+        "package_price": 4.1,
+        "package_unit_price": 4.1,
+        "priority_order": null,
+        "name": "1 lb",
+        "price_list_entries": [
+          {
+            "id": 221504,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179108,
+            "subscription_setting": {
+              "id": 124433,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 502076,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 386727,
+            "subscription_setting": {
+              "id": 380954,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617747,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479640,
+            "subscription_setting": {
+              "id": 496863,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 207489,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 167658,
+            "subscription_setting": {
+              "id": 106666,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 805938,
+        "product_name": "Sunchokes",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "lb",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T10:39:58.295395-04:00",
+        "updated": "2026-10-08T16:23:45.654755-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 167658,
+        "price_list_category": 15105,
+        "price_list": 2718,
+        "priority_order": 344,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 137529,
+            "price_list_category": 15105,
+            "priority_order": 413,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179108,
+        "price_list_category": 15118,
+        "price_list": 2966,
+        "priority_order": 645,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 147319,
+            "price_list_category": 15118,
+            "priority_order": 718,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 386727,
+        "price_list_category": 15731,
+        "price_list": 3124,
+        "priority_order": 681,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 283817,
+            "price_list_category": 15731,
+            "priority_order": 769,
+            "price_list_category_name": "Organic Vegetables - Roots 🧅🧄 🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479640,
+        "price_list_category": 28905,
+        "price_list": 5622,
+        "priority_order": 645,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370294,
+            "price_list_category": 28905,
+            "priority_order": 718,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3168,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 805938,
+  "remoteProductId": 805938,
+  "checkedAt": "2026-10-11T17:57:45.425Z"
+}

@@ -1,0 +1,261 @@
+{
+  "data": {
+    "id": 900158,
+    "name": "Organic Blue Cornmeal",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Blue cornmeal is&nbsp;a nutritious, earthy-flavored flour from ground blue corn, rich in antioxidants (</span><a href=\"https://www.google.com/search?q=anthocyanins&amp;sca_esv=a48d1260c77b0e92&amp;rlz=1CAVNCX_enUS1049US1049&amp;sxsrf=ANbL-n45bpJmtpk3Kjboi6AYSdSxpjp7Hg%3A1769105862823&amp;ei=xmlyaeL8MZu90PEPxbL1-QQ&amp;oq=blue+cornmeal+info&amp;gs_lp=Egxnd3Mtd2l6LXNlcnAiEmJsdWUgY29ybm1lYWwgaW5mbyoCCAAyBRAhGKABMgUQIRigATIFECEYoAFI3zJQwg9Y3SJwAXgBkAEAmAFnoAHOA6oBAzMuMrgBAcgBAPgBAZgCBqACqATCAgoQABiwAxjWBBhHwgINEAAYgAQYsAMYQxiKBcICDhAAGLADGOQCGNYE2AEBwgITEC4YgAQYsAMYQxjIAxiKBdgBAcICGRAuGIAEGLADGNEDGEMYxwEYyAMYigXYAQHCAgoQABiABBhDGIoFwgIFEAAYgATCAgYQABgWGB7CAgsQABiABBiGAxiKBcICBRAAGO8FmAMAiAYBkAYRugYGCAEQARgJkgcDMy4zoAeqG7IHAzIuM7gHkATCBwcyLTIuMy4xyAdCgAgA&amp;sclient=gws-wiz-serp&amp;mstk=AUtExfB4VOrDEoBtQrpZ_ONwvnZDZOp1T_wAcAtWe0XhE31AE83OCER_Pi324u-u5T9fzjlJjBcsP78PHMuvH1Q6iRYdJjq945DPSXMpAYJQDtNf-J2MchLEm4fYe9L6giAECIgOQuY9yiEEJgzUvrvoVWp8qe8uo6tB_og2UUI8i6HTpV_fOMfIIIPgVfIwH0G4Qhszq0iD7t_oc8sKm3D2ITvCappF2pXQu6FXI7onmMptKIlkl-U1ESkYjcAMKXpRlF7Bq_ra2RRrmRPcs4TZapej&amp;csui=3&amp;ved=2ahUKEwiquO_44J-SAxUfKzQIHQGBGgEQgK4QegQIARAE\" class=\"lexical-text-editor--link\"><span style=\"white-space: pre-wrap;\">anthocyanins</span></a><span style=\"white-space: pre-wrap;\">) and protein, used by Native Americans for tortillas, breads, and mush, offering a nutty taste and vibrant color for baking, thickening, or breading, with benefits like lower glycemic impact than yellow corn. It's naturally gluten-free, adds texture, and can substitute regular cornmeal in recipes.&nbsp;</span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2024-08-15T14:49:00.671919-04:00",
+    "updated": "2026-10-08T16:28:52.667623-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/nUKKx.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 235229,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/nUKKx.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/nUKKx.jpg",
+        "original_filename": "20240820_093730.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 3,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12591,
+      "name": "bag",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12591,
+      "name": "bag",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 642174,
+        "inventory_per_unit": 1,
+        "unit_price": 10.4,
+        "average_pack_weight": 0,
+        "package_price": 10.4,
+        "package_unit_price": 10.4,
+        "priority_order": null,
+        "name": "3 lb bag",
+        "price_list_entries": [
+          {
+            "id": 424821,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 339292,
+            "subscription_setting": {
+              "id": 305108,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 618121,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 480013,
+            "subscription_setting": {
+              "id": 497237,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 424820,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 339291,
+            "subscription_setting": {
+              "id": 305110,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 424819,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 339290,
+            "subscription_setting": {
+              "id": 305109,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 3,
+        "number_of_packages_available": 3,
+        "number_of_packages_total": 3,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 3,
+        "product_package_size": 1,
+        "product_id": 900158,
+        "product_name": "Organic Blue Cornmeal",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bag",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2024-08-15T14:49:01.017618-04:00",
+        "updated": "2026-10-08T16:28:51.815024-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 339290,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 389,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440617,
+            "price_list_category": 31659,
+            "priority_order": 480,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 339291,
+        "price_list_category": 17687,
+        "price_list": 2966,
+        "priority_order": 389,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 252979,
+            "price_list_category": 17687,
+            "priority_order": 476,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 339292,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 26,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440444,
+            "price_list_category": 31655,
+            "priority_order": 151,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 480013,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 389,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 441060,
+            "price_list_category": 31666,
+            "priority_order": 479,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 3151,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 3,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 3
+  },
+  "localProductId": 900158,
+  "remoteProductId": 900158,
+  "checkedAt": "2026-10-11T17:58:06.778Z"
+}

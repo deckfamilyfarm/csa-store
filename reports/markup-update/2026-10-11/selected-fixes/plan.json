@@ -1,0 +1,242 @@
+{
+  "createdAt": "2026-10-11T17:44:18.283Z",
+  "vendors": [
+    {
+      "id": 805889,
+      "name": "Dill",
+      "beforeVendorId": 3152,
+      "beforeVendor": "Little Wings",
+      "vendorId": 3177,
+      "vendor": "Red Tail Growers",
+      "setMarkup45": false
+    },
+    {
+      "id": 1168459,
+      "name": "Garlic Dill Pickles",
+      "beforeVendorId": null,
+      "beforeVendor": "Unassigned",
+      "vendorId": 7013,
+      "vendor": "Kurzhal Family Kickin Pickles",
+      "setMarkup45": true
+    },
+    {
+      "id": 1168460,
+      "name": "Jalapeno Dill Pickles",
+      "beforeVendorId": null,
+      "beforeVendor": "Unassigned",
+      "vendorId": 7013,
+      "vendor": "Kurzhal Family Kickin Pickles",
+      "setMarkup45": true
+    },
+    {
+      "id": 1168461,
+      "name": "Garlic Dilly Beans",
+      "beforeVendorId": null,
+      "beforeVendor": "Unassigned",
+      "vendorId": 7013,
+      "vendor": "Kurzhal Family Kickin Pickles",
+      "setMarkup45": true
+    },
+    {
+      "id": 1168462,
+      "name": "Jalapeno Dill Carrots",
+      "beforeVendorId": null,
+      "beforeVendor": "Unassigned",
+      "vendorId": 7013,
+      "vendor": "Kurzhal Family Kickin Pickles",
+      "setMarkup45": true
+    },
+    {
+      "id": 1168463,
+      "name": "Ghost Pepper Black Bean and Corn Salsa",
+      "beforeVendorId": null,
+      "beforeVendor": "Unassigned",
+      "vendorId": 7013,
+      "vendor": "Kurzhal Family Kickin Pickles",
+      "setMarkup45": true
+    }
+  ],
+  "sales": [
+    {
+      "id": 805855,
+      "name": "Paste Tomatoes",
+      "vendor": 3149,
+      "packages": [
+        {
+          "id": 526913,
+          "base": 2.5,
+          "entries": [
+            {
+              "list": 2966,
+              "adjustment": true,
+              "type": 2,
+              "value": 40,
+              "onSale": true,
+              "strike": 4.52
+            },
+            {
+              "list": 3124,
+              "adjustment": true,
+              "type": 2,
+              "value": 40,
+              "onSale": true,
+              "strike": 5.03
+            },
+            {
+              "list": 2718,
+              "adjustment": true,
+              "type": 2,
+              "value": 40,
+              "onSale": true,
+              "strike": 4.52
+            },
+            {
+              "list": 5622,
+              "adjustment": true,
+              "type": 2,
+              "value": 40,
+              "onSale": true,
+              "strike": 4.52
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 805986,
+      "name": "Red Slicer Tomatoes",
+      "vendor": 3149,
+      "packages": [
+        {
+          "id": 527045,
+          "base": 2.2,
+          "entries": [
+            {
+              "list": 5622,
+              "adjustment": true,
+              "type": 2,
+              "value": 40,
+              "onSale": true,
+              "strike": 4.52
+            },
+            {
+              "list": 2966,
+              "adjustment": true,
+              "type": 2,
+              "value": 40,
+              "onSale": true,
+              "strike": 4.52
+            },
+            {
+              "list": 2718,
+              "adjustment": true,
+              "type": 2,
+              "value": 40,
+              "onSale": true,
+              "strike": 4.52
+            },
+            {
+              "list": 3124,
+              "adjustment": true,
+              "type": 2,
+              "value": 40,
+              "onSale": true,
+              "strike": 5.03
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 978368,
+      "name": "Grazier's Salad Mix",
+      "vendor": 3149,
+      "packages": [
+        {
+          "id": 745074,
+          "base": 4,
+          "entries": [
+            {
+              "list": 2966,
+              "adjustment": true,
+              "type": 2,
+              "value": 40,
+              "onSale": true,
+              "strike": 5.32
+            },
+            {
+              "list": 3124,
+              "adjustment": true,
+              "type": 2,
+              "value": 40,
+              "onSale": false,
+              "strike": null
+            },
+            {
+              "list": 2718,
+              "adjustment": true,
+              "type": 2,
+              "value": 40,
+              "onSale": false,
+              "strike": null
+            },
+            {
+              "list": 5622,
+              "adjustment": true,
+              "type": 2,
+              "value": 40,
+              "onSale": false,
+              "strike": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 1000029,
+      "name": "Heirloom Tomatoes",
+      "vendor": 3149,
+      "packages": [
+        {
+          "id": 777061,
+          "base": 3.25,
+          "entries": [
+            {
+              "list": 3124,
+              "adjustment": true,
+              "type": 2,
+              "value": 40,
+              "onSale": true,
+              "strike": 6.66
+            },
+            {
+              "list": 5622,
+              "adjustment": true,
+              "type": 2,
+              "value": 40,
+              "onSale": true,
+              "strike": 5.99
+            },
+            {
+              "list": 2966,
+              "adjustment": true,
+              "type": 2,
+              "value": 40,
+              "onSale": true,
+              "strike": 5.99
+            },
+            {
+              "list": 2718,
+              "adjustment": true,
+              "type": 2,
+              "value": 40,
+              "onSale": true,
+              "strike": 5.99
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "localOnly": true
+}

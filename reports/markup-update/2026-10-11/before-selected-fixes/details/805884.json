@@ -1,0 +1,261 @@
+{
+  "data": {
+    "id": 805884,
+    "name": "Delfino Cilantro",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Delfino cilantro, also known as&nbsp;</span><a href=\"https://www.google.com/search?sca_esv=312756044e0986bb&amp;rlz=1CAVNCX_enUS1049US1049&amp;sxsrf=AE3TifOsBv6pymvJtcBVKkg2S2KGG1RbeA%3A1750095180930&amp;q=Confetti+Cilantro&amp;sa=X&amp;ved=2ahUKEwilntTMvPaNAxVJIjQIHRQQO6oQxccNegQIIBAB&amp;mstk=AUtExfA7MFyTZY7kZfkeHqQ7ugKbi2_9YL7PKRHZoiLUIJ73UqYSljQzg99Prpof6cvQ4HnLIWtv6k5bz_jkLA2Vbkyc6QnvqmXYzL2h-TCWCqWMZdUgWtDXAyiMnXagrxkae5qHhmJ9bvz1QWBZKtbCQHKzp0V_auPd2Sjs1Z2GoFImi5zXV23HzMdDiRsZ2sK7V_C-kQ87BUPuPLjzYnrOHFCcVMuVzbImuZFq2o11_ghtytDcYZZ2w763n0GgnwwxoEhtTBQPcru37FHSy0Uo3kMS&amp;csui=3\" target=\"_blank\" class=\"lexical-text-editor--link\"><span style=\"white-space: pre-wrap;\">Confetti Cilantro</span></a><span style=\"white-space: pre-wrap;\">,&nbsp;is&nbsp;a unique variety of cilantro known for its finely cut, fern-like leaves that resemble dill or carrot tops.&nbsp;It offers a more delicate and subtle flavor compared to traditional cilantro, making it suitable for garnishing and infusing.&nbsp;This variety is also known for its slow-bolting characteristics, meaning it takes longer to flower and produce seeds, extending the harvest window</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-08-25T10:39:57.174844-04:00",
+    "updated": "2026-10-08T16:23:03.812744-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/FdARp.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 310934,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/FdARp.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/FdARp.jpeg",
+        "original_filename": "download.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "6895",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 526942,
+        "inventory_per_unit": 1,
+        "unit_price": 2,
+        "average_pack_weight": null,
+        "package_price": 2,
+        "package_unit_price": 2,
+        "priority_order": null,
+        "name": "each",
+        "price_list_entries": [
+          {
+            "id": 221614,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179217,
+            "subscription_setting": {
+              "id": 124040,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 207608,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 167780,
+            "subscription_setting": {
+              "id": 106784,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617815,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479708,
+            "subscription_setting": {
+              "id": 496931,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 245220,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 197565,
+            "subscription_setting": {
+              "id": 153350,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 805884,
+        "product_name": "Delfino Cilantro",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bu",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T10:39:57.184815-04:00",
+        "updated": "2026-10-08T16:23:03.278939-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 167780,
+        "price_list_category": 15109,
+        "price_list": 2718,
+        "priority_order": 202,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 137646,
+            "price_list_category": 15109,
+            "priority_order": 217,
+            "price_list_category_name": "Organic Vegetables - Herbs🌿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179217,
+        "price_list_category": 15124,
+        "price_list": 2966,
+        "priority_order": 226,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 147427,
+            "price_list_category": 15124,
+            "priority_order": 240,
+            "price_list_category_name": "Organic Vegetables - Herbs🌿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 197565,
+        "price_list_category": 15736,
+        "price_list": 3124,
+        "priority_order": 363,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 163077,
+            "price_list_category": 15736,
+            "priority_order": 379,
+            "price_list_category_name": "Organic Vegetables - Herbs 🌿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479708,
+        "price_list_category": 28897,
+        "price_list": 5622,
+        "priority_order": 226,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370196,
+            "price_list_category": 28897,
+            "priority_order": 241,
+            "price_list_category_name": "Organic Vegetables - Herbs🌿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3177,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 805884,
+  "remoteProductId": 805884,
+  "checkedAt": "2026-10-11T17:26:41.558Z"
+}

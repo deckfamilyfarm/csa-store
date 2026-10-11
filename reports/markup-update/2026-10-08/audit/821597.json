@@ -1,0 +1,504 @@
+{
+  "productId": 821597,
+  "context": {
+    "product": {
+      "id": 821597,
+      "name": "Chai Cider",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">This fall-themed brew is made with Oregon apples, Blue Lotus Chai spice, and Singing Dog vanilla.</span></p>",
+      "visible": 0,
+      "trackInventory": 1,
+      "inventory": 0,
+      "categoryId": 18,
+      "vendorId": 3178,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/KwNMp.thumbnail.jpeg",
+      "createdAt": "2023-11-06T21:33:08.000Z",
+      "updatedAt": "2026-09-18T10:40:23.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Beverages 🍶🥤  and Snacks 🍿",
+    "vendor": {
+      "id": 3178,
+      "name": "BNF Kombucha and Jun",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 544654,
+        "productId": 821597,
+        "name": "16 0z",
+        "price": "3.34",
+        "packageCode": null,
+        "unit": "ea",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": null
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 544654,
+        "productId": 821597,
+        "localLinePackageId": 544654,
+        "liveName": "16 0z",
+        "livePrice": "3.34",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":821597,\"Product\":\"Chai Cider\",\"Track Inventory By\":\"package\",\"Item Unit\":\"ea\",\"Charge By\":\"package\",\"Charge Unit\":\"ea\",\"Package ID\":544654,\"Package Name\":\"16 0z\",\"# of Items\":1,\"Package Price\":3.34,\"Inventory Type\":\"product\"},\"live\":{\"id\":544654,\"inventory_per_unit\":1,\"unit_price\":3.34,\"average_pack_weight\":0,\"package_price\":3.34,\"package_unit_price\":3.34,\"priority_order\":1,\"name\":\"16 0z\",\"price_list_entries\":[{\"id\":246790,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":198765,\"subscription_setting\":{\"id\":154794,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":617990,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479882,\"subscription_setting\":{\"id\":497106,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":246789,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":198764,\"subscription_setting\":{\"id\":154795,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":246791,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":198766,\"subscription_setting\":{\"id\":154793,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":821597,\"product_name\":\"Chai Cider\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"ea\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2023-11-06T16:33:08.975301-05:00\",\"updated\":\"2025-10-20T12:53:45.016149-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 821597,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 821597,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/821597/localline/fedb3be0cc515d95a265ef65.jpg"
+    ],
+    "localLineVendorId": 3178
+  },
+  "remote": {
+    "id": 821597,
+    "name": "Chai Cider",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">This fall-themed brew is made with Oregon apples, Blue Lotus Chai spice, and Singing Dog vanilla.</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-11-06T16:33:08.957201-05:00",
+    "updated": "2026-09-17T13:20:23.792249-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/KwNMp.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 350497,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/KwNMp.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/KwNMp.jpeg",
+        "original_filename": "download.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 544654,
+        "inventory_per_unit": 1,
+        "unit_price": 3.34,
+        "average_pack_weight": 0,
+        "package_price": 3.34,
+        "package_unit_price": 3.34,
+        "priority_order": 1,
+        "name": "16 0z",
+        "price_list_entries": [
+          {
+            "id": 246790,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 198765,
+            "subscription_setting": {
+              "id": 154794,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617990,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479882,
+            "subscription_setting": {
+              "id": 497106,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 246789,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 198764,
+            "subscription_setting": {
+              "id": 154795,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 246791,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 198766,
+            "subscription_setting": {
+              "id": 154793,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 821597,
+        "product_name": "Chai Cider",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-11-06T16:33:08.975301-05:00",
+        "updated": "2025-10-20T12:53:45.016149-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 198764,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 399,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440607,
+            "price_list_category": 31657,
+            "priority_order": 5,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 198765,
+        "price_list_category": 17687,
+        "price_list": 2966,
+        "priority_order": 399,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440852,
+            "price_list_category": 31662,
+            "priority_order": 7,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 198766,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 34,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440421,
+            "price_list_category": 31656,
+            "priority_order": 7,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479882,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 399,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 441049,
+            "price_list_category": 31665,
+            "priority_order": 7,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3178,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3178,
+    "packages": [
+      {
+        "id": 544654,
+        "unit_price": 3.34,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 198766,
+            "calculated_value": 4.84,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 3.34
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 198764,
+            "calculated_value": 4.84,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 3.34
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 198765,
+            "calculated_value": 4.84,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 3.34
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 479882,
+            "calculated_value": 4.84,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 3.34
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:39:50.169Z",
+  "rows": [
+    {
+      "productId": 821597,
+      "product": "Chai Cider",
+      "vendor": "BNF Kombucha and Jun",
+      "packageId": 544654,
+      "package": "16 0z",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 3.34,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 4.68,
+      "localPriceAfter": 4.84,
+      "remoteBasePrice": 3.34,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 4.68,
+      "remotePriceAfter": 4.84
+    },
+    {
+      "productId": 821597,
+      "product": "Chai Cider",
+      "vendor": "BNF Kombucha and Jun",
+      "packageId": 544654,
+      "package": "16 0z",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 3.34,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 4.68,
+      "localPriceAfter": 4.84,
+      "remoteBasePrice": 3.34,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 4.68,
+      "remotePriceAfter": 4.84
+    },
+    {
+      "productId": 821597,
+      "product": "Chai Cider",
+      "vendor": "BNF Kombucha and Jun",
+      "packageId": 544654,
+      "package": "16 0z",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 3.34,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 4.68,
+      "localPriceAfter": 4.84,
+      "remoteBasePrice": 3.34,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 4.68,
+      "remotePriceAfter": 4.84
+    },
+    {
+      "productId": 821597,
+      "product": "Chai Cider",
+      "vendor": "BNF Kombucha and Jun",
+      "packageId": 544654,
+      "package": "16 0z",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 3.34,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 4.68,
+      "localPriceAfter": 4.84,
+      "remoteBasePrice": 3.34,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 4.68,
+      "remotePriceAfter": 4.84
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.949Z"
+}

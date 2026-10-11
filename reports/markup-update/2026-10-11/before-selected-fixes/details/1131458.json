@@ -1,0 +1,276 @@
+{
+  "data": {
+    "id": 1131458,
+    "name": "Rainer Cherries (WA)",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Rainier cherries area premium, golden-yellow cherry with a pink-red blush, prized as the \"champagne of cherries\". Developed at Washington State University, they boast an exceptionally sweet, floral flavor and high sugar content. Because their delicate skin bruises easily, they are harder to grow and feature a very short, fleeting season.</span></p><p dir=\"ltr\"><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">1.5 lb bags from Blue Eyed Fox in WA</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2026-06-11T15:41:45.112864-04:00",
+    "updated": "2026-10-08T16:34:39.632315-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/4uWro.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 439135,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/4uWro.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/4uWro.jpeg",
+        "original_filename": "download.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12591,
+      "name": "bag",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12591,
+      "name": "bag",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 965791,
+        "inventory_per_unit": 1,
+        "unit_price": 12.85,
+        "average_pack_weight": 0,
+        "package_price": 12.85,
+        "package_unit_price": 12.85,
+        "priority_order": null,
+        "name": "1.5 lb. bag",
+        "price_list_entries": [
+          {
+            "id": 964375,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 743362,
+            "subscription_setting": {
+              "id": 842974,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 964376,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 743363,
+            "subscription_setting": {
+              "id": 842975,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 964374,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 743361,
+            "subscription_setting": {
+              "id": 842973,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 964373,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 743360,
+            "subscription_setting": {
+              "id": 842972,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": null,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 1131458,
+        "product_name": "Rainer Cherries (WA)",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bag",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-06-11T15:41:45.590924-04:00",
+        "updated": "2026-10-08T16:34:38.916200-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 743360,
+        "price_list_category": 14599,
+        "price_list": 2718,
+        "priority_order": 1109,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 621130,
+            "price_list_category": 14599,
+            "priority_order": 6,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 743361,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 961,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 621131,
+            "price_list_category": 15748,
+            "priority_order": 21,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": {
+          "id": 165889,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 743362,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1343,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 621132,
+            "price_list_category": 15063,
+            "priority_order": 21,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": {
+          "id": 165890,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 743363,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1339,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 621133,
+            "price_list_category": 28911,
+            "priority_order": 21,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": {
+          "id": 165891,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3168,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 1131458,
+  "remoteProductId": 1131458,
+  "checkedAt": "2026-10-11T17:27:29.426Z"
+}

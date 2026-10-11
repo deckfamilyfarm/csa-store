@@ -1,0 +1,504 @@
+{
+  "productId": 805832,
+  "context": {
+    "product": {
+      "id": 805832,
+      "name": "Spinach  1/2 Lb.",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Full of vitamins and minerals- vitamin E and magnesium. Raw spinach has a mild, sweet flavor when raw, when cooked the flavors become more robust and acidic. </span></p><p><br></p>",
+      "visible": 0,
+      "trackInventory": 1,
+      "inventory": 0,
+      "categoryId": 14,
+      "vendorId": 3171,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/cctjt.thumbnail.jpeg",
+      "createdAt": "2023-08-25T14:39:56.000Z",
+      "updatedAt": "2026-07-03T19:41:35.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Vegetables - Leafy Greens 🥬",
+    "vendor": {
+      "id": 3171,
+      "name": "Small is Beautiful Farm",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 526889,
+        "productId": 805832,
+        "name": "each",
+        "price": "4.00",
+        "packageCode": null,
+        "unit": "bag",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": null
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 526889,
+        "productId": 805832,
+        "localLinePackageId": 526889,
+        "liveName": "each",
+        "livePrice": "4.00",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":805832,\"Product\":\"Spinach  1/2 Lb.\",\"Track Inventory By\":\"package\",\"Item Unit\":\"bag\",\"Charge By\":\"package\",\"Charge Unit\":\"bag\",\"Package ID\":526889,\"Package Name\":\"each\",\"# of Items\":1,\"Package Price\":4,\"Inventory Type\":\"product\"},\"live\":{\"id\":526889,\"inventory_per_unit\":1,\"unit_price\":4,\"average_pack_weight\":null,\"package_price\":4,\"package_unit_price\":4,\"priority_order\":null,\"name\":\"each\",\"price_list_entries\":[{\"id\":238345,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":192017,\"subscription_setting\":{\"id\":146031,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":207567,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":167739,\"subscription_setting\":{\"id\":106741,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":617787,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479680,\"subscription_setting\":{\"id\":496903,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":221575,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":179178,\"subscription_setting\":{\"id\":124068,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":805832,\"product_name\":\"Spinach  1/2 Lb.\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"bag\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2023-08-25T10:39:56.142105-04:00\",\"updated\":\"2026-03-16T12:38:35.414378-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 805832,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 805832,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/805832/localline/10b2aa405b3f459199e2454b.jpg"
+    ],
+    "localLineVendorId": 3171
+  },
+  "remote": {
+    "id": 805832,
+    "name": "Spinach  1/2 Lb.",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Full of vitamins and minerals- vitamin E and magnesium. Raw spinach has a mild, sweet flavor when raw, when cooked the flavors become more robust and acidic. </span></p><p><br></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-08-25T10:39:56.128657-04:00",
+    "updated": "2026-04-23T14:31:07.247465-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/cctjt.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 141486,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/cctjt.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/cctjt.jpg",
+        "original_filename": "858.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12591,
+      "name": "bag",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12591,
+      "name": "bag",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 526889,
+        "inventory_per_unit": 1,
+        "unit_price": 4,
+        "average_pack_weight": null,
+        "package_price": 4,
+        "package_unit_price": 4,
+        "priority_order": null,
+        "name": "each",
+        "price_list_entries": [
+          {
+            "id": 238345,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 192017,
+            "subscription_setting": {
+              "id": 146031,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 207567,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 167739,
+            "subscription_setting": {
+              "id": 106741,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617787,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479680,
+            "subscription_setting": {
+              "id": 496903,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 221575,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179178,
+            "subscription_setting": {
+              "id": 124068,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 805832,
+        "product_name": "Spinach  1/2 Lb.",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bag",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T10:39:56.142105-04:00",
+        "updated": "2026-03-16T12:38:35.414378-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 167739,
+        "price_list_category": 15107,
+        "price_list": 2718,
+        "priority_order": 337,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 137605,
+            "price_list_category": 15107,
+            "priority_order": 371,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179178,
+        "price_list_category": 15119,
+        "price_list": 2966,
+        "priority_order": 561,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 147388,
+            "price_list_category": 15119,
+            "priority_order": 597,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 192017,
+        "price_list_category": 15732,
+        "price_list": 3124,
+        "priority_order": 81,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 157899,
+            "price_list_category": 15732,
+            "priority_order": 121,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479680,
+        "price_list_category": 28913,
+        "price_list": 5622,
+        "priority_order": 561,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370243,
+            "price_list_category": 28913,
+            "priority_order": 598,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3171,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3171,
+    "packages": [
+      {
+        "id": 526889,
+        "unit_price": 4,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 192017,
+            "calculated_value": 5.8,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 4
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 167739,
+            "calculated_value": 5.8,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 4
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 179178,
+            "calculated_value": 5.8,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 4
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 479680,
+            "calculated_value": 5.8,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 4
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:38:36.298Z",
+  "rows": [
+    {
+      "productId": 805832,
+      "product": "Spinach  1/2 Lb.",
+      "vendor": "Small is Beautiful Farm",
+      "packageId": 526889,
+      "package": "each",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 4,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 5.6,
+      "localPriceAfter": 5.8,
+      "remoteBasePrice": 4,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 5.6,
+      "remotePriceAfter": 5.8
+    },
+    {
+      "productId": 805832,
+      "product": "Spinach  1/2 Lb.",
+      "vendor": "Small is Beautiful Farm",
+      "packageId": 526889,
+      "package": "each",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 4,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 5.6,
+      "localPriceAfter": 5.8,
+      "remoteBasePrice": 4,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 5.6,
+      "remotePriceAfter": 5.8
+    },
+    {
+      "productId": 805832,
+      "product": "Spinach  1/2 Lb.",
+      "vendor": "Small is Beautiful Farm",
+      "packageId": 526889,
+      "package": "each",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 4,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 5.6,
+      "localPriceAfter": 5.8,
+      "remoteBasePrice": 4,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 5.6,
+      "remotePriceAfter": 5.8
+    },
+    {
+      "productId": 805832,
+      "product": "Spinach  1/2 Lb.",
+      "vendor": "Small is Beautiful Farm",
+      "packageId": 526889,
+      "package": "each",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 4,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 5.6,
+      "localPriceAfter": 5.8,
+      "remoteBasePrice": 4,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 5.6,
+      "remotePriceAfter": 5.8
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.884Z"
+}

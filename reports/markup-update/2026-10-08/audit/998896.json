@@ -1,0 +1,524 @@
+{
+  "productId": 998896,
+  "context": {
+    "product": {
+      "id": 998896,
+      "name": "Satsuma plums",
+      "description": "<p>Satsuma plums are a variety of Japanese plum with a semi-clingstone texture and a rich, sweet flavor with a hint of tartness</p>",
+      "visible": 0,
+      "trackInventory": 1,
+      "inventory": 0,
+      "categoryId": 10,
+      "vendorId": 3171,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/tOWZt.thumbnail.jpeg",
+      "createdAt": "2025-08-11T18:14:42.000Z",
+      "updatedAt": "2025-08-14T17:30:17.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Fruit 🍒🍎🫐",
+    "vendor": {
+      "id": 3171,
+      "name": "Small is Beautiful Farm",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 775170,
+        "productId": 998896,
+        "name": "pt",
+        "price": "4.00",
+        "packageCode": null,
+        "unit": "doz",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 775170,
+        "productId": 998896,
+        "localLinePackageId": 775170,
+        "liveName": "pt",
+        "livePrice": "4.00",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":998896,\"Product\":\"Satsuma plums\",\"Track Inventory By\":\"package\",\"Item Unit\":\"doz\",\"Charge By\":\"package\",\"Charge Unit\":\"doz\",\"Package ID\":775170,\"Package Name\":\"pt\",\"# of Items\":1,\"Package Price\":4,\"Inventory Type\":\"product\"},\"live\":{\"id\":775170,\"inventory_per_unit\":1,\"unit_price\":4,\"average_pack_weight\":0,\"package_price\":4,\"package_unit_price\":4,\"priority_order\":null,\"name\":\"pt\",\"price_list_entries\":[{\"id\":667742,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":518055,\"subscription_setting\":{\"id\":546824,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":667743,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":518056,\"subscription_setting\":{\"id\":546825,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":667745,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":518058,\"subscription_setting\":{\"id\":546827,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":667744,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":518057,\"subscription_setting\":{\"id\":546826,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":998896,\"product_name\":\"Satsuma plums\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"doz\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2025-08-11T14:14:43.279991-04:00\",\"updated\":\"2025-08-11T14:14:43.358305-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 998896,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 998896,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/998896/localline/4ac93ecf5ec2719ba1fc1b01.jpg"
+    ],
+    "localLineVendorId": 3171
+  },
+  "remote": {
+    "id": 998896,
+    "name": "Satsuma plums",
+    "description": "<p>Satsuma plums are a variety of Japanese plum with a semi-clingstone texture and a rich, sweet flavor with a hint of tartness</p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2025-08-11T14:14:42.429028-04:00",
+    "updated": "2025-08-14T13:30:17.573633-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/tOWZt.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 332060,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/tOWZt.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/tOWZt.jpeg",
+        "original_filename": "account/322922/I9op2.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12596,
+      "name": "doz",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12596,
+      "name": "doz",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 775170,
+        "inventory_per_unit": 1,
+        "unit_price": 4,
+        "average_pack_weight": 0,
+        "package_price": 4,
+        "package_unit_price": 4,
+        "priority_order": null,
+        "name": "pt",
+        "price_list_entries": [
+          {
+            "id": 667742,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 518055,
+            "subscription_setting": {
+              "id": 546824,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 667743,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 518056,
+            "subscription_setting": {
+              "id": 546825,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 667745,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 518058,
+            "subscription_setting": {
+              "id": 546827,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 667744,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 518057,
+            "subscription_setting": {
+              "id": 546826,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 998896,
+        "product_name": "Satsuma plums",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "doz",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-08-11T14:14:43.279991-04:00",
+        "updated": "2025-08-11T14:14:43.358305-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 518055,
+        "price_list_category": 14599,
+        "price_list": 2718,
+        "priority_order": 989,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 407587,
+            "price_list_category": 14599,
+            "priority_order": 27,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": {
+          "id": 68492,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 518056,
+        "price_list_category": 15063,
+        "price_list": 2966,
+        "priority_order": 1198,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 407588,
+            "price_list_category": 15063,
+            "priority_order": 43,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": {
+          "id": 68493,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 518057,
+        "price_list_category": 15748,
+        "price_list": 3124,
+        "priority_order": 825,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 407589,
+            "price_list_category": 15748,
+            "priority_order": 42,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": {
+          "id": 68494,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 518058,
+        "price_list_category": 28911,
+        "price_list": 5622,
+        "priority_order": 1199,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 407590,
+            "price_list_category": 28911,
+            "priority_order": 38,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": {
+          "id": 68495,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3171,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3171,
+    "packages": [
+      {
+        "id": 775170,
+        "unit_price": 4,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 518057,
+            "calculated_value": 5.8,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 4
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 518055,
+            "calculated_value": 5.8,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 4
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 518056,
+            "calculated_value": 5.8,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 4
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 518058,
+            "calculated_value": 5.8,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 4
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:41:01.612Z",
+  "rows": [
+    {
+      "productId": 998896,
+      "product": "Satsuma plums",
+      "vendor": "Small is Beautiful Farm",
+      "packageId": 775170,
+      "package": "pt",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 4,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 5.6,
+      "localPriceAfter": 5.8,
+      "remoteBasePrice": 4,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 5.6,
+      "remotePriceAfter": 5.8
+    },
+    {
+      "productId": 998896,
+      "product": "Satsuma plums",
+      "vendor": "Small is Beautiful Farm",
+      "packageId": 775170,
+      "package": "pt",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 4,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 5.6,
+      "localPriceAfter": 5.8,
+      "remoteBasePrice": 4,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 5.6,
+      "remotePriceAfter": 5.8
+    },
+    {
+      "productId": 998896,
+      "product": "Satsuma plums",
+      "vendor": "Small is Beautiful Farm",
+      "packageId": 775170,
+      "package": "pt",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 4,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 5.6,
+      "localPriceAfter": 5.8,
+      "remoteBasePrice": 4,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 5.6,
+      "remotePriceAfter": 5.8
+    },
+    {
+      "productId": 998896,
+      "product": "Satsuma plums",
+      "vendor": "Small is Beautiful Farm",
+      "packageId": 775170,
+      "package": "pt",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 4,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 5.6,
+      "localPriceAfter": 5.8,
+      "remoteBasePrice": 4,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 5.6,
+      "remotePriceAfter": 5.8
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:41.009Z"
+}

@@ -1,0 +1,448 @@
+{
+  "productId": 1018192,
+  "context": {
+    "product": {
+      "id": 1018192,
+      "name": "Yellow Onion",
+      "description": "<p></p>",
+      "visible": 1,
+      "trackInventory": 0,
+      "inventory": 0,
+      "categoryId": 13,
+      "vendorId": 3171,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/AZ8rC.thumbnail.jpeg",
+      "createdAt": "2025-10-28T20:37:46.000Z",
+      "updatedAt": "2026-09-08T10:40:24.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Vegetables - Roots🧅🧄🥕🥔",
+    "vendor": {
+      "id": 3171,
+      "name": "Small is Beautiful Farm",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 803748,
+        "productId": 1018192,
+        "name": "1lb",
+        "price": "1.50",
+        "packageCode": null,
+        "unit": "lb",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 1,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 803748,
+        "productId": 1018192,
+        "localLinePackageId": 803748,
+        "liveName": "1lb",
+        "livePrice": "1.50",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":1018192,\"Product\":\"Yellow Onion\",\"Track Inventory By\":\"package\",\"Item Unit\":\"lb\",\"Charge By\":\"package\",\"Charge Unit\":\"lb\",\"Package ID\":803748,\"Package Name\":\"1lb\",\"# of Items\":1,\"Package Price\":1.5,\"Inventory Type\":\"product\"},\"live\":{\"id\":803748,\"inventory_per_unit\":1,\"unit_price\":1.5,\"average_pack_weight\":0,\"package_price\":1.5,\"package_unit_price\":1.5,\"priority_order\":null,\"name\":\"1lb\",\"price_list_entries\":[{\"id\":718003,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":552849,\"subscription_setting\":{\"id\":597019,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":718000,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":552848,\"subscription_setting\":{\"id\":597016,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":718002,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":552851,\"subscription_setting\":{\"id\":597018,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":718001,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":552850,\"subscription_setting\":{\"id\":597017,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":1018192,\"product_name\":\"Yellow Onion\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"lb\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2025-10-28T16:37:46.581911-04:00\",\"updated\":\"2026-09-07T14:32:42.035159-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 1018192,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 1018192,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/1018192/localline/541fc4ac73d24c8f76749e15.jpg"
+    ],
+    "localLineVendorId": 3171
+  },
+  "remote": {
+    "id": 1018192,
+    "name": "Yellow Onion",
+    "description": "<p></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2025-10-28T16:37:46.325773-04:00",
+    "updated": "2026-09-07T14:32:52.480979-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/AZ8rC.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 352483,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/AZ8rC.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/AZ8rC.jpeg",
+        "original_filename": "account/322922/PhZyQ.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 803748,
+        "inventory_per_unit": 1,
+        "unit_price": 1.5,
+        "average_pack_weight": 0,
+        "package_price": 1.5,
+        "package_unit_price": 1.5,
+        "priority_order": null,
+        "name": "1lb",
+        "price_list_entries": [
+          {
+            "id": 718003,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 552849,
+            "subscription_setting": {
+              "id": 597019,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 718000,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 552848,
+            "subscription_setting": {
+              "id": 597016,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 718002,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 552851,
+            "subscription_setting": {
+              "id": 597018,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 718001,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 552850,
+            "subscription_setting": {
+              "id": 597017,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 1018192,
+        "product_name": "Yellow Onion",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "lb",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-10-28T16:37:46.581911-04:00",
+        "updated": "2026-09-07T14:32:42.035159-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 552848,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 1033,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 443035,
+            "price_list_category": 15105,
+            "priority_order": 26,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 92226,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 552849,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1245,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 443036,
+            "price_list_category": 15118,
+            "priority_order": 28,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 92227,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 552850,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 870,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 443037,
+            "price_list_category": 15731,
+            "priority_order": 29,
+            "price_list_category_name": "Organic Vegetables - Roots 🧅🧄 🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 92228,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 552851,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1246,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 443038,
+            "price_list_category": 28905,
+            "priority_order": 28,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 92229,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not tracked",
+    "is_deleted": false,
+    "vendor": 3177,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": null,
+  "problems": [
+    "Local Line vendor differs from the saved local vendor"
+  ],
+  "status": "exception",
+  "auditedAt": "2026-10-08T19:41:13.952Z",
+  "rows": [
+    {
+      "productId": 1018192,
+      "product": "Yellow Onion",
+      "vendor": "Small is Beautiful Farm",
+      "packageId": 803748,
+      "package": "1lb",
+      "priceList": "Guest Basket",
+      "visible": true,
+      "basePrice": 1.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.1,
+      "localPriceAfter": 2.17,
+      "remoteBasePrice": 1.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": 2.1,
+      "remotePriceAfter": null
+    },
+    {
+      "productId": 1018192,
+      "product": "Yellow Onion",
+      "vendor": "Small is Beautiful Farm",
+      "packageId": 803748,
+      "package": "1lb",
+      "priceList": "CSA Members",
+      "visible": true,
+      "basePrice": 1.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.1,
+      "localPriceAfter": 2.17,
+      "remoteBasePrice": 1.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": 2.1,
+      "remotePriceAfter": null
+    },
+    {
+      "productId": 1018192,
+      "product": "Yellow Onion",
+      "vendor": "Small is Beautiful Farm",
+      "packageId": 803748,
+      "package": "1lb",
+      "priceList": "Herd Share Members",
+      "visible": true,
+      "basePrice": 1.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.1,
+      "localPriceAfter": 2.17,
+      "remoteBasePrice": 1.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": 2.1,
+      "remotePriceAfter": null
+    },
+    {
+      "productId": 1018192,
+      "product": "Yellow Onion",
+      "vendor": "Small is Beautiful Farm",
+      "packageId": 803748,
+      "package": "1lb",
+      "priceList": "SNAP",
+      "visible": true,
+      "basePrice": 1.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.1,
+      "localPriceAfter": 2.17,
+      "remoteBasePrice": 1.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": 2.1,
+      "remotePriceAfter": null
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:41.022Z"
+}

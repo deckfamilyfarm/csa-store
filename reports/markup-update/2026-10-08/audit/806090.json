@@ -1,0 +1,504 @@
+{
+  "productId": 806090,
+  "context": {
+    "product": {
+      "id": 806090,
+      "name": "Garlic Dill Popcorn",
+      "description": "This garlic dill popcorn is made with our delicious dakota black popcorn, organic dill and organic garlic powder. With just enough garlic and lots of dill, this flavor started as a seasonal option that was so good we couldn't let it go!",
+      "visible": 0,
+      "trackInventory": 1,
+      "inventory": 0,
+      "categoryId": 18,
+      "vendorId": 3150,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/2rbmw.thumbnail.jpeg",
+      "createdAt": "2023-08-25T15:15:32.000Z",
+      "updatedAt": "2026-10-04T10:40:23.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Beverages 🍶🥤  and Snacks 🍿",
+    "vendor": {
+      "id": 3150,
+      "name": "Lonesome Whistle",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 527154,
+        "productId": 806090,
+        "name": "0.4 lb bag",
+        "price": "4.00",
+        "packageCode": null,
+        "unit": "ea",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": null
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 527154,
+        "productId": 806090,
+        "localLinePackageId": 527154,
+        "liveName": "0.4 lb bag",
+        "livePrice": "4.00",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":806090,\"Product\":\"Garlic Dill Popcorn\",\"Track Inventory By\":\"package\",\"Item Unit\":\"ea\",\"Charge By\":\"package\",\"Charge Unit\":\"ea\",\"Package ID\":527154,\"Package Name\":\"0.4 lb bag\",\"# of Items\":1,\"Package Price\":4,\"Inventory Type\":\"product\"},\"live\":{\"id\":527154,\"inventory_per_unit\":1,\"unit_price\":4,\"average_pack_weight\":null,\"package_price\":4,\"package_unit_price\":4,\"priority_order\":null,\"name\":\"0.4 lb bag\",\"price_list_entries\":[{\"id\":221724,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":179327,\"subscription_setting\":{\"id\":124070,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":617892,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479785,\"subscription_setting\":{\"id\":497008,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":220355,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":178273,\"subscription_setting\":{\"id\":121260,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":272941,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":222383,\"subscription_setting\":{\"id\":169639,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":806090,\"product_name\":\"Garlic Dill Popcorn\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"ea\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2023-08-25T11:15:32.030057-04:00\",\"updated\":\"2025-10-02T17:01:26.712990-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 806090,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 806090,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/806090/localline/b2cbdf2f25b666f5f558c8f8.jpg"
+    ],
+    "localLineVendorId": 3150
+  },
+  "remote": {
+    "id": 806090,
+    "name": "Garlic Dill Popcorn",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">This garlic dill popcorn is made with our delicious dakota black popcorn, organic dill and organic garlic powder. With just enough garlic and lots of dill, this flavor started as a seasonal option that was so good we couldn't let it go!</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-08-25T11:15:32.021999-04:00",
+    "updated": "2026-10-03T12:46:06.324496-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/2rbmw.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 141942,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/2rbmw.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/2rbmw.jpg",
+        "original_filename": "934.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "934",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 527154,
+        "inventory_per_unit": 1,
+        "unit_price": 4,
+        "average_pack_weight": null,
+        "package_price": 4,
+        "package_unit_price": 4,
+        "priority_order": null,
+        "name": "0.4 lb bag",
+        "price_list_entries": [
+          {
+            "id": 221724,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179327,
+            "subscription_setting": {
+              "id": 124070,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617892,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479785,
+            "subscription_setting": {
+              "id": 497008,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 220355,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 178273,
+            "subscription_setting": {
+              "id": 121260,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 272941,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 222383,
+            "subscription_setting": {
+              "id": 169639,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 806090,
+        "product_name": "Garlic Dill Popcorn",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T11:15:32.030057-04:00",
+        "updated": "2025-10-02T17:01:26.712990-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 178273,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 429,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440603,
+            "price_list_category": 31657,
+            "priority_order": 7,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179327,
+        "price_list_category": 17687,
+        "price_list": 2966,
+        "priority_order": 429,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440845,
+            "price_list_category": 31662,
+            "priority_order": 11,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 222383,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 101,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440422,
+            "price_list_category": 31656,
+            "priority_order": 11,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479785,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 429,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 441045,
+            "price_list_category": 31665,
+            "priority_order": 19,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3150,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3150,
+    "packages": [
+      {
+        "id": 527154,
+        "unit_price": 4,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 222383,
+            "calculated_value": 5.8,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 4
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 178273,
+            "calculated_value": 5.8,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 4
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 179327,
+            "calculated_value": 5.8,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 4
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 479785,
+            "calculated_value": 5.8,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 4
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:39:31.566Z",
+  "rows": [
+    {
+      "productId": 806090,
+      "product": "Garlic Dill Popcorn",
+      "vendor": "Lonesome Whistle",
+      "packageId": 527154,
+      "package": "0.4 lb bag",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 4,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 5.6,
+      "localPriceAfter": 5.8,
+      "remoteBasePrice": 4,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 5.6,
+      "remotePriceAfter": 5.8
+    },
+    {
+      "productId": 806090,
+      "product": "Garlic Dill Popcorn",
+      "vendor": "Lonesome Whistle",
+      "packageId": 527154,
+      "package": "0.4 lb bag",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 4,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 5.6,
+      "localPriceAfter": 5.8,
+      "remoteBasePrice": 4,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 5.6,
+      "remotePriceAfter": 5.8
+    },
+    {
+      "productId": 806090,
+      "product": "Garlic Dill Popcorn",
+      "vendor": "Lonesome Whistle",
+      "packageId": 527154,
+      "package": "0.4 lb bag",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 4,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 5.6,
+      "localPriceAfter": 5.8,
+      "remoteBasePrice": 4,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 5.6,
+      "remotePriceAfter": 5.8
+    },
+    {
+      "productId": 806090,
+      "product": "Garlic Dill Popcorn",
+      "vendor": "Lonesome Whistle",
+      "packageId": 527154,
+      "package": "0.4 lb bag",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 4,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 5.6,
+      "localPriceAfter": 5.8,
+      "remoteBasePrice": 4,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 5.6,
+      "remotePriceAfter": 5.8
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.930Z"
+}

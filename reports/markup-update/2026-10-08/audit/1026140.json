@@ -1,0 +1,527 @@
+{
+  "productId": 1026140,
+  "context": {
+    "product": {
+      "id": 1026140,
+      "name": "\"It Really Woks!\" Deodorant- Cedarwood and Fir",
+      "description": "<p dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">Made with all edible ingredients! Only baking soda, non-gmo corn starch, coconut oil, beeswax,&nbsp;cedar &amp; fir&nbsp;essential oils. &nbsp;</span></p><p dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">Made in our home in Oregon.</span></p>",
+      "visible": 1,
+      "trackInventory": 1,
+      "inventory": 8,
+      "categoryId": 9,
+      "vendorId": 5745,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/149bk.thumbnail.jpeg",
+      "createdAt": "2025-11-24T19:40:33.000Z",
+      "updatedAt": "2026-10-04T10:40:21.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Home Goods 🥄🌱🪏🍽️",
+    "vendor": {
+      "id": 5745,
+      "name": "Granny Smith All Natural",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 815788,
+        "productId": 1026140,
+        "name": "2.5 oz ea",
+        "price": "11.20",
+        "packageCode": null,
+        "unit": "ea",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 1,
+        "trackInventory": 0,
+        "inventory": null
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 815788,
+        "productId": 1026140,
+        "localLinePackageId": 815788,
+        "liveName": "2.5 oz ea",
+        "livePrice": "11.20",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":1026140,\"Product\":\"\\\"It Really Woks!\\\" Deodorant- Cedarwood and Fir\",\"Track Inventory By\":\"package\",\"Item Unit\":\"ea\",\"Charge By\":\"package\",\"Charge Unit\":\"ea\",\"Package ID\":815788,\"Package Name\":\"2.5 oz ea\",\"# of Items\":1,\"Package Price\":11.2,\"Inventory Type\":\"product\"},\"live\":{\"id\":815788,\"inventory_per_unit\":1,\"unit_price\":11.2,\"average_pack_weight\":0,\"package_price\":11.2,\"package_unit_price\":11.2,\"priority_order\":1,\"name\":\"2.5 oz ea\",\"price_list_entries\":[{\"id\":735616,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":566023,\"subscription_setting\":{\"id\":614384,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":735617,\"adjustment\":true,\"adjustment_type\":3,\"adjustment_value\":15,\"price_list_id\":2718,\"product_price_list_entry\":566024,\"subscription_setting\":{\"id\":614385,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":1000440,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":771013,\"subscription_setting\":{\"id\":879093,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":735618,\"adjustment\":true,\"adjustment_type\":3,\"adjustment_value\":15,\"price_list_id\":2966,\"product_price_list_entry\":566025,\"subscription_setting\":{\"id\":614386,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":8,\"number_of_packages_available\":8,\"number_of_packages_total\":8,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":8,\"product_package_size\":1,\"product_id\":1026140,\"product_name\":\"\\\"It Really Woks!\\\" Deodorant- Cedarwood and Fir\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"ea\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2025-11-24T14:40:33.877956-05:00\",\"updated\":\"2026-10-03T12:54:01.183024-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 1026140,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 1026140,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/1026140/localline/9ab39b66e4f4b2f13836301b.jpg"
+    ],
+    "localLineVendorId": 5745
+  },
+  "remote": {
+    "id": 1026140,
+    "name": "\"It Really Woks!\" Deodorant- Cedarwood and Fir",
+    "description": "<p dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">Made with all edible ingredients! Only baking soda, non-gmo corn starch, coconut oil, beeswax,&nbsp;cedar &amp; fir&nbsp;essential oils. &nbsp;</span></p><p dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">Made in our home in Oregon.</span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2025-11-24T14:40:33.539053-05:00",
+    "updated": "2026-10-03T12:54:20.817174-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/149bk.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 359994,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/149bk.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/149bk.jpg",
+        "original_filename": "ceader deodorant .jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 8,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 815788,
+        "inventory_per_unit": 1,
+        "unit_price": 11.2,
+        "average_pack_weight": 0,
+        "package_price": 11.2,
+        "package_unit_price": 11.2,
+        "priority_order": 1,
+        "name": "2.5 oz ea",
+        "price_list_entries": [
+          {
+            "id": 735616,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 566023,
+            "subscription_setting": {
+              "id": 614384,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 735617,
+            "adjustment": true,
+            "adjustment_type": 3,
+            "adjustment_value": 15,
+            "price_list_id": 2718,
+            "product_price_list_entry": 566024,
+            "subscription_setting": {
+              "id": 614385,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1000440,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 771013,
+            "subscription_setting": {
+              "id": 879093,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 735618,
+            "adjustment": true,
+            "adjustment_type": 3,
+            "adjustment_value": 15,
+            "price_list_id": 2966,
+            "product_price_list_entry": 566025,
+            "subscription_setting": {
+              "id": 614386,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 8,
+        "number_of_packages_available": 8,
+        "number_of_packages_total": 8,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 8,
+        "product_package_size": 1,
+        "product_id": 1026140,
+        "product_name": "\"It Really Woks!\" Deodorant- Cedarwood and Fir",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-11-24T14:40:33.877956-05:00",
+        "updated": "2026-10-03T12:54:01.183024-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 566023,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 886,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 455540,
+            "price_list_category": 15746,
+            "priority_order": 24,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 99465,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 566024,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 1048,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 455541,
+            "price_list_category": 14598,
+            "priority_order": 15,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 99466,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 566025,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1261,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 455542,
+            "price_list_category": 15064,
+            "priority_order": 25,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 99467,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 771013,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1376,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 648880,
+            "price_list_category": 28909,
+            "priority_order": 14,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 179863,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 5745,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 8,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 8
+  },
+  "payload": {
+    "vendor": 5745,
+    "packages": [
+      {
+        "id": 815788,
+        "unit_price": 11.2,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 566023,
+            "calculated_value": 16.24,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 11.2
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 3,
+            "adjustment_value": 16.24,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 566024,
+            "calculated_value": 16.24,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 11.2
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 3,
+            "adjustment_value": 16.24,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 566025,
+            "calculated_value": 16.24,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 11.2
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 771013,
+            "calculated_value": 16.24,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 11.2
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:41:17.809Z",
+  "rows": [
+    {
+      "productId": 1026140,
+      "product": "\"It Really Woks!\" Deodorant- Cedarwood and Fir",
+      "vendor": "Granny Smith All Natural",
+      "packageId": 815788,
+      "package": "2.5 oz ea",
+      "priceList": "Guest Basket",
+      "visible": true,
+      "basePrice": 11.2,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 15.68,
+      "localPriceAfter": 16.24,
+      "remoteBasePrice": 11.2,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 15.68,
+      "remotePriceAfter": 16.24
+    },
+    {
+      "productId": 1026140,
+      "product": "\"It Really Woks!\" Deodorant- Cedarwood and Fir",
+      "vendor": "Granny Smith All Natural",
+      "packageId": 815788,
+      "package": "2.5 oz ea",
+      "priceList": "CSA Members",
+      "visible": true,
+      "basePrice": 11.2,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 15.68,
+      "localPriceAfter": 16.24,
+      "remoteBasePrice": 11.2,
+      "remoteAdjustmentType": 3,
+      "remoteAdjustmentBefore": 15,
+      "remoteAdjustmentAfter": 16.24,
+      "remotePriceBefore": 15,
+      "remotePriceAfter": 16.24
+    },
+    {
+      "productId": 1026140,
+      "product": "\"It Really Woks!\" Deodorant- Cedarwood and Fir",
+      "vendor": "Granny Smith All Natural",
+      "packageId": 815788,
+      "package": "2.5 oz ea",
+      "priceList": "Herd Share Members",
+      "visible": true,
+      "basePrice": 11.2,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 15.68,
+      "localPriceAfter": 16.24,
+      "remoteBasePrice": 11.2,
+      "remoteAdjustmentType": 3,
+      "remoteAdjustmentBefore": 15,
+      "remoteAdjustmentAfter": 16.24,
+      "remotePriceBefore": 15,
+      "remotePriceAfter": 16.24
+    },
+    {
+      "productId": 1026140,
+      "product": "\"It Really Woks!\" Deodorant- Cedarwood and Fir",
+      "vendor": "Granny Smith All Natural",
+      "packageId": 815788,
+      "package": "2.5 oz ea",
+      "priceList": "SNAP",
+      "visible": true,
+      "basePrice": 11.2,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 15.68,
+      "localPriceAfter": 16.24,
+      "remoteBasePrice": 11.2,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 15.68,
+      "remotePriceAfter": 16.24
+    }
+  ],
+  "warnings": [
+    "CSA Members: remote adjustment 15 (type 3) differed from local 40%; set to approved 45% pricing.",
+    "Herd Share Members: remote adjustment 15 (type 3) differed from local 40%; set to approved 45% pricing."
+  ],
+  "reviewedAt": "2026-10-08T19:48:41.026Z"
+}

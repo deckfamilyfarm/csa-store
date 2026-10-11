@@ -1,0 +1,524 @@
+{
+  "productId": 1004361,
+  "context": {
+    "product": {
+      "id": 1004361,
+      "name": "Bulk Red Beets - 5lb. bag",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Beets are a vibrantly colored root vegetable known for its earthy flavor, high nutrient content, and antioxidant properties.&nbsp;Rich in vitamins, minerals, fiber, and compounds called&nbsp;</span><a href=\"https://www.google.com/search?sca_esv=ba24c2d2484ecd3d&amp;q=betalains&amp;sa=X&amp;ved=2ahUKEwjrmunL0KuPAxX9ke4BHX2aAm0QxccNegQIDBAB&amp;mstk=AUtExfC2F0-QPMxBneNQg4txMByQojg91q5IdD-3kpk8EHUKZlCa1MT_BTCeE2g1EqbPtuDaOofEXG9iiU3UFdx9QB0JbIhQuqethzQ577VmUIMmarEjT1k38ICjo9j1LpGH2DM&amp;csui=3\" target=\"_blank\" class=\"lexical-text-editor--link\"><span style=\"white-space: pre-wrap;\">betalains</span></a><span style=\"white-space: pre-wrap;\">,&nbsp;red beets support overall health by improving blood flow, aiding liver and heart function, and boosting digestion.&nbsp;They can be enjoyed raw, steamed, roasted, or boiled, and are a versatile ingredient in salads, juices, dips, and other dishes.</span></p>",
+      "visible": 0,
+      "trackInventory": 1,
+      "inventory": 0,
+      "categoryId": 13,
+      "vendorId": 3149,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/Nvuez.thumbnail.jpeg",
+      "createdAt": "2025-08-27T18:38:40.000Z",
+      "updatedAt": "2025-09-15T18:53:03.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Vegetables - Roots🧅🧄🥕🥔",
+    "vendor": {
+      "id": 3149,
+      "name": "Grazier's Garden",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 784289,
+        "productId": 1004361,
+        "name": "5lb. bag",
+        "price": "6.45",
+        "packageCode": null,
+        "unit": "bu",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 784289,
+        "productId": 1004361,
+        "localLinePackageId": 784289,
+        "liveName": "5lb. bag",
+        "livePrice": "6.45",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":1004361,\"Product\":\"Bulk Red Beets - 5lb. bag\",\"Track Inventory By\":\"package\",\"Item Unit\":\"bu\",\"Charge By\":\"package\",\"Charge Unit\":\"bu\",\"Package ID\":784289,\"Package Name\":\"5lb. bag\",\"# of Items\":1,\"Package Price\":6.45,\"Inventory Type\":\"product\"},\"live\":{\"id\":784289,\"inventory_per_unit\":1,\"unit_price\":6.45,\"average_pack_weight\":0,\"package_price\":6.45,\"package_unit_price\":6.45,\"priority_order\":1,\"name\":\"5lb. bag\",\"price_list_entries\":[{\"id\":683901,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":528244,\"subscription_setting\":{\"id\":562961,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":683046,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":527590,\"subscription_setting\":{\"id\":562106,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":683902,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":528245,\"subscription_setting\":{\"id\":562962,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":683047,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":527591,\"subscription_setting\":{\"id\":562107,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":1004361,\"product_name\":\"Bulk Red Beets - 5lb. bag\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"bu\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2025-08-27T14:38:40.615976-04:00\",\"updated\":\"2025-09-04T16:30:29.474587-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 1004361,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 1004361,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/1004361/localline/bb2b9c656a52f681a6af5c51.jpg"
+    ],
+    "localLineVendorId": 3149
+  },
+  "remote": {
+    "id": 1004361,
+    "name": "Bulk Red Beets - 5lb. bag",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Beets are a vibrantly colored root vegetable known for its earthy flavor, high nutrient content, and antioxidant properties.&nbsp;Rich in vitamins, minerals, fiber, and compounds called&nbsp;</span><a href=\"https://www.google.com/search?sca_esv=ba24c2d2484ecd3d&amp;q=betalains&amp;sa=X&amp;ved=2ahUKEwjrmunL0KuPAxX9ke4BHX2aAm0QxccNegQIDBAB&amp;mstk=AUtExfC2F0-QPMxBneNQg4txMByQojg91q5IdD-3kpk8EHUKZlCa1MT_BTCeE2g1EqbPtuDaOofEXG9iiU3UFdx9QB0JbIhQuqethzQ577VmUIMmarEjT1k38ICjo9j1LpGH2DM&amp;csui=3\" target=\"_blank\" class=\"lexical-text-editor--link\"><span style=\"white-space: pre-wrap;\">betalains</span></a><span style=\"white-space: pre-wrap;\">,&nbsp;red beets support overall health by improving blood flow, aiding liver and heart function, and boosting digestion.&nbsp;They can be enjoyed raw, steamed, roasted, or boiled, and are a versatile ingredient in salads, juices, dips, and other dishes.</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2025-08-27T14:38:40.588863-04:00",
+    "updated": "2025-09-15T14:53:03.492338-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/Nvuez.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 338586,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/Nvuez.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/Nvuez.jpg",
+        "original_filename": "image8.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": 0,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 784289,
+        "inventory_per_unit": 1,
+        "unit_price": 6.45,
+        "average_pack_weight": 0,
+        "package_price": 6.45,
+        "package_unit_price": 6.45,
+        "priority_order": 1,
+        "name": "5lb. bag",
+        "price_list_entries": [
+          {
+            "id": 683901,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 528244,
+            "subscription_setting": {
+              "id": 562961,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 683046,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 527590,
+            "subscription_setting": {
+              "id": 562106,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 683902,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 528245,
+            "subscription_setting": {
+              "id": 562962,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 683047,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 527591,
+            "subscription_setting": {
+              "id": 562107,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 1004361,
+        "product_name": "Bulk Red Beets - 5lb. bag",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bu",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-08-27T14:38:40.615976-04:00",
+        "updated": "2025-09-04T16:30:29.474587-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 527590,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 996,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 416344,
+            "price_list_category": 15105,
+            "priority_order": 42,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 73404,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 527591,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 832,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 416345,
+            "price_list_category": 15731,
+            "priority_order": 44,
+            "price_list_category_name": "Organic Vegetables - Roots 🧅🧄 🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 73405,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 528244,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1209,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 416767,
+            "price_list_category": 15118,
+            "priority_order": 47,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 73765,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 528245,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1210,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 416768,
+            "price_list_category": 28905,
+            "priority_order": 43,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 73766,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3149,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3149,
+    "packages": [
+      {
+        "id": 784289,
+        "unit_price": 6.45,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 527591,
+            "calculated_value": 9.35,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 6.45
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 527590,
+            "calculated_value": 9.35,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 6.45
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 528244,
+            "calculated_value": 9.35,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 6.45
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 528245,
+            "calculated_value": 9.35,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 6.45
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:41:04.787Z",
+  "rows": [
+    {
+      "productId": 1004361,
+      "product": "Bulk Red Beets - 5lb. bag",
+      "vendor": "Grazier's Garden",
+      "packageId": 784289,
+      "package": "5lb. bag",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 6.45,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 9.03,
+      "localPriceAfter": 9.35,
+      "remoteBasePrice": 6.45,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 9.03,
+      "remotePriceAfter": 9.35
+    },
+    {
+      "productId": 1004361,
+      "product": "Bulk Red Beets - 5lb. bag",
+      "vendor": "Grazier's Garden",
+      "packageId": 784289,
+      "package": "5lb. bag",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 6.45,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 9.03,
+      "localPriceAfter": 9.35,
+      "remoteBasePrice": 6.45,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 9.03,
+      "remotePriceAfter": 9.35
+    },
+    {
+      "productId": 1004361,
+      "product": "Bulk Red Beets - 5lb. bag",
+      "vendor": "Grazier's Garden",
+      "packageId": 784289,
+      "package": "5lb. bag",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 6.45,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 9.03,
+      "localPriceAfter": 9.35,
+      "remoteBasePrice": 6.45,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 9.03,
+      "remotePriceAfter": 9.35
+    },
+    {
+      "productId": 1004361,
+      "product": "Bulk Red Beets - 5lb. bag",
+      "vendor": "Grazier's Garden",
+      "packageId": 784289,
+      "package": "5lb. bag",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 6.45,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 9.03,
+      "localPriceAfter": 9.35,
+      "remoteBasePrice": 6.45,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 9.03,
+      "remotePriceAfter": 9.35
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:41.012Z"
+}

@@ -1,0 +1,288 @@
+{
+  "data": {
+    "id": 1130087,
+    "name": "Orange Carrots",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">The Carrot is&nbsp;a versatile root vegetable known for its sweet and earthy flavor, satisfying crunch when raw, and tender texture when cooked. It is a staple in both savory and sweet dishes, appearing in everything from salads and soups to baked goods like carrot cake. Carrots can be prepared in numerous ways, including raw, roasted, boiled, mashed, or juiced, and are a key component in classic cooking bases like mirepoix.&nbsp;</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2026-06-08T13:39:25.897540-04:00",
+    "updated": "2026-10-08T16:34:32.560385-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/rqFy7.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 437801,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/rqFy7.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/rqFy7.jpeg",
+        "original_filename": "account/322922/iLAjK.jpeg"
+      },
+      {
+        "id": 437802,
+        "priority_order": 1,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/1uEAV.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/1uEAV.jpeg",
+        "original_filename": "account/322922/B12BO.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 963998,
+        "inventory_per_unit": 1,
+        "unit_price": 2.3,
+        "average_pack_weight": 1,
+        "package_price": 2.3,
+        "package_unit_price": 2.3,
+        "priority_order": 1,
+        "name": "1 bunch",
+        "price_list_entries": [
+          {
+            "id": 960235,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 739537,
+            "subscription_setting": {
+              "id": 838833,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 960236,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 739538,
+            "subscription_setting": {
+              "id": 838834,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 960237,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 739539,
+            "subscription_setting": {
+              "id": 838835,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 960238,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 739540,
+            "subscription_setting": {
+              "id": 838836,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 1130087,
+        "product_name": "Orange Carrots",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bu",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-06-08T13:39:26.405759-04:00",
+        "updated": "2026-10-08T16:34:31.671431-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 739537,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 1108,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 617406,
+            "price_list_category": 15105,
+            "priority_order": 11,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 164437,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 739538,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 958,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 617407,
+            "price_list_category": 15731,
+            "priority_order": 13,
+            "price_list_category_name": "Organic Vegetables - Roots 🧅🧄 🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 164438,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 739539,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1340,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 617408,
+            "price_list_category": 15118,
+            "priority_order": 13,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 164439,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 739540,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1336,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 617409,
+            "price_list_category": 28905,
+            "priority_order": 13,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 164440,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 6482,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 1130087,
+  "remoteProductId": 1130087,
+  "checkedAt": "2026-10-11T18:10:13.232Z"
+}

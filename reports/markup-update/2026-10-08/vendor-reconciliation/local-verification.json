@@ -1,0 +1,12 @@
+{
+  "verifiedAt": "2026-10-09T19:40:47.627Z",
+  "checks": {
+    "vendors": true,
+    "products": true,
+    "packages": true,
+    "productSales": true,
+    "excludedProfiles": true
+  },
+  "newlyUpdated": 62,
+  "totalAt45": 150
+}

@@ -1,0 +1,288 @@
+{
+  "data": {
+    "id": 1011853,
+    "name": "Purple Bell Peppers",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Purple bell peppers offer a unique combination of visual appeal and a flavor profile that is a bit less sweet and more earthy than other bell peppers, with a crisp texture that makes them&nbsp;ideal for raw applications like salads and garnishes.&nbsp;They contain anthocyanins, the same antioxidant compounds that give blueberries their color and contribute to a host of health benefits.&nbsp;When cooked, their vibrant purple color fades to green, so they are best enjoyed raw or lightly cooked to preserve their beautiful hue.</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2025-09-26T16:39:14.337366-04:00",
+    "updated": "2026-10-08T16:32:41.235779-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/AXoUA.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 345032,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/AXoUA.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/AXoUA.jpg",
+        "original_filename": "account/322922/OVkQQ.jpg"
+      },
+      {
+        "id": 345033,
+        "priority_order": 1,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/qA6Go.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/qA6Go.jpg",
+        "original_filename": "account/322922/hbF6A.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "825",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 794969,
+        "inventory_per_unit": 1,
+        "unit_price": 2,
+        "average_pack_weight": null,
+        "package_price": 2,
+        "package_unit_price": 2,
+        "priority_order": null,
+        "name": "each",
+        "price_list_entries": [
+          {
+            "id": 701572,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 540654,
+            "subscription_setting": {
+              "id": 580620,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 701573,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 540655,
+            "subscription_setting": {
+              "id": 580621,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 701574,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 540653,
+            "subscription_setting": {
+              "id": 580622,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 701575,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 540656,
+            "subscription_setting": {
+              "id": 580623,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 1011853,
+        "product_name": "Purple Bell Peppers",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-09-26T16:39:14.801244-04:00",
+        "updated": "2026-10-08T16:32:40.708763-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 540653,
+        "price_list_category": 15111,
+        "price_list": 2718,
+        "priority_order": 1016,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 429764,
+            "price_list_category": 15111,
+            "priority_order": 28,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 83325,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 540654,
+        "price_list_category": 15120,
+        "price_list": 2966,
+        "priority_order": 1226,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 429765,
+            "price_list_category": 15120,
+            "priority_order": 36,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 83326,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 540655,
+        "price_list_category": 15750,
+        "price_list": 3124,
+        "priority_order": 852,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 429766,
+            "price_list_category": 15750,
+            "priority_order": 34,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 83327,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 540656,
+        "price_list_category": 28914,
+        "price_list": 5622,
+        "priority_order": 1227,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 429767,
+            "price_list_category": 28914,
+            "priority_order": 31,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 83328,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3149,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 1011853,
+  "remoteProductId": 1011853,
+  "checkedAt": "2026-10-11T17:58:20.402Z"
+}

@@ -1,0 +1,261 @@
+{
+  "data": {
+    "id": 987077,
+    "name": "Red Currant Berries",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Red currants are&nbsp;small, tart, red berries native to parts of Western Europe, belonging to the Ribes genus.&nbsp;They are known for their bright red color, translucent flesh, and a flavor that is both sweet and tart with citrusy notes.&nbsp;Red currants are rich in vitamins C and K, antioxidants, and are relatively low in calories.&nbsp;They are commonly used in jams, jellies, pies, juices, and even wines.&nbsp;</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2025-06-30T16:47:19.395546-04:00",
+    "updated": "2026-10-08T16:31:39.817747-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/Bm1tm.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 316114,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/Bm1tm.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/Bm1tm.jpeg",
+        "original_filename": "images (1).jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12593,
+      "name": "1/2 pt",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12593,
+      "name": "1/2 pt",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 757755,
+        "inventory_per_unit": 1,
+        "unit_price": 4.59,
+        "average_pack_weight": 0,
+        "package_price": 4.59,
+        "package_unit_price": 4.59,
+        "priority_order": 1,
+        "name": "1/2 pt",
+        "price_list_entries": [
+          {
+            "id": 637746,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 494576,
+            "subscription_setting": {
+              "id": 516840,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 637747,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 494577,
+            "subscription_setting": {
+              "id": 516841,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 637748,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 494578,
+            "subscription_setting": {
+              "id": 516842,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 637749,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 494579,
+            "subscription_setting": {
+              "id": 516843,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": null,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 987077,
+        "product_name": "Red Currant Berries",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "1/2 pt",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-06-30T16:47:19.660802-04:00",
+        "updated": "2026-10-08T16:31:39.234333-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 494576,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 799,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 384580,
+            "price_list_category": 15748,
+            "priority_order": 49,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 494577,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 964,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 384581,
+            "price_list_category": 14599,
+            "priority_order": 34,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 494578,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1171,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 384582,
+            "price_list_category": 15063,
+            "priority_order": 50,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 494579,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1172,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 384583,
+            "price_list_category": 28911,
+            "priority_order": 45,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3168,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 987077,
+  "remoteProductId": 987077,
+  "checkedAt": "2026-10-11T18:10:02.317Z"
+}

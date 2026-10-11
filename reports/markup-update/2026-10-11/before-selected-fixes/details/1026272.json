@@ -1,0 +1,202 @@
+{
+  "data": {
+    "id": 1026272,
+    "name": "Handmade Cedar Catch-All Tray – Rustic Ring Dish & Coin Holder",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Add a touch of nature to your nightstand or entryway with this rustic catch-all tray. Meticulously crafted from solid, aromatic cedar 4x4 timber, this sturdy holder is perfect for keeping your rings, jewelry, keys, or loose change organized in one beautiful place.</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Material: 100% Solid Cedar wood (showcasing natural grain and warm tones).</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Finish: Sealed with durable polyurethane to protect against daily wear and moisture.</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Dimensions: Roughly 4\" x 4\" x 4\" (Perfect for small spaces).</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Features: Natural, rustic, and handcrafted.</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Note: Due to the nature of wood, each piece will have unique grain patterns and natural characteristics.</span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2025-11-25T16:08:47.157579-05:00",
+    "updated": "2026-10-08T16:33:18.588009-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/dkHAP.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 427383,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/dkHAP.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/dkHAP.jpg",
+        "original_filename": "il_794xN.7428079390_1e44.jpg"
+      },
+      {
+        "id": 427382,
+        "priority_order": 1,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/sSv9G.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/sSv9G.jpg",
+        "original_filename": "il_794xN.7476000621_qj84.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 10,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 816045,
+        "inventory_per_unit": 1,
+        "unit_price": 10,
+        "average_pack_weight": 0,
+        "package_price": 10,
+        "package_unit_price": 10,
+        "priority_order": 1,
+        "name": "ea",
+        "price_list_entries": [
+          {
+            "id": 736097,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 566326,
+            "subscription_setting": {
+              "id": 614865,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 736095,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 566324,
+            "subscription_setting": {
+              "id": 614863,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 10,
+        "number_of_packages_available": 10,
+        "number_of_packages_total": 10,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 10,
+        "product_package_size": 1,
+        "product_id": 1026272,
+        "product_name": "Handmade Cedar Catch-All Tray – Rustic Ring Dish & Coin Holder",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-11-25T16:08:47.637349-05:00",
+        "updated": "2026-10-08T16:33:18.008575-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 566324,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 890,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 455820,
+            "price_list_category": 15746,
+            "priority_order": 657,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 99676,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 566326,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1265,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 455822,
+            "price_list_category": 15064,
+            "priority_order": 38,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 99678,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 3181,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 10,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 10
+  },
+  "localProductId": 1026272,
+  "remoteProductId": 1026272,
+  "checkedAt": "2026-10-11T17:27:25.322Z"
+}

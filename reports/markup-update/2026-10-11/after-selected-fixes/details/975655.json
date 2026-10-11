@@ -1,0 +1,287 @@
+{
+  "data": {
+    "id": 975655,
+    "name": "Frozen Golden Cherry Tomatoes",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Frozen golden cherry tomatoes are best used in soups, stews, sauces, or for blending into dressings or pestos.&nbsp;Curated mix of four different varieties - Sungold, Citrine, Sunrise Bumblebee, and Santium Sun. </span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2025-05-26T16:25:09.179814-04:00",
+    "updated": "2026-10-08T16:31:07.761558-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/1HaPP.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 338599,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/1HaPP.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/1HaPP.jpg",
+        "original_filename": "freezing-cherry-tomatoes-600x900.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "338",
+    "internal_tags": [
+      {
+        "id": 2245,
+        "priority_order": 2,
+        "name": "Frozen"
+      }
+    ],
+    "packing_tag": 86,
+    "packages": [
+      {
+        "id": 741109,
+        "inventory_per_unit": 1,
+        "unit_price": 4,
+        "average_pack_weight": null,
+        "package_price": 4,
+        "package_unit_price": 4,
+        "priority_order": null,
+        "name": "lb",
+        "price_list_entries": [
+          {
+            "id": 606691,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 470722,
+            "subscription_setting": {
+              "id": 485806,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 618275,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 480165,
+            "subscription_setting": {
+              "id": 497391,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 606692,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 470720,
+            "subscription_setting": {
+              "id": 485807,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 606693,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 470721,
+            "subscription_setting": {
+              "id": 485808,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 975655,
+        "product_name": "Frozen Golden Cherry Tomatoes",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "lb",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-05-26T16:25:09.380360-04:00",
+        "updated": "2026-10-08T16:31:07.151674-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 470720,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 940,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 441196,
+            "price_list_category": 15111,
+            "priority_order": 21,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 90720,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 470721,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1148,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 441197,
+            "price_list_category": 15120,
+            "priority_order": 28,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 90721,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 470722,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 773,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 441198,
+            "price_list_category": 15750,
+            "priority_order": 27,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 90722,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 480165,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1148,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 441199,
+            "price_list_category": 28914,
+            "priority_order": 28,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 90723,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3149,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 975655,
+  "remoteProductId": 975655,
+  "checkedAt": "2026-10-11T17:58:14.051Z"
+}

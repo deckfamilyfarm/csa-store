@@ -1,0 +1,261 @@
+{
+  "data": {
+    "id": 812612,
+    "name": "Dandelion, Red",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">The leaves of the Red Dandelion greens are a deeper green than that of true Dandelion greens. They grow in larger more upright bunches and are less prone to bolting. They offer a bitter flavor with a robust peppery finish, very similar to other varieties of chicory.</span></p><p dir=\"ltr\"><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Usage. Dandelion greens can be mixed into salads with dried fruit and toasted nuts, or even baked with rich flavors or blended into pesto.</span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2023-09-30T01:47:20.868323-04:00",
+    "updated": "2026-10-08T16:27:04.053446-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/cxKvk.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 144596,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/cxKvk.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/cxKvk.jpg",
+        "original_filename": "img_1801.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 534480,
+        "inventory_per_unit": 1,
+        "unit_price": 2.35,
+        "average_pack_weight": 0,
+        "package_price": 2.35,
+        "package_unit_price": 2.35,
+        "priority_order": null,
+        "name": "bu",
+        "price_list_entries": [
+          {
+            "id": 238462,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 192131,
+            "subscription_setting": {
+              "id": 145935,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 220707,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 178606,
+            "subscription_setting": {
+              "id": 121662,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617936,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479828,
+            "subscription_setting": {
+              "id": 497052,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 221786,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179384,
+            "subscription_setting": {
+              "id": 123241,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": null,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 812612,
+        "product_name": "Dandelion, Red",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bu",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-09-30T01:47:20.932335-04:00",
+        "updated": "2026-10-08T16:27:03.524807-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 178606,
+        "price_list_category": 15107,
+        "price_list": 2718,
+        "priority_order": 479,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 146865,
+            "price_list_category": 15107,
+            "priority_order": 513,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179384,
+        "price_list_category": 15119,
+        "price_list": 2966,
+        "priority_order": 479,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 147594,
+            "price_list_category": 15119,
+            "priority_order": 515,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 192131,
+        "price_list_category": 15732,
+        "price_list": 3124,
+        "priority_order": 199,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 158008,
+            "price_list_category": 15732,
+            "priority_order": 239,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479828,
+        "price_list_category": 28913,
+        "price_list": 5622,
+        "priority_order": 479,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370262,
+            "price_list_category": 28913,
+            "priority_order": 516,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not tracked",
+    "is_deleted": false,
+    "vendor": 3177,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 812612,
+  "remoteProductId": 812612,
+  "checkedAt": "2026-10-11T17:57:57.054Z"
+}

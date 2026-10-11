@@ -1,0 +1,261 @@
+{
+  "data": {
+    "id": 805932,
+    "name": "Shallots",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Shallots have a delicate and sweet flavor with a hint of sharpness, while onions bring a more intense heat. You can substitute shallots in nearly any recipe that calls for onions just make sure you're using the same volume. (For example, several medium shallots equals about one small yellow onion.)</span></p><p><br></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-08-25T10:39:58.177910-04:00",
+    "updated": "2026-10-08T16:23:38.341142-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/cKZ9g.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 142090,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/cKZ9g.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/cKZ9g.jpg",
+        "original_filename": "6245.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "6245",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 526992,
+        "inventory_per_unit": 1,
+        "unit_price": 4,
+        "average_pack_weight": null,
+        "package_price": 4,
+        "package_unit_price": 4,
+        "priority_order": null,
+        "name": "1 lb",
+        "price_list_entries": [
+          {
+            "id": 221661,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179264,
+            "subscription_setting": {
+              "id": 124165,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 238444,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 192116,
+            "subscription_setting": {
+              "id": 145926,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 207655,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 167827,
+            "subscription_setting": {
+              "id": 106831,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617842,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479735,
+            "subscription_setting": {
+              "id": 496958,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 805932,
+        "product_name": "Shallots",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "lb",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T10:39:58.189520-04:00",
+        "updated": "2026-10-08T16:23:37.779333-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 167827,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 323,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440531,
+            "price_list_category": 15105,
+            "priority_order": 378,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179264,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 324,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440739,
+            "price_list_category": 15118,
+            "priority_order": 378,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 192116,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 184,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440321,
+            "price_list_category": 15731,
+            "priority_order": 250,
+            "price_list_category_name": "Organic Vegetables - Roots 🧅🧄 🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479735,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 324,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 440947,
+            "price_list_category": 28905,
+            "priority_order": 382,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3177,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 805932,
+  "remoteProductId": 805932,
+  "checkedAt": "2026-10-11T17:26:45.688Z"
+}

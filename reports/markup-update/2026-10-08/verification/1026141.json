@@ -1,0 +1,282 @@
+{
+  "verifiedAt": "2026-10-08T20:50:27.931Z",
+  "productId": 1026141,
+  "priceConfirmed": true,
+  "otherFieldsUnchanged": true,
+  "remote": {
+    "id": 1026141,
+    "name": "\"It Really Woks!\" Deodorant- Lavender",
+    "description": "<p dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">Made with all edible ingredients! Only baking soda, non-gmo corn starch, coconut oil, beeswax,&nbsp;lavender&nbsp;essential oils. &nbsp;</span></p><p dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">Made in our home in Oregon.</span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2025-11-24T14:41:46.590272-05:00",
+    "updated": "2026-10-08T16:33:14.820302-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/bHUKo.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 359995,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/bHUKo.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/bHUKo.jpg",
+        "original_filename": "lavender deo.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 8,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 815789,
+        "inventory_per_unit": 1,
+        "unit_price": 11.2,
+        "average_pack_weight": 0,
+        "package_price": 11.2,
+        "package_unit_price": 11.2,
+        "priority_order": 1,
+        "name": "2.5 oz ea",
+        "price_list_entries": [
+          {
+            "id": 735620,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 566027,
+            "subscription_setting": {
+              "id": 614388,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1000438,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 771011,
+            "subscription_setting": {
+              "id": 879091,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 735621,
+            "adjustment": true,
+            "adjustment_type": 3,
+            "adjustment_value": 16.24,
+            "price_list_id": 2718,
+            "product_price_list_entry": 566028,
+            "subscription_setting": {
+              "id": 614389,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 735622,
+            "adjustment": true,
+            "adjustment_type": 3,
+            "adjustment_value": 16.24,
+            "price_list_id": 2966,
+            "product_price_list_entry": 566029,
+            "subscription_setting": {
+              "id": 614390,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 8,
+        "number_of_packages_available": 8,
+        "number_of_packages_total": 8,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 8,
+        "product_package_size": 1,
+        "product_id": 1026141,
+        "product_name": "\"It Really Woks!\" Deodorant- Lavender",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-11-24T14:41:46.880103-05:00",
+        "updated": "2026-10-08T16:33:14.264311-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 566027,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 887,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 455544,
+            "price_list_category": 15746,
+            "priority_order": 23,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 99469,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 566028,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 1049,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 455545,
+            "price_list_category": 14598,
+            "priority_order": 14,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 99470,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 566029,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1262,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 455546,
+            "price_list_category": 15064,
+            "priority_order": 24,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 99471,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 771011,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1375,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 648878,
+            "price_list_category": 28909,
+            "priority_order": 15,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 179861,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 5745,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 8,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 8
+  }
+}

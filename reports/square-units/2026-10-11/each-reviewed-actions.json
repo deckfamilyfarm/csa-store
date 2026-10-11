@@ -1,0 +1,1559 @@
+[
+  {
+    "direction": "outgoing",
+    "platform": "square",
+    "kind": "price",
+    "productId": 825834,
+    "productName": "Beef Marrow Bones",
+    "packageId": 549813,
+    "packageName": "3.00 - 5.00 lbs",
+    "vendorName": "Deck Family Farm",
+    "status": "synced",
+    "message": "",
+    "staged": {},
+    "localBefore": {
+      "productId": 825834,
+      "packageId": 549813,
+      "vendorName": "Deck Family Farm",
+      "productName": "Beef Marrow Bones",
+      "categoryName": "Grass-fed Beef 🐮",
+      "sourceUnitPrice": null,
+      "unitOfMeasure": "each",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "localAfter": {
+      "productId": 825834,
+      "packageId": 549813,
+      "vendorName": "Deck Family Farm",
+      "productName": "Beef Marrow Bones",
+      "categoryName": "Grass-fed Beef 🐮",
+      "sourceUnitPrice": null,
+      "unitOfMeasure": "each",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "mapping": {
+      "linkId": 11,
+      "squareItemId": "SHZS54JA7XZFU4WNB3O4CLSO",
+      "squareVariationId": "PJUREPBRNPEO4OGFFYYA7Q7Z",
+      "linkApprovedAt": "2026-09-15 11:56:46"
+    },
+    "remoteBefore": {
+      "id": "PJUREPBRNPEO4OGFFYYA7Q7Z",
+      "deleted": false,
+      "itemId": "SHZS54JA7XZFU4WNB3O4CLSO",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1500,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "desired": {
+      "id": "PJUREPBRNPEO4OGFFYYA7Q7Z",
+      "deleted": false,
+      "itemId": "SHZS54JA7XZFU4WNB3O4CLSO",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1500,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "payload": {
+      "amount": 1500,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "display": {
+      "current": {
+        "price": 15,
+        "currency": "USD",
+        "sellingUnit": "each"
+      },
+      "proposed": {
+        "price": 15,
+        "currency": "USD",
+        "sellingUnit": "each"
+      },
+      "basis": "vendor-retail-price"
+    },
+    "localSnapshot": {
+      "productId": 825834,
+      "productName": "Beef Marrow Bones",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": 0,
+      "onSale": 0,
+      "saleDiscount": 0
+    },
+    "id": 1978,
+    "auditId": 13,
+    "result": null,
+    "released": false
+  },
+  {
+    "direction": "outgoing",
+    "platform": "square",
+    "kind": "price",
+    "productId": 840823,
+    "productName": "Bulk English Breakfast Sausage",
+    "packageId": 568237,
+    "packageName": "12 oz",
+    "vendorName": "Deck Family Farm's Hyland Artisinal Meats",
+    "status": "synced",
+    "message": "",
+    "staged": {},
+    "localBefore": {
+      "productId": 840823,
+      "packageId": 568237,
+      "vendorName": "Deck Family Farm's Hyland Artisinal Meats",
+      "productName": "Bulk English Breakfast Sausage",
+      "categoryName": "Sausages & Cured Meats🥓",
+      "sourceUnitPrice": null,
+      "unitOfMeasure": "each",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "localAfter": {
+      "productId": 840823,
+      "packageId": 568237,
+      "vendorName": "Deck Family Farm's Hyland Artisinal Meats",
+      "productName": "Bulk English Breakfast Sausage",
+      "categoryName": "Sausages & Cured Meats🥓",
+      "sourceUnitPrice": null,
+      "unitOfMeasure": "each",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "mapping": {
+      "linkId": 23,
+      "squareItemId": "DSKZWD2Z6KSSTTADHICAXC5G",
+      "squareVariationId": "GVDPMOIBYDM7FPJUH6PKQPT2",
+      "linkApprovedAt": "2026-09-15 11:58:04"
+    },
+    "remoteBefore": {
+      "id": "GVDPMOIBYDM7FPJUH6PKQPT2",
+      "deleted": false,
+      "itemId": "DSKZWD2Z6KSSTTADHICAXC5G",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1650,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "desired": {
+      "id": "GVDPMOIBYDM7FPJUH6PKQPT2",
+      "deleted": false,
+      "itemId": "DSKZWD2Z6KSSTTADHICAXC5G",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1650,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "payload": {
+      "amount": 1650,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "display": {
+      "current": {
+        "price": 16.5,
+        "currency": "USD",
+        "sellingUnit": "each"
+      },
+      "proposed": {
+        "price": 16.5,
+        "currency": "USD",
+        "sellingUnit": "each"
+      },
+      "basis": "vendor-retail-price"
+    },
+    "localSnapshot": {
+      "productId": 840823,
+      "productName": "Bulk English Breakfast Sausage",
+      "visible": 1,
+      "trackInventory": 0,
+      "inventory": 0,
+      "onSale": 0,
+      "saleDiscount": 0
+    },
+    "id": 1979,
+    "auditId": 13,
+    "result": null,
+    "released": false
+  },
+  {
+    "direction": "outgoing",
+    "platform": "square",
+    "kind": "price",
+    "productId": 913651,
+    "productName": "Bulk Thai Curry Sausage",
+    "packageId": 659187,
+    "packageName": "12 oz",
+    "vendorName": "Deck Family Farm's Hyland Artisinal Meats",
+    "status": "synced",
+    "message": "",
+    "staged": {},
+    "localBefore": {
+      "productId": 913651,
+      "packageId": 659187,
+      "vendorName": "Deck Family Farm's Hyland Artisinal Meats",
+      "productName": "Bulk Thai Curry Sausage",
+      "categoryName": "Sausages & Cured Meats🥓",
+      "sourceUnitPrice": null,
+      "unitOfMeasure": "each",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "localAfter": {
+      "productId": 913651,
+      "packageId": 659187,
+      "vendorName": "Deck Family Farm's Hyland Artisinal Meats",
+      "productName": "Bulk Thai Curry Sausage",
+      "categoryName": "Sausages & Cured Meats🥓",
+      "sourceUnitPrice": null,
+      "unitOfMeasure": "each",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "mapping": {
+      "linkId": 25,
+      "squareItemId": "56JW4CHELXLEOPRF7E4K4B4Z",
+      "squareVariationId": "LF5N3PXAP6GF6SPZA5R3RC2Z",
+      "linkApprovedAt": "2026-09-15 11:58:15"
+    },
+    "remoteBefore": {
+      "id": "LF5N3PXAP6GF6SPZA5R3RC2Z",
+      "deleted": false,
+      "itemId": "56JW4CHELXLEOPRF7E4K4B4Z",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1650,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "desired": {
+      "id": "LF5N3PXAP6GF6SPZA5R3RC2Z",
+      "deleted": false,
+      "itemId": "56JW4CHELXLEOPRF7E4K4B4Z",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1650,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "payload": {
+      "amount": 1650,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "display": {
+      "current": {
+        "price": 16.5,
+        "currency": "USD",
+        "sellingUnit": "each"
+      },
+      "proposed": {
+        "price": 16.5,
+        "currency": "USD",
+        "sellingUnit": "each"
+      },
+      "basis": "vendor-retail-price"
+    },
+    "localSnapshot": {
+      "productId": 913651,
+      "productName": "Bulk Thai Curry Sausage",
+      "visible": 1,
+      "trackInventory": 0,
+      "inventory": 0,
+      "onSale": 0,
+      "saleDiscount": 0
+    },
+    "id": 1980,
+    "auditId": 13,
+    "result": null,
+    "released": false
+  },
+  {
+    "direction": "outgoing",
+    "platform": "square",
+    "kind": "price",
+    "productId": 816905,
+    "productName": "Cajun Chaurice Sausage Links",
+    "packageId": 539546,
+    "packageName": "4 links/ pack 14 oz pack",
+    "vendorName": "Deck Family Farm's Hyland Artisinal Meats",
+    "status": "changed",
+    "message": "",
+    "staged": {},
+    "localBefore": {
+      "productId": 816905,
+      "packageId": 539546,
+      "vendorName": "Deck Family Farm's Hyland Artisinal Meats",
+      "productName": "Cajun Chaurice Sausage Links",
+      "categoryName": "Sausages & Cured Meats🥓",
+      "sourceUnitPrice": null,
+      "unitOfMeasure": "each",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "localAfter": {
+      "productId": 816905,
+      "packageId": 539546,
+      "vendorName": "Deck Family Farm's Hyland Artisinal Meats",
+      "productName": "Cajun Chaurice Sausage Links",
+      "categoryName": "Sausages & Cured Meats🥓",
+      "sourceUnitPrice": null,
+      "unitOfMeasure": "each",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "mapping": {
+      "linkId": 26,
+      "squareItemId": "BKII4YYPR7FUPZVKDYUHUXVD",
+      "squareVariationId": "WBDNBYBMRDK55JR6NCQG6FGD",
+      "linkApprovedAt": "2026-09-15 11:58:22"
+    },
+    "remoteBefore": {
+      "id": "WBDNBYBMRDK55JR6NCQG6FGD",
+      "deleted": false,
+      "itemId": "BKII4YYPR7FUPZVKDYUHUXVD",
+      "pricingType": "FIXED_PRICING",
+      "amount": 2000,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "desired": {
+      "id": "WBDNBYBMRDK55JR6NCQG6FGD",
+      "deleted": false,
+      "itemId": "BKII4YYPR7FUPZVKDYUHUXVD",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1999,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "payload": {
+      "amount": 1999,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "display": {
+      "current": {
+        "price": 20,
+        "currency": "USD",
+        "sellingUnit": "each"
+      },
+      "proposed": {
+        "price": 19.99,
+        "currency": "USD",
+        "sellingUnit": "each"
+      },
+      "basis": "vendor-retail-price"
+    },
+    "localSnapshot": {
+      "productId": 816905,
+      "productName": "Cajun Chaurice Sausage Links",
+      "visible": 1,
+      "trackInventory": 0,
+      "inventory": 0,
+      "onSale": 0,
+      "saleDiscount": 0
+    },
+    "id": 1981,
+    "auditId": 13,
+    "result": null,
+    "released": false
+  },
+  {
+    "direction": "outgoing",
+    "platform": "square",
+    "kind": "price",
+    "productId": 1011877,
+    "productName": "Classic Beef Broth",
+    "packageId": 795009,
+    "packageName": "1 quart",
+    "vendorName": "Deck Family Farm's Hyland Artisinal Meats",
+    "status": "synced",
+    "message": "",
+    "staged": {},
+    "localBefore": {
+      "productId": 1011877,
+      "packageId": 795009,
+      "vendorName": "Deck Family Farm's Hyland Artisinal Meats",
+      "productName": "Classic Beef Broth",
+      "categoryName": "Broth, Lard, Bones, and Organs🦴",
+      "sourceUnitPrice": null,
+      "unitOfMeasure": "each",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "localAfter": {
+      "productId": 1011877,
+      "packageId": 795009,
+      "vendorName": "Deck Family Farm's Hyland Artisinal Meats",
+      "productName": "Classic Beef Broth",
+      "categoryName": "Broth, Lard, Bones, and Organs🦴",
+      "sourceUnitPrice": null,
+      "unitOfMeasure": "each",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "mapping": {
+      "linkId": 30,
+      "squareItemId": "STOLBNKXICC2JBBIP4575AQW",
+      "squareVariationId": "7LHBXGXLCLG3OWB2BHSGAJUT",
+      "linkApprovedAt": "2026-09-15 11:59:00"
+    },
+    "remoteBefore": {
+      "id": "7LHBXGXLCLG3OWB2BHSGAJUT",
+      "deleted": false,
+      "itemId": "STOLBNKXICC2JBBIP4575AQW",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1450,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "desired": {
+      "id": "7LHBXGXLCLG3OWB2BHSGAJUT",
+      "deleted": false,
+      "itemId": "STOLBNKXICC2JBBIP4575AQW",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1450,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "payload": {
+      "amount": 1450,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "display": {
+      "current": {
+        "price": 14.5,
+        "currency": "USD",
+        "sellingUnit": "each"
+      },
+      "proposed": {
+        "price": 14.5,
+        "currency": "USD",
+        "sellingUnit": "each"
+      },
+      "basis": "vendor-retail-price"
+    },
+    "localSnapshot": {
+      "productId": 1011877,
+      "productName": "Classic Beef Broth",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": 0,
+      "onSale": 0,
+      "saleDiscount": 0
+    },
+    "id": 1982,
+    "auditId": 13,
+    "result": null,
+    "released": false
+  },
+  {
+    "direction": "outgoing",
+    "platform": "square",
+    "kind": "price",
+    "productId": 1011876,
+    "productName": "Classic Pork Broth",
+    "packageId": 795008,
+    "packageName": "1 quart",
+    "vendorName": "Deck Family Farm's Hyland Artisinal Meats",
+    "status": "synced",
+    "message": "",
+    "staged": {},
+    "localBefore": {
+      "productId": 1011876,
+      "packageId": 795008,
+      "vendorName": "Deck Family Farm's Hyland Artisinal Meats",
+      "productName": "Classic Pork Broth",
+      "categoryName": "Broth, Lard, Bones, and Organs🦴",
+      "sourceUnitPrice": null,
+      "unitOfMeasure": "each",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "localAfter": {
+      "productId": 1011876,
+      "packageId": 795008,
+      "vendorName": "Deck Family Farm's Hyland Artisinal Meats",
+      "productName": "Classic Pork Broth",
+      "categoryName": "Broth, Lard, Bones, and Organs🦴",
+      "sourceUnitPrice": null,
+      "unitOfMeasure": "each",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "mapping": {
+      "linkId": 32,
+      "squareItemId": "STOLBNKXICC2JBBIP4575AQW",
+      "squareVariationId": "MJNI7UO6UHP7E4UPVVAAJFUT",
+      "linkApprovedAt": "2026-09-15 11:59:06"
+    },
+    "remoteBefore": {
+      "id": "MJNI7UO6UHP7E4UPVVAAJFUT",
+      "deleted": false,
+      "itemId": "STOLBNKXICC2JBBIP4575AQW",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1450,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "desired": {
+      "id": "MJNI7UO6UHP7E4UPVVAAJFUT",
+      "deleted": false,
+      "itemId": "STOLBNKXICC2JBBIP4575AQW",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1450,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "payload": {
+      "amount": 1450,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "display": {
+      "current": {
+        "price": 14.5,
+        "currency": "USD",
+        "sellingUnit": "each"
+      },
+      "proposed": {
+        "price": 14.5,
+        "currency": "USD",
+        "sellingUnit": "each"
+      },
+      "basis": "vendor-retail-price"
+    },
+    "localSnapshot": {
+      "productId": 1011876,
+      "productName": "Classic Pork Broth",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": 0,
+      "onSale": 0,
+      "saleDiscount": 0
+    },
+    "id": 1984,
+    "auditId": 13,
+    "result": null,
+    "released": false
+  },
+  {
+    "direction": "outgoing",
+    "platform": "square",
+    "kind": "price",
+    "productId": 1061161,
+    "productName": "Classic Pork Broth",
+    "packageId": 868147,
+    "packageName": "1 quart",
+    "vendorName": "Deck Family Farm's Hyland Artisinal Meats",
+    "status": "synced",
+    "message": "",
+    "staged": {},
+    "localBefore": {
+      "productId": 1061161,
+      "packageId": 868147,
+      "vendorName": "Deck Family Farm's Hyland Artisinal Meats",
+      "productName": "Classic Pork Broth",
+      "categoryName": null,
+      "sourceUnitPrice": null,
+      "unitOfMeasure": "each",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "localAfter": {
+      "productId": 1061161,
+      "packageId": 868147,
+      "vendorName": "Deck Family Farm's Hyland Artisinal Meats",
+      "productName": "Classic Pork Broth",
+      "categoryName": null,
+      "sourceUnitPrice": null,
+      "unitOfMeasure": "each",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "mapping": {
+      "linkId": 33,
+      "squareItemId": "STOLBNKXICC2JBBIP4575AQW",
+      "squareVariationId": "TCNUAREBJXQELVW3ODJGAW7W",
+      "linkApprovedAt": "2026-09-15 11:59:11"
+    },
+    "remoteBefore": {
+      "id": "TCNUAREBJXQELVW3ODJGAW7W",
+      "deleted": false,
+      "itemId": "STOLBNKXICC2JBBIP4575AQW",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1450,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "desired": {
+      "id": "TCNUAREBJXQELVW3ODJGAW7W",
+      "deleted": false,
+      "itemId": "STOLBNKXICC2JBBIP4575AQW",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1450,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "payload": {
+      "amount": 1450,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "display": {
+      "current": {
+        "price": 14.5,
+        "currency": "USD",
+        "sellingUnit": "each"
+      },
+      "proposed": {
+        "price": 14.5,
+        "currency": "USD",
+        "sellingUnit": "each"
+      },
+      "basis": "vendor-retail-price"
+    },
+    "localSnapshot": {
+      "productId": 1061161,
+      "productName": "Classic Pork Broth",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": 0,
+      "onSale": 0,
+      "saleDiscount": 0
+    },
+    "id": 1983,
+    "auditId": 13,
+    "result": null,
+    "released": false
+  },
+  {
+    "direction": "outgoing",
+    "platform": "square",
+    "kind": "price",
+    "productId": 913648,
+    "productName": "Lamb Merguez Sausage Links",
+    "packageId": 659184,
+    "packageName": "4 links/pack 14 oz pack",
+    "vendorName": "Deck Family Farm's Hyland Artisinal Meats",
+    "status": "synced",
+    "message": "",
+    "staged": {},
+    "localBefore": {
+      "productId": 913648,
+      "packageId": 659184,
+      "vendorName": "Deck Family Farm's Hyland Artisinal Meats",
+      "productName": "Lamb Merguez Sausage Links",
+      "categoryName": "Sausages & Cured Meats🥓",
+      "sourceUnitPrice": null,
+      "unitOfMeasure": "each",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "localAfter": {
+      "productId": 913648,
+      "packageId": 659184,
+      "vendorName": "Deck Family Farm's Hyland Artisinal Meats",
+      "productName": "Lamb Merguez Sausage Links",
+      "categoryName": "Sausages & Cured Meats🥓",
+      "sourceUnitPrice": null,
+      "unitOfMeasure": "each",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "mapping": {
+      "linkId": 53,
+      "squareItemId": "N7X3GEGY2OGLMSPQ4KCM4OGO",
+      "squareVariationId": "U37CHXXOQNKCISKGN4INWKO3",
+      "linkApprovedAt": "2026-09-15 12:02:29"
+    },
+    "remoteBefore": {
+      "id": "U37CHXXOQNKCISKGN4INWKO3",
+      "deleted": false,
+      "itemId": "N7X3GEGY2OGLMSPQ4KCM4OGO",
+      "pricingType": "FIXED_PRICING",
+      "amount": 2400,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "desired": {
+      "id": "U37CHXXOQNKCISKGN4INWKO3",
+      "deleted": false,
+      "itemId": "N7X3GEGY2OGLMSPQ4KCM4OGO",
+      "pricingType": "FIXED_PRICING",
+      "amount": 2400,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "payload": {
+      "amount": 2400,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "display": {
+      "current": {
+        "price": 24,
+        "currency": "USD",
+        "sellingUnit": "each"
+      },
+      "proposed": {
+        "price": 24,
+        "currency": "USD",
+        "sellingUnit": "each"
+      },
+      "basis": "vendor-retail-price"
+    },
+    "localSnapshot": {
+      "productId": 913648,
+      "productName": "Lamb Merguez Sausage Links",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": 0,
+      "onSale": 0,
+      "saleDiscount": 0
+    },
+    "id": 1985,
+    "auditId": 13,
+    "result": null,
+    "released": false
+  },
+  {
+    "direction": "outgoing",
+    "platform": "square",
+    "kind": "price",
+    "productId": 859028,
+    "productName": "Olympia Provisions, Dog Treats",
+    "packageId": 588612,
+    "packageName": "5 oz",
+    "vendorName": "Deck Family Farm",
+    "status": "synced",
+    "message": "",
+    "staged": {},
+    "localBefore": {
+      "productId": 859028,
+      "packageId": 588612,
+      "vendorName": "Deck Family Farm",
+      "productName": "Olympia Provisions, Dog Treats",
+      "categoryName": "Sausages & Cured Meats🥓",
+      "sourceUnitPrice": null,
+      "unitOfMeasure": "each",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "localAfter": {
+      "productId": 859028,
+      "packageId": 588612,
+      "vendorName": "Deck Family Farm",
+      "productName": "Olympia Provisions, Dog Treats",
+      "categoryName": "Sausages & Cured Meats🥓",
+      "sourceUnitPrice": null,
+      "unitOfMeasure": "each",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "mapping": {
+      "linkId": 65,
+      "squareItemId": "WWWJVCE57A35KUIF5UDYVR4Z",
+      "squareVariationId": "7ONA7WTZJVR2U67PQAQ3GHDS",
+      "linkApprovedAt": "2026-09-15 12:03:37"
+    },
+    "remoteBefore": {
+      "id": "7ONA7WTZJVR2U67PQAQ3GHDS",
+      "deleted": false,
+      "itemId": "WWWJVCE57A35KUIF5UDYVR4Z",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1800,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "desired": {
+      "id": "7ONA7WTZJVR2U67PQAQ3GHDS",
+      "deleted": false,
+      "itemId": "WWWJVCE57A35KUIF5UDYVR4Z",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1800,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "payload": {
+      "amount": 1800,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "display": {
+      "current": {
+        "price": 18,
+        "currency": "USD",
+        "sellingUnit": "each"
+      },
+      "proposed": {
+        "price": 18,
+        "currency": "USD",
+        "sellingUnit": "each"
+      },
+      "basis": "vendor-retail-price"
+    },
+    "localSnapshot": {
+      "productId": 859028,
+      "productName": "Olympia Provisions, Dog Treats",
+      "visible": 1,
+      "trackInventory": 0,
+      "inventory": 0,
+      "onSale": 0,
+      "saleDiscount": 0
+    },
+    "id": 1986,
+    "auditId": 13,
+    "result": null,
+    "released": false
+  },
+  {
+    "direction": "outgoing",
+    "platform": "square",
+    "kind": "price",
+    "productId": 806161,
+    "productName": "Raw Honey, 1 pint",
+    "packageId": 527228,
+    "packageName": "1 pint",
+    "vendorName": "Deck Family Farm",
+    "status": "synced",
+    "message": "",
+    "staged": {},
+    "localBefore": {
+      "productId": 806161,
+      "packageId": 527228,
+      "vendorName": "Deck Family Farm",
+      "productName": "Raw Honey, 1 pint",
+      "categoryName": "Canned Goods 🥫",
+      "sourceUnitPrice": null,
+      "unitOfMeasure": "each",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "localAfter": {
+      "productId": 806161,
+      "packageId": 527228,
+      "vendorName": "Deck Family Farm",
+      "productName": "Raw Honey, 1 pint",
+      "categoryName": "Canned Goods 🥫",
+      "sourceUnitPrice": null,
+      "unitOfMeasure": "each",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "mapping": {
+      "linkId": 81,
+      "squareItemId": "IRMSDE3RXXZRQ5RGXN5MAUFY",
+      "squareVariationId": "VBA7QNBQN4DAJEBMIWY5BZ4I",
+      "linkApprovedAt": "2026-09-15 12:05:02"
+    },
+    "remoteBefore": {
+      "id": "VBA7QNBQN4DAJEBMIWY5BZ4I",
+      "deleted": false,
+      "itemId": "IRMSDE3RXXZRQ5RGXN5MAUFY",
+      "pricingType": "FIXED_PRICING",
+      "amount": 2600,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "desired": {
+      "id": "VBA7QNBQN4DAJEBMIWY5BZ4I",
+      "deleted": false,
+      "itemId": "IRMSDE3RXXZRQ5RGXN5MAUFY",
+      "pricingType": "FIXED_PRICING",
+      "amount": 2600,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "payload": {
+      "amount": 2600,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "display": {
+      "current": {
+        "price": 26,
+        "currency": "USD",
+        "sellingUnit": "each"
+      },
+      "proposed": {
+        "price": 26,
+        "currency": "USD",
+        "sellingUnit": "each"
+      },
+      "basis": "vendor-retail-price"
+    },
+    "localSnapshot": {
+      "productId": 806161,
+      "productName": "Raw Honey, 1 pint",
+      "visible": 1,
+      "trackInventory": 0,
+      "inventory": 0,
+      "onSale": 0,
+      "saleDiscount": 0
+    },
+    "id": 1987,
+    "auditId": 13,
+    "result": null,
+    "released": false
+  },
+  {
+    "direction": "outgoing",
+    "platform": "square",
+    "kind": "price",
+    "productId": 940998,
+    "productName": "Raw Honey, 1/2 pint",
+    "packageId": 694994,
+    "packageName": "1/2 pint",
+    "vendorName": "Deck Family Farm",
+    "status": "synced",
+    "message": "",
+    "staged": {},
+    "localBefore": {
+      "productId": 940998,
+      "packageId": 694994,
+      "vendorName": "Deck Family Farm",
+      "productName": "Raw Honey, 1/2 pint",
+      "categoryName": "Canned Goods 🥫",
+      "sourceUnitPrice": null,
+      "unitOfMeasure": "each",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "localAfter": {
+      "productId": 940998,
+      "packageId": 694994,
+      "vendorName": "Deck Family Farm",
+      "productName": "Raw Honey, 1/2 pint",
+      "categoryName": "Canned Goods 🥫",
+      "sourceUnitPrice": null,
+      "unitOfMeasure": "each",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "mapping": {
+      "linkId": 83,
+      "squareItemId": "UDZUFDD4BZQV4OKACAQ55ZGA",
+      "squareVariationId": "5L6WZFWO6HESVITXZYJELIQJ",
+      "linkApprovedAt": "2026-09-15 12:05:09"
+    },
+    "remoteBefore": {
+      "id": "5L6WZFWO6HESVITXZYJELIQJ",
+      "deleted": false,
+      "itemId": "UDZUFDD4BZQV4OKACAQ55ZGA",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1700,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "desired": {
+      "id": "5L6WZFWO6HESVITXZYJELIQJ",
+      "deleted": false,
+      "itemId": "UDZUFDD4BZQV4OKACAQ55ZGA",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1700,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "payload": {
+      "amount": 1700,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "display": {
+      "current": {
+        "price": 17,
+        "currency": "USD",
+        "sellingUnit": "each"
+      },
+      "proposed": {
+        "price": 17,
+        "currency": "USD",
+        "sellingUnit": "each"
+      },
+      "basis": "vendor-retail-price"
+    },
+    "localSnapshot": {
+      "productId": 940998,
+      "productName": "Raw Honey, 1/2 pint",
+      "visible": 1,
+      "trackInventory": 0,
+      "inventory": 0,
+      "onSale": 0,
+      "saleDiscount": 0
+    },
+    "id": 1988,
+    "auditId": 13,
+    "result": null,
+    "released": false
+  },
+  {
+    "direction": "outgoing",
+    "platform": "square",
+    "kind": "price",
+    "productId": 941045,
+    "productName": "Rendered Beef Tallow, 8 oz",
+    "packageId": 695051,
+    "packageName": "8 oz",
+    "vendorName": "Deck Family Farm's Hyland Artisinal Meats",
+    "status": "synced",
+    "message": "",
+    "staged": {},
+    "localBefore": {
+      "productId": 941045,
+      "packageId": 695051,
+      "vendorName": "Deck Family Farm's Hyland Artisinal Meats",
+      "productName": "Rendered Beef Tallow, 8 oz",
+      "categoryName": "Broth, Lard, Bones, and Organs🦴",
+      "sourceUnitPrice": null,
+      "unitOfMeasure": "each",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "localAfter": {
+      "productId": 941045,
+      "packageId": 695051,
+      "vendorName": "Deck Family Farm's Hyland Artisinal Meats",
+      "productName": "Rendered Beef Tallow, 8 oz",
+      "categoryName": "Broth, Lard, Bones, and Organs🦴",
+      "sourceUnitPrice": null,
+      "unitOfMeasure": "each",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "mapping": {
+      "linkId": 87,
+      "squareItemId": "HVG4VFTHE3RMCAWBXDGPTBKG",
+      "squareVariationId": "4HFME7B2JIQDOLKVUVLVS6F7",
+      "linkApprovedAt": "2026-09-15 12:05:46"
+    },
+    "remoteBefore": {
+      "id": "4HFME7B2JIQDOLKVUVLVS6F7",
+      "deleted": false,
+      "itemId": "HVG4VFTHE3RMCAWBXDGPTBKG",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1000,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "desired": {
+      "id": "4HFME7B2JIQDOLKVUVLVS6F7",
+      "deleted": false,
+      "itemId": "HVG4VFTHE3RMCAWBXDGPTBKG",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1000,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "payload": {
+      "amount": 1000,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "display": {
+      "current": {
+        "price": 10,
+        "currency": "USD",
+        "sellingUnit": "each"
+      },
+      "proposed": {
+        "price": 10,
+        "currency": "USD",
+        "sellingUnit": "each"
+      },
+      "basis": "vendor-retail-price"
+    },
+    "localSnapshot": {
+      "productId": 941045,
+      "productName": "Rendered Beef Tallow, 8 oz",
+      "visible": 1,
+      "trackInventory": 0,
+      "inventory": 0,
+      "onSale": 0,
+      "saleDiscount": 0
+    },
+    "id": 1989,
+    "auditId": 13,
+    "result": null,
+    "released": false
+  },
+  {
+    "direction": "outgoing",
+    "platform": "square",
+    "kind": "price",
+    "productId": 1013988,
+    "productName": "Smoked Pork Shanks - Skin-on and Smoked",
+    "packageId": 798012,
+    "packageName": "2 - 2.5 lbs",
+    "vendorName": "Deck Family Farm",
+    "status": "changed",
+    "message": "Change Square selling unit from lb to each/package; price is per each/package.",
+    "staged": {},
+    "localBefore": {
+      "productId": 1013988,
+      "packageId": 798012,
+      "vendorName": "Deck Family Farm",
+      "productName": "Smoked Pork Shanks - Skin-on and Smoked",
+      "categoryName": "Broth, Lard, Bones, and Organs🦴",
+      "sourceUnitPrice": null,
+      "unitOfMeasure": "each",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "localAfter": {
+      "productId": 1013988,
+      "packageId": 798012,
+      "vendorName": "Deck Family Farm",
+      "productName": "Smoked Pork Shanks - Skin-on and Smoked",
+      "categoryName": "Broth, Lard, Bones, and Organs🦴",
+      "sourceUnitPrice": null,
+      "unitOfMeasure": "each",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "mapping": {
+      "linkId": 95,
+      "squareItemId": "4MJHJVJYDZNCHSKIFKWF553J",
+      "squareVariationId": "HSN75FILHGFLQGROEUIIC2XC",
+      "linkApprovedAt": "2026-09-15 12:06:36"
+    },
+    "remoteBefore": {
+      "id": "HSN75FILHGFLQGROEUIIC2XC",
+      "deleted": false,
+      "itemId": "4MJHJVJYDZNCHSKIFKWF553J",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1650,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+        "unit": "lb",
+        "precision": 2,
+        "definition": {
+          "weight_unit": "IMPERIAL_POUND",
+          "type": "TYPE_WEIGHT"
+        }
+      }
+    },
+    "desired": {
+      "id": "HSN75FILHGFLQGROEUIIC2XC",
+      "deleted": false,
+      "itemId": "4MJHJVJYDZNCHSKIFKWF553J",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1650,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "payload": {
+      "amount": 1650,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "display": {
+      "current": {
+        "price": 16.5,
+        "currency": "USD",
+        "sellingUnit": "lb"
+      },
+      "proposed": {
+        "price": 16.5,
+        "currency": "USD",
+        "sellingUnit": "each"
+      },
+      "basis": "vendor-retail-price"
+    },
+    "localSnapshot": {
+      "productId": 1013988,
+      "productName": "Smoked Pork Shanks - Skin-on and Smoked",
+      "visible": 1,
+      "trackInventory": 0,
+      "inventory": 0,
+      "onSale": 0,
+      "saleDiscount": 0
+    },
+    "id": 1990,
+    "auditId": 13,
+    "result": null,
+    "released": false
+  },
+  {
+    "direction": "outgoing",
+    "platform": "square",
+    "kind": "price",
+    "productId": 805687,
+    "productName": "Summer Sausage",
+    "packageId": 526740,
+    "packageName": "8 oz",
+    "vendorName": "Deck Family Farm",
+    "status": "synced",
+    "message": "",
+    "staged": {},
+    "localBefore": {
+      "productId": 805687,
+      "packageId": 526740,
+      "vendorName": "Deck Family Farm",
+      "productName": "Summer Sausage",
+      "categoryName": "Sausages & Cured Meats🥓",
+      "sourceUnitPrice": null,
+      "unitOfMeasure": "each",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "localAfter": {
+      "productId": 805687,
+      "packageId": 526740,
+      "vendorName": "Deck Family Farm",
+      "productName": "Summer Sausage",
+      "categoryName": "Sausages & Cured Meats🥓",
+      "sourceUnitPrice": null,
+      "unitOfMeasure": "each",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "mapping": {
+      "linkId": 97,
+      "squareItemId": "IGVW5XO7MRUVRIPCIM7VWN2Y",
+      "squareVariationId": "634VPLABW35HBLQMFSCMU6HA",
+      "linkApprovedAt": "2026-09-15 12:06:51"
+    },
+    "remoteBefore": {
+      "id": "634VPLABW35HBLQMFSCMU6HA",
+      "deleted": false,
+      "itemId": "IGVW5XO7MRUVRIPCIM7VWN2Y",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1700,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "desired": {
+      "id": "634VPLABW35HBLQMFSCMU6HA",
+      "deleted": false,
+      "itemId": "IGVW5XO7MRUVRIPCIM7VWN2Y",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1700,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "payload": {
+      "amount": 1700,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "display": {
+      "current": {
+        "price": 17,
+        "currency": "USD",
+        "sellingUnit": "each"
+      },
+      "proposed": {
+        "price": 17,
+        "currency": "USD",
+        "sellingUnit": "each"
+      },
+      "basis": "vendor-retail-price"
+    },
+    "localSnapshot": {
+      "productId": 805687,
+      "productName": "Summer Sausage",
+      "visible": 1,
+      "trackInventory": 0,
+      "inventory": 0,
+      "onSale": 0,
+      "saleDiscount": 0
+    },
+    "id": 1991,
+    "auditId": 13,
+    "result": null,
+    "released": false
+  }
+]

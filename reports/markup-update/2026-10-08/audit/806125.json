@@ -1,0 +1,173 @@
+{
+  "productId": 806125,
+  "context": {
+    "product": {
+      "id": 806125,
+      "name": "Organic Spelt Flour",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Spelt is a ancient variety of wheat with a low gluten content. Spelt flour has a mild and nutty flavor and is great for making cookies, muffins, scones, some breads and pasta.</span></p>",
+      "visible": 0,
+      "trackInventory": 1,
+      "inventory": 0,
+      "categoryId": 20,
+      "vendorId": 3151,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/sQjnO.thumbnail.jpeg",
+      "createdAt": "2023-08-25T15:15:32.000Z",
+      "updatedAt": "2026-09-29T10:40:24.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Grains/Pasta/Nuts  🫘 🍝 🥣",
+    "vendor": {
+      "id": 3151,
+      "name": "Camas Country Mill",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 642173,
+        "productId": 806125,
+        "name": "2 lb. Bag",
+        "price": "8.65",
+        "packageCode": null,
+        "unit": "ea",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": null
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 642173,
+        "productId": 806125,
+        "localLinePackageId": 642173,
+        "liveName": "2 lb. Bag",
+        "livePrice": "8.65",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":806125,\"Product\":\"Organic Spelt Flour\",\"Track Inventory By\":\"package\",\"Item Unit\":\"ea\",\"Charge By\":\"package\",\"Charge Unit\":\"ea\",\"Package ID\":642173,\"Package Name\":\"2 lb. Bag\",\"# of Items\":1,\"Package Price\":8.65,\"Inventory Type\":\"product\"},\"live\":{\"id\":642173,\"inventory_per_unit\":1,\"unit_price\":8.65,\"average_pack_weight\":0,\"package_price\":8.65,\"package_unit_price\":8.65,\"priority_order\":null,\"name\":\"2 lb. Bag\",\"price_list_entries\":[{\"id\":424816,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":234329,\"subscription_setting\":{\"id\":305105,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":424817,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":234330,\"subscription_setting\":{\"id\":305106,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":618025,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479917,\"subscription_setting\":{\"id\":497141,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":424818,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":234331,\"subscription_setting\":{\"id\":305107,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":806125,\"product_name\":\"Organic Spelt Flour\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"ea\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2024-08-15T14:46:16.821583-04:00\",\"updated\":\"2026-01-22T13:23:58.750933-05:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-05T10:41:40.000Z",
+        "lastSyncedAt": "2026-10-05T10:41:40.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 806125,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-05T10:41:40.000Z"
+    },
+    "remoteId": 806125,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/806125/localline/566f3007e66352b95056d17c.jpg"
+    ]
+  },
+  "remote": null,
+  "payload": null,
+  "problems": [
+    "Local Line product not found (404)"
+  ],
+  "status": "exception",
+  "auditedAt": "2026-10-08T19:39:38.690Z",
+  "rows": [
+    {
+      "productId": 806125,
+      "product": "Organic Spelt Flour",
+      "vendor": "Camas Country Mill",
+      "packageId": 642173,
+      "package": "2 lb. Bag",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 8.65,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 12.11,
+      "localPriceAfter": 12.54,
+      "remoteBasePrice": null,
+      "remoteAdjustmentType": null,
+      "remoteAdjustmentBefore": null,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": null,
+      "remotePriceAfter": null
+    },
+    {
+      "productId": 806125,
+      "product": "Organic Spelt Flour",
+      "vendor": "Camas Country Mill",
+      "packageId": 642173,
+      "package": "2 lb. Bag",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 8.65,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 12.11,
+      "localPriceAfter": 12.54,
+      "remoteBasePrice": null,
+      "remoteAdjustmentType": null,
+      "remoteAdjustmentBefore": null,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": null,
+      "remotePriceAfter": null
+    },
+    {
+      "productId": 806125,
+      "product": "Organic Spelt Flour",
+      "vendor": "Camas Country Mill",
+      "packageId": 642173,
+      "package": "2 lb. Bag",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 8.65,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 12.11,
+      "localPriceAfter": 12.54,
+      "remoteBasePrice": null,
+      "remoteAdjustmentType": null,
+      "remoteAdjustmentBefore": null,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": null,
+      "remotePriceAfter": null
+    },
+    {
+      "productId": 806125,
+      "product": "Organic Spelt Flour",
+      "vendor": "Camas Country Mill",
+      "packageId": 642173,
+      "package": "2 lb. Bag",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 8.65,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 12.11,
+      "localPriceAfter": 12.54,
+      "remoteBasePrice": null,
+      "remoteAdjustmentType": null,
+      "remoteAdjustmentBefore": null,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": null,
+      "remotePriceAfter": null
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.937Z",
+  "connectionError": "Local Line product not found (404)"
+}

@@ -1,0 +1,281 @@
+{
+  "data": {
+    "id": 1058760,
+    "name": "Pea Shoot Microgreens",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Pea shoot microgreens are the&nbsp;young, tender leaves, stems, and tendrils of the pea plant, offering a sweet, crisp, and slightly nutty flavor reminiscent of fresh snap peas. Typically harvested within 10–14 days, they are nutrient-dense, rich in vitamins A, C, and K, folic acid, and essential amino acids.&nbsp;</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Gorge Greens (WA)</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2026-02-05T17:40:39.522177-05:00",
+    "updated": "2026-10-08T16:33:36.529886-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/Bin0g.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 382462,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/Bin0g.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/Bin0g.jpeg",
+        "original_filename": "download (3).jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 865052,
+        "inventory_per_unit": 1,
+        "unit_price": 5.45,
+        "average_pack_weight": 0,
+        "package_price": 5.45,
+        "package_unit_price": 5.45,
+        "priority_order": 1,
+        "name": "2.5 oz ea",
+        "price_list_entries": [
+          {
+            "id": 797270,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 610796,
+            "subscription_setting": {
+              "id": 675749,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 797267,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 610793,
+            "subscription_setting": {
+              "id": 675746,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 797268,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 610794,
+            "subscription_setting": {
+              "id": 675747,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 797269,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 610795,
+            "subscription_setting": {
+              "id": 675748,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": null,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 1058760,
+        "product_name": "Pea Shoot Microgreens",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-02-05T17:40:39.839799-05:00",
+        "updated": "2026-10-08T16:33:35.725492-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 610793,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 912,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 504307,
+            "price_list_category": 15732,
+            "priority_order": 13,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": {
+          "id": 115889,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 610794,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 1075,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 504308,
+            "price_list_category": 15107,
+            "priority_order": 10,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": {
+          "id": 115890,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 610795,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1290,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 504309,
+            "price_list_category": 15119,
+            "priority_order": 13,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": {
+          "id": 115891,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 610796,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1291,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 504310,
+            "price_list_category": 28913,
+            "priority_order": 13,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": {
+          "id": 115892,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3168,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 1058760,
+  "remoteProductId": 1058760,
+  "checkedAt": "2026-10-11T18:10:10.231Z"
+}

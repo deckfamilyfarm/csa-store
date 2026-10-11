@@ -1,0 +1,274 @@
+{
+  "remote": {
+    "id": 1162016,
+    "name": "Organic Spelt Flour",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Spelt is a ancient variety of wheat with a low gluten content. Spelt flour has a mild and nutty flavor and is great for making cookies, muffins, scones, some breads and pasta.</span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2026-09-14T12:58:06.336799-04:00",
+    "updated": "2026-09-14T12:58:08.136418-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/65XHR.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 474530,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/65XHR.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/65XHR.jpeg",
+        "original_filename": "account/322922/sQjnO.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 1,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "421",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 1008808,
+        "inventory_per_unit": 1,
+        "unit_price": 12,
+        "average_pack_weight": 0,
+        "package_price": 12,
+        "package_unit_price": 12,
+        "priority_order": null,
+        "name": "4 lb. Bag",
+        "price_list_entries": [
+          {
+            "id": 1045233,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 806067,
+            "subscription_setting": {
+              "id": 923908,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1045234,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 806068,
+            "subscription_setting": {
+              "id": 923909,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1045235,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 806069,
+            "subscription_setting": {
+              "id": 923910,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1045236,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 806070,
+            "subscription_setting": {
+              "id": 923911,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 1,
+        "number_of_packages_available": 1,
+        "number_of_packages_total": 1,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 1,
+        "product_package_size": 1,
+        "product_id": 1162016,
+        "product_name": "Organic Spelt Flour",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-09-14T12:58:06.826478-04:00",
+        "updated": "2026-09-14T12:58:06.928783-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 806067,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 1131,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 683495,
+            "price_list_category": 31659,
+            "priority_order": 490,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 806068,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 1018,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 683496,
+            "price_list_category": 31655,
+            "priority_order": 168,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": {
+          "id": 200757,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 806069,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1400,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 683497,
+            "price_list_category": 17687,
+            "priority_order": 485,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": {
+          "id": 200758,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 806070,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1418,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 683498,
+            "price_list_category": 31666,
+            "priority_order": 491,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": {
+          "id": 200759,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 3151,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 1,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 1
+  },
+  "fetchedAt": "2026-10-08T21:50:59.324Z"
+}

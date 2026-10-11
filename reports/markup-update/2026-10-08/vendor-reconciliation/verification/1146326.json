@@ -1,0 +1,240 @@
+{
+  "verifiedAt": "2026-10-09T20:09:23.372Z",
+  "productId": 1146326,
+  "priceConfirmed": true,
+  "otherFieldsUnchanged": true,
+  "classicPricesUnchanged": true,
+  "remote": {
+    "id": 1146326,
+    "name": "Green Cabbage",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Serve cabbage raw as a crunchy coleslaw, braised on the stove for a meaty stew, roasted in the oven, cooked in the slow cooker, or even grilled like a steak. Cabbage doesn't always get the appreciation it deserves.</span></p><p><br></p><p><br></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2026-07-21T15:52:14.769111-04:00",
+    "updated": "2026-10-09T16:00:59.331677-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/BkJYj.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 454748,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/BkJYj.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/BkJYj.jpg",
+        "original_filename": "account/322922/YdDVd.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "6504",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 986082,
+        "inventory_per_unit": 1,
+        "unit_price": 2.5,
+        "average_pack_weight": null,
+        "package_price": 2.5,
+        "package_unit_price": 2.5,
+        "priority_order": null,
+        "name": "each",
+        "price_list_entries": [
+          {
+            "id": 1004103,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 773766,
+            "subscription_setting": {
+              "id": 882756,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1004104,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 773765,
+            "subscription_setting": {
+              "id": 882757,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1004105,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 773767,
+            "subscription_setting": {
+              "id": 882758,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": null,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 1146326,
+        "product_name": "Green Cabbage",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-07-21T15:52:15.233405-04:00",
+        "updated": "2026-10-09T16:00:58.737831-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 773765,
+        "price_list_category": 15122,
+        "price_list": 2966,
+        "priority_order": 1365,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 651063,
+            "price_list_category": 15122,
+            "priority_order": 1,
+            "price_list_category_name": "Organic Cruciferous Vegetables🥦"
+          }
+        ],
+        "tax_configuration": {
+          "id": 181086,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 773766,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 983,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 651064,
+            "price_list_category": 15735,
+            "priority_order": 1,
+            "price_list_category_name": "Organic Cruciferous Vegetables🥦"
+          }
+        ],
+        "tax_configuration": {
+          "id": 181087,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 773767,
+        "price_list_category": 28916,
+        "price_list": 5622,
+        "priority_order": 1386,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 651065,
+            "price_list_category": 28916,
+            "priority_order": 1,
+            "price_list_category_name": "Organic Cruciferous Vegetables🥦"
+          }
+        ],
+        "tax_configuration": {
+          "id": 181088,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3177,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  }
+}

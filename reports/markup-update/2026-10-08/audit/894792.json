@@ -1,0 +1,504 @@
+{
+  "productId": 894792,
+  "context": {
+    "product": {
+      "id": 894792,
+      "name": "Flavor Infused Olive Oil- Rosemary and Basil 250mL",
+      "description": "<p>Flavor Infused Olive Oil- Rosemary and Basil</p>",
+      "visible": 1,
+      "trackInventory": 1,
+      "inventory": 8,
+      "categoryId": 19,
+      "vendorId": 3170,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/fyA53.thumbnail.jpeg",
+      "createdAt": "2024-07-22T19:06:55.000Z",
+      "updatedAt": "2026-09-20T10:40:22.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Canned Goods 🥫",
+    "vendor": {
+      "id": 3170,
+      "name": "River Ranch Oregon Olive OIl",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 635199,
+        "productId": 894792,
+        "name": "250mL",
+        "price": "21.95",
+        "packageCode": null,
+        "unit": "ea",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 1,
+        "trackInventory": 0,
+        "inventory": null
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 635199,
+        "productId": 894792,
+        "localLinePackageId": 635199,
+        "liveName": "250mL",
+        "livePrice": "21.95",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":894792,\"Product\":\"Flavor Infused Olive Oil- Rosemary and Basil 250mL\",\"Track Inventory By\":\"package\",\"Item Unit\":\"ea\",\"Charge By\":\"package\",\"Charge Unit\":\"ea\",\"Package ID\":635199,\"Package Name\":\"250mL\",\"# of Items\":1,\"Package Price\":21.95,\"Inventory Type\":\"product\"},\"live\":{\"id\":635199,\"inventory_per_unit\":1,\"unit_price\":21.95,\"average_pack_weight\":null,\"package_price\":21.95,\"package_unit_price\":21.95,\"priority_order\":null,\"name\":\"250mL\",\"price_list_entries\":[{\"id\":618092,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479984,\"subscription_setting\":{\"id\":497208,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":406985,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":326244,\"subscription_setting\":{\"id\":287192,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":406986,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":326245,\"subscription_setting\":{\"id\":287193,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":406987,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":326246,\"subscription_setting\":{\"id\":287194,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":8,\"number_of_packages_available\":8,\"number_of_packages_total\":8,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":8,\"product_package_size\":1,\"product_id\":894792,\"product_name\":\"Flavor Infused Olive Oil- Rosemary and Basil 250mL\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"ea\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2024-07-22T15:06:55.979580-04:00\",\"updated\":\"2025-11-03T12:47:41.490113-05:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 894792,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 894792,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/894792/localline/bfc2d47a56371341c0c7fe53.jpg"
+    ],
+    "localLineVendorId": 3170
+  },
+  "remote": {
+    "id": 894792,
+    "name": "Flavor Infused Olive Oil- Rosemary and Basil 250mL",
+    "description": "<p>Flavor Infused Olive Oil- Rosemary and Basil</p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2024-07-22T15:06:55.733483-04:00",
+    "updated": "2025-11-03T12:47:41.657687-05:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/fyA53.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 219711,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/fyA53.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/fyA53.jpg",
+        "original_filename": "account/322922/5l2xx.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 8,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 635199,
+        "inventory_per_unit": 1,
+        "unit_price": 21.95,
+        "average_pack_weight": null,
+        "package_price": 21.95,
+        "package_unit_price": 21.95,
+        "priority_order": null,
+        "name": "250mL",
+        "price_list_entries": [
+          {
+            "id": 618092,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479984,
+            "subscription_setting": {
+              "id": 497208,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 406985,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 326244,
+            "subscription_setting": {
+              "id": 287192,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 406986,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 326245,
+            "subscription_setting": {
+              "id": 287193,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 406987,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 326246,
+            "subscription_setting": {
+              "id": 287194,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 8,
+        "number_of_packages_available": 8,
+        "number_of_packages_total": 8,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 8,
+        "product_package_size": 1,
+        "product_id": 894792,
+        "product_name": "Flavor Infused Olive Oil- Rosemary and Basil 250mL",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2024-07-22T15:06:55.979580-04:00",
+        "updated": "2025-11-03T12:47:41.490113-05:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 326244,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 425,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440586,
+            "price_list_category": 31658,
+            "priority_order": 433,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 326245,
+        "price_list_category": 17687,
+        "price_list": 2966,
+        "priority_order": 425,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440817,
+            "price_list_category": 31663,
+            "priority_order": 433,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 326246,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 84,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440392,
+            "price_list_category": 15762,
+            "priority_order": 68,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479984,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 425,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 441028,
+            "price_list_category": 31667,
+            "priority_order": 433,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 3170,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 8,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 8
+  },
+  "payload": {
+    "vendor": 3170,
+    "packages": [
+      {
+        "id": 635199,
+        "unit_price": 21.95,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 326246,
+            "calculated_value": 31.83,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 21.95
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 326244,
+            "calculated_value": 31.83,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 21.95
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 326245,
+            "calculated_value": 31.83,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 21.95
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 479984,
+            "calculated_value": 31.83,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 21.95
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:40:05.995Z",
+  "rows": [
+    {
+      "productId": 894792,
+      "product": "Flavor Infused Olive Oil- Rosemary and Basil 250mL",
+      "vendor": "River Ranch Oregon Olive OIl",
+      "packageId": 635199,
+      "package": "250mL",
+      "priceList": "Guest Basket",
+      "visible": true,
+      "basePrice": 21.95,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 30.73,
+      "localPriceAfter": 31.83,
+      "remoteBasePrice": 21.95,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 30.73,
+      "remotePriceAfter": 31.83
+    },
+    {
+      "productId": 894792,
+      "product": "Flavor Infused Olive Oil- Rosemary and Basil 250mL",
+      "vendor": "River Ranch Oregon Olive OIl",
+      "packageId": 635199,
+      "package": "250mL",
+      "priceList": "CSA Members",
+      "visible": true,
+      "basePrice": 21.95,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 30.73,
+      "localPriceAfter": 31.83,
+      "remoteBasePrice": 21.95,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 30.73,
+      "remotePriceAfter": 31.83
+    },
+    {
+      "productId": 894792,
+      "product": "Flavor Infused Olive Oil- Rosemary and Basil 250mL",
+      "vendor": "River Ranch Oregon Olive OIl",
+      "packageId": 635199,
+      "package": "250mL",
+      "priceList": "Herd Share Members",
+      "visible": true,
+      "basePrice": 21.95,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 30.73,
+      "localPriceAfter": 31.83,
+      "remoteBasePrice": 21.95,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 30.73,
+      "remotePriceAfter": 31.83
+    },
+    {
+      "productId": 894792,
+      "product": "Flavor Infused Olive Oil- Rosemary and Basil 250mL",
+      "vendor": "River Ranch Oregon Olive OIl",
+      "packageId": 635199,
+      "package": "250mL",
+      "priceList": "SNAP",
+      "visible": true,
+      "basePrice": 21.95,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 30.73,
+      "localPriceAfter": 31.83,
+      "remoteBasePrice": 21.95,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 30.73,
+      "remotePriceAfter": 31.83
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.961Z"
+}

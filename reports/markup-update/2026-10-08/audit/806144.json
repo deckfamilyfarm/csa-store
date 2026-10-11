@@ -1,0 +1,504 @@
+{
+  "productId": 806144,
+  "context": {
+    "product": {
+      "id": 806144,
+      "name": "Sweet Relish",
+      "description": "<p>Mixed into tuna salad or smothered onto a hot dog our dill and sweet relish will add that flavor you are drooling for. They are an essential for any BBQ and will make every hot dog into a legendary feast for any occasion. Mix some into our albacore tuna with a little mayo for a delicious tuna salad that your guest will love!</p>",
+      "visible": 0,
+      "trackInventory": 1,
+      "inventory": 0,
+      "categoryId": 19,
+      "vendorId": 3160,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/nvCrZ.thumbnail.jpeg",
+      "createdAt": "2023-08-25T15:15:33.000Z",
+      "updatedAt": "2026-07-28T10:40:23.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Canned Goods 🥫",
+    "vendor": {
+      "id": 3160,
+      "name": "Sweet Creek",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 527209,
+        "productId": 806144,
+        "name": "16 oz",
+        "price": "5.60",
+        "packageCode": null,
+        "unit": "ea",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 527209,
+        "productId": 806144,
+        "localLinePackageId": 527209,
+        "liveName": "16 oz",
+        "livePrice": "5.60",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":806144,\"Product\":\"Sweet Relish\",\"Track Inventory By\":\"package\",\"Item Unit\":\"ea\",\"Charge By\":\"package\",\"Charge Unit\":\"ea\",\"Package ID\":527209,\"Package Name\":\"16 oz\",\"# of Items\":1,\"Package Price\":5.6,\"Inventory Type\":\"product\"},\"live\":{\"id\":527209,\"inventory_per_unit\":1,\"unit_price\":5.6,\"average_pack_weight\":null,\"package_price\":5.6,\"package_unit_price\":5.6,\"priority_order\":null,\"name\":\"16 oz\",\"price_list_entries\":[{\"id\":618009,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479901,\"subscription_setting\":{\"id\":497125,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":253006,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":203974,\"subscription_setting\":{\"id\":161140,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":253007,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":203975,\"subscription_setting\":{\"id\":161139,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":253008,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":203976,\"subscription_setting\":{\"id\":161138,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":806144,\"product_name\":\"Sweet Relish\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"ea\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2023-08-25T11:15:33.622924-04:00\",\"updated\":\"2025-09-29T17:43:16.013436-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 806144,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 806144,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/806144/localline/29d2b8eedcddc2bc3299d8c5.jpg"
+    ],
+    "localLineVendorId": 3160
+  },
+  "remote": {
+    "id": 806144,
+    "name": "Sweet Relish",
+    "description": "<p>Mixed into tuna salad or smothered onto a hot dog our dill and sweet relish will add that flavor you are drooling for. They are an essential for any BBQ and will make every hot dog into a legendary feast for any occasion. Mix some into our albacore tuna with a little mayo for a delicious tuna salad that your guest will love!</p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-08-25T11:15:33.607277-04:00",
+    "updated": "2026-07-27T13:28:33.081468-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/nvCrZ.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 141430,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/nvCrZ.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/nvCrZ.jpg",
+        "original_filename": "726.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "726",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 527209,
+        "inventory_per_unit": 1,
+        "unit_price": 5.6,
+        "average_pack_weight": null,
+        "package_price": 5.6,
+        "package_unit_price": 5.6,
+        "priority_order": null,
+        "name": "16 oz",
+        "price_list_entries": [
+          {
+            "id": 618009,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479901,
+            "subscription_setting": {
+              "id": 497125,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 253006,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 203974,
+            "subscription_setting": {
+              "id": 161140,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 253007,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 203975,
+            "subscription_setting": {
+              "id": 161139,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 253008,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 203976,
+            "subscription_setting": {
+              "id": 161138,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 806144,
+        "product_name": "Sweet Relish",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T11:15:33.622924-04:00",
+        "updated": "2025-09-29T17:43:16.013436-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 203974,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 825,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440685,
+            "price_list_category": 31658,
+            "priority_order": 851,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 203975,
+        "price_list_category": 17687,
+        "price_list": 2966,
+        "priority_order": 1030,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440903,
+            "price_list_category": 31663,
+            "priority_order": 1056,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 203976,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 408,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 441167,
+            "price_list_category": 15762,
+            "priority_order": 5,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479901,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1030,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 441124,
+            "price_list_category": 31667,
+            "priority_order": 1056,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3160,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3160,
+    "packages": [
+      {
+        "id": 527209,
+        "unit_price": 5.6,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 203976,
+            "calculated_value": 8.12,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 5.6
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 203974,
+            "calculated_value": 8.12,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 5.6
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 203975,
+            "calculated_value": 8.12,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 5.6
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 479901,
+            "calculated_value": 8.12,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 5.6
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:39:42.734Z",
+  "rows": [
+    {
+      "productId": 806144,
+      "product": "Sweet Relish",
+      "vendor": "Sweet Creek",
+      "packageId": 527209,
+      "package": "16 oz",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 5.6,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 7.84,
+      "localPriceAfter": 8.12,
+      "remoteBasePrice": 5.6,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 7.84,
+      "remotePriceAfter": 8.12
+    },
+    {
+      "productId": 806144,
+      "product": "Sweet Relish",
+      "vendor": "Sweet Creek",
+      "packageId": 527209,
+      "package": "16 oz",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 5.6,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 7.84,
+      "localPriceAfter": 8.12,
+      "remoteBasePrice": 5.6,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 7.84,
+      "remotePriceAfter": 8.12
+    },
+    {
+      "productId": 806144,
+      "product": "Sweet Relish",
+      "vendor": "Sweet Creek",
+      "packageId": 527209,
+      "package": "16 oz",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 5.6,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 7.84,
+      "localPriceAfter": 8.12,
+      "remoteBasePrice": 5.6,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 7.84,
+      "remotePriceAfter": 8.12
+    },
+    {
+      "productId": 806144,
+      "product": "Sweet Relish",
+      "vendor": "Sweet Creek",
+      "packageId": 527209,
+      "package": "16 oz",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 5.6,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 7.84,
+      "localPriceAfter": 8.12,
+      "remoteBasePrice": 5.6,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 7.84,
+      "remotePriceAfter": 8.12
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.942Z"
+}

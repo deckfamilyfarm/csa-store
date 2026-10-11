@@ -1,0 +1,451 @@
+{
+  "productId": 901386,
+  "context": {
+    "product": {
+      "id": 901386,
+      "name": "Fall Decor- Iris Rhizome",
+      "description": "<p>Early midseason bloom and rebloom. Standards almond shell; style arms yellow; falls burnt umber, tan edge, white marking at hafts; beard hairs based lavender, tips yellow; pronounced spicy fragrance.</p>",
+      "visible": 0,
+      "trackInventory": 1,
+      "inventory": 0,
+      "categoryId": 9,
+      "vendorId": 3181,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/Bx3ei.thumbnail.jpeg",
+      "createdAt": "2024-08-22T14:45:58.000Z",
+      "updatedAt": "2026-06-05T10:40:19.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Home Goods 🥄🌱🪏🍽️",
+    "vendor": {
+      "id": 3181,
+      "name": "RL Plants & Home Goods",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 643634,
+        "productId": 901386,
+        "name": "ea",
+        "price": "8.00",
+        "packageCode": null,
+        "unit": "ea",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 643634,
+        "productId": 901386,
+        "localLinePackageId": 643634,
+        "liveName": "ea",
+        "livePrice": "8.00",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":901386,\"Product\":\"Fall Decor- Iris Rhizome\",\"Track Inventory By\":\"package\",\"Item Unit\":\"ea\",\"Charge By\":\"package\",\"Charge Unit\":\"ea\",\"Package ID\":643634,\"Package Name\":\"ea\",\"# of Items\":1,\"Package Price\":8,\"Inventory Type\":\"product\"},\"live\":{\"id\":643634,\"inventory_per_unit\":1,\"unit_price\":8,\"average_pack_weight\":0,\"package_price\":8,\"package_unit_price\":8,\"priority_order\":null,\"name\":\"ea\",\"price_list_entries\":[{\"id\":427310,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":341318,\"subscription_setting\":{\"id\":307636,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":427311,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":341319,\"subscription_setting\":{\"id\":307637,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":427312,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":341320,\"subscription_setting\":{\"id\":307638,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":901386,\"product_name\":\"Fall Decor- Iris Rhizome\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"ea\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2024-08-22T10:45:59.115890-04:00\",\"updated\":\"2024-11-29T15:05:57.867258-05:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 901386,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 901386,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/901386/localline/6c6d57c4122a7edf99686b2d.jpg"
+    ],
+    "localLineVendorId": 3181
+  },
+  "remote": {
+    "id": 901386,
+    "name": "Fall Decor- Iris Rhizome",
+    "description": "<p>Early midseason bloom and rebloom. Standards almond shell; style arms yellow; falls burnt umber, tan edge, white marking at hafts; beard hairs based lavender, tips yellow; pronounced spicy fragrance.</p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2024-08-22T10:45:58.959007-04:00",
+    "updated": "2026-06-04T13:01:07.125347-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/Bx3ei.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 227514,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/Bx3ei.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/Bx3ei.jpeg",
+        "original_filename": "fall.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 643634,
+        "inventory_per_unit": 1,
+        "unit_price": 8,
+        "average_pack_weight": 0,
+        "package_price": 8,
+        "package_unit_price": 8,
+        "priority_order": null,
+        "name": "ea",
+        "price_list_entries": [
+          {
+            "id": 427310,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 341318,
+            "subscription_setting": {
+              "id": 307636,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 427311,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 341319,
+            "subscription_setting": {
+              "id": 307637,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 427312,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 341320,
+            "subscription_setting": {
+              "id": 307638,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 901386,
+        "product_name": "Fall Decor- Iris Rhizome",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2024-08-22T10:45:59.115890-04:00",
+        "updated": "2024-11-29T15:05:57.867258-05:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 341318,
+        "price_list_category": 14598,
+        "price_list": 2718,
+        "priority_order": 779,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 254818,
+            "price_list_category": 14598,
+            "priority_order": 817,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 341319,
+        "price_list_category": 15064,
+        "price_list": 2966,
+        "priority_order": 981,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 254819,
+            "price_list_category": 15064,
+            "priority_order": 1026,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 341320,
+        "price_list_category": 15746,
+        "price_list": 3124,
+        "priority_order": 602,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 254820,
+            "price_list_category": 15746,
+            "priority_order": 645,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3181,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3181,
+    "packages": [
+      {
+        "id": 643634,
+        "unit_price": 8,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 341320,
+            "calculated_value": 11.6,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 8
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 341318,
+            "calculated_value": 11.6,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 8
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 341319,
+            "calculated_value": 11.6,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 8
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:40:18.313Z",
+  "rows": [
+    {
+      "productId": 901386,
+      "product": "Fall Decor- Iris Rhizome",
+      "vendor": "RL Plants & Home Goods",
+      "packageId": 643634,
+      "package": "ea",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 8,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 11.2,
+      "localPriceAfter": 11.6,
+      "remoteBasePrice": 8,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 11.2,
+      "remotePriceAfter": 11.6
+    },
+    {
+      "productId": 901386,
+      "product": "Fall Decor- Iris Rhizome",
+      "vendor": "RL Plants & Home Goods",
+      "packageId": 643634,
+      "package": "ea",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 8,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 11.2,
+      "localPriceAfter": 11.6,
+      "remoteBasePrice": 8,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 11.2,
+      "remotePriceAfter": 11.6
+    },
+    {
+      "productId": 901386,
+      "product": "Fall Decor- Iris Rhizome",
+      "vendor": "RL Plants & Home Goods",
+      "packageId": 643634,
+      "package": "ea",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 8,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 11.2,
+      "localPriceAfter": 11.6,
+      "remoteBasePrice": 8,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 11.2,
+      "remotePriceAfter": 11.6
+    },
+    {
+      "productId": 901386,
+      "product": "Fall Decor- Iris Rhizome",
+      "vendor": "RL Plants & Home Goods",
+      "packageId": 643634,
+      "package": "ea",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 8,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 11.2,
+      "localPriceAfter": 11.6,
+      "remoteBasePrice": 8,
+      "remoteAdjustmentType": null,
+      "remoteAdjustmentBefore": null,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": null,
+      "remotePriceAfter": null
+    }
+  ],
+  "warnings": [
+    "SNAP is not present for package ea; no listing created."
+  ],
+  "reviewedAt": "2026-10-08T19:48:40.970Z"
+}

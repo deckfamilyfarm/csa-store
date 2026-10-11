@@ -1,0 +1,295 @@
+{
+  "data": {
+    "id": 1017030,
+    "name": "Cornito Peppers",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Cornito peppers are&nbsp;sweet, tapering peppers with a mild flavor, ideal for cooking methods like grilling, roasting, and frying, though they are also delicious when eaten raw.&nbsp;They are a smaller, earlier-maturing variety of the Italian \"Corno di Toro\" (bull's horn) pepper, coming in colors like red (Rosso), yellow (Giallo), and orange (Arancia).&nbsp;Their flavor intensifies with cooking, but they can be used fresh in salads or as a snack. </span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2025-10-23T14:50:51.132458-04:00",
+    "updated": "2026-10-08T16:32:50.674621-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/77gun.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 351274,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/77gun.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/77gun.jpeg",
+        "original_filename": "IMG_8980.jpeg"
+      },
+      {
+        "id": 351275,
+        "priority_order": 1,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/sf6Pg.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/sf6Pg.jpeg",
+        "original_filename": "IMG_8981.jpeg"
+      },
+      {
+        "id": 351276,
+        "priority_order": 2,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/w1wCZ.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/w1wCZ.jpeg",
+        "original_filename": "IMG_8978.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 1,
+      "name": "pound",
+      "abbrieviation": "lb",
+      "unit_type": "weight",
+      "default": true
+    },
+    "charge_unit": {
+      "id": 1,
+      "name": "pound",
+      "abbrieviation": "lb",
+      "unit_type": "weight",
+      "default": true
+    },
+    "track_type": "weight",
+    "charge_type": "weight",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 802189,
+        "inventory_per_unit": 1,
+        "unit_price": 3.75,
+        "average_pack_weight": 1,
+        "package_price": 3.75,
+        "package_unit_price": 3.75,
+        "priority_order": 1,
+        "name": "pound",
+        "price_list_entries": [
+          {
+            "id": 715272,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 550656,
+            "subscription_setting": {
+              "id": 594278,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 715274,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 550658,
+            "subscription_setting": {
+              "id": 594280,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 715275,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 550659,
+            "subscription_setting": {
+              "id": 594281,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 715276,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 550660,
+            "subscription_setting": {
+              "id": 594282,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "weight",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 1017030,
+        "product_name": "Cornito Peppers",
+        "is_by_weight": true,
+        "is_charge_by_weight": true,
+        "product_charge_unit": "lb",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "No inventory",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-10-23T14:50:51.556531-04:00",
+        "updated": "2026-10-08T16:32:50.124038-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 550656,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 864,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440003,
+            "price_list_category": 15750,
+            "priority_order": 29,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 90501,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 550658,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 1028,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440004,
+            "price_list_category": 15111,
+            "priority_order": 23,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 90503,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 550659,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1240,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440005,
+            "price_list_category": 15120,
+            "priority_order": 30,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 90504,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 550660,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1241,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 440006,
+            "price_list_category": 28914,
+            "priority_order": 30,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 90505,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3149,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "package",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 1017030,
+  "remoteProductId": 1017030,
+  "checkedAt": "2026-10-11T17:58:20.922Z"
+}

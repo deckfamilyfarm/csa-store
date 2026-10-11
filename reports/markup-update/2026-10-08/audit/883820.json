@@ -1,0 +1,504 @@
+{
+  "productId": 883820,
+  "context": {
+    "product": {
+      "id": 883820,
+      "name": "Basil",
+      "description": "An aromatic herb that works great in sauces, salads and soups!",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": 0,
+      "categoryId": 11,
+      "vendorId": 3152,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/IJGmZ.thumbnail.jpeg",
+      "createdAt": "2024-06-14T02:04:59.000Z",
+      "updatedAt": "2026-09-20T10:40:21.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Vegetables - Herbs🌿",
+    "vendor": {
+      "id": 3152,
+      "name": "Little Wings",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 621072,
+        "productId": 883820,
+        "name": "1 bu.",
+        "price": "2.25",
+        "packageCode": null,
+        "unit": "bu",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": null
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 621072,
+        "productId": 883820,
+        "localLinePackageId": 621072,
+        "liveName": "1 bu.",
+        "livePrice": "2.25",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":883820,\"Product\":\"Basil\",\"Track Inventory By\":\"package\",\"Item Unit\":\"bu\",\"Charge By\":\"package\",\"Charge Unit\":\"bu\",\"Package ID\":621072,\"Package Name\":\"1 bu.\",\"# of Items\":1,\"Package Price\":2.25,\"Inventory Type\":\"product\"},\"live\":{\"id\":621072,\"inventory_per_unit\":1,\"unit_price\":2.25,\"average_pack_weight\":null,\"package_price\":2.25,\"package_unit_price\":2.25,\"priority_order\":null,\"name\":\"1 bu.\",\"price_list_entries\":[{\"id\":369295,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":301033,\"subscription_setting\":{\"id\":250135,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":369296,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":301034,\"subscription_setting\":{\"id\":250136,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":618073,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479965,\"subscription_setting\":{\"id\":497189,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":369297,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":301035,\"subscription_setting\":{\"id\":250137,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":883820,\"product_name\":\"Basil\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"bu\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2024-06-13T22:04:59.352919-04:00\",\"updated\":\"2026-06-19T19:49:19.834454-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 883820,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 883820,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/883820/localline/48ea5443127d765f17eceb4c.jpg"
+    ],
+    "localLineVendorId": 3152
+  },
+  "remote": {
+    "id": 883820,
+    "name": "Basil",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">An aromatic herb that works great in sauces, salads and soups! </span></p><p><br></p><p><br></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2024-06-13T22:04:59.192601-04:00",
+    "updated": "2026-09-19T14:36:44.022002-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/IJGmZ.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 207886,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/IJGmZ.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/IJGmZ.jpg",
+        "original_filename": "account/322922/Fww3K.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 621072,
+        "inventory_per_unit": 1,
+        "unit_price": 2.25,
+        "average_pack_weight": null,
+        "package_price": 2.25,
+        "package_unit_price": 2.25,
+        "priority_order": null,
+        "name": "1 bu.",
+        "price_list_entries": [
+          {
+            "id": 369295,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 301033,
+            "subscription_setting": {
+              "id": 250135,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 369296,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 301034,
+            "subscription_setting": {
+              "id": 250136,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 618073,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479965,
+            "subscription_setting": {
+              "id": 497189,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 369297,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 301035,
+            "subscription_setting": {
+              "id": 250137,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 883820,
+        "product_name": "Basil",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bu",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2024-06-13T22:04:59.352919-04:00",
+        "updated": "2026-06-19T19:49:19.834454-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 301033,
+        "price_list_category": 15109,
+        "price_list": 2718,
+        "priority_order": 713,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 227152,
+            "price_list_category": 15109,
+            "priority_order": 727,
+            "price_list_category_name": "Organic Vegetables - Herbs🌿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 301034,
+        "price_list_category": 15124,
+        "price_list": 2966,
+        "priority_order": 914,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 227153,
+            "price_list_category": 15124,
+            "priority_order": 927,
+            "price_list_category_name": "Organic Vegetables - Herbs🌿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 301035,
+        "price_list_category": 15736,
+        "price_list": 3124,
+        "priority_order": 524,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 227154,
+            "price_list_category": 15736,
+            "priority_order": 539,
+            "price_list_category_name": "Organic Vegetables - Herbs 🌿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479965,
+        "price_list_category": 28897,
+        "price_list": 5622,
+        "priority_order": 914,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370326,
+            "price_list_category": 28897,
+            "priority_order": 928,
+            "price_list_category_name": "Organic Vegetables - Herbs🌿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3152,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3152,
+    "packages": [
+      {
+        "id": 621072,
+        "unit_price": 2.25,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 301035,
+            "calculated_value": 3.26,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.25
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 301033,
+            "calculated_value": 3.26,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.25
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 301034,
+            "calculated_value": 3.26,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.25
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 479965,
+            "calculated_value": 3.26,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.25
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:40:01.537Z",
+  "rows": [
+    {
+      "productId": 883820,
+      "product": "Basil",
+      "vendor": "Little Wings",
+      "packageId": 621072,
+      "package": "1 bu.",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 2.25,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.15,
+      "localPriceAfter": 3.26,
+      "remoteBasePrice": 2.25,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.15,
+      "remotePriceAfter": 3.26
+    },
+    {
+      "productId": 883820,
+      "product": "Basil",
+      "vendor": "Little Wings",
+      "packageId": 621072,
+      "package": "1 bu.",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 2.25,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.15,
+      "localPriceAfter": 3.26,
+      "remoteBasePrice": 2.25,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.15,
+      "remotePriceAfter": 3.26
+    },
+    {
+      "productId": 883820,
+      "product": "Basil",
+      "vendor": "Little Wings",
+      "packageId": 621072,
+      "package": "1 bu.",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 2.25,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.15,
+      "localPriceAfter": 3.26,
+      "remoteBasePrice": 2.25,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.15,
+      "remotePriceAfter": 3.26
+    },
+    {
+      "productId": 883820,
+      "product": "Basil",
+      "vendor": "Little Wings",
+      "packageId": 621072,
+      "package": "1 bu.",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 2.25,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.15,
+      "localPriceAfter": 3.26,
+      "remoteBasePrice": 2.25,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.15,
+      "remotePriceAfter": 3.26
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.957Z"
+}

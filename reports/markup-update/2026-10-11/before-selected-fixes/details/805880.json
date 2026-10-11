@@ -1,0 +1,266 @@
+{
+  "data": {
+    "id": 805880,
+    "name": "Fresh Chives",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Fresh chives are a culinary herb known for their mild, onion-like flavor and vibrant green color. They are a versatile addition to various dishes, offering a subtle, savory taste and a fresh visual appeal.</span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2023-08-25T10:39:57.088725-04:00",
+    "updated": "2026-10-08T16:23:02.537761-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/jPTVE.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 141398,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/jPTVE.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/jPTVE.jpg",
+        "original_filename": "604.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 526938,
+        "inventory_per_unit": 1,
+        "unit_price": 2,
+        "average_pack_weight": null,
+        "package_price": 2,
+        "package_unit_price": 2,
+        "priority_order": null,
+        "name": "each",
+        "price_list_entries": [
+          {
+            "id": 221615,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179218,
+            "subscription_setting": {
+              "id": 124184,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 207609,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 167781,
+            "subscription_setting": {
+              "id": 106785,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 949560,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 730868,
+            "subscription_setting": {
+              "id": 828237,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617816,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479709,
+            "subscription_setting": {
+              "id": 496932,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 805880,
+        "product_name": "Fresh Chives",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bu",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T10:39:57.106245-04:00",
+        "updated": "2026-10-08T16:23:01.936763-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 167781,
+        "price_list_category": 15109,
+        "price_list": 2718,
+        "priority_order": 201,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 137647,
+            "price_list_category": 15109,
+            "priority_order": 216,
+            "price_list_category_name": "Organic Vegetables - Herbs🌿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179218,
+        "price_list_category": 15124,
+        "price_list": 2966,
+        "priority_order": 224,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 147428,
+            "price_list_category": 15124,
+            "priority_order": 238,
+            "price_list_category_name": "Organic Vegetables - Herbs🌿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479709,
+        "price_list_category": 28897,
+        "price_list": 5622,
+        "priority_order": 224,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370197,
+            "price_list_category": 28897,
+            "priority_order": 239,
+            "price_list_category_name": "Organic Vegetables - Herbs🌿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 730868,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 949,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 608694,
+            "price_list_category": 15736,
+            "priority_order": 5,
+            "price_list_category_name": "Organic Vegetables - Herbs 🌿"
+          }
+        ],
+        "tax_configuration": {
+          "id": 160222,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not tracked",
+    "is_deleted": false,
+    "vendor": 3177,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 805880,
+  "remoteProductId": 805880,
+  "checkedAt": "2026-10-11T17:26:41.862Z"
+}

@@ -1,0 +1,240 @@
+{
+  "verifiedAt": "2026-10-09T20:09:14.292Z",
+  "productId": 805827,
+  "priceConfirmed": true,
+  "otherFieldsUnchanged": true,
+  "classicPricesUnchanged": true,
+  "remote": {
+    "id": 805827,
+    "name": "Sungold Cherry Tomato Pint",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Golden cherry tomatoes are known for their exceptionally sweet, golden-orange color and relatively low acidity. They are a popular hybrid cultivar, prized for their vibrant color, early ripening, and firm texture. These tomatoes are also known for their unique flavor profile, described as a balance of citrusy tart and sweet, with subtle grape and floral notes. We have curated our pints to include - Sungold, Santium Sun, Sunrise Bumblebee, &amp; Citrine. </span></p><p><br></p><p><br></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2023-08-25T10:39:56.037233-04:00",
+    "updated": "2026-10-09T15:58:58.692346-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/1aQga.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 341846,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/1aQga.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/1aQga.jpg",
+        "original_filename": "download.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 24,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12594,
+      "name": "pt",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12594,
+      "name": "pt",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "338",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 526885,
+        "inventory_per_unit": 1,
+        "unit_price": 4,
+        "average_pack_weight": null,
+        "package_price": 4,
+        "package_unit_price": 4,
+        "priority_order": null,
+        "name": "each",
+        "price_list_entries": [
+          {
+            "id": 238388,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 192060,
+            "subscription_setting": {
+              "id": 145962,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617791,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479684,
+            "subscription_setting": {
+              "id": 496907,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 221581,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179184,
+            "subscription_setting": {
+              "id": 123220,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 24,
+        "number_of_packages_available": 24,
+        "number_of_packages_total": 24,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 24,
+        "product_package_size": 1,
+        "product_id": 805827,
+        "product_name": "Sungold Cherry Tomato Pint",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "pt",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T10:39:56.051103-04:00",
+        "updated": "2026-10-09T15:58:57.979525-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 179184,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 570,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 441213,
+            "price_list_category": 15120,
+            "priority_order": 24,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 90835,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 192060,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 124,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 441214,
+            "price_list_category": 15750,
+            "priority_order": 23,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 90836,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479684,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 570,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 441215,
+            "price_list_category": 28914,
+            "priority_order": 24,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 90837,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 6482,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 24,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 24
+  }
+}

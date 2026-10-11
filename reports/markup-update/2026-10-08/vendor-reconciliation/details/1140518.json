@@ -1,0 +1,274 @@
+{
+  "remote": {
+    "id": 1140518,
+    "name": "Stripped Zucchini",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Striped zucchini (often known as </span><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Cocozelle</strong></b><span style=\"white-space: pre-wrap;\"> or Italian Striped) is characterized bya </span><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">distinctive nutty flavor</strong></b><span style=\"white-space: pre-wrap;\"> and a mild, slightly sweeter taste compared to traditional dark green zucchini. It is widely considered to have a superior, richer flavor, especially when harvested young at 6–8 inches</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2026-07-09T20:02:22.056227-04:00",
+    "updated": "2026-09-03T11:51:33.541700-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/ckltX.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 450157,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/ckltX.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/ckltX.jpeg",
+        "original_filename": "images.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 978740,
+        "inventory_per_unit": 1,
+        "unit_price": 2.5,
+        "average_pack_weight": null,
+        "package_price": 2.5,
+        "package_unit_price": 2.5,
+        "priority_order": null,
+        "name": "1 lb",
+        "price_list_entries": [
+          {
+            "id": 991060,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 763736,
+            "subscription_setting": {
+              "id": 869696,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 991061,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 763737,
+            "subscription_setting": {
+              "id": 869697,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 991062,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 763738,
+            "subscription_setting": {
+              "id": 869698,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 991063,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 763739,
+            "subscription_setting": {
+              "id": 869699,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": null,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 1140518,
+        "product_name": "Stripped Zucchini",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "lb",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-07-09T20:02:22.362293-04:00",
+        "updated": "2026-07-09T20:02:22.449063-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 763736,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 1116,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 641212,
+            "price_list_category": 15111,
+            "priority_order": 3,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 763737,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 979,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 641213,
+            "price_list_category": 15750,
+            "priority_order": 8,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 176647,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 763738,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1361,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 641214,
+            "price_list_category": 15120,
+            "priority_order": 9,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 176648,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 763739,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1357,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 641215,
+            "price_list_category": 28914,
+            "priority_order": 9,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 176649,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3154,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "fetchedAt": "2026-10-09T19:15:56.427Z"
+}

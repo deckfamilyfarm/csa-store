@@ -1,0 +1,504 @@
+{
+  "productId": 881653,
+  "context": {
+    "product": {
+      "id": 881653,
+      "name": "Nantes Carrots",
+      "description": "Claimed to be the perfect health food. It is crunchy, tasty, and highly nutritious. Carrots are a particularly good source of beta carotene, fiber, vitamin K1, potassium, and antioxidants. Carrots a verastile- add them to soups, stews, salads, casseroles, the possibilities are endless. Grown by Riverland Family Farms in Corvallis OR",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": 0,
+      "categoryId": 13,
+      "vendorId": 3168,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/mUiSB.thumbnail.jpeg",
+      "createdAt": "2024-06-01T19:08:34.000Z",
+      "updatedAt": "2026-07-03T19:41:35.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Vegetables - Roots🧅🧄🥕🥔",
+    "vendor": {
+      "id": 3168,
+      "name": "Organically Grown Company",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 618132,
+        "productId": 881653,
+        "name": "bunch",
+        "price": "2.53",
+        "packageCode": null,
+        "unit": "bu",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 618132,
+        "productId": 881653,
+        "localLinePackageId": 618132,
+        "liveName": "bunch",
+        "livePrice": "2.53",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":881653,\"Product\":\"Nantes Carrots\",\"Track Inventory By\":\"package\",\"Item Unit\":\"bu\",\"Charge By\":\"package\",\"Charge Unit\":\"bu\",\"Package ID\":618132,\"Package Name\":\"bunch\",\"# of Items\":1,\"Package Price\":2.53,\"Inventory Type\":\"product\"},\"live\":{\"id\":618132,\"inventory_per_unit\":1,\"unit_price\":2.53,\"average_pack_weight\":null,\"package_price\":2.53,\"package_unit_price\":2.53,\"priority_order\":null,\"name\":\"bunch\",\"price_list_entries\":[{\"id\":359370,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":293749,\"subscription_setting\":{\"id\":239836,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":618064,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479956,\"subscription_setting\":{\"id\":497180,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":359369,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":293748,\"subscription_setting\":{\"id\":239835,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":359368,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":293747,\"subscription_setting\":{\"id\":239834,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":null,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":881653,\"product_name\":\"Nantes Carrots\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"bu\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2024-06-01T15:08:34.733869-04:00\",\"updated\":\"2026-03-19T19:14:37.198336-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 881653,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 881653,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/881653/localline/63ba39ed6aac28af708e204b.jpg"
+    ],
+    "localLineVendorId": 3168
+  },
+  "remote": {
+    "id": 881653,
+    "name": "Nantes Carrots",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Claimed to be the perfect health food. It is crunchy, tasty, and highly nutritious. Carrots are a particularly good source of beta carotene, fiber, vitamin K1, potassium, and antioxidants. Carrots a verastile- add them to soups, stews, salads, casseroles, the possibilities are endless.</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Grown by Riverland Family Farms in Corvallis OR</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2024-06-01T15:08:34.638873-04:00",
+    "updated": "2026-04-09T15:18:38.611257-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/mUiSB.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 204112,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/mUiSB.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/mUiSB.jpg",
+        "original_filename": "account/322922/OPKHa.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 618132,
+        "inventory_per_unit": 1,
+        "unit_price": 2.53,
+        "average_pack_weight": null,
+        "package_price": 2.53,
+        "package_unit_price": 2.53,
+        "priority_order": null,
+        "name": "bunch",
+        "price_list_entries": [
+          {
+            "id": 359370,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 293749,
+            "subscription_setting": {
+              "id": 239836,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 618064,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479956,
+            "subscription_setting": {
+              "id": 497180,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 359369,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 293748,
+            "subscription_setting": {
+              "id": 239835,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 359368,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 293747,
+            "subscription_setting": {
+              "id": 239834,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": null,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 881653,
+        "product_name": "Nantes Carrots",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bu",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2024-06-01T15:08:34.733869-04:00",
+        "updated": "2026-03-19T19:14:37.198336-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 293747,
+        "price_list_category": 15105,
+        "price_list": 2718,
+        "priority_order": 703,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 221033,
+            "price_list_category": 15105,
+            "priority_order": 782,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 293748,
+        "price_list_category": 15118,
+        "price_list": 2966,
+        "priority_order": 903,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 221034,
+            "price_list_category": 15118,
+            "priority_order": 982,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 293749,
+        "price_list_category": 15731,
+        "price_list": 3124,
+        "priority_order": 510,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 221035,
+            "price_list_category": 15731,
+            "priority_order": 588,
+            "price_list_category_name": "Organic Vegetables - Roots 🧅🧄 🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479956,
+        "price_list_category": 28905,
+        "price_list": 5622,
+        "priority_order": 903,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370316,
+            "price_list_category": 28905,
+            "priority_order": 982,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3168,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3168,
+    "packages": [
+      {
+        "id": 618132,
+        "unit_price": 2.53,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 293749,
+            "calculated_value": 3.67,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.53
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 293747,
+            "calculated_value": 3.67,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.53
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 293748,
+            "calculated_value": 3.67,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.53
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 479956,
+            "calculated_value": 3.67,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.53
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:39:59.861Z",
+  "rows": [
+    {
+      "productId": 881653,
+      "product": "Nantes Carrots",
+      "vendor": "Organically Grown Company",
+      "packageId": 618132,
+      "package": "bunch",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 2.53,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.54,
+      "localPriceAfter": 3.67,
+      "remoteBasePrice": 2.53,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.54,
+      "remotePriceAfter": 3.67
+    },
+    {
+      "productId": 881653,
+      "product": "Nantes Carrots",
+      "vendor": "Organically Grown Company",
+      "packageId": 618132,
+      "package": "bunch",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 2.53,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.54,
+      "localPriceAfter": 3.67,
+      "remoteBasePrice": 2.53,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.54,
+      "remotePriceAfter": 3.67
+    },
+    {
+      "productId": 881653,
+      "product": "Nantes Carrots",
+      "vendor": "Organically Grown Company",
+      "packageId": 618132,
+      "package": "bunch",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 2.53,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.54,
+      "localPriceAfter": 3.67,
+      "remoteBasePrice": 2.53,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.54,
+      "remotePriceAfter": 3.67
+    },
+    {
+      "productId": 881653,
+      "product": "Nantes Carrots",
+      "vendor": "Organically Grown Company",
+      "packageId": 618132,
+      "package": "bunch",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 2.53,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.54,
+      "localPriceAfter": 3.67,
+      "remoteBasePrice": 2.53,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.54,
+      "remotePriceAfter": 3.67
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.955Z"
+}

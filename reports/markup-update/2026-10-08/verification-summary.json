@@ -1,0 +1,22 @@
+{
+  "verifiedAt": "2026-10-08T20:50:38.942Z",
+  "catalogCount": 833,
+  "localUpdated": 534,
+  "allLocal45": true,
+  "checks": {
+    "vendors": true,
+    "products": true,
+    "packages": true,
+    "productSales": true,
+    "excludedProfiles": true
+  },
+  "remoteApproved": 447,
+  "remoteCompleted": 447,
+  "remoteConfirmed": 447,
+  "unrelatedRemoteChanges": 0,
+  "remoteHeld": 87,
+  "excluded": 299,
+  "auditId": 9,
+  "releaseId": 5,
+  "releaseStatus": "completed"
+}

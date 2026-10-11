@@ -1,0 +1,504 @@
+{
+  "productId": 805899,
+  "context": {
+    "product": {
+      "id": 805899,
+      "name": "French Breakfast Radish",
+      "description": "<p>Similar appearance to the familiar cherry belle radish but instead of a bulbous shape, it is elongated with edible leafy greens on top. The French breakfast radish has a mild peppery flavor and crisp texture. It is often eaten raw but the radish can be cooked as well.</p>",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": null,
+      "categoryId": 13,
+      "vendorId": 3177,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/VfxeX.thumbnail.jpeg",
+      "createdAt": "2023-08-25T14:39:57.000Z",
+      "updatedAt": "2026-04-08T20:23:56.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Vegetables - Roots🧅🧄🥕🥔",
+    "vendor": {
+      "id": 3177,
+      "name": "Red Tail Growers",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 526957,
+        "productId": 805899,
+        "name": "each",
+        "price": "1.85",
+        "packageCode": null,
+        "unit": "bu",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": null
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 526957,
+        "productId": 805899,
+        "localLinePackageId": 526957,
+        "liveName": "each",
+        "livePrice": "1.85",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":805899,\"Product\":\"French Breakfast Radish\",\"Track Inventory By\":\"package\",\"Item Unit\":\"bu\",\"Charge By\":\"package\",\"Charge Unit\":\"bu\",\"Package ID\":526957,\"Package Name\":\"each\",\"# of Items\":1,\"Package Price\":1.85,\"Inventory Type\":\"product\"},\"live\":{\"id\":526957,\"inventory_per_unit\":1,\"unit_price\":1.85,\"average_pack_weight\":null,\"package_price\":1.85,\"package_unit_price\":1.85,\"priority_order\":null,\"name\":\"each\",\"price_list_entries\":[{\"id\":572667,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":444180,\"subscription_setting\":{\"id\":451443,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":221610,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":179213,\"subscription_setting\":{\"id\":124404,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":207604,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":167776,\"subscription_setting\":{\"id\":106780,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":617812,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479705,\"subscription_setting\":{\"id\":496928,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":2,\"number_of_packages_available\":2,\"number_of_packages_total\":2,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":2,\"product_package_size\":1,\"product_id\":805899,\"product_name\":\"French Breakfast Radish\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"bu\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2023-08-25T10:39:57.499777-04:00\",\"updated\":\"2025-09-22T13:28:07.214303-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 805899,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 805899,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/805899/localline/0874a93f8e21bb7a7c640b3a.jpg"
+    ],
+    "localLineVendorId": 3177
+  },
+  "remote": {
+    "id": 805899,
+    "name": "French Breakfast Radish",
+    "description": "<p>Similar appearance to the familiar cherry belle radish but instead of a bulbous shape, it is elongated with edible leafy greens on top. The French breakfast radish has a mild peppery flavor and crisp texture. It is often eaten raw but the radish can be cooked as well.</p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-08-25T10:39:57.489255-04:00",
+    "updated": "2025-10-11T12:16:40.700229-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/VfxeX.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 142097,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/VfxeX.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/VfxeX.jpeg",
+        "original_filename": "6308.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 526957,
+        "inventory_per_unit": 1,
+        "unit_price": 1.85,
+        "average_pack_weight": null,
+        "package_price": 1.85,
+        "package_unit_price": 1.85,
+        "priority_order": null,
+        "name": "each",
+        "price_list_entries": [
+          {
+            "id": 572667,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 444180,
+            "subscription_setting": {
+              "id": 451443,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 221610,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179213,
+            "subscription_setting": {
+              "id": 124404,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 207604,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 167776,
+            "subscription_setting": {
+              "id": 106780,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617812,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479705,
+            "subscription_setting": {
+              "id": 496928,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 2,
+        "number_of_packages_available": 2,
+        "number_of_packages_total": 2,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 2,
+        "product_package_size": 1,
+        "product_id": 805899,
+        "product_name": "French Breakfast Radish",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bu",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T10:39:57.499777-04:00",
+        "updated": "2025-09-22T13:28:07.214303-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 167776,
+        "price_list_category": 15105,
+        "price_list": 2718,
+        "priority_order": 220,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 137642,
+            "price_list_category": 15105,
+            "priority_order": 278,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179213,
+        "price_list_category": 15118,
+        "price_list": 2966,
+        "priority_order": 256,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 147423,
+            "price_list_category": 15118,
+            "priority_order": 314,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 444180,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 749,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 334339,
+            "price_list_category": 15731,
+            "priority_order": 55,
+            "price_list_category_name": "Organic Vegetables - Roots 🧅🧄 🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479705,
+        "price_list_category": 28905,
+        "price_list": 5622,
+        "priority_order": 256,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370307,
+            "price_list_category": 28905,
+            "priority_order": 314,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3177,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 2,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 2
+  },
+  "payload": {
+    "vendor": 3177,
+    "packages": [
+      {
+        "id": 526957,
+        "unit_price": 1.85,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 444180,
+            "calculated_value": 2.68,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1.85
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 167776,
+            "calculated_value": 2.68,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1.85
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 179213,
+            "calculated_value": 2.68,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1.85
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 479705,
+            "calculated_value": 2.68,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1.85
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:38:49.826Z",
+  "rows": [
+    {
+      "productId": 805899,
+      "product": "French Breakfast Radish",
+      "vendor": "Red Tail Growers",
+      "packageId": 526957,
+      "package": "each",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 1.85,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.59,
+      "localPriceAfter": 2.68,
+      "remoteBasePrice": 1.85,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.59,
+      "remotePriceAfter": 2.68
+    },
+    {
+      "productId": 805899,
+      "product": "French Breakfast Radish",
+      "vendor": "Red Tail Growers",
+      "packageId": 526957,
+      "package": "each",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 1.85,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.59,
+      "localPriceAfter": 2.68,
+      "remoteBasePrice": 1.85,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.59,
+      "remotePriceAfter": 2.68
+    },
+    {
+      "productId": 805899,
+      "product": "French Breakfast Radish",
+      "vendor": "Red Tail Growers",
+      "packageId": 526957,
+      "package": "each",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 1.85,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.59,
+      "localPriceAfter": 2.68,
+      "remoteBasePrice": 1.85,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.59,
+      "remotePriceAfter": 2.68
+    },
+    {
+      "productId": 805899,
+      "product": "French Breakfast Radish",
+      "vendor": "Red Tail Growers",
+      "packageId": 526957,
+      "package": "each",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 1.85,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.59,
+      "localPriceAfter": 2.68,
+      "remoteBasePrice": 1.85,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.59,
+      "remotePriceAfter": 2.68
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.897Z"
+}

@@ -1,0 +1,45 @@
+{
+  "productId": 1133713,
+  "context": {
+    "product": {
+      "id": 1133713,
+      "name": "Dinner in a Box: Roasting Chicken",
+      "description": null,
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": null,
+      "categoryId": null,
+      "vendorId": 3148,
+      "thumbnailUrl": null,
+      "createdAt": "2026-06-19T10:40:19.000Z",
+      "updatedAt": "2026-07-03T19:41:35.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "",
+    "vendor": {
+      "id": 3148,
+      "name": "Full Farm CSA",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [],
+    "packageMeta": [],
+    "sale": {},
+    "remoteId": 1133713,
+    "imageUrls": []
+  },
+  "remote": null,
+  "payload": null,
+  "problems": [
+    "Local Line box/bundle: product endpoint does not support this item"
+  ],
+  "status": "exception",
+  "auditedAt": "2026-10-08T19:41:39.295Z",
+  "rows": [],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:41.051Z",
+  "connectionError": "Local Line box/bundle: product endpoint does not support this item"
+}

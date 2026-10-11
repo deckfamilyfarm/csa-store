@@ -1,0 +1,261 @@
+{
+  "data": {
+    "id": 973114,
+    "name": "Arugula",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Extra tender and succulent! Has a slight pepper taste.</span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2025-05-19T12:23:08.157681-04:00",
+    "updated": "2026-10-08T16:30:53.332263-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/xkasJ.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 300526,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/xkasJ.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/xkasJ.jpg",
+        "original_filename": "account/322922/3qdGx.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12591,
+      "name": "bag",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12591,
+      "name": "bag",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 737954,
+        "inventory_per_unit": 1,
+        "unit_price": 4.25,
+        "average_pack_weight": null,
+        "package_price": 4.25,
+        "package_unit_price": 4.25,
+        "priority_order": null,
+        "name": "1/2 lb bag",
+        "price_list_entries": [
+          {
+            "id": 601023,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 467158,
+            "subscription_setting": {
+              "id": 480127,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 618269,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 480159,
+            "subscription_setting": {
+              "id": 497385,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 601024,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 467159,
+            "subscription_setting": {
+              "id": 480128,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 601025,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 467157,
+            "subscription_setting": {
+              "id": 480129,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 2,
+        "number_of_packages_available": 2,
+        "number_of_packages_total": 2,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 2,
+        "product_package_size": 1,
+        "product_id": 973114,
+        "product_name": "Arugula",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bag",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-05-19T12:23:08.390161-04:00",
+        "updated": "2026-10-08T16:30:52.268267-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 467157,
+        "price_list_category": 15107,
+        "price_list": 2718,
+        "priority_order": 934,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 359029,
+            "price_list_category": 15107,
+            "priority_order": 27,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 467158,
+        "price_list_category": 15119,
+        "price_list": 2966,
+        "priority_order": 1142,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 359030,
+            "price_list_category": 15119,
+            "priority_order": 29,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 467159,
+        "price_list_category": 15732,
+        "price_list": 3124,
+        "priority_order": 766,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 359031,
+            "price_list_category": 15732,
+            "priority_order": 29,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 480159,
+        "price_list_category": 28913,
+        "price_list": 5622,
+        "priority_order": 1142,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370252,
+            "price_list_category": 28913,
+            "priority_order": 30,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not tracked",
+    "is_deleted": false,
+    "vendor": 3177,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 2,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 2
+  },
+  "localProductId": 973114,
+  "remoteProductId": 973114,
+  "checkedAt": "2026-10-11T17:58:11.995Z"
+}

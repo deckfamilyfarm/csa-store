@@ -1,0 +1,261 @@
+{
+  "data": {
+    "id": 805790,
+    "name": "Mixed Apple \"Seconds\"",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Perfect for pies, applesauce, drying apples, etc...&nbsp; minor insect damage or just smaller versions of perfection   </span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">A mix of: Black Arkansas, Freedom,&nbsp; Braeburn, McIntosh, Melrose, Winesap</span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2023-08-25T10:28:07.260350-04:00",
+    "updated": "2026-10-08T17:12:30.029578-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/h0UIe.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 141078,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/h0UIe.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/h0UIe.jpg",
+        "original_filename": "701.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 40,
+    "inventory_warning": null,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "701",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 526846,
+        "inventory_per_unit": 1,
+        "unit_price": 0.5,
+        "average_pack_weight": null,
+        "package_price": 0.5,
+        "package_unit_price": 0.5,
+        "priority_order": 1,
+        "name": "each",
+        "price_list_entries": [
+          {
+            "id": 207401,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 167575,
+            "subscription_setting": {
+              "id": 106575,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 221423,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179029,
+            "subscription_setting": {
+              "id": 124392,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 238539,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 192208,
+            "subscription_setting": {
+              "id": 146118,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617715,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479608,
+            "subscription_setting": {
+              "id": 496831,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 40,
+        "number_of_packages_available": 40,
+        "number_of_packages_total": 40,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 40,
+        "product_package_size": 1,
+        "product_id": 805790,
+        "product_name": "Mixed Apple \"Seconds\"",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T10:28:07.271704-04:00",
+        "updated": "2026-10-08T16:22:13.239632-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 167575,
+        "price_list_category": 14599,
+        "price_list": 2718,
+        "priority_order": 149,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 137446,
+            "price_list_category": 14599,
+            "priority_order": 186,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179029,
+        "price_list_category": 15063,
+        "price_list": 2966,
+        "priority_order": 228,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 147240,
+            "price_list_category": 15063,
+            "priority_order": 281,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 192208,
+        "price_list_category": 15748,
+        "price_list": 3124,
+        "priority_order": 276,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 158084,
+            "price_list_category": 15748,
+            "priority_order": 329,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479608,
+        "price_list_category": 28911,
+        "price_list": 5622,
+        "priority_order": 228,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370038,
+            "price_list_category": 28911,
+            "priority_order": 277,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 3171,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 40,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 40
+  },
+  "localProductId": 805790,
+  "remoteProductId": 805790,
+  "checkedAt": "2026-10-11T17:57:38.918Z"
+}

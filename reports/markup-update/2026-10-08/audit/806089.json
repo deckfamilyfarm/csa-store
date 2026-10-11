@@ -1,0 +1,504 @@
+{
+  "productId": 806089,
+  "context": {
+    "product": {
+      "id": 806089,
+      "name": "Blueberry Fruit Spread",
+      "description": "<p>Northwest grown blueberries are some of the sweetest in existence. <br><br>Sweet yet tastes like it was just picked from the plant.</p>",
+      "visible": 1,
+      "trackInventory": 1,
+      "inventory": 12,
+      "categoryId": 19,
+      "vendorId": 3160,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/7Arnz.thumbnail.jpeg",
+      "createdAt": "2023-08-25T15:15:31.000Z",
+      "updatedAt": "2026-10-04T10:40:22.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Canned Goods 🥫",
+    "vendor": {
+      "id": 3160,
+      "name": "Sweet Creek",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 527153,
+        "productId": 806089,
+        "name": "10 oz",
+        "price": "4.48",
+        "packageCode": null,
+        "unit": "ea",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 1,
+        "trackInventory": 0,
+        "inventory": null
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 527153,
+        "productId": 806089,
+        "localLinePackageId": 527153,
+        "liveName": "10 oz",
+        "livePrice": "4.48",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":806089,\"Product\":\"Blueberry Fruit Spread\",\"Track Inventory By\":\"package\",\"Item Unit\":\"ea\",\"Charge By\":\"package\",\"Charge Unit\":\"ea\",\"Package ID\":527153,\"Package Name\":\"10 oz\",\"# of Items\":1,\"Package Price\":4.48,\"Inventory Type\":\"product\"},\"live\":{\"id\":527153,\"inventory_per_unit\":1,\"unit_price\":4.48,\"average_pack_weight\":null,\"package_price\":4.48,\"package_unit_price\":4.48,\"priority_order\":null,\"name\":\"10 oz\",\"price_list_entries\":[{\"id\":238359,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":192031,\"subscription_setting\":{\"id\":146152,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":220333,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":178251,\"subscription_setting\":{\"id\":121238,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":221702,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":179305,\"subscription_setting\":{\"id\":122941,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":617875,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479768,\"subscription_setting\":{\"id\":496991,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":12,\"number_of_packages_available\":12,\"number_of_packages_total\":12,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":12,\"product_package_size\":1,\"product_id\":806089,\"product_name\":\"Blueberry Fruit Spread\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"ea\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2023-08-25T11:15:31.981765-04:00\",\"updated\":\"2025-09-29T17:55:05.062602-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 806089,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 806089,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/806089/localline/0079c39889f459e42534b5c1.jpg"
+    ],
+    "localLineVendorId": 3160
+  },
+  "remote": {
+    "id": 806089,
+    "name": "Blueberry Fruit Spread",
+    "description": "<p>Northwest grown blueberries are some of the sweetest in existence. <br><br>Sweet yet tastes like it was just picked from the plant.</p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2023-08-25T11:15:31.969296-04:00",
+    "updated": "2026-08-24T14:33:27.177664-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/7Arnz.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 141339,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/7Arnz.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/7Arnz.jpg",
+        "original_filename": "494.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 12,
+    "inventory_warning": 1,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "494",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 527153,
+        "inventory_per_unit": 1,
+        "unit_price": 4.48,
+        "average_pack_weight": null,
+        "package_price": 4.48,
+        "package_unit_price": 4.48,
+        "priority_order": null,
+        "name": "10 oz",
+        "price_list_entries": [
+          {
+            "id": 238359,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 192031,
+            "subscription_setting": {
+              "id": 146152,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 220333,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 178251,
+            "subscription_setting": {
+              "id": 121238,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 221702,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179305,
+            "subscription_setting": {
+              "id": 122941,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617875,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479768,
+            "subscription_setting": {
+              "id": 496991,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 12,
+        "number_of_packages_available": 12,
+        "number_of_packages_total": 12,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 12,
+        "product_package_size": 1,
+        "product_id": 806089,
+        "product_name": "Blueberry Fruit Spread",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T11:15:31.981765-04:00",
+        "updated": "2025-09-29T17:55:05.062602-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 178251,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 388,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440571,
+            "price_list_category": 31658,
+            "priority_order": 14,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179305,
+        "price_list_category": 17687,
+        "price_list": 2966,
+        "priority_order": 388,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440802,
+            "price_list_category": 31663,
+            "priority_order": 14,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 192031,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 95,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 441160,
+            "price_list_category": 15762,
+            "priority_order": 12,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479768,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 388,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 441014,
+            "price_list_category": 31667,
+            "priority_order": 14,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 3160,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 12,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 12
+  },
+  "payload": {
+    "vendor": 3160,
+    "packages": [
+      {
+        "id": 527153,
+        "unit_price": 4.48,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 192031,
+            "calculated_value": 6.5,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 4.48
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 178251,
+            "calculated_value": 6.5,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 4.48
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 179305,
+            "calculated_value": 6.5,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 4.48
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 479768,
+            "calculated_value": 6.5,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 4.48
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:39:31.411Z",
+  "rows": [
+    {
+      "productId": 806089,
+      "product": "Blueberry Fruit Spread",
+      "vendor": "Sweet Creek",
+      "packageId": 527153,
+      "package": "10 oz",
+      "priceList": "Guest Basket",
+      "visible": true,
+      "basePrice": 4.48,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 6.27,
+      "localPriceAfter": 6.5,
+      "remoteBasePrice": 4.48,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 6.27,
+      "remotePriceAfter": 6.5
+    },
+    {
+      "productId": 806089,
+      "product": "Blueberry Fruit Spread",
+      "vendor": "Sweet Creek",
+      "packageId": 527153,
+      "package": "10 oz",
+      "priceList": "CSA Members",
+      "visible": true,
+      "basePrice": 4.48,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 6.27,
+      "localPriceAfter": 6.5,
+      "remoteBasePrice": 4.48,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 6.27,
+      "remotePriceAfter": 6.5
+    },
+    {
+      "productId": 806089,
+      "product": "Blueberry Fruit Spread",
+      "vendor": "Sweet Creek",
+      "packageId": 527153,
+      "package": "10 oz",
+      "priceList": "Herd Share Members",
+      "visible": true,
+      "basePrice": 4.48,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 6.27,
+      "localPriceAfter": 6.5,
+      "remoteBasePrice": 4.48,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 6.27,
+      "remotePriceAfter": 6.5
+    },
+    {
+      "productId": 806089,
+      "product": "Blueberry Fruit Spread",
+      "vendor": "Sweet Creek",
+      "packageId": 527153,
+      "package": "10 oz",
+      "priceList": "SNAP",
+      "visible": true,
+      "basePrice": 4.48,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 6.27,
+      "localPriceAfter": 6.5,
+      "remoteBasePrice": 4.48,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 6.27,
+      "remotePriceAfter": 6.5
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.930Z"
+}

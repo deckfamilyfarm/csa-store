@@ -1,0 +1,282 @@
+{
+  "verifiedAt": "2026-10-08T20:50:25.286Z",
+  "productId": 1014310,
+  "priceConfirmed": true,
+  "otherFieldsUnchanged": true,
+  "remote": {
+    "id": 1014310,
+    "name": "Braising Green Bundle",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">mixed arugula, mizuna, tatsoi bundles great for eating raw, in stir&nbsp;frys, scrambled with eggs, etc..</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2025-10-09T18:34:45.232740-04:00",
+    "updated": "2026-10-08T16:32:49.476102-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/EFIWW.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 348245,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/EFIWW.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/EFIWW.jpg",
+        "original_filename": "IMG_0986.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 7,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 798441,
+        "inventory_per_unit": 1,
+        "unit_price": 2.5,
+        "average_pack_weight": 0,
+        "package_price": 2.5,
+        "package_unit_price": 2.5,
+        "priority_order": 1,
+        "name": "bu",
+        "price_list_entries": [
+          {
+            "id": 710096,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 546846,
+            "subscription_setting": {
+              "id": 589105,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 710097,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 546847,
+            "subscription_setting": {
+              "id": 589106,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 710098,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 546848,
+            "subscription_setting": {
+              "id": 589107,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 710099,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 546849,
+            "subscription_setting": {
+              "id": 589108,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 7,
+        "number_of_packages_available": 7,
+        "number_of_packages_total": 7,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 7,
+        "product_package_size": 1,
+        "product_id": 1014310,
+        "product_name": "Braising Green Bundle",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bu",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-10-09T18:34:45.571808-04:00",
+        "updated": "2026-10-08T16:32:48.878168-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 546846,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 862,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 435456,
+            "price_list_category": 15732,
+            "priority_order": 22,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": {
+          "id": 87159,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 546847,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 1026,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 435457,
+            "price_list_category": 15107,
+            "priority_order": 20,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": {
+          "id": 87160,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 546848,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1236,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 435458,
+            "price_list_category": 15119,
+            "priority_order": 23,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": {
+          "id": 87161,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 546849,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1237,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 435459,
+            "price_list_category": 28913,
+            "priority_order": 23,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": {
+          "id": 87162,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3171,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 7,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 7
+  }
+}

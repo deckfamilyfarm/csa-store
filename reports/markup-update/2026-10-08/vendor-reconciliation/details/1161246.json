@@ -1,0 +1,236 @@
+{
+  "remote": {
+    "id": 1161246,
+    "name": "Seckel Pears",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">The </span><a href=\"https://en.wikipedia.org/wiki/Seckel_pear\" target=\"_blank\" rel=\"noopener\" class=\"lexical-text-editor--link\"><span style=\"white-space: pre-wrap;\">Seckel pear</span></a><span style=\"white-space: pre-wrap;\"> is a tiny, exceptionally sweet heirloom fruit often called the \"sugar pear\" or \"candy pear\".</span></p><p dir=\"ltr\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Flavor &amp; Texture:</strong></b><span style=\"white-space: pre-wrap;\"> Rich, spicy, and honeyed sweetness with firm, juicy, and smooth flesh.</span></p><ul class=\"lexical-text-editor--list-ul\"><li value=\"1\"><span style=\"white-space: pre-wrap;\">Perfect for kids and lunchboxes because of its bite-sized shape.</span></li><li value=\"2\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Canning:</strong></b><span style=\"white-space: pre-wrap;\"> Small enough to be canned or pickled whole.</span></li><li value=\"3\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Cooking:</strong></b><span style=\"white-space: pre-wrap;\"> Excellent for poaching, roasting, and pairing with cheese boards or desserts. </span></li></ul>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2026-09-10T12:53:49.547790-04:00",
+    "updated": "2026-09-10T12:53:50.377403-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/ycKOX.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 473772,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/ycKOX.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/ycKOX.jpg",
+        "original_filename": "IMG_20260910_094439(1).jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 164,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 1006818,
+        "inventory_per_unit": 1,
+        "unit_price": 3,
+        "average_pack_weight": 0,
+        "package_price": 3,
+        "package_unit_price": 3,
+        "priority_order": 0,
+        "name": "lb",
+        "price_list_entries": [
+          {
+            "id": 1043347,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 804660,
+            "subscription_setting": {
+              "id": 922024,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1043348,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 804661,
+            "subscription_setting": {
+              "id": 922025,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1043349,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 804662,
+            "subscription_setting": {
+              "id": 922026,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 164,
+        "number_of_packages_available": 164,
+        "number_of_packages_total": 164,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 164,
+        "product_package_size": 1,
+        "product_id": 1161246,
+        "product_name": "Seckel Pears",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "lb",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-09-10T12:53:49.738075-04:00",
+        "updated": "2026-09-10T12:53:49.818788-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 804660,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 1011,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 681934,
+            "price_list_category": 15748,
+            "priority_order": 10,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": {
+          "id": 199885,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 804661,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1393,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 681935,
+            "price_list_category": 15063,
+            "priority_order": 10,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": {
+          "id": 199886,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 804662,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1411,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 681936,
+            "price_list_category": 28911,
+            "priority_order": 10,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": {
+          "id": 199887,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 6886,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 164,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 164
+  },
+  "fetchedAt": "2026-10-09T19:16:00.321Z"
+}

@@ -1,0 +1,504 @@
+{
+  "productId": 805939,
+  "context": {
+    "product": {
+      "id": 805939,
+      "name": "Jalapeño Peppers",
+      "description": "<p>Jalapeo peppers have a vegetal flavor similar to a green bell pepper and a front-of-mouth heat effect. The spiciness can vary widely among individual peppers. Jalapenos are picked green and generally used in this unripened state. Jalapenos turn red as they ripen, both on and off the plant. They usually fall in the range of 2,000 to 8,000 Scoville Heat Units (SHU), which sounds like a lot, but it really isn't!</p>",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": 0,
+      "categoryId": 12,
+      "vendorId": 3152,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/qAsts.thumbnail.jpeg",
+      "createdAt": "2023-08-25T14:39:58.000Z",
+      "updatedAt": "2025-11-20T16:32:49.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Fruiting Vegetables 🌶🥒🎃🍅",
+    "vendor": {
+      "id": 3152,
+      "name": "Little Wings",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 526999,
+        "productId": 805939,
+        "name": "Lb.",
+        "price": "3.50",
+        "packageCode": null,
+        "unit": "ea",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 526999,
+        "productId": 805939,
+        "localLinePackageId": 526999,
+        "liveName": "Lb.",
+        "livePrice": "3.50",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":805939,\"Product\":\"Jalapeño Peppers\",\"Track Inventory By\":\"package\",\"Item Unit\":\"ea\",\"Charge By\":\"package\",\"Charge Unit\":\"ea\",\"Package ID\":526999,\"Package Name\":\"Lb.\",\"# of Items\":1,\"Package Price\":3.5,\"Inventory Type\":\"product\"},\"live\":{\"id\":526999,\"inventory_per_unit\":1,\"unit_price\":3.5,\"average_pack_weight\":null,\"package_price\":3.5,\"package_unit_price\":3.5,\"priority_order\":1,\"name\":\"Lb.\",\"price_list_entries\":[{\"id\":221552,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":179155,\"subscription_setting\":{\"id\":124088,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":238530,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":192199,\"subscription_setting\":{\"id\":146072,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":617769,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479662,\"subscription_setting\":{\"id\":496885,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":207544,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":167713,\"subscription_setting\":{\"id\":106718,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":805939,\"product_name\":\"Jalapeño Peppers\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"ea\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2023-08-25T10:39:58.302017-04:00\",\"updated\":\"2025-11-20T11:15:11.594742-05:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 805939,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 805939,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/805939/localline/deeebcf1584a8b66fde1b53b.jpg"
+    ],
+    "localLineVendorId": 3152
+  },
+  "remote": {
+    "id": 805939,
+    "name": "Jalapeño Peppers",
+    "description": "<p>Jalapeo peppers have a vegetal flavor similar to a green bell pepper and a front-of-mouth heat effect. The spiciness can vary widely among individual peppers. Jalapenos are picked green and generally used in this unripened state. Jalapenos turn red as they ripen, both on and off the plant. They usually fall in the range of 2,000 to 8,000 Scoville Heat Units (SHU), which sounds like a lot, but it really isn't!</p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-08-25T10:39:58.286778-04:00",
+    "updated": "2025-11-20T11:32:49.410152-05:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/qAsts.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 141448,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/qAsts.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/qAsts.jpg",
+        "original_filename": "787.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "787",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 526999,
+        "inventory_per_unit": 1,
+        "unit_price": 3.5,
+        "average_pack_weight": null,
+        "package_price": 3.5,
+        "package_unit_price": 3.5,
+        "priority_order": 1,
+        "name": "Lb.",
+        "price_list_entries": [
+          {
+            "id": 221552,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179155,
+            "subscription_setting": {
+              "id": 124088,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 238530,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 192199,
+            "subscription_setting": {
+              "id": 146072,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617769,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479662,
+            "subscription_setting": {
+              "id": 496885,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 207544,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 167713,
+            "subscription_setting": {
+              "id": 106718,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 805939,
+        "product_name": "Jalapeño Peppers",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T10:39:58.302017-04:00",
+        "updated": "2025-11-20T11:15:11.594742-05:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 167713,
+        "price_list_category": 15111,
+        "price_list": 2718,
+        "priority_order": 246,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 137583,
+            "price_list_category": 15111,
+            "priority_order": 292,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179155,
+        "price_list_category": 15120,
+        "price_list": 2966,
+        "priority_order": 323,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 147366,
+            "price_list_category": 15120,
+            "priority_order": 378,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 192199,
+        "price_list_category": 15750,
+        "price_list": 3124,
+        "priority_order": 267,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 158076,
+            "price_list_category": 15750,
+            "priority_order": 316,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479662,
+        "price_list_category": 28914,
+        "price_list": 5622,
+        "priority_order": 323,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370091,
+            "price_list_category": 28914,
+            "priority_order": 376,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3152,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3152,
+    "packages": [
+      {
+        "id": 526999,
+        "unit_price": 3.5,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 192199,
+            "calculated_value": 5.08,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 3.5
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 167713,
+            "calculated_value": 5.08,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 3.5
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 179155,
+            "calculated_value": 5.08,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 3.5
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 479662,
+            "calculated_value": 5.08,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 3.5
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:39:03.221Z",
+  "rows": [
+    {
+      "productId": 805939,
+      "product": "Jalapeño Peppers",
+      "vendor": "Little Wings",
+      "packageId": 526999,
+      "package": "Lb.",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 3.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 4.9,
+      "localPriceAfter": 5.08,
+      "remoteBasePrice": 3.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 4.9,
+      "remotePriceAfter": 5.08
+    },
+    {
+      "productId": 805939,
+      "product": "Jalapeño Peppers",
+      "vendor": "Little Wings",
+      "packageId": 526999,
+      "package": "Lb.",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 3.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 4.9,
+      "localPriceAfter": 5.08,
+      "remoteBasePrice": 3.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 4.9,
+      "remotePriceAfter": 5.08
+    },
+    {
+      "productId": 805939,
+      "product": "Jalapeño Peppers",
+      "vendor": "Little Wings",
+      "packageId": 526999,
+      "package": "Lb.",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 3.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 4.9,
+      "localPriceAfter": 5.08,
+      "remoteBasePrice": 3.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 4.9,
+      "remotePriceAfter": 5.08
+    },
+    {
+      "productId": 805939,
+      "product": "Jalapeño Peppers",
+      "vendor": "Little Wings",
+      "packageId": 526999,
+      "package": "Lb.",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 3.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 4.9,
+      "localPriceAfter": 5.08,
+      "remoteBasePrice": 3.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 4.9,
+      "remotePriceAfter": 5.08
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.904Z"
+}

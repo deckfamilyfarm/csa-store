@@ -1,0 +1,262 @@
+{
+  "verifiedAt": "2026-10-08T20:49:57.093Z",
+  "productId": 890651,
+  "priceConfirmed": true,
+  "otherFieldsUnchanged": true,
+  "remote": {
+    "id": 890651,
+    "name": "Marjoram",
+    "description": "<p>What Does Marjoram Taste Like? The primary flavor compounds in marjoram are sabinene (fresh, woody), terpinene (citrusy), and linalool (floral). Marjoram has a milder flavor than oregano and tastes similar to thyme, but sweeter and with a stronger scent. It's warm, slightly sharp, and a little bitter.</p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2024-07-02T20:08:55.302555-04:00",
+    "updated": "2026-10-08T16:27:59.595932-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/0Dx2u.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 214000,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/0Dx2u.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/0Dx2u.png",
+        "original_filename": "What-Is-Marjoram-3x2-1-4008fd33ae26426d9e699b4b44801293.png"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 630140,
+        "inventory_per_unit": 1,
+        "unit_price": 1.5,
+        "average_pack_weight": 0,
+        "package_price": 1.5,
+        "package_unit_price": 1.5,
+        "priority_order": null,
+        "name": "bu",
+        "price_list_entries": [
+          {
+            "id": 382413,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 310082,
+            "subscription_setting": {
+              "id": 263299,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 382414,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 310083,
+            "subscription_setting": {
+              "id": 263300,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 618082,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479974,
+            "subscription_setting": {
+              "id": 497198,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 382415,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 310084,
+            "subscription_setting": {
+              "id": 263301,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": null,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 890651,
+        "product_name": "Marjoram",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bu",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2024-07-02T20:08:55.406376-04:00",
+        "updated": "2026-10-08T16:27:59.011912-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 310082,
+        "price_list_category": 15109,
+        "price_list": 2718,
+        "priority_order": 723,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 235409,
+            "price_list_category": 15109,
+            "priority_order": 737,
+            "price_list_category_name": "Organic Vegetables - Herbs🌿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 310083,
+        "price_list_category": 15124,
+        "price_list": 2966,
+        "priority_order": 925,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 235410,
+            "price_list_category": 15124,
+            "priority_order": 938,
+            "price_list_category_name": "Organic Vegetables - Herbs🌿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 310084,
+        "price_list_category": 15736,
+        "price_list": 3124,
+        "priority_order": 538,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 235411,
+            "price_list_category": 15736,
+            "priority_order": 553,
+            "price_list_category_name": "Organic Vegetables - Herbs 🌿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479974,
+        "price_list_category": 28897,
+        "price_list": 5622,
+        "priority_order": 925,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370453,
+            "price_list_category": 28897,
+            "priority_order": 939,
+            "price_list_category_name": "Organic Vegetables - Herbs🌿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3177,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  }
+}

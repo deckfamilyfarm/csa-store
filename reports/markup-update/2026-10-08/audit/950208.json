@@ -1,0 +1,451 @@
+{
+  "productId": 950208,
+  "context": {
+    "product": {
+      "id": 950208,
+      "name": "Mixed Bok Choi and Mustard Raab",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Bok choy and mustard raab, both belonging to the Brassica family, are versatile greens that can be enjoyed in various preparations, with&nbsp;bok choy being milder and sweeter, while mustard raab offers a more peppery flavor</span></p>",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": 0,
+      "categoryId": 14,
+      "vendorId": 3177,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/ACp5p.thumbnail.jpeg",
+      "createdAt": "2025-03-10T18:54:09.000Z",
+      "updatedAt": "2026-04-08T20:24:12.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Vegetables - Leafy Greens 🥬",
+    "vendor": {
+      "id": 3177,
+      "name": "Red Tail Growers",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 706698,
+        "productId": 950208,
+        "name": "bu",
+        "price": "2.50",
+        "packageCode": null,
+        "unit": "bu",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 1,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 706698,
+        "productId": 950208,
+        "localLinePackageId": 706698,
+        "liveName": "bu",
+        "livePrice": "2.50",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "package",
+        "packageInventory": 0,
+        "packageReservedInventory": 0,
+        "packageAvailableInventory": 0,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":950208,\"Product\":\"Mixed Bok Choi and Mustard Raab\",\"Track Inventory By\":\"package\",\"Item Unit\":\"bu\",\"Charge By\":\"package\",\"Charge Unit\":\"bu\",\"Package ID\":706698,\"Package Name\":\"bu\",\"# of Items\":1,\"Package Price\":2.5,\"Inventory Type\":\"package\",\"Package Inventory\":0,\"Package Reserved Inventory\":0,\"Package Available Inventory\":0},\"live\":{\"id\":706698,\"inventory_per_unit\":1,\"unit_price\":2.5,\"average_pack_weight\":0,\"package_price\":2.5,\"package_unit_price\":2.5,\"priority_order\":null,\"name\":\"bu\",\"price_list_entries\":[{\"id\":553140,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":428416,\"subscription_setting\":{\"id\":431759,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":553141,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":428417,\"subscription_setting\":{\"id\":431760,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":618240,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":480130,\"subscription_setting\":{\"id\":497356,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":950208,\"product_name\":\"Mixed Bok Choi and Mustard Raab\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"bu\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"No inventory\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2025-03-10T14:54:09.838413-04:00\",\"updated\":\"2025-03-10T14:54:09.943884-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 950208,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 950208,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/950208/localline/0334813dfefe412de4dcb948.jpg"
+    ],
+    "localLineVendorId": 3177
+  },
+  "remote": {
+    "id": 950208,
+    "name": "Mixed Bok Choi and Mustard Raab",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Bok choy and mustard raab, both belonging to the Brassica family, are versatile greens that can be enjoyed in various preparations, with&nbsp;bok choy being milder and sweeter, while mustard raab offers a more peppery flavor</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2025-03-10T14:54:09.672250-04:00",
+    "updated": "2025-03-13T15:06:28.184114-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/ACp5p.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 279332,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/ACp5p.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/ACp5p.jpeg",
+        "original_filename": "images.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 706698,
+        "inventory_per_unit": 1,
+        "unit_price": 2.5,
+        "average_pack_weight": 0,
+        "package_price": 2.5,
+        "package_unit_price": 2.5,
+        "priority_order": null,
+        "name": "bu",
+        "price_list_entries": [
+          {
+            "id": 553140,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 428416,
+            "subscription_setting": {
+              "id": 431759,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 553141,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 428417,
+            "subscription_setting": {
+              "id": 431760,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 618240,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 480130,
+            "subscription_setting": {
+              "id": 497356,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 950208,
+        "product_name": "Mixed Bok Choi and Mustard Raab",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bu",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "No inventory",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-03-10T14:54:09.838413-04:00",
+        "updated": "2025-03-10T14:54:09.943884-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 428416,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 906,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 319829,
+            "price_list_category": 15107,
+            "priority_order": 32,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 428417,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1112,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 319830,
+            "price_list_category": 15119,
+            "priority_order": 34,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 480130,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1112,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370248,
+            "price_list_category": 28913,
+            "priority_order": 35,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3177,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "package",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3177,
+    "packages": [
+      {
+        "id": 706698,
+        "unit_price": 2.5,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 428416,
+            "calculated_value": 3.63,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.5
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 428417,
+            "calculated_value": 3.63,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.5
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 480130,
+            "calculated_value": 3.63,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.5
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:40:33.549Z",
+  "rows": [
+    {
+      "productId": 950208,
+      "product": "Mixed Bok Choi and Mustard Raab",
+      "vendor": "Red Tail Growers",
+      "packageId": 706698,
+      "package": "bu",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 2.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.5,
+      "localPriceAfter": 3.63,
+      "remoteBasePrice": 2.5,
+      "remoteAdjustmentType": null,
+      "remoteAdjustmentBefore": null,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": null,
+      "remotePriceAfter": null
+    },
+    {
+      "productId": 950208,
+      "product": "Mixed Bok Choi and Mustard Raab",
+      "vendor": "Red Tail Growers",
+      "packageId": 706698,
+      "package": "bu",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 2.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.5,
+      "localPriceAfter": 3.63,
+      "remoteBasePrice": 2.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.5,
+      "remotePriceAfter": 3.63
+    },
+    {
+      "productId": 950208,
+      "product": "Mixed Bok Choi and Mustard Raab",
+      "vendor": "Red Tail Growers",
+      "packageId": 706698,
+      "package": "bu",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 2.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.5,
+      "localPriceAfter": 3.63,
+      "remoteBasePrice": 2.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.5,
+      "remotePriceAfter": 3.63
+    },
+    {
+      "productId": 950208,
+      "product": "Mixed Bok Choi and Mustard Raab",
+      "vendor": "Red Tail Growers",
+      "packageId": 706698,
+      "package": "bu",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 2.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.5,
+      "localPriceAfter": 3.63,
+      "remoteBasePrice": 2.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.5,
+      "remotePriceAfter": 3.63
+    }
+  ],
+  "warnings": [
+    "Guest Basket is not present for package bu; no listing created."
+  ],
+  "reviewedAt": "2026-10-08T19:48:40.988Z"
+}

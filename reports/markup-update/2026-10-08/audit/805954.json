@@ -1,0 +1,504 @@
+{
+  "productId": 805954,
+  "context": {
+    "product": {
+      "id": 805954,
+      "name": "Sweet Italian Peppers",
+      "description": "<p>A mix of red and yellow sweet Italian peppers!</p>",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": 0,
+      "categoryId": 12,
+      "vendorId": 3154,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/wKgWR.thumbnail.jpeg",
+      "createdAt": "2023-08-25T14:39:58.000Z",
+      "updatedAt": "2023-10-28T16:47:18.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Fruiting Vegetables 🌶🥒🎃🍅",
+    "vendor": {
+      "id": 3154,
+      "name": "Camas Swale Farm",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 527014,
+        "productId": 805954,
+        "name": "each",
+        "price": "3.35",
+        "packageCode": null,
+        "unit": "lb",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 527014,
+        "productId": 805954,
+        "localLinePackageId": 527014,
+        "liveName": "each",
+        "livePrice": "3.35",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":805954,\"Product\":\"Sweet Italian Peppers\",\"Track Inventory By\":\"package\",\"Item Unit\":\"lb\",\"Charge By\":\"package\",\"Charge Unit\":\"lb\",\"Package ID\":527014,\"Package Name\":\"each\",\"# of Items\":1,\"Package Price\":3.35,\"Inventory Type\":\"product\"},\"live\":{\"id\":527014,\"inventory_per_unit\":1,\"unit_price\":3.35,\"average_pack_weight\":null,\"package_price\":3.35,\"package_unit_price\":3.35,\"priority_order\":null,\"name\":\"each\",\"price_list_entries\":[{\"id\":207660,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":167832,\"subscription_setting\":{\"id\":106836,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":221666,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":179269,\"subscription_setting\":{\"id\":124095,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":238442,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":192114,\"subscription_setting\":{\"id\":146044,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":617846,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479739,\"subscription_setting\":{\"id\":496962,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":805954,\"product_name\":\"Sweet Italian Peppers\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"lb\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2023-08-25T10:39:58.602639-04:00\",\"updated\":\"2023-10-25T14:16:57.892271-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 805954,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 805954,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/805954/localline/a0024e5095aa40ad3e3db2bc.jpg"
+    ],
+    "localLineVendorId": 3154
+  },
+  "remote": {
+    "id": 805954,
+    "name": "Sweet Italian Peppers",
+    "description": "<p>A mix of red and yellow sweet Italian peppers!</p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-08-25T10:39:58.589998-04:00",
+    "updated": "2023-10-28T12:47:18.881640-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/wKgWR.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 142114,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/wKgWR.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/wKgWR.jpg",
+        "original_filename": "6701.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "6701",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 527014,
+        "inventory_per_unit": 1,
+        "unit_price": 3.35,
+        "average_pack_weight": null,
+        "package_price": 3.35,
+        "package_unit_price": 3.35,
+        "priority_order": null,
+        "name": "each",
+        "price_list_entries": [
+          {
+            "id": 207660,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 167832,
+            "subscription_setting": {
+              "id": 106836,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 221666,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179269,
+            "subscription_setting": {
+              "id": 124095,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 238442,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 192114,
+            "subscription_setting": {
+              "id": 146044,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617846,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479739,
+            "subscription_setting": {
+              "id": 496962,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 805954,
+        "product_name": "Sweet Italian Peppers",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "lb",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T10:39:58.602639-04:00",
+        "updated": "2023-10-25T14:16:57.892271-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 167832,
+        "price_list_category": 15111,
+        "price_list": 2718,
+        "priority_order": 348,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 137698,
+            "price_list_category": 15111,
+            "priority_order": 397,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179269,
+        "price_list_category": 15120,
+        "price_list": 2966,
+        "priority_order": 350,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 147479,
+            "price_list_category": 15120,
+            "priority_order": 406,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 192114,
+        "price_list_category": 15750,
+        "price_list": 3124,
+        "priority_order": 182,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 157991,
+            "price_list_category": 15750,
+            "priority_order": 228,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479739,
+        "price_list_category": 28914,
+        "price_list": 5622,
+        "priority_order": 350,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370115,
+            "price_list_category": 28914,
+            "priority_order": 405,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3154,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3154,
+    "packages": [
+      {
+        "id": 527014,
+        "unit_price": 3.35,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 192114,
+            "calculated_value": 4.86,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 3.35
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 167832,
+            "calculated_value": 4.86,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 3.35
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 179269,
+            "calculated_value": 4.86,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 3.35
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 479739,
+            "calculated_value": 4.86,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 3.35
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:39:06.657Z",
+  "rows": [
+    {
+      "productId": 805954,
+      "product": "Sweet Italian Peppers",
+      "vendor": "Camas Swale Farm",
+      "packageId": 527014,
+      "package": "each",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 3.35,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 4.69,
+      "localPriceAfter": 4.86,
+      "remoteBasePrice": 3.35,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 4.69,
+      "remotePriceAfter": 4.86
+    },
+    {
+      "productId": 805954,
+      "product": "Sweet Italian Peppers",
+      "vendor": "Camas Swale Farm",
+      "packageId": 527014,
+      "package": "each",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 3.35,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 4.69,
+      "localPriceAfter": 4.86,
+      "remoteBasePrice": 3.35,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 4.69,
+      "remotePriceAfter": 4.86
+    },
+    {
+      "productId": 805954,
+      "product": "Sweet Italian Peppers",
+      "vendor": "Camas Swale Farm",
+      "packageId": 527014,
+      "package": "each",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 3.35,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 4.69,
+      "localPriceAfter": 4.86,
+      "remoteBasePrice": 3.35,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 4.69,
+      "remotePriceAfter": 4.86
+    },
+    {
+      "productId": 805954,
+      "product": "Sweet Italian Peppers",
+      "vendor": "Camas Swale Farm",
+      "packageId": 527014,
+      "package": "each",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 3.35,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 4.69,
+      "localPriceAfter": 4.86,
+      "remoteBasePrice": 3.35,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 4.69,
+      "remotePriceAfter": 4.86
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.908Z"
+}

@@ -1,0 +1,504 @@
+{
+  "productId": 806102,
+  "context": {
+    "product": {
+      "id": 806102,
+      "name": "Rise & Shine Gluten Free Pancake Mix",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">This gluten free pancake mix is a unique blend of buckwheat, oat and corn flour. Try this tender and delicious blend for your breakfast today!</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Ingredients: Buckwheat Flour, Oat Flour, Corn Flour, Baking Powder, Baking Soda, Salt</span></p>",
+      "visible": 1,
+      "trackInventory": 1,
+      "inventory": 7,
+      "categoryId": 20,
+      "vendorId": 3150,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/rtKFl.thumbnail.jpeg",
+      "createdAt": "2023-08-25T15:15:32.000Z",
+      "updatedAt": "2026-09-16T10:40:24.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Grains/Pasta/Nuts  🫘 🍝 🥣",
+    "vendor": {
+      "id": 3150,
+      "name": "Lonesome Whistle",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 527166,
+        "productId": 806102,
+        "name": "1.6 lbs",
+        "price": "5.33",
+        "packageCode": null,
+        "unit": "ea",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 1,
+        "trackInventory": 0,
+        "inventory": null
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 527166,
+        "productId": 806102,
+        "localLinePackageId": 527166,
+        "liveName": "1.6 lbs",
+        "livePrice": "5.33",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":806102,\"Product\":\"Rise & Shine Gluten Free Pancake Mix\",\"Track Inventory By\":\"package\",\"Item Unit\":\"ea\",\"Charge By\":\"package\",\"Charge Unit\":\"ea\",\"Package ID\":527166,\"Package Name\":\"1.6 lbs\",\"# of Items\":1,\"Package Price\":5.33,\"Inventory Type\":\"product\"},\"live\":{\"id\":527166,\"inventory_per_unit\":1,\"unit_price\":5.33,\"average_pack_weight\":null,\"package_price\":5.33,\"package_unit_price\":5.33,\"priority_order\":null,\"name\":\"1.6 lbs\",\"price_list_entries\":[{\"id\":221763,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":179364,\"subscription_setting\":{\"id\":124502,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":238292,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":191967,\"subscription_setting\":{\"id\":146140,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":617917,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479810,\"subscription_setting\":{\"id\":497033,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":220394,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":178310,\"subscription_setting\":{\"id\":121299,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":7,\"number_of_packages_available\":7,\"number_of_packages_total\":7,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":7,\"product_package_size\":1,\"product_id\":806102,\"product_name\":\"Rise & Shine Gluten Free Pancake Mix\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"ea\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2023-08-25T11:15:32.321654-04:00\",\"updated\":\"2025-03-04T15:55:51.802503-05:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 806102,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 806102,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/806102/localline/17dde5f23cf8158a32078c23.png"
+    ],
+    "localLineVendorId": 3150
+  },
+  "remote": {
+    "id": 806102,
+    "name": "Rise & Shine Gluten Free Pancake Mix",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">This gluten free pancake mix is a unique blend of buckwheat, oat and corn flour. Try this tender and delicious blend for your breakfast today!</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Ingredients: Buckwheat Flour, Oat Flour, Corn Flour, Baking Powder, Baking Soda, Salt</span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2023-08-25T11:15:32.312732-04:00",
+    "updated": "2026-09-14T12:52:37.485432-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/rtKFl.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 141982,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/rtKFl.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/rtKFl.png",
+        "original_filename": "1038.png"
+      }
+    ],
+    "tags": [],
+    "inventory": 7,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "1038",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 527166,
+        "inventory_per_unit": 1,
+        "unit_price": 5.33,
+        "average_pack_weight": null,
+        "package_price": 5.33,
+        "package_unit_price": 5.33,
+        "priority_order": null,
+        "name": "1.6 lbs",
+        "price_list_entries": [
+          {
+            "id": 221763,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179364,
+            "subscription_setting": {
+              "id": 124502,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 238292,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 191967,
+            "subscription_setting": {
+              "id": 146140,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617917,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479810,
+            "subscription_setting": {
+              "id": 497033,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 220394,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 178310,
+            "subscription_setting": {
+              "id": 121299,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 7,
+        "number_of_packages_available": 7,
+        "number_of_packages_total": 7,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 7,
+        "product_package_size": 1,
+        "product_id": 806102,
+        "product_name": "Rise & Shine Gluten Free Pancake Mix",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T11:15:32.321654-04:00",
+        "updated": "2025-03-04T15:55:51.802503-05:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 178310,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 742,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440703,
+            "price_list_category": 31659,
+            "priority_order": 692,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179364,
+        "price_list_category": 17687,
+        "price_list": 2966,
+        "priority_order": 944,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 147574,
+            "price_list_category": 17687,
+            "priority_order": 910,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 191967,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 592,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440464,
+            "price_list_category": 31655,
+            "priority_order": 532,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479810,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 944,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 441143,
+            "price_list_category": 31666,
+            "priority_order": 913,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 3150,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 7,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 7
+  },
+  "payload": {
+    "vendor": 3150,
+    "packages": [
+      {
+        "id": 527166,
+        "unit_price": 5.33,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 191967,
+            "calculated_value": 7.73,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 5.33
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 178310,
+            "calculated_value": 7.73,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 5.33
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 179364,
+            "calculated_value": 7.73,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 5.33
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 479810,
+            "calculated_value": 7.73,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 5.33
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:39:34.680Z",
+  "rows": [
+    {
+      "productId": 806102,
+      "product": "Rise & Shine Gluten Free Pancake Mix",
+      "vendor": "Lonesome Whistle",
+      "packageId": 527166,
+      "package": "1.6 lbs",
+      "priceList": "Guest Basket",
+      "visible": true,
+      "basePrice": 5.33,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 7.46,
+      "localPriceAfter": 7.73,
+      "remoteBasePrice": 5.33,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 7.46,
+      "remotePriceAfter": 7.73
+    },
+    {
+      "productId": 806102,
+      "product": "Rise & Shine Gluten Free Pancake Mix",
+      "vendor": "Lonesome Whistle",
+      "packageId": 527166,
+      "package": "1.6 lbs",
+      "priceList": "CSA Members",
+      "visible": true,
+      "basePrice": 5.33,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 7.46,
+      "localPriceAfter": 7.73,
+      "remoteBasePrice": 5.33,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 7.46,
+      "remotePriceAfter": 7.73
+    },
+    {
+      "productId": 806102,
+      "product": "Rise & Shine Gluten Free Pancake Mix",
+      "vendor": "Lonesome Whistle",
+      "packageId": 527166,
+      "package": "1.6 lbs",
+      "priceList": "Herd Share Members",
+      "visible": true,
+      "basePrice": 5.33,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 7.46,
+      "localPriceAfter": 7.73,
+      "remoteBasePrice": 5.33,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 7.46,
+      "remotePriceAfter": 7.73
+    },
+    {
+      "productId": 806102,
+      "product": "Rise & Shine Gluten Free Pancake Mix",
+      "vendor": "Lonesome Whistle",
+      "packageId": 527166,
+      "package": "1.6 lbs",
+      "priceList": "SNAP",
+      "visible": true,
+      "basePrice": 5.33,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 7.46,
+      "localPriceAfter": 7.73,
+      "remoteBasePrice": 5.33,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 7.46,
+      "remotePriceAfter": 7.73
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.933Z"
+}

@@ -1,0 +1,1055 @@
+[
+  {
+    "direction": "outgoing",
+    "platform": "square",
+    "kind": "price",
+    "productId": 841579,
+    "productName": "Beef Liver",
+    "packageId": 569100,
+    "packageName": "0.90 - 1.30 lbs",
+    "vendorName": "Deck Family Farm",
+    "status": "changed",
+    "message": "Change Square selling unit from each/package to lb; price is per lb.",
+    "staged": {},
+    "localBefore": {
+      "productId": 841579,
+      "packageId": 569100,
+      "vendorName": "Deck Family Farm",
+      "productName": "Beef Liver",
+      "categoryName": "Grass-fed Beef 🐮",
+      "sourceUnitPrice": 15,
+      "unitOfMeasure": "lbs",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "localAfter": {
+      "productId": 841579,
+      "packageId": 569100,
+      "vendorName": "Deck Family Farm",
+      "productName": "Beef Liver",
+      "categoryName": "Grass-fed Beef 🐮",
+      "sourceUnitPrice": 15,
+      "unitOfMeasure": "lbs",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "mapping": {
+      "linkId": 10,
+      "squareItemId": "PLQR3XP6GQOWX6GLDFJQZI6D",
+      "squareVariationId": "DPHMZXG5A3S4YOMA3V3FICUI",
+      "linkApprovedAt": "2026-09-15 11:56:40"
+    },
+    "remoteBefore": {
+      "id": "DPHMZXG5A3S4YOMA3V3FICUI",
+      "deleted": false,
+      "itemId": "PLQR3XP6GQOWX6GLDFJQZI6D",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1500,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "desired": {
+      "id": "DPHMZXG5A3S4YOMA3V3FICUI",
+      "deleted": false,
+      "itemId": "PLQR3XP6GQOWX6GLDFJQZI6D",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1500,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+        "unit": "lb",
+        "precision": 2,
+        "definition": {
+          "weight_unit": "IMPERIAL_POUND",
+          "type": "TYPE_WEIGHT"
+        }
+      }
+    },
+    "payload": {
+      "amount": 1500,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+        "unit": "lb",
+        "precision": 2,
+        "definition": {
+          "weight_unit": "IMPERIAL_POUND",
+          "type": "TYPE_WEIGHT"
+        }
+      }
+    },
+    "display": {
+      "current": {
+        "price": 15,
+        "currency": "USD",
+        "sellingUnit": "each/package"
+      },
+      "proposed": {
+        "price": 15,
+        "currency": "USD",
+        "sellingUnit": "lb"
+      },
+      "basis": "vendor-retail-price"
+    },
+    "localSnapshot": {
+      "productId": 841579,
+      "productName": "Beef Liver",
+      "visible": 1,
+      "trackInventory": 0,
+      "inventory": 0,
+      "onSale": 0,
+      "saleDiscount": 0
+    },
+    "id": 1969,
+    "auditId": 12,
+    "result": null,
+    "released": false
+  },
+  {
+    "direction": "outgoing",
+    "platform": "square",
+    "kind": "price",
+    "productId": 813092,
+    "productName": "Ground Lamb",
+    "packageId": 535123,
+    "packageName": "1.00 lbs",
+    "vendorName": "Deck Family Farm",
+    "status": "changed",
+    "message": "Change Square selling unit from each/package to lb; price is per lb.",
+    "staged": {},
+    "localBefore": {
+      "productId": 813092,
+      "packageId": 535123,
+      "vendorName": "Deck Family Farm",
+      "productName": "Ground Lamb",
+      "categoryName": "Spring Lamb 🐑",
+      "sourceUnitPrice": 17,
+      "unitOfMeasure": "lbs",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "localAfter": {
+      "productId": 813092,
+      "packageId": 535123,
+      "vendorName": "Deck Family Farm",
+      "productName": "Ground Lamb",
+      "categoryName": "Spring Lamb 🐑",
+      "sourceUnitPrice": 17,
+      "unitOfMeasure": "lbs",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "mapping": {
+      "linkId": 43,
+      "squareItemId": "W6TLTOS5DEHZUYMO47WBSGOE",
+      "squareVariationId": "I4326UJUHXDELAFK7M2BZ4Z6",
+      "linkApprovedAt": "2026-09-15 12:01:08"
+    },
+    "remoteBefore": {
+      "id": "I4326UJUHXDELAFK7M2BZ4Z6",
+      "deleted": false,
+      "itemId": "W6TLTOS5DEHZUYMO47WBSGOE",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1700,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "desired": {
+      "id": "I4326UJUHXDELAFK7M2BZ4Z6",
+      "deleted": false,
+      "itemId": "W6TLTOS5DEHZUYMO47WBSGOE",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1700,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+        "unit": "lb",
+        "precision": 2,
+        "definition": {
+          "weight_unit": "IMPERIAL_POUND",
+          "type": "TYPE_WEIGHT"
+        }
+      }
+    },
+    "payload": {
+      "amount": 1700,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+        "unit": "lb",
+        "precision": 2,
+        "definition": {
+          "weight_unit": "IMPERIAL_POUND",
+          "type": "TYPE_WEIGHT"
+        }
+      }
+    },
+    "display": {
+      "current": {
+        "price": 17,
+        "currency": "USD",
+        "sellingUnit": "each/package"
+      },
+      "proposed": {
+        "price": 17,
+        "currency": "USD",
+        "sellingUnit": "lb"
+      },
+      "basis": "vendor-retail-price"
+    },
+    "localSnapshot": {
+      "productId": 813092,
+      "productName": "Ground Lamb",
+      "visible": 1,
+      "trackInventory": 0,
+      "inventory": 0,
+      "onSale": 0,
+      "saleDiscount": 0
+    },
+    "id": 1970,
+    "auditId": 12,
+    "result": null,
+    "released": false
+  },
+  {
+    "direction": "outgoing",
+    "platform": "square",
+    "kind": "price",
+    "productId": 805691,
+    "productName": "Ground Pork",
+    "packageId": 526744,
+    "packageName": "1.00 lbs",
+    "vendorName": "Deck Family Farm",
+    "status": "changed",
+    "message": "Change Square selling unit from each/package to lb; price is per lb.",
+    "staged": {},
+    "localBefore": {
+      "productId": 805691,
+      "packageId": 526744,
+      "vendorName": "Deck Family Farm",
+      "productName": "Ground Pork",
+      "categoryName": "Pasture-raised Pork 🐖",
+      "sourceUnitPrice": 12,
+      "unitOfMeasure": "lbs",
+      "packagePrice": null,
+      "onSale": 1,
+      "saleDiscount": 0.2,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "localAfter": {
+      "productId": 805691,
+      "packageId": 526744,
+      "vendorName": "Deck Family Farm",
+      "productName": "Ground Pork",
+      "categoryName": "Pasture-raised Pork 🐖",
+      "sourceUnitPrice": 12,
+      "unitOfMeasure": "lbs",
+      "packagePrice": null,
+      "onSale": 1,
+      "saleDiscount": 0.2,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "mapping": {
+      "linkId": 44,
+      "squareItemId": "ZWYKIFSJHXRJAMUTBROCLXDV",
+      "squareVariationId": "ATTBVR3RYMNJXCOHHWZ7LUE7",
+      "linkApprovedAt": "2026-09-15 12:01:12"
+    },
+    "remoteBefore": {
+      "id": "ATTBVR3RYMNJXCOHHWZ7LUE7",
+      "deleted": false,
+      "itemId": "ZWYKIFSJHXRJAMUTBROCLXDV",
+      "pricingType": "FIXED_PRICING",
+      "amount": 960,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "desired": {
+      "id": "ATTBVR3RYMNJXCOHHWZ7LUE7",
+      "deleted": false,
+      "itemId": "ZWYKIFSJHXRJAMUTBROCLXDV",
+      "pricingType": "FIXED_PRICING",
+      "amount": 960,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+        "unit": "lb",
+        "precision": 2,
+        "definition": {
+          "weight_unit": "IMPERIAL_POUND",
+          "type": "TYPE_WEIGHT"
+        }
+      }
+    },
+    "payload": {
+      "amount": 960,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+        "unit": "lb",
+        "precision": 2,
+        "definition": {
+          "weight_unit": "IMPERIAL_POUND",
+          "type": "TYPE_WEIGHT"
+        }
+      }
+    },
+    "display": {
+      "current": {
+        "price": 9.6,
+        "currency": "USD",
+        "sellingUnit": "each/package"
+      },
+      "proposed": {
+        "price": 9.6,
+        "currency": "USD",
+        "sellingUnit": "lb"
+      },
+      "basis": "vendor-retail-price"
+    },
+    "localSnapshot": {
+      "productId": 805691,
+      "productName": "Ground Pork",
+      "visible": 1,
+      "trackInventory": 0,
+      "inventory": 0,
+      "onSale": 1,
+      "saleDiscount": 0.2
+    },
+    "id": 1971,
+    "auditId": 12,
+    "result": null,
+    "released": false
+  },
+  {
+    "direction": "outgoing",
+    "platform": "square",
+    "kind": "price",
+    "productId": 805664,
+    "productName": "Hamburger Patties",
+    "packageId": 526717,
+    "packageName": "1.00 lbs",
+    "vendorName": "Deck Family Farm",
+    "status": "changed",
+    "message": "Change Square selling unit from each/package to lb; price is per lb.",
+    "staged": {},
+    "localBefore": {
+      "productId": 805664,
+      "packageId": 526717,
+      "vendorName": "Deck Family Farm",
+      "productName": "Hamburger Patties",
+      "categoryName": "Grass-fed Beef 🐮",
+      "sourceUnitPrice": 15.5,
+      "unitOfMeasure": "lbs",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "localAfter": {
+      "productId": 805664,
+      "packageId": 526717,
+      "vendorName": "Deck Family Farm",
+      "productName": "Hamburger Patties",
+      "categoryName": "Grass-fed Beef 🐮",
+      "sourceUnitPrice": 15.5,
+      "unitOfMeasure": "lbs",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "mapping": {
+      "linkId": 45,
+      "squareItemId": "ZWZUCQRCDOB2CJF4KCGQJYI5",
+      "squareVariationId": "T5CTPJKL4O3BTPFAD4IEBOYY",
+      "linkApprovedAt": "2026-09-15 12:01:16"
+    },
+    "remoteBefore": {
+      "id": "T5CTPJKL4O3BTPFAD4IEBOYY",
+      "deleted": false,
+      "itemId": "ZWZUCQRCDOB2CJF4KCGQJYI5",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1550,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "desired": {
+      "id": "T5CTPJKL4O3BTPFAD4IEBOYY",
+      "deleted": false,
+      "itemId": "ZWZUCQRCDOB2CJF4KCGQJYI5",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1550,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+        "unit": "lb",
+        "precision": 2,
+        "definition": {
+          "weight_unit": "IMPERIAL_POUND",
+          "type": "TYPE_WEIGHT"
+        }
+      }
+    },
+    "payload": {
+      "amount": 1550,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+        "unit": "lb",
+        "precision": 2,
+        "definition": {
+          "weight_unit": "IMPERIAL_POUND",
+          "type": "TYPE_WEIGHT"
+        }
+      }
+    },
+    "display": {
+      "current": {
+        "price": 15.5,
+        "currency": "USD",
+        "sellingUnit": "each/package"
+      },
+      "proposed": {
+        "price": 15.5,
+        "currency": "USD",
+        "sellingUnit": "lb"
+      },
+      "basis": "vendor-retail-price"
+    },
+    "localSnapshot": {
+      "productId": 805664,
+      "productName": "Hamburger Patties",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": 0,
+      "onSale": 0,
+      "saleDiscount": 0
+    },
+    "id": 1972,
+    "auditId": 12,
+    "result": null,
+    "released": false
+  },
+  {
+    "direction": "outgoing",
+    "platform": "square",
+    "kind": "price",
+    "productId": 825835,
+    "productName": "Lamb Bones",
+    "packageId": 549814,
+    "packageName": "3.00 - 5.00 lbs",
+    "vendorName": "Deck Family Farm",
+    "status": "changed",
+    "message": "Change Square selling unit from each/package to lb; price is per lb.",
+    "staged": {},
+    "localBefore": {
+      "productId": 825835,
+      "packageId": 549814,
+      "vendorName": "Deck Family Farm",
+      "productName": "Lamb Bones",
+      "categoryName": "Spring Lamb 🐑",
+      "sourceUnitPrice": 2.5,
+      "unitOfMeasure": "lbs",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "localAfter": {
+      "productId": 825835,
+      "packageId": 549814,
+      "vendorName": "Deck Family Farm",
+      "productName": "Lamb Bones",
+      "categoryName": "Spring Lamb 🐑",
+      "sourceUnitPrice": 2.5,
+      "unitOfMeasure": "lbs",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "mapping": {
+      "linkId": 49,
+      "squareItemId": "X5JEUWVLEY7Q32PNRSNNUUKG",
+      "squareVariationId": "GLJBCAFOB4EJTMLFCS5WRPTN",
+      "linkApprovedAt": "2026-09-15 12:02:05"
+    },
+    "remoteBefore": {
+      "id": "GLJBCAFOB4EJTMLFCS5WRPTN",
+      "deleted": false,
+      "itemId": "X5JEUWVLEY7Q32PNRSNNUUKG",
+      "pricingType": "FIXED_PRICING",
+      "amount": 250,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "desired": {
+      "id": "GLJBCAFOB4EJTMLFCS5WRPTN",
+      "deleted": false,
+      "itemId": "X5JEUWVLEY7Q32PNRSNNUUKG",
+      "pricingType": "FIXED_PRICING",
+      "amount": 250,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+        "unit": "lb",
+        "precision": 2,
+        "definition": {
+          "weight_unit": "IMPERIAL_POUND",
+          "type": "TYPE_WEIGHT"
+        }
+      }
+    },
+    "payload": {
+      "amount": 250,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+        "unit": "lb",
+        "precision": 2,
+        "definition": {
+          "weight_unit": "IMPERIAL_POUND",
+          "type": "TYPE_WEIGHT"
+        }
+      }
+    },
+    "display": {
+      "current": {
+        "price": 2.5,
+        "currency": "USD",
+        "sellingUnit": "each/package"
+      },
+      "proposed": {
+        "price": 2.5,
+        "currency": "USD",
+        "sellingUnit": "lb"
+      },
+      "basis": "vendor-retail-price"
+    },
+    "localSnapshot": {
+      "productId": 825835,
+      "productName": "Lamb Bones",
+      "visible": 1,
+      "trackInventory": 0,
+      "inventory": 0,
+      "onSale": 0,
+      "saleDiscount": 0
+    },
+    "id": 1973,
+    "auditId": 12,
+    "result": null,
+    "released": false
+  },
+  {
+    "direction": "outgoing",
+    "platform": "square",
+    "kind": "price",
+    "productId": 805688,
+    "productName": "Natural Ground Beef",
+    "packageId": 526741,
+    "packageName": "1 lbs",
+    "vendorName": "Deck Family Farm",
+    "status": "changed",
+    "message": "Change Square selling unit from each/package to lb; price is per lb.",
+    "staged": {},
+    "localBefore": {
+      "productId": 805688,
+      "packageId": 526741,
+      "vendorName": "Deck Family Farm",
+      "productName": "Natural Ground Beef",
+      "categoryName": "Grass-fed Beef 🐮",
+      "sourceUnitPrice": 12,
+      "unitOfMeasure": "lbs",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0.1,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "localAfter": {
+      "productId": 805688,
+      "packageId": 526741,
+      "vendorName": "Deck Family Farm",
+      "productName": "Natural Ground Beef",
+      "categoryName": "Grass-fed Beef 🐮",
+      "sourceUnitPrice": 12,
+      "unitOfMeasure": "lbs",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0.1,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "mapping": {
+      "linkId": 61,
+      "squareItemId": "XJV3K7ISGJYS3ERSUYR3I32H",
+      "squareVariationId": "ZJ5C7CRZQNREBLA2VWZU733H",
+      "linkApprovedAt": "2026-09-15 12:03:18"
+    },
+    "remoteBefore": {
+      "id": "ZJ5C7CRZQNREBLA2VWZU733H",
+      "deleted": false,
+      "itemId": "XJV3K7ISGJYS3ERSUYR3I32H",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1200,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "desired": {
+      "id": "ZJ5C7CRZQNREBLA2VWZU733H",
+      "deleted": false,
+      "itemId": "XJV3K7ISGJYS3ERSUYR3I32H",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1200,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+        "unit": "lb",
+        "precision": 2,
+        "definition": {
+          "weight_unit": "IMPERIAL_POUND",
+          "type": "TYPE_WEIGHT"
+        }
+      }
+    },
+    "payload": {
+      "amount": 1200,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+        "unit": "lb",
+        "precision": 2,
+        "definition": {
+          "weight_unit": "IMPERIAL_POUND",
+          "type": "TYPE_WEIGHT"
+        }
+      }
+    },
+    "display": {
+      "current": {
+        "price": 12,
+        "currency": "USD",
+        "sellingUnit": "each/package"
+      },
+      "proposed": {
+        "price": 12,
+        "currency": "USD",
+        "sellingUnit": "lb"
+      },
+      "basis": "vendor-retail-price"
+    },
+    "localSnapshot": {
+      "productId": 805688,
+      "productName": "Natural Ground Beef",
+      "visible": 1,
+      "trackInventory": 0,
+      "inventory": 0,
+      "onSale": 0,
+      "saleDiscount": 0.1
+    },
+    "id": 1974,
+    "auditId": 12,
+    "result": null,
+    "released": false
+  },
+  {
+    "direction": "outgoing",
+    "platform": "square",
+    "kind": "price",
+    "productId": 805689,
+    "productName": "Organic Ground Beef",
+    "packageId": 526742,
+    "packageName": "1 lbs",
+    "vendorName": "Deck Family Farm",
+    "status": "changed",
+    "message": "Change Square selling unit from each/package to lb; price is per lb.",
+    "staged": {},
+    "localBefore": {
+      "productId": 805689,
+      "packageId": 526742,
+      "vendorName": "Deck Family Farm",
+      "productName": "Organic Ground Beef",
+      "categoryName": "Grass-fed Beef 🐮",
+      "sourceUnitPrice": 14,
+      "unitOfMeasure": "lbs",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0.1,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "localAfter": {
+      "productId": 805689,
+      "packageId": 526742,
+      "vendorName": "Deck Family Farm",
+      "productName": "Organic Ground Beef",
+      "categoryName": "Grass-fed Beef 🐮",
+      "sourceUnitPrice": 14,
+      "unitOfMeasure": "lbs",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0.1,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "mapping": {
+      "linkId": 67,
+      "squareItemId": "XJV3K7ISGJYS3ERSUYR3I32H",
+      "squareVariationId": "6DJNVCZ3SEZG7PYWKJED3HZJ",
+      "linkApprovedAt": "2026-09-15 12:03:47"
+    },
+    "remoteBefore": {
+      "id": "6DJNVCZ3SEZG7PYWKJED3HZJ",
+      "deleted": false,
+      "itemId": "XJV3K7ISGJYS3ERSUYR3I32H",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1400,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "desired": {
+      "id": "6DJNVCZ3SEZG7PYWKJED3HZJ",
+      "deleted": false,
+      "itemId": "XJV3K7ISGJYS3ERSUYR3I32H",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1400,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+        "unit": "lb",
+        "precision": 2,
+        "definition": {
+          "weight_unit": "IMPERIAL_POUND",
+          "type": "TYPE_WEIGHT"
+        }
+      }
+    },
+    "payload": {
+      "amount": 1400,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+        "unit": "lb",
+        "precision": 2,
+        "definition": {
+          "weight_unit": "IMPERIAL_POUND",
+          "type": "TYPE_WEIGHT"
+        }
+      }
+    },
+    "display": {
+      "current": {
+        "price": 14,
+        "currency": "USD",
+        "sellingUnit": "each/package"
+      },
+      "proposed": {
+        "price": 14,
+        "currency": "USD",
+        "sellingUnit": "lb"
+      },
+      "basis": "vendor-retail-price"
+    },
+    "localSnapshot": {
+      "productId": 805689,
+      "productName": "Organic Ground Beef",
+      "visible": 1,
+      "trackInventory": 0,
+      "inventory": 0,
+      "onSale": 0,
+      "saleDiscount": 0.1
+    },
+    "id": 1975,
+    "auditId": 12,
+    "result": null,
+    "released": false
+  },
+  {
+    "direction": "outgoing",
+    "platform": "square",
+    "kind": "price",
+    "productId": 813080,
+    "productName": "Pet Food, Organ Blend",
+    "packageId": 535111,
+    "packageName": "1.00 lbs",
+    "vendorName": "Deck Family Farm",
+    "status": "changed",
+    "message": "Change Square selling unit from each/package to lb; price is per lb.",
+    "staged": {},
+    "localBefore": {
+      "productId": 813080,
+      "packageId": 535111,
+      "vendorName": "Deck Family Farm",
+      "productName": "Pet Food, Organ Blend",
+      "categoryName": "Pasture-raised Pork 🐖",
+      "sourceUnitPrice": 12,
+      "unitOfMeasure": "lbs",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "localAfter": {
+      "productId": 813080,
+      "packageId": 535111,
+      "vendorName": "Deck Family Farm",
+      "productName": "Pet Food, Organ Blend",
+      "categoryName": "Pasture-raised Pork 🐖",
+      "sourceUnitPrice": 12,
+      "unitOfMeasure": "lbs",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "mapping": {
+      "linkId": 73,
+      "squareItemId": "KMIWMJLL7C73ADSABAGDF4KO",
+      "squareVariationId": "U3KGBMTUXU63EPJN6A2CITXP",
+      "linkApprovedAt": "2026-09-15 12:04:20"
+    },
+    "remoteBefore": {
+      "id": "U3KGBMTUXU63EPJN6A2CITXP",
+      "deleted": false,
+      "itemId": "KMIWMJLL7C73ADSABAGDF4KO",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1200,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "desired": {
+      "id": "U3KGBMTUXU63EPJN6A2CITXP",
+      "deleted": false,
+      "itemId": "KMIWMJLL7C73ADSABAGDF4KO",
+      "pricingType": "FIXED_PRICING",
+      "amount": 1200,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+        "unit": "lb",
+        "precision": 2,
+        "definition": {
+          "weight_unit": "IMPERIAL_POUND",
+          "type": "TYPE_WEIGHT"
+        }
+      }
+    },
+    "payload": {
+      "amount": 1200,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+        "unit": "lb",
+        "precision": 2,
+        "definition": {
+          "weight_unit": "IMPERIAL_POUND",
+          "type": "TYPE_WEIGHT"
+        }
+      }
+    },
+    "display": {
+      "current": {
+        "price": 12,
+        "currency": "USD",
+        "sellingUnit": "each/package"
+      },
+      "proposed": {
+        "price": 12,
+        "currency": "USD",
+        "sellingUnit": "lb"
+      },
+      "basis": "vendor-retail-price"
+    },
+    "localSnapshot": {
+      "productId": 813080,
+      "productName": "Pet Food, Organ Blend",
+      "visible": 1,
+      "trackInventory": 0,
+      "inventory": 0,
+      "onSale": 0,
+      "saleDiscount": 0
+    },
+    "id": 1976,
+    "auditId": 12,
+    "result": null,
+    "released": false
+  },
+  {
+    "direction": "outgoing",
+    "platform": "square",
+    "kind": "price",
+    "productId": 813078,
+    "productName": "Pork Bones",
+    "packageId": 535108,
+    "packageName": "3.00 - 5.00 lbs",
+    "vendorName": "Deck Family Farm",
+    "status": "changed",
+    "message": "Change Square selling unit from each/package to lb; price is per lb.",
+    "staged": {},
+    "localBefore": {
+      "productId": 813078,
+      "packageId": 535108,
+      "vendorName": "Deck Family Farm",
+      "productName": "Pork Bones",
+      "categoryName": "Broth, Lard, Bones, and Organs🦴",
+      "sourceUnitPrice": 2.5,
+      "unitOfMeasure": "lbs",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "localAfter": {
+      "productId": 813078,
+      "packageId": 535108,
+      "vendorName": "Deck Family Farm",
+      "productName": "Pork Bones",
+      "categoryName": "Broth, Lard, Bones, and Organs🦴",
+      "sourceUnitPrice": 2.5,
+      "unitOfMeasure": "lbs",
+      "packagePrice": null,
+      "onSale": 0,
+      "saleDiscount": 0,
+      "priceBasis": "vendor-retail-price",
+      "configuredCurrency": "USD"
+    },
+    "mapping": {
+      "linkId": 75,
+      "squareItemId": "HIBUHRVFDXAGQIDKI3N5UNVM",
+      "squareVariationId": "4Q3SG46WA27GRXGSATR4ZWCY",
+      "linkApprovedAt": "2026-09-15 12:04:29"
+    },
+    "remoteBefore": {
+      "id": "4Q3SG46WA27GRXGSATR4ZWCY",
+      "deleted": false,
+      "itemId": "HIBUHRVFDXAGQIDKI3N5UNVM",
+      "pricingType": "FIXED_PRICING",
+      "amount": 250,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "desired": {
+      "id": "4Q3SG46WA27GRXGSATR4ZWCY",
+      "deleted": false,
+      "itemId": "HIBUHRVFDXAGQIDKI3N5UNVM",
+      "pricingType": "FIXED_PRICING",
+      "amount": 250,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+        "unit": "lb",
+        "precision": 2,
+        "definition": {
+          "weight_unit": "IMPERIAL_POUND",
+          "type": "TYPE_WEIGHT"
+        }
+      }
+    },
+    "payload": {
+      "amount": 250,
+      "currency": "USD",
+      "sellingUnit": {
+        "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+        "unit": "lb",
+        "precision": 2,
+        "definition": {
+          "weight_unit": "IMPERIAL_POUND",
+          "type": "TYPE_WEIGHT"
+        }
+      }
+    },
+    "display": {
+      "current": {
+        "price": 2.5,
+        "currency": "USD",
+        "sellingUnit": "each/package"
+      },
+      "proposed": {
+        "price": 2.5,
+        "currency": "USD",
+        "sellingUnit": "lb"
+      },
+      "basis": "vendor-retail-price"
+    },
+    "localSnapshot": {
+      "productId": 813078,
+      "productName": "Pork Bones",
+      "visible": 1,
+      "trackInventory": 0,
+      "inventory": 0,
+      "onSale": 0,
+      "saleDiscount": 0
+    },
+    "id": 1977,
+    "auditId": 12,
+    "result": null,
+    "released": false
+  }
+]

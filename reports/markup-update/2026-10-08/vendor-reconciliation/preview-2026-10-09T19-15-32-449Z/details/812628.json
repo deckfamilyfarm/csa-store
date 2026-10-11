@@ -1,0 +1,259 @@
+{
+  "remote": {
+    "id": 812628,
+    "name": "Tomatillos",
+    "description": "<p>These little fruits (yep, they're fruits, just like tomatoes and cucumbers), sometimes called husk tomatoes, look like green, unripe tomatoes with a dry, leafy husk that wraps around the outside. Tomatillos have a slightly more acidic, slightly less sweet flavor than ripe and unripe tomatoes. Prepping a tomatillo is pretty straight forward. The husks can be easily removed with your hands and discarded. You’ll notice a sticky film on the surface, which will come off with a quick rinse under warm water. From here, you decide what you want to do with them. If you want to keep the flavor bright and play up their bracing acidity, use them raw. If you want to mellow out that acidity a bit and access the fruit's deeper, more savory qualities, cooking them—whether you're roasting or grilling them whole or chopping them for a saute—is the move.</p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-09-30T02:15:52.061928-04:00",
+    "updated": "2026-08-27T12:01:38.300477-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/nMUKn.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 144613,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/nMUKn.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/nMUKn.jpg",
+        "original_filename": "tomatillos-c47984d4094d4c8e96f8fe9a8bf36013.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 1,
+      "name": "pound",
+      "abbrieviation": "lb",
+      "unit_type": "weight",
+      "default": true
+    },
+    "charge_unit": {
+      "id": 1,
+      "name": "pound",
+      "abbrieviation": "lb",
+      "unit_type": "weight",
+      "default": true
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 534496,
+        "inventory_per_unit": 1,
+        "unit_price": 3.4,
+        "average_pack_weight": 0,
+        "package_price": 3.4,
+        "package_unit_price": 3.4,
+        "priority_order": null,
+        "name": "pound",
+        "price_list_entries": [
+          {
+            "id": 238480,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 192149,
+            "subscription_setting": {
+              "id": 145983,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 220740,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 178640,
+            "subscription_setting": {
+              "id": 121695,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 221799,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179398,
+            "subscription_setting": {
+              "id": 124215,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617946,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479838,
+            "subscription_setting": {
+              "id": 497062,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": null,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 812628,
+        "product_name": "Tomatillos",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "lb",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-09-30T02:15:52.112998-04:00",
+        "updated": "2026-08-06T12:48:08.776600-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 178640,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 493,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440931,
+            "price_list_category": 14599,
+            "priority_order": 9,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179398,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 493,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440921,
+            "price_list_category": 15063,
+            "priority_order": 25,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 192149,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 217,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 441190,
+            "price_list_category": 15748,
+            "priority_order": 26,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479838,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 493,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 440938,
+            "price_list_category": 28911,
+            "priority_order": 524,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3154,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "fetchedAt": "2026-10-08T21:50:50.249Z"
+}

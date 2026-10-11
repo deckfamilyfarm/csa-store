@@ -1,0 +1,524 @@
+{
+  "productId": 1108544,
+  "context": {
+    "product": {
+      "id": 1108544,
+      "name": "Purple Radish",
+      "description": "Purple radishes, often found as varieties like the purple daikon (Bora King, KN-Bravo), are crisp, mild, and slightly sweet root vegetables, commonly used raw in salads or pickled. They have violet skin with a white, purple-streaked interior, offering a crunchy texture and high levels of anthocyanins, antioxidants, Vitamin C, and fiber.",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": null,
+      "categoryId": null,
+      "vendorId": 3152,
+      "thumbnailUrl": null,
+      "createdAt": "2026-04-30T16:14:15.000Z",
+      "updatedAt": "2026-07-03T19:41:35.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "",
+    "vendor": {
+      "id": 3152,
+      "name": "Little Wings",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 927365,
+        "productId": 1108544,
+        "name": "bu",
+        "price": "2.25",
+        "packageCode": null,
+        "unit": null,
+        "numOfItems": 1,
+        "trackType": null,
+        "chargeType": null,
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": null
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 927365,
+        "productId": 1108544,
+        "localLinePackageId": 927365,
+        "liveName": "bu",
+        "livePrice": "2.25",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":1108544,\"Product\":\"Purple Radish\",\"Track Inventory By\":\"package\",\"Item Unit\":\"bu\",\"Charge By\":\"package\",\"Charge Unit\":\"bu\",\"Package ID\":927365,\"Package Name\":\"bu\",\"# of Items\":1,\"Package Price\":2.25,\"Inventory Type\":\"product\"},\"live\":{\"id\":927365,\"inventory_per_unit\":1,\"unit_price\":2.25,\"average_pack_weight\":0,\"package_price\":2.25,\"package_unit_price\":2.25,\"priority_order\":1,\"name\":\"bu\",\"price_list_entries\":[{\"id\":904468,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":698339,\"subscription_setting\":{\"id\":783081,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":904469,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":698340,\"subscription_setting\":{\"id\":783082,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":904470,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":698341,\"subscription_setting\":{\"id\":783083,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":904471,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":698342,\"subscription_setting\":{\"id\":783084,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":null,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":1108544,\"product_name\":\"Purple Radish\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"bu\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2026-04-21T12:57:13.186422-04:00\",\"updated\":\"2026-05-04T13:02:23.374984-04:00\"}}",
+        "createdAt": "2026-04-30T16:16:59.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 1108544,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 1108544,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/1108544/localline/6f1d7fdd1c36425dbbe4c7d1.jpg"
+    ],
+    "localLineVendorId": 3152
+  },
+  "remote": {
+    "id": 1108544,
+    "name": "Purple Radish",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Purple radishes, often found as varieties like the purple daikon (Bora King, KN-Bravo), are&nbsp;crisp, mild, and slightly sweet root vegetables, commonly used raw in salads or pickled. They have violet skin with a white, purple-streaked interior, offering a crunchy texture and high levels of anthocyanins, antioxidants, Vitamin C, and fiber.</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2026-04-21T12:57:12.719790-04:00",
+    "updated": "2026-05-04T12:26:15.738145-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/Ehzob.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 418658,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/Ehzob.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/Ehzob.jpeg",
+        "original_filename": "download.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 927365,
+        "inventory_per_unit": 1,
+        "unit_price": 2.25,
+        "average_pack_weight": 0,
+        "package_price": 2.25,
+        "package_unit_price": 2.25,
+        "priority_order": 1,
+        "name": "bu",
+        "price_list_entries": [
+          {
+            "id": 904468,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 698339,
+            "subscription_setting": {
+              "id": 783081,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 904469,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 698340,
+            "subscription_setting": {
+              "id": 783082,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 904470,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 698341,
+            "subscription_setting": {
+              "id": 783083,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 904471,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 698342,
+            "subscription_setting": {
+              "id": 783084,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": null,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 1108544,
+        "product_name": "Purple Radish",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bu",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-04-21T12:57:13.186422-04:00",
+        "updated": "2026-05-04T13:02:23.374984-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 698339,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 936,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 575498,
+            "price_list_category": 15731,
+            "priority_order": 18,
+            "price_list_category_name": "Organic Vegetables - Roots 🧅🧄 🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 147261,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 698340,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 1097,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 575499,
+            "price_list_category": 15105,
+            "priority_order": 15,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 147262,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 698341,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1320,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 575500,
+            "price_list_category": 15118,
+            "priority_order": 17,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 147263,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 698342,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1321,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 575501,
+            "price_list_category": 28905,
+            "priority_order": 17,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 147264,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3152,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3152,
+    "packages": [
+      {
+        "id": 927365,
+        "unit_price": 2.25,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 698339,
+            "calculated_value": 3.26,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.25
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 698340,
+            "calculated_value": 3.26,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.25
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 698341,
+            "calculated_value": 3.26,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.25
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 698342,
+            "calculated_value": 3.26,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.25
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:41:29.777Z",
+  "rows": [
+    {
+      "productId": 1108544,
+      "product": "Purple Radish",
+      "vendor": "Little Wings",
+      "packageId": 927365,
+      "package": "bu",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 2.25,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.15,
+      "localPriceAfter": 3.26,
+      "remoteBasePrice": 2.25,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.15,
+      "remotePriceAfter": 3.26
+    },
+    {
+      "productId": 1108544,
+      "product": "Purple Radish",
+      "vendor": "Little Wings",
+      "packageId": 927365,
+      "package": "bu",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 2.25,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.15,
+      "localPriceAfter": 3.26,
+      "remoteBasePrice": 2.25,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.15,
+      "remotePriceAfter": 3.26
+    },
+    {
+      "productId": 1108544,
+      "product": "Purple Radish",
+      "vendor": "Little Wings",
+      "packageId": 927365,
+      "package": "bu",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 2.25,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.15,
+      "localPriceAfter": 3.26,
+      "remoteBasePrice": 2.25,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.15,
+      "remotePriceAfter": 3.26
+    },
+    {
+      "productId": 1108544,
+      "product": "Purple Radish",
+      "vendor": "Little Wings",
+      "packageId": 927365,
+      "package": "bu",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 2.25,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.15,
+      "localPriceAfter": 3.26,
+      "remoteBasePrice": 2.25,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.15,
+      "remotePriceAfter": 3.26
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:41.039Z"
+}

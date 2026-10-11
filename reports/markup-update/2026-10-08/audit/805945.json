@@ -1,0 +1,504 @@
+{
+  "productId": 805945,
+  "context": {
+    "product": {
+      "id": 805945,
+      "name": "Sugarloaf Chicory",
+      "description": "Looks similar to romaine lettuce, but is distinctly more bitter in flavor. Great in salads, sliced thinly and eaten raw. Grown by: Boldly Grown Farm(WA)",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": 0,
+      "categoryId": 14,
+      "vendorId": 3168,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/rnmQ9.thumbnail.jpeg",
+      "createdAt": "2023-08-25T14:39:58.000Z",
+      "updatedAt": "2026-07-03T19:41:35.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Vegetables - Leafy Greens 🥬",
+    "vendor": {
+      "id": 3168,
+      "name": "Organically Grown Company",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 527005,
+        "productId": 805945,
+        "name": "each",
+        "price": "3.21",
+        "packageCode": null,
+        "unit": "bu",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 527005,
+        "productId": 805945,
+        "localLinePackageId": 527005,
+        "liveName": "each",
+        "livePrice": "3.21",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":805945,\"Product\":\"Sugarloaf Chicory\",\"Track Inventory By\":\"package\",\"Item Unit\":\"bu\",\"Charge By\":\"package\",\"Charge Unit\":\"bu\",\"Package ID\":527005,\"Package Name\":\"each\",\"# of Items\":1,\"Package Price\":3.21,\"Inventory Type\":\"product\"},\"live\":{\"id\":527005,\"inventory_per_unit\":1,\"unit_price\":3.21,\"average_pack_weight\":null,\"package_price\":3.21,\"package_unit_price\":3.21,\"priority_order\":null,\"name\":\"each\",\"price_list_entries\":[{\"id\":221663,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":179266,\"subscription_setting\":{\"id\":124167,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":244036,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":196700,\"subscription_setting\":{\"id\":152347,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":617843,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479736,\"subscription_setting\":{\"id\":496959,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":207657,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":167829,\"subscription_setting\":{\"id\":106833,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":805945,\"product_name\":\"Sugarloaf Chicory\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"bu\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2023-08-25T10:39:58.438679-04:00\",\"updated\":\"2026-02-05T17:34:08.526874-05:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 805945,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 805945,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/805945/localline/6156383231b546ba2d9cdc20.jpg"
+    ],
+    "localLineVendorId": 3168
+  },
+  "remote": {
+    "id": 805945,
+    "name": "Sugarloaf Chicory",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Looks similar to romaine lettuce, but is distinctly more bitter in flavor. Great in salads, sliced thinly and eaten raw.</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Grown by: Boldly Grown Farm(WA)</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-08-25T10:39:58.425788-04:00",
+    "updated": "2026-02-19T14:58:39.250712-05:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/rnmQ9.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 141474,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/rnmQ9.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/rnmQ9.jpg",
+        "original_filename": "837.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "837",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 527005,
+        "inventory_per_unit": 1,
+        "unit_price": 3.21,
+        "average_pack_weight": null,
+        "package_price": 3.21,
+        "package_unit_price": 3.21,
+        "priority_order": null,
+        "name": "each",
+        "price_list_entries": [
+          {
+            "id": 221663,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179266,
+            "subscription_setting": {
+              "id": 124167,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 244036,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 196700,
+            "subscription_setting": {
+              "id": 152347,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617843,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479736,
+            "subscription_setting": {
+              "id": 496959,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 207657,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 167829,
+            "subscription_setting": {
+              "id": 106833,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 805945,
+        "product_name": "Sugarloaf Chicory",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bu",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T10:39:58.438679-04:00",
+        "updated": "2026-02-05T17:34:08.526874-05:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 167829,
+        "price_list_category": 15107,
+        "price_list": 2718,
+        "priority_order": 342,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 137695,
+            "price_list_category": 15107,
+            "priority_order": 376,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179266,
+        "price_list_category": 15119,
+        "price_list": 2966,
+        "priority_order": 343,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 147476,
+            "price_list_category": 15119,
+            "priority_order": 379,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 196700,
+        "price_list_category": 15732,
+        "price_list": 3124,
+        "priority_order": 352,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 162232,
+            "price_list_category": 15732,
+            "priority_order": 392,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479736,
+        "price_list_category": 28913,
+        "price_list": 5622,
+        "priority_order": 343,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370247,
+            "price_list_category": 28913,
+            "priority_order": 380,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3168,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3168,
+    "packages": [
+      {
+        "id": 527005,
+        "unit_price": 3.21,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 196700,
+            "calculated_value": 4.65,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 3.21
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 167829,
+            "calculated_value": 4.65,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 3.21
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 179266,
+            "calculated_value": 4.65,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 3.21
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 479736,
+            "calculated_value": 4.65,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 3.21
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:39:05.541Z",
+  "rows": [
+    {
+      "productId": 805945,
+      "product": "Sugarloaf Chicory",
+      "vendor": "Organically Grown Company",
+      "packageId": 527005,
+      "package": "each",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 3.21,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 4.49,
+      "localPriceAfter": 4.65,
+      "remoteBasePrice": 3.21,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 4.49,
+      "remotePriceAfter": 4.65
+    },
+    {
+      "productId": 805945,
+      "product": "Sugarloaf Chicory",
+      "vendor": "Organically Grown Company",
+      "packageId": 527005,
+      "package": "each",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 3.21,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 4.49,
+      "localPriceAfter": 4.65,
+      "remoteBasePrice": 3.21,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 4.49,
+      "remotePriceAfter": 4.65
+    },
+    {
+      "productId": 805945,
+      "product": "Sugarloaf Chicory",
+      "vendor": "Organically Grown Company",
+      "packageId": 527005,
+      "package": "each",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 3.21,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 4.49,
+      "localPriceAfter": 4.65,
+      "remoteBasePrice": 3.21,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 4.49,
+      "remotePriceAfter": 4.65
+    },
+    {
+      "productId": 805945,
+      "product": "Sugarloaf Chicory",
+      "vendor": "Organically Grown Company",
+      "packageId": 527005,
+      "package": "each",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 3.21,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 4.49,
+      "localPriceAfter": 4.65,
+      "remoteBasePrice": 3.21,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 4.49,
+      "remotePriceAfter": 4.65
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.906Z"
+}

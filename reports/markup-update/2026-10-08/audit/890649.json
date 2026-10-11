@@ -1,0 +1,504 @@
+{
+  "productId": 890649,
+  "context": {
+    "product": {
+      "id": 890649,
+      "name": "Chioggia Beets",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Though the candy stripe beet can be prepared much like any other beet, the Chioggia has an especially sweet and mild earthy flavor—and it doesn't 'bleed' as much as regular beets, meaning you don't have to worry about bright red beet juice staining your fingers and clothes</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">From: Red Tail Growers</span></p><p><br></p><p dir=\"ltr\"><br></p>",
+      "visible": 0,
+      "trackInventory": 1,
+      "inventory": 0,
+      "categoryId": 13,
+      "vendorId": 3148,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/yYROl.thumbnail.jpeg",
+      "createdAt": "2024-07-03T00:01:51.000Z",
+      "updatedAt": "2025-02-14T03:35:37.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Vegetables - Roots🧅🧄🥕🥔",
+    "vendor": {
+      "id": 3148,
+      "name": "Full Farm CSA",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 630138,
+        "productId": 890649,
+        "name": "1 Lb",
+        "price": "1.00",
+        "packageCode": null,
+        "unit": "lb",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 630138,
+        "productId": 890649,
+        "localLinePackageId": 630138,
+        "liveName": "1 Lb",
+        "livePrice": "1.00",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":890649,\"Product\":\"Chioggia Beets\",\"Track Inventory By\":\"package\",\"Item Unit\":\"pound\",\"Charge By\":\"package\",\"Charge Unit\":\"pound\",\"Package ID\":630138,\"Package Name\":\"1 Lb\",\"# of Items\":1,\"Package Price\":1,\"Inventory Type\":\"product\"},\"live\":{\"id\":630138,\"inventory_per_unit\":1,\"unit_price\":1,\"average_pack_weight\":0,\"package_price\":1,\"package_unit_price\":1,\"priority_order\":null,\"name\":\"1 Lb\",\"price_list_entries\":[{\"id\":382407,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":310078,\"subscription_setting\":{\"id\":263293,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":382409,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":310076,\"subscription_setting\":{\"id\":263295,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":382408,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":310077,\"subscription_setting\":{\"id\":263294,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":618080,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479972,\"subscription_setting\":{\"id\":497196,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":890649,\"product_name\":\"Chioggia Beets\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"lb\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2024-07-02T20:01:51.809618-04:00\",\"updated\":\"2025-01-17T16:30:53.848620-05:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 890649,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 890649,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/890649/localline/c2cd354f86bd13827b7797c0.jpg"
+    ],
+    "localLineVendorId": 3148
+  },
+  "remote": {
+    "id": 890649,
+    "name": "Chioggia Beets",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Though the candy stripe beet can be prepared much like any other beet, the Chioggia has an especially sweet and mild earthy flavor—and it doesn't 'bleed' as much as regular beets, meaning you don't have to worry about bright red beet juice staining your fingers and clothes</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">From: Red Tail Growers</span></p><p><br></p><p dir=\"ltr\"><br></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2024-07-02T20:01:51.705161-04:00",
+    "updated": "2025-02-13T22:35:37.563017-05:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/yYROl.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 213998,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/yYROl.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/yYROl.jpg",
+        "original_filename": "account/322922/b9clk.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 1,
+      "name": "pound",
+      "abbrieviation": "lb",
+      "unit_type": "weight",
+      "default": true
+    },
+    "charge_unit": {
+      "id": 1,
+      "name": "pound",
+      "abbrieviation": "lb",
+      "unit_type": "weight",
+      "default": true
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 630138,
+        "inventory_per_unit": 1,
+        "unit_price": 1,
+        "average_pack_weight": 0,
+        "package_price": 1,
+        "package_unit_price": 1,
+        "priority_order": null,
+        "name": "1 Lb",
+        "price_list_entries": [
+          {
+            "id": 382407,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 310078,
+            "subscription_setting": {
+              "id": 263293,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 382409,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 310076,
+            "subscription_setting": {
+              "id": 263295,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 382408,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 310077,
+            "subscription_setting": {
+              "id": 263294,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 618080,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479972,
+            "subscription_setting": {
+              "id": 497196,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 890649,
+        "product_name": "Chioggia Beets",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "lb",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2024-07-02T20:01:51.809618-04:00",
+        "updated": "2025-01-17T16:30:53.848620-05:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 310076,
+        "price_list_category": 15105,
+        "price_list": 2718,
+        "priority_order": 721,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 235403,
+            "price_list_category": 15105,
+            "priority_order": 802,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 310077,
+        "price_list_category": 15118,
+        "price_list": 2966,
+        "priority_order": 923,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 235404,
+            "price_list_category": 15118,
+            "priority_order": 1005,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 310078,
+        "price_list_category": 15731,
+        "price_list": 3124,
+        "priority_order": 536,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 235405,
+            "price_list_category": 15731,
+            "priority_order": 614,
+            "price_list_category_name": "Organic Vegetables - Roots 🧅🧄 🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479972,
+        "price_list_category": 28905,
+        "price_list": 5622,
+        "priority_order": 923,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370304,
+            "price_list_category": 28905,
+            "priority_order": 1003,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3148,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3148,
+    "packages": [
+      {
+        "id": 630138,
+        "unit_price": 1,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 310078,
+            "calculated_value": 1.45,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 310076,
+            "calculated_value": 1.45,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 310077,
+            "calculated_value": 1.45,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 479972,
+            "calculated_value": 1.45,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:40:02.719Z",
+  "rows": [
+    {
+      "productId": 890649,
+      "product": "Chioggia Beets",
+      "vendor": "Full Farm CSA",
+      "packageId": 630138,
+      "package": "1 Lb",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 1,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 1.4,
+      "localPriceAfter": 1.45,
+      "remoteBasePrice": 1,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 1.4,
+      "remotePriceAfter": 1.45
+    },
+    {
+      "productId": 890649,
+      "product": "Chioggia Beets",
+      "vendor": "Full Farm CSA",
+      "packageId": 630138,
+      "package": "1 Lb",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 1,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 1.4,
+      "localPriceAfter": 1.45,
+      "remoteBasePrice": 1,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 1.4,
+      "remotePriceAfter": 1.45
+    },
+    {
+      "productId": 890649,
+      "product": "Chioggia Beets",
+      "vendor": "Full Farm CSA",
+      "packageId": 630138,
+      "package": "1 Lb",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 1,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 1.4,
+      "localPriceAfter": 1.45,
+      "remoteBasePrice": 1,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 1.4,
+      "remotePriceAfter": 1.45
+    },
+    {
+      "productId": 890649,
+      "product": "Chioggia Beets",
+      "vendor": "Full Farm CSA",
+      "packageId": 630138,
+      "package": "1 Lb",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 1,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 1.4,
+      "localPriceAfter": 1.45,
+      "remoteBasePrice": 1,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 1.4,
+      "remotePriceAfter": 1.45
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.958Z"
+}

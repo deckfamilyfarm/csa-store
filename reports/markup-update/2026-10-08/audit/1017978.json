@@ -1,0 +1,490 @@
+{
+  "productId": 1017978,
+  "context": {
+    "product": {
+      "id": 1017978,
+      "name": "Handcrafted Birch Holder",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Use them to hold your change, jewelry, keys, ect. </span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">These are about 5 inches outer circumference, 3-4 inches inner circumference and 2 to 3  inches tall.</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Made with Recycled wood that would have gone to the dump.</span></p>",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": 0,
+      "categoryId": 9,
+      "vendorId": 3181,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/LSgUt.thumbnail.jpeg",
+      "createdAt": "2025-10-28T00:07:44.000Z",
+      "updatedAt": "2026-05-14T17:38:00.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Home Goods 🥄🌱🪏🍽️",
+    "vendor": {
+      "id": 3181,
+      "name": "RL Plants & Home Goods",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 803428,
+        "productId": 1017978,
+        "name": "ea",
+        "price": "15.00",
+        "packageCode": null,
+        "unit": "ea",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 1,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 803428,
+        "productId": 1017978,
+        "localLinePackageId": 803428,
+        "liveName": "ea",
+        "livePrice": "15.00",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "package",
+        "packageInventory": 0,
+        "packageReservedInventory": 0,
+        "packageAvailableInventory": 0,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":1017978,\"Product\":\"Handcrafted Birch Holder\",\"Track Inventory By\":\"package\",\"Item Unit\":\"ea\",\"Charge By\":\"package\",\"Charge Unit\":\"ea\",\"Package ID\":803428,\"Package Name\":\"ea\",\"# of Items\":1,\"Package Price\":15,\"Inventory Type\":\"package\",\"Package Inventory\":0,\"Package Reserved Inventory\":0,\"Package Available Inventory\":0},\"live\":{\"id\":803428,\"inventory_per_unit\":1,\"unit_price\":15,\"average_pack_weight\":0,\"package_price\":15,\"package_unit_price\":15,\"priority_order\":1,\"name\":\"ea\",\"price_list_entries\":[{\"id\":717440,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":552331,\"subscription_setting\":{\"id\":596456,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":717441,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":552332,\"subscription_setting\":{\"id\":596457,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":717442,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":552333,\"subscription_setting\":{\"id\":596458,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":1017978,\"product_name\":\"Handcrafted Birch Holder\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"ea\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"No inventory\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2025-10-27T20:07:44.463895-04:00\",\"updated\":\"2026-09-07T16:27:15.682886-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 1017978,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 1017978,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/1017978/localline/e7264121cfb6aba4d6b14bce.jpg",
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/1017978/localline/70a5062b2c2488c5bd57606b.jpg",
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/1017978/localline/17cd4eb095b91a0d396a461c.jpg",
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/1017978/localline/60b67a9e282abd5db36199b0.jpg"
+    ],
+    "localLineVendorId": 3181
+  },
+  "remote": {
+    "id": 1017978,
+    "name": "Handcrafted Birch Holder",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Use them to hold your change, jewelry, keys, ect. </span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">These are about 5 inches outer circumference, 3-4 inches inner circumference and 2 to 3  inches tall.</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Made with Recycled wood that would have gone to the dump.</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2025-10-27T20:07:44.249848-04:00",
+    "updated": "2026-05-11T17:35:45.706143-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/LSgUt.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 352488,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/LSgUt.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/LSgUt.jpg",
+        "original_filename": "20251027_193746.jpg"
+      },
+      {
+        "id": 352489,
+        "priority_order": 1,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/8bf5Z.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/8bf5Z.jpg",
+        "original_filename": "20251027_193715.jpg"
+      },
+      {
+        "id": 352490,
+        "priority_order": 2,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/ucMES.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/ucMES.jpg",
+        "original_filename": "20251027_193809.jpg"
+      },
+      {
+        "id": 352491,
+        "priority_order": 3,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/9Ox40.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/9Ox40.jpg",
+        "original_filename": "20251027_193752.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 803428,
+        "inventory_per_unit": 1,
+        "unit_price": 15,
+        "average_pack_weight": 0,
+        "package_price": 15,
+        "package_unit_price": 15,
+        "priority_order": 1,
+        "name": "ea",
+        "price_list_entries": [
+          {
+            "id": 717440,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 552331,
+            "subscription_setting": {
+              "id": 596456,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 717441,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 552332,
+            "subscription_setting": {
+              "id": 596457,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 717442,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 552333,
+            "subscription_setting": {
+              "id": 596458,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 1017978,
+        "product_name": "Handcrafted Birch Holder",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "No inventory",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-10-27T20:07:44.463895-04:00",
+        "updated": "2026-09-07T16:27:15.682886-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 552331,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 869,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 442864,
+            "price_list_category": 15746,
+            "priority_order": 659,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 91743,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 552332,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 1032,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 442865,
+            "price_list_category": 14598,
+            "priority_order": 21,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 91744,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 552333,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1244,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 442866,
+            "price_list_category": 15064,
+            "priority_order": 36,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 91745,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3181,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "package",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3181,
+    "packages": [
+      {
+        "id": 803428,
+        "unit_price": 15,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 552331,
+            "calculated_value": 21.75,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 15
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 552332,
+            "calculated_value": 21.75,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 15
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 552333,
+            "calculated_value": 21.75,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 15
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:41:13.645Z",
+  "rows": [
+    {
+      "productId": 1017978,
+      "product": "Handcrafted Birch Holder",
+      "vendor": "RL Plants & Home Goods",
+      "packageId": 803428,
+      "package": "ea",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 15,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 21,
+      "localPriceAfter": 21.75,
+      "remoteBasePrice": 15,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 21,
+      "remotePriceAfter": 21.75
+    },
+    {
+      "productId": 1017978,
+      "product": "Handcrafted Birch Holder",
+      "vendor": "RL Plants & Home Goods",
+      "packageId": 803428,
+      "package": "ea",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 15,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 21,
+      "localPriceAfter": 21.75,
+      "remoteBasePrice": 15,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 21,
+      "remotePriceAfter": 21.75
+    },
+    {
+      "productId": 1017978,
+      "product": "Handcrafted Birch Holder",
+      "vendor": "RL Plants & Home Goods",
+      "packageId": 803428,
+      "package": "ea",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 15,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 21,
+      "localPriceAfter": 21.75,
+      "remoteBasePrice": 15,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 21,
+      "remotePriceAfter": 21.75
+    },
+    {
+      "productId": 1017978,
+      "product": "Handcrafted Birch Holder",
+      "vendor": "RL Plants & Home Goods",
+      "packageId": 803428,
+      "package": "ea",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 15,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 21,
+      "localPriceAfter": 21.75,
+      "remoteBasePrice": 15,
+      "remoteAdjustmentType": null,
+      "remoteAdjustmentBefore": null,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": null,
+      "remotePriceAfter": null
+    }
+  ],
+  "warnings": [
+    "SNAP is not present for package ea; no listing created."
+  ],
+  "reviewedAt": "2026-10-08T19:48:41.021Z"
+}

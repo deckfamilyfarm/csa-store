@@ -1,0 +1,261 @@
+{
+  "data": {
+    "id": 824480,
+    "name": "Purple potatoes",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Purple potatoes are&nbsp;a healthy and flavorful alternative to traditional white potatoes, offering a vibrant purple color due to their high&nbsp;</span><a href=\"https://www.google.com/search?sca_esv=31cd4d2547bda482&amp;rlz=1CAVNCX_enUS1049US1049&amp;cs=0&amp;sxsrf=AHTn8zqzCqhnegRkw_k0RB4wyg1o_YqXAw%3A1746825533802&amp;q=anthocyanin+content&amp;sa=X&amp;ved=2ahUKEwj0jZqbqJeNAxVDDEQIHVjbMfYQxccNegQIBBAC&amp;mstk=AUtExfCpm4Gs8ey6uw2C1lRnC0DiEolAJxU8hrRIJZ3SVMCxXUAwapBEvIeu7e7_GNkdPd5RmJrqcdDFRlYdGKT4LQkLe556doIxIMWbTvU_mGUwDe4nrrzsRDNuTdWAamgOH08c8VbTrc2CVikmwBegUYQ-UbdqtyizIK3Txg_YaPTmmq9Zp-CI6kAdhyyJHLi-XSESsYK1I9zcbz-HcX8rYxkB44Hml8T28fwwdb3ycIUwMQyL_wRd_NPJwmEgmrD0Y_IOBGLqNc2KE68PMkjdv1Lld3lYkxzGUs031bRlW4Cq3Q&amp;csui=3\" target=\"_blank\" class=\"lexical-text-editor--link\"><span style=\"white-space: pre-wrap;\">anthocyanin content</span></a><span style=\"white-space: pre-wrap;\">,&nbsp;a type of antioxidant.&nbsp;They are rich in vitamins, minerals, and fiber, providing numerous health benefits.&nbsp;</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-11-21T20:26:20.874731-05:00",
+    "updated": "2026-10-08T16:27:25.281718-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/4kvAL.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 157164,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/4kvAL.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/4kvAL.jpeg",
+        "original_filename": "6074040B-DF0E-4828-934F-71A5ADDE3407.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 1,
+      "name": "pound",
+      "abbrieviation": "lb",
+      "unit_type": "weight",
+      "default": true
+    },
+    "charge_unit": {
+      "id": 1,
+      "name": "pound",
+      "abbrieviation": "lb",
+      "unit_type": "weight",
+      "default": true
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 548053,
+        "inventory_per_unit": 1,
+        "unit_price": 1.04,
+        "average_pack_weight": 0,
+        "package_price": 1.04,
+        "package_unit_price": 1.04,
+        "priority_order": null,
+        "name": "pound",
+        "price_list_entries": [
+          {
+            "id": 243440,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 196283,
+            "subscription_setting": {
+              "id": 151648,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 243442,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 196285,
+            "subscription_setting": {
+              "id": 151646,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617982,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479874,
+            "subscription_setting": {
+              "id": 497098,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 243443,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 196286,
+            "subscription_setting": {
+              "id": 151645,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 824480,
+        "product_name": "Purple potatoes",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "lb",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-11-21T20:26:21.043081-05:00",
+        "updated": "2026-10-08T16:27:24.770115-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 196283,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 585,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440560,
+            "price_list_category": 15105,
+            "priority_order": 621,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 196285,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 781,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440724,
+            "price_list_category": 15118,
+            "priority_order": 842,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 196286,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 349,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440263,
+            "price_list_category": 15731,
+            "priority_order": 408,
+            "price_list_category_name": "Organic Vegetables - Roots 🧅🧄 🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479874,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 781,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 441004,
+            "price_list_category": 28905,
+            "priority_order": 819,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3168,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 824480,
+  "remoteProductId": 824480,
+  "checkedAt": "2026-10-11T17:26:59.081Z"
+}

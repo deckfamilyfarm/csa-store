@@ -1,0 +1,262 @@
+{
+  "verifiedAt": "2026-10-08T20:49:33.523Z",
+  "productId": 806034,
+  "priceConfirmed": true,
+  "otherFieldsUnchanged": true,
+  "remote": {
+    "id": 806034,
+    "name": "Hibiscus Mint Yerbe Mate Kombucha",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">\"Whether climbing a mountain or cramming for finals, our Yerba-Bucha's 200mg or organic caffeine will get you where you're going with ease. Low sugar paired with a rich blend of antioxidants and probiotics will keep you glowing no matter the time of day. Our yerbe mate, guayusa, and green coffee bean is rich in: theophylline, theobromine, L theanine. L theanine releases caffeine more gradually. This helps eliminate the spikes and drops associated with coffee consumption.\" - BNF</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">This brew takes the slightly earthy flavor of yerba mate tea and pairs it with sweet, floral hibiscus and refreshing, cool mint.</span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2023-08-25T11:15:30.430683-04:00",
+    "updated": "2026-10-08T16:24:55.614986-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/80ja1.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 350506,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/80ja1.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/80ja1.jpeg",
+        "original_filename": "hibiscus.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 2,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "911",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 527096,
+        "inventory_per_unit": 1,
+        "unit_price": 3.34,
+        "average_pack_weight": null,
+        "package_price": 3.34,
+        "package_unit_price": 3.34,
+        "priority_order": 1,
+        "name": "16. fl oz",
+        "price_list_entries": [
+          {
+            "id": 220358,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 178276,
+            "subscription_setting": {
+              "id": 121263,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 221727,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179330,
+            "subscription_setting": {
+              "id": 124475,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617895,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479788,
+            "subscription_setting": {
+              "id": 497011,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 238296,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 191971,
+            "subscription_setting": {
+              "id": 146178,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 2,
+        "number_of_packages_available": 2,
+        "number_of_packages_total": 2,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 2,
+        "product_package_size": 1,
+        "product_id": 806034,
+        "product_name": "Hibiscus Mint Yerbe Mate Kombucha",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T11:15:30.445264-04:00",
+        "updated": "2026-10-08T16:24:54.957278-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 178276,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 457,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440630,
+            "price_list_category": 31657,
+            "priority_order": 32,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179330,
+        "price_list_category": 17687,
+        "price_list": 2966,
+        "priority_order": 457,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440861,
+            "price_list_category": 31662,
+            "priority_order": 39,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 191971,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 347,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440408,
+            "price_list_category": 31656,
+            "priority_order": 35,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479788,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 457,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 441076,
+            "price_list_category": 31665,
+            "priority_order": 445,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 3178,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 2,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 2
+  }
+}

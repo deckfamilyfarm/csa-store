@@ -1,0 +1,504 @@
+{
+  "productId": 805856,
+  "context": {
+    "product": {
+      "id": 805856,
+      "name": "Green Mizuna",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Mizuna, also known as&nbsp;</span><a href=\"https://www.google.com/search?sca_esv=89bf5c8dfd0dab45&amp;rlz=1CAVNCX_enUS1049US1049&amp;sxsrf=AHTn8zpuMIl04Ch4agGTSYYxQd2Xp3t52w%3A1744119620645&amp;q=Japanese+mustard+greens&amp;sa=X&amp;ved=2ahUKEwi8wrzzx8iMAxUeJTQIHS1pFnwQxccNegQINBAB&amp;mstk=AUtExfABe-LGB6j8QELaJwH4NnVan9X0D2DPxqUwcIEFHn1S8zKjpNJdYapxgBESL7jhCtnkFP89HgE9VQgsNWkQMro-q1NmpVGy9UnYaUWYJ5x4JSdsCP_HByOGC3QCXXRYBcQ_hsb-wyV9KZ74Zfc0oEIcqyig7VBf61s6t7YE5R7HiqOfk_aNdr_ONrfrsxNR6mwVdR_FMu2YzTpop1pTmq4AsvLCUdDutGoeqDHX1YuReh30mrxbg0XAdAmLCYQwl405GdRlOT-9lnsnp4pVr65_&amp;csui=3\" target=\"_blank\" class=\"lexical-text-editor--link\"><span style=\"white-space: pre-wrap;\">Japanese mustard greens</span></a><span style=\"white-space: pre-wrap;\">,&nbsp;is a nutrient-rich leafy green offering numerous health benefits, including being&nbsp;a good source of vitamins A, C, and K, antioxidants, and fiber, supporting immune health, digestion, and bone health.</span></p>",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": 0,
+      "categoryId": 14,
+      "vendorId": 3152,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/pMhn8.thumbnail.jpeg",
+      "createdAt": "2023-08-25T14:39:56.000Z",
+      "updatedAt": "2025-05-20T20:12:18.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Vegetables - Leafy Greens 🥬",
+    "vendor": {
+      "id": 3152,
+      "name": "Little Wings",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 526915,
+        "productId": 805856,
+        "name": "each",
+        "price": "2.25",
+        "packageCode": null,
+        "unit": "bu",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 526915,
+        "productId": 805856,
+        "localLinePackageId": 526915,
+        "liveName": "each",
+        "livePrice": "2.25",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":805856,\"Product\":\"Green Mizuna\",\"Track Inventory By\":\"package\",\"Item Unit\":\"bu\",\"Charge By\":\"package\",\"Charge Unit\":\"bu\",\"Package ID\":526915,\"Package Name\":\"each\",\"# of Items\":1,\"Package Price\":2.25,\"Inventory Type\":\"product\"},\"live\":{\"id\":526915,\"inventory_per_unit\":1,\"unit_price\":2.25,\"average_pack_weight\":null,\"package_price\":2.25,\"package_unit_price\":2.25,\"priority_order\":null,\"name\":\"each\",\"price_list_entries\":[{\"id\":207639,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":167811,\"subscription_setting\":{\"id\":106815,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":569923,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":441844,\"subscription_setting\":{\"id\":448689,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":221645,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":179248,\"subscription_setting\":{\"id\":124158,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":617832,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479725,\"subscription_setting\":{\"id\":496948,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":805856,\"product_name\":\"Green Mizuna\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"bu\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2023-08-25T10:39:56.652471-04:00\",\"updated\":\"2025-04-25T16:24:11.397517-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 805856,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 805856,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/805856/localline/7b2dffd9b40c0320d24a8470.jpg"
+    ],
+    "localLineVendorId": 3152
+  },
+  "remote": {
+    "id": 805856,
+    "name": "Green Mizuna",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Mizuna, also known as&nbsp;</span><a href=\"https://www.google.com/search?sca_esv=89bf5c8dfd0dab45&amp;rlz=1CAVNCX_enUS1049US1049&amp;sxsrf=AHTn8zpuMIl04Ch4agGTSYYxQd2Xp3t52w%3A1744119620645&amp;q=Japanese+mustard+greens&amp;sa=X&amp;ved=2ahUKEwi8wrzzx8iMAxUeJTQIHS1pFnwQxccNegQINBAB&amp;mstk=AUtExfABe-LGB6j8QELaJwH4NnVan9X0D2DPxqUwcIEFHn1S8zKjpNJdYapxgBESL7jhCtnkFP89HgE9VQgsNWkQMro-q1NmpVGy9UnYaUWYJ5x4JSdsCP_HByOGC3QCXXRYBcQ_hsb-wyV9KZ74Zfc0oEIcqyig7VBf61s6t7YE5R7HiqOfk_aNdr_ONrfrsxNR6mwVdR_FMu2YzTpop1pTmq4AsvLCUdDutGoeqDHX1YuReh30mrxbg0XAdAmLCYQwl405GdRlOT-9lnsnp4pVr65_&amp;csui=3\" target=\"_blank\" class=\"lexical-text-editor--link\"><span style=\"white-space: pre-wrap;\">Japanese mustard greens</span></a><span style=\"white-space: pre-wrap;\">,&nbsp;is a nutrient-rich leafy green offering numerous health benefits, including being&nbsp;a good source of vitamins A, C, and K, antioxidants, and fiber, supporting immune health, digestion, and bone health.</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-08-25T10:39:56.640364-04:00",
+    "updated": "2025-05-20T16:12:18.325883-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/pMhn8.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 142106,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/pMhn8.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/pMhn8.jpeg",
+        "original_filename": "6511.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 526915,
+        "inventory_per_unit": 1,
+        "unit_price": 2.25,
+        "average_pack_weight": null,
+        "package_price": 2.25,
+        "package_unit_price": 2.25,
+        "priority_order": null,
+        "name": "each",
+        "price_list_entries": [
+          {
+            "id": 207639,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 167811,
+            "subscription_setting": {
+              "id": 106815,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 569923,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 441844,
+            "subscription_setting": {
+              "id": 448689,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 221645,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179248,
+            "subscription_setting": {
+              "id": 124158,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617832,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479725,
+            "subscription_setting": {
+              "id": 496948,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 805856,
+        "product_name": "Green Mizuna",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bu",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T10:39:56.652471-04:00",
+        "updated": "2025-04-25T16:24:11.397517-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 167811,
+        "price_list_category": 15107,
+        "price_list": 2718,
+        "priority_order": 236,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 137677,
+            "price_list_category": 15107,
+            "priority_order": 270,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179248,
+        "price_list_category": 15119,
+        "price_list": 2966,
+        "priority_order": 236,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 147458,
+            "price_list_category": 15119,
+            "priority_order": 272,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 441844,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 744,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 331762,
+            "price_list_category": 15732,
+            "priority_order": 35,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479725,
+        "price_list_category": 28913,
+        "price_list": 5622,
+        "priority_order": 236,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370264,
+            "price_list_category": 28913,
+            "priority_order": 273,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3152,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3152,
+    "packages": [
+      {
+        "id": 526915,
+        "unit_price": 2.25,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 441844,
+            "calculated_value": 3.26,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.25
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 167811,
+            "calculated_value": 3.26,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.25
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 179248,
+            "calculated_value": 3.26,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.25
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 479725,
+            "calculated_value": 3.26,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.25
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:38:39.865Z",
+  "rows": [
+    {
+      "productId": 805856,
+      "product": "Green Mizuna",
+      "vendor": "Little Wings",
+      "packageId": 526915,
+      "package": "each",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 2.25,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.15,
+      "localPriceAfter": 3.26,
+      "remoteBasePrice": 2.25,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.15,
+      "remotePriceAfter": 3.26
+    },
+    {
+      "productId": 805856,
+      "product": "Green Mizuna",
+      "vendor": "Little Wings",
+      "packageId": 526915,
+      "package": "each",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 2.25,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.15,
+      "localPriceAfter": 3.26,
+      "remoteBasePrice": 2.25,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.15,
+      "remotePriceAfter": 3.26
+    },
+    {
+      "productId": 805856,
+      "product": "Green Mizuna",
+      "vendor": "Little Wings",
+      "packageId": 526915,
+      "package": "each",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 2.25,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.15,
+      "localPriceAfter": 3.26,
+      "remoteBasePrice": 2.25,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.15,
+      "remotePriceAfter": 3.26
+    },
+    {
+      "productId": 805856,
+      "product": "Green Mizuna",
+      "vendor": "Little Wings",
+      "packageId": 526915,
+      "package": "each",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 2.25,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.15,
+      "localPriceAfter": 3.26,
+      "remoteBasePrice": 2.25,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.15,
+      "remotePriceAfter": 3.26
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.889Z"
+}

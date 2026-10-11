@@ -1,0 +1,504 @@
+{
+  "productId": 897017,
+  "context": {
+    "product": {
+      "id": 897017,
+      "name": "Fresh Sweet Onion",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Fresh sweet onions are characterized by their&nbsp;mild, sweet flavor and relatively low pungency compared to other onion varieties.&nbsp;They are often larger than yellow onions and have a flatter, rounder shape.&nbsp;Their thin, papery skin can be yellow or light brown, and the flesh inside is translucent, juicy, and crisp.&nbsp;These onions are great for raw consumption in salads, sandwiches, and relishes, and also excel when cooked, especially in dishes requiring caramelization or onion rings.&nbsp;</span></p>",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": 0,
+      "categoryId": 13,
+      "vendorId": 3154,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/BmgcP.thumbnail.jpeg",
+      "createdAt": "2024-08-02T02:26:43.000Z",
+      "updatedAt": "2025-07-31T23:47:05.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Vegetables - Roots🧅🧄🥕🥔",
+    "vendor": {
+      "id": 3154,
+      "name": "Camas Swale Farm",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 638087,
+        "productId": 897017,
+        "name": "pound",
+        "price": "1.45",
+        "packageCode": null,
+        "unit": "lb",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 638087,
+        "productId": 897017,
+        "localLinePackageId": 638087,
+        "liveName": "pound",
+        "livePrice": "1.45",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":897017,\"Product\":\"Fresh Sweet Onion\",\"Track Inventory By\":\"package\",\"Item Unit\":\"pound\",\"Charge By\":\"package\",\"Charge Unit\":\"pound\",\"Package ID\":638087,\"Package Name\":\"pound\",\"# of Items\":1,\"Package Price\":1.45,\"Inventory Type\":\"product\"},\"live\":{\"id\":638087,\"inventory_per_unit\":1,\"unit_price\":1.45,\"average_pack_weight\":0,\"package_price\":1.45,\"package_unit_price\":1.45,\"priority_order\":null,\"name\":\"pound\",\"price_list_entries\":[{\"id\":413620,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":331219,\"subscription_setting\":{\"id\":293877,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":413622,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":331221,\"subscription_setting\":{\"id\":293879,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":413621,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":331220,\"subscription_setting\":{\"id\":293878,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":618098,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479990,\"subscription_setting\":{\"id\":497214,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":null,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":897017,\"product_name\":\"Fresh Sweet Onion\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"lb\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2024-08-01T22:26:43.806667-04:00\",\"updated\":\"2025-07-28T13:34:12.712876-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 897017,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 897017,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/897017/localline/d286d7ff8da94cae476827f7.jpg"
+    ],
+    "localLineVendorId": 3154
+  },
+  "remote": {
+    "id": 897017,
+    "name": "Fresh Sweet Onion",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Fresh sweet onions are characterized by their&nbsp;mild, sweet flavor and relatively low pungency compared to other onion varieties.&nbsp;They are often larger than yellow onions and have a flatter, rounder shape.&nbsp;Their thin, papery skin can be yellow or light brown, and the flesh inside is translucent, juicy, and crisp.&nbsp;These onions are great for raw consumption in salads, sandwiches, and relishes, and also excel when cooked, especially in dishes requiring caramelization or onion rings.&nbsp;</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2024-08-01T22:26:43.664499-04:00",
+    "updated": "2025-07-31T19:47:05.572725-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/BmgcP.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 327522,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/BmgcP.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/BmgcP.jpeg",
+        "original_filename": "images.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 1,
+      "name": "pound",
+      "abbrieviation": "lb",
+      "unit_type": "weight",
+      "default": true
+    },
+    "charge_unit": {
+      "id": 1,
+      "name": "pound",
+      "abbrieviation": "lb",
+      "unit_type": "weight",
+      "default": true
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 638087,
+        "inventory_per_unit": 1,
+        "unit_price": 1.45,
+        "average_pack_weight": 0,
+        "package_price": 1.45,
+        "package_unit_price": 1.45,
+        "priority_order": null,
+        "name": "pound",
+        "price_list_entries": [
+          {
+            "id": 413620,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 331219,
+            "subscription_setting": {
+              "id": 293877,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 413622,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 331221,
+            "subscription_setting": {
+              "id": 293879,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 413621,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 331220,
+            "subscription_setting": {
+              "id": 293878,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 618098,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479990,
+            "subscription_setting": {
+              "id": 497214,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": null,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 897017,
+        "product_name": "Fresh Sweet Onion",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "lb",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2024-08-01T22:26:43.806667-04:00",
+        "updated": "2025-07-28T13:34:12.712876-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 331219,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 744,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440541,
+            "price_list_category": 15105,
+            "priority_order": 804,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 331220,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 946,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440749,
+            "price_list_category": 15118,
+            "priority_order": 999,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 331221,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 564,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440330,
+            "price_list_category": 15731,
+            "priority_order": 628,
+            "price_list_category_name": "Organic Vegetables - Roots 🧅🧄 🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479990,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 946,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 440957,
+            "price_list_category": 28905,
+            "priority_order": 1008,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3154,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3154,
+    "packages": [
+      {
+        "id": 638087,
+        "unit_price": 1.45,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 331221,
+            "calculated_value": 2.1,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1.45
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 331219,
+            "calculated_value": 2.1,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1.45
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 331220,
+            "calculated_value": 2.1,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1.45
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 479990,
+            "calculated_value": 2.1,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1.45
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:40:07.437Z",
+  "rows": [
+    {
+      "productId": 897017,
+      "product": "Fresh Sweet Onion",
+      "vendor": "Camas Swale Farm",
+      "packageId": 638087,
+      "package": "pound",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 1.45,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.03,
+      "localPriceAfter": 2.1,
+      "remoteBasePrice": 1.45,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.03,
+      "remotePriceAfter": 2.1
+    },
+    {
+      "productId": 897017,
+      "product": "Fresh Sweet Onion",
+      "vendor": "Camas Swale Farm",
+      "packageId": 638087,
+      "package": "pound",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 1.45,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.03,
+      "localPriceAfter": 2.1,
+      "remoteBasePrice": 1.45,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.03,
+      "remotePriceAfter": 2.1
+    },
+    {
+      "productId": 897017,
+      "product": "Fresh Sweet Onion",
+      "vendor": "Camas Swale Farm",
+      "packageId": 638087,
+      "package": "pound",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 1.45,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.03,
+      "localPriceAfter": 2.1,
+      "remoteBasePrice": 1.45,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.03,
+      "remotePriceAfter": 2.1
+    },
+    {
+      "productId": 897017,
+      "product": "Fresh Sweet Onion",
+      "vendor": "Camas Swale Farm",
+      "packageId": 638087,
+      "package": "pound",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 1.45,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.03,
+      "localPriceAfter": 2.1,
+      "remoteBasePrice": 1.45,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.03,
+      "remotePriceAfter": 2.1
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.963Z"
+}

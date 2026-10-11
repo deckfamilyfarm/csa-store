@@ -1,0 +1,466 @@
+{
+  "productId": 1004531,
+  "context": {
+    "product": {
+      "id": 1004531,
+      "name": "Tanzanian Tangerine Iris Rhizome (Bulb)",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">The Tanzanian Tangerine iris is&nbsp;a Tall Bearded (TB) iris, 38 inches tall, with a plicata flower type, featuring radiant deep tangerine standards and tannish orange falls with a red wine-stippled overlay and light orange beards.&nbsp;Introduced by Brad Kasperek in 1995, this ruffled, flared flower blooms early to mid-season and is known for its unique, warm color combination and strong, well-branched stalks.</span></p>",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": 0,
+      "categoryId": 9,
+      "vendorId": 3181,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/F0NSm.thumbnail.jpeg",
+      "createdAt": "2025-08-28T20:35:55.000Z",
+      "updatedAt": "2026-04-16T13:49:13.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Home Goods 🥄🌱🪏🍽️",
+    "vendor": {
+      "id": 3181,
+      "name": "RL Plants & Home Goods",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 784571,
+        "productId": 1004531,
+        "name": "ea",
+        "price": "7.00",
+        "packageCode": null,
+        "unit": "ea",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 1,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 784571,
+        "productId": 1004531,
+        "localLinePackageId": 784571,
+        "liveName": "ea",
+        "livePrice": "7.00",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "package",
+        "packageInventory": 0,
+        "packageReservedInventory": 0,
+        "packageAvailableInventory": 0,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":1004531,\"Product\":\"Tanzanian Tangerine Iris Rhizome (Bulb)\",\"Track Inventory By\":\"package\",\"Item Unit\":\"ea\",\"Charge By\":\"package\",\"Charge Unit\":\"ea\",\"Package ID\":784571,\"Package Name\":\"ea\",\"# of Items\":1,\"Package Price\":7,\"Inventory Type\":\"package\",\"Package Inventory\":0,\"Package Reserved Inventory\":0,\"Package Available Inventory\":0},\"live\":{\"id\":784571,\"inventory_per_unit\":1,\"unit_price\":7,\"average_pack_weight\":0,\"package_price\":7,\"package_unit_price\":7,\"priority_order\":1,\"name\":\"ea\",\"price_list_entries\":[{\"id\":683924,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":528258,\"subscription_setting\":{\"id\":562984,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":683925,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":528259,\"subscription_setting\":{\"id\":562985,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":683923,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":528257,\"subscription_setting\":{\"id\":562983,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":1004531,\"product_name\":\"Tanzanian Tangerine Iris Rhizome (Bulb)\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"ea\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"No inventory\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2025-08-28T16:35:55.275701-04:00\",\"updated\":\"2026-03-30T15:36:04.006073-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 1004531,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 1004531,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/1004531/localline/cb44f251ebffa65282556b41.jpg"
+    ],
+    "localLineVendorId": 3181
+  },
+  "remote": {
+    "id": 1004531,
+    "name": "Tanzanian Tangerine Iris Rhizome (Bulb)",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">The Tanzanian Tangerine iris is&nbsp;a Tall Bearded (TB) iris, 38 inches tall, with a plicata flower type, featuring radiant deep tangerine standards and tannish orange falls with a red wine-stippled overlay and light orange beards.&nbsp;Introduced by Brad Kasperek in 1995, this ruffled, flared flower blooms early to mid-season and is known for its unique, warm color combination and strong, well-branched stalks.</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2025-08-28T16:35:55.006264-04:00",
+    "updated": "2026-04-09T18:21:20.754904-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/F0NSm.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 336670,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/F0NSm.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/F0NSm.jpg",
+        "original_filename": "20240509_191142.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 784571,
+        "inventory_per_unit": 1,
+        "unit_price": 7,
+        "average_pack_weight": 0,
+        "package_price": 7,
+        "package_unit_price": 7,
+        "priority_order": 1,
+        "name": "ea",
+        "price_list_entries": [
+          {
+            "id": 683924,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 528258,
+            "subscription_setting": {
+              "id": 562984,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 683925,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 528259,
+            "subscription_setting": {
+              "id": 562985,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 683923,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 528257,
+            "subscription_setting": {
+              "id": 562983,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 1004531,
+        "product_name": "Tanzanian Tangerine Iris Rhizome (Bulb)",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "No inventory",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-08-28T16:35:55.275701-04:00",
+        "updated": "2026-03-30T15:36:04.006073-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 528257,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 837,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 416776,
+            "price_list_category": 15746,
+            "priority_order": 31,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 73778,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 528258,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 1001,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 416777,
+            "price_list_category": 14598,
+            "priority_order": 26,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 73779,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 528259,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1211,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 416778,
+            "price_list_category": 15064,
+            "priority_order": 43,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 73780,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3181,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "package",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3181,
+    "packages": [
+      {
+        "id": 784571,
+        "unit_price": 7,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 528257,
+            "calculated_value": 10.15,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 7
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 528258,
+            "calculated_value": 10.15,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 7
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 528259,
+            "calculated_value": 10.15,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 7
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:41:07.072Z",
+  "rows": [
+    {
+      "productId": 1004531,
+      "product": "Tanzanian Tangerine Iris Rhizome (Bulb)",
+      "vendor": "RL Plants & Home Goods",
+      "packageId": 784571,
+      "package": "ea",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 7,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 9.8,
+      "localPriceAfter": 10.15,
+      "remoteBasePrice": 7,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 9.8,
+      "remotePriceAfter": 10.15
+    },
+    {
+      "productId": 1004531,
+      "product": "Tanzanian Tangerine Iris Rhizome (Bulb)",
+      "vendor": "RL Plants & Home Goods",
+      "packageId": 784571,
+      "package": "ea",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 7,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 9.8,
+      "localPriceAfter": 10.15,
+      "remoteBasePrice": 7,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 9.8,
+      "remotePriceAfter": 10.15
+    },
+    {
+      "productId": 1004531,
+      "product": "Tanzanian Tangerine Iris Rhizome (Bulb)",
+      "vendor": "RL Plants & Home Goods",
+      "packageId": 784571,
+      "package": "ea",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 7,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 9.8,
+      "localPriceAfter": 10.15,
+      "remoteBasePrice": 7,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 9.8,
+      "remotePriceAfter": 10.15
+    },
+    {
+      "productId": 1004531,
+      "product": "Tanzanian Tangerine Iris Rhizome (Bulb)",
+      "vendor": "RL Plants & Home Goods",
+      "packageId": 784571,
+      "package": "ea",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 7,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 9.8,
+      "localPriceAfter": 10.15,
+      "remoteBasePrice": 7,
+      "remoteAdjustmentType": null,
+      "remoteAdjustmentBefore": null,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": null,
+      "remotePriceAfter": null
+    }
+  ],
+  "warnings": [
+    "SNAP is not present for package ea; no listing created."
+  ],
+  "reviewedAt": "2026-10-08T19:48:41.013Z"
+}

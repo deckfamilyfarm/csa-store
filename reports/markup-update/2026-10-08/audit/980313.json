@@ -1,0 +1,451 @@
+{
+  "productId": 980313,
+  "context": {
+    "product": {
+      "id": 980313,
+      "name": "Mini Salanova Lettuce Heads (mixed colors and types)",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Salanova mini head lettuces are&nbsp;small, compact lettuce heads with a unique core structure that allows for a one-cut harvest of individual salad-sized leaves.&nbsp;These lettuce heads are known for their sweet flavor, tender texture, and long shelf life, making them popular for both home and commercial production.&nbsp;</span></p>",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": 0,
+      "categoryId": 14,
+      "vendorId": 3177,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/pxjbs.thumbnail.jpeg",
+      "createdAt": "2025-06-09T17:05:57.000Z",
+      "updatedAt": "2025-06-17T20:24:02.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Vegetables - Leafy Greens 🥬",
+    "vendor": {
+      "id": 3177,
+      "name": "Red Tail Growers",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 748220,
+        "productId": 980313,
+        "name": "ea",
+        "price": "1.00",
+        "packageCode": null,
+        "unit": "ea",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 748220,
+        "productId": 980313,
+        "localLinePackageId": 748220,
+        "liveName": "ea",
+        "livePrice": "1.00",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":980313,\"Product\":\"Mini Salanova Lettuce Heads (mixed colors and types)\",\"Track Inventory By\":\"package\",\"Item Unit\":\"ea\",\"Charge By\":\"package\",\"Charge Unit\":\"ea\",\"Package ID\":748220,\"Package Name\":\"ea\",\"# of Items\":1,\"Package Price\":1,\"Inventory Type\":\"product\"},\"live\":{\"id\":748220,\"inventory_per_unit\":1,\"unit_price\":1,\"average_pack_weight\":0,\"package_price\":1,\"package_unit_price\":1,\"priority_order\":1,\"name\":\"ea\",\"price_list_entries\":[{\"id\":620731,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":481714,\"subscription_setting\":{\"id\":499847,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":620732,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":481715,\"subscription_setting\":{\"id\":499848,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":620733,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":481716,\"subscription_setting\":{\"id\":499849,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":null,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":980313,\"product_name\":\"Mini Salanova Lettuce Heads (mixed colors and types)\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"ea\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2025-06-09T13:05:57.612802-04:00\",\"updated\":\"2025-06-09T13:05:57.683484-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 980313,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 980313,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/980313/localline/020aee28a80d4f04f72930d5.jpg"
+    ],
+    "localLineVendorId": 3177
+  },
+  "remote": {
+    "id": 980313,
+    "name": "Mini Salanova Lettuce Heads (mixed colors and types)",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Salanova mini head lettuces are&nbsp;small, compact lettuce heads with a unique core structure that allows for a one-cut harvest of individual salad-sized leaves.&nbsp;These lettuce heads are known for their sweet flavor, tender texture, and long shelf life, making them popular for both home and commercial production.&nbsp;</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2025-06-09T13:05:57.446405-04:00",
+    "updated": "2025-06-17T16:24:02.730428-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/pxjbs.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 307856,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/pxjbs.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/pxjbs.jpeg",
+        "original_filename": "images.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 748220,
+        "inventory_per_unit": 1,
+        "unit_price": 1,
+        "average_pack_weight": 0,
+        "package_price": 1,
+        "package_unit_price": 1,
+        "priority_order": 1,
+        "name": "ea",
+        "price_list_entries": [
+          {
+            "id": 620731,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 481714,
+            "subscription_setting": {
+              "id": 499847,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 620732,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 481715,
+            "subscription_setting": {
+              "id": 499848,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 620733,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 481716,
+            "subscription_setting": {
+              "id": 499849,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": null,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 980313,
+        "product_name": "Mini Salanova Lettuce Heads (mixed colors and types)",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-06-09T13:05:57.612802-04:00",
+        "updated": "2025-06-09T13:05:57.683484-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 481714,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 782,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 372238,
+            "price_list_category": 15732,
+            "priority_order": 25,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 481715,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 949,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 372239,
+            "price_list_category": 15107,
+            "priority_order": 23,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 481716,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1157,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 372240,
+            "price_list_category": 28913,
+            "priority_order": 26,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3177,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3177,
+    "packages": [
+      {
+        "id": 748220,
+        "unit_price": 1,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 481714,
+            "calculated_value": 1.45,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 481715,
+            "calculated_value": 1.45,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 481716,
+            "calculated_value": 1.45,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:40:45.291Z",
+  "rows": [
+    {
+      "productId": 980313,
+      "product": "Mini Salanova Lettuce Heads (mixed colors and types)",
+      "vendor": "Red Tail Growers",
+      "packageId": 748220,
+      "package": "ea",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 1,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 1.4,
+      "localPriceAfter": 1.45,
+      "remoteBasePrice": 1,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 1.4,
+      "remotePriceAfter": 1.45
+    },
+    {
+      "productId": 980313,
+      "product": "Mini Salanova Lettuce Heads (mixed colors and types)",
+      "vendor": "Red Tail Growers",
+      "packageId": 748220,
+      "package": "ea",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 1,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 1.4,
+      "localPriceAfter": 1.45,
+      "remoteBasePrice": 1,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 1.4,
+      "remotePriceAfter": 1.45
+    },
+    {
+      "productId": 980313,
+      "product": "Mini Salanova Lettuce Heads (mixed colors and types)",
+      "vendor": "Red Tail Growers",
+      "packageId": 748220,
+      "package": "ea",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 1,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 1.4,
+      "localPriceAfter": 1.45,
+      "remoteBasePrice": 1,
+      "remoteAdjustmentType": null,
+      "remoteAdjustmentBefore": null,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": null,
+      "remotePriceAfter": null
+    },
+    {
+      "productId": 980313,
+      "product": "Mini Salanova Lettuce Heads (mixed colors and types)",
+      "vendor": "Red Tail Growers",
+      "packageId": 748220,
+      "package": "ea",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 1,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 1.4,
+      "localPriceAfter": 1.45,
+      "remoteBasePrice": 1,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 1.4,
+      "remotePriceAfter": 1.45
+    }
+  ],
+  "warnings": [
+    "Herd Share Members is not present for package ea; no listing created."
+  ],
+  "reviewedAt": "2026-10-08T19:48:40.998Z"
+}

@@ -1,0 +1,451 @@
+{
+  "productId": 948124,
+  "context": {
+    "product": {
+      "id": 948124,
+      "name": "Ziggy Award Winner Iris Rhizome",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Early to late bloom and re-bloom. Standards straw yellow, faint lavender midrib base; style arms straw yellow, faint lavender midstripe; falls ivory ground, erratic broken-pattern splashes of bright purple; beards yellow; slight sweet fragrance</span></p>",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": 0,
+      "categoryId": 9,
+      "vendorId": 3181,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/wvq1z.thumbnail.jpeg",
+      "createdAt": "2025-03-04T05:23:36.000Z",
+      "updatedAt": "2026-05-26T11:43:26.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Home Goods 🥄🌱🪏🍽️",
+    "vendor": {
+      "id": 3181,
+      "name": "RL Plants & Home Goods",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 703446,
+        "productId": 948124,
+        "name": "ea",
+        "price": "8.00",
+        "packageCode": null,
+        "unit": "ea",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 1,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 703446,
+        "productId": 948124,
+        "localLinePackageId": 703446,
+        "liveName": "ea",
+        "livePrice": "8.00",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "package",
+        "packageInventory": 0,
+        "packageReservedInventory": 0,
+        "packageAvailableInventory": 0,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":948124,\"Product\":\"Ziggy Award Winner Iris Rhizome\",\"Track Inventory By\":\"package\",\"Item Unit\":\"ea\",\"Charge By\":\"package\",\"Charge Unit\":\"ea\",\"Package ID\":703446,\"Package Name\":\"ea\",\"# of Items\":1,\"Package Price\":8,\"Inventory Type\":\"package\",\"Package Inventory\":0,\"Package Reserved Inventory\":0,\"Package Available Inventory\":0},\"live\":{\"id\":703446,\"inventory_per_unit\":1,\"unit_price\":8,\"average_pack_weight\":0,\"package_price\":8,\"package_unit_price\":8,\"priority_order\":null,\"name\":\"ea\",\"price_list_entries\":[{\"id\":547699,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":424319,\"subscription_setting\":{\"id\":426239,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":547700,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":424320,\"subscription_setting\":{\"id\":426240,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":547701,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":424321,\"subscription_setting\":{\"id\":426241,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":948124,\"product_name\":\"Ziggy Award Winner Iris Rhizome\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"ea\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"No inventory\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2025-03-04T00:23:37.108487-05:00\",\"updated\":\"2026-04-09T18:25:55.261829-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 948124,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 948124,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/948124/localline/78c2c5eacdcb9e999aea1cdd.jpg"
+    ],
+    "localLineVendorId": 3181
+  },
+  "remote": {
+    "id": 948124,
+    "name": "Ziggy Award Winner Iris Rhizome",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Early to late bloom and re-bloom. Standards straw yellow, faint lavender midrib base; style arms straw yellow, faint lavender midstripe; falls ivory ground, erratic broken-pattern splashes of bright purple; beards yellow; slight sweet fragrance</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2025-03-04T00:23:36.891047-05:00",
+    "updated": "2026-05-21T20:18:34.007330-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/wvq1z.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 277018,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/wvq1z.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/wvq1z.jpg",
+        "original_filename": "20230515_075908.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 703446,
+        "inventory_per_unit": 1,
+        "unit_price": 8,
+        "average_pack_weight": 0,
+        "package_price": 8,
+        "package_unit_price": 8,
+        "priority_order": null,
+        "name": "ea",
+        "price_list_entries": [
+          {
+            "id": 547699,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 424319,
+            "subscription_setting": {
+              "id": 426239,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 547700,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 424320,
+            "subscription_setting": {
+              "id": 426240,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 547701,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 424321,
+            "subscription_setting": {
+              "id": 426241,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 948124,
+        "product_name": "Ziggy Award Winner Iris Rhizome",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "No inventory",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-03-04T00:23:37.108487-05:00",
+        "updated": "2026-04-09T18:25:55.261829-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 424319,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 730,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 315766,
+            "price_list_category": 15746,
+            "priority_order": 42,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 424320,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 904,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 315767,
+            "price_list_category": 14598,
+            "priority_order": 37,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 424321,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1110,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 315768,
+            "price_list_category": 15064,
+            "priority_order": 54,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3181,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "package",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3181,
+    "packages": [
+      {
+        "id": 703446,
+        "unit_price": 8,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 424319,
+            "calculated_value": 11.6,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 8
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 424320,
+            "calculated_value": 11.6,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 8
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 424321,
+            "calculated_value": 11.6,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 8
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:40:33.426Z",
+  "rows": [
+    {
+      "productId": 948124,
+      "product": "Ziggy Award Winner Iris Rhizome",
+      "vendor": "RL Plants & Home Goods",
+      "packageId": 703446,
+      "package": "ea",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 8,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 11.2,
+      "localPriceAfter": 11.6,
+      "remoteBasePrice": 8,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 11.2,
+      "remotePriceAfter": 11.6
+    },
+    {
+      "productId": 948124,
+      "product": "Ziggy Award Winner Iris Rhizome",
+      "vendor": "RL Plants & Home Goods",
+      "packageId": 703446,
+      "package": "ea",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 8,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 11.2,
+      "localPriceAfter": 11.6,
+      "remoteBasePrice": 8,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 11.2,
+      "remotePriceAfter": 11.6
+    },
+    {
+      "productId": 948124,
+      "product": "Ziggy Award Winner Iris Rhizome",
+      "vendor": "RL Plants & Home Goods",
+      "packageId": 703446,
+      "package": "ea",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 8,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 11.2,
+      "localPriceAfter": 11.6,
+      "remoteBasePrice": 8,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 11.2,
+      "remotePriceAfter": 11.6
+    },
+    {
+      "productId": 948124,
+      "product": "Ziggy Award Winner Iris Rhizome",
+      "vendor": "RL Plants & Home Goods",
+      "packageId": 703446,
+      "package": "ea",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 8,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 11.2,
+      "localPriceAfter": 11.6,
+      "remoteBasePrice": 8,
+      "remoteAdjustmentType": null,
+      "remoteAdjustmentBefore": null,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": null,
+      "remotePriceAfter": null
+    }
+  ],
+  "warnings": [
+    "SNAP is not present for package ea; no listing created."
+  ],
+  "reviewedAt": "2026-10-08T19:48:40.988Z"
+}

@@ -1,0 +1,10 @@
+{
+  "error": {
+    "status": 400,
+    "code": "product_is_box",
+    "detail": "Action not allowed on boxes"
+  },
+  "localProductId": 1023667,
+  "remoteProductId": 1023667,
+  "checkedAt": "2026-10-11T17:58:21.830Z"
+}

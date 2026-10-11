@@ -1,0 +1,512 @@
+{
+  "productId": 805757,
+  "context": {
+    "product": {
+      "id": 805757,
+      "name": "Honeydew Melon",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Classic white honeydew skin but blushed orange crisp honeydew flesh</span></p>",
+      "visible": 0,
+      "trackInventory": 1,
+      "inventory": 7,
+      "categoryId": 10,
+      "vendorId": 3149,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/IhtA5.thumbnail.jpeg",
+      "createdAt": "2023-08-25T14:28:04.000Z",
+      "updatedAt": "2024-11-11T21:02:54.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Fruit 🍒🍎🫐",
+    "vendor": {
+      "id": 3149,
+      "name": "Grazier's Garden",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 526812,
+        "productId": 805757,
+        "name": "each",
+        "price": "6.65",
+        "packageCode": null,
+        "unit": "ea",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": null
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 526812,
+        "productId": 805757,
+        "localLinePackageId": 526812,
+        "liveName": "each",
+        "livePrice": "6.65",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":805757,\"Product\":\"Honeydew Melon\",\"Track Inventory By\":\"package\",\"Item Unit\":\"ea\",\"Charge By\":\"package\",\"Charge Unit\":\"ea\",\"Package ID\":526812,\"Package Name\":\"each\",\"# of Items\":1,\"Package Price\":6.65,\"Inventory Type\":\"product\"},\"live\":{\"id\":526812,\"inventory_per_unit\":1,\"unit_price\":6.65,\"average_pack_weight\":null,\"package_price\":6.65,\"package_unit_price\":6.65,\"priority_order\":null,\"name\":\"each\",\"price_list_entries\":[{\"id\":455684,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":362078,\"subscription_setting\":{\"id\":334587,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":221438,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":179044,\"subscription_setting\":{\"id\":124162,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":207416,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":167590,\"subscription_setting\":{\"id\":106590,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":617722,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479615,\"subscription_setting\":{\"id\":496838,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":7,\"number_of_packages_available\":7,\"number_of_packages_total\":7,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":7,\"product_package_size\":1,\"product_id\":805757,\"product_name\":\"Honeydew Melon\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"ea\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2023-08-25T10:28:04.603599-04:00\",\"updated\":\"2024-10-14T16:03:29.132125-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 805757,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 805757,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/805757/localline/d766c4b72a0e63387ca00e8e.jpg",
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/805757/localline/13392c96e91d9c5d08c7b5e9.jpg"
+    ],
+    "localLineVendorId": 3149
+  },
+  "remote": {
+    "id": 805757,
+    "name": "Honeydew Melon",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Classic white honeydew skin but blushed orange crisp honeydew flesh</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-08-25T10:28:04.592653-04:00",
+    "updated": "2024-11-11T16:02:54.940630-05:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/IhtA5.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 238980,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/IhtA5.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/IhtA5.jpeg",
+        "original_filename": "IMG_0731.jpg.jpeg"
+      },
+      {
+        "id": 141009,
+        "priority_order": 1,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/zwNP4.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/zwNP4.jpeg",
+        "original_filename": "676.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 7,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 526812,
+        "inventory_per_unit": 1,
+        "unit_price": 6.65,
+        "average_pack_weight": null,
+        "package_price": 6.65,
+        "package_unit_price": 6.65,
+        "priority_order": null,
+        "name": "each",
+        "price_list_entries": [
+          {
+            "id": 455684,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 362078,
+            "subscription_setting": {
+              "id": 334587,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 221438,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179044,
+            "subscription_setting": {
+              "id": 124162,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 207416,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 167590,
+            "subscription_setting": {
+              "id": 106590,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617722,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479615,
+            "subscription_setting": {
+              "id": 496838,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 7,
+        "number_of_packages_available": 7,
+        "number_of_packages_total": 7,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 7,
+        "product_package_size": 1,
+        "product_id": 805757,
+        "product_name": "Honeydew Melon",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T10:28:04.603599-04:00",
+        "updated": "2024-10-14T16:03:29.132125-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 167590,
+        "price_list_category": 14599,
+        "price_list": 2718,
+        "priority_order": 151,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 137461,
+            "price_list_category": 14599,
+            "priority_order": 188,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179044,
+        "price_list_category": 15063,
+        "price_list": 2966,
+        "priority_order": 188,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 147255,
+            "price_list_category": 15063,
+            "priority_order": 241,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 362078,
+        "price_list_category": 15748,
+        "price_list": 3124,
+        "priority_order": 628,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 269046,
+            "price_list_category": 15748,
+            "priority_order": 681,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479615,
+        "price_list_category": 28911,
+        "price_list": 5622,
+        "priority_order": 188,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370089,
+            "price_list_category": 28911,
+            "priority_order": 236,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3149,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 7,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 7
+  },
+  "payload": {
+    "vendor": 3149,
+    "packages": [
+      {
+        "id": 526812,
+        "unit_price": 6.65,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 362078,
+            "calculated_value": 9.64,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 6.65
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 167590,
+            "calculated_value": 9.64,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 6.65
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 179044,
+            "calculated_value": 9.64,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 6.65
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 479615,
+            "calculated_value": 9.64,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 6.65
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:38:29.534Z",
+  "rows": [
+    {
+      "productId": 805757,
+      "product": "Honeydew Melon",
+      "vendor": "Grazier's Garden",
+      "packageId": 526812,
+      "package": "each",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 6.65,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 9.31,
+      "localPriceAfter": 9.64,
+      "remoteBasePrice": 6.65,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 9.31,
+      "remotePriceAfter": 9.64
+    },
+    {
+      "productId": 805757,
+      "product": "Honeydew Melon",
+      "vendor": "Grazier's Garden",
+      "packageId": 526812,
+      "package": "each",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 6.65,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 9.31,
+      "localPriceAfter": 9.64,
+      "remoteBasePrice": 6.65,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 9.31,
+      "remotePriceAfter": 9.64
+    },
+    {
+      "productId": 805757,
+      "product": "Honeydew Melon",
+      "vendor": "Grazier's Garden",
+      "packageId": 526812,
+      "package": "each",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 6.65,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 9.31,
+      "localPriceAfter": 9.64,
+      "remoteBasePrice": 6.65,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 9.31,
+      "remotePriceAfter": 9.64
+    },
+    {
+      "productId": 805757,
+      "product": "Honeydew Melon",
+      "vendor": "Grazier's Garden",
+      "packageId": 526812,
+      "package": "each",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 6.65,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 9.31,
+      "localPriceAfter": 9.64,
+      "remoteBasePrice": 6.65,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 9.31,
+      "remotePriceAfter": 9.64
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.873Z"
+}

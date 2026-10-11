@@ -1,0 +1,261 @@
+{
+  "data": {
+    "id": 805983,
+    "name": "Shishito Frying Pepper",
+    "description": "<p>Shishitos are bright, flavorful sweet chilies with typically mild spiciness. There's a fiery punch every so often where a shishito breaks the norm and turns up the dial. It makes them a ton of fun to eat. Cook them up as a side or a fun appetizer. Shishitos range from 100 to 1,000 Scoville heat units, which is hotter than bell peppers but much milder than jalapenos.</p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-08-25T10:39:59.176155-04:00",
+    "updated": "2026-10-09T15:59:24.721297-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/mQxwM.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 136305,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/mQxwM.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/mQxwM.jpg",
+        "original_filename": "shisito.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12594,
+      "name": "pt",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12594,
+      "name": "pt",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "519",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 527043,
+        "inventory_per_unit": 1,
+        "unit_price": 3,
+        "average_pack_weight": null,
+        "package_price": 3,
+        "package_unit_price": 3,
+        "priority_order": null,
+        "name": "each",
+        "price_list_entries": [
+          {
+            "id": 207582,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 167754,
+            "subscription_setting": {
+              "id": 106758,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617795,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479688,
+            "subscription_setting": {
+              "id": 496911,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 238317,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 191989,
+            "subscription_setting": {
+              "id": 146173,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 221588,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179191,
+            "subscription_setting": {
+              "id": 124075,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 805983,
+        "product_name": "Shishito Frying Pepper",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "pt",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T10:39:59.187904-04:00",
+        "updated": "2026-10-09T15:59:24.139745-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 167754,
+        "price_list_category": 15111,
+        "price_list": 2718,
+        "priority_order": 325,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 137620,
+            "price_list_category": 15111,
+            "priority_order": 373,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179191,
+        "price_list_category": 15120,
+        "price_list": 2966,
+        "priority_order": 541,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 147401,
+            "price_list_category": 15120,
+            "priority_order": 600,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 191989,
+        "price_list_category": 15750,
+        "price_list": 3124,
+        "priority_order": 53,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 157888,
+            "price_list_category": 15750,
+            "priority_order": 99,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479688,
+        "price_list_category": 28914,
+        "price_list": 5622,
+        "priority_order": 541,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370108,
+            "price_list_category": 28914,
+            "priority_order": 599,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3152,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 805983,
+  "remoteProductId": 805983,
+  "checkedAt": "2026-10-11T17:57:47.691Z"
+}

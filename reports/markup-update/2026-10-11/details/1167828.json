@@ -1,0 +1,223 @@
+{
+  "data": {
+    "id": 1167828,
+    "name": "Fuyu Persimmon",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">A good persimmon at its peak will taste sweet, mild, and rich. Many people have described its flavor as “honey-like.” Its texture is similar to that of an apricot and its skin is a bit tougher than an apple's.</span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2026-10-08T11:31:11.032297-04:00",
+    "updated": "2026-10-09T16:02:25.869404-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/DqkQN.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 480528,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/DqkQN.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/DqkQN.jpeg",
+        "original_filename": "image1.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 36,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12590,
+      "name": "pk",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12590,
+      "name": "pk",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 1016883,
+        "inventory_per_unit": 1,
+        "unit_price": 5,
+        "average_pack_weight": 0,
+        "package_price": 5,
+        "package_unit_price": 5,
+        "priority_order": null,
+        "name": "5 pack",
+        "price_list_entries": [
+          {
+            "id": 1066847,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 819829,
+            "subscription_setting": {
+              "id": 945677,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1066848,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 819827,
+            "subscription_setting": {
+              "id": 945678,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1066849,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 819828,
+            "subscription_setting": {
+              "id": 945679,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 36,
+        "number_of_packages_available": 36,
+        "number_of_packages_total": 36,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 36,
+        "product_package_size": 1,
+        "product_id": 1167828,
+        "product_name": "Fuyu Persimmon",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "pk",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-10-08T11:31:11.170111-04:00",
+        "updated": "2026-10-09T16:02:23.116219-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 819827,
+        "price_list_category": 15063,
+        "price_list": 2966,
+        "priority_order": 1417,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 696788,
+            "price_list_category": 15063,
+            "priority_order": 1,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 819828,
+        "price_list_category": 15748,
+        "price_list": 3124,
+        "priority_order": 1036,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 696789,
+            "price_list_category": 15748,
+            "priority_order": 1,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 819829,
+        "price_list_category": 28911,
+        "price_list": 5622,
+        "priority_order": 1436,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 696790,
+            "price_list_category": 28911,
+            "priority_order": 1,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 6886,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 36,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 36
+  },
+  "localProductId": 1167828,
+  "remoteProductId": 1167828,
+  "checkedAt": "2026-10-11T18:10:19.195Z"
+}

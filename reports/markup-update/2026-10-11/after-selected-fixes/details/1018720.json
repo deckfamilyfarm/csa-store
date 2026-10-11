@@ -1,0 +1,281 @@
+{
+  "data": {
+    "id": 1018720,
+    "name": "Radiant Roasters Chiapas Mexico Light Roast Ground Coffee",
+    "description": "<p dir=\"ltr\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">This organically grown coffee from the Chiapas region of Mexico is grown by smallholder farms of modest size. It is considered a SHG (Strictly High Grown) coffee meaning it was grown at least 1200m above sea level.</strong></b></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2025-10-30T17:40:17.790073-04:00",
+    "updated": "2026-10-08T16:33:01.775212-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/IAuCR.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 354503,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/IAuCR.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/IAuCR.jpg",
+        "original_filename": "20251104_110442.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12591,
+      "name": "bag",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12591,
+      "name": "bag",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 804434,
+        "inventory_per_unit": 1,
+        "unit_price": 12,
+        "average_pack_weight": 0,
+        "package_price": 12,
+        "package_unit_price": 12,
+        "priority_order": 1,
+        "name": "12 oz bag",
+        "price_list_entries": [
+          {
+            "id": 719264,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 553871,
+            "subscription_setting": {
+              "id": 598280,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 719265,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 553872,
+            "subscription_setting": {
+              "id": 598281,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 719266,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 553873,
+            "subscription_setting": {
+              "id": 598282,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 719263,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 553870,
+            "subscription_setting": {
+              "id": 598279,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 1018720,
+        "product_name": "Radiant Roasters Chiapas Mexico Light Roast Ground Coffee",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bag",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-10-30T17:40:18.165998-04:00",
+        "updated": "2026-10-08T16:33:01.196779-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 553870,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 875,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 444147,
+            "price_list_category": 31656,
+            "priority_order": 492,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": {
+          "id": 92915,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 553871,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 1037,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 444148,
+            "price_list_category": 31657,
+            "priority_order": 653,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": {
+          "id": 92916,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 553872,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1249,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 444149,
+            "price_list_category": 31662,
+            "priority_order": 874,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": {
+          "id": 92917,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 553873,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1250,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 444150,
+            "price_list_category": 31665,
+            "priority_order": 870,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": {
+          "id": 92918,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3158,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 1018720,
+  "remoteProductId": 1018720,
+  "checkedAt": "2026-10-11T17:58:21.621Z"
+}

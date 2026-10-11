@@ -1,0 +1,38 @@
+{
+  "checkedAt": "2026-10-11T17:58:23.944Z",
+  "readOnly": true,
+  "verified": [
+    {
+      "id": 805855,
+      "name": "Paste Tomatoes",
+      "customerSettings": 4,
+      "gridPrice": 3.5,
+      "onSaleFilter": true,
+      "detailsMatch": true
+    },
+    {
+      "id": 805986,
+      "name": "Red Slicer Tomatoes",
+      "customerSettings": 4,
+      "gridPrice": 3.08,
+      "onSaleFilter": true,
+      "detailsMatch": true
+    },
+    {
+      "id": 978368,
+      "name": "Grazier's Salad Mix",
+      "customerSettings": 4,
+      "gridPrice": 5.6,
+      "onSaleFilter": true,
+      "detailsMatch": true
+    },
+    {
+      "id": 1000029,
+      "name": "Heirloom Tomatoes",
+      "customerSettings": 4,
+      "gridPrice": 4.55,
+      "onSaleFilter": true,
+      "detailsMatch": true
+    }
+  ]
+}

@@ -1,0 +1,238 @@
+{
+  "data": {
+    "id": 1143177,
+    "name": "Jeff's Rolled Oats",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">A thick hearty rolled oat, takes a little longer to cook but well worth the wait for superior flavor and texture.&nbsp; A morning staple!&nbsp; Don't forget to add it to baked goods like muffins, oatmeal, cookies and pancakes.</span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2026-07-17T21:40:03.042765-04:00",
+    "updated": "2026-10-09T16:00:54.785965-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/NMHRb.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 453150,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/NMHRb.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/NMHRb.jpeg",
+        "original_filename": "images.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 1,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12591,
+      "name": "bag",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12591,
+      "name": "bag",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 982383,
+        "inventory_per_unit": 1,
+        "unit_price": 4.5,
+        "average_pack_weight": 0,
+        "package_price": 4.5,
+        "package_unit_price": 4.5,
+        "priority_order": 0,
+        "name": "1.5 lb bag",
+        "price_list_entries": [
+          {
+            "id": 998587,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 769537,
+            "subscription_setting": {
+              "id": 877242,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 998588,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 769538,
+            "subscription_setting": {
+              "id": 877243,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 998589,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 769539,
+            "subscription_setting": {
+              "id": 877244,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 1,
+        "number_of_packages_available": 1,
+        "number_of_packages_total": 1,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 1,
+        "product_package_size": 1,
+        "product_id": 1143177,
+        "product_name": "Jeff's Rolled Oats",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bag",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-07-17T21:40:03.192168-04:00",
+        "updated": "2026-10-09T16:00:54.136914-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 769537,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 981,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 647190,
+            "price_list_category": 31655,
+            "priority_order": 42,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": {
+          "id": 179658,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 769538,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1363,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 647191,
+            "price_list_category": 17687,
+            "priority_order": 421,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": {
+          "id": 179659,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 769539,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1358,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 647192,
+            "price_list_category": 31666,
+            "priority_order": 425,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": {
+          "id": 179660,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 3150,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 1,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 1
+  },
+  "localProductId": 1143177,
+  "remoteProductId": 1143177,
+  "checkedAt": "2026-10-11T17:58:30.345Z"
+}

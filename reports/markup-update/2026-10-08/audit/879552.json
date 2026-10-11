@@ -1,0 +1,504 @@
+{
+  "productId": 879552,
+  "context": {
+    "product": {
+      "id": 879552,
+      "name": "Green Garlic",
+      "description": "<p>Green garlic (also called young garlic or spring garlic) is simply garlic that hasn't fully matured. Green garlic is pulled from the ground before the clove and bulb skins dry out, so you might see green garlic at various stages of growth: with a barely discernible bulb (like a green onion), with a small bulb, but no clove separation (like a spring onion), or with a large bulb and cloves. Either way is delicious.</p><br /><br />",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": 0,
+      "categoryId": 13,
+      "vendorId": 3177,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/Ykyz9.thumbnail.jpeg",
+      "createdAt": "2024-05-24T01:25:26.000Z",
+      "updatedAt": "2026-05-27T10:40:22.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Vegetables - Roots🧅🧄🥕🥔",
+    "vendor": {
+      "id": 3177,
+      "name": "Red Tail Growers",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 615273,
+        "productId": 879552,
+        "name": "bu",
+        "price": "2.00",
+        "packageCode": null,
+        "unit": "bu",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 615273,
+        "productId": 879552,
+        "localLinePackageId": 615273,
+        "liveName": "bu",
+        "livePrice": "2.00",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":879552,\"Product\":\"Green Garlic\",\"Track Inventory By\":\"package\",\"Item Unit\":\"bu\",\"Charge By\":\"package\",\"Charge Unit\":\"bu\",\"Package ID\":615273,\"Package Name\":\"bu\",\"# of Items\":1,\"Package Price\":2,\"Inventory Type\":\"product\"},\"live\":{\"id\":615273,\"inventory_per_unit\":1,\"unit_price\":2,\"average_pack_weight\":null,\"package_price\":2,\"package_unit_price\":2,\"priority_order\":null,\"name\":\"bu\",\"price_list_entries\":[{\"id\":354421,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":290049,\"subscription_setting\":{\"id\":234826,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":354422,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":290048,\"subscription_setting\":{\"id\":234827,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":354423,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":290050,\"subscription_setting\":{\"id\":234828,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":618062,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479954,\"subscription_setting\":{\"id\":497178,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":null,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":879552,\"product_name\":\"Green Garlic\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"bu\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2024-05-23T21:25:26.636606-04:00\",\"updated\":\"2026-04-28T12:57:37.221340-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 879552,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 879552,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/879552/localline/5e85d5853443fc40e1bcfcec.jpg"
+    ],
+    "localLineVendorId": 3177
+  },
+  "remote": {
+    "id": 879552,
+    "name": "Green Garlic",
+    "description": "<p>Green garlic (also called young garlic or spring garlic) is simply garlic that hasn't fully matured. Green garlic is pulled from the ground before the clove and bulb skins dry out, so you might see green garlic at various stages of growth: with a barely discernible bulb (like a green onion), with a small bulb, but no clove separation (like a spring onion), or with a large bulb and cloves. Either way is delicious.</p><br /><br />",
+    "custom_id": "",
+    "visible": false,
+    "created": "2024-05-23T21:25:26.479067-04:00",
+    "updated": "2026-05-26T15:33:22.701515-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/Ykyz9.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 201978,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/Ykyz9.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/Ykyz9.jpg",
+        "original_filename": "account/322922/3hoas.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 615273,
+        "inventory_per_unit": 1,
+        "unit_price": 2,
+        "average_pack_weight": null,
+        "package_price": 2,
+        "package_unit_price": 2,
+        "priority_order": null,
+        "name": "bu",
+        "price_list_entries": [
+          {
+            "id": 354421,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 290049,
+            "subscription_setting": {
+              "id": 234826,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 354422,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 290048,
+            "subscription_setting": {
+              "id": 234827,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 354423,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 290050,
+            "subscription_setting": {
+              "id": 234828,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 618062,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479954,
+            "subscription_setting": {
+              "id": 497178,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": null,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 879552,
+        "product_name": "Green Garlic",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bu",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2024-05-23T21:25:26.636606-04:00",
+        "updated": "2026-04-28T12:57:37.221340-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 290048,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 701,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440537,
+            "price_list_category": 15105,
+            "priority_order": 761,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 290049,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 901,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440745,
+            "price_list_category": 15118,
+            "priority_order": 954,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 290050,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 505,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440326,
+            "price_list_category": 15731,
+            "priority_order": 569,
+            "price_list_category_name": "Organic Vegetables - Roots 🧅🧄 🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479954,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 901,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 440953,
+            "price_list_category": 28905,
+            "priority_order": 963,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3177,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3177,
+    "packages": [
+      {
+        "id": 615273,
+        "unit_price": 2,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 290050,
+            "calculated_value": 2.9,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 290048,
+            "calculated_value": 2.9,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 290049,
+            "calculated_value": 2.9,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 479954,
+            "calculated_value": 2.9,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:39:59.222Z",
+  "rows": [
+    {
+      "productId": 879552,
+      "product": "Green Garlic",
+      "vendor": "Red Tail Growers",
+      "packageId": 615273,
+      "package": "bu",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 2,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.8,
+      "localPriceAfter": 2.9,
+      "remoteBasePrice": 2,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.8,
+      "remotePriceAfter": 2.9
+    },
+    {
+      "productId": 879552,
+      "product": "Green Garlic",
+      "vendor": "Red Tail Growers",
+      "packageId": 615273,
+      "package": "bu",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 2,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.8,
+      "localPriceAfter": 2.9,
+      "remoteBasePrice": 2,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.8,
+      "remotePriceAfter": 2.9
+    },
+    {
+      "productId": 879552,
+      "product": "Green Garlic",
+      "vendor": "Red Tail Growers",
+      "packageId": 615273,
+      "package": "bu",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 2,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.8,
+      "localPriceAfter": 2.9,
+      "remoteBasePrice": 2,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.8,
+      "remotePriceAfter": 2.9
+    },
+    {
+      "productId": 879552,
+      "product": "Green Garlic",
+      "vendor": "Red Tail Growers",
+      "packageId": 615273,
+      "package": "bu",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 2,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.8,
+      "localPriceAfter": 2.9,
+      "remoteBasePrice": 2,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.8,
+      "remotePriceAfter": 2.9
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.955Z"
+}

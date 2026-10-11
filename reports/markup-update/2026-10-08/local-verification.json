@@ -1,0 +1,11 @@
+{
+  "verifiedAt": "2026-10-08T20:19:31.112Z",
+  "count": 534,
+  "checks": {
+    "vendors": true,
+    "products": true,
+    "packages": true,
+    "productSales": true,
+    "excludedProfiles": true
+  }
+}

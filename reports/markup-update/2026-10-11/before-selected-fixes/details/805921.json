@@ -1,0 +1,261 @@
+{
+  "data": {
+    "id": 805921,
+    "name": "Green Romaine Lettuce",
+    "description": "<p>A type of head lettuce that is typically deep green with elongated leaves. Known for its mild flavor and crisp texture, it has sturdy leaves that make it more tolerant to heat than other lettuce varieties. High in minerals, such as calcium, phosphorous, magnesium, and potassium. It's naturally low in sodium. Plus, romaine lettuce is packed with vitamin C, vitamin K, and folate. It's a good source of beta carotene, which converts into vitamin A in the body.</p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-08-25T10:39:57.911038-04:00",
+    "updated": "2023-10-07T13:11:30.510780-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/Enugh.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 141444,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/Enugh.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/Enugh.jpeg",
+        "original_filename": "769.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "769",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 526981,
+        "inventory_per_unit": 1,
+        "unit_price": 1.75,
+        "average_pack_weight": null,
+        "package_price": 1.75,
+        "package_unit_price": 1.75,
+        "priority_order": 1,
+        "name": "each",
+        "price_list_entries": [
+          {
+            "id": 207529,
+            "adjustment": true,
+            "adjustment_type": 3,
+            "adjustment_value": 2.5,
+            "price_list_id": 2718,
+            "product_price_list_entry": 167697,
+            "subscription_setting": {
+              "id": 106703,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 221537,
+            "adjustment": true,
+            "adjustment_type": 3,
+            "adjustment_value": 2.5,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179140,
+            "subscription_setting": {
+              "id": 123258,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 238358,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 192030,
+            "subscription_setting": {
+              "id": 146034,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617758,
+            "adjustment": true,
+            "adjustment_type": 3,
+            "adjustment_value": 2.5,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479651,
+            "subscription_setting": {
+              "id": 496874,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 805921,
+        "product_name": "Green Romaine Lettuce",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T10:39:57.925057-04:00",
+        "updated": "2023-10-06T12:15:49.183482-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 167697,
+        "price_list_category": 15107,
+        "price_list": 2718,
+        "priority_order": 237,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 137568,
+            "price_list_category": 15107,
+            "priority_order": 271,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179140,
+        "price_list_category": 15119,
+        "price_list": 2966,
+        "priority_order": 308,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 147351,
+            "price_list_category": 15119,
+            "priority_order": 344,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 192030,
+        "price_list_category": 15732,
+        "price_list": 3124,
+        "priority_order": 94,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 157911,
+            "price_list_category": 15732,
+            "priority_order": 134,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479651,
+        "price_list_category": 28913,
+        "price_list": 5622,
+        "priority_order": 308,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370266,
+            "price_list_category": 28913,
+            "priority_order": 345,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": null,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "OWNED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 805921,
+  "remoteProductId": 805921,
+  "checkedAt": "2026-10-11T17:26:43.845Z"
+}

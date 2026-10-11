@@ -1,0 +1,504 @@
+{
+  "productId": 964208,
+  "context": {
+    "product": {
+      "id": 964208,
+      "name": "Chive Flower",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Chive flowers,&nbsp;typically pale purple and star-shaped, are edible and add a subtle onion flavor to dishes.&nbsp;They appear on the green stalks of chive plants in late spring or early summer.&nbsp;These flowers can be used as a garnish, added to salads, or incorporated into soups and sauces.</span></p>",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": 0,
+      "categoryId": 25,
+      "vendorId": 3177,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/zClZb.thumbnail.jpeg",
+      "createdAt": "2025-04-26T17:24:14.000Z",
+      "updatedAt": "2025-06-02T16:41:35.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Vegetables - Herbs 🌿",
+    "vendor": {
+      "id": 3177,
+      "name": "Red Tail Growers",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 725643,
+        "productId": 964208,
+        "name": "bu",
+        "price": "2.00",
+        "packageCode": null,
+        "unit": "bu",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 725643,
+        "productId": 964208,
+        "localLinePackageId": 725643,
+        "liveName": "bu",
+        "livePrice": "2.00",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":964208,\"Product\":\"Chive Flower\",\"Track Inventory By\":\"package\",\"Item Unit\":\"bu\",\"Charge By\":\"package\",\"Charge Unit\":\"bu\",\"Package ID\":725643,\"Package Name\":\"bu\",\"# of Items\":1,\"Package Price\":2,\"Inventory Type\":\"product\"},\"live\":{\"id\":725643,\"inventory_per_unit\":1,\"unit_price\":2,\"average_pack_weight\":0,\"package_price\":2,\"package_unit_price\":2,\"priority_order\":1,\"name\":\"bu\",\"price_list_entries\":[{\"id\":584534,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":454363,\"subscription_setting\":{\"id\":463566,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":584535,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":454364,\"subscription_setting\":{\"id\":463567,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":584536,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":454365,\"subscription_setting\":{\"id\":463568,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":618259,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":480149,\"subscription_setting\":{\"id\":497375,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":null,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":964208,\"product_name\":\"Chive Flower\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"bu\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2025-04-26T13:24:14.468924-04:00\",\"updated\":\"2025-04-26T13:24:14.544711-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 964208,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 964208,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/964208/localline/fadd86b19b9b9bad83461825.jpg"
+    ],
+    "localLineVendorId": 3177
+  },
+  "remote": {
+    "id": 964208,
+    "name": "Chive Flower",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Chive flowers,&nbsp;typically pale purple and star-shaped, are edible and add a subtle onion flavor to dishes.&nbsp;They appear on the green stalks of chive plants in late spring or early summer.&nbsp;These flowers can be used as a garnish, added to salads, or incorporated into soups and sauces.</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2025-04-26T13:24:14.215712-04:00",
+    "updated": "2025-06-02T12:41:35.214957-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/zClZb.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 292945,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/zClZb.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/zClZb.jpeg",
+        "original_filename": "download.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 725643,
+        "inventory_per_unit": 1,
+        "unit_price": 2,
+        "average_pack_weight": 0,
+        "package_price": 2,
+        "package_unit_price": 2,
+        "priority_order": 1,
+        "name": "bu",
+        "price_list_entries": [
+          {
+            "id": 584534,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 454363,
+            "subscription_setting": {
+              "id": 463566,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 584535,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 454364,
+            "subscription_setting": {
+              "id": 463567,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 584536,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 454365,
+            "subscription_setting": {
+              "id": 463568,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 618259,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 480149,
+            "subscription_setting": {
+              "id": 497375,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": null,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 964208,
+        "product_name": "Chive Flower",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bu",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-04-26T13:24:14.468924-04:00",
+        "updated": "2025-04-26T13:24:14.544711-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 454363,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 753,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 346306,
+            "price_list_category": 15736,
+            "priority_order": 14,
+            "price_list_category_name": "Organic Vegetables - Herbs 🌿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 454364,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 924,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 346307,
+            "price_list_category": 15109,
+            "priority_order": 13,
+            "price_list_category_name": "Organic Vegetables - Herbs🌿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 454365,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1132,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 346308,
+            "price_list_category": 15124,
+            "priority_order": 12,
+            "price_list_category_name": "Organic Vegetables - Herbs🌿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 480149,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1132,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370198,
+            "price_list_category": 28897,
+            "priority_order": 13,
+            "price_list_category_name": "Organic Vegetables - Herbs🌿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3177,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3177,
+    "packages": [
+      {
+        "id": 725643,
+        "unit_price": 2,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 454363,
+            "calculated_value": 2.9,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 454364,
+            "calculated_value": 2.9,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 454365,
+            "calculated_value": 2.9,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 480149,
+            "calculated_value": 2.9,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:40:39.038Z",
+  "rows": [
+    {
+      "productId": 964208,
+      "product": "Chive Flower",
+      "vendor": "Red Tail Growers",
+      "packageId": 725643,
+      "package": "bu",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 2,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.8,
+      "localPriceAfter": 2.9,
+      "remoteBasePrice": 2,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.8,
+      "remotePriceAfter": 2.9
+    },
+    {
+      "productId": 964208,
+      "product": "Chive Flower",
+      "vendor": "Red Tail Growers",
+      "packageId": 725643,
+      "package": "bu",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 2,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.8,
+      "localPriceAfter": 2.9,
+      "remoteBasePrice": 2,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.8,
+      "remotePriceAfter": 2.9
+    },
+    {
+      "productId": 964208,
+      "product": "Chive Flower",
+      "vendor": "Red Tail Growers",
+      "packageId": 725643,
+      "package": "bu",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 2,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.8,
+      "localPriceAfter": 2.9,
+      "remoteBasePrice": 2,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.8,
+      "remotePriceAfter": 2.9
+    },
+    {
+      "productId": 964208,
+      "product": "Chive Flower",
+      "vendor": "Red Tail Growers",
+      "packageId": 725643,
+      "package": "bu",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 2,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.8,
+      "localPriceAfter": 2.9,
+      "remoteBasePrice": 2,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.8,
+      "remotePriceAfter": 2.9
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.990Z"
+}

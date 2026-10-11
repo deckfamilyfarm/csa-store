@@ -1,0 +1,266 @@
+{
+  "data": {
+    "id": 805753,
+    "name": "Cut Flower Bouquet",
+    "description": "<p>Venture into the realm of non edible products! (although you could argue flowers are a staple of a happy home). This bouquet from Small is Beautiful is cut fresh and sent to your door.</p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2023-08-25T10:18:16.686416-04:00",
+    "updated": "2026-10-08T17:12:34.442634-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/Ic5iC.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 142082,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/Ic5iC.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/Ic5iC.jpeg",
+        "original_filename": "6100.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 4,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "6100",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 526808,
+        "inventory_per_unit": 1,
+        "unit_price": 10,
+        "average_pack_weight": null,
+        "package_price": 10,
+        "package_unit_price": 10,
+        "priority_order": null,
+        "name": "each",
+        "price_list_entries": [
+          {
+            "id": 221394,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179000,
+            "subscription_setting": {
+              "id": 123267,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 238493,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 192162,
+            "subscription_setting": {
+              "id": 146201,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1000451,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 771022,
+            "subscription_setting": {
+              "id": 879104,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 207371,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 167545,
+            "subscription_setting": {
+              "id": 106545,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 4,
+        "number_of_packages_available": 4,
+        "number_of_packages_total": 4,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 4,
+        "product_package_size": 1,
+        "product_id": 805753,
+        "product_name": "Cut Flower Bouquet",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T10:18:16.694470-04:00",
+        "updated": "2026-10-08T16:21:51.296516-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 167545,
+        "price_list_category": 14598,
+        "price_list": 2718,
+        "priority_order": 95,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 137416,
+            "price_list_category": 14598,
+            "priority_order": 133,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179000,
+        "price_list_category": 15064,
+        "price_list": 2966,
+        "priority_order": 95,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 147211,
+            "price_list_category": 15064,
+            "priority_order": 4,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 192162,
+        "price_list_category": 15746,
+        "price_list": 3124,
+        "priority_order": 230,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 158039,
+            "price_list_category": 15746,
+            "priority_order": 8,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 771022,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1384,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 648890,
+            "price_list_category": 28909,
+            "priority_order": 6,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 179872,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 3171,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 4,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 4
+  },
+  "localProductId": 805753,
+  "remoteProductId": 805753,
+  "checkedAt": "2026-10-11T17:26:37.616Z"
+}

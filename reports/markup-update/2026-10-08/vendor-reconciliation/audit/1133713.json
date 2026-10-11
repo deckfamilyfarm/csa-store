@@ -1,0 +1,66 @@
+{
+  "productId": 1133713,
+  "context": {
+    "product": {
+      "id": 1133713,
+      "name": "Dinner in a Box: Roasting Chicken",
+      "description": null,
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": null,
+      "categoryId": null,
+      "vendorId": 3148,
+      "thumbnailUrl": null,
+      "createdAt": "2026-06-19T10:40:19.000Z",
+      "updatedAt": "2026-07-03T19:41:35.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "",
+    "vendor": {
+      "id": 3148,
+      "name": "Full Farm CSA",
+      "priceListMarkup": "0.4500",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.45",
+      "memberMarkup": "0.45"
+    },
+    "profile": {
+      "productId": 1133713,
+      "unitOfMeasure": "each",
+      "sourceUnitPrice": null,
+      "minWeight": null,
+      "maxWeight": null,
+      "avgWeightOverride": null,
+      "sourceMultiplier": "0.5412",
+      "guestMarkup": "0.4500",
+      "memberMarkup": "0.4500",
+      "herdShareMarkup": "0.4500",
+      "snapMarkup": "0.4500",
+      "markupOverride": "0.4500",
+      "onSale": 0,
+      "saleDiscount": null,
+      "priceChangedAt": "2026-10-08T21:02:21.000Z",
+      "remoteSyncStatus": "pending",
+      "remoteSyncMessage": "Vendor pricing defaults updated. Apply to remote store pending.",
+      "remoteSyncedAt": null,
+      "createdAt": "2026-10-08T20:19:27.000Z",
+      "updatedAt": "2026-10-08T21:02:21.000Z"
+    },
+    "packages": [],
+    "packageMeta": [],
+    "sale": {},
+    "remoteId": 1133713,
+    "imageUrls": [],
+    "localLineVendorId": 3148
+  },
+  "remote": null,
+  "payload": null,
+  "problems": [
+    "Unsupported Local Line box/bundle"
+  ],
+  "warnings": [],
+  "status": "exception",
+  "auditedAt": "2026-10-09T19:22:16.328Z",
+  "vendorOnly": false,
+  "rows": []
+}

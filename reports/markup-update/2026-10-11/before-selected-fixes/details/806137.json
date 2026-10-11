@@ -1,0 +1,261 @@
+{
+  "data": {
+    "id": 806137,
+    "name": "Three Sisters Porridge",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">An all organic blend of Purple Karma Barley, Dark Northern Rye, and Oat flakes from Camas Country Mill. Great in breads, or as a hearty cereal for breakfast.</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Ingredients: Organic Purple Karma Barley Flakes, Organic Dark Northern Rye Flakes, Organic Oat Flakes </span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2023-08-25T11:15:33.322334-04:00",
+    "updated": "2026-10-08T16:26:45.429884-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/4xvPl.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 141347,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/4xvPl.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/4xvPl.jpeg",
+        "original_filename": "512.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 6,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "512",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 527202,
+        "inventory_per_unit": 1,
+        "unit_price": 16.6,
+        "average_pack_weight": null,
+        "package_price": 16.6,
+        "package_unit_price": 16.6,
+        "priority_order": null,
+        "name": "4 lbs",
+        "price_list_entries": [
+          {
+            "id": 238349,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 192021,
+            "subscription_setting": {
+              "id": 146076,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 221773,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179373,
+            "subscription_setting": {
+              "id": 124515,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 220404,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 178319,
+            "subscription_setting": {
+              "id": 121309,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617926,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479819,
+            "subscription_setting": {
+              "id": 497042,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 6,
+        "number_of_packages_available": 6,
+        "number_of_packages_total": 6,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 6,
+        "product_package_size": 1,
+        "product_id": 806137,
+        "product_name": "Three Sisters Porridge",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T11:15:33.336093-04:00",
+        "updated": "2026-10-08T16:26:44.842952-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 178319,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 827,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440706,
+            "price_list_category": 31659,
+            "priority_order": 855,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179373,
+        "price_list_category": 17687,
+        "price_list": 2966,
+        "priority_order": 1032,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 147583,
+            "price_list_category": 17687,
+            "priority_order": 1059,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 192021,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 669,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440466,
+            "price_list_category": 31655,
+            "priority_order": 695,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479819,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1032,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 441146,
+            "price_list_category": 31666,
+            "priority_order": 1063,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 3151,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 6,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 6
+  },
+  "localProductId": 806137,
+  "remoteProductId": 806137,
+  "checkedAt": "2026-10-11T17:26:56.662Z"
+}

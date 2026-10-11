@@ -1,0 +1,223 @@
+{
+  "data": {
+    "id": 980313,
+    "name": "Mini Salanova Lettuce Heads (mixed colors and types)",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Salanova mini head lettuces are&nbsp;small, compact lettuce heads with a unique core structure that allows for a one-cut harvest of individual salad-sized leaves.&nbsp;These lettuce heads are known for their sweet flavor, tender texture, and long shelf life, making them popular for both home and commercial production.&nbsp;</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2025-06-09T13:05:57.446405-04:00",
+    "updated": "2026-10-08T16:31:20.653914-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/pxjbs.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 307856,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/pxjbs.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/pxjbs.jpeg",
+        "original_filename": "images.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 748220,
+        "inventory_per_unit": 1,
+        "unit_price": 1,
+        "average_pack_weight": 0,
+        "package_price": 1,
+        "package_unit_price": 1,
+        "priority_order": 1,
+        "name": "ea",
+        "price_list_entries": [
+          {
+            "id": 620731,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 481714,
+            "subscription_setting": {
+              "id": 499847,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 620732,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 481715,
+            "subscription_setting": {
+              "id": 499848,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 620733,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 481716,
+            "subscription_setting": {
+              "id": 499849,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": null,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 980313,
+        "product_name": "Mini Salanova Lettuce Heads (mixed colors and types)",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-06-09T13:05:57.612802-04:00",
+        "updated": "2026-10-08T16:31:20.139258-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 481714,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 782,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 372238,
+            "price_list_category": 15732,
+            "priority_order": 25,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 481715,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 949,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 372239,
+            "price_list_category": 15107,
+            "priority_order": 23,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 481716,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1157,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 372240,
+            "price_list_category": 28913,
+            "priority_order": 26,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3177,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 980313,
+  "remoteProductId": 980313,
+  "checkedAt": "2026-10-11T18:09:59.393Z"
+}

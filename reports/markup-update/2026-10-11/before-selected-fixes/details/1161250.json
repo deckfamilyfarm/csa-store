@@ -1,0 +1,238 @@
+{
+  "data": {
+    "id": 1161250,
+    "name": "Stanley Plums",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">a popular, self-fertile European prune-plum varietyknown for producing sweet, dark blue-purple oval fruits with golden-yellow flesh. </span></p><ul class=\"lexical-text-editor--list-ul\"><li value=\"1\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Flavor:</strong></b><span style=\"white-space: pre-wrap;\"> Very sweet and rich.</span></li><li value=\"2\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Color:</strong></b><span style=\"white-space: pre-wrap;\"> Deep blue-purple skin with golden-yellow flesh.</span></li><li value=\"3\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Uses:</strong></b><span style=\"white-space: pre-wrap;\"> Great for fresh eating, baking, canning, and drying into prunes.</span></li></ul>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2026-09-10T13:01:25.326123-04:00",
+    "updated": "2026-10-09T16:01:50.096470-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/ggQX8.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 473780,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/ggQX8.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/ggQX8.jpeg",
+        "original_filename": "images.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 1006822,
+        "inventory_per_unit": 1,
+        "unit_price": 2,
+        "average_pack_weight": 0,
+        "package_price": 2,
+        "package_unit_price": 2,
+        "priority_order": 0,
+        "name": "lb",
+        "price_list_entries": [
+          {
+            "id": 1043359,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 804672,
+            "subscription_setting": {
+              "id": 922036,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1043360,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 804673,
+            "subscription_setting": {
+              "id": 922037,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1043361,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 804674,
+            "subscription_setting": {
+              "id": 922038,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": null,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 1161250,
+        "product_name": "Stanley Plums",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "lb",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-09-10T13:01:25.498740-04:00",
+        "updated": "2026-10-09T16:01:48.252314-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 804672,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 1014,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 681946,
+            "price_list_category": 15748,
+            "priority_order": 7,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": {
+          "id": 199897,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 804673,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1396,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 681947,
+            "price_list_category": 15063,
+            "priority_order": 7,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": {
+          "id": 199898,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 804674,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1414,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 681948,
+            "price_list_category": 28911,
+            "priority_order": 7,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": {
+          "id": 199899,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 6886,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 1161250,
+  "remoteProductId": 1161250,
+  "checkedAt": "2026-10-11T17:27:33.413Z"
+}

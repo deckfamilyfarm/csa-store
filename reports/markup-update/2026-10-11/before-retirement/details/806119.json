@@ -1,0 +1,261 @@
+{
+  "data": {
+    "id": 806119,
+    "name": "Mushroom Tomato Sauce",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Made using local organic dried crimini mushrooms, this sauce is a must for any pasta party. With a well rounded flavor it is sure to please any pasta lover. Enjoy!</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Ingredients:   Organic Tomato Puree, Organic Tomato Paste, Organic Onions, Organic Olive Oil, Organic Carrot, Organic Dried Mushroom, Sea Salt, Organic Garlic, Organic Basil, Organic Oregano.</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-08-25T11:15:32.774471-04:00",
+    "updated": "2026-10-08T16:26:23.524518-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/udsRK.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 141921,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/udsRK.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/udsRK.jpg",
+        "original_filename": "885.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "885",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 527184,
+        "inventory_per_unit": 1,
+        "unit_price": 5.64,
+        "average_pack_weight": null,
+        "package_price": 5.64,
+        "package_unit_price": 5.64,
+        "priority_order": null,
+        "name": "16 oz",
+        "price_list_entries": [
+          {
+            "id": 356879,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 291698,
+            "subscription_setting": {
+              "id": 237320,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 356880,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 291699,
+            "subscription_setting": {
+              "id": 237321,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 356878,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 291697,
+            "subscription_setting": {
+              "id": 237319,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 618063,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479955,
+            "subscription_setting": {
+              "id": 497179,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 806119,
+        "product_name": "Mushroom Tomato Sauce",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T11:15:32.794121-04:00",
+        "updated": "2026-10-08T16:26:22.739737-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 291697,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 470,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440667,
+            "price_list_category": 31658,
+            "priority_order": 472,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 291698,
+        "price_list_category": 17687,
+        "price_list": 2966,
+        "priority_order": 470,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440890,
+            "price_list_category": 31663,
+            "priority_order": 477,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 291699,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 370,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440388,
+            "price_list_category": 15762,
+            "priority_order": 118,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479955,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 470,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 441100,
+            "price_list_category": 31667,
+            "priority_order": 478,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3160,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 806119,
+  "remoteProductId": 806119,
+  "checkedAt": "2026-10-11T17:57:55.336Z"
+}

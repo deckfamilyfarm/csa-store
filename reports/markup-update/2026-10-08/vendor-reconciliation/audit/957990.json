@@ -1,0 +1,527 @@
+{
+  "productId": 957990,
+  "context": {
+    "product": {
+      "id": 957990,
+      "name": "The \"Real Sassy\" Creole Spice Blend",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">The spices are layered to give you a Haitian cuisine experience in your own kitchen.</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Boost the flavors in your plate with a little sprinkle! Sprinkle some on your regular toast or your sassy avocado toast! Mix some in with your eggs before frying them! Blend some in some olive oil, vinegar, and lime juice for an instant flavorful dressing! Blend some in some olive oil to marinate your steak! Have fun cooking with it!</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Ingredients: Onions, garlic, thyme, sage, white peppercorn, black peppercorn, Sea Salt, mustard, coriander, fennel seeds, smoked paprika, cayenne pepper, habanero pepper, chili flakes, chives, parsley flakes, dehydrated orange peel, cumin, turmeric, bay leaves</span></p>",
+      "visible": 0,
+      "trackInventory": 1,
+      "inventory": 0,
+      "categoryId": 19,
+      "vendorId": 3182,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/92kto.thumbnail.jpeg",
+      "createdAt": "2025-04-05T17:51:58.000Z",
+      "updatedAt": "2025-04-28T17:16:52.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Canned Goods 🥫",
+    "vendor": {
+      "id": 3182,
+      "name": "Creole Me Up",
+      "priceListMarkup": "0.4500",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.45",
+      "memberMarkup": "0.45"
+    },
+    "profile": {
+      "productId": 957990,
+      "unitOfMeasure": "each",
+      "sourceUnitPrice": null,
+      "minWeight": null,
+      "maxWeight": null,
+      "avgWeightOverride": null,
+      "sourceMultiplier": "0.5412",
+      "guestMarkup": "0.4500",
+      "memberMarkup": "0.4500",
+      "herdShareMarkup": "0.4500",
+      "snapMarkup": "0.4500",
+      "markupOverride": "0.4500",
+      "onSale": 0,
+      "saleDiscount": null,
+      "priceChangedAt": "2026-10-08T21:01:56.000Z",
+      "remoteSyncStatus": "pending",
+      "remoteSyncMessage": "Vendor pricing defaults updated. Apply to remote store pending.",
+      "remoteSyncedAt": null,
+      "createdAt": "2026-10-08T20:19:27.000Z",
+      "updatedAt": "2026-10-08T21:01:56.000Z"
+    },
+    "packages": [
+      {
+        "id": 717429,
+        "productId": 957990,
+        "name": "3 oz jar",
+        "price": "6.75",
+        "packageCode": null,
+        "unit": "ea",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 717429,
+        "productId": 957990,
+        "localLinePackageId": 717429,
+        "liveName": "3 oz jar",
+        "livePrice": "6.75",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":957990,\"Product\":\"The \\\"Real Sassy\\\" Creole Spice Blend\",\"Track Inventory By\":\"package\",\"Item Unit\":\"ea\",\"Charge By\":\"package\",\"Charge Unit\":\"ea\",\"Package ID\":717429,\"Package Name\":\"3 oz jar\",\"# of Items\":1,\"Package Price\":6.75,\"Inventory Type\":\"product\"},\"live\":{\"id\":717429,\"inventory_per_unit\":1,\"unit_price\":6.75,\"average_pack_weight\":0,\"package_price\":6.75,\"package_unit_price\":6.75,\"priority_order\":null,\"name\":\"3 oz jar\",\"price_list_entries\":[{\"id\":568956,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":441174,\"subscription_setting\":{\"id\":447722,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":568957,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":441175,\"subscription_setting\":{\"id\":447723,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":568958,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":441176,\"subscription_setting\":{\"id\":447724,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":618252,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":480142,\"subscription_setting\":{\"id\":497368,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":957990,\"product_name\":\"The \\\"Real Sassy\\\" Creole Spice Blend\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"ea\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2025-04-05T13:51:58.592204-04:00\",\"updated\":\"2025-04-05T13:51:58.676080-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-09T10:41:30.000Z",
+        "lastSyncedAt": "2026-10-09T10:41:30.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 957990,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-09T10:41:30.000Z"
+    },
+    "remoteId": 957990,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/957990/localline/68720e81906ef65a5a8512c4.jpg"
+    ],
+    "localLineVendorId": 3182
+  },
+  "remote": {
+    "id": 957990,
+    "name": "The \"Real Sassy\" Creole Spice Blend",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">The spices are layered to give you a Haitian cuisine experience in your own kitchen.</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Boost the flavors in your plate with a little sprinkle! Sprinkle some on your regular toast or your sassy avocado toast! Mix some in with your eggs before frying them! Blend some in some olive oil, vinegar, and lime juice for an instant flavorful dressing! Blend some in some olive oil to marinate your steak! Have fun cooking with it!</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Ingredients: Onions, garlic, thyme, sage, white peppercorn, black peppercorn, Sea Salt, mustard, coriander, fennel seeds, smoked paprika, cayenne pepper, habanero pepper, chili flakes, chives, parsley flakes, dehydrated orange peel, cumin, turmeric, bay leaves</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2025-04-05T13:51:58.213955-04:00",
+    "updated": "2025-04-28T13:16:52.030346-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/92kto.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 287029,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/92kto.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/92kto.jpg",
+        "original_filename": "20250404_143511~2.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 717429,
+        "inventory_per_unit": 1,
+        "unit_price": 6.75,
+        "average_pack_weight": 0,
+        "package_price": 6.75,
+        "package_unit_price": 6.75,
+        "priority_order": null,
+        "name": "3 oz jar",
+        "price_list_entries": [
+          {
+            "id": 568956,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 441174,
+            "subscription_setting": {
+              "id": 447722,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 568957,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 441175,
+            "subscription_setting": {
+              "id": 447723,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 568958,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 441176,
+            "subscription_setting": {
+              "id": 447724,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 618252,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 480142,
+            "subscription_setting": {
+              "id": 497368,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 957990,
+        "product_name": "The \"Real Sassy\" Creole Spice Blend",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-04-05T13:51:58.592204-04:00",
+        "updated": "2025-04-05T13:51:58.676080-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 441174,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 741,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440457,
+            "price_list_category": 15762,
+            "priority_order": 701,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 441175,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 916,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440689,
+            "price_list_category": 31658,
+            "priority_order": 852,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 441176,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1124,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440906,
+            "price_list_category": 31663,
+            "priority_order": 1057,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 480142,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1124,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 441128,
+            "price_list_category": 31667,
+            "priority_order": 1057,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": null,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "OWNED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3182,
+    "packages": [
+      {
+        "id": 717429,
+        "unit_price": 6.75,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 441174,
+            "calculated_value": 9.79,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 6.75
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 441175,
+            "calculated_value": 9.79,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 6.75
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 441176,
+            "calculated_value": 9.79,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 6.75
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 480142,
+            "calculated_value": 9.79,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 6.75
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "warnings": [
+    "User approved using the current local vendor for this unassigned Local Line product."
+  ],
+  "status": "ready",
+  "auditedAt": "2026-10-09T19:22:07.040Z",
+  "vendorOnly": false,
+  "rows": [
+    {
+      "productId": 957990,
+      "product": "The \"Real Sassy\" Creole Spice Blend",
+      "vendor": "Creole Me Up",
+      "packageId": 717429,
+      "package": "3 oz jar",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 6.75,
+      "markupBefore": 45,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 9.79,
+      "localPriceAfter": 9.79,
+      "remoteBasePrice": 6.75,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 9.45,
+      "remotePriceAfter": 9.79
+    },
+    {
+      "productId": 957990,
+      "product": "The \"Real Sassy\" Creole Spice Blend",
+      "vendor": "Creole Me Up",
+      "packageId": 717429,
+      "package": "3 oz jar",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 6.75,
+      "markupBefore": 45,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 9.79,
+      "localPriceAfter": 9.79,
+      "remoteBasePrice": 6.75,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 9.45,
+      "remotePriceAfter": 9.79
+    },
+    {
+      "productId": 957990,
+      "product": "The \"Real Sassy\" Creole Spice Blend",
+      "vendor": "Creole Me Up",
+      "packageId": 717429,
+      "package": "3 oz jar",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 6.75,
+      "markupBefore": 45,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 9.79,
+      "localPriceAfter": 9.79,
+      "remoteBasePrice": 6.75,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 9.45,
+      "remotePriceAfter": 9.79
+    },
+    {
+      "productId": 957990,
+      "product": "The \"Real Sassy\" Creole Spice Blend",
+      "vendor": "Creole Me Up",
+      "packageId": 717429,
+      "package": "3 oz jar",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 6.75,
+      "markupBefore": 45,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 9.79,
+      "localPriceAfter": 9.79,
+      "remoteBasePrice": 6.75,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 9.45,
+      "remotePriceAfter": 9.79
+    }
+  ]
+}

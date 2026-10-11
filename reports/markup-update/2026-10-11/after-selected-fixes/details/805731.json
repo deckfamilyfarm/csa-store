@@ -1,0 +1,223 @@
+{
+  "data": {
+    "id": 805731,
+    "name": "The Insulated Jar Tote/Jar Bag: Hemp + Natural Rubber (Yulex)",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Naturally padded and insulated, ready to handle your next adventure. It even has padded/insulated slots for your milk jars cool and safe!</span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2023-08-25T10:18:15.334384-04:00",
+    "updated": "2026-10-08T16:21:45.160401-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/gnmqw.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 477557,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/gnmqw.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/gnmqw.jpg",
+        "original_filename": "20260925_122408.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 1,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "735",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 526786,
+        "inventory_per_unit": 1,
+        "unit_price": 110.5,
+        "average_pack_weight": null,
+        "package_price": 110.5,
+        "package_unit_price": 110.5,
+        "priority_order": null,
+        "name": "each",
+        "price_list_entries": [
+          {
+            "id": 221417,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179023,
+            "subscription_setting": {
+              "id": 124363,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 244045,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 196709,
+            "subscription_setting": {
+              "id": 152356,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 207394,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 167568,
+            "subscription_setting": {
+              "id": 106568,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 1,
+        "number_of_packages_available": 1,
+        "number_of_packages_total": 1,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 1,
+        "product_package_size": 1,
+        "product_id": 805731,
+        "product_name": "The Insulated Jar Tote/Jar Bag: Hemp + Natural Rubber (Yulex)",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T10:18:15.343596-04:00",
+        "updated": "2026-10-08T16:21:44.294643-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 167568,
+        "price_list_category": 14598,
+        "price_list": 2718,
+        "priority_order": 118,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 137439,
+            "price_list_category": 14598,
+            "priority_order": 156,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179023,
+        "price_list_category": 15064,
+        "price_list": 2966,
+        "priority_order": 118,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 147234,
+            "price_list_category": 15064,
+            "priority_order": 1027,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 196709,
+        "price_list_category": 15746,
+        "price_list": 3124,
+        "priority_order": 360,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 162241,
+            "price_list_category": 15746,
+            "priority_order": 407,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 3173,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 1,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 1
+  },
+  "localProductId": 805731,
+  "remoteProductId": 805731,
+  "checkedAt": "2026-10-11T17:57:32.724Z"
+}

@@ -1,0 +1,504 @@
+{
+  "productId": 906536,
+  "context": {
+    "product": {
+      "id": 906536,
+      "name": "White Russian Kale",
+      "description": "<p>White Russian kale is a dark green, oak leaf-shaped kale with white stems that's great for cooking or eating raw. It's a popular variety that's disease resistant and has a sweet flavor that intensifies when cooked. Here are some more characteristics of White Russian kale:&nbsp;</p>\n<p>Taste:White Russian kale has a crisp, sweet flavor that's considered by many to be the best tasting. Frost improves the flavor even more.&nbsp;</p>\n<p>Appearance:White Russian kale has lightly frilled leaves with white veins and a gray-green base</p>\n<p>Preparation:White Russian kale can be blanched and used in soups, stews, casseroles, and side dishes.</p>",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": 0,
+      "categoryId": 14,
+      "vendorId": 3177,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/otAAF.thumbnail.jpeg",
+      "createdAt": "2024-09-19T16:54:59.000Z",
+      "updatedAt": "2024-12-27T05:03:18.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Vegetables - Leafy Greens 🥬",
+    "vendor": {
+      "id": 3177,
+      "name": "Red Tail Growers",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 650562,
+        "productId": 906536,
+        "name": "bu",
+        "price": "2.00",
+        "packageCode": null,
+        "unit": "bu",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 650562,
+        "productId": 906536,
+        "localLinePackageId": 650562,
+        "liveName": "bu",
+        "livePrice": "2.00",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":906536,\"Product\":\"White Russian Kale\",\"Track Inventory By\":\"package\",\"Item Unit\":\"bu\",\"Charge By\":\"package\",\"Charge Unit\":\"bu\",\"Package ID\":650562,\"Package Name\":\"bu\",\"# of Items\":1,\"Package Price\":2,\"Inventory Type\":\"product\"},\"live\":{\"id\":650562,\"inventory_per_unit\":1,\"unit_price\":2,\"average_pack_weight\":0,\"package_price\":2,\"package_unit_price\":2,\"priority_order\":null,\"name\":\"bu\",\"price_list_entries\":[{\"id\":438980,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":350463,\"subscription_setting\":{\"id\":319092,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":438982,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":350465,\"subscription_setting\":{\"id\":319094,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":438981,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":350464,\"subscription_setting\":{\"id\":319093,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":618142,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":480034,\"subscription_setting\":{\"id\":497258,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":null,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":906536,\"product_name\":\"White Russian Kale\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"bu\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2024-09-19T12:54:59.995611-04:00\",\"updated\":\"2024-09-19T12:55:00.149522-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 906536,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 906536,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/906536/localline/a680fa52f0933659c559a932.jpg"
+    ],
+    "localLineVendorId": 3177
+  },
+  "remote": {
+    "id": 906536,
+    "name": "White Russian Kale",
+    "description": "<p>White Russian kale is a dark green, oak leaf-shaped kale with white stems that's great for cooking or eating raw. It's a popular variety that's disease resistant and has a sweet flavor that intensifies when cooked. Here are some more characteristics of White Russian kale:&nbsp;</p>\n<p>Taste:White Russian kale has a crisp, sweet flavor that's considered by many to be the best tasting. Frost improves the flavor even more.&nbsp;</p>\n<p>Appearance:White Russian kale has lightly frilled leaves with white veins and a gray-green base</p>\n<p>Preparation:White Russian kale can be blanched and used in soups, stews, casseroles, and side dishes.</p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2024-09-19T12:54:59.758862-04:00",
+    "updated": "2024-12-27T00:03:18.793996-05:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/otAAF.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 233869,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/otAAF.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/otAAF.jpeg",
+        "original_filename": "white russian.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 650562,
+        "inventory_per_unit": 1,
+        "unit_price": 2,
+        "average_pack_weight": 0,
+        "package_price": 2,
+        "package_unit_price": 2,
+        "priority_order": null,
+        "name": "bu",
+        "price_list_entries": [
+          {
+            "id": 438980,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 350463,
+            "subscription_setting": {
+              "id": 319092,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 438982,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 350465,
+            "subscription_setting": {
+              "id": 319094,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 438981,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 350464,
+            "subscription_setting": {
+              "id": 319093,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 618142,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 480034,
+            "subscription_setting": {
+              "id": 497258,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": null,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 906536,
+        "product_name": "White Russian Kale",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bu",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2024-09-19T12:54:59.995611-04:00",
+        "updated": "2024-09-19T12:55:00.149522-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 350463,
+        "price_list_category": 15107,
+        "price_list": 2718,
+        "priority_order": 794,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 262745,
+            "price_list_category": 15107,
+            "priority_order": 828,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 350464,
+        "price_list_category": 15119,
+        "price_list": 2966,
+        "priority_order": 996,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 262746,
+            "price_list_category": 15119,
+            "priority_order": 1032,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 350465,
+        "price_list_category": 15732,
+        "price_list": 3124,
+        "priority_order": 618,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 262747,
+            "price_list_category": 15732,
+            "priority_order": 658,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 480034,
+        "price_list_category": 28913,
+        "price_list": 5622,
+        "priority_order": 996,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370269,
+            "price_list_category": 28913,
+            "priority_order": 1033,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3177,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3177,
+    "packages": [
+      {
+        "id": 650562,
+        "unit_price": 2,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 350465,
+            "calculated_value": 2.9,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 350463,
+            "calculated_value": 2.9,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 350464,
+            "calculated_value": 2.9,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 480034,
+            "calculated_value": 2.9,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:40:20.643Z",
+  "rows": [
+    {
+      "productId": 906536,
+      "product": "White Russian Kale",
+      "vendor": "Red Tail Growers",
+      "packageId": 650562,
+      "package": "bu",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 2,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.8,
+      "localPriceAfter": 2.9,
+      "remoteBasePrice": 2,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.8,
+      "remotePriceAfter": 2.9
+    },
+    {
+      "productId": 906536,
+      "product": "White Russian Kale",
+      "vendor": "Red Tail Growers",
+      "packageId": 650562,
+      "package": "bu",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 2,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.8,
+      "localPriceAfter": 2.9,
+      "remoteBasePrice": 2,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.8,
+      "remotePriceAfter": 2.9
+    },
+    {
+      "productId": 906536,
+      "product": "White Russian Kale",
+      "vendor": "Red Tail Growers",
+      "packageId": 650562,
+      "package": "bu",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 2,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.8,
+      "localPriceAfter": 2.9,
+      "remoteBasePrice": 2,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.8,
+      "remotePriceAfter": 2.9
+    },
+    {
+      "productId": 906536,
+      "product": "White Russian Kale",
+      "vendor": "Red Tail Growers",
+      "packageId": 650562,
+      "package": "bu",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 2,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.8,
+      "localPriceAfter": 2.9,
+      "remoteBasePrice": 2,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.8,
+      "remotePriceAfter": 2.9
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.974Z"
+}

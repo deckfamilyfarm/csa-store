@@ -1,0 +1,262 @@
+{
+  "verifiedAt": "2026-10-08T20:49:40.089Z",
+  "productId": 806099,
+  "priceConfirmed": true,
+  "otherFieldsUnchanged": true,
+  "remote": {
+    "id": 806099,
+    "name": "Enchilada Red Sauce, Medium",
+    "description": "<p>These delicious red sauces are made from all locally grown, organic Northwest tomatoes and continue to be a crowd pleaser. Try these sauces on enchiladas, chili, red rice or just as a burrito sauce. Yuuuuum!</p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2023-08-25T11:15:32.229881-04:00",
+    "updated": "2026-10-08T16:26:08.780519-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/ukNMC.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 214010,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/ukNMC.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/ukNMC.jpeg",
+        "original_filename": "med .jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 1,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "497",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 527163,
+        "inventory_per_unit": 1,
+        "unit_price": 4.92,
+        "average_pack_weight": null,
+        "package_price": 4.92,
+        "package_unit_price": 4.92,
+        "priority_order": null,
+        "name": "16 oz",
+        "price_list_entries": [
+          {
+            "id": 253014,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 203982,
+            "subscription_setting": {
+              "id": 161144,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 253013,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 203981,
+            "subscription_setting": {
+              "id": 161145,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 253012,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 203980,
+            "subscription_setting": {
+              "id": 161146,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 618011,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479903,
+            "subscription_setting": {
+              "id": 497127,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 1,
+        "number_of_packages_available": 1,
+        "number_of_packages_total": 1,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 1,
+        "product_package_size": 1,
+        "product_id": 806099,
+        "product_name": "Enchilada Red Sauce, Medium",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T11:15:32.241208-04:00",
+        "updated": "2026-10-08T16:26:08.250229-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 203980,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 421,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440578,
+            "price_list_category": 31658,
+            "priority_order": 420,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 203981,
+        "price_list_category": 17687,
+        "price_list": 2966,
+        "priority_order": 421,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440809,
+            "price_list_category": 31663,
+            "priority_order": 420,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 203982,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 410,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 441169,
+            "price_list_category": 15762,
+            "priority_order": 3,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479903,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 421,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 441020,
+            "price_list_category": 31667,
+            "priority_order": 420,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 3160,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 1,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 1
+  }
+}

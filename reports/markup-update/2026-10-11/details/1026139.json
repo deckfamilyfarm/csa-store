@@ -1,0 +1,281 @@
+{
+  "data": {
+    "id": 1026139,
+    "name": "Shampoo Bar-  Honeysuckle",
+    "description": "<p dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">Our shampoo bars are gentle, soft, &amp; moisturizing.&nbsp;Plus, the ingredients are completely natural! Made with saponified coconut, palm, olive, canola, neem, &amp; castor oils, rain water, &amp; honeysuckle essential oil.</span></p><p dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">Attention naturalists, backpackers, and campers! Here is a great biodegradable, earth-friendly &amp; sustainable choice for you: our&nbsp;all-natural SHAMPOO BAR. It's shampoo in a bar form!</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">We only use biodegradable shrink wrap on our soaps.</span></p><p dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">Biolefin is formulated to be totally degradable in the environment. At the end of its useful life, it fragments and oxidizes by the effect of light and heat. It then becomes assimilable by s o i l m i c r o - o r g a n i s m s , a n d eventually disappears, leaving only water, carbon dioxide and biomass.</span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2025-11-24T14:37:22.701091-05:00",
+    "updated": "2026-10-08T16:33:12.664638-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/wSvWo.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 359993,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/wSvWo.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/wSvWo.jpeg",
+        "original_filename": "soap shampoo honeysuckle  x 1 4.5 ratio.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 8,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 815785,
+        "inventory_per_unit": 1,
+        "unit_price": 6.3,
+        "average_pack_weight": 0,
+        "package_price": 6.3,
+        "package_unit_price": 6.3,
+        "priority_order": 1,
+        "name": "4.5 oz ea",
+        "price_list_entries": [
+          {
+            "id": 1000428,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 771001,
+            "subscription_setting": {
+              "id": 879081,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 735610,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 566019,
+            "subscription_setting": {
+              "id": 614378,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 735611,
+            "adjustment": true,
+            "adjustment_type": 3,
+            "adjustment_value": 9.13,
+            "price_list_id": 2718,
+            "product_price_list_entry": 566020,
+            "subscription_setting": {
+              "id": 614379,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 735613,
+            "adjustment": true,
+            "adjustment_type": 3,
+            "adjustment_value": 9.13,
+            "price_list_id": 2966,
+            "product_price_list_entry": 566021,
+            "subscription_setting": {
+              "id": 614381,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 8,
+        "number_of_packages_available": 8,
+        "number_of_packages_total": 8,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 8,
+        "product_package_size": 1,
+        "product_id": 1026139,
+        "product_name": "Shampoo Bar-  Honeysuckle",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-11-24T14:37:23.019761-05:00",
+        "updated": "2026-10-08T16:33:12.121050-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 566019,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 885,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 455536,
+            "price_list_category": 15746,
+            "priority_order": 25,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 99461,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 566020,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 1047,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 455537,
+            "price_list_category": 14598,
+            "priority_order": 16,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 99462,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 566021,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1260,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 455538,
+            "price_list_category": 15064,
+            "priority_order": 10,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 99463,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 771001,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1365,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 648869,
+            "price_list_category": 28909,
+            "priority_order": 24,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 179853,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 5745,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 8,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 8
+  },
+  "localProductId": 1026139,
+  "remoteProductId": 1026139,
+  "checkedAt": "2026-10-11T18:10:08.566Z"
+}

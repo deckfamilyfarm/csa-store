@@ -1,0 +1,504 @@
+{
+  "productId": 805932,
+  "context": {
+    "product": {
+      "id": 805932,
+      "name": "Shallots",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Shallots have a delicate and sweet flavor with a hint of sharpness, while onions bring a more intense heat. You can substitute shallots in nearly any recipe that calls for onions just make sure you're using the same volume. (For example, several medium shallots equals about one small yellow onion.)</span></p><p><br></p>",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": 0,
+      "categoryId": 13,
+      "vendorId": 3177,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/cKZ9g.thumbnail.jpeg",
+      "createdAt": "2023-08-25T14:39:58.000Z",
+      "updatedAt": "2026-09-29T10:40:25.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Vegetables - Roots🧅🧄🥕🥔",
+    "vendor": {
+      "id": 3177,
+      "name": "Red Tail Growers",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 526992,
+        "productId": 805932,
+        "name": "1 lb",
+        "price": "4.00",
+        "packageCode": null,
+        "unit": "lb",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 526992,
+        "productId": 805932,
+        "localLinePackageId": 526992,
+        "liveName": "1 lb",
+        "livePrice": "4.00",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":805932,\"Product\":\"Shallots\",\"Track Inventory By\":\"package\",\"Item Unit\":\"lb\",\"Charge By\":\"package\",\"Charge Unit\":\"lb\",\"Package ID\":526992,\"Package Name\":\"1 lb\",\"# of Items\":1,\"Package Price\":4,\"Inventory Type\":\"product\"},\"live\":{\"id\":526992,\"inventory_per_unit\":1,\"unit_price\":4,\"average_pack_weight\":null,\"package_price\":4,\"package_unit_price\":4,\"priority_order\":null,\"name\":\"1 lb\",\"price_list_entries\":[{\"id\":221661,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":179264,\"subscription_setting\":{\"id\":124165,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":238444,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":192116,\"subscription_setting\":{\"id\":145926,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":207655,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":167827,\"subscription_setting\":{\"id\":106831,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":617842,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479735,\"subscription_setting\":{\"id\":496958,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":805932,\"product_name\":\"Shallots\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"lb\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2023-08-25T10:39:58.189520-04:00\",\"updated\":\"2026-01-17T16:00:10.891083-05:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 805932,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 805932,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/805932/localline/1094a721894294d96bde735a.jpg"
+    ],
+    "localLineVendorId": 3177
+  },
+  "remote": {
+    "id": 805932,
+    "name": "Shallots",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Shallots have a delicate and sweet flavor with a hint of sharpness, while onions bring a more intense heat. You can substitute shallots in nearly any recipe that calls for onions just make sure you're using the same volume. (For example, several medium shallots equals about one small yellow onion.)</span></p><p><br></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-08-25T10:39:58.177910-04:00",
+    "updated": "2026-09-28T12:56:42.937962-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/cKZ9g.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 142090,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/cKZ9g.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/cKZ9g.jpg",
+        "original_filename": "6245.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "6245",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 526992,
+        "inventory_per_unit": 1,
+        "unit_price": 4,
+        "average_pack_weight": null,
+        "package_price": 4,
+        "package_unit_price": 4,
+        "priority_order": null,
+        "name": "1 lb",
+        "price_list_entries": [
+          {
+            "id": 221661,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179264,
+            "subscription_setting": {
+              "id": 124165,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 238444,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 192116,
+            "subscription_setting": {
+              "id": 145926,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 207655,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 167827,
+            "subscription_setting": {
+              "id": 106831,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617842,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479735,
+            "subscription_setting": {
+              "id": 496958,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 805932,
+        "product_name": "Shallots",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "lb",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T10:39:58.189520-04:00",
+        "updated": "2026-01-17T16:00:10.891083-05:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 167827,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 323,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440531,
+            "price_list_category": 15105,
+            "priority_order": 377,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179264,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 324,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440739,
+            "price_list_category": 15118,
+            "priority_order": 377,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 192116,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 184,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440321,
+            "price_list_category": 15731,
+            "priority_order": 249,
+            "price_list_category_name": "Organic Vegetables - Roots 🧅🧄 🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479735,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 324,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 440947,
+            "price_list_category": 28905,
+            "priority_order": 381,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3177,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3177,
+    "packages": [
+      {
+        "id": 526992,
+        "unit_price": 4,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 192116,
+            "calculated_value": 5.8,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 4
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 167827,
+            "calculated_value": 5.8,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 4
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 179264,
+            "calculated_value": 5.8,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 4
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 479735,
+            "calculated_value": 5.8,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 4
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:38:59.354Z",
+  "rows": [
+    {
+      "productId": 805932,
+      "product": "Shallots",
+      "vendor": "Red Tail Growers",
+      "packageId": 526992,
+      "package": "1 lb",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 4,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 5.6,
+      "localPriceAfter": 5.8,
+      "remoteBasePrice": 4,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 5.6,
+      "remotePriceAfter": 5.8
+    },
+    {
+      "productId": 805932,
+      "product": "Shallots",
+      "vendor": "Red Tail Growers",
+      "packageId": 526992,
+      "package": "1 lb",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 4,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 5.6,
+      "localPriceAfter": 5.8,
+      "remoteBasePrice": 4,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 5.6,
+      "remotePriceAfter": 5.8
+    },
+    {
+      "productId": 805932,
+      "product": "Shallots",
+      "vendor": "Red Tail Growers",
+      "packageId": 526992,
+      "package": "1 lb",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 4,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 5.6,
+      "localPriceAfter": 5.8,
+      "remoteBasePrice": 4,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 5.6,
+      "remotePriceAfter": 5.8
+    },
+    {
+      "productId": 805932,
+      "product": "Shallots",
+      "vendor": "Red Tail Growers",
+      "packageId": 526992,
+      "package": "1 lb",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 4,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 5.6,
+      "localPriceAfter": 5.8,
+      "remoteBasePrice": 4,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 5.6,
+      "remotePriceAfter": 5.8
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.903Z"
+}

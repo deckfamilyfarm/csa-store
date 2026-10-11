@@ -1,0 +1,451 @@
+{
+  "productId": 975217,
+  "context": {
+    "product": {
+      "id": 975217,
+      "name": "Desert Trails Iris Rhizome",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">\"Desert Trails\" is a&nbsp;Tall Bearded Iris&nbsp;(TB) introduced by Keith Keppel in 2017. It's known for its unique plicata pattern, featuring colonial buff standards with a lighter marguerite yellow center, pale dove grey dots, and citron yellow falls with a dark greyed purple edge and haft.&nbsp;The beards are white with bronzed yellow tips, and the style arms are quince yellow</span></p>",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": 0,
+      "categoryId": 9,
+      "vendorId": 3181,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/c1b6g.thumbnail.jpeg",
+      "createdAt": "2025-05-26T18:01:38.000Z",
+      "updatedAt": "2026-06-05T10:40:18.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Home Goods 🥄🌱🪏🍽️",
+    "vendor": {
+      "id": 3181,
+      "name": "RL Plants & Home Goods",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 740628,
+        "productId": 975217,
+        "name": "ea",
+        "price": "8.00",
+        "packageCode": null,
+        "unit": "ea",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 1,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 740628,
+        "productId": 975217,
+        "localLinePackageId": 740628,
+        "liveName": "ea",
+        "livePrice": "8.00",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "package",
+        "packageInventory": 0,
+        "packageReservedInventory": 0,
+        "packageAvailableInventory": 0,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":975217,\"Product\":\"Desert Trails Iris Rhizome\",\"Track Inventory By\":\"package\",\"Item Unit\":\"ea\",\"Charge By\":\"package\",\"Charge Unit\":\"ea\",\"Package ID\":740628,\"Package Name\":\"ea\",\"# of Items\":1,\"Package Price\":8,\"Inventory Type\":\"package\",\"Package Inventory\":0,\"Package Reserved Inventory\":0,\"Package Available Inventory\":0},\"live\":{\"id\":740628,\"inventory_per_unit\":1,\"unit_price\":8,\"average_pack_weight\":0,\"package_price\":8,\"package_unit_price\":8,\"priority_order\":1,\"name\":\"ea\",\"price_list_entries\":[{\"id\":606597,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":470658,\"subscription_setting\":{\"id\":485712,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":606598,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":470659,\"subscription_setting\":{\"id\":485713,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":606599,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":470660,\"subscription_setting\":{\"id\":485714,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":975217,\"product_name\":\"Desert Trails Iris Rhizome\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"ea\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"No inventory\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2025-05-26T14:01:38.449887-04:00\",\"updated\":\"2026-04-09T18:25:25.536362-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 975217,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 975217,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/975217/localline/c8cf365173ecf4b025daf49b.jpg"
+    ],
+    "localLineVendorId": 3181
+  },
+  "remote": {
+    "id": 975217,
+    "name": "Desert Trails Iris Rhizome",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">\"Desert Trails\" is a&nbsp;Tall Bearded Iris&nbsp;(TB) introduced by Keith Keppel in 2017. It's known for its unique plicata pattern, featuring colonial buff standards with a lighter marguerite yellow center, pale dove grey dots, and citron yellow falls with a dark greyed purple edge and haft.&nbsp;The beards are white with bronzed yellow tips, and the style arms are quince yellow</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2025-05-26T14:01:38.275731-04:00",
+    "updated": "2026-06-04T13:01:07.301478-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/c1b6g.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 302370,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/c1b6g.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/c1b6g.jpg",
+        "original_filename": "ce748586-5c5d-4906-b42d-5204aa4cd2f3.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 740628,
+        "inventory_per_unit": 1,
+        "unit_price": 8,
+        "average_pack_weight": 0,
+        "package_price": 8,
+        "package_unit_price": 8,
+        "priority_order": 1,
+        "name": "ea",
+        "price_list_entries": [
+          {
+            "id": 606597,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 470658,
+            "subscription_setting": {
+              "id": 485712,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 606598,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 470659,
+            "subscription_setting": {
+              "id": 485713,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 606599,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 470660,
+            "subscription_setting": {
+              "id": 485714,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 975217,
+        "product_name": "Desert Trails Iris Rhizome",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "No inventory",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-05-26T14:01:38.449887-04:00",
+        "updated": "2026-04-09T18:25:25.536362-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 470658,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 769,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 361916,
+            "price_list_category": 15746,
+            "priority_order": 40,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 470659,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 936,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 361917,
+            "price_list_category": 14598,
+            "priority_order": 35,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 470660,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1144,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 361918,
+            "price_list_category": 15064,
+            "priority_order": 52,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3181,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "package",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3181,
+    "packages": [
+      {
+        "id": 740628,
+        "unit_price": 8,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 470658,
+            "calculated_value": 11.6,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 8
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 470659,
+            "calculated_value": 11.6,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 8
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 470660,
+            "calculated_value": 11.6,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 8
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:40:40.575Z",
+  "rows": [
+    {
+      "productId": 975217,
+      "product": "Desert Trails Iris Rhizome",
+      "vendor": "RL Plants & Home Goods",
+      "packageId": 740628,
+      "package": "ea",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 8,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 11.2,
+      "localPriceAfter": 11.6,
+      "remoteBasePrice": 8,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 11.2,
+      "remotePriceAfter": 11.6
+    },
+    {
+      "productId": 975217,
+      "product": "Desert Trails Iris Rhizome",
+      "vendor": "RL Plants & Home Goods",
+      "packageId": 740628,
+      "package": "ea",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 8,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 11.2,
+      "localPriceAfter": 11.6,
+      "remoteBasePrice": 8,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 11.2,
+      "remotePriceAfter": 11.6
+    },
+    {
+      "productId": 975217,
+      "product": "Desert Trails Iris Rhizome",
+      "vendor": "RL Plants & Home Goods",
+      "packageId": 740628,
+      "package": "ea",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 8,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 11.2,
+      "localPriceAfter": 11.6,
+      "remoteBasePrice": 8,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 11.2,
+      "remotePriceAfter": 11.6
+    },
+    {
+      "productId": 975217,
+      "product": "Desert Trails Iris Rhizome",
+      "vendor": "RL Plants & Home Goods",
+      "packageId": 740628,
+      "package": "ea",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 8,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 11.2,
+      "localPriceAfter": 11.6,
+      "remoteBasePrice": 8,
+      "remoteAdjustmentType": null,
+      "remoteAdjustmentBefore": null,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": null,
+      "remotePriceAfter": null
+    }
+  ],
+  "warnings": [
+    "SNAP is not present for package ea; no listing created."
+  ],
+  "reviewedAt": "2026-10-08T19:48:40.994Z"
+}

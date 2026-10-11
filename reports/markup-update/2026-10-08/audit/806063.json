@@ -1,0 +1,504 @@
+{
+  "productId": 806063,
+  "context": {
+    "product": {
+      "id": 806063,
+      "name": "Brown Teff Flour",
+      "description": "<p>Milled from the whole grain, grown in the Willamette Valley by Camas Country Mill. Teff is a fine grain - about the size of a poppy seed. Teff grows predominantly in Ethiopia and Eritrea, and thrives even in difficult climates. As such, it comprises the staple grain of their cuisines. The grain has a very mild, nutty flavor, and it packs a serious nutritional punch. Teff has an excellent balance of amino acids, and it is also high in protein, calcium, and iron. Ground into flour, teff is used to make the traditional bread, injera: a flat, pancake-like, fermented bread that complements the exotic spices found in the regional food. It can also be ground into flour to make an excellent gluten-free flour alternative, and can be used to make pie crusts, cookies, breads, and an assortment of other baked goods. Teff can also be eaten whole and steamed, boiled, or baked as a side dish or a main course.</p>",
+      "visible": 1,
+      "trackInventory": 1,
+      "inventory": 4,
+      "categoryId": 20,
+      "vendorId": 3151,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/j4WqP.thumbnail.jpeg",
+      "createdAt": "2023-08-25T15:15:31.000Z",
+      "updatedAt": "2026-08-04T17:44:53.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Grains/Pasta/Nuts  🫘 🍝 🥣",
+    "vendor": {
+      "id": 3151,
+      "name": "Camas Country Mill",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 527127,
+        "productId": 806063,
+        "name": "3 lbs",
+        "price": "11.05",
+        "packageCode": null,
+        "unit": "ea",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 1,
+        "trackInventory": 0,
+        "inventory": null
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 527127,
+        "productId": 806063,
+        "localLinePackageId": 527127,
+        "liveName": "3 lbs",
+        "livePrice": "11.05",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":806063,\"Product\":\"Brown Teff Flour\",\"Track Inventory By\":\"package\",\"Item Unit\":\"ea\",\"Charge By\":\"package\",\"Charge Unit\":\"ea\",\"Package ID\":527127,\"Package Name\":\"3 lbs\",\"# of Items\":1,\"Package Price\":11.05,\"Inventory Type\":\"product\"},\"live\":{\"id\":527127,\"inventory_per_unit\":1,\"unit_price\":11.05,\"average_pack_weight\":null,\"package_price\":11.05,\"package_unit_price\":11.05,\"priority_order\":null,\"name\":\"3 lbs\",\"price_list_entries\":[{\"id\":220338,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":178256,\"subscription_setting\":{\"id\":121243,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":221707,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":179310,\"subscription_setting\":{\"id\":124176,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":617879,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479772,\"subscription_setting\":{\"id\":496995,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":245224,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":197569,\"subscription_setting\":{\"id\":153354,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":4,\"number_of_packages_available\":4,\"number_of_packages_total\":4,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":4,\"product_package_size\":1,\"product_id\":806063,\"product_name\":\"Brown Teff Flour\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"ea\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2023-08-25T11:15:31.239940-04:00\",\"updated\":\"2025-02-10T14:35:34.695360-05:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 806063,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 806063,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/806063/localline/6bc30de3f5bd9c72a8639a57.jpg"
+    ],
+    "localLineVendorId": 3151
+  },
+  "remote": {
+    "id": 806063,
+    "name": "Brown Teff Flour",
+    "description": "<p>Milled from the whole grain, grown in the Willamette Valley by Camas Country Mill. Teff is a fine grain - about the size of a poppy seed. Teff grows predominantly in Ethiopia and Eritrea, and thrives even in difficult climates. As such, it comprises the staple grain of their cuisines. The grain has a very mild, nutty flavor, and it packs a serious nutritional punch. Teff has an excellent balance of amino acids, and it is also high in protein, calcium, and iron. Ground into flour, teff is used to make the traditional bread, injera: a flat, pancake-like, fermented bread that complements the exotic spices found in the regional food. It can also be ground into flour to make an excellent gluten-free flour alternative, and can be used to make pie crusts, cookies, breads, and an assortment of other baked goods. Teff can also be eaten whole and steamed, boiled, or baked as a side dish or a main course.</p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2023-08-25T11:15:31.227087-04:00",
+    "updated": "2026-06-17T14:30:16.919707-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/j4WqP.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 141100,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/j4WqP.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/j4WqP.jpg",
+        "original_filename": "132.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 4,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "132",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 527127,
+        "inventory_per_unit": 1,
+        "unit_price": 11.05,
+        "average_pack_weight": null,
+        "package_price": 11.05,
+        "package_unit_price": 11.05,
+        "priority_order": null,
+        "name": "3 lbs",
+        "price_list_entries": [
+          {
+            "id": 220338,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 178256,
+            "subscription_setting": {
+              "id": 121243,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 221707,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179310,
+            "subscription_setting": {
+              "id": 124176,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617879,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479772,
+            "subscription_setting": {
+              "id": 496995,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 245224,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 197569,
+            "subscription_setting": {
+              "id": 153354,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 4,
+        "number_of_packages_available": 4,
+        "number_of_packages_total": 4,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 4,
+        "product_package_size": 1,
+        "product_id": 806063,
+        "product_name": "Brown Teff Flour",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T11:15:31.239940-04:00",
+        "updated": "2025-02-10T14:35:34.695360-05:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 178256,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 395,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440609,
+            "price_list_category": 31659,
+            "priority_order": 1,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179310,
+        "price_list_category": 17687,
+        "price_list": 2966,
+        "priority_order": 395,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 147520,
+            "price_list_category": 17687,
+            "priority_order": 1,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 197569,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 30,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440431,
+            "price_list_category": 31655,
+            "priority_order": 1,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479772,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 395,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 441052,
+            "price_list_category": 31666,
+            "priority_order": 1,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 3151,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 4,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 4
+  },
+  "payload": {
+    "vendor": 3151,
+    "packages": [
+      {
+        "id": 527127,
+        "unit_price": 11.05,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 197569,
+            "calculated_value": 16.02,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 11.05
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 178256,
+            "calculated_value": 16.02,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 11.05
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 179310,
+            "calculated_value": 16.02,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 11.05
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 479772,
+            "calculated_value": 16.02,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 11.05
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:39:27.779Z",
+  "rows": [
+    {
+      "productId": 806063,
+      "product": "Brown Teff Flour",
+      "vendor": "Camas Country Mill",
+      "packageId": 527127,
+      "package": "3 lbs",
+      "priceList": "Guest Basket",
+      "visible": true,
+      "basePrice": 11.05,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 15.47,
+      "localPriceAfter": 16.02,
+      "remoteBasePrice": 11.05,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 15.47,
+      "remotePriceAfter": 16.02
+    },
+    {
+      "productId": 806063,
+      "product": "Brown Teff Flour",
+      "vendor": "Camas Country Mill",
+      "packageId": 527127,
+      "package": "3 lbs",
+      "priceList": "CSA Members",
+      "visible": true,
+      "basePrice": 11.05,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 15.47,
+      "localPriceAfter": 16.02,
+      "remoteBasePrice": 11.05,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 15.47,
+      "remotePriceAfter": 16.02
+    },
+    {
+      "productId": 806063,
+      "product": "Brown Teff Flour",
+      "vendor": "Camas Country Mill",
+      "packageId": 527127,
+      "package": "3 lbs",
+      "priceList": "Herd Share Members",
+      "visible": true,
+      "basePrice": 11.05,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 15.47,
+      "localPriceAfter": 16.02,
+      "remoteBasePrice": 11.05,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 15.47,
+      "remotePriceAfter": 16.02
+    },
+    {
+      "productId": 806063,
+      "product": "Brown Teff Flour",
+      "vendor": "Camas Country Mill",
+      "packageId": 527127,
+      "package": "3 lbs",
+      "priceList": "SNAP",
+      "visible": true,
+      "basePrice": 11.05,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 15.47,
+      "localPriceAfter": 16.02,
+      "remoteBasePrice": 11.05,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 15.47,
+      "remotePriceAfter": 16.02
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.927Z"
+}

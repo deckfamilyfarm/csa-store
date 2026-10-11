@@ -1,0 +1,262 @@
+{
+  "verifiedAt": "2026-10-08T20:50:03.358Z",
+  "productId": 899379,
+  "priceConfirmed": true,
+  "otherFieldsUnchanged": true,
+  "remote": {
+    "id": 899379,
+    "name": "Honey Crisp Apple (WA)",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Honeycrisp apples are medium to large, round or oblate apples with a yellow-green background and a red-orange flush. Their skin can be mottled red, with shallow dimples and small dots, and sometimes russeting at the stem end. The flesh is white or ivory, crisp, and aromatic. Honeycrisp apples have a sweet-tart flavor that can be mild if harvested early or if the trees are heavily cropped. They are known for their exceptional juiciness and crunch, which some say is like biting into a ripe peach.</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Grown by: </span><a href=\"https://www.google.com/search?q=Joyfully+Grown+apples&amp;rlz=1CAVNCX_enUS1049US1049&amp;oq=where+is+joyfully+grown+&amp;gs_lcrp=EgZjaHJvbWUqCAgBEAAYFhgeMgYIABBFGDkyCAgBEAAYFhgeMg0IAhAAGIYDGIAEGIoFMg0IAxAAGIYDGIAEGIoFMg0IBBAAGIYDGIAEGIoFMgoIBRAAGKIEGIkFMgoIBhAAGIAEGKIEMgcIBxAAGO8FMgcICBAAGO8F0gEKMTA3MzBqMGoxNagCCLACAfEF-lV8BgjUFhrxBfpVfAYI1BYa&amp;sourceid=chrome&amp;ie=UTF-8&amp;mstk=AUtExfAeaGrh6zaQh68eMhQrFZ0G-3Xsqvb1_pDOWJl0y8Z82O2SEpsPpqvMeAzDa2jLbQDvmpTwTu8Tvi4d6rCbpqHYiB34S2TNwfhGPx0wjfYLC40HBnCXpQLKGmF-N03oJ7liVClH7KwgfUGXAVUlJiCGlIgtvUUNMOPNib5XUutA2pE&amp;csui=3&amp;ved=2ahUKEwiYvt3uvOGTAxX9weYEHbK7K-IQgK4QegQIARAB\" class=\"lexical-text-editor--link\"><span style=\"white-space: pre-wrap;\">Joyfully Grown apples</span></a><span style=\"white-space: pre-wrap;\">&nbsp;are certified organic, premium fruit grown in&nbsp;the&nbsp;</span><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">foothills of the Cascade Mountain range in North Central Washington State</strong></b><span style=\"white-space: pre-wrap;\">. Produced by&nbsp;</span><a href=\"https://chelanfresh.com/joyfully-grown-organic/\" target=\"_blank\" rel=\"noopener\" class=\"lexical-text-editor--link\"><span style=\"white-space: pre-wrap;\">Chelan Fresh</span></a><span style=\"white-space: pre-wrap;\">, these apples are handpicked on family farms that have been operating in Washington since 1894.</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2024-08-12T15:16:38.927952-04:00",
+    "updated": "2026-10-08T16:28:39.027137-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/TtoOU.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 224749,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/TtoOU.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/TtoOU.jpeg",
+        "original_filename": "honeycrisp.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 641205,
+        "inventory_per_unit": 1,
+        "unit_price": 1.75,
+        "average_pack_weight": 0,
+        "package_price": 1.75,
+        "package_unit_price": 1.75,
+        "priority_order": null,
+        "name": "ea",
+        "price_list_entries": [
+          {
+            "id": 420881,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 336569,
+            "subscription_setting": {
+              "id": 301168,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 420882,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 336570,
+            "subscription_setting": {
+              "id": 301169,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 420880,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 336568,
+            "subscription_setting": {
+              "id": 301167,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 618112,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 480004,
+            "subscription_setting": {
+              "id": 497228,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 899379,
+        "product_name": "Honey Crisp Apple (WA)",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2024-08-12T15:16:39.191475-04:00",
+        "updated": "2026-10-08T16:28:37.948472-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 336568,
+        "price_list_category": 14599,
+        "price_list": 2718,
+        "priority_order": 758,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 250940,
+            "price_list_category": 14599,
+            "priority_order": 795,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 336569,
+        "price_list_category": 15063,
+        "price_list": 2966,
+        "priority_order": 960,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 250941,
+            "price_list_category": 15063,
+            "priority_order": 1013,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 336570,
+        "price_list_category": 15748,
+        "price_list": 3124,
+        "priority_order": 579,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 250942,
+            "price_list_category": 15748,
+            "priority_order": 632,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 480004,
+        "price_list_category": 28911,
+        "price_list": 5622,
+        "priority_order": 960,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370477,
+            "price_list_category": 28911,
+            "priority_order": 1013,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3168,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  }
+}

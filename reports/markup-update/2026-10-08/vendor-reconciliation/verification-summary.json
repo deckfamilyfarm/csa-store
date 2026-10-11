@@ -1,0 +1,20 @@
+{
+  "verifiedAt": "2026-10-09T20:09:31.706Z",
+  "newLocal45": 62,
+  "remotePriceProducts": 125,
+  "remoteVendorOnlyProducts": 1,
+  "remoteVendorsFilled": 6,
+  "remoteHeld": 25,
+  "checks": {
+    "vendors": true,
+    "products": true,
+    "packages": true,
+    "productSales": true,
+    "excludedProfiles": true,
+    "classicPorkBrothPricing": true,
+    "local45": true
+  },
+  "auditId": 11,
+  "releaseId": 7,
+  "releaseStatus": "completed"
+}

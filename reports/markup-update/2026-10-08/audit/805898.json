@@ -1,0 +1,504 @@
+{
+  "productId": 805898,
+  "context": {
+    "product": {
+      "id": 805898,
+      "name": "Fennel",
+      "description": "Uncooked fennel has a mild licorice flavor and a crunchy texture. When cooked it becomes more delicate and the texture softens. Sautee, braise or bake! Use in soups and stews, or slice up raw and garnish your salads. About 1 pound.",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": 0,
+      "categoryId": 13,
+      "vendorId": 3152,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/rmn9y.thumbnail.jpeg",
+      "createdAt": "2023-08-25T14:39:57.000Z",
+      "updatedAt": "2026-10-06T10:40:24.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Vegetables - Roots🧅🧄🥕🥔",
+    "vendor": {
+      "id": 3152,
+      "name": "Little Wings",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 526956,
+        "productId": 805898,
+        "name": "each",
+        "price": "2.25",
+        "packageCode": null,
+        "unit": "ea",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 526956,
+        "productId": 805898,
+        "localLinePackageId": 526956,
+        "liveName": "each",
+        "livePrice": "2.25",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":805898,\"Product\":\"Fennel\",\"Track Inventory By\":\"package\",\"Item Unit\":\"ea\",\"Charge By\":\"package\",\"Charge Unit\":\"ea\",\"Package ID\":526956,\"Package Name\":\"each\",\"# of Items\":1,\"Package Price\":2.25,\"Inventory Type\":\"product\"},\"live\":{\"id\":526956,\"inventory_per_unit\":1,\"unit_price\":2.25,\"average_pack_weight\":null,\"package_price\":2.25,\"package_unit_price\":2.25,\"priority_order\":1,\"name\":\"each\",\"price_list_entries\":[{\"id\":238347,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":192019,\"subscription_setting\":{\"id\":146188,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":221559,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":179162,\"subscription_setting\":{\"id\":124320,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":617775,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479668,\"subscription_setting\":{\"id\":496891,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":207551,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":167722,\"subscription_setting\":{\"id\":106725,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":805898,\"product_name\":\"Fennel\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"ea\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2023-08-25T10:39:57.492827-04:00\",\"updated\":\"2026-09-07T18:37:38.471454-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 805898,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 805898,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/805898/localline/ffa435db33aae1c24980c460.jpg"
+    ],
+    "localLineVendorId": 3152
+  },
+  "remote": {
+    "id": 805898,
+    "name": "Fennel",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Uncooked fennel has a mild licorice flavor and a crunchy texture. When cooked it becomes more delicate and the texture softens. Sautee, braise or bake! Use in soups and stews, or slice up raw and garnish your salads.&nbsp;</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">About 1 pound.</span></p><p><br></p><p><br></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-08-25T10:39:57.480369-04:00",
+    "updated": "2026-10-05T11:31:23.211376-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/rmn9y.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 141480,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/rmn9y.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/rmn9y.jpg",
+        "original_filename": "846.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 526956,
+        "inventory_per_unit": 1,
+        "unit_price": 2.25,
+        "average_pack_weight": null,
+        "package_price": 2.25,
+        "package_unit_price": 2.25,
+        "priority_order": 1,
+        "name": "each",
+        "price_list_entries": [
+          {
+            "id": 238347,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 192019,
+            "subscription_setting": {
+              "id": 146188,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 221559,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179162,
+            "subscription_setting": {
+              "id": 124320,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617775,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479668,
+            "subscription_setting": {
+              "id": 496891,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 207551,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 167722,
+            "subscription_setting": {
+              "id": 106725,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 805898,
+        "product_name": "Fennel",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T10:39:57.492827-04:00",
+        "updated": "2026-09-07T18:37:38.471454-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 167722,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 217,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440522,
+            "price_list_category": 15105,
+            "priority_order": 267,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179162,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 269,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440796,
+            "price_list_category": 15118,
+            "priority_order": 307,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 192019,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 83,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440370,
+            "price_list_category": 15731,
+            "priority_order": 122,
+            "price_list_category_name": "Organic Vegetables - Roots 🧅🧄 🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479668,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 269,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 440971,
+            "price_list_category": 28905,
+            "priority_order": 312,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3152,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3152,
+    "packages": [
+      {
+        "id": 526956,
+        "unit_price": 2.25,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 192019,
+            "calculated_value": 3.26,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.25
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 167722,
+            "calculated_value": 3.26,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.25
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 179162,
+            "calculated_value": 3.26,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.25
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 479668,
+            "calculated_value": 3.26,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.25
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:38:49.015Z",
+  "rows": [
+    {
+      "productId": 805898,
+      "product": "Fennel",
+      "vendor": "Little Wings",
+      "packageId": 526956,
+      "package": "each",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 2.25,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.15,
+      "localPriceAfter": 3.26,
+      "remoteBasePrice": 2.25,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.15,
+      "remotePriceAfter": 3.26
+    },
+    {
+      "productId": 805898,
+      "product": "Fennel",
+      "vendor": "Little Wings",
+      "packageId": 526956,
+      "package": "each",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 2.25,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.15,
+      "localPriceAfter": 3.26,
+      "remoteBasePrice": 2.25,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.15,
+      "remotePriceAfter": 3.26
+    },
+    {
+      "productId": 805898,
+      "product": "Fennel",
+      "vendor": "Little Wings",
+      "packageId": 526956,
+      "package": "each",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 2.25,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.15,
+      "localPriceAfter": 3.26,
+      "remoteBasePrice": 2.25,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.15,
+      "remotePriceAfter": 3.26
+    },
+    {
+      "productId": 805898,
+      "product": "Fennel",
+      "vendor": "Little Wings",
+      "packageId": 526956,
+      "package": "each",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 2.25,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.15,
+      "localPriceAfter": 3.26,
+      "remoteBasePrice": 2.25,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.15,
+      "remotePriceAfter": 3.26
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.897Z"
+}

@@ -1,0 +1,261 @@
+{
+  "data": {
+    "id": 806094,
+    "name": "Organic Buckwheat Flour",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Use the flour of this protein-rich seed to soba noodles, waffles, or as a flour substitute. Naturally gluten-free!</span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2023-08-25T11:15:32.127499-04:00",
+    "updated": "2026-10-08T16:26:01.747841-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/vM8UE.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 141322,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/vM8UE.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/vM8UE.jpg",
+        "original_filename": "415.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 2,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "415",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 642172,
+        "inventory_per_unit": 1,
+        "unit_price": 9.2,
+        "average_pack_weight": 0,
+        "package_price": 9.2,
+        "package_unit_price": 9.2,
+        "priority_order": null,
+        "name": "3 lbs",
+        "price_list_entries": [
+          {
+            "id": 424810,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 339287,
+            "subscription_setting": {
+              "id": 305102,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 424812,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 339289,
+            "subscription_setting": {
+              "id": 305104,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 424811,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 339288,
+            "subscription_setting": {
+              "id": 305103,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 618120,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 480012,
+            "subscription_setting": {
+              "id": 497236,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 2,
+        "number_of_packages_available": 2,
+        "number_of_packages_total": 2,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 2,
+        "product_package_size": 1,
+        "product_id": 806094,
+        "product_name": "Organic Buckwheat Flour",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2024-08-15T14:44:28.400286-04:00",
+        "updated": "2026-10-08T16:26:01.025342-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 339287,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 588,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440664,
+            "price_list_category": 31659,
+            "priority_order": 481,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 339288,
+        "price_list_category": 17687,
+        "price_list": 2966,
+        "priority_order": 785,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 252976,
+            "price_list_category": 17687,
+            "priority_order": 479,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 339289,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 440,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440442,
+            "price_list_category": 31655,
+            "priority_order": 155,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 480012,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 785,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 441113,
+            "price_list_category": 31666,
+            "priority_order": 483,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 3151,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 2,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 2
+  },
+  "localProductId": 806094,
+  "remoteProductId": 806094,
+  "checkedAt": "2026-10-11T17:26:54.739Z"
+}

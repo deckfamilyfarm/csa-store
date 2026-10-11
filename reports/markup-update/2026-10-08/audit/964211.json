@@ -1,0 +1,504 @@
+{
+  "productId": 964211,
+  "context": {
+    "product": {
+      "id": 964211,
+      "name": "Flowering Chervil",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Chervil&nbsp;(</span><a href=\"https://www.google.com/search?sca_esv=0d63aef30b57140a&amp;rlz=1CAVNCX_enUS1049US1049&amp;cs=0&amp;sxsrf=AHTn8zp0eMr9EfYCytSZ2KeVqQjD6zdoPA%3A1745688423148&amp;q=Anthriscus+cerefolium&amp;sa=X&amp;ved=2ahUKEwj8o8mSnPaMAxWBGzQIHQ4oHSkQxccNegQIBBAB&amp;mstk=AUtExfB_a8wF_AvlPi_37vnUSv7ie5_PGmHbZmO7VDDbj4YeZfzSn5v29M5F5EA2kiZzi8nTv4pRoOq6fugWbogONSOf6bNne2Sq3N7Yd5pcSYX5m8QzSl_iYl4_0D76MTvIIk1uZz4flrWdlbuVWK9gmZsr0-grMWNmMoz0kfhW5OC6g8bOf0UCRagoDFfh7dtS9C6r3szhjn-OEx-Rxe67KLqYsMayYJ7xVPf-Y4eW7B0iIWRHA1tEFZYimKcVb9LMCCavrO4sO0wl4_3veKhM9YlDDMMWOvIgiZUf8Yj7sS6cNw&amp;csui=3\" target=\"_blank\" class=\"lexical-text-editor--link\"><span style=\"white-space: pre-wrap;\">Anthriscus cerefolium</span></a><span style=\"white-space: pre-wrap;\">)&nbsp;is a culinary herb known for its delicate, anise-flavored leaves, often compared to a milder version of parsley or tarragon.&nbsp;It's an annual or biennial herb, meaning it typically completes its life cycle in one or two years, respectively.&nbsp;Chervil is easy to grow, whether from seed or in containers.&nbsp;The plant produces&nbsp;small, white flowers in umbels (umbrella-like clusters) during midsummer, which attract pollinators.</span></p>",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": 0,
+      "categoryId": 25,
+      "vendorId": 3177,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/phY6Z.thumbnail.jpeg",
+      "createdAt": "2025-04-26T17:30:53.000Z",
+      "updatedAt": "2025-05-06T19:11:03.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Vegetables - Herbs 🌿",
+    "vendor": {
+      "id": 3177,
+      "name": "Red Tail Growers",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 725646,
+        "productId": 964211,
+        "name": "bu",
+        "price": "2.00",
+        "packageCode": null,
+        "unit": "bu",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 725646,
+        "productId": 964211,
+        "localLinePackageId": 725646,
+        "liveName": "bu",
+        "livePrice": "2.00",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":964211,\"Product\":\"Flowering Chervil\",\"Track Inventory By\":\"package\",\"Item Unit\":\"bu\",\"Charge By\":\"package\",\"Charge Unit\":\"bu\",\"Package ID\":725646,\"Package Name\":\"bu\",\"# of Items\":1,\"Package Price\":2,\"Inventory Type\":\"product\"},\"live\":{\"id\":725646,\"inventory_per_unit\":1,\"unit_price\":2,\"average_pack_weight\":0,\"package_price\":2,\"package_unit_price\":2,\"priority_order\":1,\"name\":\"bu\",\"price_list_entries\":[{\"id\":584543,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":454372,\"subscription_setting\":{\"id\":463575,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":584544,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":454373,\"subscription_setting\":{\"id\":463576,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":584545,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":454374,\"subscription_setting\":{\"id\":463577,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":618262,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":480152,\"subscription_setting\":{\"id\":497378,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":null,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":964211,\"product_name\":\"Flowering Chervil\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"bu\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2025-04-26T13:30:53.572085-04:00\",\"updated\":\"2025-04-26T13:30:53.651765-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 964211,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 964211,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/964211/localline/4633da7c3845d5f1425b50b1.jpg"
+    ],
+    "localLineVendorId": 3177
+  },
+  "remote": {
+    "id": 964211,
+    "name": "Flowering Chervil",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Chervil&nbsp;(</span><a href=\"https://www.google.com/search?sca_esv=0d63aef30b57140a&amp;rlz=1CAVNCX_enUS1049US1049&amp;cs=0&amp;sxsrf=AHTn8zp0eMr9EfYCytSZ2KeVqQjD6zdoPA%3A1745688423148&amp;q=Anthriscus+cerefolium&amp;sa=X&amp;ved=2ahUKEwj8o8mSnPaMAxWBGzQIHQ4oHSkQxccNegQIBBAB&amp;mstk=AUtExfB_a8wF_AvlPi_37vnUSv7ie5_PGmHbZmO7VDDbj4YeZfzSn5v29M5F5EA2kiZzi8nTv4pRoOq6fugWbogONSOf6bNne2Sq3N7Yd5pcSYX5m8QzSl_iYl4_0D76MTvIIk1uZz4flrWdlbuVWK9gmZsr0-grMWNmMoz0kfhW5OC6g8bOf0UCRagoDFfh7dtS9C6r3szhjn-OEx-Rxe67KLqYsMayYJ7xVPf-Y4eW7B0iIWRHA1tEFZYimKcVb9LMCCavrO4sO0wl4_3veKhM9YlDDMMWOvIgiZUf8Yj7sS6cNw&amp;csui=3\" target=\"_blank\" class=\"lexical-text-editor--link\"><span style=\"white-space: pre-wrap;\">Anthriscus cerefolium</span></a><span style=\"white-space: pre-wrap;\">)&nbsp;is a culinary herb known for its delicate, anise-flavored leaves, often compared to a milder version of parsley or tarragon.&nbsp;It's an annual or biennial herb, meaning it typically completes its life cycle in one or two years, respectively.&nbsp;Chervil is easy to grow, whether from seed or in containers.&nbsp;The plant produces&nbsp;small, white flowers in umbels (umbrella-like clusters) during midsummer, which attract pollinators.</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2025-04-26T13:30:53.311585-04:00",
+    "updated": "2025-05-06T15:11:03.778806-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/phY6Z.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 292948,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/phY6Z.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/phY6Z.jpeg",
+        "original_filename": "download (1).jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 725646,
+        "inventory_per_unit": 1,
+        "unit_price": 2,
+        "average_pack_weight": 0,
+        "package_price": 2,
+        "package_unit_price": 2,
+        "priority_order": 1,
+        "name": "bu",
+        "price_list_entries": [
+          {
+            "id": 584543,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 454372,
+            "subscription_setting": {
+              "id": 463575,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 584544,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 454373,
+            "subscription_setting": {
+              "id": 463576,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 584545,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 454374,
+            "subscription_setting": {
+              "id": 463577,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 618262,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 480152,
+            "subscription_setting": {
+              "id": 497378,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": null,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 964211,
+        "product_name": "Flowering Chervil",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bu",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-04-26T13:30:53.572085-04:00",
+        "updated": "2025-04-26T13:30:53.651765-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 454372,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 756,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 346315,
+            "price_list_category": 15736,
+            "priority_order": 11,
+            "price_list_category_name": "Organic Vegetables - Herbs 🌿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 454373,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 927,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 346316,
+            "price_list_category": 15109,
+            "priority_order": 10,
+            "price_list_category_name": "Organic Vegetables - Herbs🌿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 454374,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1135,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 346317,
+            "price_list_category": 15124,
+            "priority_order": 9,
+            "price_list_category_name": "Organic Vegetables - Herbs🌿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 480152,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1135,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370201,
+            "price_list_category": 28897,
+            "priority_order": 10,
+            "price_list_category_name": "Organic Vegetables - Herbs🌿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3177,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3177,
+    "packages": [
+      {
+        "id": 725646,
+        "unit_price": 2,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 454372,
+            "calculated_value": 2.9,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 454373,
+            "calculated_value": 2.9,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 454374,
+            "calculated_value": 2.9,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 480152,
+            "calculated_value": 2.9,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:40:36.677Z",
+  "rows": [
+    {
+      "productId": 964211,
+      "product": "Flowering Chervil",
+      "vendor": "Red Tail Growers",
+      "packageId": 725646,
+      "package": "bu",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 2,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.8,
+      "localPriceAfter": 2.9,
+      "remoteBasePrice": 2,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.8,
+      "remotePriceAfter": 2.9
+    },
+    {
+      "productId": 964211,
+      "product": "Flowering Chervil",
+      "vendor": "Red Tail Growers",
+      "packageId": 725646,
+      "package": "bu",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 2,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.8,
+      "localPriceAfter": 2.9,
+      "remoteBasePrice": 2,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.8,
+      "remotePriceAfter": 2.9
+    },
+    {
+      "productId": 964211,
+      "product": "Flowering Chervil",
+      "vendor": "Red Tail Growers",
+      "packageId": 725646,
+      "package": "bu",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 2,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.8,
+      "localPriceAfter": 2.9,
+      "remoteBasePrice": 2,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.8,
+      "remotePriceAfter": 2.9
+    },
+    {
+      "productId": 964211,
+      "product": "Flowering Chervil",
+      "vendor": "Red Tail Growers",
+      "packageId": 725646,
+      "package": "bu",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 2,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.8,
+      "localPriceAfter": 2.9,
+      "remoteBasePrice": 2,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.8,
+      "remotePriceAfter": 2.9
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.991Z"
+}

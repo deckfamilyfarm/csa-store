@@ -1,0 +1,256 @@
+﻿"Priority","Product ID","Product","Local vendor","Issue","Local Line product ID","Box editor ID","Visible locally","Visible in Local Line","Current local","Current Local Line","Suggested fix","Decision","Notes"
+"1 — Visible in Local Line","1160556","Ground Beef & Pork Bundle","Full Farm CSA","Bundle pricing","1160556","2260","Yes","Yes","1005875 / Guest Basket: $38.76; markup 45%; sale off
+1005875 / Herd Share Members: $38.76; markup 45%; sale off
+1005875 / SNAP: $38.76; markup 45%; sale off","1005875 / Guest Basket: $41.43; 55% effective adjustment; sale off
+1005875 / Herd Share Members: $41.43; 55% effective adjustment; sale off
+1005875 / SNAP: $41.43; 55% effective adjustment; sale off","Use Local Line’s box editor (box #2260) to set the listed adjustments to 45%, or add reviewed box support to the sync integration. Preserve box contents, inventory and existing customer-list membership.","",""
+"1 — Visible in Local Line","805889","Dill","Little Wings","Vendor assignment","805889","","Yes","Yes","Little Wings","Red Tail Growers","Use Local Line’s vendor: Red Tail Growers. Update the local assignment first, then re-audit pricing.","",""
+"3 — Hidden / cleanup","806125","Organic Spelt Flour","Camas Country Mill","Missing / unavailable Local Line product","806125","","No","No","Local product exists; saved link #806125","Product #806125 returned 404; absent from live export","Review Organic Spelt Flour #1162016 (already linked locally). Retire the stale local record if this is its replacement; do not create a duplicate or reuse another product’s link blindly.","",""
+"3 — Hidden / cleanup","1017951","Breakfast Bundle","Full Farm CSA","Bundle pricing","1017951","1173","No","No","803362 / Guest Basket: $70.08; markup 45%; sale off
+803362 / CSA Members: $70.08; markup 45%; sale off
+803362 / Herd Share Members: $70.08; markup 45%; sale off
+803362 / SNAP: $70.08; markup 45%; sale off","803362 / Guest Basket: $74.91; 55% effective adjustment; sale off
+803362 / CSA Members: $74.91; 55% effective adjustment; sale off
+803362 / Herd Share Members: $74.91; 55% effective adjustment; sale off
+803362 / SNAP: $74.91; 55% effective adjustment; sale off","Use Local Line’s box editor (box #1173) to set the listed adjustments to 45%, or add reviewed box support to the sync integration. Preserve box contents, inventory and existing customer-list membership.","",""
+"3 — Hidden / cleanup","1105400","Dinner in a Box: Ground Lamb Bundle","Full Farm CSA","Bundle pricing","1105400","1762","No","No","923210 / Guest Basket: $65.22; markup 45%; sale off
+923210 / Herd Share Members: $65.22; markup 45%; sale off
+923210 / SNAP: $65.22; markup 45%; sale off","923210 / Guest Basket: $64.77; 44% effective adjustment; sale off
+923210 / Herd Share Members: $64.77; 44% effective adjustment; sale off
+923210 / SNAP: $64.77; 44% effective adjustment; sale off","Use Local Line’s box editor (box #1762) to set the listed adjustments to 45%, or add reviewed box support to the sync integration. Preserve box contents, inventory and existing customer-list membership.","",""
+"3 — Hidden / cleanup","1109581","Dinner in a Box: Ground Lamb Bundle No Yogurt","Full Farm CSA","Bundle pricing","1109581","1799","No","No","929120 / Guest Basket: $52.17; markup 45%; sale off
+929120 / Herd Share Members: $52.17; markup 45%; sale off
+929120 / SNAP: $52.17; markup 45%; sale off","929120 / Guest Basket: $51.81; 44% effective adjustment; sale off
+929120 / Herd Share Members: $51.81; 44% effective adjustment; sale off
+929120 / SNAP: $51.81; 44% effective adjustment; sale off","Use Local Line’s box editor (box #1799) to set the listed adjustments to 45%, or add reviewed box support to the sync integration. Preserve box contents, inventory and existing customer-list membership.","",""
+"3 — Hidden / cleanup","1119806","Dinner in a Box: Pork Shoulder Roast","Full Farm CSA","Bundle pricing","1119806","1875","No","No","947639 / Guest Basket: $101.64; markup 45%; sale off
+947639 / Herd Share Members: $101.64; markup 45%; sale off
+947639 / SNAP: $101.64; markup 45%; sale off","947639 / Guest Basket: $100.94; 44% effective adjustment; sale off
+947639 / Herd Share Members: $100.94; 44% effective adjustment; sale off
+947639 / SNAP: $100.94; 44% effective adjustment; sale off","Use Local Line’s box editor (box #1875) to set the listed adjustments to 45%, or add reviewed box support to the sync integration. Preserve box contents, inventory and existing customer-list membership.","",""
+"3 — Hidden / cleanup","1120974","Dinner in a Box: Pork Shoulder Roast-No Dairy","Full Farm CSA","Bundle pricing","1120974","1890","No","No","949066 / Guest Basket: $87.14; markup 45%; sale off
+949066 / Herd Share Members: $87.14; markup 45%; sale off
+949066 / SNAP: $87.14; markup 45%; sale off","949066 / Guest Basket: $86.54; 44% effective adjustment; sale off
+949066 / Herd Share Members: $86.54; 44% effective adjustment; sale off
+949066 / SNAP: $86.54; 44% effective adjustment; sale off","Use Local Line’s box editor (box #1890) to set the listed adjustments to 45%, or add reviewed box support to the sync integration. Preserve box contents, inventory and existing customer-list membership.","",""
+"3 — Hidden / cleanup","1133712","Dinner in a Box: Roasting Chicken","Full Farm CSA","Bundle pricing","1133712","2032","No","No","969091 / Guest Basket: $94.47; markup 45%; sale off
+969091 / Herd Share Members: $94.47; markup 45%; sale off
+969091 / SNAP: $94.47; markup 45%; sale off","969091 / Guest Basket: $93.82; 44% effective adjustment; sale off
+969091 / Herd Share Members: $93.82; 44% effective adjustment; sale off
+969091 / SNAP: $93.82; 44% effective adjustment; sale off","Use Local Line’s box editor (box #2032) to set the listed adjustments to 45%, or add reviewed box support to the sync integration. Preserve box contents, inventory and existing customer-list membership.","",""
+"3 — Hidden / cleanup","1133714","Dinner in a Box: Roasting Chicken - No Dairy","Full Farm CSA","Bundle pricing","1133714","2033","No","No","969093 / Guest Basket: $79.97; markup 45%; sale off
+969093 / Herd Share Members: $79.97; markup 45%; sale off
+969093 / SNAP: $79.97; markup 45%; sale off","969093 / Guest Basket: $79.42; 44% effective adjustment; sale off
+969093 / Herd Share Members: $79.42; 44% effective adjustment; sale off
+969093 / SNAP: $79.42; 44% effective adjustment; sale off","Use Local Line’s box editor (box #2033) to set the listed adjustments to 45%, or add reviewed box support to the sync integration. Preserve box contents, inventory and existing customer-list membership.","",""
+"3 — Hidden / cleanup","1023667","Ground Meat Bundle","Full Farm CSA","Bundle pricing","1023667","1244","No","No","811597 / Guest Basket: $47.99; markup 45%; sale off
+811597 / CSA Members: $47.99; markup 45%; sale off
+811597 / Herd Share Members: $47.99; markup 45%; sale off
+811597 / SNAP: $47.99; markup 45%; sale off","811597 / Guest Basket: $51.31; 55% effective adjustment; sale off
+811597 / CSA Members: $51.31; 55% effective adjustment; sale off
+811597 / Herd Share Members: $51.31; 55% effective adjustment; sale off
+811597 / SNAP: $51.31; 55% effective adjustment; sale off","Use Local Line’s box editor (box #1244) to set the listed adjustments to 45%, or add reviewed box support to the sync integration. Preserve box contents, inventory and existing customer-list membership.","",""
+"3 — Hidden / cleanup","1071880","Winter Carrots","Full Farm CSA","Missing / unavailable Local Line product","1071880","","No","No","Local product exists; saved link #1071880","Product #1071880 returned 404; absent from live export","Review Winter Carrots #929322 (already linked locally). Retire the stale local record if this is its replacement; do not create a duplicate or reuse another product’s link blindly.","",""
+"3 — Hidden / cleanup","1127318","Travel Size Lotion Stick w/ Honeysuckle Essential Oil","Granny Smith All Natural","Missing / unavailable Local Line product","1127318","","No","No","Local product exists; saved link #1127318","Product #1127318 returned 404; absent from live export","Review Travel Size Lotion Stick w/ Honeysuckle Essential Oil #1148268 (already linked locally). Retire the stale local record if this is its replacement; do not create a duplicate or reuse another product’s link blindly.","",""
+"3 — Hidden / cleanup","978368","Grazier's Salad Mix","Grazier's Garden","Sale and pricing review","978368","","No","No","1/2 lb / Guest Basket: $5.80; markup 45%; sale off
+1/2 lb / CSA Members: $5.80; markup 45%; sale off
+1/2 lb / Herd Share Members: $5.80; markup 45%; sale off
+1/2 lb / SNAP: $5.80; markup 45%; sale off","1/2 lb / Guest Basket: $5.60; 40% effective adjustment; sale off
+1/2 lb / CSA Members: $5.60; 40% effective adjustment; sale off
+1/2 lb / Herd Share Members: $5.60; 40% effective adjustment; sale on
+1/2 lb / SNAP: $5.60; 40% effective adjustment; sale off","Review the local base price and markup, then publish only the approved pricing to Local Line and confirm the readback.
+Decide whether to keep or end the Local Line sale before publishing. If keeping it, review each customer list and make the intended sale settings consistent locally; the local sale model is product-wide. If ending it, approve the local regular price.","",""
+"3 — Hidden / cleanup","1000029","Heirloom Tomatoes","Grazier's Garden","Sale and pricing review","1000029","","No","No","pound / Guest Basket: $4.71; markup 45%; sale off
+pound / CSA Members: $4.71; markup 45%; sale off
+pound / Herd Share Members: $4.71; markup 45%; sale off
+pound / SNAP: $4.71; markup 45%; sale off","pound / Guest Basket: $4.55; 40% effective adjustment; sale on
+pound / CSA Members: $4.55; 40% effective adjustment; sale on
+pound / Herd Share Members: $4.55; 40% effective adjustment; sale on
+pound / SNAP: $4.55; 40% effective adjustment; sale on","Decide whether to keep or end the Local Line sale before publishing. If keeping it, review each customer list and make the intended sale settings consistent locally; the local sale model is product-wide. If ending it, approve the local regular price.","",""
+"3 — Hidden / cleanup","805855","Paste Tomatoes","Grazier's Garden","Sale and pricing review","805855","","No","No","1 lb / Guest Basket: $3.63; markup 45%; sale off
+1 lb / CSA Members: $3.63; markup 45%; sale off
+1 lb / Herd Share Members: $3.63; markup 45%; sale off
+1 lb / SNAP: $3.63; markup 45%; sale off","1 lb / Guest Basket: $3.50; 40% effective adjustment; sale on
+1 lb / CSA Members: $3.50; 40% effective adjustment; sale on
+1 lb / Herd Share Members: $3.50; 40% effective adjustment; sale on
+1 lb / SNAP: $3.50; 40% effective adjustment; sale on","Decide whether to keep or end the Local Line sale before publishing. If keeping it, review each customer list and make the intended sale settings consistent locally; the local sale model is product-wide. If ending it, approve the local regular price.","",""
+"3 — Hidden / cleanup","805986","Red Slicer Tomatoes","Grazier's Garden","Sale and pricing review","805986","","No","No","1 lb / Guest Basket: $3.19; markup 45%; sale off
+1 lb / CSA Members: $3.19; markup 45%; sale off
+1 lb / Herd Share Members: $3.19; markup 45%; sale off
+1 lb / SNAP: $3.19; markup 45%; sale off","1 lb / Guest Basket: $3.08; 40% effective adjustment; sale on
+1 lb / CSA Members: $3.08; 40% effective adjustment; sale on
+1 lb / Herd Share Members: $3.08; 40% effective adjustment; sale on
+1 lb / SNAP: $3.08; 40% effective adjustment; sale on","Decide whether to keep or end the Local Line sale before publishing. If keeping it, review each customer list and make the intended sale settings consistent locally; the local sale model is product-wide. If ending it, approve the local regular price.","",""
+"3 — Hidden / cleanup","805850","Asparagus","Organically Grown Company","Missing / unavailable Local Line product","805850","","No","No","Local product exists; no saved Local Line link","Product #805850 returned 404; absent from live export","Confirm whether this item is retired. Archive the local record if retired; otherwise locate or restore the intended Local Line product and save its verified link before pricing.","",""
+"3 — Hidden / cleanup","1028363","Black Garlic","Organically Grown Company","Missing / unavailable Local Line product","1028363","","No","No","Local product exists; no saved Local Line link","Product #1028363 returned 404; absent from live export","Confirm whether this item is retired. Archive the local record if retired; otherwise locate or restore the intended Local Line product and save its verified link before pricing.","",""
+"3 — Hidden / cleanup","927371","Pink Lady Apple","Organically Grown Company","Missing / unavailable Local Line product","927371","","No","No","Local product exists; no saved Local Line link","Product #927371 returned 404; absent from live export","Confirm whether this item is retired. Archive the local record if retired; otherwise locate or restore the intended Local Line product and save its verified link before pricing.","",""
+"3 — Hidden / cleanup","806124","Brazil Cerrado Miniero - Dark Roast Coffee Beans","Radiant Coffee Roasters","Missing / unavailable Local Line product","806124","","No","No","Local product exists; saved link #806124","Product #806124 returned 404; absent from live export","Confirm whether this item is retired. Archive the local record if retired; otherwise locate or restore the intended Local Line product and save its verified link before pricing.","",""
+"3 — Hidden / cleanup","919071","Brazil Cerrado Miniero - Dark Roast Ground Coffee","Radiant Coffee Roasters","Missing / unavailable Local Line product","919071","","No","No","Local product exists; saved link #919071","Product #919071 returned 404; absent from live export","Confirm whether this item is retired. Archive the local record if retired; otherwise locate or restore the intended Local Line product and save its verified link before pricing.","",""
+"3 — Hidden / cleanup","805771","Cathay Bell Watermelon","Unassigned","Unassigned vendor and pricing","805771","","No","No","ea. / Guest Basket: $9.83; markup 55.00000000000001%; sale off (unassigned-vendor fallback)
+ea. / CSA Members: $8.88; markup 40%; sale off (unassigned-vendor fallback)
+ea. / Herd Share Members: $8.88; markup 40%; sale off (unassigned-vendor fallback)
+ea. / SNAP: $8.88; markup 40%; sale off (unassigned-vendor fallback)","ea. / Guest Basket: $8.88; 40% effective adjustment; sale off
+ea. / CSA Members: $8.50; 34% effective adjustment; sale off
+ea. / Herd Share Members: $8.50; 34% effective adjustment; sale off
+ea. / SNAP: $8.50; 34% effective adjustment; sale off","Choose the correct vendor in Local Line and assign it locally before reviewing pricing. These local values are fallback calculations, not approved rates to publish. If this hidden item is retired, archive it locally instead.","",""
+"3 — Hidden / cleanup","805881","Cayenne Pepper","Unassigned","Unassigned vendor and pricing","805881","","No","No","each / Guest Basket: $1.55; markup 55.00000000000001%; sale off (unassigned-vendor fallback)
+each / CSA Members: $1.40; markup 40%; sale off (unassigned-vendor fallback)
+each / Herd Share Members: $1.40; markup 40%; sale off (unassigned-vendor fallback)
+each / SNAP: $1.40; markup 40%; sale off (unassigned-vendor fallback)","each / Guest Basket: $1.40; 40% effective adjustment; sale off
+each / CSA Members: $1.33; 33% effective adjustment; sale off
+each / Herd Share Members: $1.33; 33% effective adjustment; sale off
+each / SNAP: $1.33; 33% effective adjustment; sale off","Choose the correct vendor in Local Line and assign it locally before reviewing pricing. These local values are fallback calculations, not approved rates to publish. If this hidden item is retired, archive it locally instead.","",""
+"3 — Hidden / cleanup","825306","Chanterelle mushrooms","Unassigned","Unassigned vendor and pricing","825306","","No","No","1/2 lb / Guest Basket: $13.18; markup 55.00000000000001%; sale off (unassigned-vendor fallback)
+1/2 lb / CSA Members: $11.90; markup 40%; sale off (unassigned-vendor fallback)
+1/2 lb / Herd Share Members: $11.90; markup 40%; sale off (unassigned-vendor fallback)
+1/2 lb / SNAP: $11.90; markup 40%; sale off (unassigned-vendor fallback)","1/2 lb / Guest Basket: $11.90; 40% effective adjustment; sale off
+1/2 lb / CSA Members: $11.30; 33% effective adjustment; sale off
+1/2 lb / Herd Share Members: $11.30; 33% effective adjustment; sale off
+1/2 lb / SNAP: $11.30; 33% effective adjustment; sale off","Choose the correct vendor in Local Line and assign it locally before reviewing pricing. These local values are fallback calculations, not approved rates to publish. If this hidden item is retired, archive it locally instead.","",""
+"3 — Hidden / cleanup","805885","Crisphead Lettuce","Unassigned","Unassigned vendor and pricing","805885","","No","No","each / CSA Members: $4.90; markup 40%; sale off (unassigned-vendor fallback)
+each / Herd Share Members: $4.90; markup 40%; sale off (unassigned-vendor fallback)
+each / SNAP: $4.90; markup 40%; sale off (unassigned-vendor fallback)","each / CSA Members: $3.00; Fixed $3.00; sale off
+each / Herd Share Members: $3.00; Fixed $3.00; sale off
+each / SNAP: $3.00; Fixed $3.00; sale off","Choose the correct vendor in Local Line and assign it locally before reviewing pricing. These local values are fallback calculations, not approved rates to publish. If this hidden item is retired, archive it locally instead.","",""
+"3 — Hidden / cleanup","805785","d'Anjou Pear","Unassigned","Unassigned vendor and pricing","805785","","No","No","each / Guest Basket: $2.33; markup 55.00000000000001%; sale off (unassigned-vendor fallback)
+each / CSA Members: $2.10; markup 40%; sale off (unassigned-vendor fallback)
+each / Herd Share Members: $2.10; markup 40%; sale off (unassigned-vendor fallback)
+each / SNAP: $2.10; markup 40%; sale off (unassigned-vendor fallback)","each / Guest Basket: $2.10; 40% effective adjustment; sale off
+each / CSA Members: $1.25; Fixed $1.25; sale off
+each / Herd Share Members: $1.25; Fixed $1.25; sale off
+each / SNAP: $1.25; Fixed $1.25; sale off","Choose the correct vendor in Local Line and assign it locally before reviewing pricing. These local values are fallback calculations, not approved rates to publish. If this hidden item is retired, archive it locally instead.","",""
+"3 — Hidden / cleanup","805797","Flat, Strawberries","Unassigned","Unassigned vendor and pricing","805797","","No","No","each / CSA Members: $81.55; markup 40%; sale off (unassigned-vendor fallback)
+each / Herd Share Members: $81.55; markup 40%; sale off (unassigned-vendor fallback)
+each / SNAP: $81.55; markup 40%; sale off (unassigned-vendor fallback)","each / CSA Members: $48.50; Fixed $48.50; sale off
+each / Herd Share Members: $48.50; Fixed $48.50; sale off
+each / SNAP: $48.50; Fixed $48.50; sale off","Choose the correct vendor in Local Line and assign it locally before reviewing pricing. These local values are fallback calculations, not approved rates to publish. If this hidden item is retired, archive it locally instead.","",""
+"3 — Hidden / cleanup","805770","Fuzzy Kiwis","Unassigned","Unassigned vendor and pricing","805770","","No","No","each / CSA Members: $2.45; markup 40%; sale off (unassigned-vendor fallback)
+each / Herd Share Members: $2.45; markup 40%; sale off (unassigned-vendor fallback)
+each / SNAP: $2.45; markup 40%; sale off (unassigned-vendor fallback)","each / CSA Members: $1.50; Fixed $1.50; sale off
+each / Herd Share Members: $1.50; Fixed $1.50; sale off
+each / SNAP: $1.50; Fixed $1.50; sale off","Choose the correct vendor in Local Line and assign it locally before reviewing pricing. These local values are fallback calculations, not approved rates to publish. If this hidden item is retired, archive it locally instead.","",""
+"3 — Hidden / cleanup","1168459","Garlic Dill Pickles","Unassigned","Vendor assignment","1168459","","No","No","Unassigned
+32 oz jar / Guest Basket: $18.52; markup 55.00000000000001%; sale off (unassigned-vendor fallback)
+32 oz jar / Herd Share Members: $16.73; markup 40%; sale off (unassigned-vendor fallback)
+32 oz jar / SNAP: $16.73; markup 40%; sale off (unassigned-vendor fallback)","Kurzhal Family Kickin Pickles
+32 oz jar / Guest Basket: $17.33; 45% effective adjustment; sale off
+32 oz jar / Herd Share Members: $17.33; 45% effective adjustment; sale off
+32 oz jar / SNAP: $17.33; 45% effective adjustment; sale off","Use Local Line’s vendor: Kurzhal Family Kickin Pickles. Update the local assignment first, then re-audit pricing.
+Assign Kurzhal Family Kickin Pickles locally first. The listed remote prices already use 45%; review a local product markup override of 45% to match them. Do not publish the current unassigned-vendor fallback rates.","",""
+"3 — Hidden / cleanup","1168461","Garlic Dilly Beans","Unassigned","Vendor assignment","1168461","","No","No","Unassigned
+24 oz jar / Guest Basket: $20.07; markup 55.00000000000001%; sale off (unassigned-vendor fallback)
+24 oz jar / Herd Share Members: $18.13; markup 40%; sale off (unassigned-vendor fallback)
+24 oz jar / SNAP: $18.13; markup 40%; sale off (unassigned-vendor fallback)","Kurzhal Family Kickin Pickles
+24 oz jar / Guest Basket: $18.78; 45% effective adjustment; sale off
+24 oz jar / Herd Share Members: $18.78; 45% effective adjustment; sale off
+24 oz jar / SNAP: $18.78; 45% effective adjustment; sale off","Use Local Line’s vendor: Kurzhal Family Kickin Pickles. Update the local assignment first, then re-audit pricing.
+Assign Kurzhal Family Kickin Pickles locally first. The listed remote prices already use 45%; review a local product markup override of 45% to match them. Do not publish the current unassigned-vendor fallback rates.","",""
+"3 — Hidden / cleanup","1168463","Ghost Pepper Black Bean and Corn Salsa","Unassigned","Vendor assignment","1168463","","No","No","Unassigned
+16 oz jar / Guest Basket: $12.32; markup 55.00000000000001%; sale off (unassigned-vendor fallback)
+16 oz jar / Herd Share Members: $11.13; markup 40%; sale off (unassigned-vendor fallback)
+16 oz jar / SNAP: $11.13; markup 40%; sale off (unassigned-vendor fallback)","Kurzhal Family Kickin Pickles
+16 oz jar / Guest Basket: $11.53; 45% effective adjustment; sale off
+16 oz jar / Herd Share Members: $11.53; 45% effective adjustment; sale off
+16 oz jar / SNAP: $11.53; 45% effective adjustment; sale off","Use Local Line’s vendor: Kurzhal Family Kickin Pickles. Update the local assignment first, then re-audit pricing.
+Assign Kurzhal Family Kickin Pickles locally first. The listed remote prices already use 45%; review a local product markup override of 45% to match them. Do not publish the current unassigned-vendor fallback rates.","",""
+"3 — Hidden / cleanup","812652","Green and Red Mixed Grapes","Unassigned","Unassigned vendor and pricing","812652","","No","No","pt / Guest Basket: $4.65; markup 55.00000000000001%; sale off (unassigned-vendor fallback)
+pt / CSA Members: $4.20; markup 40%; sale off (unassigned-vendor fallback)
+pt / Herd Share Members: $4.20; markup 40%; sale off (unassigned-vendor fallback)
+pt / SNAP: $4.20; markup 40%; sale off (unassigned-vendor fallback)","pt / Guest Basket: $4.20; 40% effective adjustment; sale off
+pt / CSA Members: $4.00; 33.5% effective adjustment; sale off
+pt / Herd Share Members: $4.00; 33.5% effective adjustment; sale off
+pt / SNAP: $4.00; 33.5% effective adjustment; sale off","Choose the correct vendor in Local Line and assign it locally before reviewing pricing. These local values are fallback calculations, not approved rates to publish. If this hidden item is retired, archive it locally instead.","",""
+"3 — Hidden / cleanup","805788","Green Grapes","Unassigned","Unassigned vendor and pricing","805788","","No","No","each / CSA Members: $5.95; markup 40%; sale off (unassigned-vendor fallback)
+each / Herd Share Members: $5.95; markup 40%; sale off (unassigned-vendor fallback)
+each / SNAP: $5.95; markup 40%; sale off (unassigned-vendor fallback)","each / CSA Members: $3.50; Fixed $3.50; sale off
+each / Herd Share Members: $3.50; Fixed $3.50; sale off
+each / SNAP: $3.50; Fixed $3.50; sale off","Choose the correct vendor in Local Line and assign it locally before reviewing pricing. These local values are fallback calculations, not approved rates to publish. If this hidden item is retired, archive it locally instead.","",""
+"3 — Hidden / cleanup","805964","Green Pole Beans","Unassigned","Unassigned vendor and pricing","805964","","No","No","1 lb / Guest Basket: $6.98; markup 55.00000000000001%; sale off (unassigned-vendor fallback)
+1 lb / CSA Members: $6.30; markup 40%; sale off (unassigned-vendor fallback)
+1 lb / Herd Share Members: $6.30; markup 40%; sale off (unassigned-vendor fallback)
+1 lb / SNAP: $6.30; markup 40%; sale off (unassigned-vendor fallback)","1 lb / Guest Basket: $6.30; 40% effective adjustment; sale off
+1 lb / CSA Members: $6.08; 35% effective adjustment; sale off
+1 lb / Herd Share Members: $6.08; 35% effective adjustment; sale off
+1 lb / SNAP: $6.08; 35% effective adjustment; sale off","Choose the correct vendor in Local Line and assign it locally before reviewing pricing. These local values are fallback calculations, not approved rates to publish. If this hidden item is retired, archive it locally instead.","",""
+"3 — Hidden / cleanup","805921","Green Romaine Lettuce","Unassigned","Unassigned vendor and pricing","805921","","No","No","each / Guest Basket: $2.71; markup 55.00000000000001%; sale off (unassigned-vendor fallback)
+each / CSA Members: $2.45; markup 40%; sale off (unassigned-vendor fallback)
+each / Herd Share Members: $2.45; markup 40%; sale off (unassigned-vendor fallback)
+each / SNAP: $2.45; markup 40%; sale off (unassigned-vendor fallback)","each / Guest Basket: $2.45; 40% effective adjustment; sale off
+each / CSA Members: $2.50; Fixed $2.50; sale off
+each / Herd Share Members: $2.50; Fixed $2.50; sale off
+each / SNAP: $2.50; Fixed $2.50; sale off","Choose the correct vendor in Local Line and assign it locally before reviewing pricing. These local values are fallback calculations, not approved rates to publish. If this hidden item is retired, archive it locally instead.","",""
+"3 — Hidden / cleanup","805735","Handcrafted  Wooden Bowls Large 20 Oz","Unassigned","Missing / unavailable Local Line product","805735","","No","No","Local product exists; saved link #805735","Product #805735 returned 404; absent from live export","Confirm whether this item is retired. Archive the local record if retired; otherwise locate or restore the intended Local Line product and save its verified link before pricing.","",""
+"3 — Hidden / cleanup","805733","Handcrafted Egg Pushers","Unassigned","Missing / unavailable Local Line product","805733","","No","No","Local product exists; saved link #805733","Product #805733 returned 404; absent from live export","Confirm whether this item is retired. Archive the local record if retired; otherwise locate or restore the intended Local Line product and save its verified link before pricing.","",""
+"3 — Hidden / cleanup","805746","Handcrafted Fancy Wooden Eating Spoons","Unassigned","Missing / unavailable Local Line product","805746","","No","No","Local product exists; saved link #805746","Product #805746 returned 404; absent from live export","Confirm whether this item is retired. Archive the local record if retired; otherwise locate or restore the intended Local Line product and save its verified link before pricing.","",""
+"3 — Hidden / cleanup","825842","Handcrafted Maple Candle Holder","Unassigned","Missing / unavailable Local Line product","825842","","No","No","Local product exists; saved link #825842","Product #825842 returned 404; absent from live export","Confirm whether this item is retired. Archive the local record if retired; otherwise locate or restore the intended Local Line product and save its verified link before pricing.","",""
+"3 — Hidden / cleanup","805732","Handcrafted Whisk Brooms","Unassigned","Missing / unavailable Local Line product","805732","","No","No","Local product exists; saved link #805732","Product #805732 returned 404; absent from live export","Confirm whether this item is retired. Archive the local record if retired; otherwise locate or restore the intended Local Line product and save its verified link before pricing.","",""
+"3 — Hidden / cleanup","805737","Handcrafted Wood & Metal Dustpan","Unassigned","Missing / unavailable Local Line product","805737","","No","No","Local product exists; saved link #805737","Product #805737 returned 404; absent from live export","Confirm whether this item is retired. Archive the local record if retired; otherwise locate or restore the intended Local Line product and save its verified link before pricing.","",""
+"3 — Hidden / cleanup","805736","Handcrafted Wooden Bowls, Small 14 oz","Unassigned","Missing / unavailable Local Line product","805736","","No","No","Local product exists; saved link #805736","Product #805736 returned 404; absent from live export","Confirm whether this item is retired. Archive the local record if retired; otherwise locate or restore the intended Local Line product and save its verified link before pricing.","",""
+"3 — Hidden / cleanup","805739","Handcrafted Wooden Chopsticks","Unassigned","Missing / unavailable Local Line product","805739","","No","No","Local product exists; saved link #805739","Product #805739 returned 404; absent from live export","Confirm whether this item is retired. Archive the local record if retired; otherwise locate or restore the intended Local Line product and save its verified link before pricing.","",""
+"3 — Hidden / cleanup","825841","Handcrafted Wooden Fancy Egg Pushers","Unassigned","Missing / unavailable Local Line product","825841","","No","No","Local product exists; saved link #825841","Product #825841 returned 404; absent from live export","Confirm whether this item is retired. Archive the local record if retired; otherwise locate or restore the intended Local Line product and save its verified link before pricing.","",""
+"3 — Hidden / cleanup","805740","Handcrafted Wooden Fancy Kitchen Spoons","Unassigned","Missing / unavailable Local Line product","805740","","No","No","Local product exists; saved link #805740","Product #805740 returned 404; absent from live export","Confirm whether this item is retired. Archive the local record if retired; otherwise locate or restore the intended Local Line product and save its verified link before pricing.","",""
+"3 — Hidden / cleanup","805741","Handcrafted Wooden Plain Kitchen Stir Stix","Unassigned","Missing / unavailable Local Line product","805741","","No","No","Local product exists; saved link #805741","Product #805741 returned 404; absent from live export","Confirm whether this item is retired. Archive the local record if retired; otherwise locate or restore the intended Local Line product and save its verified link before pricing.","",""
+"3 — Hidden / cleanup","805742","Handcrafted Wooden Plates","Unassigned","Missing / unavailable Local Line product","805742","","No","No","Local product exists; saved link #805742","Product #805742 returned 404; absent from live export","Confirm whether this item is retired. Archive the local record if retired; otherwise locate or restore the intended Local Line product and save its verified link before pricing.","",""
+"3 — Hidden / cleanup","805744","Handcrafted Wooden Serving Spoons","Unassigned","Missing / unavailable Local Line product","805744","","No","No","Local product exists; saved link #805744","Product #805744 returned 404; absent from live export","Confirm whether this item is retired. Archive the local record if retired; otherwise locate or restore the intended Local Line product and save its verified link before pricing.","",""
+"3 — Hidden / cleanup","805745","Handcrafted Wooden Spatulas","Unassigned","Missing / unavailable Local Line product","805745","","No","No","Local product exists; saved link #805745","Product #805745 returned 404; absent from live export","Confirm whether this item is retired. Archive the local record if retired; otherwise locate or restore the intended Local Line product and save its verified link before pricing.","",""
+"3 — Hidden / cleanup","805747","Handcrafted Wooden Teaspoons","Unassigned","Missing / unavailable Local Line product","805747","","No","No","Local product exists; saved link #805747","Product #805747 returned 404; absent from live export","Confirm whether this item is retired. Archive the local record if retired; otherwise locate or restore the intended Local Line product and save its verified link before pricing.","",""
+"3 — Hidden / cleanup","1168462","Jalapeno Dill Carrots","Unassigned","Vendor assignment","1168462","","No","No","Unassigned
+24 oz jar / Guest Basket: $20.07; markup 55.00000000000001%; sale off (unassigned-vendor fallback)
+24 oz jar / Herd Share Members: $18.13; markup 40%; sale off (unassigned-vendor fallback)
+24 oz jar / SNAP: $18.13; markup 40%; sale off (unassigned-vendor fallback)","Kurzhal Family Kickin Pickles
+24 oz jar / Guest Basket: $18.78; 45% effective adjustment; sale off
+24 oz jar / Herd Share Members: $18.78; 45% effective adjustment; sale off
+24 oz jar / SNAP: $18.78; 45% effective adjustment; sale off","Use Local Line’s vendor: Kurzhal Family Kickin Pickles. Update the local assignment first, then re-audit pricing.
+Assign Kurzhal Family Kickin Pickles locally first. The listed remote prices already use 45%; review a local product markup override of 45% to match them. Do not publish the current unassigned-vendor fallback rates.","",""
+"3 — Hidden / cleanup","1168460","Jalapeno Dill Pickles","Unassigned","Vendor assignment","1168460","","No","No","Unassigned
+32 oz jar / Guest Basket: $18.52; markup 55.00000000000001%; sale off (unassigned-vendor fallback)
+32 oz jar / Herd Share Members: $16.73; markup 40%; sale off (unassigned-vendor fallback)
+32 oz jar / SNAP: $16.73; markup 40%; sale off (unassigned-vendor fallback)","Kurzhal Family Kickin Pickles
+32 oz jar / Guest Basket: $17.33; 45% effective adjustment; sale off
+32 oz jar / Herd Share Members: $17.33; 45% effective adjustment; sale off
+32 oz jar / SNAP: $17.33; 45% effective adjustment; sale off","Use Local Line’s vendor: Kurzhal Family Kickin Pickles. Update the local assignment first, then re-audit pricing.
+Assign Kurzhal Family Kickin Pickles locally first. The listed remote prices already use 45%; review a local product markup override of 45% to match them. Do not publish the current unassigned-vendor fallback rates.","",""
+"3 — Hidden / cleanup","805952","Kohlrabi Purple or Green","Unassigned","Missing / unavailable Local Line product","805952","","No","No","Local product exists; saved link #805952","Product #805952 returned 404; absent from live export","Confirm whether this item is retired. Archive the local record if retired; otherwise locate or restore the intended Local Line product and save its verified link before pricing.","",""
+"3 — Hidden / cleanup","825305","Matsutake mushrooms","Unassigned","Unassigned vendor and pricing","825305","","No","No","1/2 lb / Guest Basket: $17.44; markup 55.00000000000001%; sale off (unassigned-vendor fallback)
+1/2 lb / CSA Members: $15.75; markup 40%; sale off (unassigned-vendor fallback)
+1/2 lb / Herd Share Members: $15.75; markup 40%; sale off (unassigned-vendor fallback)
+1/2 lb / SNAP: $15.75; markup 40%; sale off (unassigned-vendor fallback)","1/2 lb / Guest Basket: $15.75; 40% effective adjustment; sale off
+1/2 lb / CSA Members: $14.96; 33% effective adjustment; sale off
+1/2 lb / Herd Share Members: $14.96; 33% effective adjustment; sale off
+1/2 lb / SNAP: $14.96; 33% effective adjustment; sale off","Choose the correct vendor in Local Line and assign it locally before reviewing pricing. These local values are fallback calculations, not approved rates to publish. If this hidden item is retired, archive it locally instead.","",""
+"3 — Hidden / cleanup","870774","Pea Shoots","Unassigned","Unassigned vendor and pricing","870774","","No","No","1/2 Lb. / Guest Basket: $7.75; markup 55.00000000000001%; sale off (unassigned-vendor fallback)
+1/2 Lb. / CSA Members: $7.00; markup 40%; sale off (unassigned-vendor fallback)
+1/2 Lb. / Herd Share Members: $7.00; markup 40%; sale off (unassigned-vendor fallback)
+1/2 Lb. / SNAP: $7.00; markup 40%; sale off (unassigned-vendor fallback)","1/2 Lb. / Guest Basket: $7.00; 40% effective adjustment; sale off
+1/2 Lb. / CSA Members: $6.75; 35% effective adjustment; sale off
+1/2 Lb. / Herd Share Members: $6.75; 35% effective adjustment; sale off
+1/2 Lb. / SNAP: $6.75; 35% effective adjustment; sale off","Choose the correct vendor in Local Line and assign it locally before reviewing pricing. These local values are fallback calculations, not approved rates to publish. If this hidden item is retired, archive it locally instead.","",""
+"3 — Hidden / cleanup","805982","Peppermint","Unassigned","Unassigned vendor and pricing","805982","","No","No","each / CSA Members: $4.90; markup 40%; sale off (unassigned-vendor fallback)
+each / Herd Share Members: $4.90; markup 40%; sale off (unassigned-vendor fallback)
+each / SNAP: $4.90; markup 40%; sale off (unassigned-vendor fallback)","each / CSA Members: $3.00; Fixed $3.00; sale off
+each / Herd Share Members: $3.00; Fixed $3.00; sale off
+each / SNAP: $3.00; Fixed $3.00; sale off","Choose the correct vendor in Local Line and assign it locally before reviewing pricing. These local values are fallback calculations, not approved rates to publish. If this hidden item is retired, archive it locally instead.","",""
+"3 — Hidden / cleanup","883821","Persian Cucumber","Unassigned","Unassigned vendor and pricing","883821","","No","No","1 lb / Guest Basket: $3.72; markup 55.00000000000001%; sale off (unassigned-vendor fallback)
+1 lb / CSA Members: $3.36; markup 40%; sale off (unassigned-vendor fallback)
+1 lb / Herd Share Members: $3.36; markup 40%; sale off (unassigned-vendor fallback)
+1 lb / SNAP: $3.36; markup 40%; sale off (unassigned-vendor fallback)","1 lb / Guest Basket: $3.36; 40% effective adjustment; sale off
+1 lb / CSA Members: $3.22; 34% effective adjustment; sale off
+1 lb / Herd Share Members: $3.22; 34% effective adjustment; sale off
+1 lb / SNAP: $3.22; 34% effective adjustment; sale off","Choose the correct vendor in Local Line and assign it locally before reviewing pricing. These local values are fallback calculations, not approved rates to publish. If this hidden item is retired, archive it locally instead.","",""
+"3 — Hidden / cleanup","805962","Red Butter-head Little Gem Lettuce","Unassigned","Unassigned vendor and pricing","805962","","No","No","each / Guest Basket: $2.17; markup 55.00000000000001%; sale off (unassigned-vendor fallback)
+each / CSA Members: $1.96; markup 40%; sale off (unassigned-vendor fallback)
+each / Herd Share Members: $1.96; markup 40%; sale off (unassigned-vendor fallback)
+each / SNAP: $1.96; markup 40%; sale off (unassigned-vendor fallback)","each / Guest Basket: $1.96; 40% effective adjustment; sale off
+each / CSA Members: $1.88; 34% effective adjustment; sale off
+each / Herd Share Members: $1.88; 34% effective adjustment; sale off
+each / SNAP: $1.88; 34% effective adjustment; sale off","Choose the correct vendor in Local Line and assign it locally before reviewing pricing. These local values are fallback calculations, not approved rates to publish. If this hidden item is retired, archive it locally instead.","",""
+"3 — Hidden / cleanup","805839","Sweet Potato “Seconds”","Unassigned","Unassigned vendor and pricing","805839","","No","No","1 lb / CSA Members: $4.55; markup 40%; sale off (unassigned-vendor fallback)
+1 lb / Herd Share Members: $4.55; markup 40%; sale off (unassigned-vendor fallback)
+1 lb / SNAP: $4.55; markup 40%; sale off (unassigned-vendor fallback)","1 lb / CSA Members: $2.75; Fixed $2.75; sale off
+1 lb / Herd Share Members: $2.75; Fixed $2.75; sale off
+1 lb / SNAP: $2.75; Fixed $2.75; sale off","Choose the correct vendor in Local Line and assign it locally before reviewing pricing. These local values are fallback calculations, not approved rates to publish. If this hidden item is retired, archive it locally instead.","",""
+"3 — Hidden / cleanup","805846","Walla Walla Onions","Unassigned","Unassigned vendor and pricing","805846","","No","No","1 lb / CSA Members: $2.80; markup 40%; sale off (unassigned-vendor fallback)
+1 lb / Herd Share Members: $2.80; markup 40%; sale off (unassigned-vendor fallback)
+1 lb / SNAP: $2.80; markup 40%; sale off (unassigned-vendor fallback)","1 lb / CSA Members: $1.75; Fixed $1.75; sale off
+1 lb / Herd Share Members: $1.75; Fixed $1.75; sale off
+1 lb / SNAP: $1.75; Fixed $1.75; sale off","Choose the correct vendor in Local Line and assign it locally before reviewing pricing. These local values are fallback calculations, not approved rates to publish. If this hidden item is retired, archive it locally instead.","",""

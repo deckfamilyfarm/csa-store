@@ -1,0 +1,466 @@
+{
+  "productId": 1133722,
+  "context": {
+    "product": {
+      "id": 1133722,
+      "name": "Kaiware, Green Microgreens",
+      "description": "Kaiware green microgreens area Japanese variety of daikon radish microgreens. Cultivated for their crisp texture and vibrant peppery bite, they are frequently used as a zesty garnish. Local suppliers like Gorge Greens offer these nutrient-dense greens as a fresh, energizing addition to salads, bowls, and sushi. Grown by:Gorge Greens in Washington",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": null,
+      "categoryId": null,
+      "vendorId": 3168,
+      "thumbnailUrl": null,
+      "createdAt": "2026-06-19T10:40:20.000Z",
+      "updatedAt": "2026-08-14T10:40:23.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "",
+    "vendor": {
+      "id": 3168,
+      "name": "Organically Grown Company",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 969101,
+        "productId": 1133722,
+        "name": "2 oz ea",
+        "price": "5.45",
+        "packageCode": null,
+        "unit": null,
+        "numOfItems": 1,
+        "trackType": null,
+        "chargeType": null,
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": null
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 969101,
+        "productId": 1133722,
+        "localLinePackageId": 969101,
+        "liveName": "2 oz ea",
+        "livePrice": "5.45",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":1133722,\"Product\":\"Kaiware, Green Microgreens\",\"Track Inventory By\":\"package\",\"Item Unit\":\"ea\",\"Charge By\":\"package\",\"Charge Unit\":\"ea\",\"Package ID\":969101,\"Package Name\":\"2 oz ea\",\"# of Items\":1,\"Package Price\":5.45,\"Inventory Type\":\"product\"},\"live\":{\"id\":969101,\"inventory_per_unit\":1,\"unit_price\":5.45,\"average_pack_weight\":0,\"package_price\":5.45,\"package_unit_price\":5.45,\"priority_order\":0,\"name\":\"2 oz ea\",\"price_list_entries\":[{\"id\":970974,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":748461,\"subscription_setting\":{\"id\":849587,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":970975,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":748462,\"subscription_setting\":{\"id\":849588,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":970976,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":748463,\"subscription_setting\":{\"id\":849589,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":null,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":1133722,\"product_name\":\"Kaiware, Green Microgreens\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"ea\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2026-06-18T18:22:36.267471-04:00\",\"updated\":\"2026-06-18T18:22:36.378089-04:00\"}}",
+        "createdAt": "2026-06-19T10:41:58.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 1133722,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 1133722,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/1133722/localline/f3b1ecbf997d7519a2995d5f.jpg"
+    ],
+    "localLineVendorId": 3168
+  },
+  "remote": {
+    "id": 1133722,
+    "name": "Kaiware, Green Microgreens",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Kaiware green microgreens area Japanese variety of daikon radish microgreens. Cultivated for their crisp texture and vibrant peppery bite, they are frequently used as a zesty garnish. Local suppliers like Gorge Greens offer these nutrient-dense greens as a fresh, energizing addition to salads, bowls, and sushi.</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Grown by:Gorge Greens in Washington</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2026-06-18T18:22:35.993375-04:00",
+    "updated": "2026-08-13T14:18:56.464615-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/7Iyys.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 442153,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/7Iyys.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/7Iyys.jpeg",
+        "original_filename": "download.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 969101,
+        "inventory_per_unit": 1,
+        "unit_price": 5.45,
+        "average_pack_weight": 0,
+        "package_price": 5.45,
+        "package_unit_price": 5.45,
+        "priority_order": 0,
+        "name": "2 oz ea",
+        "price_list_entries": [
+          {
+            "id": 970974,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 748461,
+            "subscription_setting": {
+              "id": 849587,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 970975,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 748462,
+            "subscription_setting": {
+              "id": 849588,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 970976,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 748463,
+            "subscription_setting": {
+              "id": 849589,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": null,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 1133722,
+        "product_name": "Kaiware, Green Microgreens",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-06-18T18:22:36.267471-04:00",
+        "updated": "2026-06-18T18:22:36.378089-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 748461,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 969,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 626424,
+            "price_list_category": 15732,
+            "priority_order": 3,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": {
+          "id": 168791,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 748462,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1351,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 626425,
+            "price_list_category": 15119,
+            "priority_order": 3,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": {
+          "id": 168792,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 748463,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1347,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 626426,
+            "price_list_category": 28913,
+            "priority_order": 3,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": {
+          "id": 168793,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3168,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3168,
+    "packages": [
+      {
+        "id": 969101,
+        "unit_price": 5.45,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 748461,
+            "calculated_value": 7.9,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 5.45
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 748462,
+            "calculated_value": 7.9,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 5.45
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 748463,
+            "calculated_value": 7.9,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 5.45
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:41:40.536Z",
+  "rows": [
+    {
+      "productId": 1133722,
+      "product": "Kaiware, Green Microgreens",
+      "vendor": "Organically Grown Company",
+      "packageId": 969101,
+      "package": "2 oz ea",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 5.45,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 7.63,
+      "localPriceAfter": 7.9,
+      "remoteBasePrice": 5.45,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 7.63,
+      "remotePriceAfter": 7.9
+    },
+    {
+      "productId": 1133722,
+      "product": "Kaiware, Green Microgreens",
+      "vendor": "Organically Grown Company",
+      "packageId": 969101,
+      "package": "2 oz ea",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 5.45,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 7.63,
+      "localPriceAfter": 7.9,
+      "remoteBasePrice": 5.45,
+      "remoteAdjustmentType": null,
+      "remoteAdjustmentBefore": null,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": null,
+      "remotePriceAfter": null
+    },
+    {
+      "productId": 1133722,
+      "product": "Kaiware, Green Microgreens",
+      "vendor": "Organically Grown Company",
+      "packageId": 969101,
+      "package": "2 oz ea",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 5.45,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 7.63,
+      "localPriceAfter": 7.9,
+      "remoteBasePrice": 5.45,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 7.63,
+      "remotePriceAfter": 7.9
+    },
+    {
+      "productId": 1133722,
+      "product": "Kaiware, Green Microgreens",
+      "vendor": "Organically Grown Company",
+      "packageId": 969101,
+      "package": "2 oz ea",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 5.45,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 7.63,
+      "localPriceAfter": 7.9,
+      "remoteBasePrice": 5.45,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 7.63,
+      "remotePriceAfter": 7.9
+    }
+  ],
+  "warnings": [
+    "CSA Members is not present for package 2 oz ea; no listing created."
+  ],
+  "reviewedAt": "2026-10-08T19:48:41.052Z"
+}

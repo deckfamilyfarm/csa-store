@@ -1,0 +1,519 @@
+{
+  "productId": 1139025,
+  "context": {
+    "product": {
+      "id": 1139025,
+      "name": "Spring Onion",
+      "description": "Spring onions have a bold and spicy taste when raw, and a sweet flavor when cooked. Both the long, slender green tops and the bulbs are edible, and are good either raw or cooked.",
+      "visible": 0,
+      "trackInventory": 1,
+      "inventory": 0,
+      "categoryId": null,
+      "vendorId": 6482,
+      "thumbnailUrl": null,
+      "createdAt": "2026-07-07T10:40:19.000Z",
+      "updatedAt": "2026-10-09T19:18:37.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "",
+    "vendor": {
+      "id": 6482,
+      "name": "Winter Green Farm",
+      "priceListMarkup": "0.4500",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.45",
+      "memberMarkup": "0.45"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 976774,
+        "productId": 1139025,
+        "name": "Ea",
+        "price": "1.35",
+        "packageCode": null,
+        "unit": null,
+        "numOfItems": 1,
+        "trackType": null,
+        "chargeType": null,
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": null
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 976774,
+        "productId": 1139025,
+        "localLinePackageId": 976774,
+        "liveName": "Ea",
+        "livePrice": "1.35",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":1139025,\"Product\":\"Spring Onion\",\"Track Inventory By\":\"package\",\"Item Unit\":\"ea\",\"Charge By\":\"package\",\"Charge Unit\":\"ea\",\"Package ID\":976774,\"Package Name\":\"Ea\",\"# of Items\":1,\"Package Price\":1.35,\"Inventory Type\":\"product\"},\"live\":{\"id\":976774,\"inventory_per_unit\":1,\"unit_price\":1.35,\"average_pack_weight\":null,\"package_price\":1.35,\"package_unit_price\":1.35,\"priority_order\":null,\"name\":\"Ea\",\"price_list_entries\":[{\"id\":988005,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":761221,\"subscription_setting\":{\"id\":866640,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":988006,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":761222,\"subscription_setting\":{\"id\":866641,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":988007,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":761223,\"subscription_setting\":{\"id\":866642,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":988008,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":761224,\"subscription_setting\":{\"id\":866643,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":1139025,\"product_name\":\"Spring Onion\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"ea\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2026-07-06T13:11:12.005447-04:00\",\"updated\":\"2026-07-06T13:11:12.122955-04:00\"}}",
+        "createdAt": "2026-07-07T10:42:14.000Z",
+        "updatedAt": "2026-10-09T10:41:30.000Z",
+        "lastSyncedAt": "2026-10-09T10:41:30.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 1139025,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-09T10:41:30.000Z"
+    },
+    "remoteId": 1139025,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/1139025/localline/e077c2eb79d365df70493659.jpg"
+    ],
+    "localLineVendorId": 6482
+  },
+  "remote": {
+    "id": 1139025,
+    "name": "Spring Onion",
+    "description": "<p>Spring onions have a bold and spicy taste when raw, and a sweet flavor when cooked. Both the long, slender green tops and the bulbs are edible, and are good either raw or cooked.</p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2026-07-06T13:11:11.620498-04:00",
+    "updated": "2026-08-27T12:39:56.079508-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/Nbp0P.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 448216,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/Nbp0P.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/Nbp0P.jpg",
+        "original_filename": "account/322922/ZlqX8.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "804",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 976774,
+        "inventory_per_unit": 1,
+        "unit_price": 1.35,
+        "average_pack_weight": null,
+        "package_price": 1.35,
+        "package_unit_price": 1.35,
+        "priority_order": null,
+        "name": "Ea",
+        "price_list_entries": [
+          {
+            "id": 988005,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 761221,
+            "subscription_setting": {
+              "id": 866640,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 988006,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 761222,
+            "subscription_setting": {
+              "id": 866641,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 988007,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 761223,
+            "subscription_setting": {
+              "id": 866642,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 988008,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 761224,
+            "subscription_setting": {
+              "id": 866643,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 1139025,
+        "product_name": "Spring Onion",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-07-06T13:11:12.005447-04:00",
+        "updated": "2026-07-06T13:11:12.122955-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 761221,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 1115,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 638951,
+            "price_list_category": 15105,
+            "priority_order": 6,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 761222,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 974,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 638952,
+            "price_list_category": 15731,
+            "priority_order": 10,
+            "price_list_category_name": "Organic Vegetables - Roots 🧅🧄 🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 174716,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 761223,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1356,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 638953,
+            "price_list_category": 15118,
+            "priority_order": 10,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 174717,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 761224,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1352,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 638954,
+            "price_list_category": 28905,
+            "priority_order": 10,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 174718,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 6482,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 6482,
+    "packages": [
+      {
+        "id": 976774,
+        "unit_price": 1.35,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 761222,
+            "calculated_value": 1.96,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1.35
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 761221,
+            "calculated_value": 1.96,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1.35
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 761223,
+            "calculated_value": 1.96,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1.35
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 761224,
+            "calculated_value": 1.96,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1.35
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "warnings": [],
+  "status": "ready",
+  "auditedAt": "2026-10-09T19:22:17.349Z",
+  "vendorOnly": false,
+  "rows": [
+    {
+      "productId": 1139025,
+      "product": "Spring Onion",
+      "vendor": "Winter Green Farm",
+      "packageId": 976774,
+      "package": "Ea",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 1.35,
+      "markupBefore": 45,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 1.96,
+      "localPriceAfter": 1.96,
+      "remoteBasePrice": 1.35,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 1.89,
+      "remotePriceAfter": 1.96
+    },
+    {
+      "productId": 1139025,
+      "product": "Spring Onion",
+      "vendor": "Winter Green Farm",
+      "packageId": 976774,
+      "package": "Ea",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 1.35,
+      "markupBefore": 45,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 1.96,
+      "localPriceAfter": 1.96,
+      "remoteBasePrice": 1.35,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 1.89,
+      "remotePriceAfter": 1.96
+    },
+    {
+      "productId": 1139025,
+      "product": "Spring Onion",
+      "vendor": "Winter Green Farm",
+      "packageId": 976774,
+      "package": "Ea",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 1.35,
+      "markupBefore": 45,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 1.96,
+      "localPriceAfter": 1.96,
+      "remoteBasePrice": 1.35,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 1.89,
+      "remotePriceAfter": 1.96
+    },
+    {
+      "productId": 1139025,
+      "product": "Spring Onion",
+      "vendor": "Winter Green Farm",
+      "packageId": 976774,
+      "package": "Ea",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 1.35,
+      "markupBefore": 45,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 1.96,
+      "localPriceAfter": 1.96,
+      "remoteBasePrice": 1.35,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 1.89,
+      "remotePriceAfter": 1.96
+    }
+  ]
+}

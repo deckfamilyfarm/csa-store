@@ -1,0 +1,308 @@
+{
+  "id": 9,
+  "auditId": 13,
+  "name": "Align Square after confirming 14 products priced each — October 11",
+  "status": "completed",
+  "isScheduled": false,
+  "scheduledAt": "2026-10-11T19:03:10Z",
+  "startedAt": "2026-10-11T19:03:12Z",
+  "createdAt": "2026-10-11T19:03:10Z",
+  "actions": [
+    {
+      "direction": "outgoing",
+      "platform": "square",
+      "kind": "price",
+      "productId": 816905,
+      "productName": "Cajun Chaurice Sausage Links",
+      "packageId": 539546,
+      "packageName": "4 links/ pack 14 oz pack",
+      "vendorName": "Deck Family Farm's Hyland Artisinal Meats",
+      "status": "completed",
+      "message": "Approved values confirmed remotely.",
+      "staged": {},
+      "localBefore": {
+        "productId": 816905,
+        "packageId": 539546,
+        "vendorName": "Deck Family Farm's Hyland Artisinal Meats",
+        "productName": "Cajun Chaurice Sausage Links",
+        "categoryName": "Sausages & Cured Meats🥓",
+        "sourceUnitPrice": null,
+        "unitOfMeasure": "each",
+        "packagePrice": null,
+        "onSale": 0,
+        "saleDiscount": 0,
+        "priceBasis": "vendor-retail-price",
+        "configuredCurrency": "USD"
+      },
+      "localAfter": {
+        "productId": 816905,
+        "packageId": 539546,
+        "vendorName": "Deck Family Farm's Hyland Artisinal Meats",
+        "productName": "Cajun Chaurice Sausage Links",
+        "categoryName": "Sausages & Cured Meats🥓",
+        "sourceUnitPrice": null,
+        "unitOfMeasure": "each",
+        "packagePrice": null,
+        "onSale": 0,
+        "saleDiscount": 0,
+        "priceBasis": "vendor-retail-price",
+        "configuredCurrency": "USD"
+      },
+      "mapping": {
+        "linkId": 26,
+        "squareItemId": "BKII4YYPR7FUPZVKDYUHUXVD",
+        "squareVariationId": "WBDNBYBMRDK55JR6NCQG6FGD",
+        "linkApprovedAt": "2026-09-15 11:58:22"
+      },
+      "remoteBefore": {
+        "id": "WBDNBYBMRDK55JR6NCQG6FGD",
+        "deleted": false,
+        "itemId": "BKII4YYPR7FUPZVKDYUHUXVD",
+        "pricingType": "FIXED_PRICING",
+        "amount": 2000,
+        "currency": "USD",
+        "sellingUnit": {
+          "id": null,
+          "unit": "each/package",
+          "precision": 0,
+          "definition": null
+        }
+      },
+      "desired": {
+        "id": "WBDNBYBMRDK55JR6NCQG6FGD",
+        "deleted": false,
+        "itemId": "BKII4YYPR7FUPZVKDYUHUXVD",
+        "pricingType": "FIXED_PRICING",
+        "amount": 1999,
+        "currency": "USD",
+        "sellingUnit": {
+          "id": null,
+          "unit": "each/package",
+          "precision": 0,
+          "definition": null
+        }
+      },
+      "payload": {
+        "amount": 1999,
+        "currency": "USD",
+        "sellingUnit": {
+          "id": null,
+          "unit": "each/package",
+          "precision": 0,
+          "definition": null
+        }
+      },
+      "display": {
+        "current": {
+          "price": 20,
+          "currency": "USD",
+          "sellingUnit": "each"
+        },
+        "proposed": {
+          "price": 19.99,
+          "currency": "USD",
+          "sellingUnit": "each"
+        },
+        "basis": "vendor-retail-price"
+      },
+      "localSnapshot": {
+        "productId": 816905,
+        "productName": "Cajun Chaurice Sausage Links",
+        "visible": 1,
+        "trackInventory": 0,
+        "inventory": 0,
+        "onSale": 0,
+        "saleDiscount": 0
+      },
+      "id": 1981,
+      "auditId": 13,
+      "result": null,
+      "released": true,
+      "releaseActionId": 609,
+      "checkpoint": {
+        "request": {
+          "type": "ITEM_VARIATION",
+          "id": "WBDNBYBMRDK55JR6NCQG6FGD",
+          "updated_at": "2026-09-19T01:29:38.67Z",
+          "created_at": "2023-10-21T15:33:55.927Z",
+          "version": 1789781378670,
+          "is_deleted": false,
+          "catalog_v1_ids": [
+            {
+              "catalog_v1_id": "NIGKVXS7YRUIQD4NW27NAJ7E",
+              "location_id": "C0T7DVZY5XVG5"
+            }
+          ],
+          "present_at_all_locations": true,
+          "item_variation_data": {
+            "item_id": "BKII4YYPR7FUPZVKDYUHUXVD",
+            "name": "Regular",
+            "ordinal": 1,
+            "pricing_type": "FIXED_PRICING",
+            "price_money": {
+              "amount": 1999,
+              "currency": "USD"
+            },
+            "track_inventory": false,
+            "inventory_alert_type": "NONE",
+            "service_duration": 0,
+            "sellable": true,
+            "stockable": true,
+            "channels": [
+              "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+            ]
+          }
+        },
+        "idempotencyKey": "174a74dc-f440-43dc-b7b2-ef0065368b57"
+      }
+    },
+    {
+      "direction": "outgoing",
+      "platform": "square",
+      "kind": "price",
+      "productId": 1013988,
+      "productName": "Smoked Pork Shanks - Skin-on and Smoked",
+      "packageId": 798012,
+      "packageName": "2 - 2.5 lbs",
+      "vendorName": "Deck Family Farm",
+      "status": "completed",
+      "message": "Approved values confirmed remotely.",
+      "staged": {},
+      "localBefore": {
+        "productId": 1013988,
+        "packageId": 798012,
+        "vendorName": "Deck Family Farm",
+        "productName": "Smoked Pork Shanks - Skin-on and Smoked",
+        "categoryName": "Broth, Lard, Bones, and Organs🦴",
+        "sourceUnitPrice": null,
+        "unitOfMeasure": "each",
+        "packagePrice": null,
+        "onSale": 0,
+        "saleDiscount": 0,
+        "priceBasis": "vendor-retail-price",
+        "configuredCurrency": "USD"
+      },
+      "localAfter": {
+        "productId": 1013988,
+        "packageId": 798012,
+        "vendorName": "Deck Family Farm",
+        "productName": "Smoked Pork Shanks - Skin-on and Smoked",
+        "categoryName": "Broth, Lard, Bones, and Organs🦴",
+        "sourceUnitPrice": null,
+        "unitOfMeasure": "each",
+        "packagePrice": null,
+        "onSale": 0,
+        "saleDiscount": 0,
+        "priceBasis": "vendor-retail-price",
+        "configuredCurrency": "USD"
+      },
+      "mapping": {
+        "linkId": 95,
+        "squareItemId": "4MJHJVJYDZNCHSKIFKWF553J",
+        "squareVariationId": "HSN75FILHGFLQGROEUIIC2XC",
+        "linkApprovedAt": "2026-09-15 12:06:36"
+      },
+      "remoteBefore": {
+        "id": "HSN75FILHGFLQGROEUIIC2XC",
+        "deleted": false,
+        "itemId": "4MJHJVJYDZNCHSKIFKWF553J",
+        "pricingType": "FIXED_PRICING",
+        "amount": 1650,
+        "currency": "USD",
+        "sellingUnit": {
+          "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+          "unit": "lb",
+          "precision": 2,
+          "definition": {
+            "weight_unit": "IMPERIAL_POUND",
+            "type": "TYPE_WEIGHT"
+          }
+        }
+      },
+      "desired": {
+        "id": "HSN75FILHGFLQGROEUIIC2XC",
+        "deleted": false,
+        "itemId": "4MJHJVJYDZNCHSKIFKWF553J",
+        "pricingType": "FIXED_PRICING",
+        "amount": 1650,
+        "currency": "USD",
+        "sellingUnit": {
+          "id": null,
+          "unit": "each/package",
+          "precision": 0,
+          "definition": null
+        }
+      },
+      "payload": {
+        "amount": 1650,
+        "currency": "USD",
+        "sellingUnit": {
+          "id": null,
+          "unit": "each/package",
+          "precision": 0,
+          "definition": null
+        }
+      },
+      "display": {
+        "current": {
+          "price": 16.5,
+          "currency": "USD",
+          "sellingUnit": "lb"
+        },
+        "proposed": {
+          "price": 16.5,
+          "currency": "USD",
+          "sellingUnit": "each"
+        },
+        "basis": "vendor-retail-price"
+      },
+      "localSnapshot": {
+        "productId": 1013988,
+        "productName": "Smoked Pork Shanks - Skin-on and Smoked",
+        "visible": 1,
+        "trackInventory": 0,
+        "inventory": 0,
+        "onSale": 0,
+        "saleDiscount": 0
+      },
+      "id": 1990,
+      "auditId": 13,
+      "result": null,
+      "released": true,
+      "releaseActionId": 610,
+      "checkpoint": {
+        "request": {
+          "type": "ITEM_VARIATION",
+          "id": "HSN75FILHGFLQGROEUIIC2XC",
+          "updated_at": "2026-09-12T16:30:23.437Z",
+          "created_at": "2025-10-24T19:46:07.819Z",
+          "version": 1789230623437,
+          "is_deleted": false,
+          "present_at_all_locations": true,
+          "present_at_location_ids": [
+            "L307W0S4THZP3"
+          ],
+          "item_variation_data": {
+            "item_id": "4MJHJVJYDZNCHSKIFKWF553J",
+            "name": "Hock",
+            "ordinal": 1,
+            "pricing_type": "FIXED_PRICING",
+            "price_money": {
+              "amount": 1650,
+              "currency": "USD"
+            },
+            "track_inventory": false,
+            "inventory_alert_type": "NONE",
+            "service_duration": 0,
+            "sellable": true,
+            "stockable": true,
+            "channels": [
+              "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+            ]
+          }
+        },
+        "idempotencyKey": "d949dfbc-7358-4fed-a855-d52d67b9bbaa"
+      }
+    }
+  ]
+}

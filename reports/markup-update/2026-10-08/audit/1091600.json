@@ -1,0 +1,548 @@
+{
+  "productId": 1091600,
+  "context": {
+    "product": {
+      "id": 1091600,
+      "name": "Kale Raab",
+      "description": "Kale raab is the tender, flowering shoot that emerges from overwintered kale plants in early spring, offering a sweet, nutty, and slightly bitter flavor, and is a nutritious part of the brassica family, rich in vitamins A, C, and K. It's a seasonal delicacy often harvested before the yellow flowers fully open, and can be eaten raw in salads or cooked by sautéing, roasting, or adding to pasta, soups, and frittatas, typically with garlic, olive oil, and lemon juice.",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": null,
+      "categoryId": null,
+      "vendorId": 3149,
+      "thumbnailUrl": null,
+      "createdAt": "2026-04-04T16:46:54.000Z",
+      "updatedAt": "2026-07-03T19:41:35.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "",
+    "vendor": {
+      "id": 3149,
+      "name": "Grazier's Garden",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 905262,
+        "productId": 1091600,
+        "name": "bu",
+        "price": "3.50",
+        "packageCode": null,
+        "unit": null,
+        "numOfItems": 1,
+        "trackType": null,
+        "chargeType": null,
+        "visible": 0,
+        "trackInventory": 1,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 905262,
+        "productId": 1091600,
+        "localLinePackageId": 905262,
+        "liveName": "bu",
+        "livePrice": "3.50",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "package",
+        "packageInventory": 0,
+        "packageReservedInventory": 0,
+        "packageAvailableInventory": 0,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":1091600,\"Product\":\"Kale Raab\",\"Track Inventory By\":\"package\",\"Item Unit\":\"bu\",\"Charge By\":\"package\",\"Charge Unit\":\"bu\",\"Package ID\":905262,\"Package Name\":\"bu\",\"# of Items\":1,\"Package Price\":3.5,\"Inventory Type\":\"package\",\"Package Inventory\":0,\"Package Reserved Inventory\":0,\"Package Available Inventory\":0},\"live\":{\"id\":905262,\"inventory_per_unit\":1,\"unit_price\":3.5,\"average_pack_weight\":0,\"package_price\":3.5,\"package_unit_price\":3.5,\"priority_order\":1,\"name\":\"bu\",\"price_list_entries\":[{\"id\":855733,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":661286,\"subscription_setting\":{\"id\":734052,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":0,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":855734,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":661287,\"subscription_setting\":{\"id\":734053,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":855735,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":661288,\"subscription_setting\":{\"id\":734054,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":855737,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":661290,\"subscription_setting\":{\"id\":734056,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":1091600,\"product_name\":\"Kale Raab\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"bu\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"No inventory\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2026-03-20T19:54:08.033510-04:00\",\"updated\":\"2026-03-20T20:13:37.938035-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 1091600,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 1091600,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/1091600/localline/0a032d26d64cdbe9df9d64d8.jpg"
+    ],
+    "localLineVendorId": 3149
+  },
+  "remote": {
+    "id": 1091600,
+    "name": "Kale Raab",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Kale raab is&nbsp;the tender, flowering shoot that emerges from overwintered kale plants in early spring, offering a sweet, nutty, and slightly bitter flavor, and is a nutritious part of the brassica family, rich in vitamins A, C, and K. It's a seasonal delicacy often harvested before the yellow flowers fully open, and can be eaten raw in salads or cooked by sautéing, roasting, or adding to pasta, soups, and frittatas, typically with garlic, olive oil, and lemon juice.&nbsp;</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2026-03-20T19:54:07.943922-04:00",
+    "updated": "2026-04-06T12:37:30.998221-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/qTTuE.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 405696,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/qTTuE.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/qTTuE.jpg",
+        "original_filename": "unnamed.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 905262,
+        "inventory_per_unit": 1,
+        "unit_price": 3.5,
+        "average_pack_weight": 0,
+        "package_price": 3.5,
+        "package_unit_price": 3.5,
+        "priority_order": 1,
+        "name": "bu",
+        "price_list_entries": [
+          {
+            "id": 855733,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 661286,
+            "subscription_setting": {
+              "id": 734052,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": 0,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 855734,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 661287,
+            "subscription_setting": {
+              "id": 734053,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 855735,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 661288,
+            "subscription_setting": {
+              "id": 734054,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 855737,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 661290,
+            "subscription_setting": {
+              "id": 734056,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 1091600,
+        "product_name": "Kale Raab",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bu",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "No inventory",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-03-20T19:54:08.033510-04:00",
+        "updated": "2026-03-20T20:13:37.938035-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 661286,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 922,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 536729,
+            "price_list_category": 15735,
+            "priority_order": 6,
+            "price_list_category_name": "Organic Cruciferous Vegetables🥦"
+          },
+          {
+            "id": 536738,
+            "price_list_category": 15732,
+            "priority_order": 11,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": {
+          "id": 132925,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 661287,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 1085,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 536739,
+            "price_list_category": 15107,
+            "priority_order": 7,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          },
+          {
+            "id": 536740,
+            "price_list_category": 15110,
+            "priority_order": 4,
+            "price_list_category_name": "Organic Cruciferous Vegetables🥦"
+          }
+        ],
+        "tax_configuration": {
+          "id": 132926,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 661288,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1300,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 536731,
+            "price_list_category": 15122,
+            "priority_order": 6,
+            "price_list_category_name": "Organic Cruciferous Vegetables🥦"
+          },
+          {
+            "id": 536741,
+            "price_list_category": 15119,
+            "priority_order": 11,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": {
+          "id": 132927,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 661290,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1301,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 536730,
+            "price_list_category": 28916,
+            "priority_order": 6,
+            "price_list_category_name": "Organic Cruciferous Vegetables🥦"
+          },
+          {
+            "id": 536742,
+            "price_list_category": 28913,
+            "priority_order": 11,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": {
+          "id": 132929,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3149,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "package",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3149,
+    "packages": [
+      {
+        "id": 905262,
+        "unit_price": 3.5,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 661286,
+            "calculated_value": 5.08,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": 0,
+            "strikethrough_display_value": null,
+            "base_price_used": 3.5
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 661287,
+            "calculated_value": 5.08,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 3.5
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 661288,
+            "calculated_value": 5.08,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 3.5
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 661290,
+            "calculated_value": 5.08,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 3.5
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:41:26.547Z",
+  "rows": [
+    {
+      "productId": 1091600,
+      "product": "Kale Raab",
+      "vendor": "Grazier's Garden",
+      "packageId": 905262,
+      "package": "bu",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 3.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 4.9,
+      "localPriceAfter": 5.08,
+      "remoteBasePrice": 3.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 4.9,
+      "remotePriceAfter": 5.08
+    },
+    {
+      "productId": 1091600,
+      "product": "Kale Raab",
+      "vendor": "Grazier's Garden",
+      "packageId": 905262,
+      "package": "bu",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 3.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 4.9,
+      "localPriceAfter": 5.08,
+      "remoteBasePrice": 3.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 4.9,
+      "remotePriceAfter": 5.08
+    },
+    {
+      "productId": 1091600,
+      "product": "Kale Raab",
+      "vendor": "Grazier's Garden",
+      "packageId": 905262,
+      "package": "bu",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 3.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 4.9,
+      "localPriceAfter": 5.08,
+      "remoteBasePrice": 3.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 4.9,
+      "remotePriceAfter": 5.08
+    },
+    {
+      "productId": 1091600,
+      "product": "Kale Raab",
+      "vendor": "Grazier's Garden",
+      "packageId": 905262,
+      "package": "bu",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 3.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 4.9,
+      "localPriceAfter": 5.08,
+      "remoteBasePrice": 3.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 4.9,
+      "remotePriceAfter": 5.08
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:41.035Z"
+}

@@ -1,0 +1,261 @@
+{
+  "data": {
+    "id": 806135,
+    "name": "Sues Soup Mix",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Ingredients: Mayocoba Beans, Pinto Beans, Brown Lentils, Oat Groats, Hard Red and Hard White Berries, and Rye Berries</span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2023-08-25T11:15:33.228361-04:00",
+    "updated": "2026-10-08T16:26:44.075469-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/q3P7j.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 141928,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/q3P7j.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/q3P7j.jpg",
+        "original_filename": "896.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 3,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "896",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 527200,
+        "inventory_per_unit": 1,
+        "unit_price": 17.7,
+        "average_pack_weight": null,
+        "package_price": 17.7,
+        "package_unit_price": 17.7,
+        "priority_order": null,
+        "name": "3 lbs",
+        "price_list_entries": [
+          {
+            "id": 220403,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 178318,
+            "subscription_setting": {
+              "id": 121308,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 221772,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179372,
+            "subscription_setting": {
+              "id": 124514,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 245259,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 197584,
+            "subscription_setting": {
+              "id": 153389,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617925,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479818,
+            "subscription_setting": {
+              "id": 497041,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 3,
+        "number_of_packages_available": 3,
+        "number_of_packages_total": 3,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 3,
+        "product_package_size": 1,
+        "product_id": 806135,
+        "product_name": "Sues Soup Mix",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T11:15:33.242559-04:00",
+        "updated": "2026-10-08T16:26:43.530866-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 178318,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 824,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440705,
+            "price_list_category": 31659,
+            "priority_order": 828,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179372,
+        "price_list_category": 17687,
+        "price_list": 2966,
+        "priority_order": 1029,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 147582,
+            "price_list_category": 17687,
+            "priority_order": 1029,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 197584,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 655,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440467,
+            "price_list_category": 31655,
+            "priority_order": 689,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479818,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1029,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 441145,
+            "price_list_category": 31666,
+            "priority_order": 1033,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 3151,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 3,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 3
+  },
+  "localProductId": 806135,
+  "remoteProductId": 806135,
+  "checkedAt": "2026-10-11T18:09:38.701Z"
+}

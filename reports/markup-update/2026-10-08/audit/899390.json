@@ -1,0 +1,504 @@
+{
+  "productId": 899390,
+  "context": {
+    "product": {
+      "id": 899390,
+      "name": "Mini Sweet Mix Bell Peppers",
+      "description": "<p>Mini sweet peppers are small in size, averaging seven centimeters in length and have an elongated, uniform shape that tapers slightly to the non-stem end. The petite peppers range in color from yellow, red, to orange and the skin is smooth, thin, glossy, and firm.</p>",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": 0,
+      "categoryId": 12,
+      "vendorId": 3168,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/iiJrb.thumbnail.jpeg",
+      "createdAt": "2024-08-12T19:39:55.000Z",
+      "updatedAt": "2024-08-28T00:41:35.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Fruiting Vegetables 🌶🥒🎃🍅",
+    "vendor": {
+      "id": 3168,
+      "name": "Organically Grown Company",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 641285,
+        "productId": 899390,
+        "name": "1 lb bag",
+        "price": "4.59",
+        "packageCode": null,
+        "unit": "bag",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 641285,
+        "productId": 899390,
+        "localLinePackageId": 641285,
+        "liveName": "1 lb bag",
+        "livePrice": "4.59",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":899390,\"Product\":\"Mini Sweet Mix Bell Peppers\",\"Track Inventory By\":\"package\",\"Item Unit\":\"bag\",\"Charge By\":\"package\",\"Charge Unit\":\"bag\",\"Package ID\":641285,\"Package Name\":\"1 lb bag\",\"# of Items\":1,\"Package Price\":4.59,\"Inventory Type\":\"product\"},\"live\":{\"id\":641285,\"inventory_per_unit\":1,\"unit_price\":4.59,\"average_pack_weight\":0,\"package_price\":4.59,\"package_unit_price\":4.59,\"priority_order\":null,\"name\":\"1 lb bag\",\"price_list_entries\":[{\"id\":420903,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":336591,\"subscription_setting\":{\"id\":301190,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":420904,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":336592,\"subscription_setting\":{\"id\":301191,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":420902,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":336590,\"subscription_setting\":{\"id\":301189,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":618116,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":480008,\"subscription_setting\":{\"id\":497232,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":null,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":899390,\"product_name\":\"Mini Sweet Mix Bell Peppers\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"bag\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2024-08-12T15:39:56.318321-04:00\",\"updated\":\"2024-08-12T15:39:56.538923-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 899390,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 899390,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/899390/localline/f96f22266fdddcf39a8a68cb.jpg"
+    ],
+    "localLineVendorId": 3168
+  },
+  "remote": {
+    "id": 899390,
+    "name": "Mini Sweet Mix Bell Peppers",
+    "description": "<p>Mini sweet peppers are small in size, averaging seven centimeters in length and have an elongated, uniform shape that tapers slightly to the non-stem end. The petite peppers range in color from yellow, red, to orange and the skin is smooth, thin, glossy, and firm.</p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2024-08-12T15:39:55.870828-04:00",
+    "updated": "2024-08-27T20:41:35.009904-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/iiJrb.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 224763,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/iiJrb.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/iiJrb.jpeg",
+        "original_filename": "mini sweet pepper.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12591,
+      "name": "bag",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12591,
+      "name": "bag",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 641285,
+        "inventory_per_unit": 1,
+        "unit_price": 4.59,
+        "average_pack_weight": 0,
+        "package_price": 4.59,
+        "package_unit_price": 4.59,
+        "priority_order": null,
+        "name": "1 lb bag",
+        "price_list_entries": [
+          {
+            "id": 420903,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 336591,
+            "subscription_setting": {
+              "id": 301190,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 420904,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 336592,
+            "subscription_setting": {
+              "id": 301191,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 420902,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 336590,
+            "subscription_setting": {
+              "id": 301189,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 618116,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 480008,
+            "subscription_setting": {
+              "id": 497232,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": null,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 899390,
+        "product_name": "Mini Sweet Mix Bell Peppers",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bag",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2024-08-12T15:39:56.318321-04:00",
+        "updated": "2024-08-12T15:39:56.538923-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 336590,
+        "price_list_category": 15111,
+        "price_list": 2718,
+        "priority_order": 763,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 250962,
+            "price_list_category": 15111,
+            "priority_order": 820,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 336591,
+        "price_list_category": 15120,
+        "price_list": 2966,
+        "priority_order": 965,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 250963,
+            "price_list_category": 15120,
+            "priority_order": 1030,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 336592,
+        "price_list_category": 15750,
+        "price_list": 3124,
+        "priority_order": 586,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 250964,
+            "price_list_category": 15750,
+            "priority_order": 647,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 480008,
+        "price_list_category": 28914,
+        "price_list": 5622,
+        "priority_order": 965,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370475,
+            "price_list_category": 28914,
+            "priority_order": 1029,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3168,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3168,
+    "packages": [
+      {
+        "id": 641285,
+        "unit_price": 4.59,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 336592,
+            "calculated_value": 6.66,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 4.59
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 336590,
+            "calculated_value": 6.66,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 4.59
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 336591,
+            "calculated_value": 6.66,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 4.59
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 480008,
+            "calculated_value": 6.66,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 4.59
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:40:13.850Z",
+  "rows": [
+    {
+      "productId": 899390,
+      "product": "Mini Sweet Mix Bell Peppers",
+      "vendor": "Organically Grown Company",
+      "packageId": 641285,
+      "package": "1 lb bag",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 4.59,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 6.43,
+      "localPriceAfter": 6.66,
+      "remoteBasePrice": 4.59,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 6.43,
+      "remotePriceAfter": 6.66
+    },
+    {
+      "productId": 899390,
+      "product": "Mini Sweet Mix Bell Peppers",
+      "vendor": "Organically Grown Company",
+      "packageId": 641285,
+      "package": "1 lb bag",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 4.59,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 6.43,
+      "localPriceAfter": 6.66,
+      "remoteBasePrice": 4.59,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 6.43,
+      "remotePriceAfter": 6.66
+    },
+    {
+      "productId": 899390,
+      "product": "Mini Sweet Mix Bell Peppers",
+      "vendor": "Organically Grown Company",
+      "packageId": 641285,
+      "package": "1 lb bag",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 4.59,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 6.43,
+      "localPriceAfter": 6.66,
+      "remoteBasePrice": 4.59,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 6.43,
+      "remotePriceAfter": 6.66
+    },
+    {
+      "productId": 899390,
+      "product": "Mini Sweet Mix Bell Peppers",
+      "vendor": "Organically Grown Company",
+      "packageId": 641285,
+      "package": "1 lb bag",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 4.59,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 6.43,
+      "localPriceAfter": 6.66,
+      "remoteBasePrice": 4.59,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 6.43,
+      "remotePriceAfter": 6.66
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.969Z"
+}

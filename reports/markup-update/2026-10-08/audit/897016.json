@@ -1,0 +1,504 @@
+{
+  "productId": 897016,
+  "context": {
+    "product": {
+      "id": 897016,
+      "name": "Shiro plums",
+      "description": "Shiro plums are large, round, yellow plums with a mild, sweet flavor and a slightly tart skin. Their flesh is juicy, translucent, and has a tender, melting texture. Shiro plums are great for fresh eating, cooking, canning, and dessert. Some say that Shiro plum jam has a flavor similar to pear butter, with notes of candied lemon and soft floral sweetness. Shiro plum is a popular, heirloom Japanese plum introduced in 1899 by Luther Burbank. Famous for its translucent, golden-yellow skin and incredibly sweet, juicy flesh. It is prized for fresh eating, baking, and canning. I also dry them for a sweet/tart treat in my mixed dried fruit bags.",
+      "visible": 0,
+      "trackInventory": 1,
+      "inventory": 0,
+      "categoryId": 10,
+      "vendorId": 3171,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/kxc2q.thumbnail.jpeg",
+      "createdAt": "2024-08-02T02:22:01.000Z",
+      "updatedAt": "2026-08-11T10:40:24.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Fruit 🍒🍎🫐",
+    "vendor": {
+      "id": 3171,
+      "name": "Small is Beautiful Farm",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 638086,
+        "productId": 897016,
+        "name": "dozen",
+        "price": "3.50",
+        "packageCode": null,
+        "unit": "dz",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 638086,
+        "productId": 897016,
+        "localLinePackageId": 638086,
+        "liveName": "dozen",
+        "livePrice": "3.50",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":897016,\"Product\":\"Shiro plums\",\"Track Inventory By\":\"package\",\"Item Unit\":\"dozen\",\"Charge By\":\"package\",\"Charge Unit\":\"dozen\",\"Package ID\":638086,\"Package Name\":\"dozen\",\"# of Items\":1,\"Package Price\":3.5,\"Inventory Type\":\"product\"},\"live\":{\"id\":638086,\"inventory_per_unit\":1,\"unit_price\":3.5,\"average_pack_weight\":0,\"package_price\":3.5,\"package_unit_price\":3.5,\"priority_order\":null,\"name\":\"dozen\",\"price_list_entries\":[{\"id\":413616,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":331215,\"subscription_setting\":{\"id\":293873,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":413618,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":331217,\"subscription_setting\":{\"id\":293875,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":413617,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":331216,\"subscription_setting\":{\"id\":293874,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":618097,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479989,\"subscription_setting\":{\"id\":497213,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":897016,\"product_name\":\"Shiro plums\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"dz\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2024-08-01T22:22:01.512185-04:00\",\"updated\":\"2025-07-24T14:10:38.132556-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 897016,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 897016,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/897016/localline/d2d03848e1004d8d81c79c61.jpg"
+    ],
+    "localLineVendorId": 3171
+  },
+  "remote": {
+    "id": 897016,
+    "name": "Shiro plums",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Shiro plums are large, round, yellow plums with a mild, sweet flavor and a slightly tart skin. Their flesh is juicy, translucent, and has a tender, melting texture. Shiro plums are great for fresh eating, cooking, canning, and dessert. Some say that Shiro plum jam has a flavor similar to pear butter, with notes of candied lemon and soft floral sweetness.</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Shiro plum is a popular, heirloom Japanese plum introduced in 1899 by Luther Burbank.&nbsp;&nbsp;&nbsp;Famous for its translucent, golden-yellow skin and incredibly sweet, juicy flesh.&nbsp; It is prized for fresh eating, baking, and canning.&nbsp;I also dry them for a sweet/tart treat in my mixed dried fruit bags.</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2024-08-01T22:22:01.309983-04:00",
+    "updated": "2026-08-10T12:19:07.987355-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/kxc2q.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 222396,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/kxc2q.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/kxc2q.jpeg",
+        "original_filename": "download.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 6,
+      "name": "dozen",
+      "abbrieviation": "dz",
+      "unit_type": "item",
+      "default": true
+    },
+    "charge_unit": {
+      "id": 6,
+      "name": "dozen",
+      "abbrieviation": "dz",
+      "unit_type": "item",
+      "default": true
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 638086,
+        "inventory_per_unit": 1,
+        "unit_price": 3.5,
+        "average_pack_weight": 0,
+        "package_price": 3.5,
+        "package_unit_price": 3.5,
+        "priority_order": null,
+        "name": "dozen",
+        "price_list_entries": [
+          {
+            "id": 413616,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 331215,
+            "subscription_setting": {
+              "id": 293873,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 413618,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 331217,
+            "subscription_setting": {
+              "id": 293875,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 413617,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 331216,
+            "subscription_setting": {
+              "id": 293874,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 618097,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479989,
+            "subscription_setting": {
+              "id": 497213,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 897016,
+        "product_name": "Shiro plums",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "dz",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2024-08-01T22:22:01.512185-04:00",
+        "updated": "2025-07-24T14:10:38.132556-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 331215,
+        "price_list_category": 14599,
+        "price_list": 2718,
+        "priority_order": 743,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 246855,
+            "price_list_category": 14599,
+            "priority_order": 780,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 331216,
+        "price_list_category": 15063,
+        "price_list": 2966,
+        "priority_order": 945,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 246856,
+            "price_list_category": 15063,
+            "priority_order": 998,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 331217,
+        "price_list_category": 15748,
+        "price_list": 3124,
+        "priority_order": 563,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 246857,
+            "price_list_category": 15748,
+            "priority_order": 616,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479989,
+        "price_list_category": 28911,
+        "price_list": 5622,
+        "priority_order": 945,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370461,
+            "price_list_category": 28911,
+            "priority_order": 998,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3171,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3171,
+    "packages": [
+      {
+        "id": 638086,
+        "unit_price": 3.5,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 331217,
+            "calculated_value": 5.08,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 3.5
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 331215,
+            "calculated_value": 5.08,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 3.5
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 331216,
+            "calculated_value": 5.08,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 3.5
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 479989,
+            "calculated_value": 5.08,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 3.5
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:40:07.204Z",
+  "rows": [
+    {
+      "productId": 897016,
+      "product": "Shiro plums",
+      "vendor": "Small is Beautiful Farm",
+      "packageId": 638086,
+      "package": "dozen",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 3.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 4.9,
+      "localPriceAfter": 5.08,
+      "remoteBasePrice": 3.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 4.9,
+      "remotePriceAfter": 5.08
+    },
+    {
+      "productId": 897016,
+      "product": "Shiro plums",
+      "vendor": "Small is Beautiful Farm",
+      "packageId": 638086,
+      "package": "dozen",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 3.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 4.9,
+      "localPriceAfter": 5.08,
+      "remoteBasePrice": 3.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 4.9,
+      "remotePriceAfter": 5.08
+    },
+    {
+      "productId": 897016,
+      "product": "Shiro plums",
+      "vendor": "Small is Beautiful Farm",
+      "packageId": 638086,
+      "package": "dozen",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 3.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 4.9,
+      "localPriceAfter": 5.08,
+      "remoteBasePrice": 3.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 4.9,
+      "remotePriceAfter": 5.08
+    },
+    {
+      "productId": 897016,
+      "product": "Shiro plums",
+      "vendor": "Small is Beautiful Farm",
+      "packageId": 638086,
+      "package": "dozen",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 3.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 4.9,
+      "localPriceAfter": 5.08,
+      "remoteBasePrice": 3.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 4.9,
+      "remotePriceAfter": 5.08
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.963Z"
+}

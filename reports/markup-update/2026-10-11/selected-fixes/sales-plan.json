@@ -1,0 +1,170 @@
+[
+  {
+    "id": 805855,
+    "name": "Paste Tomatoes",
+    "customerPriceOverrides": [
+      {
+        "packageId": 526913,
+        "priceListId": 2718,
+        "adjustment": true,
+        "adjustmentType": 2,
+        "adjustmentValue": 40,
+        "onSale": true,
+        "strikethrough": 4.52
+      },
+      {
+        "packageId": 526913,
+        "priceListId": 2966,
+        "adjustment": true,
+        "adjustmentType": 2,
+        "adjustmentValue": 40,
+        "onSale": true,
+        "strikethrough": 4.52
+      },
+      {
+        "packageId": 526913,
+        "priceListId": 3124,
+        "adjustment": true,
+        "adjustmentType": 2,
+        "adjustmentValue": 40,
+        "onSale": true,
+        "strikethrough": 5.03
+      },
+      {
+        "packageId": 526913,
+        "priceListId": 5622,
+        "adjustment": true,
+        "adjustmentType": 2,
+        "adjustmentValue": 40,
+        "onSale": true,
+        "strikethrough": 4.52
+      }
+    ]
+  },
+  {
+    "id": 805986,
+    "name": "Red Slicer Tomatoes",
+    "customerPriceOverrides": [
+      {
+        "packageId": 527045,
+        "priceListId": 2718,
+        "adjustment": true,
+        "adjustmentType": 2,
+        "adjustmentValue": 40,
+        "onSale": true,
+        "strikethrough": 4.52
+      },
+      {
+        "packageId": 527045,
+        "priceListId": 2966,
+        "adjustment": true,
+        "adjustmentType": 2,
+        "adjustmentValue": 40,
+        "onSale": true,
+        "strikethrough": 4.52
+      },
+      {
+        "packageId": 527045,
+        "priceListId": 3124,
+        "adjustment": true,
+        "adjustmentType": 2,
+        "adjustmentValue": 40,
+        "onSale": true,
+        "strikethrough": 5.03
+      },
+      {
+        "packageId": 527045,
+        "priceListId": 5622,
+        "adjustment": true,
+        "adjustmentType": 2,
+        "adjustmentValue": 40,
+        "onSale": true,
+        "strikethrough": 4.52
+      }
+    ]
+  },
+  {
+    "id": 978368,
+    "name": "Grazier's Salad Mix",
+    "customerPriceOverrides": [
+      {
+        "packageId": 745074,
+        "priceListId": 2718,
+        "adjustment": true,
+        "adjustmentType": 2,
+        "adjustmentValue": 40,
+        "onSale": false,
+        "strikethrough": null
+      },
+      {
+        "packageId": 745074,
+        "priceListId": 2966,
+        "adjustment": true,
+        "adjustmentType": 2,
+        "adjustmentValue": 40,
+        "onSale": true,
+        "strikethrough": 5.32
+      },
+      {
+        "packageId": 745074,
+        "priceListId": 3124,
+        "adjustment": true,
+        "adjustmentType": 2,
+        "adjustmentValue": 40,
+        "onSale": false,
+        "strikethrough": null
+      },
+      {
+        "packageId": 745074,
+        "priceListId": 5622,
+        "adjustment": true,
+        "adjustmentType": 2,
+        "adjustmentValue": 40,
+        "onSale": false,
+        "strikethrough": null
+      }
+    ]
+  },
+  {
+    "id": 1000029,
+    "name": "Heirloom Tomatoes",
+    "customerPriceOverrides": [
+      {
+        "packageId": 777061,
+        "priceListId": 2718,
+        "adjustment": true,
+        "adjustmentType": 2,
+        "adjustmentValue": 40,
+        "onSale": true,
+        "strikethrough": 5.99
+      },
+      {
+        "packageId": 777061,
+        "priceListId": 2966,
+        "adjustment": true,
+        "adjustmentType": 2,
+        "adjustmentValue": 40,
+        "onSale": true,
+        "strikethrough": 5.99
+      },
+      {
+        "packageId": 777061,
+        "priceListId": 3124,
+        "adjustment": true,
+        "adjustmentType": 2,
+        "adjustmentValue": 40,
+        "onSale": true,
+        "strikethrough": 6.66
+      },
+      {
+        "packageId": 777061,
+        "priceListId": 5622,
+        "adjustment": true,
+        "adjustmentType": 2,
+        "adjustmentValue": 40,
+        "onSale": true,
+        "strikethrough": 5.99
+      }
+    ]
+  }
+]

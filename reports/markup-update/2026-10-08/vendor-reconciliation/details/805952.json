@@ -1,0 +1,4 @@
+{
+  "error": "LocalLine GET failed: 404 {\"code\":\"product_not_found\",\"title\":null,\"status_code\":404,\"detail\":\"This product does not exist, or is not owned by the requesting user.\"}",
+  "fetchedAt": "2026-10-09T19:15:41.823Z"
+}

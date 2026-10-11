@@ -1,0 +1,154 @@
+{
+  "completedAt": "2026-10-11T18:08:33.739Z",
+  "productsSoftRetired": 24,
+  "productRowsRetained": 24,
+  "relatedTablesUnchanged": true,
+  "physicalDeletes": 0,
+  "remoteWrites": 0,
+  "readback": [
+    {
+      "id": 805732,
+      "name": "Handcrafted Whisk Brooms",
+      "is_deleted": 1,
+      "visible": 0
+    },
+    {
+      "id": 805733,
+      "name": "Handcrafted Egg Pushers",
+      "is_deleted": 1,
+      "visible": 0
+    },
+    {
+      "id": 805735,
+      "name": "Handcrafted  Wooden Bowls Large 20 Oz",
+      "is_deleted": 1,
+      "visible": 0
+    },
+    {
+      "id": 805736,
+      "name": "Handcrafted Wooden Bowls, Small 14 oz",
+      "is_deleted": 1,
+      "visible": 0
+    },
+    {
+      "id": 805737,
+      "name": "Handcrafted Wood & Metal Dustpan",
+      "is_deleted": 1,
+      "visible": 0
+    },
+    {
+      "id": 805739,
+      "name": "Handcrafted Wooden Chopsticks",
+      "is_deleted": 1,
+      "visible": 0
+    },
+    {
+      "id": 805740,
+      "name": "Handcrafted Wooden Fancy Kitchen Spoons",
+      "is_deleted": 1,
+      "visible": 0
+    },
+    {
+      "id": 805741,
+      "name": "Handcrafted Wooden Plain Kitchen Stir Stix",
+      "is_deleted": 1,
+      "visible": 0
+    },
+    {
+      "id": 805742,
+      "name": "Handcrafted Wooden Plates",
+      "is_deleted": 1,
+      "visible": 0
+    },
+    {
+      "id": 805744,
+      "name": "Handcrafted Wooden Serving Spoons",
+      "is_deleted": 1,
+      "visible": 0
+    },
+    {
+      "id": 805745,
+      "name": "Handcrafted Wooden Spatulas",
+      "is_deleted": 1,
+      "visible": 0
+    },
+    {
+      "id": 805746,
+      "name": "Handcrafted Fancy Wooden Eating Spoons",
+      "is_deleted": 1,
+      "visible": 0
+    },
+    {
+      "id": 805747,
+      "name": "Handcrafted Wooden Teaspoons",
+      "is_deleted": 1,
+      "visible": 0
+    },
+    {
+      "id": 805850,
+      "name": "Asparagus",
+      "is_deleted": 1,
+      "visible": 0
+    },
+    {
+      "id": 805952,
+      "name": "Kohlrabi Purple or Green",
+      "is_deleted": 1,
+      "visible": 0
+    },
+    {
+      "id": 806124,
+      "name": "Brazil Cerrado Miniero - Dark Roast Coffee Beans",
+      "is_deleted": 1,
+      "visible": 0
+    },
+    {
+      "id": 806125,
+      "name": "Organic Spelt Flour",
+      "is_deleted": 1,
+      "visible": 0
+    },
+    {
+      "id": 825841,
+      "name": "Handcrafted Wooden Fancy Egg Pushers",
+      "is_deleted": 1,
+      "visible": 0
+    },
+    {
+      "id": 825842,
+      "name": "Handcrafted Maple Candle Holder",
+      "is_deleted": 1,
+      "visible": 0
+    },
+    {
+      "id": 919071,
+      "name": "Brazil Cerrado Miniero - Dark Roast Ground Coffee",
+      "is_deleted": 1,
+      "visible": 0
+    },
+    {
+      "id": 927371,
+      "name": "Pink Lady Apple",
+      "is_deleted": 1,
+      "visible": 0
+    },
+    {
+      "id": 1028363,
+      "name": "Black Garlic",
+      "is_deleted": 1,
+      "visible": 0
+    },
+    {
+      "id": 1071880,
+      "name": "Winter Carrots",
+      "is_deleted": 1,
+      "visible": 0
+    },
+    {
+      "id": 1127318,
+      "name": "Travel Size Lotion Stick w/ Honeysuckle Essential Oil",
+      "is_deleted": 1,
+      "visible": 0
+    }
+  ]
+}

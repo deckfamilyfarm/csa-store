@@ -1,0 +1,279 @@
+{
+  "remote": {
+    "id": 1016432,
+    "name": "#2 Juicing Carrots",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Claimed to be the perfect health food. It is crunchy, tasty, and highly nutritious. Carrots are a particularly good source of beta carotene, fiber, vitamin K1, potassium, and antioxidants. Carrots a verastile- add them to soups, stews, salads, casseroles, the possibilities are endless.</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">What Are #2 Carrots?</span></p><ul class=\"lexical-text-editor--list-ul\"><li value=\"1\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Grade definition:</strong></b><span style=\"white-space: pre-wrap;\"> Carrots that do not meet the cosmetic standards for regular grocery store display (Grade #1).</span></li><li value=\"2\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Appearance:</strong></b><span style=\"white-space: pre-wrap;\"> They may be crooked, split, cracked, undersized, oversized, or slightly scarred, but they are fresh and healthy.</span></li></ul>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2025-10-20T12:57:44.635642-04:00",
+    "updated": "2026-09-17T13:11:42.088460-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/tbmZ0.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 350499,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/tbmZ0.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/tbmZ0.jpg",
+        "original_filename": "account/322922/mUiSB.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 801261,
+        "inventory_per_unit": 1,
+        "unit_price": 1,
+        "average_pack_weight": null,
+        "package_price": 1,
+        "package_unit_price": 1,
+        "priority_order": null,
+        "name": "pound",
+        "price_list_entries": [
+          {
+            "id": 714067,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 549832,
+            "subscription_setting": {
+              "id": 593077,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 714068,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 549830,
+            "subscription_setting": {
+              "id": 593078,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 714069,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 549833,
+            "subscription_setting": {
+              "id": 593079,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 714070,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 549831,
+            "subscription_setting": {
+              "id": 593080,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 1016432,
+        "product_name": "#2 Juicing Carrots",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "lb",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-10-20T12:57:45.147941-04:00",
+        "updated": "2026-09-17T13:11:41.399972-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 549830,
+        "price_list_category": 15105,
+        "price_list": 2718,
+        "priority_order": 1027,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 438831,
+            "price_list_category": 15105,
+            "priority_order": 37,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 89703,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 549831,
+        "price_list_category": 15118,
+        "price_list": 2966,
+        "priority_order": 1239,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 438832,
+            "price_list_category": 15118,
+            "priority_order": 40,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 89704,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 549832,
+        "price_list_category": 15731,
+        "price_list": 3124,
+        "priority_order": 863,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 438833,
+            "price_list_category": 15731,
+            "priority_order": 33,
+            "price_list_category_name": "Organic Vegetables - Roots 🧅🧄 🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 89705,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 549833,
+        "price_list_category": 28905,
+        "price_list": 5622,
+        "priority_order": 1240,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 438834,
+            "price_list_category": 28905,
+            "priority_order": 40,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 89706,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not tracked",
+    "is_deleted": false,
+    "vendor": 3177,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "fetchedAt": "2026-10-08T21:50:53.940Z"
+}

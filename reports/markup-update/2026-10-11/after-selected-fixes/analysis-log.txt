@@ -1,0 +1,374 @@
+{
+  "products": 51,
+  "visible": 1,
+  "counts": {
+    "Bundle price mismatch": 9,
+    "Remote product unavailable": 24,
+    "Unassigned vendor / price mismatch": 18
+  },
+  "omissions": {
+    "vendorUnassignedInBoth": 18,
+    "noPackagesInBoth": 4,
+    "notListedCustomerListRows": 162
+  },
+  "unverified": 0,
+  "rows": [
+    {
+      "id": 1160556,
+      "name": "Ground Beef & Pork Bundle",
+      "vendor": "Full Farm CSA",
+      "issues": "Bundle price mismatch",
+      "visible": true
+    },
+    {
+      "id": 806125,
+      "name": "Organic Spelt Flour",
+      "vendor": "Camas Country Mill",
+      "issues": "Remote product unavailable",
+      "visible": false
+    },
+    {
+      "id": 1017951,
+      "name": "Breakfast Bundle",
+      "vendor": "Full Farm CSA",
+      "issues": "Bundle price mismatch",
+      "visible": false
+    },
+    {
+      "id": 1105400,
+      "name": "Dinner in a Box: Ground Lamb Bundle",
+      "vendor": "Full Farm CSA",
+      "issues": "Bundle price mismatch",
+      "visible": false
+    },
+    {
+      "id": 1109581,
+      "name": "Dinner in a Box: Ground Lamb Bundle No Yogurt",
+      "vendor": "Full Farm CSA",
+      "issues": "Bundle price mismatch",
+      "visible": false
+    },
+    {
+      "id": 1119806,
+      "name": "Dinner in a Box: Pork Shoulder Roast",
+      "vendor": "Full Farm CSA",
+      "issues": "Bundle price mismatch",
+      "visible": false
+    },
+    {
+      "id": 1120974,
+      "name": "Dinner in a Box: Pork Shoulder Roast-No Dairy",
+      "vendor": "Full Farm CSA",
+      "issues": "Bundle price mismatch",
+      "visible": false
+    },
+    {
+      "id": 1133712,
+      "name": "Dinner in a Box: Roasting Chicken",
+      "vendor": "Full Farm CSA",
+      "issues": "Bundle price mismatch",
+      "visible": false
+    },
+    {
+      "id": 1133714,
+      "name": "Dinner in a Box: Roasting Chicken - No Dairy",
+      "vendor": "Full Farm CSA",
+      "issues": "Bundle price mismatch",
+      "visible": false
+    },
+    {
+      "id": 1023667,
+      "name": "Ground Meat Bundle",
+      "vendor": "Full Farm CSA",
+      "issues": "Bundle price mismatch",
+      "visible": false
+    },
+    {
+      "id": 1071880,
+      "name": "Winter Carrots",
+      "vendor": "Full Farm CSA",
+      "issues": "Remote product unavailable",
+      "visible": false
+    },
+    {
+      "id": 1127318,
+      "name": "Travel Size Lotion Stick w/ Honeysuckle Essential Oil",
+      "vendor": "Granny Smith All Natural",
+      "issues": "Remote product unavailable",
+      "visible": false
+    },
+    {
+      "id": 805850,
+      "name": "Asparagus",
+      "vendor": "Organically Grown Company",
+      "issues": "Remote product unavailable",
+      "visible": false
+    },
+    {
+      "id": 1028363,
+      "name": "Black Garlic",
+      "vendor": "Organically Grown Company",
+      "issues": "Remote product unavailable",
+      "visible": false
+    },
+    {
+      "id": 927371,
+      "name": "Pink Lady Apple",
+      "vendor": "Organically Grown Company",
+      "issues": "Remote product unavailable",
+      "visible": false
+    },
+    {
+      "id": 806124,
+      "name": "Brazil Cerrado Miniero - Dark Roast Coffee Beans",
+      "vendor": "Radiant Coffee Roasters",
+      "issues": "Remote product unavailable",
+      "visible": false
+    },
+    {
+      "id": 919071,
+      "name": "Brazil Cerrado Miniero - Dark Roast Ground Coffee",
+      "vendor": "Radiant Coffee Roasters",
+      "issues": "Remote product unavailable",
+      "visible": false
+    },
+    {
+      "id": 805771,
+      "name": "Cathay Bell Watermelon",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 805881,
+      "name": "Cayenne Pepper",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 825306,
+      "name": "Chanterelle mushrooms",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 805885,
+      "name": "Crisphead Lettuce",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 805785,
+      "name": "d'Anjou Pear",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 805797,
+      "name": "Flat, Strawberries",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 805770,
+      "name": "Fuzzy Kiwis",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 812652,
+      "name": "Green and Red Mixed Grapes",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 805788,
+      "name": "Green Grapes",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 805964,
+      "name": "Green Pole Beans",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 805921,
+      "name": "Green Romaine Lettuce",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 805735,
+      "name": "Handcrafted  Wooden Bowls Large 20 Oz",
+      "vendor": "Unassigned",
+      "issues": "Remote product unavailable",
+      "visible": false
+    },
+    {
+      "id": 805733,
+      "name": "Handcrafted Egg Pushers",
+      "vendor": "Unassigned",
+      "issues": "Remote product unavailable",
+      "visible": false
+    },
+    {
+      "id": 805746,
+      "name": "Handcrafted Fancy Wooden Eating Spoons",
+      "vendor": "Unassigned",
+      "issues": "Remote product unavailable",
+      "visible": false
+    },
+    {
+      "id": 825842,
+      "name": "Handcrafted Maple Candle Holder",
+      "vendor": "Unassigned",
+      "issues": "Remote product unavailable",
+      "visible": false
+    },
+    {
+      "id": 805732,
+      "name": "Handcrafted Whisk Brooms",
+      "vendor": "Unassigned",
+      "issues": "Remote product unavailable",
+      "visible": false
+    },
+    {
+      "id": 805737,
+      "name": "Handcrafted Wood & Metal Dustpan",
+      "vendor": "Unassigned",
+      "issues": "Remote product unavailable",
+      "visible": false
+    },
+    {
+      "id": 805736,
+      "name": "Handcrafted Wooden Bowls, Small 14 oz",
+      "vendor": "Unassigned",
+      "issues": "Remote product unavailable",
+      "visible": false
+    },
+    {
+      "id": 805739,
+      "name": "Handcrafted Wooden Chopsticks",
+      "vendor": "Unassigned",
+      "issues": "Remote product unavailable",
+      "visible": false
+    },
+    {
+      "id": 825841,
+      "name": "Handcrafted Wooden Fancy Egg Pushers",
+      "vendor": "Unassigned",
+      "issues": "Remote product unavailable",
+      "visible": false
+    },
+    {
+      "id": 805740,
+      "name": "Handcrafted Wooden Fancy Kitchen Spoons",
+      "vendor": "Unassigned",
+      "issues": "Remote product unavailable",
+      "visible": false
+    },
+    {
+      "id": 805741,
+      "name": "Handcrafted Wooden Plain Kitchen Stir Stix",
+      "vendor": "Unassigned",
+      "issues": "Remote product unavailable",
+      "visible": false
+    },
+    {
+      "id": 805742,
+      "name": "Handcrafted Wooden Plates",
+      "vendor": "Unassigned",
+      "issues": "Remote product unavailable",
+      "visible": false
+    },
+    {
+      "id": 805744,
+      "name": "Handcrafted Wooden Serving Spoons",
+      "vendor": "Unassigned",
+      "issues": "Remote product unavailable",
+      "visible": false
+    },
+    {
+      "id": 805745,
+      "name": "Handcrafted Wooden Spatulas",
+      "vendor": "Unassigned",
+      "issues": "Remote product unavailable",
+      "visible": false
+    },
+    {
+      "id": 805747,
+      "name": "Handcrafted Wooden Teaspoons",
+      "vendor": "Unassigned",
+      "issues": "Remote product unavailable",
+      "visible": false
+    },
+    {
+      "id": 805952,
+      "name": "Kohlrabi Purple or Green",
+      "vendor": "Unassigned",
+      "issues": "Remote product unavailable",
+      "visible": false
+    },
+    {
+      "id": 825305,
+      "name": "Matsutake mushrooms",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 870774,
+      "name": "Pea Shoots",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 805982,
+      "name": "Peppermint",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 883821,
+      "name": "Persian Cucumber",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 805962,
+      "name": "Red Butter-head Little Gem Lettuce",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 805839,
+      "name": "Sweet Potato “Seconds”",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 805846,
+      "name": "Walla Walla Onions",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    }
+  ]
+}

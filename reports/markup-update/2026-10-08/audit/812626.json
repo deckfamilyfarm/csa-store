@@ -1,0 +1,524 @@
+{
+  "productId": 812626,
+  "context": {
+    "product": {
+      "id": 812626,
+      "name": "Red Potatoes (Idaho)",
+      "description": "Red potatoes are a waxy, moist potato variety known for their firm texture and mild, slightly sweet flavor. They have a thin, red skin and white flesh, making them a versatile cooking option. Red potatoes are often used in boiling, roasting, and sauteing, and they hold their shape well during cooking. Grown by: Genesis organics Located in Idaho",
+      "visible": 0,
+      "trackInventory": 1,
+      "inventory": 0,
+      "categoryId": 13,
+      "vendorId": 3168,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/GFNCV.thumbnail.jpeg",
+      "createdAt": "2023-09-30T06:12:00.000Z",
+      "updatedAt": "2026-06-30T10:40:19.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Vegetables - Roots🧅🧄🥕🥔",
+    "vendor": {
+      "id": 3168,
+      "name": "Organically Grown Company",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 534494,
+        "productId": 812626,
+        "name": "1 lb",
+        "price": "1.00",
+        "packageCode": null,
+        "unit": "lb",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": null
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 534494,
+        "productId": 812626,
+        "localLinePackageId": 534494,
+        "liveName": "1 lb",
+        "livePrice": "1.00",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":812626,\"Product\":\"Red Potatoes (Idaho)\",\"Track Inventory By\":\"package\",\"Item Unit\":\"pound\",\"Charge By\":\"package\",\"Charge Unit\":\"pound\",\"Package ID\":534494,\"Package Name\":\"1 lb\",\"# of Items\":1,\"Package Price\":1,\"Inventory Type\":\"product\"},\"live\":{\"id\":534494,\"inventory_per_unit\":1,\"unit_price\":1,\"average_pack_weight\":0,\"package_price\":1,\"package_unit_price\":1,\"priority_order\":null,\"name\":\"1 lb\",\"price_list_entries\":[{\"id\":617944,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479836,\"subscription_setting\":{\"id\":497060,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":238478,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":192147,\"subscription_setting\":{\"id\":146200,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":221797,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":179396,\"subscription_setting\":{\"id\":123243,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":220736,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":178636,\"subscription_setting\":{\"id\":121691,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":812626,\"product_name\":\"Red Potatoes (Idaho)\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"lb\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2023-09-30T02:12:00.754183-04:00\",\"updated\":\"2026-05-14T14:51:13.146607-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 812626,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 812626,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/812626/localline/4a1668f53968582122de3fc7.jpg"
+    ],
+    "localLineVendorId": 3168
+  },
+  "remote": {
+    "id": 812626,
+    "name": "Red Potatoes (Idaho)",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Red potatoes are&nbsp;a waxy, moist potato variety known for their firm texture and mild, slightly sweet flavor.&nbsp;They have a thin, red skin and white flesh, making them a versatile cooking option.&nbsp;Red potatoes are often used in boiling, roasting, and sauteing, and they hold their shape well during cooking.&nbsp;</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Grown by: Genesis organics Located in Idaho</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-09-30T02:12:00.685965-04:00",
+    "updated": "2026-06-29T12:59:44.285403-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/GFNCV.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 144611,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/GFNCV.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/GFNCV.jpeg",
+        "original_filename": "red_potato.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 1,
+      "name": "pound",
+      "abbrieviation": "lb",
+      "unit_type": "weight",
+      "default": true
+    },
+    "charge_unit": {
+      "id": 1,
+      "name": "pound",
+      "abbrieviation": "lb",
+      "unit_type": "weight",
+      "default": true
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 534494,
+        "inventory_per_unit": 1,
+        "unit_price": 1,
+        "average_pack_weight": 0,
+        "package_price": 1,
+        "package_unit_price": 1,
+        "priority_order": null,
+        "name": "1 lb",
+        "price_list_entries": [
+          {
+            "id": 617944,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479836,
+            "subscription_setting": {
+              "id": 497060,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 238478,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 192147,
+            "subscription_setting": {
+              "id": 146200,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 221797,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179396,
+            "subscription_setting": {
+              "id": 123243,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 220736,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 178636,
+            "subscription_setting": {
+              "id": 121691,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 812626,
+        "product_name": "Red Potatoes (Idaho)",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "lb",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-09-30T02:12:00.754183-04:00",
+        "updated": "2026-05-14T14:51:13.146607-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 178636,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 491,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440272,
+            "price_list_category": 15105,
+            "priority_order": 33,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 90776,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179396,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 491,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440273,
+            "price_list_category": 15118,
+            "priority_order": 35,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 90777,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 192147,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 215,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440261,
+            "price_list_category": 15731,
+            "priority_order": 268,
+            "price_list_category_name": "Organic Vegetables - Roots 🧅🧄 🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 90778,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479836,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 491,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 440274,
+            "price_list_category": 28905,
+            "priority_order": 37,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 90779,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3168,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": true,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3168,
+    "packages": [
+      {
+        "id": 534494,
+        "unit_price": 1,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 192147,
+            "calculated_value": 1.45,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 178636,
+            "calculated_value": 1.45,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 179396,
+            "calculated_value": 1.45,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 479836,
+            "calculated_value": 1.45,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:39:47.260Z",
+  "rows": [
+    {
+      "productId": 812626,
+      "product": "Red Potatoes (Idaho)",
+      "vendor": "Organically Grown Company",
+      "packageId": 534494,
+      "package": "1 lb",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 1,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 1.4,
+      "localPriceAfter": 1.45,
+      "remoteBasePrice": 1,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 1.4,
+      "remotePriceAfter": 1.45
+    },
+    {
+      "productId": 812626,
+      "product": "Red Potatoes (Idaho)",
+      "vendor": "Organically Grown Company",
+      "packageId": 534494,
+      "package": "1 lb",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 1,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 1.4,
+      "localPriceAfter": 1.45,
+      "remoteBasePrice": 1,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 1.4,
+      "remotePriceAfter": 1.45
+    },
+    {
+      "productId": 812626,
+      "product": "Red Potatoes (Idaho)",
+      "vendor": "Organically Grown Company",
+      "packageId": 534494,
+      "package": "1 lb",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 1,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 1.4,
+      "localPriceAfter": 1.45,
+      "remoteBasePrice": 1,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 1.4,
+      "remotePriceAfter": 1.45
+    },
+    {
+      "productId": 812626,
+      "product": "Red Potatoes (Idaho)",
+      "vendor": "Organically Grown Company",
+      "packageId": 534494,
+      "package": "1 lb",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 1,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 1.4,
+      "localPriceAfter": 1.45,
+      "remoteBasePrice": 1,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 1.4,
+      "remotePriceAfter": 1.45
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.946Z"
+}

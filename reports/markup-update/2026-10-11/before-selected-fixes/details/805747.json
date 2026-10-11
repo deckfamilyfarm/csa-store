@@ -1,0 +1,10 @@
+{
+  "error": {
+    "status": 404,
+    "code": "product_not_found",
+    "detail": "This product does not exist, or is not owned by the requesting user."
+  },
+  "localProductId": 805747,
+  "remoteProductId": 805747,
+  "checkedAt": "2026-10-11T17:26:37.084Z"
+}

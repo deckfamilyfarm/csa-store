@@ -1,0 +1,524 @@
+{
+  "productId": 994208,
+  "context": {
+    "product": {
+      "id": 994208,
+      "name": "Muncher Cucumber",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Marketmore cucumbers are great sliced or pickled. Known for it's sweet crisp taste and dark green color.</span></p>",
+      "visible": 0,
+      "trackInventory": 1,
+      "inventory": 15,
+      "categoryId": 12,
+      "vendorId": 3152,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/EFUAx.thumbnail.jpeg",
+      "createdAt": "2025-07-21T22:22:04.000Z",
+      "updatedAt": "2026-07-03T19:41:35.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Fruiting Vegetables 🌶🥒🎃🍅",
+    "vendor": {
+      "id": 3152,
+      "name": "Little Wings",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 767741,
+        "productId": 994208,
+        "name": "lb",
+        "price": "2.50",
+        "packageCode": null,
+        "unit": "lb",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 767741,
+        "productId": 994208,
+        "localLinePackageId": 767741,
+        "liveName": "lb",
+        "livePrice": "2.50",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":994208,\"Product\":\"Muncher Cucumber\",\"Track Inventory By\":\"package\",\"Item Unit\":\"lb\",\"Charge By\":\"package\",\"Charge Unit\":\"lb\",\"Package ID\":767741,\"Package Name\":\"lb\",\"# of Items\":1,\"Package Price\":2.5,\"Inventory Type\":\"product\"},\"live\":{\"id\":767741,\"inventory_per_unit\":1,\"unit_price\":2.5,\"average_pack_weight\":0,\"package_price\":2.5,\"package_unit_price\":2.5,\"priority_order\":1,\"name\":\"lb\",\"price_list_entries\":[{\"id\":653908,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":508211,\"subscription_setting\":{\"id\":533004,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":653907,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":508210,\"subscription_setting\":{\"id\":533003,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":653909,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":508212,\"subscription_setting\":{\"id\":533005,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":653906,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":508209,\"subscription_setting\":{\"id\":533002,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":15,\"number_of_packages_available\":15,\"number_of_packages_total\":15,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":15,\"product_package_size\":1,\"product_id\":994208,\"product_name\":\"Muncher Cucumber\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"lb\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2025-07-21T18:22:04.297616-04:00\",\"updated\":\"2026-06-09T14:03:16.193527-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 994208,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 994208,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/994208/localline/36d35268ea624a57d334f848.jpg"
+    ],
+    "localLineVendorId": 3152
+  },
+  "remote": {
+    "id": 994208,
+    "name": "Muncher Cucumber",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Marketmore cucumbers are great sliced or pickled. Known for it's sweet crisp taste and dark green color.</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2025-07-21T18:22:04.029540-04:00",
+    "updated": "2026-07-02T12:43:23.463988-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/EFUAx.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 325327,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/EFUAx.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/EFUAx.jpeg",
+        "original_filename": "download.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 15,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 767741,
+        "inventory_per_unit": 1,
+        "unit_price": 2.5,
+        "average_pack_weight": 0,
+        "package_price": 2.5,
+        "package_unit_price": 2.5,
+        "priority_order": 1,
+        "name": "lb",
+        "price_list_entries": [
+          {
+            "id": 653908,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 508211,
+            "subscription_setting": {
+              "id": 533004,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 653907,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 508210,
+            "subscription_setting": {
+              "id": 533003,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 653909,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 508212,
+            "subscription_setting": {
+              "id": 533005,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 653906,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 508209,
+            "subscription_setting": {
+              "id": 533002,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 15,
+        "number_of_packages_available": 15,
+        "number_of_packages_total": 15,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 15,
+        "product_package_size": 1,
+        "product_id": 994208,
+        "product_name": "Muncher Cucumber",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "lb",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-07-21T18:22:04.297616-04:00",
+        "updated": "2026-06-09T14:03:16.193527-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 508209,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 814,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440358,
+            "price_list_category": 15750,
+            "priority_order": 30,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 59585,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 508210,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 978,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440521,
+            "price_list_category": 15111,
+            "priority_order": 24,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 59586,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 508211,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1187,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440795,
+            "price_list_category": 15120,
+            "priority_order": 31,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 59587,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 508212,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1188,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 440986,
+            "price_list_category": 28914,
+            "priority_order": 33,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 59588,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3152,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 15,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 15
+  },
+  "payload": {
+    "vendor": 3152,
+    "packages": [
+      {
+        "id": 767741,
+        "unit_price": 2.5,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 508209,
+            "calculated_value": 3.63,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.5
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 508210,
+            "calculated_value": 3.63,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.5
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 508211,
+            "calculated_value": 3.63,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.5
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 508212,
+            "calculated_value": 3.63,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.5
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:40:58.051Z",
+  "rows": [
+    {
+      "productId": 994208,
+      "product": "Muncher Cucumber",
+      "vendor": "Little Wings",
+      "packageId": 767741,
+      "package": "lb",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 2.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.5,
+      "localPriceAfter": 3.63,
+      "remoteBasePrice": 2.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.5,
+      "remotePriceAfter": 3.63
+    },
+    {
+      "productId": 994208,
+      "product": "Muncher Cucumber",
+      "vendor": "Little Wings",
+      "packageId": 767741,
+      "package": "lb",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 2.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.5,
+      "localPriceAfter": 3.63,
+      "remoteBasePrice": 2.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.5,
+      "remotePriceAfter": 3.63
+    },
+    {
+      "productId": 994208,
+      "product": "Muncher Cucumber",
+      "vendor": "Little Wings",
+      "packageId": 767741,
+      "package": "lb",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 2.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.5,
+      "localPriceAfter": 3.63,
+      "remoteBasePrice": 2.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.5,
+      "remotePriceAfter": 3.63
+    },
+    {
+      "productId": 994208,
+      "product": "Muncher Cucumber",
+      "vendor": "Little Wings",
+      "packageId": 767741,
+      "package": "lb",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 2.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.5,
+      "localPriceAfter": 3.63,
+      "remoteBasePrice": 2.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.5,
+      "remotePriceAfter": 3.63
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:41.006Z"
+}

@@ -1,0 +1,45 @@
+{
+  "productId": 1120977,
+  "context": {
+    "product": {
+      "id": 1120977,
+      "name": "Breakfast Bundle",
+      "description": "Planning to have a house full of people? Be ready for a breakfast feast with this box of locally produced, gourmet items. Products from Taylor’s Sausage, Lonesome Whistle, Hyland Processing and Deck Family Farm. All the meats, eggs and honey were raised at Deck Family Farm.",
+      "visible": 0,
+      "trackInventory": 1,
+      "inventory": 0,
+      "categoryId": null,
+      "vendorId": 3148,
+      "thumbnailUrl": null,
+      "createdAt": "2026-05-18T04:51:13.000Z",
+      "updatedAt": "2026-07-03T19:41:35.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "",
+    "vendor": {
+      "id": 3148,
+      "name": "Full Farm CSA",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [],
+    "packageMeta": [],
+    "sale": {},
+    "remoteId": 1120977,
+    "imageUrls": []
+  },
+  "remote": null,
+  "payload": null,
+  "problems": [
+    "Local Line box/bundle: product endpoint does not support this item"
+  ],
+  "status": "exception",
+  "auditedAt": "2026-10-08T19:41:32.046Z",
+  "rows": [],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:41.043Z",
+  "connectionError": "Local Line box/bundle: product endpoint does not support this item"
+}

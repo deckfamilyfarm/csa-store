@@ -1,0 +1,205 @@
+{
+  "products": 27,
+  "visible": 1,
+  "counts": {
+    "Bundle price mismatch": 9,
+    "Unassigned vendor / price mismatch": 18
+  },
+  "omissions": {
+    "vendorUnassignedInBoth": 18,
+    "noPackagesInBoth": 4,
+    "notListedCustomerListRows": 162
+  },
+  "unverified": 0,
+  "rows": [
+    {
+      "id": 1160556,
+      "name": "Ground Beef & Pork Bundle",
+      "vendor": "Full Farm CSA",
+      "issues": "Bundle price mismatch",
+      "visible": true
+    },
+    {
+      "id": 1017951,
+      "name": "Breakfast Bundle",
+      "vendor": "Full Farm CSA",
+      "issues": "Bundle price mismatch",
+      "visible": false
+    },
+    {
+      "id": 1105400,
+      "name": "Dinner in a Box: Ground Lamb Bundle",
+      "vendor": "Full Farm CSA",
+      "issues": "Bundle price mismatch",
+      "visible": false
+    },
+    {
+      "id": 1109581,
+      "name": "Dinner in a Box: Ground Lamb Bundle No Yogurt",
+      "vendor": "Full Farm CSA",
+      "issues": "Bundle price mismatch",
+      "visible": false
+    },
+    {
+      "id": 1119806,
+      "name": "Dinner in a Box: Pork Shoulder Roast",
+      "vendor": "Full Farm CSA",
+      "issues": "Bundle price mismatch",
+      "visible": false
+    },
+    {
+      "id": 1120974,
+      "name": "Dinner in a Box: Pork Shoulder Roast-No Dairy",
+      "vendor": "Full Farm CSA",
+      "issues": "Bundle price mismatch",
+      "visible": false
+    },
+    {
+      "id": 1133712,
+      "name": "Dinner in a Box: Roasting Chicken",
+      "vendor": "Full Farm CSA",
+      "issues": "Bundle price mismatch",
+      "visible": false
+    },
+    {
+      "id": 1133714,
+      "name": "Dinner in a Box: Roasting Chicken - No Dairy",
+      "vendor": "Full Farm CSA",
+      "issues": "Bundle price mismatch",
+      "visible": false
+    },
+    {
+      "id": 1023667,
+      "name": "Ground Meat Bundle",
+      "vendor": "Full Farm CSA",
+      "issues": "Bundle price mismatch",
+      "visible": false
+    },
+    {
+      "id": 805771,
+      "name": "Cathay Bell Watermelon",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 805881,
+      "name": "Cayenne Pepper",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 825306,
+      "name": "Chanterelle mushrooms",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 805885,
+      "name": "Crisphead Lettuce",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 805785,
+      "name": "d'Anjou Pear",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 805797,
+      "name": "Flat, Strawberries",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 805770,
+      "name": "Fuzzy Kiwis",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 812652,
+      "name": "Green and Red Mixed Grapes",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 805788,
+      "name": "Green Grapes",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 805964,
+      "name": "Green Pole Beans",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 805921,
+      "name": "Green Romaine Lettuce",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 825305,
+      "name": "Matsutake mushrooms",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 870774,
+      "name": "Pea Shoots",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 805982,
+      "name": "Peppermint",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 883821,
+      "name": "Persian Cucumber",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 805962,
+      "name": "Red Butter-head Little Gem Lettuce",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 805839,
+      "name": "Sweet Potato “Seconds”",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    },
+    {
+      "id": 805846,
+      "name": "Walla Walla Onions",
+      "vendor": "Unassigned",
+      "issues": "Unassigned vendor / price mismatch",
+      "visible": false
+    }
+  ]
+}

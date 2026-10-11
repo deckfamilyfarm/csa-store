@@ -1,0 +1,464 @@
+{
+  "productId": 1161243,
+  "context": {
+    "product": {
+      "id": 1161243,
+      "name": "Naravilla and Laturilla Figs",
+      "description": "Figs are always Organic, these are vegan, not pollinated with fig wasps as in other regions because we do not have fig wasps here so they cross pollinate. Approximately 8 figs per pack.",
+      "visible": 1,
+      "trackInventory": 1,
+      "inventory": 12,
+      "categoryId": null,
+      "vendorId": 6886,
+      "thumbnailUrl": null,
+      "createdAt": "2026-09-11T10:40:23.000Z",
+      "updatedAt": "2026-10-09T19:18:40.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "",
+    "vendor": {
+      "id": 6886,
+      "name": "Falk Farm",
+      "priceListMarkup": null,
+      "sourceMultiplier": null,
+      "guestMarkup": "0.55",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 1006816,
+        "productId": 1161243,
+        "name": "pack",
+        "price": "6.00",
+        "packageCode": null,
+        "unit": null,
+        "numOfItems": 1,
+        "trackType": null,
+        "chargeType": null,
+        "visible": 1,
+        "trackInventory": 0,
+        "inventory": null
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 1006816,
+        "productId": 1161243,
+        "localLinePackageId": 1006816,
+        "liveName": "pack",
+        "livePrice": "6.00",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":1161243,\"Product\":\"Naravilla and Laturilla Figs\",\"Track Inventory By\":\"package\",\"Item Unit\":\"pk\",\"Charge By\":\"package\",\"Charge Unit\":\"pk\",\"Package ID\":1006816,\"Package Name\":\"pack\",\"# of Items\":1,\"Package Price\":6,\"Inventory Type\":\"product\"},\"live\":{\"id\":1006816,\"inventory_per_unit\":1,\"unit_price\":6,\"average_pack_weight\":0,\"package_price\":6,\"package_unit_price\":6,\"priority_order\":0,\"name\":\"pack\",\"price_list_entries\":[{\"id\":1043350,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":804663,\"subscription_setting\":{\"id\":922027,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":1043351,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":804664,\"subscription_setting\":{\"id\":922028,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":1043352,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":804665,\"subscription_setting\":{\"id\":922029,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":12,\"number_of_packages_available\":12,\"number_of_packages_total\":12,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":12,\"product_package_size\":1,\"product_id\":1161243,\"product_name\":\"Naravilla and Laturilla Figs\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"pk\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2026-09-10T12:49:47.270281-04:00\",\"updated\":\"2026-09-10T12:55:07.093614-04:00\"}}",
+        "createdAt": "2026-09-11T10:42:45.000Z",
+        "updatedAt": "2026-10-09T10:41:30.000Z",
+        "lastSyncedAt": "2026-10-09T10:41:30.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 1161243,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-09T10:41:30.000Z"
+    },
+    "remoteId": 1161243,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/1161243/localline/d382ff5a3bc6a662cb91977d.jpg"
+    ],
+    "localLineVendorId": 6886
+  },
+  "remote": {
+    "id": 1161243,
+    "name": "Naravilla and Laturilla Figs",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Figs are always Organic, these are vegan, not pollinated with fig wasps as in other regions because we do not have fig wasps here so they cross pollinate.</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Approximately 8 figs per pack.</span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2026-09-10T12:49:47.239904-04:00",
+    "updated": "2026-10-08T11:20:33.851077-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/5qpyv.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 473770,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/5qpyv.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/5qpyv.jpg",
+        "original_filename": "IMG_20260910_094436(1).jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 12,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12590,
+      "name": "pk",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12590,
+      "name": "pk",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 1006816,
+        "inventory_per_unit": 1,
+        "unit_price": 6,
+        "average_pack_weight": 0,
+        "package_price": 6,
+        "package_unit_price": 6,
+        "priority_order": 0,
+        "name": "pack",
+        "price_list_entries": [
+          {
+            "id": 1043350,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 804663,
+            "subscription_setting": {
+              "id": 922027,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1043351,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 804664,
+            "subscription_setting": {
+              "id": 922028,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1043352,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 804665,
+            "subscription_setting": {
+              "id": 922029,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 12,
+        "number_of_packages_available": 12,
+        "number_of_packages_total": 12,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 12,
+        "product_package_size": 1,
+        "product_id": 1161243,
+        "product_name": "Naravilla and Laturilla Figs",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "pk",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-09-10T12:49:47.270281-04:00",
+        "updated": "2026-09-10T12:55:07.093614-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 804663,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 1012,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 681937,
+            "price_list_category": 15748,
+            "priority_order": 9,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": {
+          "id": 199888,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 804664,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1394,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 681938,
+            "price_list_category": 15063,
+            "priority_order": 9,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": {
+          "id": 199889,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 804665,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1412,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 681939,
+            "price_list_category": 28911,
+            "priority_order": 9,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": {
+          "id": 199890,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 6886,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 12,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 12
+  },
+  "payload": {
+    "vendor": 6886,
+    "packages": [
+      {
+        "id": 1006816,
+        "unit_price": 6,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 804663,
+            "calculated_value": 8.7,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 6
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 804664,
+            "calculated_value": 8.7,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 6
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 804665,
+            "calculated_value": 8.7,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 6
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "warnings": [],
+  "status": "ready",
+  "auditedAt": "2026-10-09T19:22:26.358Z",
+  "vendorOnly": false,
+  "rows": [
+    {
+      "productId": 1161243,
+      "product": "Naravilla and Laturilla Figs",
+      "vendor": "Falk Farm",
+      "packageId": 1006816,
+      "package": "pack",
+      "priceList": "Guest Basket",
+      "visible": true,
+      "basePrice": 6,
+      "markupBefore": 55.00000000000001,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 9.3,
+      "localPriceAfter": 8.7,
+      "remoteBasePrice": 6,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 8.4,
+      "remotePriceAfter": 8.7
+    },
+    {
+      "productId": 1161243,
+      "product": "Naravilla and Laturilla Figs",
+      "vendor": "Falk Farm",
+      "packageId": 1006816,
+      "package": "pack",
+      "priceList": "CSA Members",
+      "visible": true,
+      "basePrice": 6,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 8.4,
+      "localPriceAfter": 8.7,
+      "remoteBasePrice": 6,
+      "remoteAdjustmentType": null,
+      "remoteAdjustmentBefore": null,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": null,
+      "remotePriceAfter": null
+    },
+    {
+      "productId": 1161243,
+      "product": "Naravilla and Laturilla Figs",
+      "vendor": "Falk Farm",
+      "packageId": 1006816,
+      "package": "pack",
+      "priceList": "Herd Share Members",
+      "visible": true,
+      "basePrice": 6,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 8.4,
+      "localPriceAfter": 8.7,
+      "remoteBasePrice": 6,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 8.4,
+      "remotePriceAfter": 8.7
+    },
+    {
+      "productId": 1161243,
+      "product": "Naravilla and Laturilla Figs",
+      "vendor": "Falk Farm",
+      "packageId": 1006816,
+      "package": "pack",
+      "priceList": "SNAP",
+      "visible": true,
+      "basePrice": 6,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 8.4,
+      "localPriceAfter": 8.7,
+      "remoteBasePrice": 6,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 8.4,
+      "remotePriceAfter": 8.7
+    }
+  ]
+}

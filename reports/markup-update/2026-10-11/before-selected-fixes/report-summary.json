@@ -1,0 +1,14 @@
+{
+  "products": 61,
+  "visible": 2,
+  "categories": {
+    "Bundle pricing": 9,
+    "Vendor assignment": 6,
+    "Missing / unavailable Local Line product": 24,
+    "Sale and pricing review": 4,
+    "Unassigned vendor and pricing": 18
+  },
+  "priceRows": 125,
+  "readOnly": true,
+  "checkedThrough": "2026-10-11T17:29:05.135Z"
+}

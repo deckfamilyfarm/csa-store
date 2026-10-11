@@ -1,0 +1,244 @@
+{
+  "data": {
+    "id": 1157469,
+    "name": "Fresh Frozen Elderberries",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Raw or unripe elderberries contain natural compounds that can cause stomach upset and must always be cooked or thoroughly dried/heated before consumption.</span></p><p dir=\"ltr\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Flavor Profile:</strong></b><span style=\"white-space: pre-wrap;\"> Deep, earthy, sweet, and tart when cooked or steeped.</span></p><ul class=\"lexical-text-editor--list-ul\"><li value=\"1\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Key Uses:</strong></b><span style=\"white-space: pre-wrap;\"> Perfect for simmering homemade immune syrups, blending into herbal teas, or baking into jams, jellies, and pies.</span></li><li value=\"2\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Nutritional Benefits:</strong></b><span style=\"white-space: pre-wrap;\"> Loaded with natural anthocyanins and powerful antioxidants that support year-round immune wellness. </span></li></ul><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">#3 bag of 2026 fresh frozen, cleaned, destemed, organic elderberries.</span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2026-08-24T20:34:30.524549-04:00",
+    "updated": "2026-10-09T16:01:41.315565-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/3tJ1r.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 468275,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/3tJ1r.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/3tJ1r.jpeg",
+        "original_filename": "images (6).jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 5,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12591,
+      "name": "bag",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12591,
+      "name": "bag",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [
+      {
+        "id": 2245,
+        "priority_order": 1,
+        "name": "Frozen"
+      }
+    ],
+    "packing_tag": 86,
+    "packages": [
+      {
+        "id": 1001274,
+        "inventory_per_unit": 1,
+        "unit_price": 45,
+        "average_pack_weight": 0,
+        "package_price": 45,
+        "package_unit_price": 45,
+        "priority_order": 0,
+        "name": "3 lb bag",
+        "price_list_entries": [
+          {
+            "id": 1032786,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 796575,
+            "subscription_setting": {
+              "id": 911451,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1032787,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 796576,
+            "subscription_setting": {
+              "id": 911452,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1032788,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 796577,
+            "subscription_setting": {
+              "id": 911453,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 5,
+        "number_of_packages_available": 5,
+        "number_of_packages_total": 5,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 5,
+        "product_package_size": 1,
+        "product_id": 1157469,
+        "product_name": "Fresh Frozen Elderberries",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bag",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-08-24T20:34:30.851984-04:00",
+        "updated": "2026-10-09T16:01:40.644555-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 796575,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 1008,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 674164,
+            "price_list_category": 15748,
+            "priority_order": 12,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": {
+          "id": 194925,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 796576,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1390,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 674165,
+            "price_list_category": 15063,
+            "priority_order": 12,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": {
+          "id": 194926,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 796577,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1408,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 674166,
+            "price_list_category": 28911,
+            "priority_order": 12,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": {
+          "id": 194927,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 6886,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 5,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 5
+  },
+  "localProductId": 1157469,
+  "remoteProductId": 1157469,
+  "checkedAt": "2026-10-11T18:10:17.616Z"
+}

@@ -1,0 +1,525 @@
+{
+  "productId": 805848,
+  "context": {
+    "product": {
+      "id": 805848,
+      "name": "Green Curly Kale",
+      "description": "Curly leafed kale is probably the first thing that comes to mind when you think of kale. The bright-green leaves are sometimes curled so tightly it can be hard to chop them. This kind of kale tends to have a bright, peppery flavor that can become quite bitter.",
+      "visible": 1,
+      "trackInventory": 0,
+      "inventory": 0,
+      "categoryId": 14,
+      "vendorId": 3154,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/5BgzN.thumbnail.jpeg",
+      "createdAt": "2023-08-25T14:39:56.000Z",
+      "updatedAt": "2026-10-09T19:18:32.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Vegetables - Leafy Greens 🥬",
+    "vendor": {
+      "id": 3154,
+      "name": "Camas Swale Farm",
+      "priceListMarkup": "0.4500",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.45",
+      "memberMarkup": "0.45"
+    },
+    "profile": {
+      "productId": 805848,
+      "unitOfMeasure": "each",
+      "sourceUnitPrice": null,
+      "minWeight": null,
+      "maxWeight": null,
+      "avgWeightOverride": null,
+      "sourceMultiplier": "0.5412",
+      "guestMarkup": "0.4500",
+      "memberMarkup": "0.4500",
+      "herdShareMarkup": "0.4500",
+      "snapMarkup": "0.4500",
+      "markupOverride": "0.4500",
+      "onSale": 0,
+      "saleDiscount": null,
+      "priceChangedAt": "2026-10-08T21:02:47.000Z",
+      "remoteSyncStatus": "pending",
+      "remoteSyncMessage": "Vendor pricing defaults updated. Apply to remote store pending.",
+      "remoteSyncedAt": null,
+      "createdAt": "2026-10-08T20:19:27.000Z",
+      "updatedAt": "2026-10-08T21:02:47.000Z"
+    },
+    "packages": [
+      {
+        "id": 526906,
+        "productId": 805848,
+        "name": "each",
+        "price": "2.00",
+        "packageCode": null,
+        "unit": "bu",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 1,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 526906,
+        "productId": 805848,
+        "localLinePackageId": 526906,
+        "liveName": "each",
+        "livePrice": "2.00",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":805848,\"Product\":\"Green Curly Kale\",\"Track Inventory By\":\"package\",\"Item Unit\":\"bu\",\"Charge By\":\"package\",\"Charge Unit\":\"bu\",\"Package ID\":526906,\"Package Name\":\"each\",\"# of Items\":1,\"Package Price\":2,\"Inventory Type\":\"product\"},\"live\":{\"id\":526906,\"inventory_per_unit\":1,\"unit_price\":2,\"average_pack_weight\":null,\"package_price\":2,\"package_unit_price\":2,\"priority_order\":null,\"name\":\"each\",\"price_list_entries\":[{\"id\":221643,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":179246,\"subscription_setting\":{\"id\":124076,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":207637,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":167809,\"subscription_setting\":{\"id\":106813,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":238375,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":192047,\"subscription_setting\":{\"id\":145910,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":617831,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479724,\"subscription_setting\":{\"id\":496947,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":805848,\"product_name\":\"Green Curly Kale\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"bu\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2023-08-25T10:39:56.483615-04:00\",\"updated\":\"2026-09-10T16:37:46.211232-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-09T10:41:30.000Z",
+        "lastSyncedAt": "2026-10-09T10:41:30.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 805848,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-09T10:41:30.000Z"
+    },
+    "remoteId": 805848,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/805848/localline/0fe7478f0de0ab7e864dd95c.jpg"
+    ],
+    "localLineVendorId": 3154
+  },
+  "remote": {
+    "id": 805848,
+    "name": "Green Curly Kale",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Curly leafed kale is probably the first thing that comes to mind when you think of kale. The bright-green leaves are sometimes curled so tightly it can be hard to chop them. This kind of kale tends to have a bright, peppery flavor that can become quite bitter.</span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2023-08-25T10:39:56.471511-04:00",
+    "updated": "2026-09-10T16:38:01.972098-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/5BgzN.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 141375,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/5BgzN.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/5BgzN.jpg",
+        "original_filename": "576.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 526906,
+        "inventory_per_unit": 1,
+        "unit_price": 2,
+        "average_pack_weight": null,
+        "package_price": 2,
+        "package_unit_price": 2,
+        "priority_order": null,
+        "name": "each",
+        "price_list_entries": [
+          {
+            "id": 221643,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179246,
+            "subscription_setting": {
+              "id": 124076,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 207637,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 167809,
+            "subscription_setting": {
+              "id": 106813,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 238375,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 192047,
+            "subscription_setting": {
+              "id": 145910,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617831,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479724,
+            "subscription_setting": {
+              "id": 496947,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 805848,
+        "product_name": "Green Curly Kale",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bu",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T10:39:56.483615-04:00",
+        "updated": "2026-09-10T16:37:46.211232-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 167809,
+        "price_list_category": 15107,
+        "price_list": 2718,
+        "priority_order": 232,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 137675,
+            "price_list_category": 15107,
+            "priority_order": 266,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179246,
+        "price_list_category": 15119,
+        "price_list": 2966,
+        "priority_order": 232,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 147456,
+            "price_list_category": 15119,
+            "priority_order": 268,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 192047,
+        "price_list_category": 15732,
+        "price_list": 3124,
+        "priority_order": 111,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 157924,
+            "price_list_category": 15732,
+            "priority_order": 151,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479724,
+        "price_list_category": 28913,
+        "price_list": 5622,
+        "priority_order": 232,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370272,
+            "price_list_category": 28913,
+            "priority_order": 269,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not tracked",
+    "is_deleted": false,
+    "vendor": 3154,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": true,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3154,
+    "packages": [
+      {
+        "id": 526906,
+        "unit_price": 2,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 192047,
+            "calculated_value": 2.9,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 167809,
+            "calculated_value": 2.9,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 179246,
+            "calculated_value": 2.9,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 479724,
+            "calculated_value": 2.9,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "warnings": [],
+  "status": "ready",
+  "auditedAt": "2026-10-09T19:21:55.542Z",
+  "vendorOnly": false,
+  "rows": [
+    {
+      "productId": 805848,
+      "product": "Green Curly Kale",
+      "vendor": "Camas Swale Farm",
+      "packageId": 526906,
+      "package": "each",
+      "priceList": "Guest Basket",
+      "visible": true,
+      "basePrice": 2,
+      "markupBefore": 45,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.9,
+      "localPriceAfter": 2.9,
+      "remoteBasePrice": 2,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.8,
+      "remotePriceAfter": 2.9
+    },
+    {
+      "productId": 805848,
+      "product": "Green Curly Kale",
+      "vendor": "Camas Swale Farm",
+      "packageId": 526906,
+      "package": "each",
+      "priceList": "CSA Members",
+      "visible": true,
+      "basePrice": 2,
+      "markupBefore": 45,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.9,
+      "localPriceAfter": 2.9,
+      "remoteBasePrice": 2,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.8,
+      "remotePriceAfter": 2.9
+    },
+    {
+      "productId": 805848,
+      "product": "Green Curly Kale",
+      "vendor": "Camas Swale Farm",
+      "packageId": 526906,
+      "package": "each",
+      "priceList": "Herd Share Members",
+      "visible": true,
+      "basePrice": 2,
+      "markupBefore": 45,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.9,
+      "localPriceAfter": 2.9,
+      "remoteBasePrice": 2,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.8,
+      "remotePriceAfter": 2.9
+    },
+    {
+      "productId": 805848,
+      "product": "Green Curly Kale",
+      "vendor": "Camas Swale Farm",
+      "packageId": 526906,
+      "package": "each",
+      "priceList": "SNAP",
+      "visible": true,
+      "basePrice": 2,
+      "markupBefore": 45,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.9,
+      "localPriceAfter": 2.9,
+      "remoteBasePrice": 2,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.8,
+      "remotePriceAfter": 2.9
+    }
+  ]
+}

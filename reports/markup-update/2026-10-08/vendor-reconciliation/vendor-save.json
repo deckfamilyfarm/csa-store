@@ -1,0 +1,19 @@
+{
+  "savedAt": "2026-10-09T19:19:40.819Z",
+  "vendorsInserted": 6,
+  "productsReassigned": 123,
+  "missingVendorsResolved": 63,
+  "cacheUpdated": 9,
+  "checks": {
+    "categories": true,
+    "packages": true,
+    "productPricingProfiles": true,
+    "productSales": true,
+    "localLinePackageMeta": true,
+    "existingVendorPricing": true,
+    "onlyProductVendorsChanged": true,
+    "otherAssignments": true,
+    "assignmentsConfirmed": true,
+    "protectedPrices": true
+  }
+}

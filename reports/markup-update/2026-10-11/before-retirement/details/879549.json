@@ -1,0 +1,261 @@
+{
+  "data": {
+    "id": 879549,
+    "name": "Baby Mustard Salad Mix",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Mustard mixes, like prepared mustard, offer several health benefits due to their rich nutrient content and beneficial compounds.&nbsp;They are&nbsp;a good source of minerals like selenium, magnesium, phosphorus, and calcium.&nbsp;Mustard also contains&nbsp;</span><a href=\"https://www.google.com/search?sca_esv=0d63aef30b57140a&amp;rlz=1CAVNCX_enUS1049US1049&amp;cs=0&amp;sxsrf=AHTn8zrB6wQoNklsbl8B2XsxlfQErh2nqA%3A1745689012152&amp;q=glucosinolates&amp;sa=X&amp;ved=2ahUKEwjxyqqrnvaMAxVfADQIHXHcN7YQxccNegQIBxAB&amp;mstk=AUtExfB5KxhstH0KABtrp8zvrifw6aptqBGbPngWCkNMQIvaZdW4fU9IzcJOzt_pl7yYIBfmalcde1fuhzTtOCBynsgT2mCy5umXLJYsMDc24jOWE1NPxKuSsUGIjz-C2vLoNsBYIgk7ov4QNdFNp7UgodUIJCx2bj511fF7y-14zddJt25OOFwFmMMxrSK17aKXwtjfsu_KAmL5E5N9TuY9OTEc9RimJV7WZGMmRTCsKnfMdhHRWNvXt4mdoHo8femx_upf50f9XO8CaxYy5W9rXYRZk1LcxyhCU8BbKw5Ui2-8iQ&amp;csui=3\" target=\"_blank\" class=\"lexical-text-editor--link\"><span style=\"white-space: pre-wrap;\">glucosinolates</span></a><span style=\"white-space: pre-wrap;\">&nbsp;and&nbsp;</span><a href=\"https://www.google.com/search?sca_esv=0d63aef30b57140a&amp;rlz=1CAVNCX_enUS1049US1049&amp;cs=0&amp;sxsrf=AHTn8zrB6wQoNklsbl8B2XsxlfQErh2nqA%3A1745689012152&amp;q=isothiocyanates&amp;sa=X&amp;ved=2ahUKEwjxyqqrnvaMAxVfADQIHXHcN7YQxccNegQIBxAC&amp;mstk=AUtExfB5KxhstH0KABtrp8zvrifw6aptqBGbPngWCkNMQIvaZdW4fU9IzcJOzt_pl7yYIBfmalcde1fuhzTtOCBynsgT2mCy5umXLJYsMDc24jOWE1NPxKuSsUGIjz-C2vLoNsBYIgk7ov4QNdFNp7UgodUIJCx2bj511fF7y-14zddJt25OOFwFmMMxrSK17aKXwtjfsu_KAmL5E5N9TuY9OTEc9RimJV7WZGMmRTCsKnfMdhHRWNvXt4mdoHo8femx_upf50f9XO8CaxYy5W9rXYRZk1LcxyhCU8BbKw5Ui2-8iQ&amp;csui=3\" target=\"_blank\" class=\"lexical-text-editor--link\"><span style=\"white-space: pre-wrap;\">isothiocyanates</span></a><span style=\"white-space: pre-wrap;\">,&nbsp;which may have anti-inflammatory and antioxidant properties.&nbsp;</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2024-05-23T21:17:19.159334-04:00",
+    "updated": "2026-10-08T16:27:36.986832-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/lSZwx.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 201976,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/lSZwx.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/lSZwx.jpeg",
+        "original_filename": "account/322922/loIBn.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12591,
+      "name": "bag",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12591,
+      "name": "bag",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 615270,
+        "inventory_per_unit": 1,
+        "unit_price": 4,
+        "average_pack_weight": null,
+        "package_price": 4,
+        "package_unit_price": 4,
+        "priority_order": null,
+        "name": "1/2 lb",
+        "price_list_entries": [
+          {
+            "id": 354413,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 290040,
+            "subscription_setting": {
+              "id": 234818,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 354412,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 290039,
+            "subscription_setting": {
+              "id": 234817,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 354414,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 290041,
+            "subscription_setting": {
+              "id": 234819,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 618059,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479951,
+            "subscription_setting": {
+              "id": 497175,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": null,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 879549,
+        "product_name": "Baby Mustard Salad Mix",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bag",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2024-05-23T21:17:19.341093-04:00",
+        "updated": "2026-10-08T16:27:36.422174-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 290039,
+        "price_list_category": 15107,
+        "price_list": 2718,
+        "priority_order": 698,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 218884,
+            "price_list_category": 15107,
+            "priority_order": 732,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 290040,
+        "price_list_category": 15119,
+        "price_list": 2966,
+        "priority_order": 898,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 218885,
+            "price_list_category": 15119,
+            "priority_order": 934,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 290041,
+        "price_list_category": 15732,
+        "price_list": 3124,
+        "priority_order": 502,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 218886,
+            "price_list_category": 15732,
+            "priority_order": 542,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479951,
+        "price_list_category": 28913,
+        "price_list": 5622,
+        "priority_order": 898,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370315,
+            "price_list_category": 28913,
+            "priority_order": 935,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3177,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 879549,
+  "remoteProductId": 879549,
+  "checkedAt": "2026-10-11T17:58:01.095Z"
+}

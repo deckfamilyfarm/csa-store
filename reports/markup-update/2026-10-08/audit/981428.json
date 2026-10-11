@@ -1,0 +1,428 @@
+{
+  "productId": 981428,
+  "context": {
+    "product": {
+      "id": 981428,
+      "name": "Baby Red Onion",
+      "description": "Baby red onions are a dual-purpose vegetable, meaning they can be harvested as young salad onions or allowed to mature for larger bulbs. They have a vibrant purple color and a mild to pungent flavor, depending on the variety and how they are harvested.",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": 0,
+      "categoryId": 24,
+      "vendorId": 3168,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/wU1UU.thumbnail.jpeg",
+      "createdAt": "2025-06-13T00:46:09.000Z",
+      "updatedAt": "2026-07-24T10:40:17.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Vegetables - Roots 🧅🧄 🥕🥔",
+    "vendor": {
+      "id": 3168,
+      "name": "Organically Grown Company",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 749861,
+        "productId": 981428,
+        "name": "bu",
+        "price": "2.50",
+        "packageCode": null,
+        "unit": "bu",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 749861,
+        "productId": 981428,
+        "localLinePackageId": 749861,
+        "liveName": "bu",
+        "livePrice": "2.50",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":981428,\"Product\":\"Baby Red Onion\",\"Track Inventory By\":\"package\",\"Item Unit\":\"bu\",\"Charge By\":\"package\",\"Charge Unit\":\"bu\",\"Package ID\":749861,\"Package Name\":\"bu\",\"# of Items\":1,\"Package Price\":2.5,\"Inventory Type\":\"product\"},\"live\":{\"id\":749861,\"inventory_per_unit\":1,\"unit_price\":2.5,\"average_pack_weight\":0,\"package_price\":2.5,\"package_unit_price\":2.5,\"priority_order\":1,\"name\":\"bu\",\"price_list_entries\":[{\"id\":624276,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":484508,\"subscription_setting\":{\"id\":503394,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":624279,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":484511,\"subscription_setting\":{\"id\":503397,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":624277,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":484509,\"subscription_setting\":{\"id\":503395,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":624278,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":484510,\"subscription_setting\":{\"id\":503396,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":981428,\"product_name\":\"Baby Red Onion\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"bu\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2025-06-12T20:46:09.516471-04:00\",\"updated\":\"2026-07-09T13:57:13.272120-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 981428,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 981428,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/981428/localline/163f3c20f54c2b978234908f.jpg"
+    ],
+    "localLineVendorId": 3168
+  },
+  "remote": {
+    "id": 981428,
+    "name": "Baby Red Onion",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Baby red onions are&nbsp;a dual-purpose vegetable, meaning they can be harvested as young salad onions or allowed to mature for larger bulbs.&nbsp;They have a vibrant purple color and a mild to pungent flavor, depending on the variety and how they are harvested.&nbsp;</span></p><p><br></p><p><br></p><p><br></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2025-06-12T20:46:09.240600-04:00",
+    "updated": "2026-07-23T13:03:59.422699-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/wU1UU.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 309701,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/wU1UU.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/wU1UU.jpeg",
+        "original_filename": "images.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 749861,
+        "inventory_per_unit": 1,
+        "unit_price": 2.5,
+        "average_pack_weight": 0,
+        "package_price": 2.5,
+        "package_unit_price": 2.5,
+        "priority_order": 1,
+        "name": "bu",
+        "price_list_entries": [
+          {
+            "id": 624276,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 484508,
+            "subscription_setting": {
+              "id": 503394,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 624279,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 484511,
+            "subscription_setting": {
+              "id": 503397,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 624277,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 484509,
+            "subscription_setting": {
+              "id": 503395,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 624278,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 484510,
+            "subscription_setting": {
+              "id": 503396,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 981428,
+        "product_name": "Baby Red Onion",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bu",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-06-12T20:46:09.516471-04:00",
+        "updated": "2026-07-09T13:57:13.272120-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 484508,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 788,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440341,
+            "price_list_category": 15731,
+            "priority_order": 47,
+            "price_list_category_name": "Organic Vegetables - Roots 🧅🧄 🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 484509,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 954,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440548,
+            "price_list_category": 15105,
+            "priority_order": 45,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 484510,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1161,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440756,
+            "price_list_category": 15118,
+            "priority_order": 44,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 484511,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1162,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 440964,
+            "price_list_category": 28905,
+            "priority_order": 48,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3154,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": null,
+  "problems": [
+    "Local Line vendor differs from the saved local vendor"
+  ],
+  "status": "exception",
+  "auditedAt": "2026-10-08T19:40:47.910Z",
+  "rows": [
+    {
+      "productId": 981428,
+      "product": "Baby Red Onion",
+      "vendor": "Organically Grown Company",
+      "packageId": 749861,
+      "package": "bu",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 2.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.5,
+      "localPriceAfter": 3.63,
+      "remoteBasePrice": 2.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": 3.5,
+      "remotePriceAfter": null
+    },
+    {
+      "productId": 981428,
+      "product": "Baby Red Onion",
+      "vendor": "Organically Grown Company",
+      "packageId": 749861,
+      "package": "bu",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 2.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.5,
+      "localPriceAfter": 3.63,
+      "remoteBasePrice": 2.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": 3.5,
+      "remotePriceAfter": null
+    },
+    {
+      "productId": 981428,
+      "product": "Baby Red Onion",
+      "vendor": "Organically Grown Company",
+      "packageId": 749861,
+      "package": "bu",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 2.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.5,
+      "localPriceAfter": 3.63,
+      "remoteBasePrice": 2.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": 3.5,
+      "remotePriceAfter": null
+    },
+    {
+      "productId": 981428,
+      "product": "Baby Red Onion",
+      "vendor": "Organically Grown Company",
+      "packageId": 749861,
+      "package": "bu",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 2.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.5,
+      "localPriceAfter": 3.63,
+      "remoteBasePrice": 2.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": 3.5,
+      "remotePriceAfter": null
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:41.000Z"
+}

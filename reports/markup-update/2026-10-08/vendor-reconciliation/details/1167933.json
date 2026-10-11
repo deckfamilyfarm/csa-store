@@ -1,0 +1,191 @@
+{
+  "remote": {
+    "id": 1167933,
+    "name": "A2 Milk, Quart",
+    "description": "",
+    "custom_id": "",
+    "visible": true,
+    "created": "2026-10-08T17:11:54.221890-04:00",
+    "updated": "2026-10-08T17:11:55.028838-04:00",
+    "track_inventory": false,
+    "thumbnail": null,
+    "images": [],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [
+      {
+        "id": 2244,
+        "priority_order": 1,
+        "name": "Dairy"
+      }
+    ],
+    "packing_tag": 85,
+    "packages": [
+      {
+        "id": 1017116,
+        "inventory_per_unit": 1,
+        "unit_price": 10,
+        "average_pack_weight": 0,
+        "package_price": 10,
+        "package_unit_price": 10,
+        "priority_order": 0,
+        "name": "1 Quart",
+        "price_list_entries": [
+          {
+            "id": 1067187,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 820028,
+            "subscription_setting": {
+              "id": 946013,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1067188,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 820029,
+            "subscription_setting": {
+              "id": 946014,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": null,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 1167933,
+        "product_name": "A2 Milk, Quart",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-10-08T17:11:54.404281-04:00",
+        "updated": "2026-10-08T17:11:54.508016-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 820028,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1420,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 696976,
+            "price_list_category": 15066,
+            "priority_order": 1,
+            "price_list_category_name": "Raw Dairy (Unpasteurized) 🥛 🐄 🧀"
+          }
+        ],
+        "tax_configuration": {
+          "id": 207201,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 820029,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1439,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 696977,
+            "price_list_category": 28917,
+            "priority_order": 1,
+            "price_list_category_name": "Raw Dairy (Unpasteurized) 🥛 🐄 🧀"
+          }
+        ],
+        "tax_configuration": {
+          "id": 207202,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not tracked",
+    "is_deleted": false,
+    "vendor": 3172,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "fetchedAt": "2026-10-09T19:16:02.275Z"
+}

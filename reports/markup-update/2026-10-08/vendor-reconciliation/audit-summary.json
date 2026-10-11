@@ -1,0 +1,209 @@
+{
+  "createdAt": "2026-10-09T19:23:05.701Z",
+  "counts": {
+    "ready": 126,
+    "exception": 25
+  },
+  "exceptions": [
+    {
+      "id": 805850,
+      "name": "Asparagus",
+      "vendor": "Organically Grown Company",
+      "problems": [
+        "No saved Local Line product link"
+      ]
+    },
+    {
+      "id": 805855,
+      "name": "Paste Tomatoes",
+      "vendor": "Grazier's Garden",
+      "problems": [
+        "Sale status differs on package 526913, list 3124; held for separate review"
+      ]
+    },
+    {
+      "id": 805986,
+      "name": "Red Slicer Tomatoes",
+      "vendor": "Grazier's Garden",
+      "problems": [
+        "Sale status differs on package 527045, list 3124; held for separate review"
+      ]
+    },
+    {
+      "id": 806124,
+      "name": "Brazil Cerrado Miniero - Dark Roast Coffee Beans",
+      "vendor": "Radiant Coffee Roasters",
+      "problems": [
+        "Local Line product not found (404)"
+      ]
+    },
+    {
+      "id": 806125,
+      "name": "Organic Spelt Flour",
+      "vendor": "Camas Country Mill",
+      "problems": [
+        "Local Line product not found (404)"
+      ]
+    },
+    {
+      "id": 919071,
+      "name": "Brazil Cerrado Miniero - Dark Roast Ground Coffee",
+      "vendor": "Radiant Coffee Roasters",
+      "problems": [
+        "Local Line product not found (404)"
+      ]
+    },
+    {
+      "id": 927371,
+      "name": "Pink Lady Apple",
+      "vendor": "Organically Grown Company",
+      "problems": [
+        "No saved Local Line product link"
+      ]
+    },
+    {
+      "id": 978368,
+      "name": "Grazier's Salad Mix",
+      "vendor": "Grazier's Garden",
+      "problems": [
+        "Sale status differs on package 745074, list 2966; held for separate review"
+      ]
+    },
+    {
+      "id": 1000029,
+      "name": "Heirloom Tomatoes",
+      "vendor": "Grazier's Garden",
+      "problems": [
+        "Sale status differs on package 777061, list 3124; held for separate review"
+      ]
+    },
+    {
+      "id": 1017951,
+      "name": "Breakfast Bundle",
+      "vendor": "Full Farm CSA",
+      "problems": [
+        "Unsupported Local Line box/bundle"
+      ]
+    },
+    {
+      "id": 1023667,
+      "name": "Ground Meat Bundle",
+      "vendor": "Full Farm CSA",
+      "problems": [
+        "Unsupported Local Line box/bundle"
+      ]
+    },
+    {
+      "id": 1028363,
+      "name": "Black Garlic",
+      "vendor": "Organically Grown Company",
+      "problems": [
+        "No saved Local Line product link"
+      ]
+    },
+    {
+      "id": 1071880,
+      "name": "Winter Carrots",
+      "vendor": "Full Farm CSA",
+      "problems": [
+        "Local Line product not found (404)"
+      ]
+    },
+    {
+      "id": 1105400,
+      "name": "Dinner in a Box: Ground Lamb Bundle",
+      "vendor": "Full Farm CSA",
+      "problems": [
+        "Unsupported Local Line box/bundle"
+      ]
+    },
+    {
+      "id": 1109580,
+      "name": "Dinner in a Box: Ground Lamb Bundle",
+      "vendor": "Full Farm CSA",
+      "problems": [
+        "Unsupported Local Line box/bundle"
+      ]
+    },
+    {
+      "id": 1109581,
+      "name": "Dinner in a Box: Ground Lamb Bundle No Yogurt",
+      "vendor": "Full Farm CSA",
+      "problems": [
+        "Unsupported Local Line box/bundle"
+      ]
+    },
+    {
+      "id": 1119806,
+      "name": "Dinner in a Box: Pork Shoulder Roast",
+      "vendor": "Full Farm CSA",
+      "problems": [
+        "Unsupported Local Line box/bundle"
+      ]
+    },
+    {
+      "id": 1120973,
+      "name": "Dinner in a Box: Pork Shoulder Roast",
+      "vendor": "Full Farm CSA",
+      "problems": [
+        "Unsupported Local Line box/bundle"
+      ]
+    },
+    {
+      "id": 1120974,
+      "name": "Dinner in a Box: Pork Shoulder Roast-No Dairy",
+      "vendor": "Full Farm CSA",
+      "problems": [
+        "Unsupported Local Line box/bundle"
+      ]
+    },
+    {
+      "id": 1120977,
+      "name": "Breakfast Bundle",
+      "vendor": "Full Farm CSA",
+      "problems": [
+        "Unsupported Local Line box/bundle"
+      ]
+    },
+    {
+      "id": 1127318,
+      "name": "Travel Size Lotion Stick w/ Honeysuckle Essential Oil",
+      "vendor": "Granny Smith All Natural",
+      "problems": [
+        "Local Line product not found (404)"
+      ]
+    },
+    {
+      "id": 1133712,
+      "name": "Dinner in a Box: Roasting Chicken",
+      "vendor": "Full Farm CSA",
+      "problems": [
+        "Unsupported Local Line box/bundle"
+      ]
+    },
+    {
+      "id": 1133713,
+      "name": "Dinner in a Box: Roasting Chicken",
+      "vendor": "Full Farm CSA",
+      "problems": [
+        "Unsupported Local Line box/bundle"
+      ]
+    },
+    {
+      "id": 1133714,
+      "name": "Dinner in a Box: Roasting Chicken - No Dairy",
+      "vendor": "Full Farm CSA",
+      "problems": [
+        "Unsupported Local Line box/bundle"
+      ]
+    },
+    {
+      "id": 1160556,
+      "name": "Ground Beef & Pork Bundle",
+      "vendor": "Full Farm CSA",
+      "problems": [
+        "Unsupported Local Line box/bundle"
+      ]
+    }
+  ]
+}

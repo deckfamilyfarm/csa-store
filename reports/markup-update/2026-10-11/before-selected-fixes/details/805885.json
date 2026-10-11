@@ -1,0 +1,223 @@
+{
+  "data": {
+    "id": 805885,
+    "name": "Crisphead Lettuce",
+    "description": "<p>Crisphead lettuce, more commonly known as iceberg, forms a tight firm head of crisp leaves. It has a crunchy 'CRISP' texture and mild flavor. Perfect for wedge salads - cherry tomatoes, bacon, blue cheese and lots of pepper!</p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-08-25T10:39:57.210931-04:00",
+    "updated": "2023-09-18T21:19:22.015898-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/h87Od.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 141970,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/h87Od.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/h87Od.jpg",
+        "original_filename": "1006.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "1006",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 526943,
+        "inventory_per_unit": 1,
+        "unit_price": 3.5,
+        "average_pack_weight": null,
+        "package_price": 3.5,
+        "package_unit_price": 3.5,
+        "priority_order": 1,
+        "name": "each",
+        "price_list_entries": [
+          {
+            "id": 207554,
+            "adjustment": true,
+            "adjustment_type": 3,
+            "adjustment_value": 3,
+            "price_list_id": 2718,
+            "product_price_list_entry": 167725,
+            "subscription_setting": {
+              "id": 106728,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": true,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 221562,
+            "adjustment": true,
+            "adjustment_type": 3,
+            "adjustment_value": 3,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179165,
+            "subscription_setting": {
+              "id": 124399,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": true,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617778,
+            "adjustment": true,
+            "adjustment_type": 3,
+            "adjustment_value": 3,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479671,
+            "subscription_setting": {
+              "id": 496894,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": true,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 805885,
+        "product_name": "Crisphead Lettuce",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T10:39:57.224493-04:00",
+        "updated": "2023-09-18T21:19:22.004908-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 167725,
+        "price_list_category": 15107,
+        "price_list": 2718,
+        "priority_order": 207,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 137592,
+            "price_list_category": 15107,
+            "priority_order": 241,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179165,
+        "price_list_category": 15119,
+        "price_list": 2966,
+        "priority_order": 248,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 147375,
+            "price_list_category": 15119,
+            "priority_order": 284,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479671,
+        "price_list_category": 28913,
+        "price_list": 5622,
+        "priority_order": 248,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370256,
+            "price_list_category": 28913,
+            "priority_order": 285,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": null,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "OWNED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 805885,
+  "remoteProductId": 805885,
+  "checkedAt": "2026-10-11T17:26:42.305Z"
+}

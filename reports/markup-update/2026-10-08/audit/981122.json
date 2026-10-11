@@ -1,0 +1,428 @@
+{
+  "productId": 981122,
+  "context": {
+    "product": {
+      "id": 981122,
+      "name": "Creole Masala Spice Blend",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Ingredients: Dehydrated onions, chives, thyme, parsley, garlic, orange peel granules, bay leaves powder, ground anise, cloves, fennel seeds, cayenne pepper, coriander, red chili flakes, granulated garlic.</span></p><p><br></p>",
+      "visible": 0,
+      "trackInventory": 1,
+      "inventory": 0,
+      "categoryId": 19,
+      "vendorId": 3182,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/0NmxA.thumbnail.jpeg",
+      "createdAt": "2025-06-11T23:04:58.000Z",
+      "updatedAt": "2025-11-20T16:14:27.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Canned Goods 🥫",
+    "vendor": {
+      "id": 3182,
+      "name": "Creole Me Up",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 749359,
+        "productId": 981122,
+        "name": "3 oz jar",
+        "price": "6.85",
+        "packageCode": null,
+        "unit": "ea",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 749359,
+        "productId": 981122,
+        "localLinePackageId": 749359,
+        "liveName": "3 oz jar",
+        "livePrice": "6.85",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":981122,\"Product\":\"Creole Masala Spice Blend\",\"Track Inventory By\":\"package\",\"Item Unit\":\"ea\",\"Charge By\":\"package\",\"Charge Unit\":\"ea\",\"Package ID\":749359,\"Package Name\":\"3 oz jar\",\"# of Items\":1,\"Package Price\":6.85,\"Inventory Type\":\"product\"},\"live\":{\"id\":749359,\"inventory_per_unit\":1,\"unit_price\":6.85,\"average_pack_weight\":0,\"package_price\":6.85,\"package_unit_price\":6.85,\"priority_order\":1,\"name\":\"3 oz jar\",\"price_list_entries\":[{\"id\":623477,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":483872,\"subscription_setting\":{\"id\":502594,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":623478,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":483873,\"subscription_setting\":{\"id\":502595,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":623476,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":483871,\"subscription_setting\":{\"id\":502593,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":623475,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":483870,\"subscription_setting\":{\"id\":502592,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":981122,\"product_name\":\"Creole Masala Spice Blend\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"ea\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2025-06-11T19:04:58.551890-04:00\",\"updated\":\"2025-06-11T19:07:51.937018-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 981122,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 981122,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/981122/localline/8e1aa06fa9cfa2d75142e0af.jpg"
+    ],
+    "localLineVendorId": 3182
+  },
+  "remote": {
+    "id": 981122,
+    "name": "Creole Masala Spice Blend",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Ingredients: Dehydrated onions, chives, thyme, parsley, garlic, orange peel granules, bay leaves powder, ground anise, cloves, fennel seeds, cayenne pepper, coriander, red chili flakes, granulated garlic.</span></p><p><br></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2025-06-11T19:04:58.293307-04:00",
+    "updated": "2025-11-20T11:14:27.809424-05:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/0NmxA.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 309253,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/0NmxA.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/0NmxA.jpg",
+        "original_filename": "20250603_120511.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 749359,
+        "inventory_per_unit": 1,
+        "unit_price": 6.85,
+        "average_pack_weight": 0,
+        "package_price": 6.85,
+        "package_unit_price": 6.85,
+        "priority_order": 1,
+        "name": "3 oz jar",
+        "price_list_entries": [
+          {
+            "id": 623477,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 483872,
+            "subscription_setting": {
+              "id": 502594,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 623478,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 483873,
+            "subscription_setting": {
+              "id": 502595,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 623476,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 483871,
+            "subscription_setting": {
+              "id": 502593,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 623475,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 483870,
+            "subscription_setting": {
+              "id": 502592,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 981122,
+        "product_name": "Creole Masala Spice Blend",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-06-11T19:04:58.551890-04:00",
+        "updated": "2025-06-11T19:07:51.937018-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 483870,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 784,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440398,
+            "price_list_category": 15762,
+            "priority_order": 41,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 483871,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 951,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440591,
+            "price_list_category": 31658,
+            "priority_order": 408,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 483872,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1158,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440822,
+            "price_list_category": 31663,
+            "priority_order": 408,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 483873,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1159,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 441033,
+            "price_list_category": 31667,
+            "priority_order": 408,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": null,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "OWNED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": null,
+  "problems": [
+    "Local Line vendor differs from the saved local vendor"
+  ],
+  "status": "exception",
+  "auditedAt": "2026-10-08T19:40:46.036Z",
+  "rows": [
+    {
+      "productId": 981122,
+      "product": "Creole Masala Spice Blend",
+      "vendor": "Creole Me Up",
+      "packageId": 749359,
+      "package": "3 oz jar",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 6.85,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 9.59,
+      "localPriceAfter": 9.93,
+      "remoteBasePrice": 6.85,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": 9.59,
+      "remotePriceAfter": null
+    },
+    {
+      "productId": 981122,
+      "product": "Creole Masala Spice Blend",
+      "vendor": "Creole Me Up",
+      "packageId": 749359,
+      "package": "3 oz jar",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 6.85,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 9.59,
+      "localPriceAfter": 9.93,
+      "remoteBasePrice": 6.85,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": 9.59,
+      "remotePriceAfter": null
+    },
+    {
+      "productId": 981122,
+      "product": "Creole Masala Spice Blend",
+      "vendor": "Creole Me Up",
+      "packageId": 749359,
+      "package": "3 oz jar",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 6.85,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 9.59,
+      "localPriceAfter": 9.93,
+      "remoteBasePrice": 6.85,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": 9.59,
+      "remotePriceAfter": null
+    },
+    {
+      "productId": 981122,
+      "product": "Creole Masala Spice Blend",
+      "vendor": "Creole Me Up",
+      "packageId": 749359,
+      "package": "3 oz jar",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 6.85,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 9.59,
+      "localPriceAfter": 9.93,
+      "remoteBasePrice": 6.85,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": 9.59,
+      "remotePriceAfter": null
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.999Z"
+}

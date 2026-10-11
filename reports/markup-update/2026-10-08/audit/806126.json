@@ -1,0 +1,504 @@
+{
+  "productId": 806126,
+  "context": {
+    "product": {
+      "id": 806126,
+      "name": "Pickled Beets",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">These beets dont mess around. Use them on salads or just eat them straight out of the jar! Our apple cider brined beets are a must have for any garnish assortment. There is no sweetener added to these, because the beets have a wonderful natural sweetness of their own. Made using non-GMO, organic northwest beets, our pickled beets are a salads best friend. They are a beautiful gift of nature with every bite.</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Ingredients: Organic Beets, Filtered Water, Organic Apple Cider Vinegar, Sea Salt, Organic Mustard Seed, Organic Garlic, Organic Peppercorns.</span></p>",
+      "visible": 0,
+      "trackInventory": 1,
+      "inventory": 0,
+      "categoryId": 19,
+      "vendorId": 3160,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/zOHvg.thumbnail.jpeg",
+      "createdAt": "2023-08-25T15:15:32.000Z",
+      "updatedAt": "2026-10-06T10:40:26.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Canned Goods 🥫",
+    "vendor": {
+      "id": 3160,
+      "name": "Sweet Creek",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 527191,
+        "productId": 806126,
+        "name": "16 oz",
+        "price": "5.59",
+        "packageCode": null,
+        "unit": "ea",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": null
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 527191,
+        "productId": 806126,
+        "localLinePackageId": 527191,
+        "liveName": "16 oz",
+        "livePrice": "5.59",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":806126,\"Product\":\"Pickled Beets\",\"Track Inventory By\":\"package\",\"Item Unit\":\"ea\",\"Charge By\":\"package\",\"Charge Unit\":\"ea\",\"Package ID\":527191,\"Package Name\":\"16 oz\",\"# of Items\":1,\"Package Price\":5.59,\"Inventory Type\":\"product\"},\"live\":{\"id\":527191,\"inventory_per_unit\":1,\"unit_price\":5.59,\"average_pack_weight\":null,\"package_price\":5.59,\"package_unit_price\":5.59,\"priority_order\":null,\"name\":\"16 oz\",\"price_list_entries\":[{\"id\":221745,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":179348,\"subscription_setting\":{\"id\":124501,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":238365,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":192037,\"subscription_setting\":{\"id\":146163,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":220376,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":178294,\"subscription_setting\":{\"id\":121281,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":617908,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479801,\"subscription_setting\":{\"id\":497024,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":806126,\"product_name\":\"Pickled Beets\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"ea\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2023-08-25T11:15:32.969089-04:00\",\"updated\":\"2025-09-29T17:42:22.990331-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 806126,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 806126,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/806126/localline/6c75bc0be00ea34085a4eeec.jpg"
+    ],
+    "localLineVendorId": 3160
+  },
+  "remote": {
+    "id": 806126,
+    "name": "Pickled Beets",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">These beets dont mess around. Use them on salads or just eat them straight out of the jar! Our apple cider brined beets are a must have for any garnish assortment. There is no sweetener added to these, because the beets have a wonderful natural sweetness of their own. Made using non-GMO, organic northwest beets, our pickled beets are a salads best friend. They are a beautiful gift of nature with every bite.</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Ingredients: Organic Beets, Filtered Water, Organic Apple Cider Vinegar, Sea Salt, Organic Mustard Seed, Organic Garlic, Organic Peppercorns.</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-08-25T11:15:32.955591-04:00",
+    "updated": "2026-10-05T12:56:27.748333-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/zOHvg.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 142130,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/zOHvg.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/zOHvg.jpg",
+        "original_filename": "9003.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": 0,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "9003",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 527191,
+        "inventory_per_unit": 1,
+        "unit_price": 5.59,
+        "average_pack_weight": null,
+        "package_price": 5.59,
+        "package_unit_price": 5.59,
+        "priority_order": null,
+        "name": "16 oz",
+        "price_list_entries": [
+          {
+            "id": 221745,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179348,
+            "subscription_setting": {
+              "id": 124501,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 238365,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 192037,
+            "subscription_setting": {
+              "id": 146163,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 220376,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 178294,
+            "subscription_setting": {
+              "id": 121281,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617908,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479801,
+            "subscription_setting": {
+              "id": 497024,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 806126,
+        "product_name": "Pickled Beets",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T11:15:32.969089-04:00",
+        "updated": "2025-09-29T17:42:22.990331-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 178294,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 614,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440644,
+            "price_list_category": 31658,
+            "priority_order": 503,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179348,
+        "price_list_category": 17687,
+        "price_list": 2966,
+        "priority_order": 811,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440881,
+            "price_list_category": 31663,
+            "priority_order": 500,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 192037,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 484,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440399,
+            "price_list_category": 15762,
+            "priority_order": 419,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479801,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 811,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 441090,
+            "price_list_category": 31667,
+            "priority_order": 502,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3160,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3160,
+    "packages": [
+      {
+        "id": 527191,
+        "unit_price": 5.59,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 192037,
+            "calculated_value": 8.11,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 5.59
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 178294,
+            "calculated_value": 8.11,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 5.59
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 179348,
+            "calculated_value": 8.11,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 5.59
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 479801,
+            "calculated_value": 8.11,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 5.59
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:39:39.044Z",
+  "rows": [
+    {
+      "productId": 806126,
+      "product": "Pickled Beets",
+      "vendor": "Sweet Creek",
+      "packageId": 527191,
+      "package": "16 oz",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 5.59,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 7.83,
+      "localPriceAfter": 8.11,
+      "remoteBasePrice": 5.59,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 7.83,
+      "remotePriceAfter": 8.11
+    },
+    {
+      "productId": 806126,
+      "product": "Pickled Beets",
+      "vendor": "Sweet Creek",
+      "packageId": 527191,
+      "package": "16 oz",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 5.59,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 7.83,
+      "localPriceAfter": 8.11,
+      "remoteBasePrice": 5.59,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 7.83,
+      "remotePriceAfter": 8.11
+    },
+    {
+      "productId": 806126,
+      "product": "Pickled Beets",
+      "vendor": "Sweet Creek",
+      "packageId": 527191,
+      "package": "16 oz",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 5.59,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 7.83,
+      "localPriceAfter": 8.11,
+      "remoteBasePrice": 5.59,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 7.83,
+      "remotePriceAfter": 8.11
+    },
+    {
+      "productId": 806126,
+      "product": "Pickled Beets",
+      "vendor": "Sweet Creek",
+      "packageId": 527191,
+      "package": "16 oz",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 5.59,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 7.83,
+      "localPriceAfter": 8.11,
+      "remoteBasePrice": 5.59,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 7.83,
+      "remotePriceAfter": 8.11
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.938Z"
+}

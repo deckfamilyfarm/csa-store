@@ -1,0 +1,261 @@
+{
+  "data": {
+    "id": 812655,
+    "name": "Mix of  Comice/D'Anjou",
+    "description": "<p></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-09-30T09:36:14.192715-04:00",
+    "updated": "2026-10-09T15:59:34.224111-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/3p4Dl.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 144643,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/3p4Dl.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/3p4Dl.jpeg",
+        "original_filename": "pear.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 13,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 534523,
+        "inventory_per_unit": 1,
+        "unit_price": 1,
+        "average_pack_weight": 0,
+        "package_price": 1,
+        "package_unit_price": 1,
+        "priority_order": null,
+        "name": "ea",
+        "price_list_entries": [
+          {
+            "id": 221805,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179404,
+            "subscription_setting": {
+              "id": 124403,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 238486,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 192155,
+            "subscription_setting": {
+              "id": 146114,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617949,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479841,
+            "subscription_setting": {
+              "id": 497065,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 220780,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 178675,
+            "subscription_setting": {
+              "id": 121763,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 13,
+        "number_of_packages_available": 13,
+        "number_of_packages_total": 13,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 13,
+        "product_package_size": 1,
+        "product_id": 812655,
+        "product_name": "Mix of  Comice/D'Anjou",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-09-30T09:36:14.248487-04:00",
+        "updated": "2026-10-09T15:59:33.618196-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 178675,
+        "price_list_category": 14599,
+        "price_list": 2718,
+        "priority_order": 499,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 146910,
+            "price_list_category": 14599,
+            "priority_order": 536,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179404,
+        "price_list_category": 15063,
+        "price_list": 2966,
+        "priority_order": 499,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 147614,
+            "price_list_category": 15063,
+            "priority_order": 552,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 192155,
+        "price_list_category": 15748,
+        "price_list": 3124,
+        "priority_order": 223,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 158032,
+            "price_list_category": 15748,
+            "priority_order": 276,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479841,
+        "price_list_category": 28911,
+        "price_list": 5622,
+        "priority_order": 499,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370130,
+            "price_list_category": 28911,
+            "priority_order": 549,
+            "price_list_category_name": "Organic Fruit 🍒🍎🫐"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3171,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 13,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 13
+  },
+  "localProductId": 812655,
+  "remoteProductId": 812655,
+  "checkedAt": "2026-10-11T17:26:58.091Z"
+}

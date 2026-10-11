@@ -1,0 +1,281 @@
+{
+  "data": {
+    "id": 1161320,
+    "name": "Green Italian Frying Pepper",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">The Italian \"friggi friggi\" pepper is more commonly known as&nbsp;</span><i><em class=\"lexical-text-editor--italic\" style=\"white-space: pre-wrap;\">friggitelli</em></i><span style=\"white-space: pre-wrap;\">, or Italian frying peppers. They are mild, small, and slender peppers native to southern Italy, prized for their sweet flavor and thin skin that makes them ideal for frying. The name comes from the Italian verb&nbsp;</span><i><em class=\"lexical-text-editor--italic\" style=\"white-space: pre-wrap;\">friggere</em></i><span style=\"white-space: pre-wrap;\">, meaning \"to fry\".&nbsp;</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Friggitelli have a slightly sweet, fruity, and mild flavor, with a low heat level of 100–500 on the Scoville scale. Some varieties are entirely heatless. The taste can have a pleasant, slightly bitter edge.</span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2026-09-10T16:41:09.354733-04:00",
+    "updated": "2026-10-09T16:01:51.050085-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/Ksqtt.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 473880,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/Ksqtt.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/Ksqtt.jpeg",
+        "original_filename": "account/322922/HKw16.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "519",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 1006916,
+        "inventory_per_unit": 1,
+        "unit_price": 2.5,
+        "average_pack_weight": null,
+        "package_price": 2.5,
+        "package_unit_price": 2.5,
+        "priority_order": null,
+        "name": "each",
+        "price_list_entries": [
+          {
+            "id": 1043523,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 804811,
+            "subscription_setting": {
+              "id": 922200,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1043524,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 804812,
+            "subscription_setting": {
+              "id": 922201,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1043525,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 804813,
+            "subscription_setting": {
+              "id": 922202,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1043526,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 804814,
+            "subscription_setting": {
+              "id": 922203,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": null,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 1161320,
+        "product_name": "Green Italian Frying Pepper",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "lb",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-09-10T16:41:09.668959-04:00",
+        "updated": "2026-10-09T16:01:49.556214-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 804811,
+        "price_list_category": 15111,
+        "price_list": 2718,
+        "priority_order": 1129,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 682052,
+            "price_list_category": 15111,
+            "priority_order": 2,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 199999,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 804812,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 1016,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 682053,
+            "price_list_category": 15750,
+            "priority_order": 4,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 200000,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 804813,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1398,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 682054,
+            "price_list_category": 15120,
+            "priority_order": 4,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 200001,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 804814,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1416,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 682055,
+            "price_list_category": 28914,
+            "priority_order": 4,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 200002,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not tracked",
+    "is_deleted": false,
+    "vendor": 3154,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 1161320,
+  "remoteProductId": 1161320,
+  "checkedAt": "2026-10-11T18:10:18.304Z"
+}

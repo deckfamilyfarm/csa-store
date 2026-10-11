@@ -1,0 +1,464 @@
+{
+  "productId": 1152204,
+  "context": {
+    "product": {
+      "id": 1152204,
+      "name": "Green Patty Pan Squash",
+      "description": "Green pattypan squash isa small, saucer-shaped summer squash with distinct scalloped edges. Also called scallop squash or cymling, varieties like Benning's Green Tint feature tender pale-green skin, a mild and slightly nutty flavor, and a slightly firmer, meatier texture than standard zucchini.",
+      "visible": 0,
+      "trackInventory": 1,
+      "inventory": 0,
+      "categoryId": null,
+      "vendorId": 6482,
+      "thumbnailUrl": null,
+      "createdAt": "2026-08-11T10:40:22.000Z",
+      "updatedAt": "2026-10-09T19:18:38.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "",
+    "vendor": {
+      "id": 6482,
+      "name": "Winter Green Farm",
+      "priceListMarkup": "0.4500",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.45",
+      "memberMarkup": "0.45"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 994284,
+        "productId": 1152204,
+        "name": "lb",
+        "price": "1.75",
+        "packageCode": null,
+        "unit": null,
+        "numOfItems": 1,
+        "trackType": null,
+        "chargeType": null,
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": null
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 994284,
+        "productId": 1152204,
+        "localLinePackageId": 994284,
+        "liveName": "lb",
+        "livePrice": "1.75",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":1152204,\"Product\":\"Green Patty Pan Squash\",\"Track Inventory By\":\"package\",\"Item Unit\":\"lb\",\"Charge By\":\"package\",\"Charge Unit\":\"lb\",\"Package ID\":994284,\"Package Name\":\"lb\",\"# of Items\":1,\"Package Price\":1.75,\"Inventory Type\":\"product\"},\"live\":{\"id\":994284,\"inventory_per_unit\":1,\"unit_price\":1.75,\"average_pack_weight\":0,\"package_price\":1.75,\"package_unit_price\":1.75,\"priority_order\":0,\"name\":\"lb\",\"price_list_entries\":[{\"id\":1019306,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":785827,\"subscription_setting\":{\"id\":897959,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":1019307,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":785828,\"subscription_setting\":{\"id\":897960,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":1019308,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":785829,\"subscription_setting\":{\"id\":897961,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":1152204,\"product_name\":\"Green Patty Pan Squash\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"lb\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2026-08-10T13:25:25.215319-04:00\",\"updated\":\"2026-08-10T13:25:25.294125-04:00\"}}",
+        "createdAt": "2026-08-11T10:42:18.000Z",
+        "updatedAt": "2026-10-09T10:41:30.000Z",
+        "lastSyncedAt": "2026-10-09T10:41:30.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 1152204,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-09T10:41:30.000Z"
+    },
+    "remoteId": 1152204,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/1152204/localline/b41d99885fc998c94ebde58b.jpg"
+    ],
+    "localLineVendorId": 6482
+  },
+  "remote": {
+    "id": 1152204,
+    "name": "Green Patty Pan Squash",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Green pattypan squash isa small, saucer-shaped summer squash with distinct scalloped edges. Also called scallop squash or cymling, varieties like </span><i><em class=\"lexical-text-editor--italic\" style=\"white-space: pre-wrap;\">Benning's Green Tint</em></i><span style=\"white-space: pre-wrap;\"> feature tender pale-green skin, a mild and slightly nutty flavor, and a slightly firmer, meatier texture than standard zucchini. </span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2026-08-10T13:25:24.788384-04:00",
+    "updated": "2026-08-20T14:31:12.979598-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/Ht1Z7.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 463059,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/Ht1Z7.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/Ht1Z7.jpeg",
+        "original_filename": "images.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 994284,
+        "inventory_per_unit": 1,
+        "unit_price": 1.75,
+        "average_pack_weight": 0,
+        "package_price": 1.75,
+        "package_unit_price": 1.75,
+        "priority_order": 0,
+        "name": "lb",
+        "price_list_entries": [
+          {
+            "id": 1019306,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 785827,
+            "subscription_setting": {
+              "id": 897959,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1019307,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 785828,
+            "subscription_setting": {
+              "id": 897960,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1019308,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 785829,
+            "subscription_setting": {
+              "id": 897961,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 1152204,
+        "product_name": "Green Patty Pan Squash",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "lb",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-08-10T13:25:25.215319-04:00",
+        "updated": "2026-08-10T13:25:25.294125-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 785827,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 995,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 664055,
+            "price_list_category": 15750,
+            "priority_order": 6,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 190160,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 785828,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1377,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 664056,
+            "price_list_category": 15120,
+            "priority_order": 6,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 190161,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 785829,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1395,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 664057,
+            "price_list_category": 28914,
+            "priority_order": 6,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": {
+          "id": 190162,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 6482,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 6482,
+    "packages": [
+      {
+        "id": 994284,
+        "unit_price": 1.75,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 785827,
+            "calculated_value": 2.54,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1.75
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 785828,
+            "calculated_value": 2.54,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1.75
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 785829,
+            "calculated_value": 2.54,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1.75
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "warnings": [],
+  "status": "ready",
+  "auditedAt": "2026-10-09T19:22:22.952Z",
+  "vendorOnly": false,
+  "rows": [
+    {
+      "productId": 1152204,
+      "product": "Green Patty Pan Squash",
+      "vendor": "Winter Green Farm",
+      "packageId": 994284,
+      "package": "lb",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 1.75,
+      "markupBefore": 45,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.54,
+      "localPriceAfter": 2.54,
+      "remoteBasePrice": 1.75,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.45,
+      "remotePriceAfter": 2.54
+    },
+    {
+      "productId": 1152204,
+      "product": "Green Patty Pan Squash",
+      "vendor": "Winter Green Farm",
+      "packageId": 994284,
+      "package": "lb",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 1.75,
+      "markupBefore": 45,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.54,
+      "localPriceAfter": 2.54,
+      "remoteBasePrice": 1.75,
+      "remoteAdjustmentType": null,
+      "remoteAdjustmentBefore": null,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": null,
+      "remotePriceAfter": null
+    },
+    {
+      "productId": 1152204,
+      "product": "Green Patty Pan Squash",
+      "vendor": "Winter Green Farm",
+      "packageId": 994284,
+      "package": "lb",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 1.75,
+      "markupBefore": 45,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.54,
+      "localPriceAfter": 2.54,
+      "remoteBasePrice": 1.75,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.45,
+      "remotePriceAfter": 2.54
+    },
+    {
+      "productId": 1152204,
+      "product": "Green Patty Pan Squash",
+      "vendor": "Winter Green Farm",
+      "packageId": 994284,
+      "package": "lb",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 1.75,
+      "markupBefore": 45,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 2.54,
+      "localPriceAfter": 2.54,
+      "remoteBasePrice": 1.75,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 2.45,
+      "remotePriceAfter": 2.54
+    }
+  ]
+}

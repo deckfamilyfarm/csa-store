@@ -1,0 +1,428 @@
+{
+  "productId": 805975,
+  "context": {
+    "product": {
+      "id": 805975,
+      "name": "Orange Bell Pepper",
+      "description": "Orange & red bell peppers are two of the common colors of mature bell peppers. They're blocky with three to four lobes and have crisp, juicy flesh with a sweet flavor. Grown by:River land Family Farm",
+      "visible": 0,
+      "trackInventory": 1,
+      "inventory": 2,
+      "categoryId": 12,
+      "vendorId": 3152,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/8nZuc.thumbnail.jpeg",
+      "createdAt": "2023-08-25T14:39:58.000Z",
+      "updatedAt": "2026-09-08T10:40:23.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Fruiting Vegetables 🌶🥒🎃🍅",
+    "vendor": {
+      "id": 3152,
+      "name": "Little Wings",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 527035,
+        "productId": 805975,
+        "name": "1 lb",
+        "price": "4.40",
+        "packageCode": null,
+        "unit": "lb",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 527035,
+        "productId": 805975,
+        "localLinePackageId": 527035,
+        "liveName": "1 lb",
+        "livePrice": "4.40",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":805975,\"Product\":\"Orange Bell Pepper\",\"Track Inventory By\":\"package\",\"Item Unit\":\"lb\",\"Charge By\":\"package\",\"Charge Unit\":\"lb\",\"Package ID\":527035,\"Package Name\":\"1 lb\",\"# of Items\":1,\"Package Price\":4.4,\"Inventory Type\":\"product\"},\"live\":{\"id\":527035,\"inventory_per_unit\":1,\"unit_price\":4.4,\"average_pack_weight\":null,\"package_price\":4.4,\"package_unit_price\":4.4,\"priority_order\":1,\"name\":\"1 lb\",\"price_list_entries\":[{\"id\":207538,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":167707,\"subscription_setting\":{\"id\":106712,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":221546,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":179149,\"subscription_setting\":{\"id\":124097,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":238352,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":192024,\"subscription_setting\":{\"id\":146177,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":617766,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479659,\"subscription_setting\":{\"id\":496882,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":2,\"number_of_packages_available\":2,\"number_of_packages_total\":2,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":2,\"product_package_size\":1,\"product_id\":805975,\"product_name\":\"Orange Bell Pepper\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"lb\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2023-08-25T10:39:59.001839-04:00\",\"updated\":\"2026-08-20T14:24:30.108312-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 805975,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 805975,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/805975/localline/64207dc36b60af2a04ac5299.jpg"
+    ],
+    "localLineVendorId": 3152
+  },
+  "remote": {
+    "id": 805975,
+    "name": "Orange Bell Pepper",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Orange &amp; red bell peppers are two of the common colors of mature bell peppers. They're blocky with three to four lobes and have crisp, juicy flesh with a sweet flavor.</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Grown by:River land Family Farm</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-08-25T10:39:58.988616-04:00",
+    "updated": "2026-09-07T16:23:08.547131-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/8nZuc.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 141450,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/8nZuc.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/8nZuc.jpg",
+        "original_filename": "799.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 2,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "799",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 527035,
+        "inventory_per_unit": 1,
+        "unit_price": 4.4,
+        "average_pack_weight": null,
+        "package_price": 4.4,
+        "package_unit_price": 4.4,
+        "priority_order": 1,
+        "name": "1 lb",
+        "price_list_entries": [
+          {
+            "id": 207538,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 167707,
+            "subscription_setting": {
+              "id": 106712,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 221546,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179149,
+            "subscription_setting": {
+              "id": 124097,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 238352,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 192024,
+            "subscription_setting": {
+              "id": 146177,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617766,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479659,
+            "subscription_setting": {
+              "id": 496882,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 2,
+        "number_of_packages_available": 2,
+        "number_of_packages_total": 2,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 2,
+        "product_package_size": 1,
+        "product_id": 805975,
+        "product_name": "Orange Bell Pepper",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "lb",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T10:39:59.001839-04:00",
+        "updated": "2026-08-20T14:24:30.108312-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 167707,
+        "price_list_category": 15111,
+        "price_list": 2718,
+        "priority_order": 267,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 137577,
+            "price_list_category": 15111,
+            "priority_order": 314,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179149,
+        "price_list_category": 15120,
+        "price_list": 2966,
+        "priority_order": 505,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 147360,
+            "price_list_category": 15120,
+            "priority_order": 563,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 192024,
+        "price_list_category": 15750,
+        "price_list": 3124,
+        "priority_order": 88,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 157906,
+            "price_list_category": 15750,
+            "priority_order": 134,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479659,
+        "price_list_category": 28914,
+        "price_list": 5622,
+        "priority_order": 505,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370086,
+            "price_list_category": 28914,
+            "priority_order": 562,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3148,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 2,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 2
+  },
+  "payload": null,
+  "problems": [
+    "Local Line vendor differs from the saved local vendor"
+  ],
+  "status": "exception",
+  "auditedAt": "2026-10-08T19:39:09.361Z",
+  "rows": [
+    {
+      "productId": 805975,
+      "product": "Orange Bell Pepper",
+      "vendor": "Little Wings",
+      "packageId": 527035,
+      "package": "1 lb",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 4.4,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 6.16,
+      "localPriceAfter": 6.38,
+      "remoteBasePrice": 4.4,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": 6.16,
+      "remotePriceAfter": null
+    },
+    {
+      "productId": 805975,
+      "product": "Orange Bell Pepper",
+      "vendor": "Little Wings",
+      "packageId": 527035,
+      "package": "1 lb",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 4.4,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 6.16,
+      "localPriceAfter": 6.38,
+      "remoteBasePrice": 4.4,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": 6.16,
+      "remotePriceAfter": null
+    },
+    {
+      "productId": 805975,
+      "product": "Orange Bell Pepper",
+      "vendor": "Little Wings",
+      "packageId": 527035,
+      "package": "1 lb",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 4.4,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 6.16,
+      "localPriceAfter": 6.38,
+      "remoteBasePrice": 4.4,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": 6.16,
+      "remotePriceAfter": null
+    },
+    {
+      "productId": 805975,
+      "product": "Orange Bell Pepper",
+      "vendor": "Little Wings",
+      "packageId": 527035,
+      "package": "1 lb",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 4.4,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 6.16,
+      "localPriceAfter": 6.38,
+      "remoteBasePrice": 4.4,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": 6.16,
+      "remotePriceAfter": null
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.910Z"
+}

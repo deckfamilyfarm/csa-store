@@ -1,0 +1,266 @@
+{
+  "data": {
+    "id": 805748,
+    "name": "Dark Purple Iris Rhizome",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Plant Bulb just below the soil surface. </span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Bearded Iris (Iris germanica) are&nbsp;hardy perennials, prized for their complex, fragrant, six-petaled flowers (3 upright standards, 3 hanging falls) and a \"beard\" of tiny fuzz on the lower petals. They grow from thick, fleshy, drought-tolerant underground stems called&nbsp;</span><a href=\"https://www.google.com/search?q=rhizomes&amp;newwindow=1&amp;sca_esv=9a3fab58edaf9218&amp;rlz=1CAVNCX_enUS1049US1049&amp;sxsrf=ANbL-n4JjJbTHWuiUiEqCLzOHs1ar2rwRA%3A1773682143284&amp;ei=3z24aef6EK7F0PEP2PrpgQM&amp;biw=1366&amp;bih=599&amp;ved=2ahUKEwiNjcX6-KSTAxWhCjQIHb4DOzkQgK4QegQIARAC&amp;uact=5&amp;oq=bearded+iris+rhizome+and+plant+description+for+a+store&amp;gs_lp=Egxnd3Mtd2l6LXNlcnAiNmJlYXJkZWQgaXJpcyByaGl6b21lIGFuZCBwbGFudCBkZXNjcmlwdGlvbiBmb3IgYSBzdG9yZTIFECEYoAEyBRAhGKABMgUQIRifBUjrRFDsA1j1Q3ABeAGQAQCYAZgCoAHGGaoBBjIuMTcuM7gBA8gBAPgBAZgCE6ACoRbCAgoQABiwAxjWBBhHwgIIECEYoAEYwwTCAgoQIRigARjDBBgKwgIFECEYqwKYAwCIBgGQBgiSBwYxLjE2LjKgB96CAbIHBjAuMTYuMrgHkxbCBwgwLjEuMTIuNsgHkwGACAA&amp;sclient=gws-wiz-serp\" class=\"lexical-text-editor--link\"><span style=\"white-space: pre-wrap;\">rhizomes</span></a><span style=\"white-space: pre-wrap;\">. These easy-to-grow plants prefer full sun and well-drained soil, making them perfect for sunny garden beds.&nbsp;</span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2023-08-25T10:18:16.408633-04:00",
+    "updated": "2026-10-08T16:21:45.546716-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/6M4hh.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 142036,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/6M4hh.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/6M4hh.jpg",
+        "original_filename": "1145.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 8,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "1145",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 526803,
+        "inventory_per_unit": 1,
+        "unit_price": 4,
+        "average_pack_weight": null,
+        "package_price": 4,
+        "package_unit_price": 4,
+        "priority_order": null,
+        "name": "each",
+        "price_list_entries": [
+          {
+            "id": 238499,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 192168,
+            "subscription_setting": {
+              "id": 146205,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 207372,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 167546,
+            "subscription_setting": {
+              "id": 106546,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 221395,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179001,
+            "subscription_setting": {
+              "id": 123290,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1000450,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 771021,
+            "subscription_setting": {
+              "id": 879103,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 8,
+        "number_of_packages_available": 8,
+        "number_of_packages_total": 8,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 8,
+        "product_package_size": 1,
+        "product_id": 805748,
+        "product_name": "Dark Purple Iris Rhizome",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T10:18:16.418296-04:00",
+        "updated": "2026-10-08T16:21:44.564574-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 167546,
+        "price_list_category": 14598,
+        "price_list": 2718,
+        "priority_order": 96,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 137417,
+            "price_list_category": 14598,
+            "priority_order": 134,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179001,
+        "price_list_category": 15064,
+        "price_list": 2966,
+        "priority_order": 96,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 147212,
+            "price_list_category": 15064,
+            "priority_order": 150,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 192168,
+        "price_list_category": 15762,
+        "price_list": 3124,
+        "priority_order": 236,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440377,
+            "price_list_category": 15746,
+            "priority_order": 263,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 771021,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1383,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 648888,
+            "price_list_category": 28909,
+            "priority_order": 7,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 179871,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 3181,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 8,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 8
+  },
+  "localProductId": 805748,
+  "remoteProductId": 805748,
+  "checkedAt": "2026-10-11T17:57:34.455Z"
+}

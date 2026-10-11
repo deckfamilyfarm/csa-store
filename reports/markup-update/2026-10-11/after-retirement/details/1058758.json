@@ -1,0 +1,281 @@
+{
+  "data": {
+    "id": 1058758,
+    "name": "Red Mustard Mizuna",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Red mustard mizuna is a nutrient-dense, peppery Japanese green packed with vitamins A, C, and K, along with antioxidants like anthocyanins (in the red variety) and&nbsp;</span><a href=\"https://www.google.com/search?q=glucosinolates&amp;newwindow=1&amp;rlz=1CAVNCX_enUS1049US1049&amp;biw=1366&amp;bih=599&amp;sca_esv=89aaa52b873f06b6&amp;sxsrf=ANbL-n5cjEMtt4pkXhGt6XMTDb2-JxyJ0g%3A1770330473795&amp;ei=aRmFaZGhMI650PEP4q6SgAo&amp;ved=2ahUKEwiOlZSxs8OSAxUQCTQIHQK3FuUQgK4QegQIARAB&amp;uact=5&amp;oq=red+mustard+mizuna+benefits&amp;gs_lp=Egxnd3Mtd2l6LXNlcnAiG3JlZCBtdXN0YXJkIG1penVuYSBiZW5lZml0czIIEAAYgAQYogQyBRAAGO8FMggQABiABBiiBDIIEAAYgAQYogRI0SBQ5ANYhRhwAXgBkAEAmAGsAaAB_wqqAQQxMC40uAEDyAEA-AEBmAIPoALvDMICChAAGLADGNYEGEfCAgYQABgHGB7CAggQABgHGAgYHsICCBAAGAUYBxgewgILEAAYgAQYhgMYigXCAgUQABiABMICBhAAGAUYHsICBhAAGAgYHsICCBAAGKIEGIkFwgIKECEYoAEYwwQYCsICCBAhGKABGMMEmAMAiAYBkAYIkgcDNy44oAeTTrIHAzYuOLgHzQzCBwowLjEuMi4xMC4yyAetAYAIAA&amp;sclient=gws-wiz-serp&amp;mstk=AUtExfBsZXjUSfBpbtQul0peGKSHP1Bmu3UHmZtekCZcNcke6Juf1e2GMP72NxQ_8Gj51j5-rBtpE36isKJglX7Z6JGPHSDkTkSH2xssu6KfC8M5qRkvF3k-rXBh_M8hKps4M6YiAd8EeqtIULLkaQJzpklL5t-IvaEsAZy2emkeI4xuzJ0ovfEyvffVDd16yPdtSlatxo90bMGamN5B3SMJ6CsCYXW3JVbLuy9oYX3PTVawxBeIv8OaqwfuRmE8FnB8PbNy7maZitm7VkoodJxsNJ2w&amp;csui=3\" class=\"lexical-text-editor--link\"><span style=\"white-space: pre-wrap;\">glucosinolates</span></a><span style=\"white-space: pre-wrap;\">. It&nbsp;boosts immune function, strengthens bone health, reduces inflammation, and supports eye health. Low in calories, it is ideal for salads, stir-fries, and soups.&nbsp;</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Grown by: Groundwork Organic Farm</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2026-02-05T17:32:41.664377-05:00",
+    "updated": "2026-10-08T16:33:35.556319-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/7igc4.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 382460,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/7igc4.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/7igc4.jpeg",
+        "original_filename": "download (1).jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 2,
+    "inventory_warning": 0,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 865050,
+        "inventory_per_unit": 1,
+        "unit_price": 2.3,
+        "average_pack_weight": 0,
+        "package_price": 2.3,
+        "package_unit_price": 2.3,
+        "priority_order": 1,
+        "name": "ea",
+        "price_list_entries": [
+          {
+            "id": 797255,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 610781,
+            "subscription_setting": {
+              "id": 675734,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 797256,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 610782,
+            "subscription_setting": {
+              "id": 675735,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 797257,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 610783,
+            "subscription_setting": {
+              "id": 675736,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 797258,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 610784,
+            "subscription_setting": {
+              "id": 675737,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 2,
+        "number_of_packages_available": 2,
+        "number_of_packages_total": 2,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 2,
+        "product_package_size": 1,
+        "product_id": 1058758,
+        "product_name": "Red Mustard Mizuna",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-02-05T17:32:42.080223-05:00",
+        "updated": "2026-10-08T16:33:34.854450-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 610781,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 910,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 504294,
+            "price_list_category": 15732,
+            "priority_order": 15,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": {
+          "id": 115877,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 610782,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 1073,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 504295,
+            "price_list_category": 15107,
+            "priority_order": 12,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": {
+          "id": 115878,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 610783,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1288,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 504296,
+            "price_list_category": 15119,
+            "priority_order": 15,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": {
+          "id": 115879,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 610784,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1289,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 504297,
+            "price_list_category": 28913,
+            "priority_order": 15,
+            "price_list_category_name": "Organic Vegetables - Leafy Greens 🥬"
+          }
+        ],
+        "tax_configuration": {
+          "id": 115880,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3168,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 2,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 2
+  },
+  "localProductId": 1058758,
+  "remoteProductId": 1058758,
+  "checkedAt": "2026-10-11T18:10:10.105Z"
+}

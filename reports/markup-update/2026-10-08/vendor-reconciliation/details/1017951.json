@@ -1,0 +1,4 @@
+{
+  "error": "LocalLine GET failed: 400 {\"code\":\"product_is_box\",\"title\":\"Invalid Input\",\"status_code\":400,\"detail\":\"Action not allowed on boxes\",\"errors\":[]}",
+  "fetchedAt": "2026-10-09T19:15:49.716Z"
+}

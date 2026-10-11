@@ -1,0 +1,466 @@
+{
+  "productId": 1042575,
+  "context": {
+    "product": {
+      "id": 1042575,
+      "name": "Popping Corn",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">mixed purple and white in 1 lb. bag</span></p>",
+      "visible": 0,
+      "trackInventory": 1,
+      "inventory": 0,
+      "categoryId": 28,
+      "vendorId": 3171,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/ZojPe.thumbnail.jpeg",
+      "createdAt": "2026-01-08T21:06:43.000Z",
+      "updatedAt": "2026-01-19T16:21:35.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Specials and Bundles📦💸",
+    "vendor": {
+      "id": 3171,
+      "name": "Small is Beautiful Farm",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 844561,
+        "productId": 1042575,
+        "name": "1 lb bag",
+        "price": "6.00",
+        "packageCode": null,
+        "unit": "bag",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 844561,
+        "productId": 1042575,
+        "localLinePackageId": 844561,
+        "liveName": "1 lb bag",
+        "livePrice": "6.00",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":1042575,\"Product\":\"Popping Corn\",\"Track Inventory By\":\"package\",\"Item Unit\":\"bag\",\"Charge By\":\"package\",\"Charge Unit\":\"bag\",\"Package ID\":844561,\"Package Name\":\"1 lb bag\",\"# of Items\":1,\"Package Price\":6,\"Inventory Type\":\"product\"},\"live\":{\"id\":844561,\"inventory_per_unit\":1,\"unit_price\":6,\"average_pack_weight\":0,\"package_price\":6,\"package_unit_price\":6,\"priority_order\":1,\"name\":\"1 lb bag\",\"price_list_entries\":[{\"id\":769390,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":589195,\"subscription_setting\":{\"id\":648584,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":769391,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":589196,\"subscription_setting\":{\"id\":648585,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":769392,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":589197,\"subscription_setting\":{\"id\":648586,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":1042575,\"product_name\":\"Popping Corn\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"bag\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2026-01-08T16:06:43.365329-05:00\",\"updated\":\"2026-01-08T16:06:43.444588-05:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 1042575,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 1042575,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/1042575/localline/3f91ffa95784f008d06b9de0.jpg"
+    ],
+    "localLineVendorId": 3171
+  },
+  "remote": {
+    "id": 1042575,
+    "name": "Popping Corn",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">mixed purple and white in 1 lb. bag</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2026-01-08T16:06:43.127714-05:00",
+    "updated": "2026-01-19T11:21:35.945774-05:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/ZojPe.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 371974,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/ZojPe.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/ZojPe.jpg",
+        "original_filename": "unnamed.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12591,
+      "name": "bag",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12591,
+      "name": "bag",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 844561,
+        "inventory_per_unit": 1,
+        "unit_price": 6,
+        "average_pack_weight": 0,
+        "package_price": 6,
+        "package_unit_price": 6,
+        "priority_order": 1,
+        "name": "1 lb bag",
+        "price_list_entries": [
+          {
+            "id": 769390,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 589195,
+            "subscription_setting": {
+              "id": 648584,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 769391,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 589196,
+            "subscription_setting": {
+              "id": 648585,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 769392,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 589197,
+            "subscription_setting": {
+              "id": 648586,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 1042575,
+        "product_name": "Popping Corn",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bag",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-01-08T16:06:43.365329-05:00",
+        "updated": "2026-01-08T16:06:43.444588-05:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 589195,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 1064,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 478885,
+            "price_list_category": 31773,
+            "priority_order": 16,
+            "price_list_category_name": "Specials and Bundles📦💸"
+          }
+        ],
+        "tax_configuration": {
+          "id": 109624,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 589196,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1279,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 478886,
+            "price_list_category": 31774,
+            "priority_order": 876,
+            "price_list_category_name": "Specials and Bundles📦💸"
+          }
+        ],
+        "tax_configuration": {
+          "id": 109625,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 589197,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1280,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 478887,
+            "price_list_category": 31775,
+            "priority_order": 915,
+            "price_list_category_name": "Specials and Bundles📦💸"
+          }
+        ],
+        "tax_configuration": {
+          "id": 109626,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3171,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3171,
+    "packages": [
+      {
+        "id": 844561,
+        "unit_price": 6,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 589195,
+            "calculated_value": 8.7,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 6
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 589196,
+            "calculated_value": 8.7,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 6
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 589197,
+            "calculated_value": 8.7,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 6
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:41:20.995Z",
+  "rows": [
+    {
+      "productId": 1042575,
+      "product": "Popping Corn",
+      "vendor": "Small is Beautiful Farm",
+      "packageId": 844561,
+      "package": "1 lb bag",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 6,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 8.4,
+      "localPriceAfter": 8.7,
+      "remoteBasePrice": 6,
+      "remoteAdjustmentType": null,
+      "remoteAdjustmentBefore": null,
+      "remoteAdjustmentAfter": null,
+      "remotePriceBefore": null,
+      "remotePriceAfter": null
+    },
+    {
+      "productId": 1042575,
+      "product": "Popping Corn",
+      "vendor": "Small is Beautiful Farm",
+      "packageId": 844561,
+      "package": "1 lb bag",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 6,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 8.4,
+      "localPriceAfter": 8.7,
+      "remoteBasePrice": 6,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 8.4,
+      "remotePriceAfter": 8.7
+    },
+    {
+      "productId": 1042575,
+      "product": "Popping Corn",
+      "vendor": "Small is Beautiful Farm",
+      "packageId": 844561,
+      "package": "1 lb bag",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 6,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 8.4,
+      "localPriceAfter": 8.7,
+      "remoteBasePrice": 6,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 8.4,
+      "remotePriceAfter": 8.7
+    },
+    {
+      "productId": 1042575,
+      "product": "Popping Corn",
+      "vendor": "Small is Beautiful Farm",
+      "packageId": 844561,
+      "package": "1 lb bag",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 6,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 8.4,
+      "localPriceAfter": 8.7,
+      "remoteBasePrice": 6,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 8.4,
+      "remotePriceAfter": 8.7
+    }
+  ],
+  "warnings": [
+    "Guest Basket is not present for package 1 lb bag; no listing created."
+  ],
+  "reviewedAt": "2026-10-08T19:48:41.029Z"
+}

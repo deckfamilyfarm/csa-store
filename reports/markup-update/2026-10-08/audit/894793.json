@@ -1,0 +1,504 @@
+{
+  "productId": 894793,
+  "context": {
+    "product": {
+      "id": 894793,
+      "name": "Flavor Infused Olive Oil- Garlic 250mL",
+      "description": "<p>Flavor Infused Olive Oil- Garlic</p>",
+      "visible": 0,
+      "trackInventory": 1,
+      "inventory": 0,
+      "categoryId": 19,
+      "vendorId": 3170,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/8oxoB.thumbnail.jpeg",
+      "createdAt": "2024-07-22T19:08:30.000Z",
+      "updatedAt": "2026-08-14T10:40:22.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Canned Goods 🥫",
+    "vendor": {
+      "id": 3170,
+      "name": "River Ranch Oregon Olive OIl",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 635200,
+        "productId": 894793,
+        "name": "250mL",
+        "price": "21.95",
+        "packageCode": null,
+        "unit": "ea",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": null
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 635200,
+        "productId": 894793,
+        "localLinePackageId": 635200,
+        "liveName": "250mL",
+        "livePrice": "21.95",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":894793,\"Product\":\"Flavor Infused Olive Oil- Garlic 250mL\",\"Track Inventory By\":\"package\",\"Item Unit\":\"ea\",\"Charge By\":\"package\",\"Charge Unit\":\"ea\",\"Package ID\":635200,\"Package Name\":\"250mL\",\"# of Items\":1,\"Package Price\":21.95,\"Inventory Type\":\"product\"},\"live\":{\"id\":635200,\"inventory_per_unit\":1,\"unit_price\":21.95,\"average_pack_weight\":null,\"package_price\":21.95,\"package_unit_price\":21.95,\"priority_order\":null,\"name\":\"250mL\",\"price_list_entries\":[{\"id\":406988,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":326247,\"subscription_setting\":{\"id\":287195,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":618093,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479985,\"subscription_setting\":{\"id\":497209,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":406989,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":326248,\"subscription_setting\":{\"id\":287196,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":406990,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":326249,\"subscription_setting\":{\"id\":287197,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":894793,\"product_name\":\"Flavor Infused Olive Oil- Garlic 250mL\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"ea\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2024-07-22T15:08:31.015944-04:00\",\"updated\":\"2025-11-03T12:47:22.539053-05:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 894793,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 894793,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/894793/localline/fc99d36a431209772524db5d.jpg"
+    ],
+    "localLineVendorId": 3170
+  },
+  "remote": {
+    "id": 894793,
+    "name": "Flavor Infused Olive Oil- Garlic 250mL",
+    "description": "<p>Flavor Infused Olive Oil- Garlic</p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2024-07-22T15:08:30.671828-04:00",
+    "updated": "2026-08-13T13:22:59.043700-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/8oxoB.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 219712,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/8oxoB.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/8oxoB.jpg",
+        "original_filename": "account/322922/kWbiB.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 635200,
+        "inventory_per_unit": 1,
+        "unit_price": 21.95,
+        "average_pack_weight": null,
+        "package_price": 21.95,
+        "package_unit_price": 21.95,
+        "priority_order": null,
+        "name": "250mL",
+        "price_list_entries": [
+          {
+            "id": 406988,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 326247,
+            "subscription_setting": {
+              "id": 287195,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 618093,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479985,
+            "subscription_setting": {
+              "id": 497209,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 406989,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 326248,
+            "subscription_setting": {
+              "id": 287196,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 406990,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 326249,
+            "subscription_setting": {
+              "id": 287197,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 894793,
+        "product_name": "Flavor Infused Olive Oil- Garlic 250mL",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2024-07-22T15:08:31.015944-04:00",
+        "updated": "2025-11-03T12:47:22.539053-05:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 326247,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 423,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440587,
+            "price_list_category": 31658,
+            "priority_order": 431,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 326248,
+        "price_list_category": 17687,
+        "price_list": 2966,
+        "priority_order": 423,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440818,
+            "price_list_category": 31663,
+            "priority_order": 431,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 326249,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 79,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440393,
+            "price_list_category": 15762,
+            "priority_order": 65,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479985,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 423,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 441029,
+            "price_list_category": 31667,
+            "priority_order": 431,
+            "price_list_category_name": "Canned Goods 🥫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3170,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3170,
+    "packages": [
+      {
+        "id": 635200,
+        "unit_price": 21.95,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 326249,
+            "calculated_value": 31.83,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 21.95
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 326247,
+            "calculated_value": 31.83,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 21.95
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 326248,
+            "calculated_value": 31.83,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 21.95
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 479985,
+            "calculated_value": 31.83,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 21.95
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:40:06.829Z",
+  "rows": [
+    {
+      "productId": 894793,
+      "product": "Flavor Infused Olive Oil- Garlic 250mL",
+      "vendor": "River Ranch Oregon Olive OIl",
+      "packageId": 635200,
+      "package": "250mL",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 21.95,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 30.73,
+      "localPriceAfter": 31.83,
+      "remoteBasePrice": 21.95,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 30.73,
+      "remotePriceAfter": 31.83
+    },
+    {
+      "productId": 894793,
+      "product": "Flavor Infused Olive Oil- Garlic 250mL",
+      "vendor": "River Ranch Oregon Olive OIl",
+      "packageId": 635200,
+      "package": "250mL",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 21.95,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 30.73,
+      "localPriceAfter": 31.83,
+      "remoteBasePrice": 21.95,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 30.73,
+      "remotePriceAfter": 31.83
+    },
+    {
+      "productId": 894793,
+      "product": "Flavor Infused Olive Oil- Garlic 250mL",
+      "vendor": "River Ranch Oregon Olive OIl",
+      "packageId": 635200,
+      "package": "250mL",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 21.95,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 30.73,
+      "localPriceAfter": 31.83,
+      "remoteBasePrice": 21.95,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 30.73,
+      "remotePriceAfter": 31.83
+    },
+    {
+      "productId": 894793,
+      "product": "Flavor Infused Olive Oil- Garlic 250mL",
+      "vendor": "River Ranch Oregon Olive OIl",
+      "packageId": 635200,
+      "package": "250mL",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 21.95,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 30.73,
+      "localPriceAfter": 31.83,
+      "remoteBasePrice": 21.95,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 30.73,
+      "remotePriceAfter": 31.83
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.961Z"
+}

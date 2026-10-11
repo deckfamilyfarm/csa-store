@@ -1,0 +1,261 @@
+{
+  "data": {
+    "id": 806031,
+    "name": "Grape Lavender Kombucha",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">\"This delicate white tea elixir kisses the tongue with a fusion of Oregon grown grapes and lavender. A gentle balance between dry and sweet, leaning towards the dry side.\" - BNF</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Brewed with Oregon lavender and white tea, this kombucha is bright and floral with just a hint of sweetness.</span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2023-08-25T11:15:30.348031-04:00",
+    "updated": "2026-10-08T16:24:49.315884-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/UzOEo.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 350503,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/UzOEo.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/UzOEo.jpeg",
+        "original_filename": "grape.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "904",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 527093,
+        "inventory_per_unit": 1,
+        "unit_price": 3.34,
+        "average_pack_weight": null,
+        "package_price": 3.34,
+        "package_unit_price": 3.34,
+        "priority_order": 1,
+        "name": "16 fl. oz",
+        "price_list_entries": [
+          {
+            "id": 370252,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 301689,
+            "subscription_setting": {
+              "id": 251092,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 236791,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 190845,
+            "subscription_setting": {
+              "id": 144521,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 618076,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479968,
+            "subscription_setting": {
+              "id": 497192,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 370253,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 301690,
+            "subscription_setting": {
+              "id": 251093,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 806031,
+        "product_name": "Grape Lavender Kombucha",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T11:15:30.359930-04:00",
+        "updated": "2026-10-08T16:24:48.688134-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 190845,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 453,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440639,
+            "price_list_category": 31657,
+            "priority_order": 28,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 301689,
+        "price_list_category": 17687,
+        "price_list": 2966,
+        "priority_order": 453,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440853,
+            "price_list_category": 31662,
+            "priority_order": 14,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 301690,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 320,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440425,
+            "price_list_category": 31656,
+            "priority_order": 14,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479968,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 453,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 441087,
+            "price_list_category": 31665,
+            "priority_order": 35,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "No inventory",
+    "is_deleted": false,
+    "vendor": 3178,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 806031,
+  "remoteProductId": 806031,
+  "checkedAt": "2026-10-11T17:26:49.346Z"
+}

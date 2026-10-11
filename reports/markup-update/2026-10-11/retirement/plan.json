@@ -1,0 +1,222 @@
+{
+  "createdAt": "2026-10-11T18:07:37.178Z",
+  "reason": "User requested local retirement of the 24 missing/unavailable Local Line products while retaining searchable database records.",
+  "changes": [
+    {
+      "id": 806125,
+      "name": "Organic Spelt Flour",
+      "remoteId": 806125,
+      "isDeletedBefore": 0,
+      "visibleBefore": 0,
+      "isDeletedAfter": 1,
+      "visibleAfter": 0
+    },
+    {
+      "id": 1071880,
+      "name": "Winter Carrots",
+      "remoteId": 1071880,
+      "isDeletedBefore": 0,
+      "visibleBefore": 0,
+      "isDeletedAfter": 1,
+      "visibleAfter": 0
+    },
+    {
+      "id": 1127318,
+      "name": "Travel Size Lotion Stick w/ Honeysuckle Essential Oil",
+      "remoteId": 1127318,
+      "isDeletedBefore": 0,
+      "visibleBefore": 0,
+      "isDeletedAfter": 1,
+      "visibleAfter": 0
+    },
+    {
+      "id": 805850,
+      "name": "Asparagus",
+      "remoteId": 805850,
+      "isDeletedBefore": 0,
+      "visibleBefore": 0,
+      "isDeletedAfter": 1,
+      "visibleAfter": 0
+    },
+    {
+      "id": 1028363,
+      "name": "Black Garlic",
+      "remoteId": 1028363,
+      "isDeletedBefore": 0,
+      "visibleBefore": 0,
+      "isDeletedAfter": 1,
+      "visibleAfter": 0
+    },
+    {
+      "id": 927371,
+      "name": "Pink Lady Apple",
+      "remoteId": 927371,
+      "isDeletedBefore": 0,
+      "visibleBefore": 0,
+      "isDeletedAfter": 1,
+      "visibleAfter": 0
+    },
+    {
+      "id": 806124,
+      "name": "Brazil Cerrado Miniero - Dark Roast Coffee Beans",
+      "remoteId": 806124,
+      "isDeletedBefore": 0,
+      "visibleBefore": 0,
+      "isDeletedAfter": 1,
+      "visibleAfter": 0
+    },
+    {
+      "id": 919071,
+      "name": "Brazil Cerrado Miniero - Dark Roast Ground Coffee",
+      "remoteId": 919071,
+      "isDeletedBefore": 0,
+      "visibleBefore": 0,
+      "isDeletedAfter": 1,
+      "visibleAfter": 0
+    },
+    {
+      "id": 805735,
+      "name": "Handcrafted  Wooden Bowls Large 20 Oz",
+      "remoteId": 805735,
+      "isDeletedBefore": 0,
+      "visibleBefore": 0,
+      "isDeletedAfter": 1,
+      "visibleAfter": 0
+    },
+    {
+      "id": 805733,
+      "name": "Handcrafted Egg Pushers",
+      "remoteId": 805733,
+      "isDeletedBefore": 0,
+      "visibleBefore": 0,
+      "isDeletedAfter": 1,
+      "visibleAfter": 0
+    },
+    {
+      "id": 805746,
+      "name": "Handcrafted Fancy Wooden Eating Spoons",
+      "remoteId": 805746,
+      "isDeletedBefore": 0,
+      "visibleBefore": 0,
+      "isDeletedAfter": 1,
+      "visibleAfter": 0
+    },
+    {
+      "id": 825842,
+      "name": "Handcrafted Maple Candle Holder",
+      "remoteId": 825842,
+      "isDeletedBefore": 0,
+      "visibleBefore": 0,
+      "isDeletedAfter": 1,
+      "visibleAfter": 0
+    },
+    {
+      "id": 805732,
+      "name": "Handcrafted Whisk Brooms",
+      "remoteId": 805732,
+      "isDeletedBefore": 0,
+      "visibleBefore": 0,
+      "isDeletedAfter": 1,
+      "visibleAfter": 0
+    },
+    {
+      "id": 805737,
+      "name": "Handcrafted Wood & Metal Dustpan",
+      "remoteId": 805737,
+      "isDeletedBefore": 0,
+      "visibleBefore": 0,
+      "isDeletedAfter": 1,
+      "visibleAfter": 0
+    },
+    {
+      "id": 805736,
+      "name": "Handcrafted Wooden Bowls, Small 14 oz",
+      "remoteId": 805736,
+      "isDeletedBefore": 0,
+      "visibleBefore": 0,
+      "isDeletedAfter": 1,
+      "visibleAfter": 0
+    },
+    {
+      "id": 805739,
+      "name": "Handcrafted Wooden Chopsticks",
+      "remoteId": 805739,
+      "isDeletedBefore": 0,
+      "visibleBefore": 0,
+      "isDeletedAfter": 1,
+      "visibleAfter": 0
+    },
+    {
+      "id": 825841,
+      "name": "Handcrafted Wooden Fancy Egg Pushers",
+      "remoteId": 825841,
+      "isDeletedBefore": 0,
+      "visibleBefore": 0,
+      "isDeletedAfter": 1,
+      "visibleAfter": 0
+    },
+    {
+      "id": 805740,
+      "name": "Handcrafted Wooden Fancy Kitchen Spoons",
+      "remoteId": 805740,
+      "isDeletedBefore": 0,
+      "visibleBefore": 0,
+      "isDeletedAfter": 1,
+      "visibleAfter": 0
+    },
+    {
+      "id": 805741,
+      "name": "Handcrafted Wooden Plain Kitchen Stir Stix",
+      "remoteId": 805741,
+      "isDeletedBefore": 0,
+      "visibleBefore": 0,
+      "isDeletedAfter": 1,
+      "visibleAfter": 0
+    },
+    {
+      "id": 805742,
+      "name": "Handcrafted Wooden Plates",
+      "remoteId": 805742,
+      "isDeletedBefore": 0,
+      "visibleBefore": 0,
+      "isDeletedAfter": 1,
+      "visibleAfter": 0
+    },
+    {
+      "id": 805744,
+      "name": "Handcrafted Wooden Serving Spoons",
+      "remoteId": 805744,
+      "isDeletedBefore": 0,
+      "visibleBefore": 0,
+      "isDeletedAfter": 1,
+      "visibleAfter": 0
+    },
+    {
+      "id": 805745,
+      "name": "Handcrafted Wooden Spatulas",
+      "remoteId": 805745,
+      "isDeletedBefore": 0,
+      "visibleBefore": 0,
+      "isDeletedAfter": 1,
+      "visibleAfter": 0
+    },
+    {
+      "id": 805747,
+      "name": "Handcrafted Wooden Teaspoons",
+      "remoteId": 805747,
+      "isDeletedBefore": 0,
+      "visibleBefore": 0,
+      "isDeletedAfter": 1,
+      "visibleAfter": 0
+    },
+    {
+      "id": 805952,
+      "name": "Kohlrabi Purple or Green",
+      "remoteId": 805952,
+      "isDeletedBefore": 0,
+      "visibleBefore": 0,
+      "isDeletedAfter": 1,
+      "visibleAfter": 0
+    }
+  ]
+}

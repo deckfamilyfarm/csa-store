@@ -1,0 +1,256 @@
+{
+  "data": {
+    "id": 1167838,
+    "name": "Fresh Harvested Chestnuts",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">These are fresh, NOT dried chestnuts.</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Cure them by spreading them out at room temperature for 3 to 4 days to convert starches into natural sugars, enhancing sweetness. </span></p><p dir=\"ltr\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Cooking:</strong></b><span style=\"white-space: pre-wrap;\"> Always cook and peel chestnuts before eating; never eat them raw straight off the tree due to high tannin content and tough texture. Score the outer shell and roast at 350°F for 25 minutes or steam them to make peeling easier.</span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2026-10-08T12:03:45.849698-04:00",
+    "updated": "2026-10-10T13:42:29.178420-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/2hbDc.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 481206,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/2hbDc.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/2hbDc.jpeg",
+        "original_filename": "IMG_1465.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 1016904,
+        "inventory_per_unit": 1,
+        "unit_price": 10,
+        "average_pack_weight": 0,
+        "package_price": 10,
+        "package_unit_price": 10,
+        "priority_order": 0,
+        "name": "1 lb",
+        "price_list_entries": [
+          {
+            "id": 1066888,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 819848,
+            "subscription_setting": {
+              "id": 945719,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1066889,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 819849,
+            "subscription_setting": {
+              "id": 945720,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1066890,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 819850,
+            "subscription_setting": {
+              "id": 945721,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": null,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 1167838,
+        "product_name": "Fresh Harvested Chestnuts",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "lb",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-10-08T12:03:46.249399-04:00",
+        "updated": "2026-10-09T16:02:25.262228-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 819848,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 1037,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 696810,
+            "price_list_category": 31772,
+            "priority_order": 12,
+            "price_list_category_name": "Specials and Bundles📦💸"
+          },
+          {
+            "id": 696809,
+            "price_list_category": 31655,
+            "priority_order": 28,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": {
+          "id": 207106,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 819849,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1418,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 696811,
+            "price_list_category": 17687,
+            "priority_order": 411,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          },
+          {
+            "id": 696812,
+            "price_list_category": 31774,
+            "priority_order": 13,
+            "price_list_category_name": "Specials and Bundles📦💸"
+          }
+        ],
+        "tax_configuration": {
+          "id": 207107,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 819850,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1437,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 696813,
+            "price_list_category": 31666,
+            "priority_order": 413,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          },
+          {
+            "id": 696814,
+            "price_list_category": 31775,
+            "priority_order": 13,
+            "price_list_category_name": "Specials and Bundles📦💸"
+          }
+        ],
+        "tax_configuration": {
+          "id": 207108,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not tracked",
+    "is_deleted": false,
+    "vendor": 6886,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 1167838,
+  "remoteProductId": 1167838,
+  "checkedAt": "2026-10-11T18:10:19.207Z"
+}

@@ -1,0 +1,545 @@
+{
+  "productId": 1128173,
+  "context": {
+    "product": {
+      "id": 1128173,
+      "name": "Salad Turnips (Hakurei)",
+      "description": "This white salad turnip sets the standard for flavor. Eaten raw, the flavor is sweet and fruity and the texture is juicy and tender. The tops may be eaten raw or lightly cooked. Hakurei stays smooth as it sizes.",
+      "visible": 1,
+      "trackInventory": 0,
+      "inventory": null,
+      "categoryId": null,
+      "vendorId": 3152,
+      "thumbnailUrl": null,
+      "createdAt": "2026-06-03T10:40:18.000Z",
+      "updatedAt": "2026-10-09T19:18:37.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "",
+    "vendor": {
+      "id": 3152,
+      "name": "Little Wings",
+      "priceListMarkup": "0.4500",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.45",
+      "memberMarkup": "0.45"
+    },
+    "profile": {
+      "productId": 1128173,
+      "unitOfMeasure": "each",
+      "sourceUnitPrice": null,
+      "minWeight": null,
+      "maxWeight": null,
+      "avgWeightOverride": null,
+      "sourceMultiplier": "0.5412",
+      "guestMarkup": "0.4500",
+      "memberMarkup": "0.4500",
+      "herdShareMarkup": "0.4500",
+      "snapMarkup": "0.4500",
+      "markupOverride": "0.4500",
+      "onSale": 0,
+      "saleDiscount": null,
+      "priceChangedAt": "2026-10-08T21:02:32.000Z",
+      "remoteSyncStatus": "pending",
+      "remoteSyncMessage": "Vendor pricing defaults updated. Apply to remote store pending.",
+      "remoteSyncedAt": null,
+      "createdAt": "2026-10-08T20:19:27.000Z",
+      "updatedAt": "2026-10-08T21:02:32.000Z"
+    },
+    "packages": [
+      {
+        "id": 961508,
+        "productId": 1128173,
+        "name": "bu",
+        "price": "2.25",
+        "packageCode": null,
+        "unit": null,
+        "numOfItems": 1,
+        "trackType": null,
+        "chargeType": null,
+        "visible": 1,
+        "trackInventory": 1,
+        "inventory": 30
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 961508,
+        "productId": 1128173,
+        "localLinePackageId": 961508,
+        "liveName": "bu",
+        "livePrice": "2.25",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "package",
+        "packageInventory": 30,
+        "packageReservedInventory": 0,
+        "packageAvailableInventory": 30,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":1128173,\"Product\":\"Salad Turnips (Hakurei)\",\"Track Inventory By\":\"package\",\"Item Unit\":\"bu\",\"Charge By\":\"package\",\"Charge Unit\":\"bu\",\"Package ID\":961508,\"Package Name\":\"bu\",\"# of Items\":1,\"Package Price\":2.25,\"Inventory Type\":\"package\",\"Package Inventory\":30,\"Package Reserved Inventory\":0,\"Package Available Inventory\":30},\"live\":{\"id\":961508,\"inventory_per_unit\":1,\"unit_price\":2.25,\"average_pack_weight\":0,\"package_price\":2.25,\"package_unit_price\":2.25,\"priority_order\":0,\"name\":\"bu\",\"price_list_entries\":[{\"id\":955300,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":735325,\"subscription_setting\":{\"id\":833909,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":955301,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":735326,\"subscription_setting\":{\"id\":833910,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":955302,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":735327,\"subscription_setting\":{\"id\":833911,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":955298,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":735323,\"subscription_setting\":{\"id\":833907,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":30,\"total_inventory\":30,\"number_of_packages_available\":30,\"number_of_packages_total\":30,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":30,\"product_package_size\":1,\"product_id\":1128173,\"product_name\":\"Salad Turnips (Hakurei)\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"bu\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":30,\"created\":\"2026-06-02T12:30:45.921027-04:00\",\"updated\":\"2026-10-01T10:54:49.254361-04:00\"}}",
+        "createdAt": "2026-06-03T10:41:59.000Z",
+        "updatedAt": "2026-10-09T10:41:30.000Z",
+        "lastSyncedAt": "2026-10-09T10:41:30.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 1128173,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-09T10:41:30.000Z"
+    },
+    "remoteId": 1128173,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/1128173/localline/b9200f5190558d27499df939.jpg"
+    ],
+    "localLineVendorId": 3152
+  },
+  "remote": {
+    "id": 1128173,
+    "name": "Salad Turnips (Hakurei)",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">This white salad turnip sets the standard for flavor.</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Eaten raw, the flavor is sweet and fruity and the texture is juicy and tender. The tops may be eaten raw or lightly cooked. Hakurei stays smooth as it sizes.</span></p><p><br></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2026-06-02T12:30:45.845080-04:00",
+    "updated": "2026-10-01T10:54:49.788351-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/0vqIk.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 435127,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/0vqIk.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/0vqIk.jpg",
+        "original_filename": "00706_02_hakurei.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12600,
+      "name": "bu",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 961508,
+        "inventory_per_unit": 1,
+        "unit_price": 2.25,
+        "average_pack_weight": 0,
+        "package_price": 2.25,
+        "package_unit_price": 2.25,
+        "priority_order": 0,
+        "name": "bu",
+        "price_list_entries": [
+          {
+            "id": 955300,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 735325,
+            "subscription_setting": {
+              "id": 833909,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 955301,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 735326,
+            "subscription_setting": {
+              "id": 833910,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 955302,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 735327,
+            "subscription_setting": {
+              "id": 833911,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 955298,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 735323,
+            "subscription_setting": {
+              "id": 833907,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 30,
+        "total_inventory": 30,
+        "number_of_packages_available": 30,
+        "number_of_packages_total": 30,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 30,
+        "product_package_size": 1,
+        "product_id": 1128173,
+        "product_name": "Salad Turnips (Hakurei)",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bu",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 30,
+        "created": "2026-06-02T12:30:45.921027-04:00",
+        "updated": "2026-10-01T10:54:49.254361-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 735323,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 954,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 613308,
+            "price_list_category": 15731,
+            "priority_order": 14,
+            "price_list_category_name": "Organic Vegetables - Roots 🧅🧄 🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 162504,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 735325,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 1105,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 613305,
+            "price_list_category": 15105,
+            "priority_order": 12,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 162506,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 735326,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1336,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 613306,
+            "price_list_category": 15118,
+            "priority_order": 14,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 162507,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 735327,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1332,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 613307,
+            "price_list_category": 28905,
+            "priority_order": 14,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 162508,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not tracked",
+    "is_deleted": false,
+    "vendor": 3152,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": true,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "package",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3152,
+    "packages": [
+      {
+        "id": 961508,
+        "unit_price": 2.25,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 735323,
+            "calculated_value": 3.26,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.25
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 735325,
+            "calculated_value": 3.26,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.25
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 735326,
+            "calculated_value": 3.26,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.25
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 735327,
+            "calculated_value": 3.26,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.25
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "warnings": [],
+  "status": "ready",
+  "auditedAt": "2026-10-09T19:22:16.145Z",
+  "vendorOnly": false,
+  "rows": [
+    {
+      "productId": 1128173,
+      "product": "Salad Turnips (Hakurei)",
+      "vendor": "Little Wings",
+      "packageId": 961508,
+      "package": "bu",
+      "priceList": "Guest Basket",
+      "visible": true,
+      "basePrice": 2.25,
+      "markupBefore": 45,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.26,
+      "localPriceAfter": 3.26,
+      "remoteBasePrice": 2.25,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.15,
+      "remotePriceAfter": 3.26
+    },
+    {
+      "productId": 1128173,
+      "product": "Salad Turnips (Hakurei)",
+      "vendor": "Little Wings",
+      "packageId": 961508,
+      "package": "bu",
+      "priceList": "CSA Members",
+      "visible": true,
+      "basePrice": 2.25,
+      "markupBefore": 45,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.26,
+      "localPriceAfter": 3.26,
+      "remoteBasePrice": 2.25,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.15,
+      "remotePriceAfter": 3.26
+    },
+    {
+      "productId": 1128173,
+      "product": "Salad Turnips (Hakurei)",
+      "vendor": "Little Wings",
+      "packageId": 961508,
+      "package": "bu",
+      "priceList": "Herd Share Members",
+      "visible": true,
+      "basePrice": 2.25,
+      "markupBefore": 45,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.26,
+      "localPriceAfter": 3.26,
+      "remoteBasePrice": 2.25,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.15,
+      "remotePriceAfter": 3.26
+    },
+    {
+      "productId": 1128173,
+      "product": "Salad Turnips (Hakurei)",
+      "vendor": "Little Wings",
+      "packageId": 961508,
+      "package": "bu",
+      "priceList": "SNAP",
+      "visible": true,
+      "basePrice": 2.25,
+      "markupBefore": 45,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.26,
+      "localPriceAfter": 3.26,
+      "remoteBasePrice": 2.25,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.15,
+      "remotePriceAfter": 3.26
+    }
+  ]
+}

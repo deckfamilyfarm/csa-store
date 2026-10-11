@@ -1,0 +1,76 @@
+{
+  "checkedAt": "2026-10-11T18:02:12.528Z",
+  "verification": [
+    {
+      "id": 805889,
+      "name": "Dill",
+      "vendor": "Red Tail Growers",
+      "customerEntries": 4,
+      "pricesSalesAndStrikethroughMatch": true
+    },
+    {
+      "id": 1168459,
+      "name": "Garlic Dill Pickles",
+      "vendor": "Kurzhal Family Kickin Pickles",
+      "customerEntries": 3,
+      "pricesSalesAndStrikethroughMatch": true
+    },
+    {
+      "id": 1168460,
+      "name": "Jalapeno Dill Pickles",
+      "vendor": "Kurzhal Family Kickin Pickles",
+      "customerEntries": 3,
+      "pricesSalesAndStrikethroughMatch": true
+    },
+    {
+      "id": 1168461,
+      "name": "Garlic Dilly Beans",
+      "vendor": "Kurzhal Family Kickin Pickles",
+      "customerEntries": 3,
+      "pricesSalesAndStrikethroughMatch": true
+    },
+    {
+      "id": 1168462,
+      "name": "Jalapeno Dill Carrots",
+      "vendor": "Kurzhal Family Kickin Pickles",
+      "customerEntries": 3,
+      "pricesSalesAndStrikethroughMatch": true
+    },
+    {
+      "id": 1168463,
+      "name": "Ghost Pepper Black Bean and Corn Salsa",
+      "vendor": "Kurzhal Family Kickin Pickles",
+      "customerEntries": 3,
+      "pricesSalesAndStrikethroughMatch": true
+    },
+    {
+      "id": 805855,
+      "name": "Paste Tomatoes",
+      "vendor": "Grazier's Garden",
+      "customerEntries": 4,
+      "pricesSalesAndStrikethroughMatch": true
+    },
+    {
+      "id": 805986,
+      "name": "Red Slicer Tomatoes",
+      "vendor": "Grazier's Garden",
+      "customerEntries": 4,
+      "pricesSalesAndStrikethroughMatch": true
+    },
+    {
+      "id": 978368,
+      "name": "Grazier's Salad Mix",
+      "vendor": "Grazier's Garden",
+      "customerEntries": 4,
+      "pricesSalesAndStrikethroughMatch": true
+    },
+    {
+      "id": 1000029,
+      "name": "Heirloom Tomatoes",
+      "vendor": "Grazier's Garden",
+      "customerEntries": 4,
+      "pricesSalesAndStrikethroughMatch": true
+    }
+  ],
+  "remoteWrites": 0
+}

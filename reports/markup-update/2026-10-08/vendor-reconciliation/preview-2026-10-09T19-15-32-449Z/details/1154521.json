@@ -1,0 +1,236 @@
+{
+  "remote": {
+    "id": 1154521,
+    "name": "Guatemala Cafe Feminino Light Roast Coffee Beans",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">This organic coffee from Guatemala comes from our friends at OPTCO (Organic Products Trading Company). It is part of their Cafe Feminino project that promotes equity for women producers in farming communities. A well balanced coffee that goes well in many applications, its classic enough for anyone to enjoy but has enough acidity and pop to keep you excited to wake up.</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Tasting Notes: Almond, Citrus, Cocoa</span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2026-08-17T13:14:37.245899-04:00",
+    "updated": "2026-09-14T13:05:44.620192-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/qg2Ar.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 465508,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/qg2Ar.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/qg2Ar.jpg",
+        "original_filename": "Guatemala_Feminino_1100x.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 4,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12591,
+      "name": "bag",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12591,
+      "name": "bag",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 997778,
+        "inventory_per_unit": 1,
+        "unit_price": 14,
+        "average_pack_weight": 0,
+        "package_price": 14,
+        "package_unit_price": 14,
+        "priority_order": 0,
+        "name": "12 oz bag",
+        "price_list_entries": [
+          {
+            "id": 1027409,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 792118,
+            "subscription_setting": {
+              "id": 906062,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1027410,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 792119,
+            "subscription_setting": {
+              "id": 906063,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1027411,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 792120,
+            "subscription_setting": {
+              "id": 906064,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 4,
+        "number_of_packages_available": 4,
+        "number_of_packages_total": 4,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 4,
+        "product_package_size": 1,
+        "product_id": 1154521,
+        "product_name": "Guatemala Cafe Feminino Light Roast Coffee Beans",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bag",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-08-17T13:14:37.445830-04:00",
+        "updated": "2026-08-17T13:14:37.519455-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 792118,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 997,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 670192,
+            "price_list_category": 31656,
+            "priority_order": 20,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": {
+          "id": 192484,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 792119,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1379,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 670193,
+            "price_list_category": 31662,
+            "priority_order": 23,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": {
+          "id": 192485,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 792120,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1397,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 670194,
+            "price_list_category": 31665,
+            "priority_order": 36,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": {
+          "id": 192486,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 3158,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 4,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 4
+  },
+  "fetchedAt": "2026-10-08T21:50:57.506Z"
+}

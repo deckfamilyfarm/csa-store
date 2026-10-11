@@ -1,0 +1,504 @@
+{
+  "productId": 806091,
+  "context": {
+    "product": {
+      "id": 806091,
+      "name": "Organic All Purpose Low Gluten Flour",
+      "description": "<p>This flour has a protein content of 8.5% and will work well for all of your general baking needs.</p>",
+      "visible": 1,
+      "trackInventory": 1,
+      "inventory": 8,
+      "categoryId": 20,
+      "vendorId": 3151,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/pkmBy.thumbnail.jpeg",
+      "createdAt": "2023-08-25T15:15:32.000Z",
+      "updatedAt": "2026-10-06T10:40:26.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Grains/Pasta/Nuts  🫘 🍝 🥣",
+    "vendor": {
+      "id": 3151,
+      "name": "Camas Country Mill",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 527155,
+        "productId": 806091,
+        "name": "4 lbs",
+        "price": "9.50",
+        "packageCode": null,
+        "unit": "ea",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 1,
+        "trackInventory": 0,
+        "inventory": null
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 527155,
+        "productId": 806091,
+        "localLinePackageId": 527155,
+        "liveName": "4 lbs",
+        "livePrice": "9.50",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":806091,\"Product\":\"Organic All Purpose Low Gluten Flour\",\"Track Inventory By\":\"package\",\"Item Unit\":\"ea\",\"Charge By\":\"package\",\"Charge Unit\":\"ea\",\"Package ID\":527155,\"Package Name\":\"4 lbs\",\"# of Items\":1,\"Package Price\":9.5,\"Inventory Type\":\"product\"},\"live\":{\"id\":527155,\"inventory_per_unit\":1,\"unit_price\":9.5,\"average_pack_weight\":null,\"package_price\":9.5,\"package_unit_price\":9.5,\"priority_order\":null,\"name\":\"4 lbs\",\"price_list_entries\":[{\"id\":245226,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":197571,\"subscription_setting\":{\"id\":153356,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":221736,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":179339,\"subscription_setting\":{\"id\":124485,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":617902,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479795,\"subscription_setting\":{\"id\":497018,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":220367,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":178285,\"subscription_setting\":{\"id\":121272,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":8,\"number_of_packages_available\":8,\"number_of_packages_total\":8,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":8,\"product_package_size\":1,\"product_id\":806091,\"product_name\":\"Organic All Purpose Low Gluten Flour\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"ea\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2023-08-25T11:15:32.052539-04:00\",\"updated\":\"2026-09-14T12:54:20.688316-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 806091,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 806091,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/806091/localline/0bc7017e63b1a08d36c35329.jpg"
+    ],
+    "localLineVendorId": 3151
+  },
+  "remote": {
+    "id": 806091,
+    "name": "Organic All Purpose Low Gluten Flour",
+    "description": "<p>This flour has a protein content of 8.5% and will work well for all of your general baking needs.</p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2023-08-25T11:15:32.038536-04:00",
+    "updated": "2026-10-05T15:54:37.393589-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/pkmBy.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 141993,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/pkmBy.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/pkmBy.jpg",
+        "original_filename": "1053.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 8,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "1053",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 527155,
+        "inventory_per_unit": 1,
+        "unit_price": 9.5,
+        "average_pack_weight": null,
+        "package_price": 9.5,
+        "package_unit_price": 9.5,
+        "priority_order": null,
+        "name": "4 lbs",
+        "price_list_entries": [
+          {
+            "id": 245226,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 197571,
+            "subscription_setting": {
+              "id": 153356,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 221736,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179339,
+            "subscription_setting": {
+              "id": 124485,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617902,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479795,
+            "subscription_setting": {
+              "id": 497018,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 220367,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 178285,
+            "subscription_setting": {
+              "id": 121272,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 8,
+        "number_of_packages_available": 8,
+        "number_of_packages_total": 8,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 8,
+        "product_package_size": 1,
+        "product_id": 806091,
+        "product_name": "Organic All Purpose Low Gluten Flour",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T11:15:32.052539-04:00",
+        "updated": "2026-09-14T12:54:20.688316-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 178285,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 525,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440656,
+            "price_list_category": 31659,
+            "priority_order": 476,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179339,
+        "price_list_category": 17687,
+        "price_list": 2966,
+        "priority_order": 722,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 147549,
+            "price_list_category": 17687,
+            "priority_order": 476,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 197571,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 425,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440432,
+            "price_list_category": 31655,
+            "priority_order": 137,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479795,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 722,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 441104,
+            "price_list_category": 31666,
+            "priority_order": 478,
+            "price_list_category_name": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 3151,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 8,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 8
+  },
+  "payload": {
+    "vendor": 3151,
+    "packages": [
+      {
+        "id": 527155,
+        "unit_price": 9.5,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 197571,
+            "calculated_value": 13.78,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 9.5
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 178285,
+            "calculated_value": 13.78,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 9.5
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 179339,
+            "calculated_value": 13.78,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 9.5
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 479795,
+            "calculated_value": 13.78,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 9.5
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:39:32.454Z",
+  "rows": [
+    {
+      "productId": 806091,
+      "product": "Organic All Purpose Low Gluten Flour",
+      "vendor": "Camas Country Mill",
+      "packageId": 527155,
+      "package": "4 lbs",
+      "priceList": "Guest Basket",
+      "visible": true,
+      "basePrice": 9.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 13.3,
+      "localPriceAfter": 13.78,
+      "remoteBasePrice": 9.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 13.3,
+      "remotePriceAfter": 13.78
+    },
+    {
+      "productId": 806091,
+      "product": "Organic All Purpose Low Gluten Flour",
+      "vendor": "Camas Country Mill",
+      "packageId": 527155,
+      "package": "4 lbs",
+      "priceList": "CSA Members",
+      "visible": true,
+      "basePrice": 9.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 13.3,
+      "localPriceAfter": 13.78,
+      "remoteBasePrice": 9.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 13.3,
+      "remotePriceAfter": 13.78
+    },
+    {
+      "productId": 806091,
+      "product": "Organic All Purpose Low Gluten Flour",
+      "vendor": "Camas Country Mill",
+      "packageId": 527155,
+      "package": "4 lbs",
+      "priceList": "Herd Share Members",
+      "visible": true,
+      "basePrice": 9.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 13.3,
+      "localPriceAfter": 13.78,
+      "remoteBasePrice": 9.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 13.3,
+      "remotePriceAfter": 13.78
+    },
+    {
+      "productId": 806091,
+      "product": "Organic All Purpose Low Gluten Flour",
+      "vendor": "Camas Country Mill",
+      "packageId": 527155,
+      "package": "4 lbs",
+      "priceList": "SNAP",
+      "visible": true,
+      "basePrice": 9.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 13.3,
+      "localPriceAfter": 13.78,
+      "remoteBasePrice": 9.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 13.3,
+      "remotePriceAfter": 13.78
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.931Z"
+}

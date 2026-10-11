@@ -1,0 +1,262 @@
+{
+  "verifiedAt": "2026-10-08T20:49:40.088Z",
+  "productId": 806097,
+  "priceConfirmed": true,
+  "otherFieldsUnchanged": true,
+  "remote": {
+    "id": 806097,
+    "name": "Nutritional Yeast Popcorn",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">This classic popcorn is made with our delicious dakota black popcorn, with lots of small flake nutritional yeast. Mildly cheesy and salty, but still completely vegan, it's a fast favorite for our local market customers. We hope you love it too!</span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2023-08-25T11:15:32.200918-04:00",
+    "updated": "2026-10-08T16:26:03.052407-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/OQju8.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 141943,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/OQju8.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/OQju8.jpg",
+        "original_filename": "935.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 11,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "935",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 527161,
+        "inventory_per_unit": 1,
+        "unit_price": 4,
+        "average_pack_weight": null,
+        "package_price": 4,
+        "package_unit_price": 4,
+        "priority_order": null,
+        "name": "0.4 lb bag",
+        "price_list_entries": [
+          {
+            "id": 220364,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 178282,
+            "subscription_setting": {
+              "id": 121269,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 221733,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179336,
+            "subscription_setting": {
+              "id": 124481,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617900,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479793,
+            "subscription_setting": {
+              "id": 497016,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 272942,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 222384,
+            "subscription_setting": {
+              "id": 169640,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 11,
+        "number_of_packages_available": 11,
+        "number_of_packages_total": 11,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 11,
+        "product_package_size": 1,
+        "product_id": 806097,
+        "product_name": "Nutritional Yeast Popcorn",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T11:15:32.209798-04:00",
+        "updated": "2026-10-08T16:26:02.464816-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 178282,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 472,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440634,
+            "price_list_category": 31657,
+            "priority_order": 473,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179336,
+        "price_list_category": 17687,
+        "price_list": 2966,
+        "priority_order": 472,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440865,
+            "price_list_category": 31662,
+            "priority_order": 484,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 222384,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 371,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440423,
+            "price_list_category": 31656,
+            "priority_order": 101,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479793,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 472,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 441080,
+            "price_list_category": 31665,
+            "priority_order": 476,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 3150,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 11,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 11
+  }
+}

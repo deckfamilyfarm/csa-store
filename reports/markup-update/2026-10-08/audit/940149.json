@@ -1,0 +1,504 @@
+{
+  "productId": 940149,
+  "context": {
+    "product": {
+      "id": 940149,
+      "name": "White Onion",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">White onion or Allium cepa are a cultivar of dry onion which have a distinct light and mild flavour profile. Much like red onions, they have a high sugar and low sulphur content, and thus have a relatively short shelf life. White onions are used in a variety of dishes, such as those of Mexican and European origin</span></p>",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": 0,
+      "categoryId": 24,
+      "vendorId": 3168,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/21XBb.thumbnail.jpeg",
+      "createdAt": "2025-02-10T20:05:04.000Z",
+      "updatedAt": "2025-02-25T18:06:15.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Vegetables - Roots 🧅🧄 🥕🥔",
+    "vendor": {
+      "id": 3168,
+      "name": "Organically Grown Company",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 693996,
+        "productId": 940149,
+        "name": "2# bag",
+        "price": "3.10",
+        "packageCode": null,
+        "unit": "bag",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 693996,
+        "productId": 940149,
+        "localLinePackageId": 693996,
+        "liveName": "2# bag",
+        "livePrice": "3.10",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":940149,\"Product\":\"White Onion\",\"Track Inventory By\":\"package\",\"Item Unit\":\"bag\",\"Charge By\":\"package\",\"Charge Unit\":\"bag\",\"Package ID\":693996,\"Package Name\":\"2# bag\",\"# of Items\":1,\"Package Price\":3.1,\"Inventory Type\":\"product\"},\"live\":{\"id\":693996,\"inventory_per_unit\":1,\"unit_price\":3.1,\"average_pack_weight\":0,\"package_price\":3.1,\"package_unit_price\":3.1,\"priority_order\":null,\"name\":\"2# bag\",\"price_list_entries\":[{\"id\":533926,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":412182,\"subscription_setting\":{\"id\":412705,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":533927,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":412183,\"subscription_setting\":{\"id\":412706,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":533928,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":412184,\"subscription_setting\":{\"id\":412707,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":618223,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":480113,\"subscription_setting\":{\"id\":497339,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":null,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":940149,\"product_name\":\"White Onion\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"bag\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2025-02-10T15:05:04.274589-05:00\",\"updated\":\"2025-02-10T15:05:04.366555-05:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 940149,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 940149,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/940149/localline/86372f642ef38cb80859553d.jpg"
+    ],
+    "localLineVendorId": 3168
+  },
+  "remote": {
+    "id": 940149,
+    "name": "White Onion",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">White onion or Allium cepa are a cultivar of dry onion which have a distinct light and mild flavour profile. Much like red onions, they have a high sugar and low sulphur content, and thus have a relatively short shelf life. White onions are used in a variety of dishes, such as those of Mexican and European origin</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2025-02-10T15:05:04.039482-05:00",
+    "updated": "2025-02-25T13:06:15.084259-05:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/21XBb.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 268549,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/21XBb.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/21XBb.jpeg",
+        "original_filename": "download.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12591,
+      "name": "bag",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12591,
+      "name": "bag",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 693996,
+        "inventory_per_unit": 1,
+        "unit_price": 3.1,
+        "average_pack_weight": 0,
+        "package_price": 3.1,
+        "package_unit_price": 3.1,
+        "priority_order": null,
+        "name": "2# bag",
+        "price_list_entries": [
+          {
+            "id": 533926,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 412182,
+            "subscription_setting": {
+              "id": 412705,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 533927,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 412183,
+            "subscription_setting": {
+              "id": 412706,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 533928,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 412184,
+            "subscription_setting": {
+              "id": 412707,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 618223,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 480113,
+            "subscription_setting": {
+              "id": 497339,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": null,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 940149,
+        "product_name": "White Onion",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "bag",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-02-10T15:05:04.274589-05:00",
+        "updated": "2025-02-10T15:05:04.366555-05:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 412182,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 711,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440335,
+            "price_list_category": 15731,
+            "priority_order": 61,
+            "price_list_category_name": "Organic Vegetables - Roots 🧅🧄 🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 412183,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 886,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440545,
+            "price_list_category": 15105,
+            "priority_order": 52,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 412184,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1091,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440753,
+            "price_list_category": 15118,
+            "priority_order": 51,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 480113,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1091,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 440961,
+            "price_list_category": 28905,
+            "priority_order": 55,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3168,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3168,
+    "packages": [
+      {
+        "id": 693996,
+        "unit_price": 3.1,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 412182,
+            "calculated_value": 4.5,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 3.1
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 412183,
+            "calculated_value": 4.5,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 3.1
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 412184,
+            "calculated_value": 4.5,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 3.1
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 480113,
+            "calculated_value": 4.5,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 3.1
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:40:31.968Z",
+  "rows": [
+    {
+      "productId": 940149,
+      "product": "White Onion",
+      "vendor": "Organically Grown Company",
+      "packageId": 693996,
+      "package": "2# bag",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 3.1,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 4.34,
+      "localPriceAfter": 4.5,
+      "remoteBasePrice": 3.1,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 4.34,
+      "remotePriceAfter": 4.5
+    },
+    {
+      "productId": 940149,
+      "product": "White Onion",
+      "vendor": "Organically Grown Company",
+      "packageId": 693996,
+      "package": "2# bag",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 3.1,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 4.34,
+      "localPriceAfter": 4.5,
+      "remoteBasePrice": 3.1,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 4.34,
+      "remotePriceAfter": 4.5
+    },
+    {
+      "productId": 940149,
+      "product": "White Onion",
+      "vendor": "Organically Grown Company",
+      "packageId": 693996,
+      "package": "2# bag",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 3.1,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 4.34,
+      "localPriceAfter": 4.5,
+      "remoteBasePrice": 3.1,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 4.34,
+      "remotePriceAfter": 4.5
+    },
+    {
+      "productId": 940149,
+      "product": "White Onion",
+      "vendor": "Organically Grown Company",
+      "packageId": 693996,
+      "package": "2# bag",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 3.1,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 4.34,
+      "localPriceAfter": 4.5,
+      "remoteBasePrice": 3.1,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 4.34,
+      "remotePriceAfter": 4.5
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.986Z"
+}

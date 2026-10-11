@@ -1,0 +1,504 @@
+{
+  "productId": 871793,
+  "context": {
+    "product": {
+      "id": 871793,
+      "name": "Sweet Onion",
+      "description": "Columbia Basin Onion located in Hermiston OR",
+      "visible": 1,
+      "trackInventory": 1,
+      "inventory": 2,
+      "categoryId": 13,
+      "vendorId": 3168,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/PhZyQ.thumbnail.jpeg",
+      "createdAt": "2024-05-06T17:35:44.000Z",
+      "updatedAt": "2026-10-08T10:40:25.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Vegetables - Roots🧅🧄🥕🥔",
+    "vendor": {
+      "id": 3168,
+      "name": "Organically Grown Company",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 605504,
+        "productId": 871793,
+        "name": "1lb",
+        "price": "1.05",
+        "packageCode": null,
+        "unit": "lb",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 1,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 605504,
+        "productId": 871793,
+        "localLinePackageId": 605504,
+        "liveName": "1lb",
+        "livePrice": "1.05",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":871793,\"Product\":\"Sweet Onion\",\"Track Inventory By\":\"package\",\"Item Unit\":\"lb\",\"Charge By\":\"package\",\"Charge Unit\":\"lb\",\"Package ID\":605504,\"Package Name\":\"1lb\",\"# of Items\":1,\"Package Price\":1.05,\"Inventory Type\":\"product\"},\"live\":{\"id\":605504,\"inventory_per_unit\":1,\"unit_price\":1.05,\"average_pack_weight\":0,\"package_price\":1.05,\"package_unit_price\":1.05,\"priority_order\":null,\"name\":\"1lb\",\"price_list_entries\":[{\"id\":344719,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":282675,\"subscription_setting\":{\"id\":225283,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":344721,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":282677,\"subscription_setting\":{\"id\":225285,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":344720,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":282676,\"subscription_setting\":{\"id\":225284,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":618050,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479942,\"subscription_setting\":{\"id\":497166,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":2,\"number_of_packages_available\":2,\"number_of_packages_total\":2,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":2,\"product_package_size\":1,\"product_id\":871793,\"product_name\":\"Sweet Onion\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"lb\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2024-05-06T13:35:44.275196-04:00\",\"updated\":\"2026-03-19T19:30:23.854120-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 871793,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 871793,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/871793/localline/541fc4ac73d24c8f76749e15.jpg"
+    ],
+    "localLineVendorId": 3168
+  },
+  "remote": {
+    "id": 871793,
+    "name": "Sweet Onion",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Columbia Basin Onion located in Hermiston OR</span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2024-05-06T13:35:44.132457-04:00",
+    "updated": "2026-10-01T10:55:26.267824-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/PhZyQ.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 238795,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/PhZyQ.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/PhZyQ.jpeg",
+        "original_filename": "download.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 2,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 605504,
+        "inventory_per_unit": 1,
+        "unit_price": 1.05,
+        "average_pack_weight": 0,
+        "package_price": 1.05,
+        "package_unit_price": 1.05,
+        "priority_order": null,
+        "name": "1lb",
+        "price_list_entries": [
+          {
+            "id": 344719,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 282675,
+            "subscription_setting": {
+              "id": 225283,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 344721,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 282677,
+            "subscription_setting": {
+              "id": 225285,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 344720,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 282676,
+            "subscription_setting": {
+              "id": 225284,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 618050,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479942,
+            "subscription_setting": {
+              "id": 497166,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 2,
+        "number_of_packages_available": 2,
+        "number_of_packages_total": 2,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 2,
+        "product_package_size": 1,
+        "product_id": 871793,
+        "product_name": "Sweet Onion",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "lb",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2024-05-06T13:35:44.275196-04:00",
+        "updated": "2026-03-19T19:30:23.854120-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 282675,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 686,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440536,
+            "price_list_category": 15105,
+            "priority_order": 746,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 282676,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 886,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440744,
+            "price_list_category": 15118,
+            "priority_order": 939,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 282677,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 486,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440324,
+            "price_list_category": 15731,
+            "priority_order": 551,
+            "price_list_category_name": "Organic Vegetables - Roots 🧅🧄 🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479942,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 886,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 440952,
+            "price_list_category": 28905,
+            "priority_order": 948,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 3168,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 2,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 2
+  },
+  "payload": {
+    "vendor": 3168,
+    "packages": [
+      {
+        "id": 605504,
+        "unit_price": 1.05,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 282677,
+            "calculated_value": 1.52,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1.05
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 282675,
+            "calculated_value": 1.52,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1.05
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 282676,
+            "calculated_value": 1.52,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1.05
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 479942,
+            "calculated_value": 1.52,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 1.05
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:39:55.439Z",
+  "rows": [
+    {
+      "productId": 871793,
+      "product": "Sweet Onion",
+      "vendor": "Organically Grown Company",
+      "packageId": 605504,
+      "package": "1lb",
+      "priceList": "Guest Basket",
+      "visible": true,
+      "basePrice": 1.05,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 1.47,
+      "localPriceAfter": 1.52,
+      "remoteBasePrice": 1.05,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 1.47,
+      "remotePriceAfter": 1.52
+    },
+    {
+      "productId": 871793,
+      "product": "Sweet Onion",
+      "vendor": "Organically Grown Company",
+      "packageId": 605504,
+      "package": "1lb",
+      "priceList": "CSA Members",
+      "visible": true,
+      "basePrice": 1.05,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 1.47,
+      "localPriceAfter": 1.52,
+      "remoteBasePrice": 1.05,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 1.47,
+      "remotePriceAfter": 1.52
+    },
+    {
+      "productId": 871793,
+      "product": "Sweet Onion",
+      "vendor": "Organically Grown Company",
+      "packageId": 605504,
+      "package": "1lb",
+      "priceList": "Herd Share Members",
+      "visible": true,
+      "basePrice": 1.05,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 1.47,
+      "localPriceAfter": 1.52,
+      "remoteBasePrice": 1.05,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 1.47,
+      "remotePriceAfter": 1.52
+    },
+    {
+      "productId": 871793,
+      "product": "Sweet Onion",
+      "vendor": "Organically Grown Company",
+      "packageId": 605504,
+      "package": "1lb",
+      "priceList": "SNAP",
+      "visible": true,
+      "basePrice": 1.05,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 1.47,
+      "localPriceAfter": 1.52,
+      "remoteBasePrice": 1.05,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 1.47,
+      "remotePriceAfter": 1.52
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.952Z"
+}

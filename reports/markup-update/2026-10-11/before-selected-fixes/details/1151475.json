@@ -1,0 +1,256 @@
+{
+  "data": {
+    "id": 1151475,
+    "name": "Levitate Elixirs-Spiced Pineapple & Coconut",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">INGREDIENTS: PINEAPPLE JUICE,PURIFIED WATER, WHITE WINE VINEGAR, APPLE CIDER VINEGAR, RAW WILLAMETTE VALLEY HONEY, ORGANIC CANE SUGAR, PROPRIETARY HERBAL EXTRACT BLEND OF (RED PANAX</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">GINSENG, LINDEN*, ASHWAGANDHA*, CANE ETHANOL*, DISTILLED WATER), GUAYUSA EXTRACT*, CITRIC ACID, LTHEANINE, POTASSIUM SORBATE, VITAMIN C AS ASCORBIC ACID, VANILLA &amp; COCONUT EXTRACT (VANILLA BEAN EXTRACTIVES IN WATER, COCONUT EXTRACTIVES, NATURAL FLAVORS, ETHANOL), STEVIA, SEA SALT, DISODIUM EDTA &amp; SPICES *=ORGANIC</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Just pour 3 oz of chilled elixir over ice, add seltzer, Garnish &amp; voila! You’re done!</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">750 ml / 25.4 fl oz</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2026-08-06T17:16:24.330297-04:00",
+    "updated": "2026-10-09T16:01:17.450286-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/vQKpb.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 462090,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/vQKpb.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/vQKpb.jpg",
+        "original_filename": "Levitate Elixirs Resized-00008~2.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 993252,
+        "inventory_per_unit": 1,
+        "unit_price": 25,
+        "average_pack_weight": 0,
+        "package_price": 25,
+        "package_unit_price": 25,
+        "priority_order": 0,
+        "name": "750 ml / 25.4 fl oz ea",
+        "price_list_entries": [
+          {
+            "id": 1017135,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 784061,
+            "subscription_setting": {
+              "id": 895786,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1017136,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 784062,
+            "subscription_setting": {
+              "id": 895787,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1017137,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 784063,
+            "subscription_setting": {
+              "id": 895788,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 1151475,
+        "product_name": "Levitate Elixirs-Spiced Pineapple & Coconut",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-08-06T17:16:24.834080-04:00",
+        "updated": "2026-10-09T16:01:16.667036-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 784061,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 992,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 662040,
+            "price_list_category": 31656,
+            "priority_order": 79,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          },
+          {
+            "id": 691671,
+            "price_list_category": 31772,
+            "priority_order": 90,
+            "price_list_category_name": "Specials and Bundles📦💸"
+          }
+        ],
+        "tax_configuration": {
+          "id": 189155,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 784062,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 1123,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 691672,
+            "price_list_category": 31773,
+            "priority_order": 448,
+            "price_list_category_name": "Specials and Bundles📦💸"
+          },
+          {
+            "id": 662041,
+            "price_list_category": 31657,
+            "priority_order": 442,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": {
+          "id": 189156,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 784063,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1374,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 662042,
+            "price_list_category": 31662,
+            "priority_order": 449,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          },
+          {
+            "id": 691673,
+            "price_list_category": 31774,
+            "priority_order": 459,
+            "price_list_category_name": "Specials and Bundles📦💸"
+          }
+        ],
+        "tax_configuration": {
+          "id": 189157,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 6849,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 1151475,
+  "remoteProductId": 1151475,
+  "checkedAt": "2026-10-11T17:27:31.661Z"
+}

@@ -1,0 +1,319 @@
+{
+  "data": {
+    "id": 1167935,
+    "name": "Heirloom Garlic Mix (Dried and Cured)",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Mix of: Polish White, Chesnok Red, and Music varieties</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Polish White Garlic has a rich, earthy, and full-bodied taste with a light-to-medium heat and a fresh green quality. It is an artichoke softneck variety that provides a classic, versatile garlic profile for cooking. </span></p><p dir=\"ltr\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Taste Profile:</strong></b><span style=\"white-space: pre-wrap;\"> Deep, rich, and musky-earthy with subtle fresh herbal notes.</span></p><p dir=\"ltr\"><b><strong class=\"lexical-text-editor--bold\" style=\"white-space: pre-wrap;\">Pungency:</strong></b><span style=\"white-space: pre-wrap;\"> Light to medium heat that gives a mild bite without being overwhelming.</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Chesnok Red Garlic has a rich, sweet, and complex flavor characterized by a medium-hot raw bite that turns creamy, earthy, and exceptionally sweet when roasted. </span></p><p><br></p><p dir=\"ltr\"><br></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2026-10-08T17:21:32.911557-04:00",
+    "updated": "2026-10-09T16:02:31.196517-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/xn5K3.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 480692,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/xn5K3.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/xn5K3.jpg",
+        "original_filename": "T4MBn.jpg"
+      },
+      {
+        "id": 480691,
+        "priority_order": 1,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/eexHz.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/eexHz.jpg",
+        "original_filename": "wqDjm.jpg"
+      },
+      {
+        "id": 480690,
+        "priority_order": 2,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/vrZvj.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/vrZvj.jpg",
+        "original_filename": "account/322922/wTih2.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": 0,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 1,
+      "name": "pound",
+      "abbrieviation": "lb",
+      "unit_type": "weight",
+      "default": true
+    },
+    "charge_unit": {
+      "id": 1,
+      "name": "pound",
+      "abbrieviation": "lb",
+      "unit_type": "weight",
+      "default": true
+    },
+    "track_type": "weight",
+    "charge_type": "weight",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 1017122,
+        "inventory_per_unit": 1,
+        "unit_price": 4,
+        "average_pack_weight": 1,
+        "package_price": 4,
+        "package_unit_price": 4,
+        "priority_order": 0,
+        "name": "1/2 lb",
+        "price_list_entries": [
+          {
+            "id": 1067194,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 820031,
+            "subscription_setting": {
+              "id": 946020,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1067196,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 820032,
+            "subscription_setting": {
+              "id": 946022,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1067197,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 820033,
+            "subscription_setting": {
+              "id": 946023,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1067195,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 820034,
+            "subscription_setting": {
+              "id": 946021,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "weight",
+        "current_inventory": 0,
+        "total_inventory": null,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 1167935,
+        "product_name": "Heirloom Garlic Mix (Dried and Cured)",
+        "is_by_weight": true,
+        "is_charge_by_weight": true,
+        "product_charge_unit": "lb",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2026-10-08T17:21:33.263737-04:00",
+        "updated": "2026-10-09T16:02:30.354108-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 820031,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 1039,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 696981,
+            "price_list_category": 15731,
+            "priority_order": 1,
+            "price_list_category_name": "Organic Vegetables - Roots 🧅🧄 🥕🥔"
+          },
+          {
+            "id": 696982,
+            "price_list_category": 15736,
+            "priority_order": 2,
+            "price_list_category_name": "Organic Vegetables - Herbs 🌿"
+          }
+        ],
+        "tax_configuration": {
+          "id": 207204,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 820032,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 1145,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 696983,
+            "price_list_category": 15105,
+            "priority_order": 1,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          },
+          {
+            "id": 696984,
+            "price_list_category": 15109,
+            "priority_order": 2,
+            "price_list_category_name": "Organic Vegetables - Herbs🌿"
+          }
+        ],
+        "tax_configuration": {
+          "id": 207205,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 820033,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1421,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 696985,
+            "price_list_category": 15118,
+            "priority_order": 1,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          },
+          {
+            "id": 696986,
+            "price_list_category": 15124,
+            "priority_order": 2,
+            "price_list_category_name": "Organic Vegetables - Herbs🌿"
+          }
+        ],
+        "tax_configuration": {
+          "id": 207206,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 820034,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1440,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 696987,
+            "price_list_category": 28905,
+            "priority_order": 1,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          },
+          {
+            "id": 696988,
+            "price_list_category": 28897,
+            "priority_order": 2,
+            "price_list_category_name": "Organic Vegetables - Herbs🌿"
+          }
+        ],
+        "tax_configuration": {
+          "id": 207207,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not tracked",
+    "is_deleted": false,
+    "vendor": 3149,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "package",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 1167935,
+  "remoteProductId": 1167935,
+  "checkedAt": "2026-10-11T17:27:34.591Z"
+}

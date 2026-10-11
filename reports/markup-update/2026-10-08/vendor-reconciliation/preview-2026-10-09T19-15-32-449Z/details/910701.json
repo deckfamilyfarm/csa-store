@@ -1,0 +1,259 @@
+{
+  "remote": {
+    "id": 910701,
+    "name": "Shishito Pepper Pint",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Overflowing Shishito Pepper Pint!! Shishitos are bright, flavorful sweet chilies with typically mild spiciness.  Cook them up as a side or a fun appetizer. </span></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2024-10-07T14:19:34.292093-04:00",
+    "updated": "2026-10-01T10:49:23.135499-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/sUWL0.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 338590,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/sUWL0.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/sUWL0.jpg",
+        "original_filename": "img_7576.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12594,
+      "name": "pt",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12594,
+      "name": "pt",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "519",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 655777,
+        "inventory_per_unit": 1,
+        "unit_price": 2.75,
+        "average_pack_weight": null,
+        "package_price": 2.75,
+        "package_unit_price": 2.75,
+        "priority_order": null,
+        "name": "each",
+        "price_list_entries": [
+          {
+            "id": 451886,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 359153,
+            "subscription_setting": {
+              "id": 330787,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 451885,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 359155,
+            "subscription_setting": {
+              "id": 330786,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 451887,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 50,
+            "price_list_id": 2966,
+            "product_price_list_entry": 359154,
+            "subscription_setting": {
+              "id": 330788,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 618147,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 480039,
+            "subscription_setting": {
+              "id": 497263,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 11,
+        "number_of_packages_available": 11,
+        "number_of_packages_total": 11,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 11,
+        "product_package_size": 1,
+        "product_id": 910701,
+        "product_name": "Shishito Pepper Pint",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "pt",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2024-10-07T14:19:34.513063-04:00",
+        "updated": "2026-10-01T10:49:22.394814-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 359153,
+        "price_list_category": 15111,
+        "price_list": 2718,
+        "priority_order": 799,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 266874,
+            "price_list_category": 15111,
+            "priority_order": 857,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 359154,
+        "price_list_category": 15120,
+        "price_list": 2966,
+        "priority_order": 1001,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 266875,
+            "price_list_category": 15120,
+            "priority_order": 1067,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 359155,
+        "price_list_category": 15750,
+        "price_list": 3124,
+        "priority_order": 623,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 266876,
+            "price_list_category": 15750,
+            "priority_order": 684,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 480039,
+        "price_list_category": 28914,
+        "price_list": 5622,
+        "priority_order": 1001,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370497,
+            "price_list_category": 28914,
+            "priority_order": 1066,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not tracked",
+    "is_deleted": false,
+    "vendor": 3154,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 11,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 11
+  },
+  "fetchedAt": "2026-10-08T21:50:51.426Z"
+}

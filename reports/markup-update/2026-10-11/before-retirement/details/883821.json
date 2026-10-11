@@ -1,0 +1,261 @@
+{
+  "data": {
+    "id": 883821,
+    "name": "Persian Cucumber",
+    "description": "<p></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2024-06-13T22:06:42.519002-04:00",
+    "updated": "2024-08-27T20:26:09.115307-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/6XDrF.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 207887,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/6XDrF.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/6XDrF.jpg",
+        "original_filename": "account/322922/Ql6la.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 1,
+      "name": "pound",
+      "abbrieviation": "lb",
+      "unit_type": "weight",
+      "default": true
+    },
+    "charge_unit": {
+      "id": 1,
+      "name": "pound",
+      "abbrieviation": "lb",
+      "unit_type": "weight",
+      "default": true
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 621073,
+        "inventory_per_unit": 1,
+        "unit_price": 2.4,
+        "average_pack_weight": null,
+        "package_price": 2.4,
+        "package_unit_price": 2.4,
+        "priority_order": 1,
+        "name": "1 lb",
+        "price_list_entries": [
+          {
+            "id": 369298,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 34,
+            "price_list_id": 2718,
+            "product_price_list_entry": 301036,
+            "subscription_setting": {
+              "id": 250138,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 369299,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 34,
+            "price_list_id": 2966,
+            "product_price_list_entry": 301037,
+            "subscription_setting": {
+              "id": 250139,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 618074,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 34,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479966,
+            "subscription_setting": {
+              "id": 497190,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 369300,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 301038,
+            "subscription_setting": {
+              "id": 250140,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": null,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 883821,
+        "product_name": "Persian Cucumber",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "lb",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2024-06-13T22:06:42.733190-04:00",
+        "updated": "2024-07-02T20:42:18.963155-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 301036,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 714,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440516,
+            "price_list_category": 15111,
+            "priority_order": 748,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 301037,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 915,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440789,
+            "price_list_category": 15120,
+            "priority_order": 957,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 301038,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 525,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440355,
+            "price_list_category": 15750,
+            "priority_order": 567,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479966,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 915,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 440981,
+            "price_list_category": 28914,
+            "priority_order": 970,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": null,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "OWNED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "localProductId": 883821,
+  "remoteProductId": 883821,
+  "checkedAt": "2026-10-11T17:58:02.252Z"
+}

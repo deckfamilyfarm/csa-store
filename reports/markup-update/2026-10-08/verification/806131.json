@@ -1,0 +1,262 @@
+{
+  "verifiedAt": "2026-10-08T20:49:42.287Z",
+  "productId": 806131,
+  "priceConfirmed": true,
+  "otherFieldsUnchanged": true,
+  "remote": {
+    "id": 806131,
+    "name": "Radiant Decaf Columbia Coffee Beans",
+    "description": "<p>This specialty coffee out of Colombia was decaffeinated using the Swiss Water Process. It is a blend assembled by our good friends at Novus Coffee Importers from various smallholder farms in northern Colombia. Notes of Dark Chocolate, Molasses, and Smokey.</p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2023-08-25T11:15:33.077296-04:00",
+    "updated": "2026-10-08T16:26:36.301602-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/UD17j.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 141123,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/UD17j.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/UD17j.jpg",
+        "original_filename": "383.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 4,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "383",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 527196,
+        "inventory_per_unit": 1,
+        "unit_price": 13,
+        "average_pack_weight": null,
+        "package_price": 13,
+        "package_unit_price": 13,
+        "priority_order": null,
+        "name": "12 oz",
+        "price_list_entries": [
+          {
+            "id": 238383,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 192055,
+            "subscription_setting": {
+              "id": 146185,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 220387,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 178305,
+            "subscription_setting": {
+              "id": 121292,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617912,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479805,
+            "subscription_setting": {
+              "id": 497028,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 221756,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179359,
+            "subscription_setting": {
+              "id": 124494,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 4,
+        "number_of_packages_available": 4,
+        "number_of_packages_total": 4,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 4,
+        "product_package_size": 1,
+        "product_id": 806131,
+        "product_name": "Radiant Decaf Columbia Coffee Beans",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T11:15:33.085595-04:00",
+        "updated": "2026-10-08T16:26:35.343251-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 178305,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 689,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440692,
+            "price_list_category": 31657,
+            "priority_order": 644,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179359,
+        "price_list_category": 17687,
+        "price_list": 2966,
+        "priority_order": 890,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440871,
+            "price_list_category": 31662,
+            "priority_order": 849,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 192055,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 562,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440477,
+            "price_list_category": 31656,
+            "priority_order": 427,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479805,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 890,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 441131,
+            "price_list_category": 31665,
+            "priority_order": 844,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 3158,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 4,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 4
+  }
+}

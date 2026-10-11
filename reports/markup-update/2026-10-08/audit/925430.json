@@ -1,0 +1,504 @@
+{
+  "productId": 925430,
+  "context": {
+    "product": {
+      "id": 925430,
+      "name": "Radiant Breakfast Blend - Light Roast Coffee Beans",
+      "description": "<p>This locally roasted has flavors of chocolate, caramel and brown sugar. It's the most mild of the Radiant Blends. Perfect for morning.</p>",
+      "visible": 1,
+      "trackInventory": 1,
+      "inventory": 2,
+      "categoryId": 18,
+      "vendorId": 3158,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/f9QT6.thumbnail.jpeg",
+      "createdAt": "2024-12-09T22:04:41.000Z",
+      "updatedAt": "2026-10-07T10:40:25.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Beverages 🍶🥤  and Snacks 🍿",
+    "vendor": {
+      "id": 3158,
+      "name": "Radiant Coffee Roasters",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 672999,
+        "productId": 925430,
+        "name": "12 oz",
+        "price": "12.00",
+        "packageCode": null,
+        "unit": "ea",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 1,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 672999,
+        "productId": 925430,
+        "localLinePackageId": 672999,
+        "liveName": "12 oz",
+        "livePrice": "12.00",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":925430,\"Product\":\"Radiant Breakfast Blend - Light Roast Coffee Beans\",\"Track Inventory By\":\"package\",\"Item Unit\":\"ea\",\"Charge By\":\"package\",\"Charge Unit\":\"ea\",\"Package ID\":672999,\"Package Name\":\"12 oz\",\"# of Items\":1,\"Package Price\":12,\"Inventory Type\":\"product\"},\"live\":{\"id\":672999,\"inventory_per_unit\":1,\"unit_price\":12,\"average_pack_weight\":null,\"package_price\":12,\"package_unit_price\":12,\"priority_order\":null,\"name\":\"12 oz\",\"price_list_entries\":[{\"id\":498129,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":383135,\"subscription_setting\":{\"id\":376530,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":498130,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":383136,\"subscription_setting\":{\"id\":376531,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":498131,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":383137,\"subscription_setting\":{\"id\":376532,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":618191,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":480083,\"subscription_setting\":{\"id\":497307,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":2,\"number_of_packages_available\":2,\"number_of_packages_total\":2,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":2,\"product_package_size\":1,\"product_id\":925430,\"product_name\":\"Radiant Breakfast Blend - Light Roast Coffee Beans\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"ea\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2024-12-09T17:04:42.224380-05:00\",\"updated\":\"2025-10-13T15:16:37.454866-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 925430,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 925430,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/925430/localline/e8b28fcacfbf0dcfd8ecf534.jpg"
+    ],
+    "localLineVendorId": 3158
+  },
+  "remote": {
+    "id": 925430,
+    "name": "Radiant Breakfast Blend - Light Roast Coffee Beans",
+    "description": "<p>This locally roasted has flavors of chocolate, caramel and brown sugar. It's the most mild of the Radiant Blends. Perfect for morning.</p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2024-12-09T17:04:41.886706-05:00",
+    "updated": "2026-08-24T14:30:56.285372-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/f9QT6.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 252305,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/f9QT6.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/f9QT6.jpg",
+        "original_filename": "account/322922/CxSzq.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 2,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "402",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 672999,
+        "inventory_per_unit": 1,
+        "unit_price": 12,
+        "average_pack_weight": null,
+        "package_price": 12,
+        "package_unit_price": 12,
+        "priority_order": null,
+        "name": "12 oz",
+        "price_list_entries": [
+          {
+            "id": 498129,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 383135,
+            "subscription_setting": {
+              "id": 376530,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 498130,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 383136,
+            "subscription_setting": {
+              "id": 376531,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 498131,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 383137,
+            "subscription_setting": {
+              "id": 376532,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 618191,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 480083,
+            "subscription_setting": {
+              "id": 497307,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 2,
+        "number_of_packages_available": 2,
+        "number_of_packages_total": 2,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 2,
+        "product_package_size": 1,
+        "product_id": 925430,
+        "product_name": "Radiant Breakfast Blend - Light Roast Coffee Beans",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2024-12-09T17:04:42.224380-05:00",
+        "updated": "2025-10-13T15:16:37.454866-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 383135,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 684,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440697,
+            "price_list_category": 31657,
+            "priority_order": 630,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 383136,
+        "price_list_category": 17687,
+        "price_list": 2966,
+        "priority_order": 888,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440877,
+            "price_list_category": 31662,
+            "priority_order": 833,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 383137,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 559,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440481,
+            "price_list_category": 31656,
+            "priority_order": 425,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 480083,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 888,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 441137,
+            "price_list_category": 31665,
+            "priority_order": 830,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 3158,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 2,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 2
+  },
+  "payload": {
+    "vendor": 3158,
+    "packages": [
+      {
+        "id": 672999,
+        "unit_price": 12,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 383137,
+            "calculated_value": 17.4,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 12
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 383135,
+            "calculated_value": 17.4,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 12
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 383136,
+            "calculated_value": 17.4,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 12
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 480083,
+            "calculated_value": 17.4,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 12
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:40:27.377Z",
+  "rows": [
+    {
+      "productId": 925430,
+      "product": "Radiant Breakfast Blend - Light Roast Coffee Beans",
+      "vendor": "Radiant Coffee Roasters",
+      "packageId": 672999,
+      "package": "12 oz",
+      "priceList": "Guest Basket",
+      "visible": true,
+      "basePrice": 12,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 16.8,
+      "localPriceAfter": 17.4,
+      "remoteBasePrice": 12,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 16.8,
+      "remotePriceAfter": 17.4
+    },
+    {
+      "productId": 925430,
+      "product": "Radiant Breakfast Blend - Light Roast Coffee Beans",
+      "vendor": "Radiant Coffee Roasters",
+      "packageId": 672999,
+      "package": "12 oz",
+      "priceList": "CSA Members",
+      "visible": true,
+      "basePrice": 12,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 16.8,
+      "localPriceAfter": 17.4,
+      "remoteBasePrice": 12,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 16.8,
+      "remotePriceAfter": 17.4
+    },
+    {
+      "productId": 925430,
+      "product": "Radiant Breakfast Blend - Light Roast Coffee Beans",
+      "vendor": "Radiant Coffee Roasters",
+      "packageId": 672999,
+      "package": "12 oz",
+      "priceList": "Herd Share Members",
+      "visible": true,
+      "basePrice": 12,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 16.8,
+      "localPriceAfter": 17.4,
+      "remoteBasePrice": 12,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 16.8,
+      "remotePriceAfter": 17.4
+    },
+    {
+      "productId": 925430,
+      "product": "Radiant Breakfast Blend - Light Roast Coffee Beans",
+      "vendor": "Radiant Coffee Roasters",
+      "packageId": 672999,
+      "package": "12 oz",
+      "priceList": "SNAP",
+      "visible": true,
+      "basePrice": 12,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 16.8,
+      "localPriceAfter": 17.4,
+      "remoteBasePrice": 12,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 16.8,
+      "remotePriceAfter": 17.4
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.981Z"
+}

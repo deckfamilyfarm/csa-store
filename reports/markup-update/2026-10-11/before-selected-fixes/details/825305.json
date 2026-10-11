@@ -1,0 +1,268 @@
+{
+  "data": {
+    "id": 825305,
+    "name": "Matsutake mushrooms",
+    "description": "<p>Matsutake or Pine Mushroom</p>\n<p>Tricholoma murrillianum</p><br />\n<p>Foraged weekly less than a mile from the Pacific Ocean, these matsutakes are choice mushrooms, desired for their spicy odor and flavor, and meaty texture. Excellent in rice as in the classic dish Matsutake Gohan; some simply grill them and others love them caramelized over vanilla ice cream.</p><br />\n<p>I get as much sand off of the base of matsutakes, but I don't trim the bottom because matsutakes grow in sandy soil and I like to leave that identifying feature in tact for confidence in consuming. Trim bottoms off before cooking.&nbsp;</p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-11-28T22:04:45.472338-05:00",
+    "updated": "2023-12-05T17:50:13.557740-05:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/0Radc.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 158294,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/0Radc.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/0Radc.jpeg",
+        "original_filename": "CE3B862D-7A85-4552-8AFD-0404FFD96A55.jpeg"
+      },
+      {
+        "id": 158295,
+        "priority_order": 1,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/Nj99V.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/Nj99V.jpeg",
+        "original_filename": "0B1C3E4E-DB45-4D02-8E6A-4C3ECACC141C.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 2,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12601,
+      "name": "1/2 lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12601,
+      "name": "1/2 lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "weight",
+    "charge_type": "weight",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 549219,
+        "inventory_per_unit": 1,
+        "unit_price": 11.25,
+        "average_pack_weight": 1,
+        "package_price": 11.25,
+        "package_unit_price": 11.25,
+        "priority_order": 1,
+        "name": "1/2 lb",
+        "price_list_entries": [
+          {
+            "id": 245624,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 33,
+            "price_list_id": 2966,
+            "product_price_list_entry": 197858,
+            "subscription_setting": {
+              "id": 153793,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 245623,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 197857,
+            "subscription_setting": {
+              "id": 153794,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 245622,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 33,
+            "price_list_id": 2718,
+            "product_price_list_entry": 197856,
+            "subscription_setting": {
+              "id": 153795,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617987,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 33,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479879,
+            "subscription_setting": {
+              "id": 497103,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "weight",
+        "current_inventory": 0,
+        "total_inventory": 2,
+        "number_of_packages_available": 2,
+        "number_of_packages_total": 2,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 2,
+        "product_package_size": 1,
+        "product_id": 825305,
+        "product_name": "Matsutake mushrooms",
+        "is_by_weight": true,
+        "is_charge_by_weight": true,
+        "product_charge_unit": "1/2 lb",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-11-28T22:04:45.649461-05:00",
+        "updated": "2023-11-29T10:00:02.675369-05:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 197856,
+        "price_list_category": 15108,
+        "price_list": 2718,
+        "priority_order": 590,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 163353,
+            "price_list_category": 15108,
+            "priority_order": 590,
+            "price_list_category_name": "Organic Mushrooms 🍄‍🟫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 197857,
+        "price_list_category": 15737,
+        "price_list": 3124,
+        "priority_order": 372,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 163354,
+            "price_list_category": 15737,
+            "priority_order": 373,
+            "price_list_category_name": "Organic Mushrooms 🍄‍🟫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 197858,
+        "price_list_category": 15123,
+        "price_list": 2966,
+        "priority_order": 786,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 163355,
+            "price_list_category": 15123,
+            "priority_order": 786,
+            "price_list_category_name": "Organic Mushrooms 🍄‍🟫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479879,
+        "price_list_category": 28919,
+        "price_list": 5622,
+        "priority_order": 786,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370152,
+            "price_list_category": 28919,
+            "priority_order": 786,
+            "price_list_category_name": "Organic Mushrooms 🍄‍🟫"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": null,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "OWNED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 2,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 2
+  },
+  "localProductId": 825305,
+  "remoteProductId": 825305,
+  "checkedAt": "2026-10-11T17:26:59.126Z"
+}

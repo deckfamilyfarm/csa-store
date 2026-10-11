@@ -1,0 +1,524 @@
+{
+  "productId": 806029,
+  "context": {
+    "product": {
+      "id": 806029,
+      "name": "Challah Sandwich Loaf",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Great for sandwiches or French Toast!</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Ingredients:</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Camas Mill Bread flour </span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Cage free/organic eggs&nbsp;</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Organic honey&nbsp;</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">vegetable oil&nbsp;</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Yeast/water&nbsp;</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Salt&nbsp;</span></p><p><br></p>",
+      "visible": 1,
+      "trackInventory": 0,
+      "inventory": 0,
+      "categoryId": 17,
+      "vendorId": 3169,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/OvjJi.thumbnail.jpeg",
+      "createdAt": "2023-08-25T15:15:30.000Z",
+      "updatedAt": "2025-12-29T20:14:25.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Baked Goods 🍞 🥖",
+    "vendor": {
+      "id": 3169,
+      "name": "Reality Kitchen Nonprofit",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 527091,
+        "productId": 806029,
+        "name": "each",
+        "price": "6.50",
+        "packageCode": null,
+        "unit": "ea",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 1,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 527091,
+        "productId": 806029,
+        "localLinePackageId": 527091,
+        "liveName": "each",
+        "livePrice": "6.50",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":806029,\"Product\":\"Challah Sandwich Loaf\",\"Track Inventory By\":\"package\",\"Item Unit\":\"ea\",\"Charge By\":\"package\",\"Charge Unit\":\"ea\",\"Package ID\":527091,\"Package Name\":\"each\",\"# of Items\":1,\"Package Price\":6.5,\"Inventory Type\":\"product\"},\"live\":{\"id\":527091,\"inventory_per_unit\":1,\"unit_price\":6.5,\"average_pack_weight\":null,\"package_price\":6.5,\"package_unit_price\":6.5,\"priority_order\":null,\"name\":\"each\",\"price_list_entries\":[{\"id\":221711,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":179314,\"subscription_setting\":{\"id\":123263,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":238316,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":191988,\"subscription_setting\":{\"id\":146085,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":617883,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":479776,\"subscription_setting\":{\"id\":496999,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":220342,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":178260,\"subscription_setting\":{\"id\":121247,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":806029,\"product_name\":\"Challah Sandwich Loaf\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"ea\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2023-08-25T11:15:30.352797-04:00\",\"updated\":\"2026-05-11T15:16:08.079868-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 806029,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 806029,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/806029/localline/7923b316f01a6b458a4a275c.jpg"
+    ],
+    "localLineVendorId": 3169
+  },
+  "remote": {
+    "id": 806029,
+    "name": "Challah Sandwich Loaf",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Great for sandwiches or French Toast!</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Ingredients:</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Camas Mill Bread flour </span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Cage free/organic eggs&nbsp;</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Organic honey&nbsp;</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">vegetable oil&nbsp;</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Yeast/water&nbsp;</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Salt&nbsp;</span></p><p><br></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2023-08-25T11:15:30.340183-04:00",
+    "updated": "2026-01-29T12:04:54.027407-05:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/OvjJi.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 141409,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/OvjJi.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/OvjJi.jpg",
+        "original_filename": "649.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "649",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 527091,
+        "inventory_per_unit": 1,
+        "unit_price": 6.5,
+        "average_pack_weight": null,
+        "package_price": 6.5,
+        "package_unit_price": 6.5,
+        "priority_order": null,
+        "name": "each",
+        "price_list_entries": [
+          {
+            "id": 221711,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179314,
+            "subscription_setting": {
+              "id": 123263,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 238316,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 191988,
+            "subscription_setting": {
+              "id": 146085,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617883,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479776,
+            "subscription_setting": {
+              "id": 496999,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 220342,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 178260,
+            "subscription_setting": {
+              "id": 121247,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 806029,
+        "product_name": "Challah Sandwich Loaf",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T11:15:30.352797-04:00",
+        "updated": "2026-05-11T15:16:08.079868-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 178260,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 400,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440600,
+            "price_list_category": 31660,
+            "priority_order": 17,
+            "price_list_category_name": "Baked Goods 🍞 🥖"
+          }
+        ],
+        "tax_configuration": {
+          "id": 86057,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179314,
+        "price_list_category": 17687,
+        "price_list": 2966,
+        "priority_order": 400,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440842,
+            "price_list_category": 31661,
+            "priority_order": 17,
+            "price_list_category_name": "Baked Goods 🍞 🥖"
+          }
+        ],
+        "tax_configuration": {
+          "id": 86058,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 191988,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 52,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440404,
+            "price_list_category": 31654,
+            "priority_order": 3,
+            "price_list_category_name": "Baked Goods 🍞 🥖"
+          }
+        ],
+        "tax_configuration": {
+          "id": 86059,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479776,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 400,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 441042,
+            "price_list_category": 31668,
+            "priority_order": 17,
+            "price_list_category_name": "Baked Goods 🍞 🥖"
+          }
+        ],
+        "tax_configuration": {
+          "id": 86060,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not tracked",
+    "is_deleted": false,
+    "vendor": 3169,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3169,
+    "packages": [
+      {
+        "id": 527091,
+        "unit_price": 6.5,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 191988,
+            "calculated_value": 9.42,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 6.5
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 178260,
+            "calculated_value": 9.42,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 6.5
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 179314,
+            "calculated_value": 9.42,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 6.5
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 479776,
+            "calculated_value": 9.42,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 6.5
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:39:18.175Z",
+  "rows": [
+    {
+      "productId": 806029,
+      "product": "Challah Sandwich Loaf",
+      "vendor": "Reality Kitchen Nonprofit",
+      "packageId": 527091,
+      "package": "each",
+      "priceList": "Guest Basket",
+      "visible": true,
+      "basePrice": 6.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 9.1,
+      "localPriceAfter": 9.42,
+      "remoteBasePrice": 6.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 9.1,
+      "remotePriceAfter": 9.42
+    },
+    {
+      "productId": 806029,
+      "product": "Challah Sandwich Loaf",
+      "vendor": "Reality Kitchen Nonprofit",
+      "packageId": 527091,
+      "package": "each",
+      "priceList": "CSA Members",
+      "visible": true,
+      "basePrice": 6.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 9.1,
+      "localPriceAfter": 9.42,
+      "remoteBasePrice": 6.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 9.1,
+      "remotePriceAfter": 9.42
+    },
+    {
+      "productId": 806029,
+      "product": "Challah Sandwich Loaf",
+      "vendor": "Reality Kitchen Nonprofit",
+      "packageId": 527091,
+      "package": "each",
+      "priceList": "Herd Share Members",
+      "visible": true,
+      "basePrice": 6.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 9.1,
+      "localPriceAfter": 9.42,
+      "remoteBasePrice": 6.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 9.1,
+      "remotePriceAfter": 9.42
+    },
+    {
+      "productId": 806029,
+      "product": "Challah Sandwich Loaf",
+      "vendor": "Reality Kitchen Nonprofit",
+      "packageId": 527091,
+      "package": "each",
+      "priceList": "SNAP",
+      "visible": true,
+      "basePrice": 6.5,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 9.1,
+      "localPriceAfter": 9.42,
+      "remoteBasePrice": 6.5,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 9.1,
+      "remotePriceAfter": 9.42
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.919Z"
+}

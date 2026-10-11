@@ -1,0 +1,540 @@
+{
+  "productId": 1017975,
+  "context": {
+    "product": {
+      "id": 1017975,
+      "name": "Bulk Carrots",
+      "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">The Carrot is&nbsp;a versatile root vegetable known for its sweet and earthy flavor, satisfying crunch when raw, and tender texture when cooked. It is a staple in both savory and sweet dishes, appearing in everything from salads and soups to baked goods like carrot cake. Carrots can be prepared in numerous ways, including raw, roasted, boiled, mashed, or juiced, and are a key component in classic cooking bases like mirepoix.&nbsp;</span></p>",
+      "visible": 0,
+      "trackInventory": 0,
+      "inventory": 0,
+      "categoryId": 13,
+      "vendorId": 3149,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/iLAjK.thumbnail.jpeg",
+      "createdAt": "2025-10-27T23:42:07.000Z",
+      "updatedAt": "2026-04-08T20:23:49.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Organic Vegetables - Roots🧅🧄🥕🥔",
+    "vendor": {
+      "id": 3149,
+      "name": "Grazier's Garden",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 803425,
+        "productId": 1017975,
+        "name": "pound",
+        "price": "2.20",
+        "packageCode": null,
+        "unit": "lb",
+        "numOfItems": 1,
+        "trackType": "weight",
+        "chargeType": "weight",
+        "visible": 0,
+        "trackInventory": 1,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 803425,
+        "productId": 1017975,
+        "localLinePackageId": 803425,
+        "liveName": "pound",
+        "livePrice": "2.20",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "package",
+        "packageInventory": 0,
+        "packageReservedInventory": 0,
+        "packageAvailableInventory": 0,
+        "avgPackageWeight": "1.000",
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":1017975,\"Product\":\"Bulk Carrots\",\"Track Inventory By\":\"weight\",\"Item Unit\":\"pound\",\"Charge By\":\"weight\",\"Charge Unit\":\"pound\",\"Package ID\":803425,\"Package Name\":\"pound\",\"Avg Package Weight\":1,\"# of Items\":1,\"Package Price\":2.2,\"Inventory Type\":\"package\",\"Package Inventory\":0,\"Package Reserved Inventory\":0,\"Package Available Inventory\":0},\"live\":{\"id\":803425,\"inventory_per_unit\":1,\"unit_price\":2.2,\"average_pack_weight\":1,\"package_price\":2.2,\"package_unit_price\":2.2,\"priority_order\":1,\"name\":\"pound\",\"price_list_entries\":[{\"id\":717435,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":552325,\"subscription_setting\":{\"id\":596451,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":717436,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":552326,\"subscription_setting\":{\"id\":596452,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":717437,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":552327,\"subscription_setting\":{\"id\":596453,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":717438,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":552328,\"subscription_setting\":{\"id\":596454,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"weight\",\"current_inventory\":0,\"total_inventory\":0,\"number_of_packages_available\":0,\"number_of_packages_total\":0,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":0,\"product_package_size\":1,\"product_id\":1017975,\"product_name\":\"Bulk Carrots\",\"is_by_weight\":true,\"is_charge_by_weight\":true,\"product_charge_unit\":\"lb\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"No inventory\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2025-10-27T19:42:07.545148-04:00\",\"updated\":\"2026-03-02T17:42:10.077379-05:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 1017975,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 1017975,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/1017975/localline/321718f9c172c439c8206659.jpg",
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/1017975/localline/1d72aa72387c77ea9faeb153.jpg",
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/1017975/localline/1b7be183f242cbb76233ef6a.jpg"
+    ],
+    "localLineVendorId": 3149
+  },
+  "remote": {
+    "id": 1017975,
+    "name": "Bulk Carrots",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">The Carrot is&nbsp;a versatile root vegetable known for its sweet and earthy flavor, satisfying crunch when raw, and tender texture when cooked. It is a staple in both savory and sweet dishes, appearing in everything from salads and soups to baked goods like carrot cake. Carrots can be prepared in numerous ways, including raw, roasted, boiled, mashed, or juiced, and are a key component in classic cooking bases like mirepoix.&nbsp;</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2025-10-27T19:42:07.322145-04:00",
+    "updated": "2026-03-12T12:56:38.910681-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/iLAjK.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 352227,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/iLAjK.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/iLAjK.jpeg",
+        "original_filename": "IMG_9039.jpeg"
+      },
+      {
+        "id": 352228,
+        "priority_order": 1,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/B12BO.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/B12BO.jpeg",
+        "original_filename": "IMG_9040.jpeg"
+      },
+      {
+        "id": 352226,
+        "priority_order": 2,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/qMrnY.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/qMrnY.jpeg",
+        "original_filename": "IMG_9037.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": 0,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 1,
+      "name": "pound",
+      "abbrieviation": "lb",
+      "unit_type": "weight",
+      "default": true
+    },
+    "charge_unit": {
+      "id": 1,
+      "name": "pound",
+      "abbrieviation": "lb",
+      "unit_type": "weight",
+      "default": true
+    },
+    "track_type": "weight",
+    "charge_type": "weight",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 803425,
+        "inventory_per_unit": 1,
+        "unit_price": 2.2,
+        "average_pack_weight": 1,
+        "package_price": 2.2,
+        "package_unit_price": 2.2,
+        "priority_order": 1,
+        "name": "pound",
+        "price_list_entries": [
+          {
+            "id": 717435,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 552325,
+            "subscription_setting": {
+              "id": 596451,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 717436,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 552326,
+            "subscription_setting": {
+              "id": 596452,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 717437,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 552327,
+            "subscription_setting": {
+              "id": 596453,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 717438,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 552328,
+            "subscription_setting": {
+              "id": 596454,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "weight",
+        "current_inventory": 0,
+        "total_inventory": 0,
+        "number_of_packages_available": 0,
+        "number_of_packages_total": 0,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 0,
+        "product_package_size": 1,
+        "product_id": 1017975,
+        "product_name": "Bulk Carrots",
+        "is_by_weight": true,
+        "is_charge_by_weight": true,
+        "product_charge_unit": "lb",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "No inventory",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-10-27T19:42:07.545148-04:00",
+        "updated": "2026-03-02T17:42:10.077379-05:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 552325,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 1031,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 442859,
+            "price_list_category": 15105,
+            "priority_order": 27,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 91737,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 552326,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1243,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 442860,
+            "price_list_category": 15118,
+            "priority_order": 29,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 91738,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 552327,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1244,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 442861,
+            "price_list_category": 28905,
+            "priority_order": 29,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 91739,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 552328,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 868,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 442862,
+            "price_list_category": 15731,
+            "priority_order": 30,
+            "price_list_category_name": "Organic Vegetables - Roots 🧅🧄 🥕🥔"
+          }
+        ],
+        "tax_configuration": {
+          "id": 91740,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3149,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "package",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 0,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 0
+  },
+  "payload": {
+    "vendor": 3149,
+    "packages": [
+      {
+        "id": 803425,
+        "unit_price": 2.2,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 552328,
+            "calculated_value": 3.19,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.2
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 552325,
+            "calculated_value": 3.19,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.2
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 552326,
+            "calculated_value": 3.19,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.2
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 552327,
+            "calculated_value": 3.19,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 2.2
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:41:13.526Z",
+  "rows": [
+    {
+      "productId": 1017975,
+      "product": "Bulk Carrots",
+      "vendor": "Grazier's Garden",
+      "packageId": 803425,
+      "package": "pound",
+      "priceList": "Guest Basket",
+      "visible": false,
+      "basePrice": 2.2,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.08,
+      "localPriceAfter": 3.19,
+      "remoteBasePrice": 2.2,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.08,
+      "remotePriceAfter": 3.19
+    },
+    {
+      "productId": 1017975,
+      "product": "Bulk Carrots",
+      "vendor": "Grazier's Garden",
+      "packageId": 803425,
+      "package": "pound",
+      "priceList": "CSA Members",
+      "visible": false,
+      "basePrice": 2.2,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.08,
+      "localPriceAfter": 3.19,
+      "remoteBasePrice": 2.2,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.08,
+      "remotePriceAfter": 3.19
+    },
+    {
+      "productId": 1017975,
+      "product": "Bulk Carrots",
+      "vendor": "Grazier's Garden",
+      "packageId": 803425,
+      "package": "pound",
+      "priceList": "Herd Share Members",
+      "visible": false,
+      "basePrice": 2.2,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.08,
+      "localPriceAfter": 3.19,
+      "remoteBasePrice": 2.2,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.08,
+      "remotePriceAfter": 3.19
+    },
+    {
+      "productId": 1017975,
+      "product": "Bulk Carrots",
+      "vendor": "Grazier's Garden",
+      "packageId": 803425,
+      "package": "pound",
+      "priceList": "SNAP",
+      "visible": false,
+      "basePrice": 2.2,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 3.08,
+      "localPriceAfter": 3.19,
+      "remoteBasePrice": 2.2,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 3.08,
+      "remotePriceAfter": 3.19
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:41.021Z"
+}

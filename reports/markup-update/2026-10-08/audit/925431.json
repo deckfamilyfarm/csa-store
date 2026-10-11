@@ -1,0 +1,504 @@
+{
+  "productId": 925431,
+  "context": {
+    "product": {
+      "id": 925431,
+      "name": "Radiant Decaf Columbia Ground Coffee",
+      "description": "<p>This specialty coffee out of Colombia was decaffeinated using the Swiss Water Process. It is a blend assembled by our good friends at Novus Coffee Importers from various smallholder farms in northern Colombia. Notes of Dark Chocolate, Molasses, and Smokey.</p>",
+      "visible": 1,
+      "trackInventory": 1,
+      "inventory": 2,
+      "categoryId": 18,
+      "vendorId": 3158,
+      "thumbnailUrl": "https://localline-public-images.s3.amazonaws.com/account/322922/fTrpV.thumbnail.jpeg",
+      "createdAt": "2024-12-09T22:05:57.000Z",
+      "updatedAt": "2026-10-05T10:40:25.000Z",
+      "isDeleted": 0
+    },
+    "categoryName": "Beverages 🍶🥤  and Snacks 🍿",
+    "vendor": {
+      "id": 3158,
+      "name": "Radiant Coffee Roasters",
+      "priceListMarkup": "0.4000",
+      "sourceMultiplier": null,
+      "guestMarkup": "0.40",
+      "memberMarkup": "0.40"
+    },
+    "profile": null,
+    "packages": [
+      {
+        "id": 673000,
+        "productId": 925431,
+        "name": "12 oz",
+        "price": "13.00",
+        "packageCode": null,
+        "unit": "ea",
+        "numOfItems": 1,
+        "trackType": "package",
+        "chargeType": "package",
+        "visible": 1,
+        "trackInventory": 0,
+        "inventory": 0
+      }
+    ],
+    "packageMeta": [
+      {
+        "packageId": 673000,
+        "productId": 925431,
+        "localLinePackageId": 673000,
+        "liveName": "12 oz",
+        "livePrice": "13.00",
+        "liveVisible": null,
+        "liveTrackInventory": null,
+        "inventoryType": "product",
+        "packageInventory": null,
+        "packageReservedInventory": null,
+        "packageAvailableInventory": null,
+        "avgPackageWeight": null,
+        "numOfItems": 1,
+        "packageCode": null,
+        "rawJson": "{\"export\":{\"Local Line Product ID\":925431,\"Product\":\"Radiant Decaf Columbia Ground Coffee\",\"Track Inventory By\":\"package\",\"Item Unit\":\"ea\",\"Charge By\":\"package\",\"Charge Unit\":\"ea\",\"Package ID\":673000,\"Package Name\":\"12 oz\",\"# of Items\":1,\"Package Price\":13,\"Inventory Type\":\"product\"},\"live\":{\"id\":673000,\"inventory_per_unit\":1,\"unit_price\":13,\"average_pack_weight\":null,\"package_price\":13,\"package_unit_price\":13,\"priority_order\":null,\"name\":\"12 oz\",\"price_list_entries\":[{\"id\":498133,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2718,\"product_price_list_entry\":383138,\"subscription_setting\":{\"id\":376534,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"CSA Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":618192,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":5622,\"product_price_list_entry\":480084,\"subscription_setting\":{\"id\":497308,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"SNAP\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":498134,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":2966,\"product_price_list_entry\":383139,\"subscription_setting\":{\"id\":376535,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Herd Share Members\",\"price_list_public\":false,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null},{\"id\":498132,\"adjustment\":true,\"adjustment_type\":2,\"adjustment_value\":40,\"price_list_id\":3124,\"product_price_list_entry\":383140,\"subscription_setting\":{\"id\":376533,\"order_options\":\"ONE_TIME\",\"discount_value\":0,\"discount_type\":1},\"price_list_name\":\"Guest Basket\",\"price_list_public\":true,\"max_units_per_order\":null,\"on_sale\":false,\"on_sale_toggle\":false,\"strikethrough_display_value\":null}],\"package_code\":null,\"vendor_package_code\":null,\"track_type\":\"package\",\"current_inventory\":0,\"total_inventory\":2,\"number_of_packages_available\":2,\"number_of_packages_total\":2,\"number_of_packages_reserved\":0,\"number_of_packages_unreserved\":2,\"product_package_size\":1,\"product_id\":925431,\"product_name\":\"Radiant Decaf Columbia Ground Coffee\",\"is_by_weight\":false,\"is_charge_by_weight\":false,\"product_charge_unit\":\"ea\",\"scanned_barcode\":{\"weight_based\":false,\"quantity\":1},\"status\":\"Available\",\"current_reserved_inventory\":0,\"current_unreserved_inventory\":0,\"created\":\"2024-12-09T17:05:57.735167-05:00\",\"updated\":\"2026-09-14T13:03:34.027467-04:00\"}}",
+        "createdAt": "2026-04-04T19:42:48.000Z",
+        "updatedAt": "2026-10-08T10:41:27.000Z",
+        "lastSyncedAt": "2026-10-08T10:41:27.000Z"
+      }
+    ],
+    "sale": {
+      "productId": 925431,
+      "onSale": 0,
+      "saleDiscount": null,
+      "updatedAt": "2026-10-08T10:41:27.000Z"
+    },
+    "remoteId": 925431,
+    "imageUrls": [
+      "https://csa-store.sfo3.digitaloceanspaces.com/products/925431/localline/18d836005941506d622f217d.jpg"
+    ],
+    "localLineVendorId": 3158
+  },
+  "remote": {
+    "id": 925431,
+    "name": "Radiant Decaf Columbia Ground Coffee",
+    "description": "<p>This specialty coffee out of Colombia was decaffeinated using the Swiss Water Process. It is a blend assembled by our good friends at Novus Coffee Importers from various smallholder farms in northern Colombia. Notes of Dark Chocolate, Molasses, and Smokey.</p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2024-12-09T17:05:57.394646-05:00",
+    "updated": "2026-09-14T13:03:33.111941-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/fTrpV.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 252306,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/fTrpV.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/fTrpV.jpg",
+        "original_filename": "account/322922/UD17j.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 2,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "383",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 673000,
+        "inventory_per_unit": 1,
+        "unit_price": 13,
+        "average_pack_weight": null,
+        "package_price": 13,
+        "package_unit_price": 13,
+        "priority_order": null,
+        "name": "12 oz",
+        "price_list_entries": [
+          {
+            "id": 498133,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2718,
+            "product_price_list_entry": 383138,
+            "subscription_setting": {
+              "id": 376534,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 618192,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 5622,
+            "product_price_list_entry": 480084,
+            "subscription_setting": {
+              "id": 497308,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 498134,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 2966,
+            "product_price_list_entry": 383139,
+            "subscription_setting": {
+              "id": 376535,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 498132,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 40,
+            "price_list_id": 3124,
+            "product_price_list_entry": 383140,
+            "subscription_setting": {
+              "id": 376533,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 2,
+        "number_of_packages_available": 2,
+        "number_of_packages_total": 2,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 2,
+        "product_package_size": 1,
+        "product_id": 925431,
+        "product_name": "Radiant Decaf Columbia Ground Coffee",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2024-12-09T17:05:57.735167-05:00",
+        "updated": "2026-09-14T13:03:34.027467-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 383138,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 690,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440698,
+            "price_list_category": 31657,
+            "priority_order": 645,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 383139,
+        "price_list_category": 17687,
+        "price_list": 2966,
+        "priority_order": 902,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440878,
+            "price_list_category": 31662,
+            "priority_order": 850,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 383140,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 573,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440482,
+            "price_list_category": 31656,
+            "priority_order": 472,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 480084,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 902,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 441138,
+            "price_list_category": 31665,
+            "priority_order": 845,
+            "price_list_category_name": "Beverages 🍶🥤  and Snacks 🍿"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 3158,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 2,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 2
+  },
+  "payload": {
+    "vendor": 3158,
+    "packages": [
+      {
+        "id": 673000,
+        "unit_price": 13,
+        "price_list_entries": [
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 3124,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 383140,
+            "calculated_value": 18.85,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 13
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2718,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 383138,
+            "calculated_value": 18.85,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 13
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 2966,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 383139,
+            "calculated_value": 18.85,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 13
+          },
+          {
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list": 5622,
+            "checked": true,
+            "notSubmitted": false,
+            "edited": false,
+            "dirty": true,
+            "product_price_list_entry": 480084,
+            "calculated_value": 18.85,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "max_units_per_order": null,
+            "strikethrough_display_value": null,
+            "base_price_used": 13
+          }
+        ]
+      }
+    ]
+  },
+  "problems": [],
+  "status": "ready",
+  "auditedAt": "2026-10-08T19:40:27.518Z",
+  "rows": [
+    {
+      "productId": 925431,
+      "product": "Radiant Decaf Columbia Ground Coffee",
+      "vendor": "Radiant Coffee Roasters",
+      "packageId": 673000,
+      "package": "12 oz",
+      "priceList": "Guest Basket",
+      "visible": true,
+      "basePrice": 13,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 18.2,
+      "localPriceAfter": 18.85,
+      "remoteBasePrice": 13,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 18.2,
+      "remotePriceAfter": 18.85
+    },
+    {
+      "productId": 925431,
+      "product": "Radiant Decaf Columbia Ground Coffee",
+      "vendor": "Radiant Coffee Roasters",
+      "packageId": 673000,
+      "package": "12 oz",
+      "priceList": "CSA Members",
+      "visible": true,
+      "basePrice": 13,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 18.2,
+      "localPriceAfter": 18.85,
+      "remoteBasePrice": 13,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 18.2,
+      "remotePriceAfter": 18.85
+    },
+    {
+      "productId": 925431,
+      "product": "Radiant Decaf Columbia Ground Coffee",
+      "vendor": "Radiant Coffee Roasters",
+      "packageId": 673000,
+      "package": "12 oz",
+      "priceList": "Herd Share Members",
+      "visible": true,
+      "basePrice": 13,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 18.2,
+      "localPriceAfter": 18.85,
+      "remoteBasePrice": 13,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 18.2,
+      "remotePriceAfter": 18.85
+    },
+    {
+      "productId": 925431,
+      "product": "Radiant Decaf Columbia Ground Coffee",
+      "vendor": "Radiant Coffee Roasters",
+      "packageId": 673000,
+      "package": "12 oz",
+      "priceList": "SNAP",
+      "visible": true,
+      "basePrice": 13,
+      "markupBefore": 40,
+      "markupAfter": 45,
+      "saleDiscount": 0,
+      "localPriceBefore": 18.2,
+      "localPriceAfter": 18.85,
+      "remoteBasePrice": 13,
+      "remoteAdjustmentType": 2,
+      "remoteAdjustmentBefore": 40,
+      "remoteAdjustmentAfter": 45,
+      "remotePriceBefore": 18.2,
+      "remotePriceAfter": 18.85
+    }
+  ],
+  "warnings": [],
+  "reviewedAt": "2026-10-08T19:48:40.981Z"
+}

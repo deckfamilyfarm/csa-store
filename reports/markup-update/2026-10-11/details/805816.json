@@ -1,0 +1,261 @@
+{
+  "data": {
+    "id": 805816,
+    "name": "Rutabega",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">A cross between turnip and cabbage this root vegetable is more mild than a traditional turnip when raw and buttery and sweet and savory when cooked. Great substitute for potatoes. Turn them in to french fries or mash them!</span></p><p dir=\"ltr\"><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Come from: Montecucco Farm</span></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-08-25T10:39:55.805029-04:00",
+    "updated": "2026-10-08T16:22:21.833665-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/Im4ze.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 141472,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/Im4ze.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/Im4ze.jpg",
+        "original_filename": "835.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 12,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "835",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 526873,
+        "inventory_per_unit": 1,
+        "unit_price": 1.9,
+        "average_pack_weight": null,
+        "package_price": 1.9,
+        "package_unit_price": 1.9,
+        "priority_order": null,
+        "name": "1 lb",
+        "price_list_entries": [
+          {
+            "id": 246985,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 198923,
+            "subscription_setting": {
+              "id": 154983,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 207484,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 167653,
+            "subscription_setting": {
+              "id": 106661,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 221499,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179103,
+            "subscription_setting": {
+              "id": 124421,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617746,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479639,
+            "subscription_setting": {
+              "id": 496862,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 12,
+        "number_of_packages_available": 12,
+        "number_of_packages_total": 12,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 12,
+        "product_package_size": 1,
+        "product_id": 805816,
+        "product_name": "Rutabega",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "lb",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T10:39:55.814792-04:00",
+        "updated": "2026-10-08T16:22:21.099962-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 167653,
+        "price_list_category": 15105,
+        "price_list": 2718,
+        "priority_order": 315,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 137524,
+            "price_list_category": 15105,
+            "priority_order": 380,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179103,
+        "price_list_category": 15118,
+        "price_list": 2966,
+        "priority_order": 613,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 147314,
+            "price_list_category": 15118,
+            "priority_order": 686,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 198923,
+        "price_list_category": 15731,
+        "price_list": 3124,
+        "priority_order": 385,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 164387,
+            "price_list_category": 15731,
+            "priority_order": 458,
+            "price_list_category_name": "Organic Vegetables - Roots 🧅🧄 🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479639,
+        "price_list_category": 28905,
+        "price_list": 5622,
+        "priority_order": 613,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 370293,
+            "price_list_category": 28905,
+            "priority_order": 686,
+            "price_list_category_name": "Organic Vegetables - Roots🧅🧄🥕🥔"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3168,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 12,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 12
+  },
+  "localProductId": 805816,
+  "remoteProductId": 805816,
+  "checkedAt": "2026-10-11T18:09:18.970Z"
+}

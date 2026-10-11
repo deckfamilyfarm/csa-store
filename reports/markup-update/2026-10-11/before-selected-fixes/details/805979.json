@@ -1,0 +1,261 @@
+{
+  "data": {
+    "id": 805979,
+    "name": "Green Zucchini",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Zucchini can be eaten in many ways, including raw or grilled, in salads or sandwiches, spiralized into noodles, or baked into bread.</span></p><p dir=\"ltr\"><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Zucchini has many health benefits, including:</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Digestion: Zucchini is high in fiber and water, which can help with digestion and prevent constipation. The soluble fiber in zucchini can also benefit the healthy bacteria in your gut.</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Weight management:Zucchini is low in calories and high in fiber and water, which can help you feel full and control your appetite.</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Diabetes:Zucchini is rich in vitamin B6, which may help regulate blood glucose and protect against diabetes. It also contains magnesium and zinc, which can help break down sugar in the body.</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Heart health:Zucchini is high in potassium, a heart-healthy mineral. High-fiber diets, like those that include zucchini, can also improve heart health.</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Eye health:Zucchini contains beta-carotene, a carotenoid that the body can convert into vitamin A. Vitamin A helps with cell development in the eyes, which can improve vision and prevent age-related conditions like macular degeneration. Zucchini can also reduce swelling around the eyes.</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Cancer prevention:Zucchini contains zeaxanthin and other compounds that may help prevent oxidative stress, which could reduce the risk of developing cancer.</span></p><p dir=\"ltr\"><br></p>",
+    "custom_id": "",
+    "visible": false,
+    "created": "2023-08-25T10:39:59.080504-04:00",
+    "updated": "2026-10-09T15:59:23.406661-04:00",
+    "track_inventory": false,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/kkV83.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 434650,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/kkV83.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/kkV83.jpeg",
+        "original_filename": "download.jpeg"
+      }
+    ],
+    "tags": [],
+    "inventory": null,
+    "inventory_warning": null,
+    "sold_out_notification": false,
+    "base_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12595,
+      "name": "lb",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 527039,
+        "inventory_per_unit": 1,
+        "unit_price": 2,
+        "average_pack_weight": null,
+        "package_price": 2,
+        "package_unit_price": 2,
+        "priority_order": null,
+        "name": "1 lb",
+        "price_list_entries": [
+          {
+            "id": 221672,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 179275,
+            "subscription_setting": {
+              "id": 124469,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 617848,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 479741,
+            "subscription_setting": {
+              "id": 496964,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 344723,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 282679,
+            "subscription_setting": {
+              "id": 225287,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 207666,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 167838,
+            "subscription_setting": {
+              "id": 106842,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 19,
+        "number_of_packages_available": 19,
+        "number_of_packages_total": 19,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 19,
+        "product_package_size": 1,
+        "product_id": 805979,
+        "product_name": "Green Zucchini",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "lb",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2023-08-25T10:39:59.092968-04:00",
+        "updated": "2026-10-09T15:59:22.886058-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 167838,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 372,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440499,
+            "price_list_category": 15111,
+            "priority_order": 412,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 179275,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 506,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 440769,
+            "price_list_category": 15120,
+            "priority_order": 554,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 282679,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 487,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 440314,
+            "price_list_category": 15750,
+            "priority_order": 531,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 479741,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 506,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 440993,
+            "price_list_category": 28914,
+            "priority_order": 544,
+            "price_list_category_name": "Organic Fruiting Vegetables 🌶🥒🎃🍅"
+          }
+        ],
+        "tax_configuration": null,
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Not visible",
+    "is_deleted": false,
+    "vendor": 3152,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 25,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": true,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 19,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 19
+  },
+  "localProductId": 805979,
+  "remoteProductId": 805979,
+  "checkedAt": "2026-10-11T17:26:47.652Z"
+}

@@ -1,0 +1,282 @@
+{
+  "verifiedAt": "2026-10-08T20:50:24.611Z",
+  "productId": 1012261,
+  "priceConfirmed": true,
+  "otherFieldsUnchanged": true,
+  "remote": {
+    "id": 1012261,
+    "name": "VIRGO GLOW (WhippedTallow - skin care) 4 oz glass jar",
+    "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Ingredients : Pasture raised, grass-fed,&nbsp; grass finished beef tallow, Organic Unrefined cold Pressed Virgin coconut oil, Organic 100% Pure Cold Pressed, Hexane free, Extra Virgin Castor oil, Organic Pure Vitamin E oil, Organic Jojoba oil, 100% pure Organic therapeutic grade essential oil, Lemongrass, Frankincense, Cedarwood . All products sourced from glass and are free of Chemicals,Parabens, &amp; Synthetic Fragrance</span></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Each jar is hand crafted in small batches and may have slight variations in texture or scent.</span></p><p><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Nourish your body with our</span></p><p dir=\"ltr\"><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">All natural Whipped Tallow.&nbsp; Deeply moisturizing and healing with Anti-aging, antibacterial, antifungal and&nbsp; antimicrobial properties. Our whipped formula will not only enhance&nbsp; your natural collagen production but will leave your skin smooth, hydrated and glowing</span></p><p><span style=\"white-space: pre-wrap;\">&nbsp;</span></p><p><br></p><p><br></p><p><br></p>",
+    "custom_id": "",
+    "visible": true,
+    "created": "2025-09-29T17:37:06.088336-04:00",
+    "updated": "2026-10-08T16:32:42.983413-04:00",
+    "track_inventory": true,
+    "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/nqjBM.thumbnail.jpeg",
+    "images": [
+      {
+        "id": 348961,
+        "priority_order": 0,
+        "thumbnail": "https://localline-public-images.s3.amazonaws.com/account/322922/nqjBM.thumbnail.jpeg",
+        "full": "https://localline-public-images.s3.amazonaws.com/account/322922/nqjBM.jpg",
+        "original_filename": "IMG_20251013_090219.jpg"
+      }
+    ],
+    "tags": [],
+    "inventory": 2,
+    "inventory_warning": 0,
+    "sold_out_notification": true,
+    "base_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "charge_unit": {
+      "id": 12384,
+      "name": "ea",
+      "abbrieviation": null,
+      "unit_type": "item",
+      "default": false
+    },
+    "track_type": "package",
+    "charge_type": "package",
+    "internal_id": "",
+    "internal_tags": [],
+    "packing_tag": null,
+    "packages": [
+      {
+        "id": 795587,
+        "inventory_per_unit": 1,
+        "unit_price": 23.48,
+        "average_pack_weight": 0,
+        "package_price": 23.48,
+        "package_unit_price": 23.48,
+        "priority_order": 1,
+        "name": "ea",
+        "price_list_entries": [
+          {
+            "id": 703510,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 3124,
+            "product_price_list_entry": 542222,
+            "subscription_setting": {
+              "id": 582558,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Guest Basket",
+            "price_list_public": true,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 1000423,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 5622,
+            "product_price_list_entry": 770996,
+            "subscription_setting": {
+              "id": 879076,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "SNAP",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 703511,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2718,
+            "product_price_list_entry": 542223,
+            "subscription_setting": {
+              "id": 582559,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "CSA Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          },
+          {
+            "id": 703512,
+            "adjustment": true,
+            "adjustment_type": 2,
+            "adjustment_value": 45,
+            "price_list_id": 2966,
+            "product_price_list_entry": 542224,
+            "subscription_setting": {
+              "id": 582560,
+              "order_options": "ONE_TIME",
+              "discount_value": 0,
+              "discount_type": 1
+            },
+            "price_list_name": "Herd Share Members",
+            "price_list_public": false,
+            "max_units_per_order": null,
+            "on_sale": false,
+            "on_sale_toggle": false,
+            "strikethrough_display_value": null
+          }
+        ],
+        "package_code": null,
+        "vendor_package_code": null,
+        "track_type": "package",
+        "current_inventory": 0,
+        "total_inventory": 2,
+        "number_of_packages_available": 2,
+        "number_of_packages_total": 2,
+        "number_of_packages_reserved": 0,
+        "number_of_packages_unreserved": 2,
+        "product_package_size": 1,
+        "product_id": 1012261,
+        "product_name": "VIRGO GLOW (WhippedTallow - skin care) 4 oz glass jar",
+        "is_by_weight": false,
+        "is_charge_by_weight": false,
+        "product_charge_unit": "ea",
+        "scanned_barcode": {
+          "weight_based": false,
+          "quantity": 1
+        },
+        "status": "Available",
+        "current_reserved_inventory": 0,
+        "current_unreserved_inventory": 0,
+        "created": "2025-09-29T17:37:06.420878-04:00",
+        "updated": "2026-10-08T16:32:42.314093-04:00"
+      }
+    ],
+    "product_price_list_entries": [
+      {
+        "id": 542222,
+        "price_list_category": null,
+        "price_list": 3124,
+        "priority_order": 856,
+        "taxed": false,
+        "price_list_name": "Guest Basket",
+        "product_entry_category_associations": [
+          {
+            "id": 431493,
+            "price_list_category": 15746,
+            "priority_order": 9,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 84032,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 542223,
+        "price_list_category": null,
+        "price_list": 2718,
+        "priority_order": 1020,
+        "taxed": false,
+        "price_list_name": "CSA Members",
+        "product_entry_category_associations": [
+          {
+            "id": 431494,
+            "price_list_category": 14598,
+            "priority_order": 24,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 84033,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 542224,
+        "price_list_category": null,
+        "price_list": 2966,
+        "priority_order": 1230,
+        "taxed": false,
+        "price_list_name": "Herd Share Members",
+        "product_entry_category_associations": [
+          {
+            "id": 431495,
+            "price_list_category": 15064,
+            "priority_order": 6,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 84034,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": null
+        },
+        "valid_for_storecredits": true
+      },
+      {
+        "id": 770996,
+        "price_list_category": null,
+        "price_list": 5622,
+        "priority_order": 1360,
+        "taxed": false,
+        "price_list_name": "SNAP",
+        "product_entry_category_associations": [
+          {
+            "id": 648864,
+            "price_list_category": 28909,
+            "priority_order": 29,
+            "price_list_category_name": "Home Goods 🥄🌱🪏🍽️"
+          }
+        ],
+        "tax_configuration": {
+          "id": 179848,
+          "enabled": false,
+          "rate_type": "api",
+          "static_rate": 0
+        },
+        "valid_for_storecredits": true
+      }
+    ],
+    "orders_require_approval": false,
+    "status": "Available",
+    "is_deleted": false,
+    "vendor": 5628,
+    "is_shared": false,
+    "shared_hub_names": [],
+    "is_subscribable": false,
+    "ownership": "MANAGED",
+    "package_codes_enabled": false,
+    "weight_barcode_precision": 3,
+    "split_order_threshold": 1,
+    "vendor_product_name": null,
+    "vendor_product_description": null,
+    "is_vendor_images_overridden": false,
+    "has_package_in_box": false,
+    "inventory_type": "product",
+    "has_box_swaps": false,
+    "is_box": false,
+    "current_inventory": 2,
+    "current_reserved_inventory": 0,
+    "current_unreserved_inventory": 2
+  }
+}
