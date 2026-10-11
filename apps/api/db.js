@@ -11,6 +11,7 @@ let adminAccessSchemaPromise;
 let adminPricelistIndexesPromise;
 let vendorPricingSchemaPromise;
 let productPricingSchemaPromise;
+let farmStockSchemaPromise;
 let subscriberCaptureSchemaPromise;
 let siteContentSchemaPromise;
 let marketingSchemaPromise;
@@ -2898,6 +2899,7 @@ async function runVendorPricingSchemaBootstrap(connection) {
 }
 
 async function runProductPricingSchemaBootstrap(connection) {
+  await ensureFarmStockSchema(connection);
   let addedColumn = false;
   for (const columnDefinition of PRODUCT_PRICING_COLUMN_STATEMENTS) {
     const exists = await columnExists(
@@ -3333,6 +3335,26 @@ export async function ensureVendorPricingSchema(connection = getPool()) {
   }
 
   return runVendorPricingSchemaBootstrap(connection);
+}
+
+export async function ensureFarmStockSchema(connection = getPool()) {
+  const migrate = async () => {
+    if (await columnExists(connection, "products", "stock_on_farm")) return;
+    try {
+      await connection.query("ALTER TABLE products ADD COLUMN stock_on_farm TINYINT(1) DEFAULT NULL");
+    } catch (error) {
+      // API startup and CLI workers can reach this additive migration together.
+      if (error.code !== "ER_DUP_FIELDNAME") throw error;
+    }
+  };
+  if (connection !== getPool()) return migrate();
+  if (!farmStockSchemaPromise) {
+    farmStockSchemaPromise = migrate().catch(error => {
+      farmStockSchemaPromise = null;
+      throw error;
+    });
+  }
+  return farmStockSchemaPromise;
 }
 
 export async function ensureProductPricingSchema(connection = getPool()) {

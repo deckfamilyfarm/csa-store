@@ -2915,6 +2915,7 @@ img {
   position: relative;
   z-index: 10;
   min-width: 178px;
+  max-width: 100%;
 }
 
 .admin-nav-group.open {
@@ -2939,7 +2940,7 @@ img {
   font-weight: 800;
   line-height: 1.1;
   text-align: left;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .admin-nav-group-button:hover,
@@ -2950,6 +2951,7 @@ img {
 }
 
 .admin-nav-group-caret {
+  flex-shrink: 0;
   width: 8px;
   height: 8px;
   border-right: 2px solid currentColor;

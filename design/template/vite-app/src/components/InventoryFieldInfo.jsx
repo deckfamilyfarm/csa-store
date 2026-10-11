@@ -1,0 +1,59 @@
+import React, { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+
+export const INVENTORY_FIELD_HELP = {
+  stockOnFarm: "True means some stock is available in a freezer or fridge anywhere on the farm. False means none is available anywhere on the farm. This is independent of Full Farm Stock. Not checked means farm availability has not been reviewed.",
+  inventory: "The quantity available through Full Farm. Enable Full Farm Track Inventory to edit this number. Saving sends the quantity to Local Line. This is separate from physical availability recorded by Stock on Farm.",
+  trackInventory: "When enabled, Full Farm uses the stock quantity to limit how much can be ordered. Enable this to edit Full Farm Stock. Saving updates Local Line; it does not change Stock on Farm.",
+  visible: "Controls whether the product is visible in the Full Farm storefront. Hiding a product does not change its stock quantity or Stock on Farm. Saving updates visibility in Local Line.",
+};
+
+export function InventoryFieldInfo({ field, label }) {
+  const id = useId();
+  const button = useRef(null);
+  const tooltip = useRef(null);
+  const [open, setOpen] = useState(false);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+
+  useLayoutEffect(() => {
+    if (!open) return;
+    const anchor = button.current.getBoundingClientRect();
+    const box = tooltip.current.getBoundingClientRect();
+    const below = anchor.bottom + 8;
+    setPosition({
+      top: Math.max(8, below + box.height <= window.innerHeight - 8 ? below : anchor.top - box.height - 8),
+      left: Math.max(8, Math.min(anchor.left, window.innerWidth - box.width - 8)),
+    });
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const dismiss = () => setOpen(false);
+    const outside = event => {
+      if (!button.current?.contains(event.target) && !tooltip.current?.contains(event.target)) dismiss();
+    };
+    const escape = event => { if (event.key === "Escape") dismiss(); };
+    document.addEventListener("pointerdown", outside);
+    document.addEventListener("keydown", escape);
+    window.addEventListener("scroll", dismiss, true);
+    window.addEventListener("resize", dismiss);
+    return () => {
+      document.removeEventListener("pointerdown", outside);
+      document.removeEventListener("keydown", escape);
+      window.removeEventListener("scroll", dismiss, true);
+      window.removeEventListener("resize", dismiss);
+    };
+  }, [open]);
+
+  return <span className="inventory-field-info">
+    <button ref={button} type="button" className="inventory-field-info-button" aria-label={`About ${label}`}
+      aria-expanded={open} aria-describedby={open ? id : undefined}
+      onFocus={() => setOpen(true)} onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)} onBlur={() => setOpen(false)} onClick={() => setOpen(true)}>
+      <span aria-hidden="true">i</span>
+    </button>
+    {open && createPortal(<span ref={tooltip} id={id} role="tooltip" className="inventory-field-tooltip" style={position}>
+      {INVENTORY_FIELD_HELP[field]}
+    </span>, document.body)}
+  </span>;
+}

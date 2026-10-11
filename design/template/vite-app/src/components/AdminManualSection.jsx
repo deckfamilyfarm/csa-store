@@ -87,9 +87,9 @@ export function AdminManualSection({ focusTopic = "overview" }) {
           inventory-related settings, and Local Line sync decisions.
         </p>
         <p>
-          Open Store → Products for the whole catalog. Pricing and Inventory are views
+          Open Store → Pricing or Store → Inventory for the catalog. These menu items are views
           of the same products. Search, filters, selections, and unsaved edits stay together when
-          you switch views or pages. Membership levels remain in the Membership section.
+          you switch between Pricing and Inventory or change pages. Each top menu shows its active section, such as Store: Inventory. Membership levels remain in the Membership section.
         </p>
         <p>
           Edit formula inputs, stock, visibility, sales, and single-package prices in the grid.
@@ -98,7 +98,7 @@ export function AdminManualSection({ focusTopic = "overview" }) {
           in the menu to compare the selected products with Local Line and Square.
         </p>
         <p>
-          In Inventory, Save Inventory to Local Line publishes stock, tracking, and visibility immediately and
+          In Inventory, Save Inventory Changes publishes Full Farm stock, tracking, and visibility immediately and
           confirms the result before saving local inventory. It leaves pricing, sale,
           and image changes for the Pricing and Product Sync workflow. Inventory saves never send
           Square updates or mark pricing as pending. Failed inventory edits remain available to retry.
@@ -106,8 +106,8 @@ export function AdminManualSection({ focusTopic = "overview" }) {
           need Local Line Push as well. All other Local Line publishing still requires Local Line Push.
         </p>
         <p>
-          Inventory always shows Product, Vendor, Stock, Track Inventory, and Visible. Turn on
-          Track Inventory to edit stock; Visible controls storefront availability. Pricing has
+          Inventory groups product details and Stock on Farm beside a Full Farm panel with Qty, Track, and Visible. Use the All, Not checked, and Checked tabs or the detailed Stock on Farm filter to focus your work. Desktop rows spread the controls across the screen; phones use compact two-column rows. The progress bar includes unsaved checks in the selected catalog scope. Tap an information icon beside any inventory field for an explanation. Turn on
+          Full Farm Track Inventory to edit stock; Full Farm Visible controls storefront availability. Stock on Farm is saved locally and records whether any stock is available in a farm freezer or fridge. It starts Not checked until staff choose True or False. Pricing has
           customizable columns and keeps your previous pricelist column preferences.
           Choose Deck Enterprises in the Vendor filter to include Deck Family
           Farm, Hyland, and Creamy Cow together. Inventory selects this group by default when opened;
@@ -302,7 +302,7 @@ export function AdminManualSection({ focusTopic = "overview" }) {
       <article className="admin-manual-card" ref={setSectionRef("workflow")}>
         <h4>Recommended Daily Workflow</h4>
         <ol className="admin-manual-list admin-manual-numbered">
-          <li>Open Store → Products and filter to the vendor or category you want to work on.</li>
+          <li>Open Store → Pricing and filter to the vendor or category you want to work on.</li>
           <li>
             Use <strong>Add Product</strong> for a new local item, or <strong>Duplicate</strong> to
             copy an existing item and adjust it.

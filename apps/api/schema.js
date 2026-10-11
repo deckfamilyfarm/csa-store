@@ -32,6 +32,7 @@ export const products = mysqlTable("products", {
   visible: tinyint("visible"),
   trackInventory: tinyint("track_inventory"),
   inventory: int("inventory"),
+  stockOnFarm: tinyint("stock_on_farm").default(null),
   categoryId: int("category_id"),
   vendorId: int("vendor_id"),
   thumbnailUrl: text("thumbnail_url"),

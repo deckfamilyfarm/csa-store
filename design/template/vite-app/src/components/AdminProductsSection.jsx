@@ -2,12 +2,17 @@ import React, { useEffect, useRef, useState } from "react";
 import { adminGet } from "../adminApi.js";
 import { categoryLabel } from "../categoryLabel.js";
 import { ProductActionsMenu } from "./ProductActionsMenu.jsx";
+import { InventoryFieldInfo, INVENTORY_FIELD_HELP } from "./InventoryFieldInfo.jsx";
+import { CompactInventoryList } from "./CompactInventoryList.jsx";
+import { mobileInventoryView, readMobileInventoryPages } from "./mobileInventoryView.js";
 import {
   dirtyFields,
   hydrateProductDraft,
   patchProductDraft,
   previewProductPrices,
   INVENTORY_FIELDS,
+  FULL_FARM_INVENTORY_FIELDS,
+  inventorySaveSummary,
 } from "./productWorkspace.js";
 import "./AdminProductsSection.css";
 
@@ -48,14 +53,15 @@ const PRODUCT_COLUMNS = [
     width: 126,
     defaultVisible: true,
   },
-  { key: "visible", label: "Visible", width: 72, defaultVisible: true },
+  { key: "visible", label: "Full Farm Visible", width: 120, defaultVisible: true },
   {
     key: "trackInventory",
-    label: "Track Inventory",
-    width: 132,
+    label: "Full Farm Track Inventory",
+    width: 160,
     defaultVisible: true,
   },
-  { key: "inventory", label: "Stock", width: 92, defaultVisible: true },
+  { key: "inventory", label: "Full Farm Stock", width: 130, defaultVisible: true },
+  { key: "stockOnFarm", label: "Stock on Farm", width: 165, defaultVisible: false, inventoryOnly: true },
   { key: "onSale", label: "Sale", width: 82, defaultVisible: true },
   { key: "saleDiscount", label: "Sale %", width: 96, defaultVisible: true },
 
@@ -143,6 +149,7 @@ const VIEW_COLUMNS = {
   inventory: [
     "product",
     "vendor",
+    "stockOnFarm",
     "inventory",
     "trackInventory",
     "visible",
@@ -158,7 +165,7 @@ function columnRequired(column, view) {
 }
 function pinColumns(keys) {
   const middle = [...new Set(keys)].filter(
-    (key) => COLUMN_MAP.has(key) && !["product", "actions"].includes(key),
+    (key) => COLUMN_MAP.has(key) && !COLUMN_MAP.get(key).inventoryOnly && !["product", "actions"].includes(key),
   );
   return ["product", ...middle, "actions"];
 }
@@ -186,7 +193,7 @@ function loadColumns(view, defaults = false) {
       const order = [
         ...new Set([
           ...(value.columnOrder || []),
-          ...PRODUCT_COLUMNS.map((c) => c.key),
+          ...PRODUCT_COLUMNS.filter(c => !c.inventoryOnly).map((c) => c.key),
         ]),
       ];
       return pinColumns(
@@ -222,6 +229,7 @@ const toggleId = (ids, id) =>
   ids.includes(id) ? ids.filter((value) => value !== id) : [...ids, id];
 
 export function AdminProductsSection({
+  view = "pricing",
   token,
   categories = [],
   vendors = [],
@@ -240,7 +248,6 @@ export function AdminProductsSection({
   selected,
   setSelected,
 }) {
-  const [view, setView] = useState("pricing");
   const [columnsByView, setColumnsByView] = useState(() =>
     Object.fromEntries(
       Object.keys(VIEW_COLUMNS).map((key) => [key, loadColumns(key)]),
@@ -251,10 +258,11 @@ export function AdminProductsSection({
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [filters, setFilters] = useState({
     categoryId: "",
-    vendorId: "",
+    vendorId: view === "inventory" ? DECK_ENTERPRISES : "",
     visibility: "all",
     sale: "all",
     pricingType: "all",
+    stockOnFarm: "all",
   });
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
@@ -267,6 +275,12 @@ export function AdminProductsSection({
   const requestId = useRef(0);
   const [reload, setReload] = useState(0);
   const [saveResults, setSaveResults] = useState([]);
+  const compactInventory = view === "inventory";
+  const [mobileFilter, setMobileFilter] = useState("all");
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [mobileLoaded, setMobileLoaded] = useState(false);
+  const mobile = mobileInventoryView(data.rows, drafts, search, mobileFilter, filters.stockOnFarm);
+  const requestSearch = compactInventory ? "" : debouncedSearch;
   const pendingDrafts = Object.values(drafts).filter(
     (entry) => dirtyFields(entry).length,
   );
@@ -277,6 +291,7 @@ export function AdminProductsSection({
   const columns = columnKeys
     .map((key) => COLUMN_MAP.get(key))
     .filter(Boolean);
+  const tableWidth = (view === "inventory" ? 0 : 44) + columns.reduce((sum, column) => sum + column.width, 0);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -291,23 +306,33 @@ export function AdminProductsSection({
     let cancelled = false;
     const params = new URLSearchParams({
       ...filters,
+      stockOnFarm: view === "inventory" && !compactInventory ? filters.stockOnFarm : "all",
       vendorId: filters.vendorId === DECK_ENTERPRISES ? "" : filters.vendorId,
       vendorGroup:
         filters.vendorId === DECK_ENTERPRISES ? DECK_ENTERPRISES : "",
-      search: debouncedSearch,
-      page: String(page),
-      pageSize: String(pageSize),
+      search: requestSearch,
+      page: String(compactInventory ? 1 : page),
+      pageSize: String(compactInventory ? 200 : pageSize),
       sortKey: sort.key,
       sortDirection: sort.direction,
     });
     setLoading(true);
-    adminGet(`pricelist?${params}`, token)
+    if (compactInventory) setMobileLoaded(false);
+    const request = compactInventory
+      ? readMobileInventoryPages(nextPage => {
+        const nextParams = new URLSearchParams(params);
+        nextParams.set("page", String(nextPage));
+        return adminGet(`pricelist?${nextParams}`, token);
+      }, () => cancelled)
+      : adminGet(`pricelist?${params}`, token);
+    request
       .then((response) => {
-        if (cancelled || requestId.current !== id) return;
+        if (!response || cancelled || requestId.current !== id) return;
         for (const row of response.rows || [])
           rowCache.current.set(row.productId, row);
         setData(response);
-        if (response.pagination?.page && response.pagination.page !== page)
+        if (compactInventory) setMobileLoaded(true);
+        if (!compactInventory && response.pagination?.page && response.pagination.page !== page)
           setPage(response.pagination.page);
       })
       .catch((error) => {
@@ -321,8 +346,10 @@ export function AdminProductsSection({
     };
   }, [
     token,
+    view,
+    compactInventory,
     filters,
-    debouncedSearch,
+    requestSearch,
     page,
     pageSize,
     sort,
@@ -334,12 +361,16 @@ export function AdminProductsSection({
     setFilters((prev) => ({ ...prev, [key]: value }));
     setPage(1);
   }
-  function changeView(nextView) {
-    if (nextView === view) return;
-    setView(nextView);
+  const previousView = useRef(view);
+  useEffect(() => {
+    if (previousView.current === view) return;
+    previousView.current = view;
     setColumnsOpen(false);
-    if (nextView === "inventory") filter("vendorId", DECK_ENTERPRISES);
-  }
+    if (view === "inventory") {
+      setFilters(prev => ({ ...prev, vendorId: DECK_ENTERPRISES }));
+      setPage(1);
+    }
+  }, [view]);
   function changeColumns(keys) {
     keys = pinColumns(keys);
     setColumnsByView((prev) => ({ ...prev, [view]: keys }));
@@ -374,7 +405,7 @@ export function AdminProductsSection({
     setMessage(
       results.some((result) => !result.ok)
         ? "Some changes could not be saved. The remaining edits are still available below."
-        : inventoryOnly ? "Inventory saved locally and confirmed in Local Line." : "Local changes saved.",
+        : inventoryOnly ? [...new Set(results.map(inventorySaveSummary))].join(". ") : "Local changes saved.",
     );
     setReload((value) => value + 1);
   }
@@ -394,22 +425,23 @@ export function AdminProductsSection({
       setBusy(false);
     }
   }
-  function cell(column, row) {
+  function cell(column, row, compact = false) {
     const values =
       drafts[row.productId]?.values || hydrateProductDraft(null, row).values;
     const prices = previewProductPrices(row, values);
-    const disabled = saving || busy || (view === "inventory" && ![...INVENTORY_FIELDS, "actions"].includes(column.key));
+    const disabled = saving || busy || (view === "inventory" && (![...INVENTORY_FIELDS, "actions"].includes(column.key) || (FULL_FARM_INVENTORY_FIELDS.includes(column.key) && !capabilities.inventoryPush)));
     const numericInput = (key, pricing = false) => (
       <input
         aria-label={`${column.label}: ${row.name}`}
         className="input products-number"
         type="number"
+        inputMode={key === "inventory" ? "numeric" : "decimal"}
         step={key === "inventory" ? "1" : "any"}
         min="0"
         disabled={
           disabled || !(pricing ? capabilities.pricing : capabilities.edit) || (view === "inventory" && key === "inventory" && !values.trackInventory)
         }
-        title={view === "inventory" && key === "inventory" && !values.trackInventory ? "Enable Track Inventory to edit stock." : undefined}
+        title={view === "inventory" && key === "inventory" && !values.trackInventory ? "Enable Full Farm Track Inventory to edit Full Farm Stock." : undefined}
         value={values[key]}
         onChange={(event) =>
           patch(row, {
@@ -419,6 +451,21 @@ export function AdminProductsSection({
       />
     );
     switch (column.key) {
+      case "stockOnFarm":
+        if (compact) return <div className="compact-farm-status" role="group" aria-label={`Stock on Farm: ${row.name}`}>
+          {[[null, "?", "Not checked"], [true, "Yes", "On farm"], [false, "No", "Not on farm"]].map(([value, text, label]) =>
+            <button key={text} type="button" aria-label={`${label}: ${row.name}`} aria-pressed={values.stockOnFarm === value}
+              disabled={disabled || !capabilities.edit || (value === null && (drafts[row.productId]?.defaults.stockOnFarm ?? row.stockOnFarm) != null)}
+              onClick={() => patch(row, { stockOnFarm: value })}>{text}</button>,
+          )}
+        </div>;
+        return <select className="input" aria-label={`Stock on Farm: ${row.name}`}
+          disabled={disabled || !capabilities.edit} value={values.stockOnFarm == null ? "" : String(values.stockOnFarm)}
+          onChange={event => patch(row, { stockOnFarm: event.target.value === "true" })}>
+          <option value="" disabled>Not checked</option>
+          <option value="true">True</option>
+          <option value="false">False</option>
+        </select>;
       case "product":
         return (
           <div className="products-name">
@@ -456,7 +503,7 @@ export function AdminProductsSection({
       case "trackInventory":
       case "onSale":
         if (column.key === 'onSale' && values.customerPriceOverrides?.length) return <span className="small">By group · Details</span>;
-        return (
+        const checkbox = (
           <input
             type="checkbox"
             aria-label={`${column.label}: ${row.name}`}
@@ -467,6 +514,7 @@ export function AdminProductsSection({
             }
           />
         );
+        return view === "inventory" ? <label className="products-inventory-checkbox">{checkbox}</label> : checkbox;
       case "inventory":
       case "saleDiscount":
         if (column.key === 'saleDiscount' && values.customerPriceOverrides?.length) return <span className="small">By group</span>;
@@ -603,9 +651,12 @@ export function AdminProductsSection({
     }
   }
   return (
-    <section className="admin-section products-workspace">
+    <section className={`admin-section products-workspace${view === "inventory" ? " products-inventory-workspace" : ""}${compactInventory ? " compact-inventory-workspace" : ""}`}>
       <div className="products-heading">
-        <h2 className="h2">Products</h2>
+        <h2 className="h2">{compactInventory ? "Farm Inventory" : view === "inventory" ? "Inventory" : "Pricing"}</h2>
+        {compactInventory && <span className="compact-inventory-progress-text" role="status">
+          {loading ? "Loading…" : mobileLoaded ? `${mobile.checked} / ${mobile.total} checked` : "Progress unavailable"}
+        </span>}
         <div className="products-button-group">
           {view === "pricing" && <button
             className="button alt"
@@ -615,7 +666,7 @@ export function AdminProductsSection({
           >
             Columns
           </button>}
-          {capabilities.edit ? (
+          {capabilities.edit && !compactInventory ? (
             <button
               className="button alt"
               disabled={saving || busy}
@@ -626,32 +677,22 @@ export function AdminProductsSection({
           ) : null}
         </div>
       </div>
-      <div className="products-views" role="tablist" aria-label="Product views">
-        {Object.keys(VIEW_COLUMNS).map((key) => (
-          <button
-            className="products-view"
-            role="tab"
-            aria-selected={view === key}
-            key={key}
-            onClick={() => changeView(key)}
-          >
-            {key[0].toUpperCase() + key.slice(1)}
-          </button>
-        ))}
-      </div>
-      <p className="small">
-        {view === "inventory" ? "Save updates stock, tracking, and visibility locally and in Local Line. Track Inventory enables stock limits; Visible controls storefront availability. Pricing, sales, and images stay in Product Sync."
+      {compactInventory && <progress className="compact-inventory-progress" aria-label="Farm inventory checked" max={mobile.total || 1}
+        value={mobileLoaded && !loading ? mobile.checked : undefined} />}
+      <p className="small products-inventory-description">
+        {view === "inventory" ? "Save Inventory Changes saves Stock on Farm locally and confirms changed Full Farm fields in Local Line. Full Farm Track Inventory enables stock limits; Full Farm Visible controls storefront availability. Stock on Farm records physical availability anywhere in a farm freezer or fridge, independently of Full Farm inventory."
           : "Manage product details and pricing. Save changes locally; syncing and scheduling are in Product Sync. Use Inventory to send stock, tracking, and visibility changes directly to Local Line."}
       </p>
-      {view === "inventory" && !capabilities.inventoryPush && <p className="small">Inventory Admin, or product editing and Local Line Push permissions, are required to save inventory to Local Line.</p>}
+      {view === "inventory" && !capabilities.inventoryPush && <p className="small">Stock on Farm can be saved locally. Saving Full Farm fields requires Inventory Admin, or product editing and Local Line Push permissions.</p>}
       {view === "inventory" && otherDrafts.length > 0 && <p className="small">{otherDrafts.length} products have other unsaved changes. Switch to Pricing to save those separately.</p>}
-      <div className="admin-filters">
+      <div className={`admin-filters${compactInventory && !mobileFiltersOpen ? " compact-filters-collapsed" : ""}`}>
         <label>
           Search
           <input
             className="input"
             type="search"
             aria-label="Search"
+            placeholder={compactInventory ? "Search products…" : undefined}
             value={search}
             onChange={(event) => setSearch(event.target.value)}
           />
@@ -692,12 +733,22 @@ export function AdminProductsSection({
           </select>
         </label>
         {[
-          [
-            "visibility",
-            "Visibility",
+          ...(view === "inventory" ? [[
+            "stockOnFarm",
+            "Stock on Farm",
             [
               ["all", "All"],
-              ["visible", "Visible"],
+              ["not-checked", "Not checked"],
+              ["true", "True"],
+              ["false", "False"],
+            ],
+          ]] : []),
+          [
+            "visibility",
+            "Full Farm Visibility",
+            [
+              ["all", "All"],
+              ["visible", "Full Farm Visible"],
               ["hidden", "Hidden"],
             ],
           ],
@@ -737,19 +788,55 @@ export function AdminProductsSection({
             </select>
           </label>
         ))}
+        {view === "inventory" && <label className="products-mobile-sort">
+          Sort by
+          <select className="input" aria-label="Sort inventory" value={`${sort.key}:${sort.direction}`}
+            onChange={event => {
+              const [key, direction] = event.target.value.split(":");
+              setSort({ key, direction });
+              setPage(1);
+            }}>
+            {!VIEW_COLUMNS.inventory.includes(sort.key) && <option value={`${sort.key}:${sort.direction}`}>
+              {COLUMN_MAP.get(sort.key)?.label || sort.key} ({sort.direction === "asc" ? "Low–high" : "High–low"})
+            </option>}
+            {columns.filter(column => column.key !== "stockOnFarm").flatMap(column =>
+              ["asc", "desc"].map(direction => <option key={`${column.key}:${direction}`} value={`${column.key}:${direction}`}>
+                {column.label} ({["product", "vendor"].includes(column.key)
+                  ? direction === "asc" ? "A–Z" : "Z–A"
+                  : column.key === "inventory" ? direction === "asc" ? "Low–high" : "High–low"
+                    : direction === "asc" ? "Off first" : "On first"})
+              </option>),
+            )}
+          </select>
+        </label>}
       </div>
+      {compactInventory && <>
+        <div className="compact-inventory-tabs" role="group" aria-label="Farm inventory status">
+          {[["all", "All"], ["not-checked", "Not checked"], ["checked", "Checked"]].map(([key, label]) =>
+            <button type="button" key={key} aria-pressed={mobileFilter === key} onClick={() => setMobileFilter(key)}>{label}</button>,
+          )}
+        </div>
+        <div className="compact-inventory-options">
+          <button type="button" className="products-text-button compact-inventory-filter-toggle" aria-expanded={mobileFiltersOpen} onClick={() => setMobileFiltersOpen(open => !open)}>
+            {mobileFiltersOpen ? "Fewer filters" : "Filters & sort"}
+          </button>
+          <span>{filters.vendorId === DECK_ENTERPRISES ? "Deck Enterprises" : vendors.find(v => String(v.id) === String(filters.vendorId))?.name || "All vendors"}</span>
+          {capabilities.edit && <button type="button" className="products-text-button" disabled={saving || busy} onClick={onAddProduct}>Add product</button>}
+        </div>
+      </>}
       <div className="products-toolbar">
         <div className="products-button-group">
           {capabilities.edit ? (
             <>
               <button
                 className="button"
-                disabled={saving || busy || !saveCount || (view === "inventory" && !capabilities.inventoryPush)}
+                aria-label={compactInventory ? `Save Inventory Changes (${saveCount})` : undefined}
+                disabled={saving || busy || !saveCount}
                 onClick={save}
               >
-                {saving
-                  ? view === "inventory" ? "Saving inventory to Local Line…" : "Saving…"
-                  : view === "inventory" ? `Save Inventory to Local Line (${saveCount})` : `Save Local Changes (${saveCount})`}
+                {compactInventory ? saving ? "Saving…" : `Save (${saveCount})` : saving
+                  ? view === "inventory" ? "Saving inventory changes…" : "Saving…"
+                  : view === "inventory" ? `Save Inventory Changes (${saveCount})` : `Save Local Changes (${saveCount})`}
               </button>
               <button
                 className="button alt products-discard"
@@ -759,7 +846,7 @@ export function AdminProductsSection({
                     setDrafts({});
                 }}
               >
-                Discard Changes
+                {compactInventory ? "Discard" : "Discard Changes"}
               </button>
             </>
           ) : null}
@@ -771,7 +858,7 @@ export function AdminProductsSection({
           {[
             ...columns,
             ...PRODUCT_COLUMNS.filter(
-              (column) => !columnsByView[view].includes(column.key),
+              (column) => !column.inventoryOnly && !columnsByView[view].includes(column.key),
             ),
           ].map((column) => (
             <div className="products-column-option" key={column.key}>
@@ -843,22 +930,27 @@ export function AdminProductsSection({
         </div>
       ) : null}
       {pendingDrafts.length ? (
-        <div className="small">
+        <div className="small products-unsaved-summary">
           {pendingDrafts.length} unsaved product
           {pendingDrafts.length === 1 ? "" : "s"} across all pages and filters.
         </div>
       ) : null}
+      {compactInventory ? <>
+        {!loading && !mobileLoaded && <button className="button alt" onClick={refresh}>Retry loading products</button>}
+        <CompactInventoryList rows={mobile.rows} drafts={drafts} saving={saving} saveResults={saveResults} loading={loading}
+          renderField={(key, row) => cell(COLUMN_MAP.get(key), row, true)} />
+      </> : <>
       <div
-        className="products-table-scroll"
+        className={`products-table-scroll${view === "inventory" ? " products-inventory-scroll" : ""}`}
         role="region"
         aria-label={view === "inventory" ? "Inventory table" : "Products table, scroll for more columns"}
         tabIndex={0}
       >
         <table
           className={`table products-table${view === "inventory" ? " products-inventory-table" : ""}`}
+          role="table"
           style={{
-            minWidth:
-              (view === "inventory" ? 0 : 44) + columns.reduce((sum, column) => sum + column.width, 0),
+            minWidth: view === "inventory" ? undefined : tableWidth,
           }}
         >
           <colgroup>
@@ -866,14 +958,15 @@ export function AdminProductsSection({
             {columns.map((column) => (
               <col
                 key={column.key}
+                className={`products-col-${column.key}`}
                 style={{
-                  width: column.key === "product" ? undefined : column.width,
+                  width: view === "inventory" || column.key === "product" ? undefined : column.width,
                 }}
               />
             ))}
           </colgroup>
-          <thead>
-            <tr>
+          <thead role="rowgroup">
+            <tr role="row">
               {view === "pricing" && <th>
                 <input
                   type="checkbox"
@@ -902,6 +995,8 @@ export function AdminProductsSection({
               {columns.map((column) => (
                 <th
                   key={column.key}
+                  scope="col"
+                  className={view === "inventory" && column.key === "stockOnFarm" ? "products-inventory-start" : undefined}
                   title={column.description}
                   aria-sort={
                     sort.key === column.key
@@ -911,7 +1006,8 @@ export function AdminProductsSection({
                       : undefined
                   }
                 >
-                  {column.key === "actions" ? (
+                  <span className="products-column-heading">
+                  {column.key === "stockOnFarm" || column.key === "actions" ? (
                     column.label
                   ) : (
                     <button
@@ -934,13 +1030,15 @@ export function AdminProductsSection({
                         : ""}
                     </button>
                   )}
+                  {INVENTORY_FIELD_HELP[column.key] && <InventoryFieldInfo field={column.key} label={column.label} />}
+                  </span>
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody>
+          <tbody role="rowgroup">
             {data.rows.map((row) => (
-              <tr key={row.productId}>
+              <tr key={row.productId} role="row">
                 {view === "pricing" && <td>
                   <input
                     type="checkbox"
@@ -952,7 +1050,13 @@ export function AdminProductsSection({
                   />
                 </td>}
                 {columns.map((column) => (
-                  <td key={column.key}>{cell(column, row)}</td>
+                  <td key={column.key} role="cell" className={`products-cell-${column.key}${view === "inventory" && column.key === "stockOnFarm" ? " products-inventory-start" : ""}`}>
+                    {view === "inventory" && column.key !== "product" && <span className="products-mobile-label">
+                      <span>{column.label}</span>
+                      {INVENTORY_FIELD_HELP[column.key] && <InventoryFieldInfo field={column.key} label={column.label} />}
+                    </span>}
+                    {cell(column, row)}
+                  </td>
                 ))}
               </tr>
             ))}
@@ -1013,14 +1117,15 @@ export function AdminProductsSection({
           </select>
         </label>
       </div>
+      </>}
       {saveResults.length ? (
         <details open>
           <summary>Save results</summary>
           {saveResults.map((result) => (
             <p key={result.productId} className="small">
               {result.productName}:{" "}
-              {result.ok
-                ? result.inventoryOnly ? "Inventory saved locally and confirmed in Local Line" : "Saved locally"
+              {result.inventoryOnly ? inventorySaveSummary(result) : result.ok
+                ? "Saved locally"
                 : result.partial
                   ? "Partially saved"
                   : "Failed"}

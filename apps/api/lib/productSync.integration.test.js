@@ -19,7 +19,7 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
   const pool = getPool();
   pool.pool.config.connectionConfig.socketPath = socket;
   t.after(() => pool.end());
-  for (const table of [schema.products, schema.packages, schema.vendors, schema.categories, schema.productPricingProfiles, schema.productSales, schema.productImages, schema.productMedia, schema.localLineProductMeta, schema.localLinePackageMeta, schema.users]) {
+  for (const table of [schema.products, schema.packages, schema.vendors, schema.categories, schema.productPricingProfiles, schema.productSales, schema.productTags, schema.productImages, schema.productMedia, schema.localLineProductMeta, schema.localLinePackageMeta, schema.users]) {
     const config = getTableConfig(table);
     const columns = config.columns.map(col => `\`${col.name}\` ${col.getSQLType()}${col.notNull ? " NOT NULL" : ""}${col.autoIncrement ? " AUTO_INCREMENT" : ""}${col.primary ? " PRIMARY KEY" : ""}${col.default !== undefined && (typeof col.default !== "object" || col.default === null) ? ` DEFAULT ${pool.escape(col.default)}` : ""}`);
     for (const index of config.indexes.filter(index => index.config.unique)) columns.push(`UNIQUE KEY \`${index.config.name}\` (${index.config.columns.map(col => `\`${col.name}\``).join(",")})`);
@@ -209,10 +209,13 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
     const [inserted] = await pool.query("INSERT INTO product_sync_actions (audit_id,product_id,product_name,platform,direction,status,data_json) VALUES (?,9,'Product 9','localline','incoming','changed',?)",[restartAudit.audit.id,JSON.stringify(action)]);
     incoming.push({...action,id:Number(inserted.insertId)});
   }
+  const { saveProductFarmStock } = await import('./productFarmStock.js');
+  await saveProductFarmStock(9, { stockOnFarm: false }, user);
   const connection = await pool.getConnection();
   try {
     for (const action of incoming) assert.equal((await applyIncomingAction(action,new Set([action.proposalHash]),connection)).status,"applied");
-    const [[row]] = await pool.query("SELECT name FROM products WHERE id=9"); assert.equal(row.name,"Renamed product");
+    const [[row]] = await pool.query("SELECT name, stock_on_farm FROM products WHERE id=9"); assert.equal(row.name,"Renamed product");
+    assert.equal(row.stock_on_farm, 0, 'Incoming repairs preserve local farm availability, including changes since the audit');
     const [[pkg]] = await pool.query("SELECT name, price FROM packages WHERE id=90"); assert.equal(pkg.name,"Each"); assert.equal(Number(pkg.price),10);
     const stale = await applyIncomingAction(incoming[0],new Set([incoming[0].proposalHash]),connection);
     assert.equal(stale.status,"held","Reapplying stale incoming snapshots is held");
@@ -326,6 +329,8 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
   assert.ok(!Object.hasOwn(llPriceAction.payload,'track_inventory'));
   assert.ok(!Object.hasOwn(llPriceAction.payload,'visible'));
   const startRequests=requests.length;
+  await saveProductFarmStock(130, { stockOnFarm: false }, inventoryUser);
+  assert.equal(requests.length, startRequests, 'Farm-only saves never contact remote services');
   const inventoryResult=await saveInventoryToLocalLine(130,{inventory:7,trackInventory:1,visible:0},inventoryUser);
   assert.equal(inventoryResult.localLineUpdate,true);
   const inventoryRequests=requests.slice(startRequests);
@@ -337,8 +342,10 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
   const [[saleAfter]]=await pool.query("SELECT * FROM product_sales WHERE product_id=130");
   assert.deepEqual(profileAfter,profileBefore);assert.deepEqual(saleAfter,saleBefore);
   assert.equal((await service.pendingProductSync()).rows.some(row=>row.productId===130),false,"Inventory success does not create pending Product Sync work");
-  const priceRelease=await service.createProductSyncRelease({auditId:pricingAudit.audit.id,actionIds:[llPriceAction.id]},user);
+  const priceRelease=await service.createProductSyncRelease({auditId:pricingAudit.audit.id,actionIds:pricingAudit.rows.map(row => row.id)},user);
   assert.equal((await service.runProductSyncRelease(priceRelease.id,{user,allowFuture:true})).status,'completed',"An ordinary pricing approval survives an independent inventory update");
+  const [[farmAfterRelease]] = await pool.query('SELECT stock_on_farm FROM products WHERE id=130');
+  assert.equal(farmAfterRelease.stock_on_farm, 0, 'Local Line and Square approvals survive farm-only changes and preserve the flag');
   assert.equal(remoteProducts.get(1130).inventory,7,"Product Sync must not overwrite inventory");
   assert.equal(remoteProducts.get(1130).visible,false,"An unrelated pricing release must not overwrite visibility");
   await pool.query("UPDATE product_pricing_profiles SET remote_sync_status='pending' WHERE product_id=130");
@@ -407,6 +414,11 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
     await handler({ params, body, admin: user }, response);
     return response;
   }
+  const farmSaved = await saveRoute('put', '/products/:id/farm-stock', { id: 142 }, { stockOnFarm: false });
+  assert.equal(farmSaved.statusCode, 200);
+  assert.equal(farmSaved.body.stockOnFarm, false);
+  assert.equal((await saveRoute('put', '/products/:id/farm-stock', { id: 142 }, { stockOnFarm: null })).statusCode, 400);
+  assert.equal((await saveRoute('put', '/products/:id/farm-stock', { id: 143 }, { stockOnFarm: false })).statusCode, 400);
   for (const vendorId of [null, "", 0, 99999]) {
     const result = await saveRoute("put", "/products/:id", { id: 142 }, { name: "Must not save", vendorId });
     assert.equal(result.statusCode, 400);
@@ -432,6 +444,11 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
     const [[profile]] = await pool.query('SELECT unit_of_measure FROM product_pricing_profiles WHERE product_id=?', [created.body.productId]);
     assert.equal(profile.unit_of_measure, unitOfMeasure);
   }
+  await saveProductFarmStock(142, { stockOnFarm: true }, user);
+  const duplicatedFarm = await saveRoute('post', '/products/:id/duplicate', { id: 142 }, {});
+  assert.equal(duplicatedFarm.statusCode, 200, JSON.stringify(duplicatedFarm.body));
+  const [[duplicateFlag]] = await pool.query('SELECT stock_on_farm FROM products WHERE id=?', [duplicatedFarm.body.productId]);
+  assert.equal(duplicateFlag.stock_on_farm, null, 'A duplicate needs a fresh physical stock review');
   const duplicateRejected = await saveRoute("post", "/products/:id/duplicate", { id: 143 }, {});
   assert.equal(duplicateRejected.statusCode, 400);
   assert.match(duplicateRejected.body.error, /vendor is required/);

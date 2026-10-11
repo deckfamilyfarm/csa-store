@@ -57,7 +57,8 @@ function canAccessAdminSection(roleKeys, section) {
       );
     case "orders":
       return Array.isArray(roleKeys) && roleKeys.some((roleKey) => roleKey !== "content_editor");
-    case "products":
+    case "pricing":
+    case "inventory":
       return productCapabilities(roleKeys).view;
     case "manual":
       return Array.isArray(roleKeys) && roleKeys.length > 0;
@@ -94,7 +95,8 @@ function canAccessAdminSection(roleKeys, section) {
 
 function getDefaultAdminSection(roleKeys = []) {
   const order = [
-    "products",
+    "pricing",
+    "inventory",
     "turkeyPreorders",
     "storefront",
     "googleDrive",
@@ -114,7 +116,7 @@ function getDefaultAdminSection(roleKeys = []) {
     "vendors",
     "recipes"
   ];
-  return order.find((section) => canAccessAdminSection(roleKeys, section)) || "products";
+  return order.find((section) => canAccessAdminSection(roleKeys, section)) || "pricing";
 }
 
 const ADMIN_NAV_GROUPS = [
@@ -122,7 +124,8 @@ const ADMIN_NAV_GROUPS = [
     key: "store",
     label: "Store",
     items: [
-      { section: "products", label: "Products" },
+      { section: "pricing", label: "Pricing" },
+      { section: "inventory", label: "Inventory" },
       { section: "storefront", label: "Storefront" },
       { section: "turkeyPreorders", label: "Turkey Preorders" },
       { section: "localLine", label: "Local Line Data" },
@@ -612,7 +615,8 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
     submitting: false
   });
   const [loading, setLoading] = useState(false);
-  const [activeSection, setActiveSection] = useState("products");
+  const [activeSection, setActiveSection] = useState("pricing");
+  const isProductWorkspace = activeSection === "pricing" || activeSection === "inventory";
   const [openAdminNavGroup, setOpenAdminNavGroup] = useState("");
   const [manualFocusTopic, setManualFocusTopic] = useState("overview");
   const [selectedProductId, setSelectedProductId] = useState(null);
@@ -1769,7 +1773,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
   }
 
   function confirmLeaveProducts() {
-    return activeSection !== "products" || !hasDraftChanges(workspaceDrafts) || window.confirm("You have unsaved product changes. Leave Products? Your drafts remain available until you reload or sign out.");
+    return !isProductWorkspace || !hasDraftChanges(workspaceDrafts) || window.confirm("You have unsaved product changes. Leave this workspace? Your drafts remain available until you reload or sign out.");
   }
 
   function handleSignOut() {
@@ -1820,11 +1824,18 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
   function handleAdminNavItemClick(item) {
     if (!canUseAdminNavItem(item)) return;
     setOpenAdminNavGroup("");
+    if (item.section === activeSection) return;
+    // These menu entries share one mounted catalog, including filters and drafts.
+    if (isProductWorkspace && ["pricing", "inventory"].includes(item.section)) {
+      if (productSaveLoading || !closeProductEditor()) return;
+      setActiveSection(item.section);
+      return;
+    }
     if (item.section === "manual") {
       openAdminManual(item.manualTopic || "overview");
       return;
     }
-    if (item.section === "productSync" && activeSection === "products") {
+    if (item.section === "productSync" && isProductWorkspace) {
       if (productSaveLoading) return;
       const entries = Object.values(workspaceDrafts).filter(entry =>
         dirtyFields(entry).length && (!workspaceSelection.length || workspaceSelection.includes(entry.meta.productId))
@@ -1989,7 +2000,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
     const results = [];
     try {
       for (const entry of entries) {
-        options.onProgress?.(`${results.length} of ${entries.length} products processed — ${options.inventoryOnly ? "publishing inventory for" : "saving"} ${entry.values.name}…`);
+        options.onProgress?.(`${results.length} of ${entries.length} products processed — ${options.inventoryOnly ? "saving inventory for" : "saving"} ${entry.values.name}…`);
         const submitted = { ...entry, values: { ...entry.values, description: sanitizeHtml(entry.values.description) } };
         const result = await (options.inventoryOnly ? saveInventoryDraft : saveProductDraft)(submitted, capabilities, {
           put: (path, payload) => adminPut(path, token, payload),
@@ -2579,7 +2590,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
   const currentAdminRoles = currentAdmin?.adminRoles || [];
   const canManagePricing = hasRole(currentAdmin?.adminRoles || [], "pricing_admin");
   const showProductEditor =
-    activeSection === "products" && capabilities.view &&
+    isProductWorkspace && capabilities.view &&
     (productEditorMode === "new" || (selectedProductId && activeProduct));
 
   useEffect(() => {
@@ -3486,7 +3497,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                   aria-controls={`admin-nav-group-items-${group.key}`}
                   onClick={() => setOpenAdminNavGroup(isOpen ? "" : group.key)}
                 >
-                  <span>{group.label}</span>
+                  <span>{group.label}{hasActiveItem && activeAdminSectionTitle !== group.label ? `: ${activeAdminSectionTitle}` : ""}</span>
                   <span className="admin-nav-group-caret" aria-hidden="true" />
                 </button>
                 {isOpen ? (
@@ -3513,6 +3524,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                       return (
                         <button
                           className={`admin-nav-item ${activeSection === item.section ? "active" : ""}`}
+                          aria-current={activeSection === item.section ? "page" : undefined}
                           disabled={!allowed}
                           key={`admin-nav-item-${item.section}`}
                           onClick={() => handleAdminNavItemClick(item)}
@@ -3961,7 +3973,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                           setProductDraft((prev) => ({ ...prev, visible: event.target.checked }))
                         }
                       />
-                      <span>Visible</span>
+                      <span>Full Farm Visible</span>
                     </label>
                     <label className="filter-toggle">
                       <input
@@ -3971,10 +3983,10 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                           setProductDraft((prev) => ({ ...prev, trackInventory: event.target.checked }))
                         }
                       />
-                      <span>Track inventory</span>
+                      <span>Full Farm Track Inventory</span>
                     </label>
                     <label className="filter-field">
-                      <span className="small">Inventory</span>
+                      <span className="small">Full Farm Stock</span>
                       <input
                         className="input"
                         type="number"
@@ -4460,9 +4472,10 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
             </section>
           )}
 
-          {activeSection === "products" && capabilities.view && (
+          {isProductWorkspace && capabilities.view && (
             <>
               <AdminProductsSection
+                view={activeSection}
                 token={token}
                 categories={categories}
                 vendors={vendors}

@@ -22,6 +22,7 @@ export function buildPricelistWhereClause({
   saleFilter,
   statusFilter,
   visibility = "all",
+  stockOnFarm = "all",
   pricingType = "all",
   membershipCategoryIds = [],
 }) {
@@ -52,6 +53,9 @@ export function buildPricelistWhereClause({
 
   if (visibility === "visible") clauses.push(`${PRODUCT_VISIBILITY_SQL} = 1`);
   if (visibility === "hidden") clauses.push(`${PRODUCT_VISIBILITY_SQL} = 0`);
+  if (stockOnFarm === "not-checked") clauses.push("p.stock_on_farm IS NULL");
+  if (stockOnFarm === "true") clauses.push("p.stock_on_farm = 1");
+  if (stockOnFarm === "false") clauses.push("p.stock_on_farm = 0");
   if (pricingType === "formula") clauses.push(SOURCE_PRICING_VENDOR_SQL);
   if (pricingType === "standard")
     clauses.push(

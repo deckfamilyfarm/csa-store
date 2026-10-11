@@ -7,13 +7,13 @@ function matches(filters) {
   const db = new DatabaseSync(":memory:");
   // SQLite fixture equivalent of MySQL's JSON object containment in an array.
   db.function('JSON_CONTAINS', (document, candidate) => Number(JSON.parse(document).some(row => Object.entries(JSON.parse(candidate)).every(([key,value]) => row[key] === value))));
-  db.exec(`CREATE TABLE products (id INT, name TEXT, vendor_id INT, category_id INT, visible INT, is_deleted INT);
+  db.exec(`CREATE TABLE products (id INT, name TEXT, vendor_id INT, category_id INT, visible INT, is_deleted INT, stock_on_farm INT);
     CREATE TABLE vendors (id INT, name TEXT);
     CREATE TABLE product_sales (product_id INT, on_sale INT);
     CREATE TABLE product_pricing_profiles (product_id INT, remote_sync_status TEXT, updated_at TEXT, remote_synced_at TEXT, customer_price_overrides_json TEXT);
     CREATE TABLE local_line_product_meta (product_id INT, local_line_product_id INT, visible INT);
     INSERT INTO vendors VALUES (1, 'Deck Family Farm'), (2, 'Creamy Cow'), (3, 'Hyland Processing'), (4, 'Other');
-    INSERT INTO products VALUES (1,'Sausage',1,2,1,0),(2,'Jar deposit',2,2,0,0),(3,'Chops',3,2,1,0),(4,'Bread',4,2,NULL,0),(5,'Membership',4,9,1,0),(6,'Removed',1,2,1,1);
+    INSERT INTO products VALUES (1,'Sausage',1,2,1,0,1),(2,'Jar deposit',2,2,0,0,0),(3,'Chops',3,2,1,0,NULL),(4,'Bread',4,2,NULL,0,0),(5,'Membership',4,9,1,0,1),(6,'Removed',1,2,1,1,NULL);
     INSERT INTO product_sales VALUES (1,1);
     INSERT INTO product_pricing_profiles VALUES (1,'pending','2026-01-02',NULL,NULL),(3,'failed','2026-01-02',NULL,NULL),(4,'applied','2026-01-01','2026-01-02','[{"onSale":true}]');
     INSERT INTO local_line_product_meta VALUES (1,100,NULL),(2,0,NULL),(3,103,NULL),(4,104,1),(5,105,NULL),(6,106,NULL);`);
@@ -41,6 +41,16 @@ function matches(filters) {
 
 test("default catalog includes every vendor and excludes Membership and deleted products", () => {
   assert.deepEqual(matches({}), [1, 2, 3, 4]);
+});
+test("Stock on Farm distinguishes unchecked, true and false without conflating visibility", () => {
+  assert.deepEqual(matches({ stockOnFarm: "all" }), [1, 2, 3, 4]);
+  assert.deepEqual(matches({ stockOnFarm: "not-checked" }), [3]);
+  assert.deepEqual(matches({ stockOnFarm: "true" }), [1]);
+  assert.deepEqual(matches({ stockOnFarm: "false" }), [2, 4]);
+  assert.deepEqual(matches({ stockOnFarm: "false", visibility: "visible" }), [4]);
+  assert.deepEqual(matches({ stockOnFarm: "false", vendorGroup: "deck-enterprises" }), [2]);
+  assert.deepEqual(matches({ stockOnFarm: "not-checked", search: "Chops", categoryId: 2 }), [3]);
+  assert.deepEqual(matches({ stockOnFarm: "true", vendorId: 4 }), []);
 });
 test("visibility, sale and pricing filters compose with existing vendor/category filters", () => {
   assert.deepEqual(matches({ pricingType: "formula" }), [1, 2, 3]);

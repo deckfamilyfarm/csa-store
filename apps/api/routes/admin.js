@@ -1,6 +1,7 @@
 import { requireProductPricingUnit } from '../lib/productPricingUnitInput.js';
 import productSyncRouter from "./productSync.js";
 import { saveInventoryToLocalLine } from "../lib/inventorySync.js";
+import { farmStockValue, saveProductFarmStock } from "../lib/productFarmStock.js";
 import { validateVendorAssignment, validateSavedProductVendor } from "../lib/productVendor.js";
 import { buildPricelistWhereClause, PRICELIST_PENDING_REMOTE_APPLY_SQL, PRODUCT_ON_SALE_SQL } from "../lib/productWorkspaceFilters.js";
 import express from "express";
@@ -198,6 +199,11 @@ router.use(async (_req, _res, next) => {
 });
 
 router.use("/product-sync", productSyncRouter);
+router.put("/products/:id/farm-stock", requireAdminPermission(["inventory_admin", "pricing_admin", "local_pricelist_admin"]), async (req, res) => {
+  try { res.json(await saveProductFarmStock(req.params.id, req.body, req.admin)); }
+  catch (error) { res.status(error.status || 400).json({ error: error.message }); }
+});
+
 router.post("/products/:id/inventory", requireAdminPermission(["inventory_admin", "pricing_admin", "local_pricelist_admin"]), async (req, res) => {
   try { res.json(await saveInventoryToLocalLine(req.params.id, req.body?.changes, req.admin)); }
   catch (error) { res.status(error.status || 400).json({ error: error.message }); }
@@ -5315,6 +5321,7 @@ router.get("/products", requireAdmin, async (_req, res) => {
       const saleRow = salesByProduct[row.id] || null;
       return {
         ...row,
+        stockOnFarm: farmStockValue(row.stockOnFarm),
         images:
           imageObjectsByProduct[row.id] ||
           mediaObjectsByProduct[row.id] ||
@@ -5352,6 +5359,7 @@ router.get("/inventory-products", requireAdminPermission("inventory_admin"), asy
       visible: products.visible,
       trackInventory: products.trackInventory,
       inventory: products.inventory,
+      stockOnFarm: products.stockOnFarm,
       categoryId: products.categoryId,
       vendorId: products.vendorId
     })
@@ -5396,6 +5404,7 @@ router.get("/inventory-products", requireAdminPermission("inventory_admin"), asy
   res.json({
     products: productRows.map((row) => ({
       ...row,
+      stockOnFarm: farmStockValue(row.stockOnFarm),
       packages: packagesByProduct[row.id] || [],
       onSale: salesByProduct[row.id]?.onSale ?? false,
       saleDiscount: salesByProduct[row.id]?.saleDiscount ?? null
@@ -5568,6 +5577,7 @@ router.get("/products/:id", requireAdmin, async (req, res) => {
   return res.json({
     product: {
       ...product,
+      stockOnFarm: farmStockValue(product.stockOnFarm),
       images:
         imageObjectsByProduct[product.id] ||
         mediaObjectsByProduct[product.id] ||
@@ -5680,6 +5690,7 @@ router.get("/local-pricelist-products", requireAdmin, async (req, res) => {
         p.visible,
         p.track_inventory AS trackInventory,
         p.inventory,
+        p.stock_on_farm AS stockOnFarm,
         p.category_id AS categoryId,
         p.vendor_id AS vendorId,
         p.thumbnail_url AS thumbnailUrl,
@@ -5853,6 +5864,7 @@ router.get("/local-pricelist-products", requireAdmin, async (req, res) => {
       };
       return {
         ...product,
+        stockOnFarm: farmStockValue(product.stockOnFarm),
         categoryName: product.categoryName || categoryMap.get(Number(product.categoryId)) || "Uncategorized",
         packages: productPackages,
         pricingProfile: resolveAdminProductPricingProfile({
@@ -6384,6 +6396,7 @@ function buildPricelistRows(productRows, supportingRows) {
       visible: toBooleanFlag(visibleSource, true),
       trackInventory: toBooleanFlag(trackInventorySource, false),
       inventory: toInventoryValue(inventorySource, 0),
+      stockOnFarm: farmStockValue(product.stockOnFarm),
       usesSourcePricing,
       usesNoMarkupPricing: snapshot.profile.usesNoMarkupPricing,
       pricingRule: snapshot.profile.pricingRule,
@@ -6470,6 +6483,7 @@ router.get("/pricelist", requireAdmin, async (req, res) => {
     saleFilter,
     statusFilter,
     visibility: String(req.query?.visibility || "all"),
+    stockOnFarm: String(req.query?.stockOnFarm || "all"),
     pricingType: String(req.query?.pricingType || "all"),
     vendorGroup: String(req.query?.vendorGroup || ""),
     membershipCategoryIds
@@ -6490,6 +6504,7 @@ router.get("/pricelist", requireAdmin, async (req, res) => {
       p.visible,
       p.track_inventory AS trackInventory,
       p.inventory,
+      p.stock_on_farm AS stockOnFarm,
       p.category_id AS categoryId,
       p.vendor_id AS vendorId,
       p.thumbnail_url AS thumbnailUrl,
@@ -6639,6 +6654,7 @@ router.get("/pricelist/pending-remote", requireAdmin, async (req, res) => {
     saleFilter,
     statusFilter,
     visibility: String(req.query?.visibility || "all"),
+    stockOnFarm: String(req.query?.stockOnFarm || "all"),
     pricingType: String(req.query?.pricingType || "all"),
     vendorGroup: String(req.query?.vendorGroup || ""),
     membershipCategoryIds
@@ -6657,6 +6673,7 @@ router.get("/pricelist/pending-remote", requireAdmin, async (req, res) => {
         p.visible,
         p.track_inventory AS trackInventory,
         p.inventory,
+        p.stock_on_farm AS stockOnFarm,
         p.category_id AS categoryId,
         p.vendor_id AS vendorId,
         p.thumbnail_url AS thumbnailUrl,
