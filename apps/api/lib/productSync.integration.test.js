@@ -66,11 +66,16 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
       }
       return json(remote);
     }
-    if (parsed.pathname === "/v2/catalog/list") return json({ objects: [...squareObjects.values()].filter(obj => obj.type === "ITEM") });
+    if (parsed.pathname === "/v2/catalog/list") return json({ objects: [...squareObjects.values()].filter(obj => obj.type === parsed.searchParams.get('types')) });
     if (parsed.pathname.endsWith("/batch-retrieve")) return json({ objects: body.object_ids.map(id => squareObjects.get(id)).filter(Boolean) });
     if (parsed.pathname.endsWith("/batch-upsert")) {
       if (failSquare) throw new Error("Temporary Square outage");
-      for (const object of body.batches[0].objects) squareObjects.set(object.id, { ...object, version: object.version + 1 });
+      for (const object of body.batches[0].objects) {
+        const updated = { ...object, version: object.version + 1 };
+        squareObjects.set(object.id, updated);
+        const parent = squareObjects.get(object.item_variation_data?.item_id);
+        if (parent) parent.item_data.variations = parent.item_data.variations.map(v => v.id === object.id ? updated : v);
+      }
       return json({ objects: body.batches[0].objects.map(object => squareObjects.get(object.id)) });
     }
     throw new Error(`Unhandled mock path ${parsed.pathname}`);
@@ -415,6 +420,18 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
   const createRejected = await saveRoute("post", "/products", {}, { name: "Vendorless create", packages: [{ name: "ea", price: 10 }] });
   assert.equal(createRejected.statusCode, 400);
   assert.match(createRejected.body.error, /vendor is required/);
+  for (const unitOfMeasure of [undefined, '', 'bag']) {
+    const invalidUnit = await saveRoute('post', '/products', {}, { name: 'Missing pricing unit', vendorId: 1, packages: [{ name: 'bag', price: 10 }], pricingProfile: { sourceUnitPrice: 10, unitOfMeasure } });
+    assert.equal(invalidUnit.statusCode, 400); assert.match(invalidUnit.body.error, /Pricing unit is required/);
+  }
+  const [[notCreated]] = await pool.query("SELECT COUNT(*) AS count FROM products WHERE name='Missing pricing unit'");
+  assert.equal(notCreated.count, 0);
+  for (const unitOfMeasure of ['each', 'lbs']) {
+    const created = await saveRoute('post', '/products', {}, { name: `Explicit unit ${unitOfMeasure}`, vendorId: 1, packages: [{ name: 'bag', price: 10 }], pricingProfile: { sourceUnitPrice: 10, unitOfMeasure } });
+    assert.equal(created.statusCode, 200, JSON.stringify(created.body));
+    const [[profile]] = await pool.query('SELECT unit_of_measure FROM product_pricing_profiles WHERE product_id=?', [created.body.productId]);
+    assert.equal(profile.unit_of_measure, unitOfMeasure);
+  }
   const duplicateRejected = await saveRoute("post", "/products/:id/duplicate", { id: 143 }, {});
   assert.equal(duplicateRejected.statusCode, 400);
   assert.match(duplicateRejected.body.error, /vendor is required/);
@@ -452,5 +469,28 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
   assert.equal((await service.getProductSyncAudit('latest', {platform:'localline'})).id, llAudit.insertId);
   assert.equal((await service.getProductSyncAudit('latest', {platform:'square'})).id, sqAudit.insertId);
   assert.equal((await service.getProductSyncAudit('latest', {platform:'localline',incoming:false})).id, llAudit.insertId);
+  // Unit-only changes must be reviewable, freeze the local basis, and confirm remotely.
+  const pound = { id: 'LB', type: 'MEASUREMENT_UNIT', measurement_unit_data: { measurement_unit: { type: 'TYPE_WEIGHT', weight_unit: 'IMPERIAL_POUND' }, precision: 3 } };
+  squareObjects.set('LB', pound);
+  for (const id of [950, 951, 952]) {
+    await product(id);
+    await pool.query("UPDATE product_pricing_profiles SET unit_of_measure='lbs',source_unit_price=2.5 WHERE product_id=?", [id]);
+    squareObjects.get(`V${id}`).item_variation_data.price_money.amount = 250;
+  }
+  const unitAudit = await audit([950, 951, 952], [], { platforms: ['square'] });
+  assert.equal(unitAudit.rows.length, 3);
+  assert(unitAudit.rows.every(row => row.payload.sellingUnit.id === 'LB' && row.display.current.price === row.display.proposed.price));
+  const unitRelease = await service.createProductSyncRelease({ auditId: unitAudit.audit.id, actionIds: unitAudit.rows.map(row => row.id) }, user);
+  await pool.query("UPDATE product_pricing_profiles SET unit_of_measure='each' WHERE product_id=951");
+  squareObjects.get('V952').item_variation_data.track_inventory = true;
+  const unitResult = await service.runProductSyncRelease(unitRelease.id, { user, allowFuture: true });
+  assert.equal(unitResult.actions.find(a => a.productId === 950).status, 'completed');
+  assert.equal(unitResult.actions.find(a => a.productId === 951).status, 'held');
+  assert.equal(unitResult.actions.find(a => a.productId === 952).status, 'held');
+  assert.equal(squareObjects.get('V950').item_variation_data.measurement_unit_id, 'LB');
+  assert.equal(squareObjects.get('V950').item_variation_data.price_money.amount, 250);
+  assert.equal(squareObjects.get('V951').item_variation_data.measurement_unit_id, undefined);
+  assert.equal(squareObjects.get('V952').item_variation_data.measurement_unit_id, undefined);
+  assert.equal((await audit([950], [], { platforms: ['square'] })).rows.length, 0);
   console.log(`Validated isolated MySQL database ${database}`);
 });

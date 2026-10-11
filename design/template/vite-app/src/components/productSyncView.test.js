@@ -1,6 +1,17 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { pacificCandidates, pacificInput, acknowledgeSyncDrafts, groupSyncActions, releaseProgress, isReleaseActive, elapsedText, localLineUpdateLabel, inSyncVendorScope, comparisonGroups } from "./productSyncView.js";
+test("Square UI review shows unit-only changes even when both dollar prices are identical", () => {
+  for (const [current, proposed] of [['each', 'lb'], ['lb', 'each']]) {
+    const action = { platform: 'square', status: 'changed', display: {
+      current: { price: 2.5, currency: 'USD', sellingUnit: current },
+      proposed: { price: 2.5, currency: 'USD', sellingUnit: proposed }
+    } };
+    assert.deepEqual(comparisonGroups(action), [{ title: 'Prices & packages', rows: [
+      { key: 'sellingUnit', label: 'selling Unit', current, proposed }
+    ] }]);
+  }
+});
 test("connection status distinguishes pending changes and failed publications from old matching comparisons", () => {
   const synced = { latestComparison: { status: "synced" } };
   assert.equal(localLineUpdateLabel(synced), "Matched at last check");

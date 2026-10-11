@@ -5,10 +5,12 @@ import { buildSquareCreationPreview, squareCreationRequest, creationLinks } from
 const product = { productId: 7, productName: "Classic Meatballs", vendorId: 1, vendorName: "Hyland",
   vendor: { id: 1, name: "Hyland", sourceMultiplier: 0.54, guestMarkup: 2 },
   profile: { sourceUnitPrice: 10, unitOfMeasure: "lbs", minWeight: 3, maxWeight: 5, onSale: 1, saleDiscount: 0.1 } };
+const units = new Map([["LB", { id: "LB", type: "MEASUREMENT_UNIT", measurement_unit_data: { measurement_unit: { type: "TYPE_WEIGHT", weight_unit: "IMPERIAL_POUND" }, precision: 3 } }]]);
+const previewFor = (product, packages) => buildSquareCreationPreview(product, packages, new Map(), units);
 const packages = [{ id: 70, name: "One pound", price: 35, numOfItems: 3, packageCode: "MB" }, { id: 71, name: "Two pounds", price: 70 }];
 
 test("creation uses discounted vendor retail per variation, without CSA factors, markups, or package weights", () => {
-  const preview = buildSquareCreationPreview(product, packages);
+  const preview = previewFor(product, packages);
   assert.deepEqual(preview.variations.map(row => row.amount), [900, 900]);
   assert.ok(preview.variations.every(row => row.priceBasis === "vendor-retail-price"));
   const standard = buildSquareCreationPreview({ ...product, vendorName: "Other", vendor: { name: "Other" } }, packages);
@@ -20,17 +22,17 @@ test("ineligible products, invalid prices, missing vendors, and ambiguous packag
     assert.throws(() => buildSquareCreationPreview(source, packages));
   }
   assert.throws(() => buildSquareCreationPreview(product, []));
-  assert.throws(() => buildSquareCreationPreview(product, [packages[0], { ...packages[1], name: packages[0].name }]), /distinct name/);
+  assert.throws(() => previewFor(product, [packages[0], { ...packages[1], name: packages[0].name }]), /distinct name/);
   assert.throws(() => buildSquareCreationPreview({ ...product, profile: { sourceUnitPrice: -1 } }, packages), /valid retail price/);
 });
 test("creation freezes one item with temporary variation IDs and no stock, images, or online settings", () => {
-  const preview = buildSquareCreationPreview(product, packages);
+  const preview = previewFor(product, packages);
   const request = squareCreationRequest(preview, "stable-key");
   assert.equal(request.idempotency_key, "stable-key");
   assert.equal(request.object.id, "#product-7");
   assert.equal(request.object.item_data.variations.length, 2);
   assert.deepEqual(request.object.item_data.variations[0].item_variation_data, {
-    item_id: "#product-7", name: "One pound", sku: "MB", pricing_type: "FIXED_PRICING", price_money: { amount: 900, currency: "USD" }
+    item_id: "#product-7", name: "One pound", sku: "MB", measurement_unit_id: "LB", pricing_type: "FIXED_PRICING", price_money: { amount: 900, currency: "USD" }
   });
   assert.doesNotMatch(JSON.stringify(request), /track_inventory|ecom_visibility|image_ids|inventory_count/);
 });
@@ -38,7 +40,7 @@ test("new items and every variation are available at all locations even when one
   const previous = process.env.SQUARE_LOCATION_ID;
   t.after(() => { if (previous === undefined) delete process.env.SQUARE_LOCATION_ID; else process.env.SQUARE_LOCATION_ID = previous; });
   process.env.SQUARE_LOCATION_ID = "single-location";
-  const preview = buildSquareCreationPreview(product, packages);
+  const preview = previewFor(product, packages);
   assert.equal(preview.presentAtAllLocations, true);
   const request = squareCreationRequest(preview, "all-locations-key");
   for (const object of [request.object, ...request.object.item_data.variations]) {
@@ -48,7 +50,7 @@ test("new items and every variation are available at all locations even when one
   }
 });
 test("links require matching IDs, parent, names, SKUs and confirmed frozen prices", () => {
-  const preview = buildSquareCreationPreview(product, packages);
+  const preview = previewFor(product, packages);
   const confirmed = structuredClone(squareCreationRequest(preview, "key").object);
   confirmed.id = "ITEM";
   confirmed.item_data.variations.forEach((row, i) => { row.id = `V${i}`; row.item_variation_data.item_id = "ITEM"; });
@@ -57,6 +59,7 @@ test("links require matching IDs, parent, names, SKUs and confirmed frozen price
   assert.equal(creationLinks(preview, receipt, confirmed).length, 2);
   for (const mutate of [
     obj => { obj.is_deleted = true; },
+    obj => { delete obj.item_data.variations[0].item_variation_data.measurement_unit_id; },
     obj => { obj.present_at_all_locations = false; },
     obj => { obj.item_data.variations[0].present_at_all_locations = false; },
     obj => { obj.item_data.variations[0].absent_at_location_ids = ["excluded-location"]; },
@@ -71,4 +74,10 @@ test("links require matching IDs, parent, names, SKUs and confirmed frozen price
     object.present_at_all_locations = false; object.present_at_location_ids = ["original-location"];
   }
   assert.equal(creationLinks(legacyPreview, receipt, legacyItem).length, 2);
+});
+
+test("per-pound creation cannot omit a verified unit; per-each creations do not add one", () => {
+  assert.throws(() => buildSquareCreationPreview(product, packages), /pound unit/);
+  const each = buildSquareCreationPreview({ ...product, profile: { ...product.profile, unitOfMeasure: "each" } }, packages);
+  assert.equal(squareCreationRequest(each, "each-key").object.item_data.variations[0].item_variation_data.measurement_unit_id, undefined);
 });

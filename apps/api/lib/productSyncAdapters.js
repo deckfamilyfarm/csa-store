@@ -10,8 +10,9 @@ import {
 import { requireProductVendor, localLineVendorId, confirmLocalLineVendor } from "./productVendor.js";
 import {
   loadApprovedSquarePricingRows, loadPackagesByProduct, buildSquarePriceAuditRow,
-  buildVariationUpdateObject, batchRetrieveSquareObjects, pushReviewedSquareVariation, upsertReturnedSquareObjects
+  buildVariationUpdateObject, batchRetrieveSquareObjects, pushReviewedSquareVariation, upsertReturnedSquareObjects, loadSquareMeasurementUnits
 } from "./squareStoreSync.js";
+import { squareUnitSnapshot, unitChangeIssue } from './squarePricingUnits.js';
 import { same, preflight } from "./productSyncCore.js";
 import { parseJson } from "./productSyncSchema.js";
 import { normalizeCustomerPriceOverrides } from './customerPriceOverrides.js';
@@ -79,16 +80,20 @@ export function localLineProjection(remote, payload, desired = false) {
   }
   return result;
 }
-export const squareProjection = object => object ? {
+export const squareProjection = (object, units = new Map()) => object ? {
   id: object.id, deleted: Boolean(object.is_deleted), itemId: object.item_variation_data?.item_id,
   pricingType: object.item_variation_data?.pricing_type,
-  amount: number(object.item_variation_data?.price_money?.amount), currency: object.item_variation_data?.price_money?.currency
+  amount: number(object.item_variation_data?.price_money?.amount), currency: object.item_variation_data?.price_money?.currency,
+  sellingUnit: squareUnitSnapshot(object.item_variation_data?.measurement_unit_id, units)
 } : null;
 function squareInputs(row, packages, audit) {
   return {
     productId: Number(row.productId), packageId: Number(row.packageId), vendorName: row.vendorName,
     productName: row.productName, categoryName: row.categoryName,
     sourceUnitPrice: audit.priceBasis === "vendor-retail-price" ? number(row.sourceUnitPrice) : null,
+    unitOfMeasure: audit.priceBasis === 'vendor-retail-price' ? row.unitOfMeasure ?? null : null,
+    // Legacy profiles can derive retail from package data; freeze that result too.
+    retailAmount: audit.proposedAmount,
     packagePrice: audit.priceBasis === "local-package-price" ? number(packages.find(pkg => Number(pkg.id) === Number(row.packageId))?.price) : null,
     onSale: Number(row.saleOnSale ?? row.profileOnSale ?? 0), saleDiscount: Number(row.saleSaleDiscount ?? row.profileSaleDiscount ?? 0),
     priceBasis: audit.priceBasis, configuredCurrency: process.env.SQUARE_CURRENCY || "USD"
@@ -100,15 +105,16 @@ export async function prepareSquareActions({ productIds = [], staged = {}, inclu
     (!productIds.length || productIds.includes(Number(row.productId))) &&
     (includeAllProducts || /deck family farm/i.test(row.vendorName || "")));
   const { packagesByProductId, metaByPackageId } = await loadPackagesByProduct([...new Set(rows.map(row => Number(row.productId)))]);
+  const units = await loadSquareMeasurementUnits();
   return rows.map(row => {
     const changes = staged[row.productId] || {};
     const next = { ...row, saleOnSale: changes.onSale ?? row.saleOnSale, saleSaleDiscount: changes.saleDiscount ?? row.saleSaleDiscount };
-    const before = buildSquarePriceAuditRow(row, packagesByProductId, metaByPackageId);
-    const audit = buildSquarePriceAuditRow(next, packagesByProductId, metaByPackageId);
+    const before = buildSquarePriceAuditRow(row, packagesByProductId, metaByPackageId, units);
+    const audit = buildSquarePriceAuditRow(next, packagesByProductId, metaByPackageId, units);
     const remote = parseJson(row.squareRawJson);
     let desired = null;
     try {
-      desired = remote && audit.status !== "blocked" ? squareProjection(buildVariationUpdateObject(remote, audit.proposedAmount, audit.currency)) : null;
+      desired = remote && audit.status !== "blocked" ? squareProjection(buildVariationUpdateObject(remote, audit.proposedAmount, audit.currency, audit.proposedUnit.id), units) : null;
     } catch (error) { audit.status = "blocked"; audit.message = error.message; }
     return {
       direction: "outgoing", platform: "square", kind: "price", productId: Number(row.productId), productName: row.productName,
@@ -116,9 +122,9 @@ export async function prepareSquareActions({ productIds = [], staged = {}, inclu
       status: audit.status, message: audit.message, staged: changes,
       localBefore: squareInputs(row, packagesByProductId.get(Number(row.productId)) || [], before),
       localAfter: squareInputs(next, packagesByProductId.get(Number(row.productId)) || [], audit),
-      mapping: squareMapping(row), remoteBefore: squareProjection(remote), desired,
-      payload: { amount: audit.proposedAmount, currency: audit.currency },
-      display: { current: { price: audit.remotePrice, currency: audit.currency }, proposed: { price: audit.proposedPrice, currency: audit.currency }, basis: audit.priceBasis }
+      mapping: squareMapping(row), remoteBefore: squareProjection(remote, units), desired,
+      payload: { amount: audit.proposedAmount, currency: audit.currency, sellingUnit: audit.proposedUnit },
+      display: { current: { price: audit.remotePrice, currency: audit.currency, sellingUnit: audit.currentUnit.id ? audit.currentUnit.unit : audit.expectedUnit === 'package' ? 'package' : 'each' }, proposed: { price: audit.proposedPrice, currency: audit.currency, sellingUnit: audit.expectedUnit || 'Review local unit' }, basis: audit.priceBasis }
     };
   });
 }
@@ -174,16 +180,24 @@ export async function prepareLocalLineAction(product, staged = {}, { onRefresh }
 export async function inspectAction(action, saveCheckpoint = async () => {}) {
   const checkpoint = action.checkpoint || {};
   if (action.platform === "square") {
+    if (!action.payload?.sellingUnit) throw Object.assign(new Error('This approval predates selling-unit checks. Run a new audit and review the unit before publishing.'), { hold: true });
     const row = (await loadApprovedSquarePricingRows([action.packageId], { includeAllProducts: true }))[0];
+    const units = await loadSquareMeasurementUnits();
+    if (!same(squareUnitSnapshot(action.payload.sellingUnit.id, units), action.payload.sellingUnit)) {
+      throw Object.assign(new Error('Square measurement-unit definition changed. Audit and approve again.'), { hold: true });
+    }
     const objects = await batchRetrieveSquareObjects([action.mapping.squareVariationId]);
     const remote = objects.find(obj => obj.id === action.mapping.squareVariationId) || null;
+    if ((remote?.item_variation_data?.measurement_unit_id || null) !== action.payload.sellingUnit.id && unitChangeIssue(remote)) {
+      throw Object.assign(new Error(unitChangeIssue(remote)), { hold: true });
+    }
     let local = null;
     if (row) {
       const { packagesByProductId, metaByPackageId } = await loadPackagesByProduct([action.productId]);
-      const audit = buildSquarePriceAuditRow(row, packagesByProductId, metaByPackageId);
+      const audit = buildSquarePriceAuditRow(row, packagesByProductId, metaByPackageId, units);
       local = squareInputs(row, packagesByProductId.get(action.productId) || [], audit);
     }
-    return { local, mapping: squareMapping(row), remote: squareProjection(remote), desired: action.desired, object: remote };
+    return { local, mapping: squareMapping(row), remote: squareProjection(remote, units), desired: action.desired, object: remote };
   }
   if (action.kind === "create" && checkpoint.remoteId && !checkpoint.createdMapping) {
     await finishCreatedLink(action, checkpoint, await getLocalLineAccessToken(), saveCheckpoint);
@@ -267,7 +281,7 @@ export async function executeAction(action, current, saveCheckpoint) {
     const checkpoint = action.checkpoint || {};
     // Preserve the exact request body and key across uncertain responses.
     if (!checkpoint.request) {
-      checkpoint.request = buildVariationUpdateObject(current.object, action.payload.amount, action.payload.currency);
+      checkpoint.request = buildVariationUpdateObject(current.object, action.payload.amount, action.payload.currency, action.payload.sellingUnit?.id);
       checkpoint.idempotencyKey = crypto.randomUUID();
       await saveCheckpoint(checkpoint);
     }

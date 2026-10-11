@@ -1,3 +1,4 @@
+import { requireProductPricingUnit } from '../lib/productPricingUnitInput.js';
 import productSyncRouter from "./productSync.js";
 import { saveInventoryToLocalLine } from "../lib/inventorySync.js";
 import { validateVendorAssignment, validateSavedProductVendor } from "../lib/productVendor.js";
@@ -2903,6 +2904,7 @@ async function upsertLocalOnlyProductMeta(db, productId, productRow = {}) {
 
 async function createLocalProductRecord(connection, payload) {
   const vendor = await validateVendorAssignment(connection, payload.vendorId);
+  requireProductPricingUnit(payload, isSourcePricingVendor(vendor));
   const now = new Date();
   const productId = await getNextManualId(connection, "products");
   const normalizedPackages = (Array.isArray(payload.packages) ? payload.packages : [])
@@ -3330,7 +3332,7 @@ async function duplicateLocalProductRecord(connection, sourceProductId) {
   if (!sourceProduct) {
     throw new Error("Product not found");
   }
-  await validateVendorAssignment(connection, sourceProduct.vendor_id);
+  const sourceVendor = await validateVendorAssignment(connection, sourceProduct.vendor_id);
 
   const [packageRows] = await connection.query(
     "SELECT * FROM packages WHERE product_id = ? ORDER BY id",
@@ -3376,6 +3378,7 @@ async function duplicateLocalProductRecord(connection, sourceProductId) {
     [sourceProductId]
   );
   const created = await createLocalProductRecord(connection, {
+    pricingProfile: { unitOfMeasure: profileRows[0]?.unit_of_measure || (isSourcePricingVendor(sourceVendor) ? null : 'each') },
     name: `${sourceProduct.name} Copy`,
     description: sourceProduct.description || "",
     visible: Boolean(sourceProduct.visible),
@@ -10561,6 +10564,8 @@ router.post("/products", requireAdminPermission(["inventory_admin", "pricing_adm
           product: created.productRecord,
           vendor: vendorRows[0] || null
         });
+      } else {
+        await connection.query("INSERT INTO product_pricing_profiles (product_id,unit_of_measure,created_at,updated_at) VALUES (?,'each',UTC_TIMESTAMP(),UTC_TIMESTAMP())", [created.productId]);
       }
     }
     await connection.commit();

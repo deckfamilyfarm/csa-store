@@ -628,7 +628,7 @@ export function AdminSquareSection({
         <h3>{creation.resuming ? "Finish Square creation" : "Create in Square"}</h3>
         <p>Create <strong>{creation.productName}</strong> with these variations in Square ({creation.environment}), then link each CSA package.</p>
         {creation.presentAtAllLocations && <p className="small">The item and all variations will be available at all Square locations.</p>}
-        <div className="table-wrap"><table className="admin-table"><thead><tr><th>Variation</th><th>SKU</th><th>Price</th><th>Price basis</th></tr></thead><tbody>{creation.variations.map(row => <tr key={row.packageId}><td>{row.name}</td><td>{row.sku || "—"}</td><td>{formatCents(row.amount, row.currency)}</td><td>{formatPriceBasis(row.priceBasis)}</td></tr>)}</tbody></table></div>
+        <div className="table-wrap"><table className="admin-table"><thead><tr><th>Variation</th><th>SKU</th><th>Price</th><th>Price basis</th></tr></thead><tbody>{creation.variations.map(row => <tr key={row.packageId}><td>{row.name}</td><td>{row.sku || "—"}</td><td>{formatCents(row.amount, row.currency)}{row.unit ? ` / ${row.unit}` : ""}</td><td>{formatPriceBasis(row.priceBasis)}</td></tr>)}</tbody></table></div>
         <p className="small">This adds a catalog item with all of this product’s packages. Manage photos, taxes, inventory, and online availability in Square.</p>
         {creation.resuming && <p className="small">A previous creation is awaiting confirmation. Continue to finish that same request.</p>}
         {(creationError || creation.error) && <div className="form-message error" role="alert">{creationError || creation.error}</div>}

@@ -33,7 +33,7 @@ test("Square creation previews, explicit approval, durable recovery, and guarded
     const body = options.body ? JSON.parse(options.body) : null;
     requests.push({ path: parsed.pathname, method: options.method || "GET", body });
     const json = (value, status = 200) => new Response(JSON.stringify(value), { status });
-    if (parsed.pathname === "/v2/catalog/list") return json({ objects: [...objects.values()] });
+    if (parsed.pathname === "/v2/catalog/list") return json({ objects: [...objects.values()].filter(object => object.type === parsed.searchParams.get('types')) });
     if (parsed.pathname === "/v2/catalog/object") {
       if (rejectNext) { rejectNext = false; return json({ errors: [{ detail: "Unauthorized" }] }, 401); }
       if (pauseCreate) { pauseCreate.entered(); await pauseCreate.wait; }
@@ -136,6 +136,29 @@ test("Square creation previews, explicit approval, durable recovery, and guarded
     await assert.rejects(preview(9, 7), /already has a Square link/);
     await product(10); await pool.query("UPDATE products SET category_id=2 WHERE id=10");
     await assert.rejects(preview(10, 7), /not eligible/);
+  });
+  await t.test('per-pound creation freezes and confirms its unit, including after lost responses', async () => {
+    const pound = { id: 'LB', type: 'MEASUREMENT_UNIT', measurement_unit_data: { measurement_unit: { type: 'TYPE_WEIGHT', weight_unit: 'IMPERIAL_POUND' }, precision: 3 } };
+    objects.set('LB', pound);
+    await product(12);
+    await pool.query("UPDATE product_pricing_profiles SET unit_of_measure='lbs' WHERE product_id=12");
+    const draft = await preview(12, 7);
+    assert.equal(draft.variations[0].sellingUnit.id, 'LB');
+    loseResponse = true;
+    await assert.rejects(apply(draft.id, 7), /Connection lost/);
+    await pool.query("UPDATE product_pricing_profiles SET unit_of_measure='each' WHERE product_id=12");
+    const done = await apply(draft.id, 7);
+    assert.equal(done.status, 'completed');
+    const attempts = writes().filter(row => row.body.idempotency_key === draft.id);
+    assert.equal(attempts.length, 2); assert.deepEqual(attempts[0].body, attempts[1].body);
+    assert.equal(attempts[0].body.object.item_data.variations[0].item_variation_data.measurement_unit_id, 'LB');
+    await product(13);
+    await pool.query("UPDATE product_pricing_profiles SET unit_of_measure='lbs' WHERE product_id=13");
+    const stale = await preview(13, 7);
+    const count = writes().length;
+    pound.measurement_unit_data.precision = 1;
+    await assert.rejects(apply(stale.id, 7), /changed/);
+    assert.equal(writes().length, count);
   });
   await t.test("both preview and create routes enforce both Square grants", async () => {
     const { default: router } = await import("../routes/admin.js");

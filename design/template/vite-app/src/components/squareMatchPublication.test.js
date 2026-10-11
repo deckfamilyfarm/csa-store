@@ -7,6 +7,12 @@ const row = { productId: 1, packageId: 2, productName: 'Lamb Neck Slices', csaRe
 const action = { id: 30, productId: 1, packageId: 2, kind: 'price', status: 'changed', mapping: { squareItemId: 'I', squareVariationId: 'V' }, display: { current: { price: 21.5, currency: 'USD' }, proposed: { price: 15.5, currency: 'USD' } } };
 const done = { id: 40, status: 'completed', actions: [{ id: 30, status: 'completed' }] };
 
+test('price-only match approval cannot silently approve a missing pound unit', async () => {
+  const h = harness({ action: { ...action, display: { current: { price: 15.5, currency: 'USD', sellingUnit: 'each/package' }, proposed: { price: 15.5, currency: 'USD', sellingUnit: 'lb' } } } });
+  await assert.rejects(publishSquareMatch(newSquareMatchPublication(row, candidate), h.deps), /selling unit differs/);
+  assert(!h.posts.some(p => p.path === 'product-sync/releases'));
+});
+
 function harness(options = {}) {
   const posts = [], gets = [], checkpoints = [];
   const deps = {

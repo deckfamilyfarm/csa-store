@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { expectedSquareUnit, planSquareUnit, unitChangeIssue } from './squarePricingUnits.js';
 import { ensureSquareSyncSchema, getPool } from "../db.js";
 import {
   getCustomerFacingSaleDiscount,
@@ -173,6 +174,19 @@ async function listSquareCatalogItems() {
   } while (cursor);
 
   return objects.filter((object) => object?.type === "ITEM");
+}
+
+export async function loadSquareMeasurementUnits() {
+  const units = new Map();
+  let cursor;
+  do {
+    const params = new URLSearchParams({ types: 'MEASUREMENT_UNIT' });
+    if (cursor) params.set('cursor', cursor);
+    const response = await fetchSquare(`/v2/catalog/list?${params}`);
+    for (const object of response.objects || []) if (object.type === 'MEASUREMENT_UNIT') units.set(object.id, object);
+    cursor = response.cursor;
+  } while (cursor);
+  return units;
 }
 
 async function batchRetrieveSquareObjects(objectIds) {
@@ -1106,13 +1120,13 @@ export function buildSquareMatchRetailPrice(row, packagesByProductId, metaByPack
     regularAmount: dollarsToCents(retail.regularPrice),
     amount: dollarsToCents(retail.price),
     currency: configuredCurrency(),
-    unit: profile.usesSourcePricing ? (profile.unitOfMeasure === "lbs" ? "lb" : "each") : "package",
+    unit: expectedSquareUnit(profile.usesSourcePricing, row.unitOfMeasure),
     priceBasis: retail.basis,
     saleApplied: Boolean(profile.onSale) && Number(profile.saleDiscount || 0) > 0
   };
 }
 
-function buildSquarePriceAuditRow(row, packagesByProductId, metaByPackageId) {
+function buildSquarePriceAuditRow(row, packagesByProductId, metaByPackageId, measurementUnits = new Map()) {
   const productPackages = packagesByProductId.get(Number(row.productId)) || [];
   const packageMetaByPackageId = new Map(
     productPackages.map((pkg) => [
@@ -1134,6 +1148,12 @@ function buildSquarePriceAuditRow(row, packagesByProductId, metaByPackageId) {
   }
 
   const { profile: resolvedProfile, retail: squareRetail } = resolveSquareRetailPricing(row, productPackages, packageMetaByPackageId, targetPackage);
+  const remote = parseJson(row.squareRawJson);
+  if (!remote || remote.is_deleted || remote.id !== row.squareVariationId || remote.item_variation_data?.item_id !== row.squareItemId) {
+    issues.push('Refresh the Square catalog: the linked variation is missing, deleted, or has a different parent.');
+  }
+  const unitPlan = planSquareUnit(expectedSquareUnit(resolvedProfile.usesSourcePricing, row.unitOfMeasure), remote, measurementUnits);
+  issues.push(...unitPlan.issues);
   const proposedAmount = dollarsToCents(squareRetail.price);
   if (proposedAmount === null || !Number.isFinite(Number(proposedAmount)) || proposedAmount < 0) {
     issues.push("Local store retail price for Square could not be calculated.");
@@ -1148,7 +1168,7 @@ function buildSquarePriceAuditRow(row, packagesByProductId, metaByPackageId) {
   const changed =
     !issues.length &&
     Number.isFinite(Number(proposedAmount)) &&
-    Number(remoteAmount) !== Number(proposedAmount);
+    (Number(remoteAmount) !== Number(proposedAmount) || unitPlan.changed);
 
   return {
     productId: Number(row.productId),
@@ -1169,9 +1189,13 @@ function buildSquarePriceAuditRow(row, packagesByProductId, metaByPackageId) {
     priceBasis: squareRetail.basis,
     saleApplied: Boolean(resolvedProfile.onSale) && Number(resolvedProfile.saleDiscount || 0) > 0,
     currency,
+    expectedUnit: unitPlan.expectedUnit,
+    currentUnit: unitPlan.current,
+    proposedUnit: unitPlan.proposed,
+    unitChanged: unitPlan.changed,
     status: issues.length ? "blocked" : changed ? "changed" : "synced",
     issues,
-    message: issues.join(" "),
+    message: issues.join(" ") || (unitPlan.changed ? `Change Square selling unit from ${unitPlan.current.unit} to ${unitPlan.proposed.unit}; price is per ${unitPlan.proposed.unit}.` : ''),
     squareVersion: row.squareVersion || null,
     squareRawJson: row.squareRawJson || null
   };
@@ -1181,7 +1205,8 @@ async function buildSquarePriceAuditRows(packageIds = [], { includeAllProducts =
   const rows = await loadApprovedSquarePricingRows(packageIds, { includeAllProducts });
   const productIds = [...new Set(rows.map((row) => Number(row.productId)).filter(Number.isFinite))];
   const { packagesByProductId, metaByPackageId } = await loadPackagesByProduct(productIds);
-  return rows.map((row) => buildSquarePriceAuditRow(row, packagesByProductId, metaByPackageId));
+  const units = await loadSquareMeasurementUnits();
+  return rows.map((row) => buildSquarePriceAuditRow(row, packagesByProductId, metaByPackageId, units));
 }
 
 export async function auditSquarePrices({
@@ -1230,7 +1255,7 @@ export async function auditSquarePrices({
   }
 }
 
-function buildVariationUpdateObject(latestVariation, proposedAmount, currency) {
+function buildVariationUpdateObject(latestVariation, proposedAmount, currency, measurementUnitId = undefined) {
   const nextObject = JSON.parse(JSON.stringify(latestVariation));
   if (nextObject.type !== "ITEM_VARIATION") {
     throw new Error("Square object is not an item variation.");
@@ -1246,6 +1271,14 @@ function buildVariationUpdateObject(latestVariation, proposedAmount, currency) {
   }
   if (nextObject.item_variation_data.pricing_type !== "FIXED_PRICING") {
     throw new Error("Square variation is not fixed-price.");
+  }
+
+  if (measurementUnitId !== undefined && (nextObject.item_variation_data.measurement_unit_id || null) !== measurementUnitId) {
+    const issue = unitChangeIssue(nextObject);
+    if (issue) throw new Error(issue);
+    // Catalog upserts fully replace objects; omit only this field to clear it.
+    if (measurementUnitId === null) delete nextObject.item_variation_data.measurement_unit_id;
+    else nextObject.item_variation_data.measurement_unit_id = measurementUnitId;
   }
 
   nextObject.item_variation_data.price_money = {
@@ -1282,8 +1315,11 @@ export async function applySquarePrices({ packageIds = [], userId = null, includ
 
     for (const row of targets) {
       try {
+        // The legacy price-only endpoint has no explicit unit approval. Use Product Sync.
+        if (row.unitChanged) throw new Error('Selling unit differs. Review and approve the unit change in Product Sync.');
         const latest = latestById.get(row.squareVariationId);
         if (!latest) throw new Error("Square variation was not returned by Square.");
+        if ((latest.item_variation_data?.measurement_unit_id || null) !== row.currentUnit.id) throw new Error('Square selling unit changed. Run a new audit.');
         const updateObject = buildVariationUpdateObject(latest, row.proposedAmount, row.currency);
         updates.push({ row, updateObject });
       } catch (error) {

@@ -16,7 +16,7 @@ export function comparisonGroups(action, changedOnly = true) {
   const groups = new Map();
   for (const row of comparisonRows(action, changedOnly)) {
     const group = /image/i.test(row.key) ? "Images" : /sale|strikethrough/i.test(row.key) ? "Sales"
-      : /visible|inventory/i.test(row.key) ? "Visibility & inventory" : /price|adjustment|packages/i.test(row.key) ? "Prices & packages" : "Product details";
+      : /visible|inventory/i.test(row.key) ? "Visibility & inventory" : /price|adjustment|packages|sellingUnit/i.test(row.key) ? "Prices & packages" : "Product details";
     const label = row.key.replace(/^fields · /, "").split(" · ").map(part => labels[part] || part.replaceAll("_", " ").replace(/([a-z])([A-Z])/g, "$1 $2")).join(" · ");
     if (!groups.has(group)) groups.set(group, []);
     groups.get(group).push({ ...row, label });

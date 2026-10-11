@@ -13,6 +13,7 @@ export function squareMatchPriceIssue(row, candidate) {
   const retail = localRetailPriceForMatch(row);
   if (!retail) return "The server has not returned the local retail price. Refresh after the API has restarted.";
   if (!Number.isInteger(retail.amount) || retail.amount < 0) return "The local store retail price is missing. Set Retail Price in Products before updating Square.";
+  if (retail.unit === null) return 'Set the local Retail Price unit (lb or each) in Products before updating Square.';
   if (!candidate) return "Choose a Square variation to compare prices.";
   if (candidate.pricingType !== "FIXED_PRICING" || !Number.isInteger(candidate.priceAmount)) return "The selected Square variation has no fixed price. Refresh Square Catalog and review the variation.";
   if (!retail.currency || !candidate.currency) return "A price currency is missing. Refresh the prices before updating Square.";
@@ -73,6 +74,9 @@ export async function publishSquareMatch(initial, { get, post, checkpoint, onRel
     const action = (result.rows || []).find(a => sameId(a.productId, state.productId) && sameId(a.packageId, state.packageId) && a.kind === "price");
     if (!action || action.mapping?.squareItemId !== state.squareItemId || action.mapping?.squareVariationId !== state.squareVariationId) throw stop("The Square match changed during the price check. Refresh and review the match again.", true);
     const current = cents(action.display?.current?.price), proposed = cents(action.display?.proposed?.price);
+    if (action.display?.current?.sellingUnit !== action.display?.proposed?.sellingUnit) {
+      throw stop('The match is saved, but the selling unit differs. Open Product Sync to review and approve the unit change before updating Square.', true);
+    }
     if (action.display?.proposed?.currency !== state.currency || action.display?.current?.currency !== state.currency || proposed !== state.expectedProposedAmount) {
       throw stop("The local store retail price changed since it was displayed. The match is saved; refresh and review the new price before updating Square.", true);
     }

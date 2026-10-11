@@ -530,7 +530,7 @@ function createEmptyProductDraft() {
     visible: true,
     trackInventory: false,
     inventory: 0,
-    unitOfMeasure: "each",
+    unitOfMeasure: "",
     sourceUnitPrice: "",
     minWeight: "",
     maxWeight: "",
@@ -1904,7 +1904,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
 
   function buildSourcePricingPayloadFromDraft() {
     return {
-      unitOfMeasure: productDraft?.unitOfMeasure === "lbs" ? "lbs" : "each",
+      unitOfMeasure: productDraft?.unitOfMeasure,
       sourceUnitPrice:
         productDraft?.sourceUnitPrice === "" ? null : Number(productDraft?.sourceUnitPrice),
       minWeight:
@@ -2016,6 +2016,8 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
     setProductSaveLoading(true);
     try {
       if (!vendors.some(vendor => Number(vendor.id) === Number(productDraft.vendorId))) throw new Error("A vendor is required. Select a vendor before saving.");
+      if (!["each", "lbs"].includes(productDraft.unitOfMeasure)) throw new Error("Choose a pricing unit before creating the product.");
+      if (!selectedDraftUsesSourcePricing && productDraft.unitOfMeasure !== "each") throw new Error("Standard products use Each (one package/bag) pricing.");
       const pricingProfile = buildSourcePricingPayloadFromDraft();
       if (selectedDraftUsesSourcePricing && !(Number(pricingProfile.sourceUnitPrice) > 0)) throw new Error("Vendor retail price must be greater than zero.");
       const response = await adminPost("products", token, {
@@ -2025,7 +2027,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
         visible: productDraft.visible, trackInventory: productDraft.trackInventory,
         inventory: Number(productDraft.inventory) || 0, onSale: productDraft.onSale,
         saleDiscount: Math.min(Math.max(Number(productDraft.saleDiscount) || 0, 0), 100) / 100,
-        packages: normalizeDraftPackagesForSubmit(), pricingProfile: selectedDraftUsesSourcePricing ? pricingProfile : null
+        packages: normalizeDraftPackagesForSubmit(), pricingProfile: selectedDraftUsesSourcePricing ? pricingProfile : { unitOfMeasure: productDraft.unitOfMeasure }
       });
       // A successful local creation must never be repeated if refreshing or pushing fails.
       setNewProductDraft(null);
@@ -3586,6 +3588,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                         setProductDraft((prev) => ({
                           ...prev,
                           vendorId: nextVendorId,
+                          ...(productEditorMode === 'new' && !isSourcePricingVendorName(nextVendor?.name) && prev.unitOfMeasure === 'lbs' ? { unitOfMeasure: '' } : {}),
                           sourceMultiplier:
                             (capabilities.pricing || productEditorMode === "new") &&
                             isSourcePricingVendorName(nextVendor?.name) &&
@@ -3621,6 +3624,16 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                       ))}
                       </select>
                   </label>
+                  {(productEditorMode === "new" || selectedDraftUsesSourcePricing) && <label className="filter-field">
+                    <span className="small">Pricing unit{productEditorMode === "new" ? " (required)" : ""}</span>
+                    <select className="input" required aria-label="Pricing unit" value={productDraft.unitOfMeasure}
+                      disabled={productEditorMode !== "new" && !capabilities.pricing}
+                      onChange={event => setProductDraft(prev => ({ ...prev, unitOfMeasure: event.target.value }))}>
+                      <option value="" disabled>Select pricing unit</option>
+                      <option value="each">Each (one package/bag)</option>
+                      {selectedDraftUsesSourcePricing && <option value="lbs">Pounds (price per lb)</option>}
+                    </select>
+                  </label>}
                   {selectedDraftUsesSourcePricing ? (
                     <>
                       <div className="admin-source-pricing-callout">
@@ -3647,23 +3660,6 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                           </li>
                         </ol>
                       </div>
-                      <label className="filter-field">
-                        <span className="small">Vendor's Unit Type</span>
-                        <select
-                          className="input"
-                          disabled={productEditorMode !== "new" && !capabilities.pricing}
-                          value={productDraft.unitOfMeasure}
-                          onChange={(event) =>
-                            setProductDraft((prev) => ({
-                              ...prev,
-                              unitOfMeasure: event.target.value
-                            }))
-                          }
-                        >
-                          <option value="each">Each</option>
-                          <option value="lbs">Lbs</option>
-                        </select>
-                      </label>
                       <label className="filter-field">
                         <span className="small">Vendor's Retail Price</span>
                         <input

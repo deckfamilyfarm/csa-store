@@ -3,7 +3,9 @@ import { ensureSquareSyncSchema, getPool } from "../db.js";
 import { withSyncLock } from "./productSyncSchema.js";
 import { getCustomerFacingSaleDiscount, resolvePricingProfile } from "./productPricing.js";
 import { computeSquareRetailPackagePrice, fetchSquare, getSquareConfig, listSquareCatalogItems,
-  loadPackagesByProduct, upsertReturnedSquareObjects } from "./squareStoreSync.js";
+  loadPackagesByProduct, upsertReturnedSquareObjects, loadSquareMeasurementUnits } from "./squareStoreSync.js";
+import { expectedSquareUnit, planSquareUnit, squareUnitSnapshot } from './squarePricingUnits.js';
+import { same } from './productSyncCore.js';
 
 const parse = value => typeof value === "string" ? JSON.parse(value) : value;
 const fail = (message, status = 409) => Object.assign(new Error(message), { status });
@@ -28,7 +30,7 @@ function targetHash() {
 }
 
 // The same retail resolver used for Square price updates also sets initial prices.
-export function buildSquareCreationPreview(source, packages, metaByPackageId = new Map()) {
+export function buildSquareCreationPreview(source, packages, metaByPackageId = new Map(), measurementUnits = new Map()) {
   if (!source || source.isDeleted || normalize(source.categoryName) === "membership") throw fail("This product is not eligible for Square creation.", 400);
   if (!source.vendorId || !source.vendorName?.trim()) throw fail("Choose a valid vendor before creating the Square item.", 400);
   if (!source.productName?.trim() || !packages.length) throw fail("A product name and at least one package are required.", 400);
@@ -41,8 +43,11 @@ export function buildSquareCreationPreview(source, packages, metaByPackageId = n
     const price = computeSquareRetailPackagePrice({ ...profile, saleDiscount: getCustomerFacingSaleDiscount(profile) }, pkg);
     const amount = price.price == null ? null : Math.round(price.price * 100);
     if (!Number.isSafeInteger(amount) || amount < 0) throw fail(`A valid retail price is required for ${pkg.name || "this package"}.`, 400);
+    const unitPlan = planSquareUnit(expectedSquareUnit(profile.usesSourcePricing, source.profile?.unitOfMeasure), null, measurementUnits);
+    if (unitPlan.issues.length) throw fail(unitPlan.issues.join(' '), 400);
     return { packageId: Number(pkg.id), name: String(pkg.name || "Regular").trim() || "Regular",
-      sku: String(pkg.packageCode || "").trim(), amount, currency: getSquareConfig().currency, priceBasis: price.basis };
+      sku: String(pkg.packageCode || "").trim(), amount, currency: getSquareConfig().currency, priceBasis: price.basis,
+      unit: unitPlan.expectedUnit, sellingUnit: unitPlan.proposed };
   });
   if (new Set(variations.map(row => normalize(row.name))).size !== variations.length) throw fail("Give each package a distinct name before creating Square variations.", 400);
   return { productId: Number(source.productId), productName: source.productName.trim(), vendorName: source.vendorName,
@@ -56,6 +61,7 @@ export function squareCreationRequest(preview, id) {
     name: preview.productName, product_type: "REGULAR",
     variations: preview.variations.map(row => ({ type: "ITEM_VARIATION", id: `#package-${row.packageId}`, ...availability,
       item_variation_data: { item_id: itemId, name: row.name, ...(row.sku ? { sku: row.sku } : {}),
+        ...(row.sellingUnit?.id ? { measurement_unit_id: row.sellingUnit.id } : {}),
         pricing_type: "FIXED_PRICING", price_money: { amount: row.amount, currency: row.currency } } }))
   } } };
 }
@@ -74,9 +80,10 @@ async function loadPreview(productId) {
     LEFT JOIN product_pricing_profiles pp ON pp.product_id=p.id LEFT JOIN product_sales ps ON ps.product_id=p.id WHERE p.id=?`, [productId]);
   if (!row) throw fail("Product not found.", 404);
   const { packagesByProductId, metaByPackageId } = await loadPackagesByProduct([productId]);
+  const units = await loadSquareMeasurementUnits();
   return buildSquareCreationPreview({ ...row, profile: row, vendor: { id: row.vendorId, name: row.vendorName,
     priceListMarkup: row.vendorPriceListMarkup, sourceMultiplier: row.vendorSourceMultiplier,
-    guestMarkup: row.vendorGuestMarkup, memberMarkup: row.vendorMemberMarkup } }, packagesByProductId.get(productId) || [], metaByPackageId);
+    guestMarkup: row.vendorGuestMarkup, memberMarkup: row.vendorMemberMarkup } }, packagesByProductId.get(productId) || [], metaByPackageId, units);
 }
 async function requireUnlinked(productId, connection = getPool()) {
   const [links] = await connection.query("SELECT package_id FROM square_variation_links WHERE product_id=?", [productId]);
@@ -135,7 +142,8 @@ export function creationLinks(preview, result, confirmed) {
     const remote = variations.find(variation => variation.id === variationId);
     const data = remote?.item_variation_data;
     if (!variationId || remote?.type !== "ITEM_VARIATION" || remote?.is_deleted || data?.item_id !== itemId || data?.name !== row.name
-      || (data.sku || "") !== row.sku || data.pricing_type !== "FIXED_PRICING" || data.price_money?.amount !== row.amount || data.price_money?.currency !== row.currency) {
+      || (data.sku || "") !== row.sku || data.pricing_type !== "FIXED_PRICING" || data.price_money?.amount !== row.amount || data.price_money?.currency !== row.currency
+      || (row.sellingUnit && (data.measurement_unit_id || null) !== row.sellingUnit.id)) {
       throw fail("Square creation could not be confirmed. Retry to finish linking the same item.");
     }
     return { productId: preview.productId, packageId: row.packageId, itemId, variationId };
@@ -177,6 +185,12 @@ export async function applySquareProductCreation(id, userId) {
         await connection.query("UPDATE square_product_creations SET status='created',result_json=?,updated_at=UTC_TIMESTAMP() WHERE id=?", [JSON.stringify(result), id]);
       }
       const remote = await fetchSquare(`/v2/catalog/object/${encodeURIComponent(result.catalog_object.id)}`, { signal: AbortSignal.timeout(30000) });
+      if (preview.variations.some(row => row.sellingUnit)) {
+        const units = await loadSquareMeasurementUnits();
+        if (preview.variations.some(row => row.sellingUnit && !same(row.sellingUnit, squareUnitSnapshot(row.sellingUnit.id, units)))) {
+          throw fail('The approved Square unit definition changed. Review the created item; its receipt is saved and it will not be recreated.');
+        }
+      }
       const links = creationLinks(preview, result, remote.object);
       await connection.beginTransaction();
       try {
