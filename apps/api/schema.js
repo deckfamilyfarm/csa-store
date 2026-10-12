@@ -33,6 +33,8 @@ export const products = mysqlTable("products", {
   trackInventory: tinyint("track_inventory"),
   inventory: int("inventory"),
   stockOnFarm: tinyint("stock_on_farm").default(null),
+  stockOnFarmLbs: decimal("stock_on_farm_lbs", { precision: 10, scale: 3 }).default(null),
+  farmStockRevision: int("farm_stock_revision").notNull().default(0),
   categoryId: int("category_id"),
   vendorId: int("vendor_id"),
   thumbnailUrl: text("thumbnail_url"),

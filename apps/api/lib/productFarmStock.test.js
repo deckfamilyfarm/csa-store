@@ -7,7 +7,7 @@ test("farm availability preserves unchecked and explicit false, and accepts only
   for (const value of [null, undefined]) assert.equal(farmStockValue(value), null);
   for (const value of [false, 0, "0"]) assert.equal(farmStockValue(value), false);
   for (const value of [true, 1, "1"]) assert.equal(farmStockValue(value), true);
-  for (const value of [true, false]) assert.equal(validateFarmStockInput({ stockOnFarm: value }), value);
+  for (const value of [true, false]) assert.deepEqual(validateFarmStockInput({ stockOnFarm: value }), { stockOnFarm: value });
   for (const input of [null, {}, { stockOnFarm: null }, { stockOnFarm: "false" }, { stockOnFarm: 0 }, { stockOnFarm: false, inventory: 0 }]) {
     assert.throws(() => validateFarmStockInput(input), /True or False/);
   }

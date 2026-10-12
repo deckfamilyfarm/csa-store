@@ -1,4 +1,5 @@
 import { canPublishInventory } from "../../../../../apps/api/lib/adminRoles.js";
+import { farmPounds, FARM_INVENTORY_FIELDS } from "../../../../../apps/api/lib/farmInventory.js";
 import { normalizeCustomerPriceOverrides, customerOverridePrice } from '../../../../../apps/api/lib/customerPriceOverrides.js';
 
 // Shared state and local-save rules for the Products grid and Details editor.
@@ -19,19 +20,38 @@ export const SCHEDULE_FIELDS = [
 ];
 const METADATA_FIELDS = ["name", "description", "vendorId", "categoryId"];
 export const FULL_FARM_INVENTORY_FIELDS = ["inventory", "trackInventory", "visible"];
-export const INVENTORY_FIELDS = [...FULL_FARM_INVENTORY_FIELDS, "stockOnFarm"];
+export const INVENTORY_FIELDS = [...FULL_FARM_INVENTORY_FIELDS, ...FARM_INVENTORY_FIELDS];
 
 async function saveFarmStock(entry, api) {
+  if (entry.meta.farmStockConflict) throw new Error("Review the latest farm count below before retrying.");
   const stockOnFarm = entry.values.stockOnFarm;
-  if (typeof stockOnFarm !== "boolean") throw new Error("Choose True or False for Stock on Farm.");
-  const response = await api.put(`products/${entry.meta.productId}/farm-stock`, { stockOnFarm });
-  if (!response?.ok || response.stockOnFarm !== stockOnFarm) throw new Error(response?.message || "Stock on Farm was not confirmed.");
+  const stockOnFarmLbs = farmPounds(entry.values.stockOnFarmLbs);
+  const statusDirty = dirtyFields(entry).includes("stockOnFarm");
+  if (statusDirty && typeof stockOnFarm !== "boolean") throw new Error("Choose True or False for Stock on Farm.");
+  const response = await api.put(`products/${entry.meta.productId}/farm-stock`, {
+    ...(typeof stockOnFarm === "boolean" ? { stockOnFarm } : {}),
+    stockOnFarmLbs,
+    expectedRevision: entry.meta.farmStockRevision,
+  });
+  if (!response?.ok || response.stockOnFarm !== stockOnFarm || response.stockOnFarmLbs !== stockOnFarmLbs || !Number.isSafeInteger(response.farmStockRevision)) {
+    throw new Error(response?.message || "Farm inventory was not confirmed.");
+  }
   return response;
+}
+
+async function saveFarmInventory(entry, api, result) {
+  try {
+    result.farmStock = await saveFarmStock(entry, api);
+    result.savedFields.push(...FARM_INVENTORY_FIELDS);
+  } catch (error) {
+    if (error.farmStockConflict) result.farmStockConflict = error.farmStockConflict;
+    result.errors.push(`Stock on Farm: ${error.message || "Local save failed."}`);
+  }
 }
 
 export function inventorySaveSummary(result) {
   const saved = [];
-  if (result.savedFields.includes("stockOnFarm")) saved.push("Stock on Farm saved locally");
+  if (result.savedFields.some(key => FARM_INVENTORY_FIELDS.includes(key))) saved.push("Farm inventory saved locally");
   if (result.savedFields.some(key => FULL_FARM_INVENTORY_FIELDS.includes(key))) saved.push("Full Farm inventory confirmed in Local Line and saved locally");
   return saved.join("; ") || "No inventory changes saved";
 }
@@ -44,12 +64,7 @@ export async function saveInventoryDraft(entry, capabilities, api) {
     if (!capabilities.edit) throw new Error("Product editing permission is required.");
     if (!Number.isInteger(Number(entry.defaults.vendorId)) || Number(entry.defaults.vendorId) <= 0) throw new Error("A vendor is required. Select a vendor in Details and save it in Pricing before saving inventory.");
   } catch (error) { result.errors.push(error.message); return result; }
-  if (dirty.includes("stockOnFarm")) {
-    try {
-      await saveFarmStock(entry, api);
-      result.savedFields.push("stockOnFarm");
-    } catch (error) { result.errors.push(`Stock on Farm: ${error.message || "Local save failed."}`); }
-  }
+  if (dirty.some(key => FARM_INVENTORY_FIELDS.includes(key))) await saveFarmInventory(entry, api, result);
   if (fields.length) {
     try {
       if (!capabilities.inventoryPush) throw new Error("Inventory Admin, or product editing and Local Line Push permissions, are required.");
@@ -117,6 +132,7 @@ export function buildProductDraftFromProduct(
     trackInventory: Boolean(product.trackInventory),
     inventory: Number(product.inventory) || 0,
     stockOnFarm: product.stockOnFarm == null ? null : Boolean(Number(product.stockOnFarm)),
+    stockOnFarmLbs: product.stockOnFarmLbs == null ? "" : String(Number(product.stockOnFarmLbs)),
     unitOfMeasure: field("unitOfMeasure", "each") === "lbs" ? "lbs" : "each",
     sourceUnitPrice: field("sourceUnitPrice"),
     minWeight: field("minWeight"),
@@ -154,6 +170,13 @@ export function hydrateProductDraft(existing, product, sanitize) {
   const baseline = { ...defaults };
   for (const key of dirtyFields(existing))
     baseline[key] = existing.defaults[key];
+  const farmDirty = dirtyFields(existing).some(key => FARM_INVENTORY_FIELDS.includes(key));
+  if (farmDirty || existing?.meta.farmStockConflict) {
+    for (const key of FARM_INVENTORY_FIELDS) {
+      baseline[key] = existing.defaults[key];
+      values[key] = existing.values[key];
+    }
+  }
   return {
     defaults: baseline,
     values,
@@ -161,6 +184,7 @@ export function hydrateProductDraft(existing, product, sanitize) {
       ...existing?.meta,
       productId: Number(product.productId ?? product.id),
       productName: product.name,
+      farmStockRevision: farmDirty || existing?.meta.farmStockConflict ? existing.meta.farmStockRevision : Number(product.farmStockRevision || 0),
       categoryName: product.categoryName,
       usesSourcePricing:
         product.usesSourcePricing ?? existing?.meta?.usesSourcePricing,
@@ -175,9 +199,22 @@ export function hydrateProductDraft(existing, product, sanitize) {
 export function patchProductDraft(drafts, product, patch) {
   const id = product.productId ?? product.id;
   const entry = drafts[id] || hydrateProductDraft(null, product);
+  const changes = { ...patch };
+  if (Object.hasOwn(changes, "stockOnFarmLbs")) {
+    // Retain text while typing (including invalid/incomplete input) for validation on save.
+    changes.stockOnFarmLbs = changes.stockOnFarmLbs == null ? "" : String(changes.stockOnFarmLbs);
+    try {
+      const pounds = farmPounds(changes.stockOnFarmLbs);
+      if (pounds !== null) changes.stockOnFarm = pounds > 0;
+    } catch { /* Do not turn an invalid/incomplete count into a status change. */ }
+  } else if (Object.hasOwn(changes, "stockOnFarm")) {
+    if (changes.stockOnFarm === false) changes.stockOnFarmLbs = "0";
+    else if (changes.stockOnFarm === null) changes.stockOnFarmLbs = "";
+    else if (entry.values.stockOnFarmLbs !== "" && Number(entry.values.stockOnFarmLbs) === 0) changes.stockOnFarmLbs = "";
+  }
   return {
     ...drafts,
-    [id]: { ...entry, values: { ...entry.values, ...patch } },
+    [id]: { ...entry, values: { ...entry.values, ...changes } },
   };
 }
 
@@ -186,6 +223,7 @@ export function acknowledgeSave(
   submitted,
   savedFields,
   savedPackageIds = [],
+  result = {},
 ) {
   if (!current) return current;
   const defaults = { ...current.defaults };
@@ -197,7 +235,33 @@ export function acknowledgeSave(
         : pkg,
     );
   }
-  return { ...current, defaults };
+  const values = { ...current.values };
+  const meta = { ...current.meta };
+  if (result.farmStock) {
+    const confirmed = buildProductDraftFromProduct(result.farmStock);
+    for (const key of FARM_INVENTORY_FIELDS) {
+      defaults[key] = confirmed[key];
+      if (valuesEqual(current.values[key], submitted.values[key])) values[key] = confirmed[key];
+    }
+    meta.farmStockRevision = result.farmStock.farmStockRevision;
+    delete meta.farmStockConflict;
+  }
+  if (result.farmStockConflict) meta.farmStockConflict = result.farmStockConflict;
+  return { ...current, defaults, values, meta };
+}
+
+export function reviewFarmStockConflict(entry, keepDraft) {
+  const latest = entry?.meta.farmStockConflict;
+  if (!latest) return entry;
+  const confirmed = buildProductDraftFromProduct(latest);
+  const defaults = { ...entry.defaults }, values = { ...entry.values };
+  for (const key of FARM_INVENTORY_FIELDS) {
+    defaults[key] = confirmed[key];
+    if (!keepDraft) values[key] = confirmed[key];
+  }
+  const meta = { ...entry.meta, farmStockRevision: latest.farmStockRevision };
+  delete meta.farmStockConflict;
+  return { ...entry, defaults, values, meta };
 }
 
 export function unsupportedScheduleFields(entry) {
@@ -288,9 +352,7 @@ export async function saveProductDraft(entry, capabilities, api) {
     );
   }
   if (metadata.includes("vendorId") && !result.savedFields.includes("vendorId")) return result;
-  if (fields.includes("stockOnFarm")) {
-    await run("Stock on Farm", ["stockOnFarm"], () => saveFarmStock(entry, api));
-  }
+  if (fields.some(key => FARM_INVENTORY_FIELDS.includes(key))) await saveFarmInventory(entry, api, result);
   if (fields.includes('customerPriceOverrides')) {
     await run('Customer prices', ['customerPriceOverrides'], async () => {
       if (!capabilities.pricing) throw new Error('Pricing permission is required.');

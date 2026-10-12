@@ -7,9 +7,11 @@ function getRequestKey(url, token = "") {
 
 async function throwForError(response, fallbackMessage) {
   let detail = "";
+  let farmStockConflict;
   try {
     const payload = await response.json();
     detail = payload?.detail || payload?.error || "";
+    if (response.status === 409) farmStockConflict = payload?.farmStockConflict;
   } catch (error) {
     try {
       detail = (await response.text()) || "";
@@ -20,6 +22,7 @@ async function throwForError(response, fallbackMessage) {
 
   const error = new Error(detail || fallbackMessage);
   error.status = response.status;
+  if (farmStockConflict) error.farmStockConflict = farmStockConflict;
   throw error;
 }
 

@@ -210,12 +210,13 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
     incoming.push({...action,id:Number(inserted.insertId)});
   }
   const { saveProductFarmStock } = await import('./productFarmStock.js');
-  await saveProductFarmStock(9, { stockOnFarm: false }, user);
+  await saveProductFarmStock(9, { stockOnFarmLbs: 12.125, expectedRevision: 0 }, user);
   const connection = await pool.getConnection();
   try {
     for (const action of incoming) assert.equal((await applyIncomingAction(action,new Set([action.proposalHash]),connection)).status,"applied");
-    const [[row]] = await pool.query("SELECT name, stock_on_farm FROM products WHERE id=9"); assert.equal(row.name,"Renamed product");
-    assert.equal(row.stock_on_farm, 0, 'Incoming repairs preserve local farm availability, including changes since the audit');
+    const [[row]] = await pool.query("SELECT name, stock_on_farm, stock_on_farm_lbs FROM products WHERE id=9"); assert.equal(row.name,"Renamed product");
+    assert.equal(row.stock_on_farm, 1, 'Incoming repairs preserve local farm availability, including changes since the audit');
+    assert.equal(Number(row.stock_on_farm_lbs), 12.125, 'Incoming repairs preserve local farm pounds');
     const [[pkg]] = await pool.query("SELECT name, price FROM packages WHERE id=90"); assert.equal(pkg.name,"Each"); assert.equal(Number(pkg.price),10);
     const stale = await applyIncomingAction(incoming[0],new Set([incoming[0].proposalHash]),connection);
     assert.equal(stale.status,"held","Reapplying stale incoming snapshots is held");
@@ -329,7 +330,7 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
   assert.ok(!Object.hasOwn(llPriceAction.payload,'track_inventory'));
   assert.ok(!Object.hasOwn(llPriceAction.payload,'visible'));
   const startRequests=requests.length;
-  await saveProductFarmStock(130, { stockOnFarm: false }, inventoryUser);
+  await saveProductFarmStock(130, { stockOnFarmLbs: 18.5, expectedRevision: 0 }, inventoryUser);
   assert.equal(requests.length, startRequests, 'Farm-only saves never contact remote services');
   const inventoryResult=await saveInventoryToLocalLine(130,{inventory:7,trackInventory:1,visible:0},inventoryUser);
   assert.equal(inventoryResult.localLineUpdate,true);
@@ -344,8 +345,9 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
   assert.equal((await service.pendingProductSync()).rows.some(row=>row.productId===130),false,"Inventory success does not create pending Product Sync work");
   const priceRelease=await service.createProductSyncRelease({auditId:pricingAudit.audit.id,actionIds:pricingAudit.rows.map(row => row.id)},user);
   assert.equal((await service.runProductSyncRelease(priceRelease.id,{user,allowFuture:true})).status,'completed',"An ordinary pricing approval survives an independent inventory update");
-  const [[farmAfterRelease]] = await pool.query('SELECT stock_on_farm FROM products WHERE id=130');
-  assert.equal(farmAfterRelease.stock_on_farm, 0, 'Local Line and Square approvals survive farm-only changes and preserve the flag');
+  const [[farmAfterRelease]] = await pool.query('SELECT stock_on_farm, stock_on_farm_lbs FROM products WHERE id=130');
+  assert.equal(farmAfterRelease.stock_on_farm, 1, 'Local Line and Square approvals survive farm-only changes and preserve the flag');
+  assert.equal(Number(farmAfterRelease.stock_on_farm_lbs), 18.5, 'Pricing releases preserve the physical farm count');
   assert.equal(remoteProducts.get(1130).inventory,7,"Product Sync must not overwrite inventory");
   assert.equal(remoteProducts.get(1130).visible,false,"An unrelated pricing release must not overwrite visibility");
   await pool.query("UPDATE product_pricing_profiles SET remote_sync_status='pending' WHERE product_id=130");
@@ -411,7 +413,7 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
   async function saveRoute(method, path, params, body) {
     const handler = adminRouter.stack.find(layer => layer.route?.path === path && layer.route.methods[method]).route.stack.at(-1).handle;
     const response = { statusCode: 200, status(code) { this.statusCode = code; return this; }, json(data) { this.body = data; return this; } };
-    await handler({ params, body, admin: user }, response);
+    await handler({ params, body, query: method === 'get' ? body || {} : {}, admin: user }, response);
     return response;
   }
   const farmSaved = await saveRoute('put', '/products/:id/farm-stock', { id: 142 }, { stockOnFarm: false });
@@ -444,11 +446,22 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
     const [[profile]] = await pool.query('SELECT unit_of_measure FROM product_pricing_profiles WHERE product_id=?', [created.body.productId]);
     assert.equal(profile.unit_of_measure, unitOfMeasure);
   }
-  await saveProductFarmStock(142, { stockOnFarm: true }, user);
+  await saveProductFarmStock(142, { stockOnFarmLbs: 33.5, expectedRevision: farmSaved.body.farmStockRevision }, user);
+  const conflict = await saveRoute('put', '/products/:id/farm-stock', { id: 142 }, { stockOnFarmLbs: 9, expectedRevision: farmSaved.body.farmStockRevision });
+  assert.equal(conflict.statusCode, 409);
+  assert.equal(conflict.body.farmStockConflict.stockOnFarmLbs, 33.5);
+  const readCount = await saveRoute('get', '/pricelist', {}, { search: 'Product 142', pageSize: '200' });
+  assert.equal(readCount.statusCode, 200);
+  const countRow = readCount.body.rows.find(row => row.productId === 142);
+  assert.equal(countRow.stockOnFarm, true);
+  assert.equal(countRow.stockOnFarmLbs, 33.5);
+  assert.equal(countRow.farmStockRevision, conflict.body.farmStockConflict.farmStockRevision);
   const duplicatedFarm = await saveRoute('post', '/products/:id/duplicate', { id: 142 }, {});
   assert.equal(duplicatedFarm.statusCode, 200, JSON.stringify(duplicatedFarm.body));
-  const [[duplicateFlag]] = await pool.query('SELECT stock_on_farm FROM products WHERE id=?', [duplicatedFarm.body.productId]);
+  const [[duplicateFlag]] = await pool.query('SELECT stock_on_farm, stock_on_farm_lbs, farm_stock_revision FROM products WHERE id=?', [duplicatedFarm.body.productId]);
   assert.equal(duplicateFlag.stock_on_farm, null, 'A duplicate needs a fresh physical stock review');
+  assert.equal(duplicateFlag.stock_on_farm_lbs, null);
+  assert.equal(duplicateFlag.farm_stock_revision, 0);
   const duplicateRejected = await saveRoute("post", "/products/:id/duplicate", { id: 143 }, {});
   assert.equal(duplicateRejected.statusCode, 400);
   assert.match(duplicateRejected.body.error, /vendor is required/);

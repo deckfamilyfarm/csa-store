@@ -2007,7 +2007,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
           post: (path, payload) => adminPost(path, token, payload)
         });
         results.push(result);
-        setWorkspaceDrafts((prev) => ({ ...prev, [entry.meta.productId]: acknowledgeSave(prev[entry.meta.productId], entry, result.savedFields, result.savedPackageIds) }));
+        setWorkspaceDrafts((prev) => ({ ...prev, [entry.meta.productId]: acknowledgeSave(prev[entry.meta.productId], entry, result.savedFields, result.savedPackageIds, result) }));
       }
       setPricelistRefreshNonce((value) => value + 1);
       if (selectedProductId) await refreshSelectedProductDetail(selectedProductId);

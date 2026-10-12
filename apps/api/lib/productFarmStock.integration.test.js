@@ -19,7 +19,7 @@ test('farm availability migration, persistence, defaults, permissions and indepe
   t.mock.method(globalThis, 'fetch', () => assert.fail('Local farm availability must not call remote services'));
   for (const table of [schema.products, schema.vendors, schema.categories]) {
     const config = getTableConfig(table);
-    const columns = config.columns.filter(col => col.name !== 'stock_on_farm').map(col => `\`${col.name}\` ${col.getSQLType()}${col.notNull ? ' NOT NULL' : ''}${col.autoIncrement ? ' AUTO_INCREMENT' : ''}${col.primary ? ' PRIMARY KEY' : ''}`);
+    const columns = config.columns.filter(col => !['stock_on_farm', 'stock_on_farm_lbs', 'farm_stock_revision'].includes(col.name)).map(col => `\`${col.name}\` ${col.getSQLType()}${col.notNull ? ' NOT NULL' : ''}${col.autoIncrement ? ' AUTO_INCREMENT' : ''}${col.primary ? ' PRIMARY KEY' : ''}`);
     await pool.query(`CREATE TABLE \`${config.name}\` (${columns.join(',')}) ENGINE=InnoDB`);
   }
   await pool.query("INSERT INTO vendors (id,name) VALUES (1,'Deck Family Farm'),(2,'')");
@@ -32,7 +32,9 @@ test('farm availability migration, persistence, defaults, permissions and indepe
   const read = async () => (await getDb().select().from(schema.products)).find(row => row.id === 1);
   const before = await read();
   assert.equal(before.stockOnFarm, null);
-  const unchanged = ({ stockOnFarm, updatedAt, ...rest }) => rest;
+  assert.equal(before.stockOnFarmLbs, null);
+  assert.equal(before.farmStockRevision, 0);
+  const unchanged = ({ stockOnFarm, stockOnFarmLbs, farmStockRevision, updatedAt, ...rest }) => rest;
   for (const role of ['inventory_admin', 'pricing_admin', 'local_pricelist_admin', 'admin']) {
     for (const stockOnFarm of [true, false]) {
       const saved = await saveProductFarmStock(1, { stockOnFarm }, { adminRoles: [role] });
@@ -47,7 +49,36 @@ test('farm availability migration, persistence, defaults, permissions and indepe
   for (const id of [2,3,4,5,999]) await assert.rejects(saveProductFarmStock(id, { stockOnFarm: true }, user));
   await assert.rejects(saveProductFarmStock(1, { stockOnFarm: true, inventory: 0 }, user));
   assert.equal((await read()).stockOnFarm, 0);
+  const revision = (await read()).farmStockRevision;
+  const counted = await saveProductFarmStock(1, { stockOnFarmLbs: 25.125, expectedRevision: revision }, user);
+  assert.equal(counted.stockOnFarm, true);
+  assert.equal(counted.stockOnFarmLbs, 25.125);
+  assert.equal(Number((await read()).stockOnFarmLbs), 25.125);
+  assert.equal(counted.farmStockRevision, revision + 1);
+  assert.deepEqual(unchanged(await read()), unchanged(before));
+  const retried = await saveProductFarmStock(1, { stockOnFarmLbs: 25.125, expectedRevision: revision }, user);
+  assert.equal(retried.farmStockRevision, counted.farmStockRevision, 'lost-response retry does not write again');
+  await assert.rejects(saveProductFarmStock(1, { stockOnFarmLbs: 50, expectedRevision: revision }, user), error => {
+    assert.equal(error.status, 409);
+    assert.equal(error.farmStockConflict.stockOnFarmLbs, 25.125);
+    return true;
+  });
+  const concurrent = await Promise.allSettled([30, 40].map(stockOnFarmLbs => saveProductFarmStock(1, { stockOnFarmLbs, expectedRevision: counted.farmStockRevision }, user)));
+  assert.equal(concurrent.filter(result => result.status === 'fulfilled').length, 1);
+  assert.equal(concurrent.find(result => result.status === 'rejected').reason.status, 409);
+  const latest = await read();
+  const cleared = await saveProductFarmStock(1, { stockOnFarmLbs: null, expectedRevision: latest.farmStockRevision }, user);
+  assert.equal(cleared.stockOnFarmLbs, null);
+  assert.equal(cleared.stockOnFarm, true);
+  const no = await saveProductFarmStock(1, { stockOnFarm: false }, user);
+  assert.equal(no.stockOnFarmLbs, 0, 'legacy No save also links pounds');
+  const yes = await saveProductFarmStock(1, { stockOnFarm: true }, user);
+  assert.equal(yes.stockOnFarmLbs, null, 'legacy Yes does not invent a weight');
+  await assert.rejects(saveProductFarmStock(1, { stockOnFarm: false, stockOnFarmLbs: 8, expectedRevision: yes.farmStockRevision }, user), /agree/);
+  assert.deepEqual(unchanged(await read()), unchanged(before));
   await pool.query("INSERT INTO products (id,name,vendor_id) VALUES (6,'New product',1)");
-  const [[created]] = await pool.query('SELECT stock_on_farm FROM products WHERE id=6');
+  const [[created]] = await pool.query('SELECT stock_on_farm, stock_on_farm_lbs, farm_stock_revision FROM products WHERE id=6');
   assert.equal(created.stock_on_farm, null);
+  assert.equal(created.stock_on_farm_lbs, null);
+  assert.equal(created.farm_stock_revision, 0);
 });

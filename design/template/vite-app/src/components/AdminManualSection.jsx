@@ -107,7 +107,7 @@ export function AdminManualSection({ focusTopic = "overview" }) {
         </p>
         <p>
           Inventory groups product details and Stock on Farm beside a Full Farm panel with Qty, Track, and Visible. Use the All, Not checked, and Checked tabs or the detailed Stock on Farm filter to focus your work. Desktop rows spread the controls across the screen; phones use compact two-column rows. The progress bar includes unsaved checks in the selected catalog scope. Tap an information icon beside any inventory field for an explanation. Turn on
-          Full Farm Track Inventory to edit stock; Full Farm Visible controls storefront availability. Stock on Farm is saved locally and records whether any stock is available in a farm freezer or fridge. It starts Not checked until staff choose True or False. Pricing has
+          Full Farm Track Inventory to edit stock; Full Farm Visible controls storefront availability. Stock on Farm and the lbs box save locally. Enter the total pounds in all farm freezers and fridges, regardless of selling unit. Positive pounds set Yes; zero sets No. Clicking No sets zero pounds; Yes without a weight means available but unweighed. Clearing pounds means weight unknown and keeps the status. Existing weights start blank. Sales do not yet deduct from this count. If another staff member changes a count, review the latest saved count before retrying. Pricing has
           customizable columns and keeps your previous pricelist column preferences.
           Choose Deck Enterprises in the Vendor filter to include Deck Family
           Farm, Hyland, and Creamy Cow together. Inventory selects this group by default when opened;

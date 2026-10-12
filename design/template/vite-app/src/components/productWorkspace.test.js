@@ -12,8 +12,10 @@ import {
   syncLabel,
   previewProductPrices,
   buildScheduleUpdate,
+  reviewFarmStockConflict,
 } from "./productWorkspace.js";
 import { computeProductPricingSnapshot } from "../../../../../apps/api/lib/productPricing.js";
+import { mobileInventoryView } from "./mobileInventoryView.js";
 
 const product = {
   productId: 7,
@@ -435,12 +437,12 @@ test("price previews match server calculation for standard, formula, weight, dep
 test("farm stock keeps null/false distinct through hydration and shared drafts", () => {
   assert.equal(hydrateProductDraft(null, product).values.stockOnFarm, null);
   const draft = patchProductDraft({}, product, { stockOnFarm: false })[7];
-  assert.deepEqual(dirtyFields(draft), ['stockOnFarm']);
+  assert.deepEqual(dirtyFields(draft), ['stockOnFarm', 'stockOnFarmLbs']);
   const refreshed = hydrateProductDraft(draft, { ...product, stockOnFarm: true });
   assert.equal(refreshed.values.stockOnFarm, false);
   assert.equal(refreshed.defaults.stockOnFarm, null);
   const newer = { ...draft, values: { ...draft.values, stockOnFarm: true } };
-  const saved = acknowledgeSave(newer, draft, ['stockOnFarm']);
+  const saved = acknowledgeSave(newer, draft, ['stockOnFarm', 'stockOnFarmLbs']);
   assert.equal(saved.defaults.stockOnFarm, false);
   assert.deepEqual(dirtyFields(saved), ['stockOnFarm']);
 });
@@ -451,13 +453,13 @@ test("farm-only saves work from either view without publishing or marking pricin
       const draft = patchProductDraft({}, { ...product, localLineProductId: null }, { stockOnFarm: false })[7];
       const calls = [];
       const result = await save(draft, productCapabilities(roles), {
-        put: async (path, body) => { calls.push({ path, body }); return { ok: true, ...body }; },
+        put: async (path, body) => { calls.push({ path, body }); return { ok: true, ...body, farmStockRevision: 1 }; },
         post: () => assert.fail('Farm-only save must not publish or queue Product Sync')
       });
       assert.equal(result.ok, true);
-      assert.deepEqual(calls, [{ path: 'products/7/farm-stock', body: { stockOnFarm: false } }]);
+      assert.deepEqual(calls, [{ path: 'products/7/farm-stock', body: { stockOnFarm: false, stockOnFarmLbs: 0, expectedRevision: 0 } }]);
       assert.deepEqual(dirtyFields(acknowledgeSave(draft, draft, result.savedFields)), []);
-      assert.deepEqual(unsupportedScheduleFields(draft), ['stockOnFarm']);
+      assert.deepEqual(unsupportedScheduleFields(draft), ['stockOnFarm', 'stockOnFarmLbs']);
       assert.equal(Object.hasOwn(buildScheduleUpdate(draft).changes, 'stockOnFarm'), false);
     }
   }
@@ -468,16 +470,16 @@ test("mixed inventory saves acknowledge successes independently and retry only f
     const draft = patchProductDraft({}, product, { stockOnFarm: false, inventory: 0, onSale: true })[7];
     const calls = [];
     const result = await saveInventoryDraft(draft, productCapabilities(['inventory_admin']), {
-      put: async (_path, body) => { calls.push('farm'); if (failedDomain === 'farm') throw new Error('Local failure'); return { ok: true, ...body }; },
+      put: async (_path, body) => { calls.push('farm'); if (failedDomain === 'farm') throw new Error('Local failure'); return { ok: true, ...body, farmStockRevision: 1 }; },
       post: async (_path, body) => { calls.push('full'); assert.deepEqual(body, { changes: { inventory: 0 } }); if (failedDomain === 'full') throw new Error('Local Line unavailable'); return { ok: true, localLineUpdate: true }; }
     });
     assert.deepEqual(calls, ['farm', 'full']);
     assert.equal(result.partial, true);
-    assert.deepEqual(result.savedFields, failedDomain === 'farm' ? ['inventory'] : ['stockOnFarm']);
+    assert.deepEqual(result.savedFields, failedDomain === 'farm' ? ['inventory'] : ['stockOnFarm', 'stockOnFarmLbs']);
     const remaining = acknowledgeSave(draft, draft, result.savedFields);
     const retries = [];
     const retried = await saveInventoryDraft(remaining, productCapabilities(['inventory_admin']), {
-      put: async (_path, body) => { retries.push('farm'); return { ok: true, ...body }; },
+      put: async (_path, body) => { retries.push('farm'); return { ok: true, ...body, farmStockRevision: 1 }; },
       post: async () => { retries.push('full'); return { ok: true, localLineUpdate: true }; }
     });
     assert.equal(retried.ok, true);
@@ -490,10 +492,10 @@ test("farm availability saves despite invalid or unauthorized Full Farm edits", 
   for (const [roles, inventory] of [[['pricing_admin'], 8], [['inventory_admin'], -1]]) {
     const draft = patchProductDraft({}, product, { stockOnFarm: true, inventory })[7];
     const result = await saveInventoryDraft(draft, productCapabilities(roles), {
-      put: async (_path, body) => ({ ok: true, ...body }), post: () => assert.fail('Full Farm save must be held')
+      put: async (_path, body) => ({ ok: true, ...body, farmStockRevision: 1 }), post: () => assert.fail('Full Farm save must be held')
     });
     assert.equal(result.partial, true);
-    assert.deepEqual(result.savedFields, ['stockOnFarm']);
+    assert.deepEqual(result.savedFields, ['stockOnFarm', 'stockOnFarmLbs']);
     assert.deepEqual(dirtyFields(acknowledgeSave(draft, draft, result.savedFields)), ['inventory']);
   }
 });
@@ -507,4 +509,87 @@ test("farm save requires confirmed value and keeps failed or unreviewed values a
     assert.equal(result.ok, false);
     assert.deepEqual(result.savedFields, []);
   }
+});
+
+test('farm pounds link status, drive checked filters, and preserve typed drafts and count baselines', () => {
+  let drafts = patchProductDraft({}, product, { stockOnFarmLbs: '.125' });
+  assert.equal(drafts[7].values.stockOnFarm, true);
+  assert.equal(mobileInventoryView([product], drafts, '', 'checked').checked, 1);
+  assert.equal(mobileInventoryView([product], drafts, '', 'not-checked').rows.length, 0);
+  drafts = patchProductDraft(drafts, product, { stockOnFarmLbs: '' });
+  assert.equal(drafts[7].values.stockOnFarm, true);
+  drafts = patchProductDraft(drafts, product, { stockOnFarm: false });
+  assert.equal(drafts[7].values.stockOnFarmLbs, '0');
+  drafts = patchProductDraft(drafts, product, { stockOnFarm: true });
+  assert.equal(drafts[7].values.stockOnFarmLbs, '');
+  drafts = patchProductDraft(drafts, product, { stockOnFarmLbs: '25.125' });
+  const refreshed = hydrateProductDraft(drafts[7], { ...product, stockOnFarm: false, stockOnFarmLbs: 0, farmStockRevision: 5 });
+  assert.equal(refreshed.values.stockOnFarmLbs, '25.125');
+  assert.equal(refreshed.defaults.stockOnFarmLbs, '');
+  assert.equal(refreshed.meta.farmStockRevision, 0);
+  drafts = patchProductDraft(drafts, product, { stockOnFarm: null });
+  assert.equal(drafts[7].values.stockOnFarmLbs, '');
+  assert.deepEqual(dirtyFields(drafts[7]), []);
+});
+
+test('pounds-only save persists from either workspace and never enters sync staging', async () => {
+  for (const save of [saveInventoryDraft, saveProductDraft]) {
+    const counted = { ...product, stockOnFarm: true, stockOnFarmLbs: 10, farmStockRevision: 3 };
+    const draft = patchProductDraft({}, counted, { stockOnFarmLbs: '25.500' })[7];
+    assert.deepEqual(dirtyFields(draft), ['stockOnFarmLbs']);
+    const result = await save(draft, productCapabilities(['inventory_admin']), {
+      put: async (path, body) => {
+        assert.equal(path, 'products/7/farm-stock');
+        assert.deepEqual(body, { stockOnFarm: true, stockOnFarmLbs: 25.5, expectedRevision: 3 });
+        return { ok: true, stockOnFarm: true, stockOnFarmLbs: 25.5, farmStockRevision: 4 };
+      }, post: () => assert.fail('Farm count must not publish or queue remote changes'),
+    });
+    assert.equal(result.ok, true);
+    const saved = acknowledgeSave(draft, draft, result.savedFields, [], result);
+    assert.deepEqual(dirtyFields(saved), []);
+    assert.equal(saved.values.stockOnFarmLbs, '25.5');
+    assert.equal(saved.meta.farmStockRevision, 4);
+    const newer = patchProductDraft({ 7: draft }, counted, { stockOnFarmLbs: '30' })[7];
+    const acknowledged = acknowledgeSave(newer, draft, result.savedFields, [], result);
+    assert.equal(acknowledged.values.stockOnFarmLbs, '30');
+    assert.equal(acknowledged.defaults.stockOnFarmLbs, '25.5');
+    assert.deepEqual(unsupportedScheduleFields(draft), ['stockOnFarmLbs']);
+    assert.equal(Object.hasOwn(buildScheduleUpdate(draft).changes, 'stockOnFarmLbs'), false);
+  }
+});
+
+test('farm count conflicts retain drafts, allow independent Full Farm saves, and require explicit review', async () => {
+  const draft = patchProductDraft({}, { ...product, stockOnFarm: true, stockOnFarmLbs: 10, farmStockRevision: 3 }, { stockOnFarmLbs: '20', inventory: 5 })[7];
+  const latest = { stockOnFarm: true, stockOnFarmLbs: 15, farmStockRevision: 4 };
+  const api = { put: async () => { throw Object.assign(new Error('Farm inventory changed'), { status: 409, farmStockConflict: latest }); }, post: async () => ({ ok: true, localLineUpdate: true }) };
+  const result = await saveInventoryDraft(draft, productCapabilities(['inventory_admin']), api);
+  assert.equal(result.partial, true);
+  assert.deepEqual(result.savedFields, ['inventory']);
+  const retained = acknowledgeSave(draft, draft, result.savedFields, [], result);
+  assert.equal(retained.values.stockOnFarmLbs, '20');
+  assert.equal(retained.meta.farmStockRevision, 3);
+  const blocked = await saveInventoryDraft(retained, productCapabilities(['inventory_admin']), { put: () => assert.fail('Do not overwrite before review') });
+  assert.match(blocked.errors[0], /Review/);
+  const adopted = reviewFarmStockConflict(retained, false);
+  assert.equal(adopted.values.stockOnFarmLbs, '15');
+  assert.deepEqual(dirtyFields(adopted), []);
+  const reviewed = reviewFarmStockConflict(retained, true);
+  assert.equal(reviewed.values.stockOnFarmLbs, '20');
+  assert.equal(reviewed.defaults.stockOnFarmLbs, '15');
+  assert.equal(reviewed.meta.farmStockRevision, 4);
+  const retry = await saveInventoryDraft(reviewed, productCapabilities(['inventory_admin']), { put: async (_path, body) => {
+    assert.equal(body.expectedRevision, 4);
+    return { ok: true, stockOnFarm: true, stockOnFarmLbs: 20, farmStockRevision: 5 };
+  }, post: () => assert.fail('Do not retry a confirmed Full Farm save') });
+  assert.equal(retry.ok, true);
+});
+
+test('invalid pounds stay visible for correction without blocking Full Farm saves', async () => {
+  const draft = patchProductDraft({}, product, { stockOnFarmLbs: '2.1234', inventory: 5 })[7];
+  const result = await saveInventoryDraft(draft, productCapabilities(['inventory_admin']), {
+    put: () => assert.fail('Invalid local count must not be sent'), post: async () => ({ ok: true, localLineUpdate: true }),
+  });
+  assert.equal(result.partial, true);
+  assert.deepEqual(result.savedFields, ['inventory']);
+  assert.equal(acknowledgeSave(draft, draft, result.savedFields).values.stockOnFarmLbs, '2.1234');
 });

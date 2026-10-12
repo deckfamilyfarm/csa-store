@@ -13,6 +13,7 @@ import {
   INVENTORY_FIELDS,
   FULL_FARM_INVENTORY_FIELDS,
   inventorySaveSummary,
+  reviewFarmStockConflict,
 } from "./productWorkspace.js";
 import "./AdminProductsSection.css";
 
@@ -62,6 +63,7 @@ const PRODUCT_COLUMNS = [
   },
   { key: "inventory", label: "Full Farm Stock", width: 130, defaultVisible: true },
   { key: "stockOnFarm", label: "Stock on Farm", width: 165, defaultVisible: false, inventoryOnly: true },
+  { key: "stockOnFarmLbs", label: "On-farm inventory (lbs)", width: 165, defaultVisible: false, inventoryOnly: true },
   { key: "onSale", label: "Sale", width: 82, defaultVisible: true },
   { key: "saleDiscount", label: "Sale %", width: 96, defaultVisible: true },
 
@@ -393,6 +395,11 @@ export function AdminProductsSection({
   function patch(row, values) {
     setDrafts((prev) => patchProductDraft(prev, row, values));
   }
+  function reviewFarmCount(productId, keepDraft) {
+    setDrafts(prev => ({ ...prev, [productId]: reviewFarmStockConflict(prev[productId], keepDraft) }));
+    setSaveResults(prev => prev.filter(result => result.productId !== productId));
+    setMessage(keepDraft ? "Your farm count is retained. Save again to apply it. Other unsaved edits are unchanged." : "Latest farm count loaded. Other unsaved edits are unchanged.");
+  }
   async function refresh() {
     setReload((value) => value + 1);
     await onDataRefresh?.();
@@ -451,6 +458,11 @@ export function AdminProductsSection({
       />
     );
     switch (column.key) {
+      case "stockOnFarmLbs":
+        return <input className="input compact-farm-pounds" aria-label={`On-farm inventory (lbs): ${row.name}`}
+          type="text" inputMode="decimal" placeholder="Unknown" value={values.stockOnFarmLbs}
+          disabled={disabled || !capabilities.edit}
+          onChange={event => patch(row, { stockOnFarmLbs: event.target.value })} />;
       case "stockOnFarm":
         if (compact) return <div className="compact-farm-status" role="group" aria-label={`Stock on Farm: ${row.name}`}>
           {[[null, "?", "Not checked"], [true, "Yes", "On farm"], [false, "No", "Not on farm"]].map(([value, text, label]) =>
@@ -1130,6 +1142,15 @@ export function AdminProductsSection({
                   ? "Partially saved"
                   : "Failed"}
               {result.errors?.length ? ` — ${result.errors.join("; ")}` : ""}
+              {drafts[result.productId]?.meta.farmStockConflict && <span className="farm-stock-conflict" role="alert">
+                Latest saved: {drafts[result.productId].meta.farmStockConflict.stockOnFarmLbs ?? "Unknown"} lbs
+                {" · "}{drafts[result.productId].meta.farmStockConflict.stockOnFarm === null ? "Not checked" : drafts[result.productId].meta.farmStockConflict.stockOnFarm ? "Yes" : "No"}.
+                {" "}Your edit: {drafts[result.productId].values.stockOnFarmLbs || "Unknown"} lbs.
+                <span className="products-button-group">
+                  <button className="button secondary" type="button" disabled={saving} onClick={() => reviewFarmCount(result.productId, false)}>Use latest saved count</button>
+                  <button className="button secondary" type="button" disabled={saving} onClick={() => reviewFarmCount(result.productId, true)}>Keep my edit for next save</button>
+                </span>
+              </span>}
             </p>
           ))}
         </details>

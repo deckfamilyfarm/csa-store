@@ -672,6 +672,26 @@
 .compact-inventory-list .inventory-field-info-button > span { width: 16px; height: 16px; font-size: 10px; }
 .compact-inventory-feedback { display: block; font-size: 10px; line-height: 12px; color: #625c53; }
 .compact-inventory-feedback.failed { color: var(--barn); }
+.compact-farm-weight {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) 24px;
+  gap: 3px;
+  align-items: center;
+  max-width: 180px;
+  margin-top: 4px;
+}
+.compact-farm-weight-label { font-size: 11px; line-height: 13px; }
+.compact-farm-pounds.input {
+  width: 100%;
+  min-width: 0;
+  height: 36px;
+  min-height: 36px;
+  padding: 3px 5px;
+  border-radius: 5px;
+  font-size: 16px;
+}
+.farm-stock-conflict { display: block; margin-top: 6px; }
+.farm-stock-conflict .products-button-group { margin-top: 6px; flex-wrap: wrap; }
 
 @media (min-width: 601px) {
   .compact-inventory-workspace .products-heading {

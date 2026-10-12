@@ -25,9 +25,14 @@ export function CompactInventoryList({ rows, drafts, renderField, saving, saveRe
                 <span>Stock on farm</span><InventoryFieldInfo field="stockOnFarm" label="Stock on Farm" />
               </div>
               {renderField("stockOnFarm", row)}
+              <div className="compact-farm-weight">
+                <span className="compact-farm-weight-label">lbs</span>
+                {renderField("stockOnFarmLbs", row)}
+                <InventoryFieldInfo field="stockOnFarmLbs" label="On-farm inventory (lbs)" />
+              </div>
             </div>
             {(dirty || result) && <span className={`compact-inventory-feedback${result && !result.ok ? " failed" : ""}`} role="status">
-              {saving && dirty ? "Saving…" : result && !result.ok ? "Save failed — retry" : dirty ? "Unsaved" : "Saved"}
+              {saving && dirty ? "Saving…" : draft?.meta.farmStockConflict ? "Count changed — review below" : result && !result.ok ? "Save failed — retry" : dirty ? "Unsaved" : "Saved"}
             </span>}
           </div>
           <div className="compact-inventory-full-farm" role="group" aria-label={`Full Farm inventory: ${row.name}`}>

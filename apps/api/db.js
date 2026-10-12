@@ -3339,12 +3339,18 @@ export async function ensureVendorPricingSchema(connection = getPool()) {
 
 export async function ensureFarmStockSchema(connection = getPool()) {
   const migrate = async () => {
-    if (await columnExists(connection, "products", "stock_on_farm")) return;
-    try {
-      await connection.query("ALTER TABLE products ADD COLUMN stock_on_farm TINYINT(1) DEFAULT NULL");
-    } catch (error) {
-      // API startup and CLI workers can reach this additive migration together.
-      if (error.code !== "ER_DUP_FIELDNAME") throw error;
+    for (const [column, definition] of [
+      ["stock_on_farm", "TINYINT(1) DEFAULT NULL"],
+      ["stock_on_farm_lbs", "DECIMAL(10,3) DEFAULT NULL"],
+      ["farm_stock_revision", "INT NOT NULL DEFAULT 0"],
+    ]) {
+      if (await columnExists(connection, "products", column)) continue;
+      try {
+        await connection.query(`ALTER TABLE products ADD COLUMN ${column} ${definition}`);
+      } catch (error) {
+        // API startup and CLI workers can reach this additive migration together.
+        if (error.code !== "ER_DUP_FIELDNAME") throw error;
+      }
     }
   };
   if (connection !== getPool()) return migrate();
