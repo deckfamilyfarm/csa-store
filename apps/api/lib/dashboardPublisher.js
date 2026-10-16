@@ -38,8 +38,11 @@ function getDashboardEnv(key, fallback = "") {
 }
 
 export const DASHBOARD_SHEET_ID =
-  getDashboardEnv("GOOGLE_SHEETS_ID") ||
   getDashboardEnv("DASHBOARD_SHEET_ID") ||
+  "1ZQc0HYI150kKa6aiJ_bA4RLLhfJCL83QPeIPfEG0xXI";
+const DASHBOARD_SOURCE_SHEET_ID =
+  getDashboardEnv("DASHBOARD_SOURCE_SHEET_ID") ||
+  getDashboardEnv("GOOGLE_SHEETS_ID") ||
   "1plDSzQo8PZqQbCAt9Xb1BRd-cdJmkpoGwSmCFQvolUc";
 const DASHBOARD_SOURCE_GID = getDashboardEnv("DASHBOARD_SOURCE_GID", "707104494");
 const DASHBOARD_TARGET_TITLE =
@@ -5305,7 +5308,7 @@ async function refreshLatestSnapshotSnapSubscriberCount(connection) {
 }
 
 async function fetchSourceSheetRows() {
-  const url = `https://docs.google.com/spreadsheets/d/${DASHBOARD_SHEET_ID}/export?format=csv&gid=${DASHBOARD_SOURCE_GID}`;
+  const url = `https://docs.google.com/spreadsheets/d/${DASHBOARD_SOURCE_SHEET_ID}/export?format=csv&gid=${DASHBOARD_SOURCE_GID}`;
   const response = await fetchWithRetry(url, {}, "Dashboard source sheet");
   if (!response.ok) {
     const body = await response.text();
@@ -5317,11 +5320,14 @@ async function fetchSourceSheetRows() {
   return xlsx.utils.sheet_to_json(worksheet, { header: 1, raw: false, defval: "" });
 }
 
-async function fetchSheetRowsByTitle(accessToken, title, { valueRenderOption = "FORMULA" } = {}) {
+async function fetchSheetRowsByTitle(accessToken, title, {
+  spreadsheetId = DASHBOARD_SHEET_ID,
+  valueRenderOption = "FORMULA"
+} = {}) {
   const metadata = await sheetsRequest(
     accessToken,
     "GET",
-    `https://sheets.googleapis.com/v4/spreadsheets/${DASHBOARD_SHEET_ID}?fields=sheets(properties(title))`
+    `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?fields=sheets(properties(title))`
   );
   const exists = (metadata.sheets || []).some((sheet) => sheet?.properties?.title === title);
   if (!exists) return [];
@@ -5329,7 +5335,7 @@ async function fetchSheetRowsByTitle(accessToken, title, { valueRenderOption = "
   const payload = await sheetsRequest(
     accessToken,
     "GET",
-    `https://sheets.googleapis.com/v4/spreadsheets/${DASHBOARD_SHEET_ID}/values/${encodeURIComponent(`${title}!A:ZZ`)}?valueRenderOption=${encodeURIComponent(valueRenderOption)}`
+    `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(`${title}!A:ZZ`)}?valueRenderOption=${encodeURIComponent(valueRenderOption)}`
   );
   return Array.isArray(payload?.values) ? payload.values : [];
 }
@@ -7748,6 +7754,7 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
     const accessToken = await getSheetsAccessToken();
     const targetRows = await fetchSheetRowsByTitle(accessToken, DASHBOARD_TARGET_TITLE);
     const creditsRows = await fetchSheetRowsByTitle(accessToken, DASHBOARD_CREDITS_SOURCE_TITLE, {
+      spreadsheetId: DASHBOARD_SOURCE_SHEET_ID,
       valueRenderOption: "UNFORMATTED_VALUE"
     });
     const creditsMonthlyMap = buildDashboardCreditsMonthlyMap(

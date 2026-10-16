@@ -4603,7 +4603,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                 <summary>Dashboard publish details</summary>
                 <div className="audit-section">
                   <div className="small">
-                    Target tabs: Dashboard-auto-26, Dashboard-auto-26v2, Dashboard-auto-employee-credits26
+                    Published tabs: Dashboard-auto-26, Dashboard-auto-26v2, Dashboard-auto-employee-credits26. Editable forecast: gp_per_member.
                   </div>
                   {dashboardStatusMessage ? <div className="small">{dashboardStatusMessage}</div> : null}
                   {renderLocalLinePullJobContent(

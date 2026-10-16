@@ -6991,7 +6991,7 @@ router.get("/google-drive/status", requireAdminPermission(["pricing_admin", "loc
     const pricelistSpreadsheetId = pricelistSummary?.spreadsheetId ||
       pricelistSummary?.spreadsheetSummary?.match(/^([A-Za-z0-9_-]+) \(tab:/)?.[1] ||
       process.env.GOOGLE_SHEETS_SPREADSHEET_ID;
-    const dashboardSpreadsheetId = publications.dashboard?.summary?.spreadsheetId || DASHBOARD_SHEET_ID;
+    const dashboardSpreadsheetId = DASHBOARD_SHEET_ID;
     const spreadsheetUrl = (id) => id
       ? `https://docs.google.com/spreadsheets/d/${encodeURIComponent(id)}/edit`
       : null;

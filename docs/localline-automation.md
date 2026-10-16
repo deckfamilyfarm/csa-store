@@ -71,7 +71,7 @@ LIMIT 10;
 
 ## Environment
 
-The dashboard publisher accepts `GOOGLE_SERVICE_ACCOUNT_JSON` or `GOOGLE_APPLICATION_CREDENTIALS` for service-account auth. Dashboard sheet targeting can be set with `DASHBOARD_SHEET_ID`, `DASHBOARD_SOURCE_GID`, and `DASHBOARD_TARGET_TITLE`.
+The dashboard publisher accepts `GOOGLE_SERVICE_ACCOUNT_JSON` or `GOOGLE_APPLICATION_CREDENTIALS` for service-account auth. It publishes `Dashboard-auto-26`, `Dashboard-auto-26v2`, and `Dashboard-auto-employee-credits26` to the FFCSA dashboard spreadsheet (`1ZQc0HYI150kKa6aiJ_bA4RLLhfJCL83QPeIPfEG0xXI`) by default. The editable `gp_per_member` forecast tab is preserved during publishes. `DASHBOARD_SHEET_ID` overrides the output spreadsheet. The source weekly layout and `Credits` tab remain in the previous workbook (`1plDSzQo8PZqQbCAt9Xb1BRd-cdJmkpoGwSmCFQvolUc`); `DASHBOARD_SOURCE_SHEET_ID` overrides that input workbook, and `DASHBOARD_SOURCE_GID` selects its weekly source tab. The legacy `GOOGLE_SHEETS_ID` is accepted only as a source-workbook override.
 
 Optional automation tuning:
 
