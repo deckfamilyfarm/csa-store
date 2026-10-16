@@ -14,13 +14,13 @@ node --env-file=.env apps/api/scripts/runLocalLineAutomation.js --mode=full
 
 Modes:
 
-- `pull`: products/cache, fulfillments/drop sites, orders, reporting cache, and subscriber snapshot.
+- `pull`: products/cache, fulfillments/drop sites, orders, reporting cache, subscriber snapshot, and the pack-day team scorecard.
 - `dashboard`: publish the Google dashboard if the latest product, fulfillment, and order pulls completed recently.
 - `full`: run `pull`, then publish the dashboard.
 
 ## Cron Entries
 
-The deployed crontab is currently written in UTC with Pacific daylight-time comments. These entries schedule the daily pull at 3:40 AM PT during daylight time and the Monday dashboard publish at 4:35 AM PT during daylight time.
+The deployed crontab is currently written in UTC with Pacific daylight-time comments. These entries schedule the daily pull at 3:40 AM PT during daylight time and the Monday dashboard publish at 4:35 AM PT during daylight time. The daily pull also refreshes `auto-pack-day-team` after orders and subscribers are synced. A scorecard failure is recorded in the automation result without invalidating a successful source pull.
 
 ```cron
 # **************************************** #
@@ -72,6 +72,10 @@ LIMIT 10;
 ## Environment
 
 The dashboard publisher accepts `GOOGLE_SERVICE_ACCOUNT_JSON` or `GOOGLE_APPLICATION_CREDENTIALS` for service-account auth. It publishes `auto-weekly-summary`, `auto-monthly-summary`, and `auto-employee-credits` to the FFCSA dashboard spreadsheet (`1ZQc0HYI150kKa6aiJ_bA4RLLhfJCL83QPeIPfEG0xXI`) by default. The editable `auto-gp-per-member` forecast tab is preserved during publishes. The weekly and monthly tabs freeze rows 1–2 and columns A–B. `DASHBOARD_SHEET_ID` overrides the output spreadsheet. The source weekly layout and `Credits` tab remain in the previous workbook (`1plDSzQo8PZqQbCAt9Xb1BRd-cdJmkpoGwSmCFQvolUc`); `DASHBOARD_SOURCE_SHEET_ID` overrides that input workbook, and `DASHBOARD_SOURCE_GID` selects its weekly source tab. The legacy `GOOGLE_SHEETS_ID` is accepted only as a source-workbook override.
+
+The daily scorecard shows every cycle in the last two calendar months, newest first. Tuesday uses Monday–Tuesday Packout, Dairy and Frozen Packing, and Delivery task hours divided by Tuesday paid retail orders; Saturday uses Thursday–Saturday task hours divided by Friday and Saturday orders. Delivery is a driving proxy, not vehicle-only time. One shared target is the 25th percentile of combined packing and delivery minutes per order across all completed cycles since February 2026; a completed cycle needs both task groups recorded. The publish uses the previous completed Pacific calendar day and rechecks history so late Timesheets entries can correct a prior score. Run `npm --prefix apps/api run publish:pack-day` for a standalone refresh, or `node --env-file=.env apps/api/scripts/publishPackDayTeamView.js --dry-run` at the repository root to check the calculations without a Google write.
+
+Both summaries put subscriber counts, order averages, and sales versus the same-year average under GIVENS. Regular subscribers are active subscription plans excluding employee tiers; SNAP price-list members are counted separately. The subscription export does not name the membership tier, so employee subscriptions are identified by the current $100, $150, and $250 monthly plan amounts. Monthly order averages are weighted by order count, and monthly sales are compared with the average published month in the same year. The forecast tab has editable projected counts beside the current counts; its base GP and exit assumptions are below the main table.
 
 Optional automation tuning:
 

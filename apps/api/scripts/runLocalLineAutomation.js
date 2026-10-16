@@ -4,6 +4,7 @@ import path from "path";
 import { ensureLocalLineSyncSchema, getPool } from "../db.js";
 import {
   publishLocalLineDashboard,
+  publishPackDayTeamView,
   syncLocalLineSubscriberSnapshotCache
 } from "../lib/dashboardPublisher.js";
 import {
@@ -61,7 +62,8 @@ function buildPhaseDefs(mode) {
       { key: "products", label: "Pull Products" },
       { key: "fulfillments", label: "Pull Fulfillments" },
       { key: "orders", label: "Pull Orders" },
-      { key: "subscriptions", label: "Pull Subscribers" }
+      { key: "subscriptions", label: "Pull Subscribers" },
+      { key: "packEfficiency", label: "Publish Pack Day Scorecard" }
     );
   }
   if (mode === "dashboard" || mode === "full") {
@@ -423,6 +425,35 @@ export async function runLocalLineAutomation({ mode = "pull" } = {}) {
           }),
         get: getLocalLinePullJob
       });
+
+      await updateAutomationJob(job, {
+        phaseKey: "packEfficiency",
+        phaseLabel: "Publish Pack Day Scorecard",
+        status: "running",
+        percent: 0,
+        message: "Calculating pack and delivery minutes per order"
+      });
+      try {
+        job.result.packEfficiency = await publishPackDayTeamView();
+        await updateAutomationJob(job, {
+          phaseKey: "packEfficiency",
+          phaseLabel: "Publish Pack Day Scorecard",
+          status: "completed",
+          percent: 100,
+          message: "Pack day scorecard published"
+        });
+      } catch (error) {
+        const message = error?.message || "Pack day scorecard publish failed";
+        job.result.packEfficiency = { status: "failed", message };
+        await updateAutomationJob(job, {
+          phaseKey: "packEfficiency",
+          phaseLabel: "Publish Pack Day Scorecard",
+          status: "failed",
+          percent: 100,
+          message
+        }).catch(() => {});
+        console.warn("Pack day scorecard publish failed:", message);
+      }
     }
 
     if (normalizedMode === "dashboard") {

@@ -13,6 +13,13 @@ import {
 } from "./localLinePriceListMembers.js";
 import { loadDashboardQboPeriodMetrics } from "./qboDashboard.js";
 import { recordGoogleDrivePublish } from "./googleDrivePublishing.js";
+import {
+  PACK_DAY_TEAM_VIEW_TITLE,
+  buildPackDayCycles,
+  buildPackDayTeamViewValues,
+  pacificToday,
+  scorePackDayCycles
+} from "./packDayEfficiency.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -94,6 +101,7 @@ const DASHBOARD_SNAP_MANUAL_CREDIT_MIN_AMOUNT =
     0,
     Number.parseFloat(getDashboardEnv("DASHBOARD_SNAP_MANUAL_CREDIT_MIN_AMOUNT", "50")) || 50
   );
+const DASHBOARD_EMPLOYEE_SUBSCRIPTION_AMOUNTS = new Set([100, 150, 250]);
 const DASHBOARD_TOM_CULHANE_CASH_RECEIVED_EMAIL = normalizeDashboardText(
   getDashboardEnv("DASHBOARD_TOM_CULHANE_CASH_RECEIVED_EMAIL", "thomasabcxyz@yahoo.com")
 );
@@ -382,6 +390,11 @@ function isYmdInRange(value, start, end) {
 
 function isFeedAFriendAmount(amount) {
   return [100, 150, 250].includes(Number(amount));
+}
+
+// The export has no plan-name field; its Fulfillment Name is the same for every tier.
+export function isEmployeeSubscriberSnapshotRow(row = {}) {
+  return DASHBOARD_EMPLOYEE_SUBSCRIPTION_AMOUNTS.has(parseCurrencyCell(row.Total));
 }
 
 function isSnapSubscriberSnapshotRow(row = {}) {
@@ -973,7 +986,7 @@ function getMetricCellRefs(metricSheetRowsByLabel, labels, columnName) {
     .filter(Boolean);
 }
 
-function buildDashboardRows(
+export function buildDashboardRows(
   weeks,
   manualValueMap,
   weeklyKpiMap,
@@ -1056,12 +1069,7 @@ function buildDashboardRows(
               ? `=IF(${numOrdersRef}="","",MAX(0,${numOrdersRef}-${guestOrdersRef}))`
               : "";
           }
-        }
-      ]
-    },
-    {
-      section: "REVENUE",
-      rows: [
+        },
         {
           label: "New Subscribers",
           entry: "AUTO",
@@ -1079,6 +1087,15 @@ function buildDashboardRows(
           auto: (w) => subscriberWeeklyMap[w.start]?.exitingSubscribers
         },
         {
+          label: "Regular subscribers",
+          entry: "AUTO",
+          source: "Active subscription export excluding employee plans",
+          methodology: "Counts active subscription plans other than the employee tiers. SNAP price-list members are counted separately.",
+          valueType: "int",
+          summary: "latest",
+          auto: (w) => subscriberWeeklyMap[w.start]?.regularSubscribers
+        },
+        {
           label: "SNAP subscribers",
           entry: "AUTO",
           source: "Local Line SNAP price-list members",
@@ -1086,6 +1103,15 @@ function buildDashboardRows(
           valueType: "int",
           summary: "latest",
           auto: (w) => Number(subscriberWeeklyMap[w.start]?.snapSubscribers)
+        },
+        {
+          label: "Employee subscribers",
+          entry: "AUTO",
+          source: "Active employee-tier subscriptions",
+          methodology: "Counts active subscription export rows in the $100, $150, and $250 employee tiers.",
+          valueType: "int",
+          summary: "latest",
+          auto: (w) => subscriberWeeklyMap[w.start]?.employeeSubscribers
         },
         {
           label: "Total Subscribers",
@@ -1121,7 +1147,12 @@ function buildDashboardRows(
             if (!average) return null;
             return ((sales - average) / average) * 100;
           }
-        },
+        }
+      ]
+    },
+    {
+      section: "REVENUE",
+      rows: [
         {
           label: "Subscription Income",
           entry: "AUTO",
@@ -2006,7 +2037,7 @@ function buildMonthlyDashboardTimesheetMap(weeks = [], timesheetWeeklyMap = {}) 
   return Object.fromEntries(byMonth.entries());
 }
 
-function buildMonthlyDashboardSubscriberMap(weeks = [], subscriberWeeklyMap = {}) {
+export function buildMonthlyDashboardSubscriberMap(weeks = [], subscriberWeeklyMap = {}) {
   const byMonth = new Map();
   (weeks || []).forEach((week) => {
     const monthStart = getDashboardMonthStartYmd(week.start);
@@ -2017,6 +2048,12 @@ function buildMonthlyDashboardSubscriberMap(weeks = [], subscriberWeeklyMap = {}
     addDashboardMonthlyNumber(summary, "exitingSubscribers", source.exitingSubscribers);
     const snapSubscribers = Number(source.snapSubscribers);
     if (Number.isFinite(snapSubscribers)) summary.snapSubscribers = snapSubscribers;
+    if (source.regularSubscribers !== null && typeof source.regularSubscribers !== "undefined") {
+      summary.regularSubscribers = Number(source.regularSubscribers);
+    }
+    if (source.employeeSubscribers !== null && typeof source.employeeSubscribers !== "undefined") {
+      summary.employeeSubscribers = Number(source.employeeSubscribers);
+    }
     const totalSubscribers = Number(source.totalSubscribers);
     if (Number.isFinite(totalSubscribers)) summary.totalSubscribers = totalSubscribers;
     byMonth.set(monthStart, summary);
@@ -2563,7 +2600,7 @@ function getQboIncomeLineValue(qboPeriodMap = {}, period, label) {
   return value === null || typeof value === "undefined" ? null : Number(value);
 }
 
-function buildDashboardV2Rows({
+export function buildDashboardV2Rows({
   months = [],
   summaryPeriods = [],
   manualValueMap,
@@ -2577,6 +2614,7 @@ function buildDashboardV2Rows({
   generatedAt = new Date()
 } = {}) {
   const periods = [...summaryPeriods, ...months];
+  const yearlyAverageSalesByYear = buildYearlyAverageMap(months, monthlyKpiMap, "totalSales");
   const incomeLineLabels = collectQboIncomeLineLabels(qboPeriodMap);
   const expenseLineLabels = collectQboExpenseLineLabels(qboPeriodMap);
   const getPeriodSum = (period, getValue) => sumPeriodWeekValues(months, period, getValue);
@@ -2698,6 +2736,15 @@ function buildDashboardV2Rows({
             getPeriodSum(period, (month) => monthlySubscriberMap[month.start]?.exitingSubscribers)
         },
         {
+          label: "Regular subscribers",
+          entry: "AUTO",
+          source: "Active subscription export excluding employee plans",
+          methodology: "Counts active subscription plans other than the employee tiers. SNAP price-list members are counted separately.",
+          valueType: "int",
+          periodAuto: (period) =>
+            getPeriodLatest(period, (month) => monthlySubscriberMap[month.start]?.regularSubscribers ?? NaN)
+        },
+        {
           label: "SNAP subscribers",
           entry: "AUTO",
           source: "Local Line SNAP price-list members",
@@ -2706,12 +2753,56 @@ function buildDashboardV2Rows({
             getPeriodLatest(period, (month) => monthlySubscriberMap[month.start]?.snapSubscribers)
         },
         {
+          label: "Employee subscribers",
+          entry: "AUTO",
+          source: "Active employee-tier subscriptions",
+          methodology: "Counts active subscription export rows in the $100, $150, and $250 employee tiers.",
+          valueType: "int",
+          periodAuto: (period) =>
+            getPeriodLatest(period, (month) => monthlySubscriberMap[month.start]?.employeeSubscribers ?? NaN)
+        },
+        {
           label: "Total Subscribers",
           entry: "AUTO",
           source: "Subscriber export active as of month end + Local Line SNAP price-list members",
           valueType: "int",
           periodAuto: (period) =>
             getPeriodLatest(period, (month) => monthlySubscriberMap[month.start]?.totalSubscribers)
+        },
+        {
+          label: "Average items Per order",
+          entry: "AUTO",
+          source: "Local DB",
+          valueType: "int",
+          periodAuto: (period) => {
+            const orders = getPeriodSum(period, (month) => monthlyKpiMap[month.start]?.numOrders);
+            const items = getPeriodSum(period, (month) => monthlyKpiMap[month.start]?.totalItemsWeightedByOrder);
+            return orders ? Math.round(items / orders) : null;
+          }
+        },
+        {
+          label: "Average Order Amount",
+          entry: "AUTO",
+          source: "Order export Order Total",
+          valueType: "currency",
+          periodAuto: (period) => {
+            const orders = getPeriodSum(period, (month) => monthlyKpiMap[month.start]?.numOrders);
+            const amount = getPeriodSum(period, (month) => monthlyKpiMap[month.start]?.totalOrderAmountWeightedByOrder);
+            return orders ? round2(amount / orders) : null;
+          }
+        },
+        {
+          label: "Sales compared to yearly average",
+          entry: "AUTO",
+          source: "Local DB vs same-year monthly average",
+          valueType: "percent",
+          periodAuto: (period) => {
+            if (period.key?.endsWith(":total")) return null;
+            const sales = getPeriodSum(period, (month) => monthlyKpiMap[month.start]?.totalSales);
+            const monthCount = months.filter((month) => isWeekInDashboardSummaryPeriod(month, period)).length;
+            const average = Number(yearlyAverageSalesByYear[period.year] || 0) * monthCount;
+            return average && sales !== null ? ((sales - average) / average) * 100 : null;
+          }
         }
       ]
     },
@@ -5875,7 +5966,7 @@ async function loadVendorWeeklyMap(weeks) {
   );
 }
 
-async function buildSubscriberWeeklyMap(weeks) {
+export async function buildSubscriberWeeklyMap(weeks) {
   const pool = getPool();
   const snapshotWeekEnds = [...new Set(
     weeks.flatMap((week) => [week.end, addDaysYmd(week.end, -7)]).filter(Boolean)
@@ -5929,6 +6020,8 @@ async function buildSubscriberWeeklyMap(weeks) {
     const newSubscriberKeys = new Set();
     const exitingSubscriberKeys = new Set();
     const activeAsOfWeekEndKeys = new Set();
+    const employeeActiveAsOfWeekEndKeys = new Set();
+    const employeeActiveSnapshotKeys = new Set();
     let hasCreatedDates = false;
     let hasCancelledDates = false;
 
@@ -5939,6 +6032,10 @@ async function buildSubscriberWeeklyMap(weeks) {
       const cancelledDate = parseLocalLineExportDate(raw["Cancelled Date"]);
       if (Object.prototype.hasOwnProperty.call(raw, "Created")) hasCreatedDates = true;
       if (Object.prototype.hasOwnProperty.call(raw, "Cancelled Date")) hasCancelledDates = true;
+      const isEmployee = isEmployeeSubscriberSnapshotRow(raw);
+      if (isEmployee && String(row.status || "").trim().toLowerCase() === "active") {
+        employeeActiveSnapshotKeys.add(snapshotKey);
+      }
       if (
         createdDate &&
         String(createdDate) <= String(week.end) &&
@@ -5946,6 +6043,7 @@ async function buildSubscriberWeeklyMap(weeks) {
           (cancelledDate && String(cancelledDate) > String(week.end)))
       ) {
         activeAsOfWeekEndKeys.add(snapshotKey);
+        if (isEmployee) employeeActiveAsOfWeekEndKeys.add(snapshotKey);
       }
       if (isYmdInRange(createdDate, week.start, week.end)) {
         newSubscriberKeys.add(snapshotKey);
@@ -5955,13 +6053,17 @@ async function buildSubscriberWeeklyMap(weeks) {
       }
     }
 
+    const activeSubscribers = hasCreatedDates
+      ? activeAsOfWeekEndKeys.size
+      : Number(currentSummary?.activeSubscriberCount || 0);
+    const employeeSubscribers = hasCreatedDates
+      ? employeeActiveAsOfWeekEndKeys.size
+      : employeeActiveSnapshotKeys.size;
     result[week.start] = {
       snapSubscribers: Number(currentSummary?.snapSubscriberCount || 0),
-      totalSubscribers:
-        (hasCreatedDates
-          ? activeAsOfWeekEndKeys.size
-          : Number(currentSummary?.activeSubscriberCount || 0)) +
-        Number(currentSummary?.snapSubscriberCount || 0),
+      regularSubscribers: currentRows.length ? Math.max(0, activeSubscribers - employeeSubscribers) : null,
+      employeeSubscribers: currentRows.length ? employeeSubscribers : null,
+      totalSubscribers: activeSubscribers + Number(currentSummary?.snapSubscriberCount || 0),
       newSubscribers: hasCreatedDates
         ? newSubscriberKeys.size
         : currentSet && previousSet
@@ -7707,6 +7809,235 @@ export async function importLocalLineSubscriberHistory({
   } finally {
     connection.release();
   }
+}
+
+export async function buildPackDayTeamViewReport({ now = new Date() } = {}) {
+  const today = pacificToday(now);
+  const throughDate = addDaysYmd(today, -1);
+  const [orderRows] = await getPool().query(
+    `
+      SELECT fulfillment_date AS fulfillmentDate,
+             COUNT(DISTINCT local_line_order_id) AS orders
+      FROM local_line_order_reporting_entries
+      WHERE fulfillment_date >= ? AND fulfillment_date < ?
+        AND order_status = 'OPEN'
+        AND payment_status = 'PAID'
+        AND ${getDashboardRetailSalesPredicate()}
+      GROUP BY fulfillment_date
+      ORDER BY fulfillment_date
+    `,
+    ["2026-01-05", today]
+  );
+
+  const { config, status } = getTimesheetDbConfig();
+  if (!config) throw new Error(`Pack day scorecard requires Timesheets: ${status}`);
+  const timesheetPool = mysql.createPool({
+    ...config,
+    waitForConnections: true,
+    connectionLimit: 2
+  });
+  let laborRows;
+  try {
+    const approvedStatuses = String(TIMESHEET_APPROVED_STATUSES || "")
+      .split(",")
+      .map((value) => value.trim())
+      .filter(Boolean);
+    const params = ["2026-01-05", today, "%FFCSA%"];
+    const approvedSql = approvedStatuses.length
+      ? ` AND approved IN (${buildInClause(approvedStatuses)})`
+      : "";
+    params.push(...approvedStatuses);
+    [laborRows] = await timesheetPool.query(
+      `
+        SELECT task,
+               DATE_FORMAT(start_time, '%Y-%m-%d') AS workDate,
+               DATE_FORMAT(start_time, '%Y-%m-%d %H:%i:%s') AS startTime,
+               DATE_FORMAT(end_time, '%Y-%m-%d %H:%i:%s') AS endTime,
+               \`break\` AS breakMinutes, hours
+        FROM timesheets
+        WHERE start_time >= ? AND start_time < ?
+          AND enterprise LIKE ?${approvedSql}
+        ORDER BY start_time
+      `,
+      params
+    );
+  } finally {
+    await timesheetPool.end();
+  }
+
+  const cycles = buildPackDayCycles({ orderRows, laborRows, throughDate });
+  const scored = scorePackDayCycles(cycles, { throughDate });
+  const values = buildPackDayTeamViewValues(scored, { asOfDate: throughDate });
+  return { throughDate, cycles, scored, values };
+}
+
+export async function publishPackDayTeamView({ now = new Date() } = {}) {
+  const { throughDate, cycles, scored, values } = await buildPackDayTeamViewReport({ now });
+  const accessToken = await getSheetsAccessToken();
+  const sheetMetadata = await getOrCreateSheetMetadata(
+    accessToken,
+    DASHBOARD_SHEET_ID,
+    PACK_DAY_TEAM_VIEW_TITLE,
+    { afterTitle: DASHBOARD_EMPLOYEE_CREDITS_TARGET_TITLE }
+  );
+  const sheetId = Number(sheetMetadata?.properties?.sheetId);
+  if (!Number.isFinite(sheetId)) throw new Error("Pack day team view sheet ID is missing");
+
+  const currentRows = Number(sheetMetadata?.properties?.gridProperties?.rowCount || 0);
+  if (currentRows < values.length) {
+    await sheetsRequest(
+      accessToken,
+      "POST",
+      `https://sheets.googleapis.com/v4/spreadsheets/${DASHBOARD_SHEET_ID}:batchUpdate`,
+      { requests: [{
+        updateSheetProperties: {
+          properties: { sheetId, gridProperties: { rowCount: values.length } },
+          fields: "gridProperties.rowCount"
+        }
+      }] }
+    );
+  }
+
+  await sheetsRequest(
+    accessToken,
+    "POST",
+    `https://sheets.googleapis.com/v4/spreadsheets/${DASHBOARD_SHEET_ID}/values/${encodeURIComponent(`${PACK_DAY_TEAM_VIEW_TITLE}!A:J`)}:clear`,
+    {}
+  );
+  await sheetsRequest(
+    accessToken,
+    "PUT",
+    `https://sheets.googleapis.com/v4/spreadsheets/${DASHBOARD_SHEET_ID}/values/${encodeURIComponent(`${PACK_DAY_TEAM_VIEW_TITLE}!A1`)}?valueInputOption=USER_ENTERED`,
+    { range: `${PACK_DAY_TEAM_VIEW_TITLE}!A1`, majorDimension: "ROWS", values }
+  );
+
+  const navy = { red: 0.122, green: 0.306, blue: 0.471 };
+  const blue = { red: 0.184, green: 0.459, blue: 0.71 };
+  const pale = { red: 0.851, green: 0.882, blue: 0.949 };
+  const white = { red: 1, green: 1, blue: 1 };
+  const formatMetadata = await sheetsRequest(
+    accessToken,
+    "GET",
+    `https://sheets.googleapis.com/v4/spreadsheets/${DASHBOARD_SHEET_ID}?fields=sheets(properties(sheetId),conditionalFormats)`
+  );
+  const existingFormatCount = formatMetadata.sheets?.find((sheet) =>
+    Number(sheet.properties?.sheetId) === sheetId
+  )?.conditionalFormats?.length || 0;
+  const band = (row, color, foregroundColor) => ({
+    repeatCell: {
+      range: { sheetId, startRowIndex: row - 1, endRowIndex: row, startColumnIndex: 0, endColumnIndex: 6 },
+      cell: {
+        userEnteredFormat: {
+          backgroundColor: color,
+          textFormat: { bold: true, ...(foregroundColor ? { foregroundColor } : {}) },
+          verticalAlignment: "MIDDLE",
+          wrapStrategy: "WRAP"
+        }
+      },
+      fields: "userEnteredFormat(backgroundColor,textFormat,verticalAlignment,wrapStrategy)"
+    }
+  });
+  const requests = [
+    {
+      repeatCell: {
+        range: { sheetId, startRowIndex: 0, endRowIndex: Math.max(currentRows, values.length), startColumnIndex: 0, endColumnIndex: 10 },
+        cell: { userEnteredFormat: {} },
+        fields: "userEnteredFormat"
+      }
+    },
+    {
+      updateSheetProperties: {
+        properties: { sheetId, gridProperties: { frozenRowCount: 6, frozenColumnCount: 0 } },
+        fields: "gridProperties.frozenRowCount,gridProperties.frozenColumnCount"
+      }
+    },
+    band(1, navy, white),
+    band(2, pale),
+    band(6, blue, white),
+    band(8 + scored.rows.length, pale),
+    {
+      repeatCell: {
+        range: { sheetId, startRowIndex: 0, endRowIndex: 1, startColumnIndex: 0, endColumnIndex: 1 },
+        cell: { userEnteredFormat: { textFormat: { bold: true, fontSize: 16, foregroundColor: white } } },
+        fields: "userEnteredFormat.textFormat"
+      }
+    },
+    {
+      repeatCell: {
+        range: { sheetId, startRowIndex: 1, endRowIndex: 2, startColumnIndex: 1, endColumnIndex: 2 },
+        cell: { userEnteredFormat: { numberFormat: { type: "NUMBER", pattern: "0.0" }, textFormat: { bold: true, fontSize: 16 } } },
+        fields: "userEnteredFormat.numberFormat,userEnteredFormat.textFormat"
+      }
+    },
+    {
+      repeatCell: {
+        range: { sheetId, startRowIndex: 6, endRowIndex: 6 + scored.rows.length, startColumnIndex: 1, endColumnIndex: 2 },
+        cell: { userEnteredFormat: { numberFormat: { type: "NUMBER", pattern: "0" } } },
+        fields: "userEnteredFormat.numberFormat"
+      }
+    },
+    {
+      repeatCell: {
+        range: { sheetId, startRowIndex: 6, endRowIndex: 6 + scored.rows.length, startColumnIndex: 2, endColumnIndex: 5 },
+        cell: { userEnteredFormat: { numberFormat: { type: "NUMBER", pattern: "0.0" } } },
+        fields: "userEnteredFormat.numberFormat"
+      }
+    }
+  ];
+  for (const [startIndex, endIndex, pixelSize] of [
+    [0, 1, 165], [1, 2, 85], [2, 5, 145], [5, 6, 150], [6, 10, 40]
+  ]) {
+    requests.push({
+      updateDimensionProperties: {
+        range: { sheetId, dimension: "COLUMNS", startIndex, endIndex },
+        properties: { pixelSize },
+        fields: "pixelSize"
+      }
+    });
+  }
+  for (let index = existingFormatCount - 1; index >= 0; index -= 1) {
+    requests.push({ deleteConditionalFormatRule: { sheetId, index } });
+  }
+  for (const [index, phrase, backgroundColor, foregroundColor] of [
+    [0, "faster", { red: 0.851, green: 0.918, blue: 0.824 }, { red: 0.18, green: 0.43, blue: 0.2 }],
+    [1, "slower", { red: 1, green: 0.945, blue: 0.8 }, { red: 0.6, green: 0.32, blue: 0.06 }]
+  ]) {
+    requests.push({
+      addConditionalFormatRule: {
+        index,
+        rule: {
+          ranges: [{ sheetId, startRowIndex: 6, endRowIndex: 6 + scored.rows.length, startColumnIndex: 5, endColumnIndex: 6 }],
+          booleanRule: {
+            condition: { type: "TEXT_CONTAINS", values: [{ userEnteredValue: phrase }] },
+            format: { backgroundColor, textFormat: { foregroundColor } }
+          }
+        }
+      }
+    });
+  }
+  await sheetsRequest(
+    accessToken,
+    "POST",
+    `https://sheets.googleapis.com/v4/spreadsheets/${DASHBOARD_SHEET_ID}:batchUpdate`,
+    { requests }
+  );
+
+  return {
+    spreadsheetId: DASHBOARD_SHEET_ID,
+    sheetTitle: PACK_DAY_TEAM_VIEW_TITLE,
+    throughDate,
+    cycleCount: cycles.length,
+    targetMinutesPerOrder: scored.targetMinutesPerOrder === null
+      ? null
+      : round2(scored.targetMinutesPerOrder),
+    displayedCycleCount: scored.rows.length,
+    latest: scored.rows.slice(0, 2).map((cycle) => ({
+      cycleDate: cycle.cycleDate,
+      type: cycle.type,
+      orders: cycle.orders,
+      totalMinutesPerOrder: cycle.totalMinutesPerOrder === null ? null : round2(cycle.totalMinutesPerOrder)
+    }))
+  };
 }
 
 export async function publishLocalLineDashboard({ reportProgress = () => {} } = {}) {
