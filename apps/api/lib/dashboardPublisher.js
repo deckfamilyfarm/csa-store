@@ -48,12 +48,12 @@ const DASHBOARD_SOURCE_GID = getDashboardEnv("DASHBOARD_SOURCE_GID", "707104494"
 const DASHBOARD_TARGET_TITLE =
   getDashboardEnv("GOOGLE_SHEETS_TAB") ||
   getDashboardEnv("DASHBOARD_TARGET_TITLE") ||
-  "Dashboard-auto-26";
+  "auto-weekly-summary";
 const DASHBOARD_V2_TARGET_TITLE =
-  getDashboardEnv("DASHBOARD_V2_TARGET_TITLE") || `${DASHBOARD_TARGET_TITLE}v2`;
+  getDashboardEnv("DASHBOARD_V2_TARGET_TITLE") || "auto-monthly-summary";
 const DASHBOARD_EMPLOYEE_CREDITS_TARGET_TITLE =
   getDashboardEnv("DASHBOARD_EMPLOYEE_CREDITS_TARGET_TITLE") ||
-  "Dashboard-auto-employee-credits26";
+  "auto-employee-credits";
 const DASHBOARD_CREDITS_SOURCE_TITLE =
   getDashboardEnv("DASHBOARD_CREDITS_SOURCE_TITLE") || "Credits";
 const DASHBOARD_EMPLOYEE_CREDITS_YEAR =
@@ -6458,7 +6458,7 @@ async function writeDashboardToSheet(
   {
     targetTitle = DASHBOARD_TARGET_TITLE,
     placeAfterTitle = "",
-    frozenColumnCount = DASHBOARD_WEEK_START_COLUMN_INDEX,
+    frozenColumnCount = 2,
     weekStartColumnIndex = DASHBOARD_WEEK_START_COLUMN_INDEX
   } = {}
 ) {
@@ -6480,7 +6480,6 @@ async function writeDashboardToSheet(
     1
   );
   const gridColumnCount = Math.max(Number(sheetProperties?.gridProperties?.columnCount || 0), maxCols, 1);
-  const titleMergeEndCol = Math.min(4, maxCols);
 
   await sheetsRequest(
     accessToken,
@@ -6544,21 +6543,6 @@ async function writeDashboardToSheet(
       fields: "note"
     }
   });
-
-  if (titleMergeEndCol > 1) {
-    requests.push({
-      mergeCells: {
-        range: {
-          sheetId,
-          startRowIndex: 0,
-          endRowIndex: 1,
-          startColumnIndex: 0,
-          endColumnIndex: titleMergeEndCol
-        },
-        mergeType: "MERGE_ALL"
-      }
-    });
-  }
 
   requests.push(
     {
@@ -8001,7 +7985,7 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       {
         targetTitle: DASHBOARD_V2_TARGET_TITLE,
         placeAfterTitle: DASHBOARD_TARGET_TITLE,
-        frozenColumnCount: DASHBOARD_STATIC_COLUMN_COUNT,
+        frozenColumnCount: 2,
         weekStartColumnIndex: DASHBOARD_STATIC_COLUMN_COUNT
       }
     );
