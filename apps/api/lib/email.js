@@ -72,6 +72,14 @@ export function storefrontEmailConfigured() {
   return Boolean(createTransporter() && getSenderAddress());
 }
 
+export async function sendOperationalEmail({ to, subject, text, messageId } = {}) {
+  const transporter = createTransporter();
+  const from = getSenderAddress();
+  if (!transporter || !from) throw new Error("Operational email delivery is not configured.");
+  if (!to || !subject || !text) throw new Error("Operational email requires a recipient, subject, and text.");
+  return transporter.sendMail({ from, to, subject, text, ...(messageId ? { messageId } : {}) });
+}
+
 export async function sendStorefrontEmail(order) {
   const transporter = createTransporter();
   if (!transporter || !getSenderAddress()) throw new Error("Storefront email delivery is not configured.");

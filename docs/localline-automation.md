@@ -75,6 +75,20 @@ The dashboard publisher accepts `GOOGLE_SERVICE_ACCOUNT_JSON` or `GOOGLE_APPLICA
 
 The daily scorecard shows every cycle in the last two calendar months, newest first. Tuesday uses Monday–Tuesday Packout, Dairy and Frozen Packing, and Delivery task hours divided by Tuesday paid retail orders; Saturday uses Thursday–Saturday task hours divided by Friday and Saturday orders. Delivery is a driving proxy, not vehicle-only time. One shared target is the 25th percentile of combined packing and delivery minutes per order across all completed cycles since February 2026; a completed cycle needs both task groups recorded. The publish uses the previous completed Pacific calendar day and rechecks history so late Timesheets entries can correct a prior score. Run `npm --prefix apps/api run publish:pack-day` for a standalone refresh, or `node --env-file=.env apps/api/scripts/publishPackDayTeamView.js --dry-run` at the repository root to check the calculations without a Google write.
 
+## Pack-day efficiency email
+
+The brief report goes to `jdeck88@gmail.com` by default (`PACK_DAY_EFFICIENCY_EMAIL_TO` overrides it). It uses the same paid-order and Timesheets calculations as `auto-pack-day-team`, and includes the previous day's packing, delivery, total, and comparison with the shared target. If either labor category is missing, it says the efficiency is pending. Email uses the existing SMTP/Gmail configuration.
+
+Install the line in [`scripts/pack-day-efficiency-email.cron`](../scripts/pack-day-efficiency-email.cron) in the server's UTC crontab. It runs at 17:00 and 18:00 UTC on Wednesday and Sunday; `--scheduled` sends only when the local Pacific time is 10:00 AM, covering both daylight and standard time. This is after the daily 3:40 AM Pacific order pull. Cron output goes to `tmp/pack-day-efficiency-email.log`.
+
+Preview the Tuesday report without sending mail:
+
+```bash
+node --env-file=.env apps/api/scripts/emailPackDayEfficiency.js --dry-run --cycle-date=2026-10-13
+```
+
+For an intentional manual send, omit `--dry-run` and supply the cycle date. The scheduled command uses `--scheduled` and always selects the previous Pacific day.
+
 Both summaries put subscriber counts, order averages, and sales versus the same-year average under GIVENS. Regular subscribers are active subscription plans excluding employee tiers; SNAP price-list members are counted separately. The subscription export does not name the membership tier, so employee subscriptions are identified by the current $100, $150, and $250 monthly plan amounts. Monthly order averages are weighted by order count, and monthly sales are compared with the average published month in the same year. The forecast tab has editable projected counts beside the current counts; its base GP and exit assumptions are below the main table.
 
 Optional automation tuning:

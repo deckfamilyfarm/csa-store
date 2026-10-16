@@ -1,0 +1,4 @@
+# Server cron is UTC: 10 AM Pacific is 17:00 UTC in PDT or 18:00 UTC in PST.
+# --scheduled checks Pacific weekday/time and skips the alternate UTC hour.
+# Run Wednesday for Tuesday's cycle and Sunday for Saturday's cycle.
+0 17,18 * * 0,3 cd /home/jdeck/code/csa-store && /usr/bin/node --env-file=.env apps/api/scripts/emailPackDayEfficiency.js --scheduled >> /home/jdeck/code/csa-store/tmp/pack-day-efficiency-email.log 2>&1

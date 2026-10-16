@@ -23,6 +23,7 @@
     "run:scheduled-pricelist": "node --env-file=../../.env scripts/runScheduledPricelistReleases.js",
     "publish:dashboard": "node --env-file=../../.env scripts/runLocalLineAutomation.js --mode=dashboard",
     "publish:pack-day": "node --env-file=../../.env scripts/publishPackDayTeamView.js",
+    "email:pack-day": "node --env-file=../../.env scripts/emailPackDayEfficiency.js",
     "check:qbo": "node --env-file=../../.env scripts/checkQboConnection.js",
     "qbo:reauthorize": "node --env-file=../../.env scripts/reauthorizeQbo.js",
     "sync:timesheets-users": "node scripts/syncTimesheetsUsers.js",
