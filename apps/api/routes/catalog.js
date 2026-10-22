@@ -1735,12 +1735,30 @@ router.get("/catalog", async (_req, res) => {
     const pricingProfileByProductId = new Map(
       pricingProfileRows.map((row) => [Number(row.productId), row])
     );
+    let enterpriseActiveByProductId = new Map();
+    if (productIds.length) {
+      try {
+        const [activeRows] = await getPool().query(`SELECT s.product_id AS productId, r.output_json AS outputJson
+          FROM enterprise_pricing_product_state s JOIN enterprise_pricing_revisions r ON r.id=s.active_revision_id
+          WHERE s.product_id IN (?) AND r.status IN (?)`, [productIds,
+          process.env.CSA_LOCAL_ONLY === "true" ? ["active", "local-preview"] : ["active"]]);
+        enterpriseActiveByProductId = new Map(activeRows.map(row => [Number(row.productId), typeof row.outputJson === "string" ? JSON.parse(row.outputJson) : row.outputJson]));
+      } catch (error) {
+        if (!isMissingTableError(error, "enterprise_pricing_product_state")) throw error;
+      }
+    }
     const packageMetaByPackageId = new Map(
       packageMetaRows.map((row) => [Number(row.packageId), row])
     );
 
     const productPayload = productRows.map((row) => {
       const productPackages = packagesByProduct[row.id] || [];
+      const enterpriseActive = enterpriseActiveByProductId.get(Number(row.id));
+      const enterprisePackageById = new Map((enterpriseActive?.packages || []).map(pkg => [Number(pkg.packageId), pkg]));
+      const sellingPackages = enterpriseActive ? productPackages.map(pkg => {
+        const priced = enterprisePackageById.get(Number(pkg.id));
+        return priced?.localLineSaleCents == null ? pkg : { ...pkg, price: priced.localLineSaleCents / 100 };
+      }) : productPackages;
       const visiblePackages = productPackages.filter((pkg) => pkg.visible === 1 || pkg.visible === null);
       const priceCandidates = visiblePackages
         .map((pkg) => Number(pkg.price))
@@ -1807,6 +1825,13 @@ router.get("/catalog", async (_req, res) => {
           }
         : saleMeta;
 
+      const enterprisePackagePrices = (enterpriseActive?.packages || []).filter(pkg => pkg.localLineSaleCents != null);
+      const enterpriseMinimum = enterprisePackagePrices.length ? Math.min(...enterprisePackagePrices.map(pkg => pkg.localLineSaleCents)) / 100 : null;
+      const enterpriseRegularMinimum = enterprisePackagePrices.length ? Math.min(...enterprisePackagePrices.map(pkg => pkg.localLineRegularCents)) / 100 : null;
+      const enterpriseCustomerPrices = enterpriseActive && enterpriseMinimum !== null
+        ? Object.fromEntries(["guest", "member", "herdShare", "snap"].map(key => [key, { regular: enterpriseRegularMinimum, final: enterpriseMinimum, strikethrough: enterpriseMinimum < enterpriseRegularMinimum ? enterpriseRegularMinimum : null, onSale: enterpriseMinimum < enterpriseRegularMinimum, overridden: false }]))
+        : null;
+
       return {
         id: row.id,
         name: row.name,
@@ -1815,12 +1840,12 @@ router.get("/catalog", async (_req, res) => {
         category: categoryMap.get(row.categoryId) || null,
         vendorId: row.vendorId,
         vendor: vendorMap.get(row.vendorId) || null,
-        basePrice: basePrice !== null ? Number(basePrice.toFixed(2)) : null,
-        guestPrice,
-        memberPrice,
+        basePrice: enterpriseActive ? enterpriseActive.csaUnitCents / 100 : basePrice !== null ? Number(basePrice.toFixed(2)) : null,
+        guestPrice: enterpriseMinimum ?? guestPrice,
+        memberPrice: enterpriseMinimum ?? memberPrice,
         vendorGuestMarkup: markups.guestMarkup,
         vendorMemberMarkup: markups.memberMarkup,
-        packages: productPackages,
+        packages: sellingPackages,
         images:
           imageObjectsByProduct[row.id] ||
           mediaObjectsByProduct[row.id] ||
@@ -1844,9 +1869,9 @@ router.get("/catalog", async (_req, res) => {
           row.thumbnailUrl ||
           null,
         featured: featuredSet.has(row.id),
-        onSale: effectiveSaleMeta ? Boolean(effectiveSaleMeta.onSale) : saleSet.has(row.id),
-        saleDiscount: effectiveSaleMeta ? effectiveSaleMeta.saleDiscount : null,
-        customerPrices: hasResolvedPricingProfile ? pricingSnapshot.customerPrices : null,
+        onSale: enterpriseActive ? enterpriseMinimum < enterpriseRegularMinimum : effectiveSaleMeta ? Boolean(effectiveSaleMeta.onSale) : saleSet.has(row.id),
+        saleDiscount: enterpriseActive ? Number(enterpriseActive.saleBp || 0) / 10000 : effectiveSaleMeta ? effectiveSaleMeta.saleDiscount : null,
+        customerPrices: enterpriseCustomerPrices || (hasResolvedPricingProfile ? pricingSnapshot.customerPrices : null),
         rating: avgRating ? Math.round(avgRating * 10) / 10 : 0,
         reviews: productReviews
       };

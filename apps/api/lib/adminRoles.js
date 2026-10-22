@@ -25,6 +25,16 @@ export const ADMIN_ROLE_DEFINITIONS = [
     description: "Manage Products pricing, formulas, cached Local Line entries, and scheduled releases. Manual pushes require Local Line Push."
   },
   {
+    key: "pricing_editor",
+    label: "Pricing Editor",
+    description: "Edit and save enterprise pricing proposals without publishing."
+  },
+  {
+    key: "pricing_publisher",
+    label: "Pricing Publisher",
+    description: "Review and approve enterprise pricing proposals; destination Push grants are still required to publish."
+  },
+  {
     key: "local_pricelist_admin",
     label: "Local Product Pricing",
     description: "Manage local product details, package prices, and formula inputs in Products."

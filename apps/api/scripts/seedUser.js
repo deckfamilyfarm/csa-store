@@ -8,7 +8,9 @@ import { eq } from "drizzle-orm";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
+if (process.env.CSA_LOCAL_ONLY !== "true") {
+  dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
+}
 
 export async function ensureSeedUser() {
   const username = process.env.USER_SEED_USERNAME || process.env.USER_SEED_EMAIL || "member";

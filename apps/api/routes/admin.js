@@ -1,5 +1,8 @@
 import { requireProductPricingUnit } from '../lib/productPricingUnitInput.js';
 import productSyncRouter from "./productSync.js";
+import enterprisePricingRouter from "./enterprisePricing.js";
+import enterprisePromotionsRouter from "./enterprisePromotions.js";
+import { assertLegacyPricingPublicationAllowed, assertNoMigratedLegacySquarePublication } from "../lib/enterprisePricingService.js";
 import { saveInventoryToLocalLine } from "../lib/inventorySync.js";
 import { saveProductFarmStock } from "../lib/productFarmStock.js";
 import { farmInventorySnapshot } from "../lib/farmInventory.js";
@@ -200,6 +203,8 @@ router.use(async (_req, _res, next) => {
 });
 
 router.use("/product-sync", productSyncRouter);
+router.use("/enterprise-pricing", enterprisePricingRouter);
+router.use("/enterprise-promotions", enterprisePromotionsRouter);
 router.put("/products/:id/farm-stock", requireAdminPermission(["inventory_admin", "pricing_admin", "local_pricelist_admin"]), async (req, res) => {
   try { res.json(await saveProductFarmStock(req.params.id, req.body, req.admin)); }
   catch (error) { res.status(error.status || 400).json({ error: error.message, ...(error.farmStockConflict ? { farmStockConflict: error.farmStockConflict } : {}) }); }
@@ -6719,6 +6724,8 @@ router.get("/pricelist/pending-remote", requireAdmin, async (req, res) => {
 router.post("/pricelist/bulk-save", requireAdminPermission("pricing_admin"), async (req, res) => {
   const db = getDb();
   const rows = Array.isArray(req.body?.rows) ? req.body.rows : [];
+  try { await assertLegacyPricingPublicationAllowed(rows.map(row => row?.productId)); }
+  catch (error) { return res.status(error.status || 409).json({ error: error.message }); }
   const now = new Date();
   const savedProductIds = [];
 
@@ -6805,6 +6812,8 @@ router.post("/pricelist/apply-remote", requireAdminPermission("localline_push"),
       .map((value) => Number(value))
       .filter((value) => Number.isFinite(value))
   )];
+  try { await assertLegacyPricingPublicationAllowed(productIds); }
+  catch (error) { return res.status(error.status || 409).json({ error: error.message }); }
 
   const results = [];
   for (const productId of productIds) {
@@ -8497,6 +8506,7 @@ router.get("/square/matches", requireAdminPermission(["square_pull", "square_pus
 
 router.post("/square/products/preview", requireAdminPermission("square_push"), requireAdminPermission("square_pull"), async (req, res) => {
   try {
+    await assertLegacyPricingPublicationAllowed([Number(req.body?.productId)]);
     return res.json(await previewSquareProductCreation(Number(req.body?.productId), req.admin?.userId || req.admin?.adminId || null));
   } catch (error) {
     return res.status(error.status || 400).json({ error: error.message || "Unable to preview Square creation." });
@@ -8505,6 +8515,7 @@ router.post("/square/products/preview", requireAdminPermission("square_push"), r
 
 router.post("/square/products/:id/create", requireAdminPermission("square_push"), requireAdminPermission("square_pull"), async (req, res) => {
   try {
+    await assertLegacyPricingPublicationAllowed([Number(req.params.id)]);
     return res.json(await applySquareProductCreation(req.params.id, req.admin?.userId || req.admin?.adminId || null));
   } catch (error) {
     return res.status(error.status || 400).json({ error: error.message || "Unable to finish Square creation. Retry the same request." });
@@ -8560,6 +8571,11 @@ router.post("/square/audit-prices", requireAdminPermission(["square_pull", "squa
 
 router.post("/square/apply-prices", requireAdminPermission("square_push"), async (req, res) => {
   try {
+    if (req.body?.includeAllProducts || !Array.isArray(req.body?.packageIds) || !req.body.packageIds.length) await assertNoMigratedLegacySquarePublication();
+    else if (Array.isArray(req.body?.packageIds) && req.body.packageIds.length) {
+      const [candidateRows] = await getPool().query("SELECT DISTINCT product_id AS productId FROM packages WHERE id IN (?)", [req.body.packageIds]);
+      await assertLegacyPricingPublicationAllowed(candidateRows.map(row => row.productId));
+    }
     await ensureSquareSyncSchema();
     const result = await applySquarePrices({
       packageIds: Array.isArray(req.body?.packageIds) ? req.body.packageIds : [],
@@ -10746,6 +10762,7 @@ router.put("/products/:id", requireAdminPermission(["inventory_admin", "pricing_
 
 router.put('/products/:id/customer-prices', requireAdminPermission(['pricing_admin', 'local_pricelist_admin']), async (req, res) => {
   try {
+    await assertLegacyPricingPublicationAllowed([Number(req.params.id)]);
     await ensureProductPricingSchema();
     return res.json(await saveCustomerPriceOverrides(getPool(), Number(req.params.id), req.body?.customerPriceOverrides));
   } catch (error) {
@@ -10755,6 +10772,7 @@ router.put('/products/:id/customer-prices', requireAdminPermission(['pricing_adm
 
 router.put("/products/:id/markup", requireAdminPermission(["pricing_admin", "local_pricelist_admin"]), async (req, res) => {
   try {
+    await assertLegacyPricingPublicationAllowed([Number(req.params.id)]);
     await ensureProductPricingSchema();
     return res.json(await saveProductMarkupOverride(getPool(), Number(req.params.id), req.body?.markupOverride));
   } catch (error) {
@@ -10768,6 +10786,8 @@ router.put("/products/:id/pricing-profile", requireAdminPermission(["pricing_adm
   if (!Number.isFinite(productId)) {
     return res.status(400).json({ error: "Invalid product id" });
   }
+  try { await assertLegacyPricingPublicationAllowed([productId]); }
+  catch (error) { return res.status(error.status || 409).json({ error: error.message }); }
 
   const connection = await pool.getConnection();
   try {
@@ -10805,6 +10825,8 @@ router.post("/products/:id/push-to-localline", requireAdminPermission("localline
   if (!Number.isFinite(productId)) {
     return res.status(400).json({ error: "Invalid product id" });
   }
+  try { await assertLegacyPricingPublicationAllowed([productId]); }
+  catch (error) { return res.status(error.status || 409).json({ error: error.message }); }
 
   await ensureLocalLineSyncSchema().catch((error) => {
     console.warn("Local Line schema bootstrap skipped for /admin/products/:id/push-to-localline:", error.message);
@@ -11026,6 +11048,10 @@ router.put("/packages/:id", requireAdminPermission(["pricing_admin", "membership
 
   if (!existing) {
     return res.status(404).json({ error: "Package not found" });
+  }
+  if (["price", "unit", "numOfItems"].some(field => Object.hasOwn(updates, field))) {
+    try { await assertLegacyPricingPublicationAllowed([Number(existing.productId)]); }
+    catch (error) { return res.status(error.status || 409).json({ error: error.message }); }
   }
 
   try { await validateSavedProductVendor(pool, existing.productId); }

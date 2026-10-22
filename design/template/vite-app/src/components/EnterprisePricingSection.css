@@ -1,0 +1,233 @@
+.enterprise-pricing-page {
+  min-width: 0;
+  padding: clamp(16px, 2vw, 28px);
+}
+
+.enterprise-pricing-page .admin-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin-bottom: 18px;
+}
+
+.enterprise-pricing-page .admin-section-heading h2,
+.enterprise-pricing-page .admin-section-heading h3,
+.enterprise-pricing-page .admin-section-heading p {
+  margin: 0 0 6px;
+}
+
+.enterprise-pricing-page .admin-section-heading .admin-actions {
+  margin: 0;
+}
+
+.enterprise-pricing-filters,
+.enterprise-pricing-editor-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+  gap: 14px;
+}
+
+.enterprise-pricing-page label {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.enterprise-pricing-page label > .input {
+  width: 100%;
+  min-width: 0;
+}
+
+.enterprise-pricing-page label > input[type="checkbox"] {
+  justify-self: start;
+}
+
+.enterprise-pricing-table-wrap {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.enterprise-pricing-table {
+  min-width: 1180px;
+  border: 0;
+}
+
+.enterprise-pricing-table th,
+.enterprise-pricing-table td {
+  padding: 10px 12px;
+  vertical-align: top;
+}
+
+.enterprise-pricing-table td:first-child {
+  min-width: 170px;
+}
+
+.enterprise-pricing-product-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 260px;
+  white-space: nowrap;
+}
+
+.enterprise-pricing-product-line a {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.enterprise-pricing-sort,
+.enterprise-pricing-warning {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+}
+
+.enterprise-pricing-sort {
+  padding: 0;
+  color: inherit;
+  font-weight: inherit;
+  white-space: nowrap;
+}
+
+.enterprise-pricing-sort span { color: var(--muted); }
+
+.enterprise-pricing-warning {
+  flex: none;
+  padding: 2px;
+  color: #9a5a00;
+}
+
+.enterprise-pricing-warning-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgb(0 0 0 / 40%);
+}
+
+.enterprise-pricing-warning-dialog {
+  width: min(100%, 520px);
+  max-height: 85vh;
+  overflow: auto;
+  padding: 20px;
+}
+
+.enterprise-pricing-warning-dialog ul { margin-bottom: 0; }
+
+.enterprise-pricing-table td small {
+  display: block;
+  margin-top: 3px;
+}
+
+.enterprise-pricing-buy-value,
+.enterprise-pricing-buy-edit {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.enterprise-pricing-buy-value button,
+.enterprise-pricing-buy-edit button {
+  border: 0;
+  background: transparent;
+  color: var(--accent, #325b45);
+  font: inherit;
+  cursor: pointer;
+  padding: 2px;
+}
+
+.enterprise-pricing-buy-edit .input {
+  width: 88px;
+  min-width: 0;
+  padding: 5px;
+}
+
+.enterprise-pricing-editor {
+  min-width: 0;
+  margin-top: 20px;
+  padding: clamp(14px, 2vw, 24px);
+  box-shadow: none;
+}
+
+.enterprise-pricing-source-detail {
+  margin: 16px 0 22px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #faf7f1;
+}
+
+.enterprise-pricing-source-detail summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.enterprise-pricing-source-detail .admin-table {
+  min-width: 800px;
+}
+
+.enterprise-pricing-repeat-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr));
+  align-items: end;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+
+.enterprise-pricing-repeat-grid > .input {
+  width: 100%;
+  min-width: 0;
+}
+
+.enterprise-markup-cell { min-width: 115px; }
+.enterprise-pricing-page .enterprise-pricing-edit-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex: none;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  padding: 0;
+  color: var(--accent, #325b45);
+  cursor: pointer;
+}
+.enterprise-pricing-edit-icon:hover { background: #e8efe6; }
+.enterprise-pricing-edit-icon:focus-visible { outline: 2px solid var(--accent, #325b45); outline-offset: 2px; }
+.enterprise-markup-inline { width: 300px; white-space: normal; }
+.enterprise-markup-controls { display: grid; gap: 8px; }
+.enterprise-markup-controls input { max-width: 120px; }
+.enterprise-markup-controls button { justify-self: start; }
+.enterprise-markup-calculation {
+  margin: 12px 0;
+  padding: 12px;
+  border-left: 3px solid var(--accent, #325b45);
+  border-radius: 6px;
+  background: #f0f5ef;
+  white-space: normal;
+  line-height: 1.6;
+}
+.enterprise-markup-calculation small { display: block; }
+
+@media (max-width: 600px) {
+  .enterprise-pricing-page .admin-section-heading .admin-actions {
+    justify-content: flex-start;
+  }
+
+  .enterprise-pricing-filters,
+  .enterprise-pricing-editor-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+  }
+}

@@ -70,6 +70,15 @@ function centsToDollars(value) {
   return Number((numeric / 100).toFixed(2));
 }
 
+export function squareLocationPriceIssue(variation) {
+  const overrides = variation?.item_variation_data?.location_overrides || [];
+  const priced = overrides.find(row => row?.price_money != null || row?.pricing_type != null);
+  if (!priced) return "";
+  const amount = toNumber(priced.price_money?.amount);
+  const price = amount === null ? "" : ` (${normalizeCurrency(priced.price_money?.currency || configuredCurrency())} ${centsToDollars(amount).toFixed(2)})`;
+  return `Square location ${priced.location_id || "unknown"} has a separate price${price}. Review that location price in Square before publishing; CSA Store updates the base variation price.`;
+}
+
 function jsonString(value) {
   if (value === null || typeof value === "undefined") return null;
   try {
@@ -1152,6 +1161,8 @@ function buildSquarePriceAuditRow(row, packagesByProductId, metaByPackageId, mea
   if (!remote || remote.is_deleted || remote.id !== row.squareVariationId || remote.item_variation_data?.item_id !== row.squareItemId) {
     issues.push('Refresh the Square catalog: the linked variation is missing, deleted, or has a different parent.');
   }
+  const locationPriceIssue = squareLocationPriceIssue(remote);
+  if (locationPriceIssue) issues.push(locationPriceIssue);
   const unitPlan = planSquareUnit(expectedSquareUnit(resolvedProfile.usesSourcePricing, row.unitOfMeasure), remote, measurementUnits);
   issues.push(...unitPlan.issues);
   const proposedAmount = dollarsToCents(squareRetail.price);
@@ -1272,6 +1283,8 @@ function buildVariationUpdateObject(latestVariation, proposedAmount, currency, m
   if (nextObject.item_variation_data.pricing_type !== "FIXED_PRICING") {
     throw new Error("Square variation is not fixed-price.");
   }
+  const locationPriceIssue = squareLocationPriceIssue(nextObject);
+  if (locationPriceIssue) throw new Error(locationPriceIssue);
 
   if (measurementUnitId !== undefined && (nextObject.item_variation_data.measurement_unit_id || null) !== measurementUnitId) {
     const issue = unitChangeIssue(nextObject);

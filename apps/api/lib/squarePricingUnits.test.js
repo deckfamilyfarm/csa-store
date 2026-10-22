@@ -25,6 +25,14 @@ test('Lamb and Pork Bones with equal prices still require a reviewed unit correc
     assert.equal(variation.item_variation_data.measurement_unit_id, undefined);
   }
 });
+test('a location price override prevents a false synced result and a base-price publication', () => {
+  const atLocation = { ...variation, item_variation_data: { ...variation.item_variation_data,
+    measurement_unit_id: 'LB', location_overrides: [{ location_id: 'KING', price_money: { amount: 1000, currency: 'USD' }, pricing_type: 'FIXED_PRICING' }] } };
+  const audit = buildSquarePriceAuditRow({ ...row, squareRawJson: atLocation }, packages, new Map(), units);
+  assert.equal(audit.status, 'blocked');
+  assert.match(audit.message, /KING.*USD 10\.00/);
+  assert.throws(() => buildVariationUpdateObject(atLocation, 250, 'USD', 'LB'), /location KING has a separate price/);
+});
 test('sale rates remain per pound, while standard bag prices remain per package', () => {
   const sale = buildSquarePriceAuditRow({ ...row, saleOnSale: 1, saleSaleDiscount: .2 }, packages, new Map(), units);
   assert.equal(sale.proposedAmount, 200); assert.equal(sale.expectedUnit, 'lb');

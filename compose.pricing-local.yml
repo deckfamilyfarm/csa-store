@@ -1,0 +1,20 @@
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: csa-local-root-only
+      MYSQL_DATABASE: csa_pricing_local
+      MYSQL_USER: csa_local
+      MYSQL_PASSWORD: csa-local-only
+    ports:
+      - "127.0.0.1:33077:3306"
+    volumes:
+      - csa_pricing_mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  csa_pricing_mysql:

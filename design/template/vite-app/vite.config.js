@@ -5,6 +5,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5176,
+    strictPort: true,
     host: true,
     allowedHosts: ["store.deckfamilyfarm.com", "subscribe.deckfamilyfarm.com", "dropsites.deckfamilyfarm.com", "turkeys.deckfamilyfarm.com", "admin.deckfamilyfarm.com"],
     proxy: {

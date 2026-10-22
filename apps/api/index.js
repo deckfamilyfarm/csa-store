@@ -23,13 +23,15 @@ import { storefrontRouter, storefrontAdminRouter, storefrontStripeWebhook } from
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-dotenv.config({ path: path.resolve(__dirname, "../../.env") });
+if (process.env.CSA_LOCAL_ONLY !== "true") {
+  dotenv.config({ path: path.resolve(__dirname, "../../.env") });
+}
 const legacyDashboardEnvPath =
   process.env.LOCALLINE_DASHBOARD_ENV_PATH ||
   "/Users/jdeck/code/ffcsa_scripts/localline/.env";
 
 try {
-  if (legacyDashboardEnvPath && fs.existsSync(legacyDashboardEnvPath)) {
+  if (process.env.CSA_LOCAL_ONLY !== "true" && legacyDashboardEnvPath && fs.existsSync(legacyDashboardEnvPath)) {
     dotenv.config({ path: legacyDashboardEnvPath, override: false });
   }
 } catch (error) {
@@ -106,9 +108,15 @@ if (serveFrontend) {
   });
 }
 
-app.listen(port, () => {
+const onListening = () => {
   console.log(`API listening on :${port}`);
   if (serveFrontend) {
     console.log("Serving built frontend from design/template/vite-app/dist");
   }
-});
+};
+
+if (process.env.CSA_LOCAL_ONLY === "true") {
+  app.listen(port, "127.0.0.1", onListening);
+} else {
+  app.listen(port, onListening);
+}

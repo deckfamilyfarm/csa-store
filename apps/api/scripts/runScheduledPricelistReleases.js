@@ -3,6 +3,7 @@ import { fileURLToPath } from "url";
 import path from "path";
 import { getPool } from "../db.js";
 import { runDueScheduledPricelistBatches } from "../lib/scheduledPricelistReleases.js";
+import { runDueEnterprisePromotions } from "../lib/enterprisePromotions.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const LOCK_NAME = "csa-store:scheduled-pricelist-releases";
@@ -45,7 +46,8 @@ async function main() {
   try {
     const result = await runDueScheduledPricelistBatches();
     const productSync = await runDueProductSyncReleases({ lockConnection });
-    console.log(JSON.stringify({ ok: true, ...result, productSync }, null, 2));
+    const promotions = await runDueEnterprisePromotions();
+    console.log(JSON.stringify({ ok: true, ...result, productSync, promotions }, null, 2));
   } finally {
     await releaseLock(lockConnection);
   }

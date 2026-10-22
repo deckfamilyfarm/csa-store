@@ -12,6 +12,9 @@ import { CustomerPricingEditor } from './CustomerPricingEditor.jsx';
 import { categoryLabel } from "../categoryLabel.js";
 import { productCapabilities, buildProductDraftFromProduct, createDraftPackage, hydrateProductDraft, dirtyFields, hasDraftChanges, acknowledgeSave, saveProductDraft, saveInventoryDraft, INVENTORY_FIELDS, unsupportedScheduleFields, buildScheduleUpdate } from "./productWorkspace.js";
 import { AdminProductSyncSection } from "./AdminProductSyncSection.jsx";
+import { EnterprisePricingSection } from "./EnterprisePricingSection.jsx";
+import { EnterpriseReviewSection } from "./EnterpriseReviewSection.jsx";
+import { EnterprisePricingSettings } from "./EnterprisePricingSettings.jsx";
 import { acknowledgeSyncDrafts } from "./productSyncView.js";
 import {
   AdminMemberCreditsSection,
@@ -53,13 +56,19 @@ function canAccessAdminSection(roleKeys, section) {
         roleKeys.includes("localline_push") ||
         roleKeys.includes("square_pull") ||
         roleKeys.includes("square_push") ||
-        roleKeys.includes("pricing_admin")
+        roleKeys.includes("pricing_admin") ||
+        roleKeys.includes("pricing_publisher")
       );
     case "orders":
       return Array.isArray(roleKeys) && roleKeys.some((roleKey) => roleKey !== "content_editor");
     case "pricing":
     case "inventory":
       return productCapabilities(roleKeys).view;
+    case "enterprisePricing":
+    case "reviewPublish":
+      return roleKeys.some(role => ["pricing_editor", "pricing_publisher", "pricing_admin", "local_pricelist_admin"].includes(role));
+    case "enterprisePricingSettings":
+      return roleKeys.includes("pricing_admin");
     case "manual":
       return Array.isArray(roleKeys) && roleKeys.length > 0;
     case "membership":
@@ -95,6 +104,8 @@ function canAccessAdminSection(roleKeys, section) {
 
 function getDefaultAdminSection(roleKeys = []) {
   const order = [
+    "enterprisePricing",
+    "reviewPublish",
     "pricing",
     "inventory",
     "turkeyPreorders",
@@ -124,8 +135,9 @@ const ADMIN_NAV_GROUPS = [
     key: "store",
     label: "Store",
     items: [
-      { section: "pricing", label: "Pricing" },
+      { section: "enterprisePricing", label: "Pricing" },
       { section: "inventory", label: "Inventory" },
+      { section: "reviewPublish", label: "Review & Publish" },
       { section: "storefront", label: "Storefront" },
       { section: "turkeyPreorders", label: "Turkey Preorders" },
       { section: "localLine", label: "Local Line Data" },
@@ -159,6 +171,8 @@ const ADMIN_NAV_GROUPS = [
     key: "administration",
     label: "Administration",
     items: [
+      { section: "enterprisePricingSettings", label: "Pricing Settings" },
+      { section: "pricing", label: "Legacy Pricing" },
       { section: "reviews", label: "Reviews" },
       { section: "googleDrive", label: "Google Drive" },
       { section: "users", label: "Users" },
@@ -615,7 +629,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
     submitting: false
   });
   const [loading, setLoading] = useState(false);
-  const [activeSection, setActiveSection] = useState("pricing");
+  const [activeSection, setActiveSection] = useState("enterprisePricing");
   const isProductWorkspace = activeSection === "pricing" || activeSection === "inventory";
   const [openAdminNavGroup, setOpenAdminNavGroup] = useState("");
   const [manualFocusTopic, setManualFocusTopic] = useState("overview");
@@ -4500,6 +4514,18 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
                 }}
               />
             </>
+          )}
+
+          {activeSection === "enterprisePricing" && canAccessAdminSection(currentAdminRoles, "enterprisePricing") && (
+            <EnterprisePricingSection token={token} roles={currentAdminRoles} onOpenReview={() => setActiveSection("reviewPublish")} />
+          )}
+
+          {activeSection === "reviewPublish" && canAccessAdminSection(currentAdminRoles, "reviewPublish") && (
+            <EnterpriseReviewSection token={token} roles={currentAdminRoles} onOpenPricing={() => setActiveSection("enterprisePricing")} />
+          )}
+
+          {activeSection === "enterprisePricingSettings" && canAccessAdminSection(currentAdminRoles, "enterprisePricingSettings") && (
+            <EnterprisePricingSettings token={token} />
           )}
 
           {activeSection === "productSync" && canManageProductSync && (

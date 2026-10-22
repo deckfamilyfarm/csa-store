@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 
 export const STAGED_FIELDS = ["visible", "trackInventory", "inventory", "onSale", "saleDiscount"];
-export const SYNC_ROLES = ["localline_pull", "localline_push", "square_pull", "square_push", "pricing_admin"];
+export const SYNC_ROLES = ["localline_pull", "localline_push", "square_pull", "square_push", "pricing_admin", "pricing_publisher"];
 export const hasGrant = (roles, grant) => roles.includes("admin") || roles.includes(grant);
 export const canonical = value => JSON.stringify(stable(value));
 function stable(value) {
@@ -81,17 +81,23 @@ export function releaseStatus(actions) {
 // The database adapter checkpoints every transition. A restart rechecks remote state before sending.
 export async function executeProductActions(actions, io) {
   const checks = [];
+  let blocked = false;
   for (const action of actions) {
     if (["completed", "held", "cancelled"].includes(action.status)) continue;
     try {
       await io.save(action, { status: "working", message: "Checking local values, product match, and current remote values." });
       const current = await io.inspect(action);
       const check = preflight(action, current, await io.isLocalApplied());
-      if (check.status === "held") await io.save(action, check);
+      if (check.status === "held") { blocked = true; await io.save(action, check); }
       else checks.push({ action, current, check });
     } catch (error) {
+      blocked = true;
       await io.save(action, { status: error.hold ? "held" : "failed", message: error.message });
     }
+  }
+  if (io.requireAllReady && blocked) {
+    for (const { action } of checks) await io.save(action, { status: "held", message: "Another required destination failed preflight. Audit and approve both destinations again." });
+    return;
   }
   if (!checks.length) return;
   try {

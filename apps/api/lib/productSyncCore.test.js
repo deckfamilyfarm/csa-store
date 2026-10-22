@@ -84,6 +84,15 @@ test("a held platform does not stop eligible platform actions or get retried wit
   await executeProductActions(actions, h.io);
   assert.deepEqual(h.calls, [1]); assert.equal(actions[1].status, "held"); assert.equal(h.localApplies, 1);
 });
+test("coordinated enterprise pricing holds both destinations when either preflight fails", async () => {
+  const actions = [{ ...action("localline"), id: 1 }, { ...action(), id: 2 }];
+  const h = harness(actions, { mapping: a => a.platform === "square" ? { id: "changed" } : a.mapping });
+  h.io.requireAllReady = true;
+  await executeProductActions(actions, h.io);
+  assert.deepEqual(h.calls, []);
+  assert.equal(h.localApplies, 0);
+  assert.deepEqual(actions.map(a => a.status), ["held", "held"]);
+});
 test("restart after a lost response verifies remote success before resending", async () => {
   const actions = [{ ...action(), status: "working" }];
   const h = harness(actions, { localApplied: true });

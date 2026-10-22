@@ -10,9 +10,12 @@ import {
 import { requireProductVendor, localLineVendorId, confirmLocalLineVendor } from "./productVendor.js";
 import {
   loadApprovedSquarePricingRows, loadPackagesByProduct, buildSquarePriceAuditRow,
-  buildVariationUpdateObject, batchRetrieveSquareObjects, pushReviewedSquareVariation, upsertReturnedSquareObjects, loadSquareMeasurementUnits
+  buildVariationUpdateObject, batchRetrieveSquareObjects, pushReviewedSquareVariation, upsertReturnedSquareObjects, loadSquareMeasurementUnits,
+  squareLocationPriceIssue
 } from "./squareStoreSync.js";
-import { squareUnitSnapshot, unitChangeIssue } from './squarePricingUnits.js';
+import { squareUnitSnapshot, unitChangeIssue, planSquareUnit } from './squarePricingUnits.js';
+import { applyEnterpriseLocalLinePrices } from './enterprisePricingPublication.js';
+import { enterpriseRevisionMarker } from './enterprisePricingService.js';
 import { same, preflight } from "./productSyncCore.js";
 import { parseJson } from "./productSyncSchema.js";
 import { normalizeCustomerPriceOverrides } from './customerPriceOverrides.js';
@@ -24,6 +27,7 @@ const normalized = row => Object.fromEntries(Object.entries(row).map(([key, valu
 const sortById = rows => rows.slice().sort((a, b) => Number(a.id ?? a.packageId) - Number(b.id ?? b.packageId));
 export function localLineInputs(context, includeInventory = true, includeVisibility = true) {
   return {
+    ...(context.enterpriseRevisionId !== undefined ? { enterpriseRevisionId: context.enterpriseRevisionId } : {}),
     categoryName: context.categoryName || "",
     product: normalized(pick(context.product, ["id", "name", "description", ...(includeVisibility ? ["visible"] : []), ...(includeInventory ? ["trackInventory", "inventory"] : []), "vendorId", "categoryId", "isDeleted"])),
     vendor: normalized(pick(context.vendor, ["id", "name", "sourceMultiplier", "priceListMarkup", "guestMarkup", "memberMarkup"])),
@@ -100,7 +104,7 @@ function squareInputs(row, packages, audit) {
   };
 }
 const squareMapping = row => row ? pick(row, ["linkId", "squareItemId", "squareVariationId", "linkApprovedAt"]) : null;
-export async function prepareSquareActions({ productIds = [], staged = {}, includeAllProducts = false } = {}) {
+export async function prepareSquareActions({ productIds = [], staged = {}, includeAllProducts = false, enterpriseRevision = null } = {}) {
   const rows = (await loadApprovedSquarePricingRows([], { includeAllProducts: true })).filter(row =>
     (!productIds.length || productIds.includes(Number(row.productId))) &&
     (includeAllProducts || /deck family farm/i.test(row.vendorName || "")));
@@ -112,6 +116,35 @@ export async function prepareSquareActions({ productIds = [], staged = {}, inclu
     const before = buildSquarePriceAuditRow(row, packagesByProductId, metaByPackageId, units);
     const audit = buildSquarePriceAuditRow(next, packagesByProductId, metaByPackageId, units);
     const remote = parseJson(row.squareRawJson);
+    if (enterpriseRevision && Number(row.productId) === enterpriseRevision.productId) {
+      const packagePrice = enterpriseRevision.output.packages.find(pkg => pkg.packageId === Number(row.packageId));
+      const unitPlan = planSquareUnit(enterpriseRevision.input.pricingUnit, remote, units);
+      const problems = [...unitPlan.issues];
+      if (!packagePrice || packagePrice.squareVariationCents === null) problems.push("Approved Square package price is missing.");
+      if (!remote || remote.is_deleted || remote.id !== row.squareVariationId || remote.item_variation_data?.item_id !== row.squareItemId) problems.push("Approved Square variation mapping changed or is missing.");
+      if (row.squarePricingType !== "FIXED_PRICING") problems.push("Square variation is not fixed-price.");
+      const locationIssue = squareLocationPriceIssue(remote);
+      if (locationIssue) problems.push(locationIssue);
+      const amount = packagePrice?.squareVariationCents;
+      let frozenDesired = null;
+      if (!problems.length) {
+        try { frozenDesired = squareProjection(buildVariationUpdateObject(remote, amount, audit.currency, unitPlan.proposed.id), units); }
+        catch (error) { problems.push(error.message); }
+      }
+      const current = squareProjection(remote, units);
+      const baseline = { ...squareInputs(row, packagesByProductId.get(Number(row.productId)) || [], before), enterpriseRevisionId: enterpriseRevision.id };
+      return {
+        direction: "outgoing", platform: "square", kind: "price", productId: Number(row.productId), productName: row.productName,
+        packageId: Number(row.packageId), packageName: audit.packageName, vendorName: row.vendorName,
+        enterpriseRevisionId: enterpriseRevision.id,
+        status: problems.length ? "blocked" : same(current, frozenDesired) ? "synced" : "changed",
+        message: problems.join(" "), staged: {}, localBefore: baseline, localAfter: baseline,
+        mapping: squareMapping(row), remoteBefore: current, desired: frozenDesired,
+        payload: { amount, currency: audit.currency, sellingUnit: unitPlan.proposed },
+        display: { current: { price: audit.remotePrice, currency: audit.currency, sellingUnit: unitPlan.current.unit },
+          proposed: { price: amount == null ? null : amount / 100, currency: audit.currency, sellingUnit: enterpriseRevision.input.pricingUnit }, basis: "enterprise-pricing" }
+      };
+    }
     let desired = null;
     try {
       desired = remote && audit.status !== "blocked" ? squareProjection(buildVariationUpdateObject(remote, audit.proposedAmount, audit.currency, audit.proposedUnit.id), units) : null;
@@ -128,9 +161,10 @@ export async function prepareSquareActions({ productIds = [], staged = {}, inclu
     };
   });
 }
-export async function prepareLocalLineAction(product, staged = {}, { onRefresh } = {}) {
+export async function prepareLocalLineAction(product, staged = {}, { onRefresh, enterpriseRevision = null } = {}) {
   if (process.env.LOCALLINE_TEST === "true" || process.env.LOCALLINE_UPDATE_PRICES === "false") throw new Error("Local Line publishing is disabled by server configuration.");
   const context = await loadLocalLineSyncContext(getDb(), product.id);
+  if (enterpriseRevision) context.enterpriseRevisionId = enterpriseRevision.id;
   requireProductVendor(context.product, context.vendor);
   if (!context.remoteId) {
     const [attempts] = await getPool().query(`SELECT ra.checkpoint_json FROM product_sync_release_actions ra
@@ -139,10 +173,12 @@ export async function prepareLocalLineAction(product, staged = {}, { onRefresh }
   }
   if (context.categoryName?.trim().toLowerCase() === "membership" || context.product.isDeleted) throw new Error("Membership and deleted products are excluded from product sync.");
   const next = stageLocalLineContext(context, staged);
+  if (enterpriseRevision) next.enterpriseRevisionId = enterpriseRevision.id;
   const includeInventory = !context.remoteId || ["inventory", "trackInventory"].some(key => Object.hasOwn(staged, key));
   const token = await getLocalLineAccessToken();
   next.localLineVendorId = await resolveLocalLineVendor(next, token);
   const remote = context.remoteId ? await fetchLocalLineProduct(context.remoteId, token) : null;
+  if (enterpriseRevision && !remote) throw new Error("Enterprise pricing needs an approved Local Line product and package mapping before publication.");
   // A pricing/image approval should not freeze visibility when no visibility change was reviewed.
   const includeVisibility = !remote || Object.hasOwn(staged, "visible") || Boolean(remote.visible) !== Boolean(next.product.visible);
   if (remote?.is_deleted) throw new Error("The Local Line product was deleted. Review its link first.");
@@ -151,7 +187,8 @@ export async function prepareLocalLineAction(product, staged = {}, { onRefresh }
   if (remote) await upsertLocalLineProductMeta(getDb(), product.id, context.remoteId, { rawJson: JSON.stringify(remote), lastSyncedAt: new Date() });
   let payload, createPayload = null;
   if (remote) {
-    payload = { ...buildLocalLinePricePayload(next, remote, next.sale), ...buildInventoryPayload({
+    const prices = buildLocalLinePricePayload(next, remote, next.sale);
+    payload = { ...(enterpriseRevision ? applyEnterpriseLocalLinePrices(prices, next, enterpriseRevision) : prices), ...buildInventoryPayload({
       ...(includeInventory ? { inventory: next.product.inventory, trackInventory: next.product.trackInventory } : {}),
       ...(includeVisibility ? { visible: next.product.visible } : {})
     }) };
@@ -167,6 +204,7 @@ export async function prepareLocalLineAction(product, staged = {}, { onRefresh }
   const action = {
     direction: "outgoing", platform: "localline", kind: remote ? "update" : "create", productId: Number(product.id), productName: product.name,
     vendorName: product.vendorName, staged, includeInventory, includeVisibility, mapping: localLineMapping(context),
+    ...(enterpriseRevision ? { enterpriseRevisionId: enterpriseRevision.id } : {}),
     localBefore: localLineInputs(context, includeInventory, includeVisibility), localAfter: localLineInputs(next, includeInventory, includeVisibility),
     payload, createPayload, imageSources: imagesMatch ? [] : imageSources,
     remoteBefore: remote ? { fields: localLineProjection(remote, payload), images: imageSources.length && !imagesMatch ? imagesOf(remote) : null } : null,
@@ -188,6 +226,8 @@ export async function inspectAction(action, saveCheckpoint = async () => {}) {
     }
     const objects = await batchRetrieveSquareObjects([action.mapping.squareVariationId]);
     const remote = objects.find(obj => obj.id === action.mapping.squareVariationId) || null;
+    const locationPriceIssue = squareLocationPriceIssue(remote);
+    if (locationPriceIssue) throw Object.assign(new Error(locationPriceIssue), { hold: true });
     if ((remote?.item_variation_data?.measurement_unit_id || null) !== action.payload.sellingUnit.id && unitChangeIssue(remote)) {
       throw Object.assign(new Error(unitChangeIssue(remote)), { hold: true });
     }
@@ -196,6 +236,7 @@ export async function inspectAction(action, saveCheckpoint = async () => {}) {
       const { packagesByProductId, metaByPackageId } = await loadPackagesByProduct([action.productId]);
       const audit = buildSquarePriceAuditRow(row, packagesByProductId, metaByPackageId, units);
       local = squareInputs(row, packagesByProductId.get(action.productId) || [], audit);
+      if (action.enterpriseRevisionId) local.enterpriseRevisionId = await enterpriseRevisionMarker(action.productId, action.enterpriseRevisionId);
     }
     return { local, mapping: squareMapping(row), remote: squareProjection(remote, units), desired: action.desired, object: remote };
   }
@@ -203,6 +244,7 @@ export async function inspectAction(action, saveCheckpoint = async () => {}) {
     await finishCreatedLink(action, checkpoint, await getLocalLineAccessToken(), saveCheckpoint);
   }
   const context = await loadLocalLineSyncContext(getDb(), action.productId);
+  if (action.enterpriseRevisionId) context.enterpriseRevisionId = await enterpriseRevisionMarker(action.productId, action.enterpriseRevisionId);
   try {
     requireProductVendor(context.product, context.vendor);
     if (!localLineVendorId(action.payload)) throw new Error("This approval does not include a vendor. Run a new audit and approve the vendor before publishing.");

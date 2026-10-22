@@ -54,8 +54,10 @@ What to edit where
   - update `styles.css`
 
 Local testing
-- Start the app:
-  - `npm run dev`
+- For pricing refactors, use the [local-only MySQL workflow](docs/local-pricing-refactor.md).
+- For the full production clone, price comparisons, and repeatable production migration, use [the pricing migration guide](docs/pricing-migration.md). `npm run db:local:clone` creates and selects a fresh isolated clone; restart `npm run dev` afterward.
+- The new enterprise pricing model, approval flow, migration rules, and sale pilot gate are in [enterprise pricing](docs/enterprise-pricing.md).
+- Start the app with `npm run dev` after its local database setup.
 - Open the subscribe page locally:
   - `http://localhost:5176/?experience=subscribe`
 - Production subscribe host:
@@ -102,15 +104,16 @@ Admin panel
 
 Run locally (dev)
 1) `npm install`
-2) Copy `.env.example` to `.env` and fill in DB creds
-3) `npm run dev`
+2) `npm run db:local:up`
+3) `npm run db:local:init`
+4) `npm run dev`
 
 The dev server defaults to port 5176.
 
 Run the API (dev)
 1) `cd apps/api`
 2) `npm install`
-3) Copy `.env.example` to `.env` and fill in DB creds
+3) From the repository root, run `npm run db:local:up` and `npm run db:local:init`
 4) `npm run dev`
 
 Run online (preview/prod)
@@ -173,8 +176,8 @@ Store pricelist sync
 - Dry-run the store sync with `npm run sync:killdeer-pricelist`.
 - Apply the sync only when ready with `npm run sync:killdeer-pricelist -- --write`.
 
-Products workspace
-- Open **Store → Pricing** or **Store → Inventory** from the first two Store menu items. They share filters, selections, paging, and drafts; Membership levels remain separate. The active top menu displays its selected section, such as **Store: Inventory** or **Ops: Vendors**, and the breadcrumb matches.
+Legacy products workspace
+- Open **Store → Pricing** for enterprise costs, retail and wholesale prices, package calculations, and sales. Open **Store → Review & Publish** to approve and synchronize enterprise pricing. The older product grid remains under **Administration → Legacy Pricing** and shares filters, selections, paging, and drafts with **Store → Inventory** for unmigrated products. Membership levels remain separate.
 - Use inline controls for formula inputs, stock, visibility, sales, and single-package prices. **Details** shares those edits and manages descriptions, images, and multiple packages.
 - **Save Local Changes** saves to CSA Store and retains failed fields for retry. **Review & Push** lets you select products and review whether each creates or updates a Local Line record. Results retain errors and Local Line IDs.
 - **Schedule Changes** supports stock, tracking, visibility, and sales. Save formula/package/Details changes first, then use **Schedule Pending Pushes**. Scheduled releases apply local values and push at the selected time.

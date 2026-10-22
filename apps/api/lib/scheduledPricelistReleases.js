@@ -869,6 +869,10 @@ export async function pushItemRemote(item, {
   db = getDb(), pool = getPool(), pushProduct = createLocalLineProductFromStoreProduct
 } = {}) {
   try {
+    if (pool === getPool()) {
+      const { assertLegacyPricingPublicationAllowed } = await import("./enterprisePricingService.js");
+      await assertLegacyPricingPublicationAllowed([item.productId]);
+    }
     // The local stage has already applied the scheduled fields. Use the same
     // confirmed create/update path as manual pushes, including pending images.
     const remoteResult = await pushProduct(db, item.productId);

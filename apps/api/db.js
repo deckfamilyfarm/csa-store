@@ -3,6 +3,7 @@ import { drizzle } from "drizzle-orm/mysql2";
 import { relations } from "drizzle-orm";
 import * as schema from "./schema.js";
 import { ADMIN_ROLE_DEFINITIONS } from "./lib/adminRoles.js";
+import { isLocalPricingDatabaseName } from "./lib/localPricingDatabase.js";
 
 let db;
 let pool;
@@ -3238,6 +3239,19 @@ async function runLiabilityReleaseSchemaBootstrap(connection) {
 
 export function initDb() {
   if (db) return db;
+
+  if (process.env.CSA_LOCAL_ONLY === "true") {
+    const expected = {
+      STORE_DB_HOST: "127.0.0.1",
+      STORE_DB_PORT: "33077",
+      STORE_DB_USER: "csa_local",
+      STORE_DB_PASSWORD: "csa-local-only"
+    };
+    if (Object.entries(expected).some(([key, value]) => process.env[key] !== value) ||
+        !isLocalPricingDatabaseName(process.env.STORE_DB_DATABASE)) {
+      throw new Error("Local pricing mode refused a database outside the dedicated localhost MySQL instance.");
+    }
+  }
 
   pool = mysql.createPool({
     host: process.env.STORE_DB_HOST,

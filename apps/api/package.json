@@ -4,7 +4,8 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "node index.js",
+    "dev": "node ../../scripts/local-pricing/api.mjs",
+    "dev:connected": "node index.js",
     "start": "node index.js",
     "seed:admin": "node scripts/seedAdmin.js",
     "seed:user": "node scripts/seedUser.js",

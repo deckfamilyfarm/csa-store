@@ -3,9 +3,9 @@
 This API serves the CSA storefront catalog and admin endpoints.
 
 Setup
-1) Copy `.env.example` to `.env` and fill in DB creds.
+1) From the repository root, run `npm run db:local:up` and `npm run db:local:init`.
 2) `npm install`
-3) `npm run dev`
+3) `npm run dev` for the isolated local API. See `../../docs/local-pricing-refactor.md`.
 
 Optional: seed admin
 - Set `AUTO_SEED_ADMIN=true` in `.env`, then start the server.
