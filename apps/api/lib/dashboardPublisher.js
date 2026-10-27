@@ -1041,8 +1041,8 @@ export function buildDashboardRows(
     {
       section: "GIVENS",
       rows: [
-        { label: "Errors/week", entry: "MANUAL", source: "Manual QA", rowLabel: "Errors/week" },
         { label: "Positive responses/week", entry: "MANUAL", source: "Manual QA", rowLabel: "Positive responses/week" },
+        { label: "Errors/week", entry: "MANUAL", source: "Manual QA", rowLabel: "Errors/week" },
         { label: "Num Orders", entry: "AUTO", source: "Local DB", valueType: "int", summary: "sum", auto: (w) => Number(weeklyKpiMap[w.start]?.numOrders) },
         {
           label: "Orders Compared to Yearly Average",
@@ -2703,14 +2703,6 @@ export function buildDashboardV2Rows({
       section: "GIVENS",
       rows: [
         {
-          label: "Errors/week",
-          entry: "MANUAL",
-          source: "Manual QA",
-          rowLabel: "Errors/week",
-          valueType: "int",
-          periodAuto: (period) => sumPeriodManualValues(months, period, manualValueMap, "Errors/week")
-        },
-        {
           label: "Positive responses/week",
           entry: "MANUAL",
           source: "Manual QA",
@@ -2718,6 +2710,14 @@ export function buildDashboardV2Rows({
           valueType: "int",
           periodAuto: (period) =>
             sumPeriodManualValues(months, period, manualValueMap, "Positive responses/week")
+        },
+        {
+          label: "Errors/week",
+          entry: "MANUAL",
+          source: "Manual QA",
+          rowLabel: "Errors/week",
+          valueType: "int",
+          periodAuto: (period) => sumPeriodManualValues(months, period, manualValueMap, "Errors/week")
         },
         {
           label: "New Subscribers",
@@ -3504,14 +3504,6 @@ function buildQboDashboardRows({
       section: "GIVENS",
       rows: [
         {
-          label: "Errors/week",
-          entry: "MANUAL",
-          source: "Manual QA",
-          rowLabel: "Errors/week",
-          valueType: "int",
-          periodAuto: (period) => sumPeriodManualValues(weeks, period, manualValueMap, "Errors/week")
-        },
-        {
           label: "Positive responses/week",
           entry: "MANUAL",
           source: "Manual QA",
@@ -3519,6 +3511,14 @@ function buildQboDashboardRows({
           valueType: "int",
           periodAuto: (period) =>
             sumPeriodManualValues(weeks, period, manualValueMap, "Positive responses/week")
+        },
+        {
+          label: "Errors/week",
+          entry: "MANUAL",
+          source: "Manual QA",
+          rowLabel: "Errors/week",
+          valueType: "int",
+          periodAuto: (period) => sumPeriodManualValues(weeks, period, manualValueMap, "Errors/week")
         },
         {
           label: "New Subscribers",
