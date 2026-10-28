@@ -14,6 +14,12 @@ import {
 import { loadDashboardQboPeriodMetrics } from "./qboDashboard.js";
 import { recordGoogleDrivePublish } from "./googleDrivePublishing.js";
 import {
+  FULFILLMENT_EFFICIENCY_LABEL,
+  FULFILLMENT_EFFICIENCY_NOTE,
+  getFulfillmentLaborMinutes,
+  buildFulfillmentEfficiencyFormula
+} from "./dashboardFulfillmentEfficiency.js";
+import {
   PACK_DAY_TEAM_VIEW_TITLE,
   buildPackDayCycles,
   buildPackDayTeamViewValues,
@@ -1044,6 +1050,29 @@ export function buildDashboardRows(
         { label: "Errors/week", entry: "MANUAL", source: "Manual QA", rowLabel: "Errors/week" },
         { label: "Positive responses/week", entry: "MANUAL", source: "Manual QA", rowLabel: "Positive responses/week" },
         { label: "Num Orders", entry: "AUTO", source: "Local DB", valueType: "int", summary: "sum", auto: (w) => Number(weeklyKpiMap[w.start]?.numOrders) },
+        {
+          label: FULFILLMENT_EFFICIENCY_LABEL,
+          entry: "AUTO",
+          source: "Timesheets labor minutes ÷ Num Orders",
+          valueType: "minutes",
+          note: FULFILLMENT_EFFICIENCY_NOTE,
+          formula: ({ week, columnName, metricSheetRowsByLabel }) => buildFulfillmentEfficiencyFormula([{
+            minutes: getFulfillmentLaborMinutes(timesheetWeeklyMap[week.start]?.taskHours),
+            orders: Number(weeklyKpiMap[week.start]?.numOrders),
+            orderCell: getMetricCellRef(metricSheetRowsByLabel, "Num Orders", columnName)
+          }]),
+          periodFormula: ({ period, metricSheetRowsByLabel }) => buildFulfillmentEfficiencyFormula(
+            weeks.flatMap((week, index) => {
+              if (!isWeekInDashboardSummaryPeriod(week, period) ||
+                (publishableWeekStarts && !publishableWeekStarts.has(week.start))) return [];
+              return [{
+                minutes: getFulfillmentLaborMinutes(timesheetWeeklyMap[week.start]?.taskHours),
+                orders: Number(weeklyKpiMap[week.start]?.numOrders),
+                orderCell: getMetricCellRef(metricSheetRowsByLabel, "Num Orders", getSheetColumnName(DASHBOARD_WEEK_START_COLUMN_INDEX + index))
+              }];
+            })
+          )
+        },
         {
           label: "Orders Compared to Yearly Average",
           entry: "AUTO",
@@ -6160,7 +6189,7 @@ async function buildTimesheetWeeklyMap(weeks) {
   });
 
   const map = Object.fromEntries(
-    weekKeys.map((weekKey) => [weekKey, { totalWages: 0, tasks: {} }])
+    weekKeys.map((weekKey) => [weekKey, { totalWages: 0, tasks: {}, taskHours: {} }])
   );
 
   try {
@@ -6246,6 +6275,7 @@ async function buildTimesheetWeeklyMap(weeks) {
       observedTaskLabels.add(taskLabel);
 
       const weekEntry = map[weekStart];
+      weekEntry.taskHours[taskKey] = round2(Number(weekEntry.taskHours[taskKey] || 0) + hours);
       weekEntry.totalWages = round2(weekEntry.totalWages + withFringe);
       weekEntry.tasks[taskLabel] = round2(
         Number(weekEntry.tasks[taskLabel] || 0) + withFringe
@@ -6796,6 +6826,7 @@ async function writeDashboardToSheet(
     let pattern = null;
     if (metric.valueType === "currency") pattern = "$#,##0.00";
     if (metric.valueType === "int") pattern = "0";
+    if (metric.valueType === "minutes") pattern = "0.0";
     if (metric.valueType === "percent") pattern = "0.00%";
     if (!pattern) return;
 
@@ -7826,7 +7857,7 @@ export async function buildPackDayTeamViewReport({ now = new Date() } = {}) {
       GROUP BY fulfillment_date
       ORDER BY fulfillment_date
     `,
-    ["2026-01-05", today]
+    ["2026-01-01", today]
   );
 
   const { config, status } = getTimesheetDbConfig();
@@ -7842,7 +7873,7 @@ export async function buildPackDayTeamViewReport({ now = new Date() } = {}) {
       .split(",")
       .map((value) => value.trim())
       .filter(Boolean);
-    const params = ["2026-01-05", today, "%FFCSA%"];
+    const params = ["2026-01-01", today, "%FFCSA%"];
     const approvedSql = approvedStatuses.length
       ? ` AND approved IN (${buildInClause(approvedStatuses)})`
       : "";
@@ -7925,7 +7956,7 @@ export async function publishPackDayTeamView({ now = new Date() } = {}) {
   )?.conditionalFormats?.length || 0;
   const band = (row, color, foregroundColor) => ({
     repeatCell: {
-      range: { sheetId, startRowIndex: row - 1, endRowIndex: row, startColumnIndex: 0, endColumnIndex: 6 },
+      range: { sheetId, startRowIndex: row - 1, endRowIndex: row, startColumnIndex: 0, endColumnIndex: 7 },
       cell: {
         userEnteredFormat: {
           backgroundColor: color,
@@ -7957,6 +7988,13 @@ export async function publishPackDayTeamView({ now = new Date() } = {}) {
     band(8 + scored.rows.length, pale),
     {
       repeatCell: {
+        range: { sheetId, startRowIndex: 6, endRowIndex: 6 + scored.rows.length, startColumnIndex: 0, endColumnIndex: 1 },
+        cell: { userEnteredFormat: { numberFormat: { type: "DATE", pattern: "ddd, mmm d" } } },
+        fields: "userEnteredFormat.numberFormat"
+      }
+    },
+    {
+      repeatCell: {
         range: { sheetId, startRowIndex: 0, endRowIndex: 1, startColumnIndex: 0, endColumnIndex: 1 },
         cell: { userEnteredFormat: { textFormat: { bold: true, fontSize: 16, foregroundColor: white } } },
         fields: "userEnteredFormat.textFormat"
@@ -7978,14 +8016,14 @@ export async function publishPackDayTeamView({ now = new Date() } = {}) {
     },
     {
       repeatCell: {
-        range: { sheetId, startRowIndex: 6, endRowIndex: 6 + scored.rows.length, startColumnIndex: 2, endColumnIndex: 5 },
+        range: { sheetId, startRowIndex: 6, endRowIndex: 6 + scored.rows.length, startColumnIndex: 2, endColumnIndex: 6 },
         cell: { userEnteredFormat: { numberFormat: { type: "NUMBER", pattern: "0.0" } } },
         fields: "userEnteredFormat.numberFormat"
       }
     }
   ];
   for (const [startIndex, endIndex, pixelSize] of [
-    [0, 1, 165], [1, 2, 85], [2, 5, 145], [5, 6, 150], [6, 10, 40]
+    [0, 1, 165], [1, 2, 85], [2, 6, 145], [6, 7, 150], [7, 10, 40]
   ]) {
     requests.push({
       updateDimensionProperties: {
@@ -8006,7 +8044,7 @@ export async function publishPackDayTeamView({ now = new Date() } = {}) {
       addConditionalFormatRule: {
         index,
         rule: {
-          ranges: [{ sheetId, startRowIndex: 6, endRowIndex: 6 + scored.rows.length, startColumnIndex: 5, endColumnIndex: 6 }],
+          ranges: [{ sheetId, startRowIndex: 6, endRowIndex: 6 + scored.rows.length, startColumnIndex: 6, endColumnIndex: 7 }],
           booleanRule: {
             condition: { type: "TEXT_CONTAINS", values: [{ userEnteredValue: phrase }] },
             format: { backgroundColor, textFormat: { foregroundColor } }
