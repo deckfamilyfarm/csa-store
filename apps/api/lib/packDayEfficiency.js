@@ -1,6 +1,6 @@
 export const PACK_DAY_TEAM_VIEW_TITLE = "auto-pack-day-team";
 
-const FIRST_MONDAY = "2026-01-05";
+const REPORTING_START = "2026-01-01";
 const BASELINE_START = "2026-02-01";
 const PACKING_TASKS = new Set(["packout", "dairy_and_frozen_packing"]);
 
@@ -66,16 +66,16 @@ export function buildPackDayCycles({ orderRows = [], laborRows = [], throughDate
     throw new Error("Pack day throughDate must be YYYY-MM-DD");
   }
   const weeks = new Map();
-  for (let monday = FIRST_MONDAY; monday <= throughDate; monday = addDays(monday, 7)) {
+  for (let monday = mondayOf(REPORTING_START); monday <= throughDate; monday = addDays(monday, 7)) {
     weeks.set(monday, {
-      tuesday: { cycleDate: addDays(monday, 1), type: "Tuesday", orders: 0, packHours: 0, deliveryHours: 0 },
-      weekend: { cycleDate: addDays(monday, 5), type: "Friday/Saturday", orders: 0, packHours: 0, deliveryHours: 0 }
+      tuesday: { cycleDate: addDays(monday, 1), type: "Tuesday", orders: 0, packHours: 0, deliveryHours: 0, pickupHours: 0 },
+      weekend: { cycleDate: addDays(monday, 5), type: "Friday/Saturday", orders: 0, packHours: 0, deliveryHours: 0, pickupHours: 0 }
     });
   }
 
   for (const row of orderRows) {
     const day = toYmd(row.fulfillmentDate);
-    if (!day || day > throughDate) continue;
+    if (!day || day < REPORTING_START || day > throughDate) continue;
     const week = weeks.get(mondayOf(day));
     if (!week) continue;
     const dayNumber = weekday(day);
@@ -85,7 +85,7 @@ export function buildPackDayCycles({ orderRows = [], laborRows = [], throughDate
 
   for (const row of laborRows) {
     const day = toYmd(row.workDate);
-    if (!day || day > throughDate) continue;
+    if (!day || day < REPORTING_START || day > throughDate) continue;
     const week = weeks.get(mondayOf(day));
     if (!week) continue;
     const dayNumber = weekday(day);
@@ -99,6 +99,7 @@ export function buildPackDayCycles({ orderRows = [], laborRows = [], throughDate
     const hours = workingHours(row);
     if (PACKING_TASKS.has(task)) cycle.packHours += hours;
     if (task === "delivery") cycle.deliveryHours += hours;
+    if (task === "pick_ups") cycle.pickupHours += hours;
   }
 
   return [...weeks.values()]
@@ -107,7 +108,8 @@ export function buildPackDayCycles({ orderRows = [], laborRows = [], throughDate
     .map((cycle) => ({
       ...cycle,
       packHours: round(cycle.packHours, 2),
-      deliveryHours: round(cycle.deliveryHours, 2)
+      deliveryHours: round(cycle.deliveryHours, 2),
+      pickupHours: round(cycle.pickupHours, 2)
     }));
 }
 
@@ -125,6 +127,15 @@ function cycleLabel(ymd) {
   }).format(new Date(`${ymd}T00:00:00Z`));
 }
 
+function hasCompleteLabor(cycle) {
+  return [cycle.packHours, cycle.deliveryHours, cycle.pickupHours]
+    .every((hours) => Number.isFinite(hours) && hours > 0);
+}
+
+function totalLaborMinutes(cycle) {
+  return (cycle.packHours + cycle.deliveryHours + cycle.pickupHours) * 60;
+}
+
 export function scorePackDayCycles(cycles, { throughDate } = {}) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(String(throughDate || ""))) {
     throw new Error("Pack day throughDate must be YYYY-MM-DD");
@@ -132,41 +143,74 @@ export function scorePackDayCycles(cycles, { throughDate } = {}) {
   const windowStart = twoMonthsBefore(throughDate);
   const eligible = cycles.filter((cycle) =>
     cycle.cycleDate >= BASELINE_START && cycle.cycleDate <= throughDate &&
-    cycle.orders > 0 && cycle.packHours > 0 && cycle.deliveryHours > 0
+    cycle.orders > 0 && hasCompleteLabor(cycle)
   );
   const targetMinutesPerOrder = eligible.length
     ? percentile(eligible.map((cycle) =>
-      (cycle.packHours + cycle.deliveryHours) * 60 / cycle.orders
+      totalLaborMinutes(cycle) / cycle.orders
     ), 0.25)
     : null;
-  const rows = cycles
-    .filter((cycle) => cycle.cycleDate >= windowStart && cycle.cycleDate <= throughDate)
+  const allRows = cycles
+    .filter((cycle) => cycle.orders > 0 && cycle.cycleDate <= throughDate)
     .sort((a, b) => b.cycleDate.localeCompare(a.cycleDate))
     .map((cycle) => {
-      const complete = cycle.packHours > 0 && cycle.deliveryHours > 0;
+      const complete = hasCompleteLabor(cycle);
       return {
         ...cycle,
         label: cycleLabel(cycle.cycleDate),
         complete,
         packMinutesPerOrder: cycle.packHours * 60 / cycle.orders,
         deliveryMinutesPerOrder: cycle.deliveryHours * 60 / cycle.orders,
+        pickupMinutesPerOrder: cycle.pickupHours > 0 ? cycle.pickupHours * 60 / cycle.orders : null,
+        ordersPerMinute: complete ? cycle.orders / totalLaborMinutes(cycle) : null,
         totalMinutesPerOrder: complete
-          ? (cycle.packHours + cycle.deliveryHours) * 60 / cycle.orders
+          ? totalLaborMinutes(cycle) / cycle.orders
           : null
       };
     });
+  const rows = allRows.filter((cycle) => cycle.cycleDate >= windowStart).map((cycle) => {
+    // Select operating cycles before checking labor completeness: missing timesheets
+    // must not silently change the requested 30-day comparison period.
+    const previous = allRows.filter((row) => row.cycleDate < cycle.cycleDate).slice(0, 30);
+    const orders = previous.reduce((sum, row) => sum + row.orders, 0);
+    const complete = previous.length > 0 && previous.every(hasCompleteLabor);
+    const averageMinutes = (field) => previous.length > 0 && previous.every((row) => row[field] > 0)
+      ? previous.reduce((sum, row) => sum + row[field] * 60, 0) / orders
+      : null;
+    const year = cycle.cycleDate.slice(0, 4);
+    const yearToDate = allRows.filter((row) => row.cycleDate.startsWith(`${year}-`) && row.cycleDate <= cycle.cycleDate);
+    return {
+      ...cycle,
+      dailyOrderAverage: {
+        year: Number(year),
+        operatingDays: yearToDate.length,
+        orders: yearToDate.length ? yearToDate.reduce((sum, row) => sum + row.orders, 0) / yearToDate.length : null
+      },
+      averages: {
+        operatingDays: previous.length,
+        startDate: previous.at(-1)?.cycleDate ?? null,
+        endDate: previous[0]?.cycleDate ?? null,
+        orders: previous.length ? orders / previous.length : null,
+        ordersPerMinute: complete ? orders / previous.reduce((sum, row) => sum + totalLaborMinutes(row), 0) : null,
+        packMinutesPerOrder: averageMinutes("packHours"),
+        deliveryMinutesPerOrder: averageMinutes("deliveryHours"),
+        pickupMinutesPerOrder: averageMinutes("pickupHours"),
+        totalMinutesPerOrder: complete ? previous.reduce((sum, row) => sum + totalLaborMinutes(row), 0) / orders : null
+      }
+    };
+  });
   return { targetMinutesPerOrder, referenceCycleCount: eligible.length, windowStart, throughDate, rows };
 }
 
 export function buildPackDayTeamViewValues(report, { asOfDate }) {
   const { targetMinutesPerOrder, referenceCycleCount, windowStart, rows } = report;
   const values = [
-    ["CSA Packing & Delivery Efficiency"],
+    ["CSA Packing, Delivery & Pickup Efficiency"],
     ["TARGET", targetMinutesPerOrder ?? "", "min/order"],
     [`Top 25% of ${referenceCycleCount} completed delivery cycles since Feb 2026`],
     [`Last two months: ${windowStart} to ${asOfDate} · most recent first`],
     [],
-    ["Delivery cycle", "Orders", "Packing min/order", "Delivery min/order", "Total min/order", "vs. Target"]
+    ["Delivery cycle", "Orders", "Packing min/order", "Delivery min/order", "Pickup min/order", "Total min/order", "vs. Target"]
   ];
   rows.forEach((cycle, index) => {
     const rowNumber = 7 + index;
@@ -175,9 +219,10 @@ export function buildPackDayTeamViewValues(report, { asOfDate }) {
       cycle.orders,
       cycle.packHours > 0 ? cycle.packMinutesPerOrder : "",
       cycle.deliveryHours > 0 ? cycle.deliveryMinutesPerOrder : "",
-      cycle.complete ? `=C${rowNumber}+D${rowNumber}` : "",
+      cycle.pickupMinutesPerOrder ?? "",
+      cycle.complete ? `=SUM(C${rowNumber}:E${rowNumber})` : "",
       cycle.complete && targetMinutesPerOrder !== null
-        ? `=IF(ROUND(E${rowNumber}-$B$2,1)>0,TEXT(ROUND(E${rowNumber}-$B$2,1),"0.0")&" min slower",IF(ROUND(E${rowNumber}-$B$2,1)<0,TEXT(ABS(ROUND(E${rowNumber}-$B$2,1)),"0.0")&" min faster","On target"))`
+        ? `=IF(ROUND(F${rowNumber}-$B$2,1)>0,TEXT(ROUND(F${rowNumber}-$B$2,1),"0.0")&" min slower",IF(ROUND(F${rowNumber}-$B$2,1)<0,TEXT(ABS(ROUND(F${rowNumber}-$B$2,1)),"0.0")&" min faster","On target"))`
         : "Awaiting timesheets"
     ]);
   });
@@ -186,7 +231,7 @@ export function buildPackDayTeamViewValues(report, { asOfDate }) {
     ["Notes:"],
     ["Goal: Match or beat the top 25% most efficient completed delivery cycles."],
     ["vs. Target: Faster means less time per order; slower means more time per order."],
-    ["Packing + Delivery: Includes both labor categories, measured in minutes per order."],
+    ["Packing + Delivery + Pickup: Includes all three labor categories, measured in labor minutes per order. Pickup means vendor collections."],
     ["Why it matters: Reducing minutes per order lowers labor costs and improves CSA profitability."],
     ["Figures are rounded; small differences may occur."],
     ["Tuesday uses Monday–Tuesday labor and Tuesday orders. Saturday uses Thursday–Saturday labor and Friday–Saturday orders. Delivery task time can include loading and stops. Recent timesheets may arrive late."]

@@ -111,3 +111,41 @@ test("monthly sales use the same-year monthly baseline and order averages are we
   assert.deepEqual(rowByLabel(dashboard.values, "Average Order Amount").slice(4), [175, 100, 200]);
   assert.deepEqual(rowByLabel(dashboard.values, "Sales compared to yearly average").slice(4), ["", -0.5, 0.5]);
 });
+
+test("weekly fulfillment time follows Num Orders, uses hours independently of wages, and weights period totals", () => {
+  const weeks = ["2026-01-05", "2026-04-06", "2026-04-13", "2026-04-20", "2026-04-27"]
+    .map((start) => ({ start, end: new Date(Date.parse(start) + 6 * 86400000).toISOString().slice(0, 10), label: start, year: 2026 }));
+  const kpi = Object.fromEntries(weeks.map((week, index) => [week.start, { numOrders: [10, 30, 50, 0, 100][index] }]));
+  const labor = {
+    "2026-01-05": { totalWages: 0, taskHours: { packout: 1, delivery: 2, pick_ups: 1 } },
+    "2026-04-06": { totalWages: 9999, taskHours: { dairy_and_frozen_packing: 2, delivery: 3, pick_ups: 1 } },
+    "2026-04-13": { taskHours: { packout: 1, delivery: 2 } },
+    "2026-04-20": { taskHours: { packout: 1, delivery: 2, pick_ups: 1 } },
+    "2026-04-27": { taskHours: { packout: 99, delivery: 99, pick_ups: 99 } }
+  };
+  const periods = [
+    { label: "Total", started: true, weekStarts: new Set(weeks.map((w) => w.start)) },
+    { label: "Q1", started: true, weekStarts: new Set(["2026-01-05"]) },
+    { label: "Q2", started: true, weekStarts: new Set(weeks.slice(1).map((w) => w.start)) },
+    { label: "Q3", started: false }, { label: "Q4", started: false }
+  ];
+  const report = buildDashboardRows(weeks, new Map(), kpi, {}, labor, [], {}, new Set(weeks.slice(0, 4).map((w) => w.start)), periods);
+  const ordersIndex = report.values.findIndex((row) => row[1] === "Num Orders");
+  assert.equal(ordersIndex, 5);
+  const row = report.values[ordersIndex + 1];
+  assert.equal(row[1], "Pack / Delivery / Pickup (min/order)");
+  assert.equal(row[2], "AUTO");
+  assert.deepEqual(row.slice(4, 9), [
+    '=IF(OR(COUNT(J6,K6)<>2,MIN(J6,K6)<=0),"",600/SUM(J6,K6))',
+    '=IF(OR(COUNT(J6)<>1,MIN(J6)<=0),"",240/SUM(J6))',
+    '=IF(OR(COUNT(K6)<>1,MIN(K6)<=0),"",360/SUM(K6))', "", ""
+  ]);
+  assert.deepEqual(row.slice(9), [
+    '=IF(OR(COUNT(J6)<>1,MIN(J6)<=0),"",240/SUM(J6))',
+    '=IF(OR(COUNT(K6)<>1,MIN(K6)<=0),"",360/SUM(K6))', "", "", ""
+  ]);
+  const metadata = report.metricRows.find((metric) => metric.rowIndex === ordersIndex + 1);
+  assert.equal(metadata.valueType, "minutes");
+  assert.match(metadata.note, /eligible completed weeks only/);
+  assert.match(rowByLabel(report.values, "Num Subscriber Orders")[4], /E6-E9/);
+});

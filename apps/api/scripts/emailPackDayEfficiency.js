@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { getPool } from "../db.js";
 import { DASHBOARD_SHEET_ID, buildPackDayTeamViewReport } from "../lib/dashboardPublisher.js";
 import { sendOperationalEmail } from "../lib/email.js";
@@ -10,12 +11,13 @@ import {
 const args = process.argv.slice(2);
 const dryRun = args.includes("--dry-run");
 const scheduled = args.includes("--scheduled");
+const sample = args.includes("--sample");
 const dateArgs = args.filter((arg) => arg.startsWith("--cycle-date="));
 const invalid = args.filter((arg) =>
-  !["--dry-run", "--scheduled"].includes(arg) && !arg.startsWith("--cycle-date=")
+  !["--dry-run", "--scheduled", "--sample"].includes(arg) && !arg.startsWith("--cycle-date=")
 );
-if (invalid.length || dateArgs.length > 1 || (scheduled && dateArgs.length)) {
-  throw new Error("Usage: emailPackDayEfficiency.js [--scheduled] [--dry-run] [--cycle-date=YYYY-MM-DD]");
+if (invalid.length || dateArgs.length > 1 || (scheduled && (dateArgs.length || sample))) {
+  throw new Error("Usage: emailPackDayEfficiency.js [--scheduled | --sample] [--dry-run] [--cycle-date=YYYY-MM-DD]");
 }
 
 const now = new Date();
@@ -31,6 +33,7 @@ if (scheduled && !isScheduledPackDayEmailTime(now)) {
     const report = await buildPackDayTeamViewReport({ now: reportNow });
     if (report.throughDate !== cycleDate) throw new Error("Pack day report date did not match the requested cycle date.");
     const email = buildPackDayEfficiencyEmail(report, cycleDate, { spreadsheetId: DASHBOARD_SHEET_ID });
+    if (sample) email.subject = `[Sample] ${email.subject}`;
     const to = process.env.PACK_DAY_EFFICIENCY_EMAIL_TO || "jdeck88@gmail.com";
     if (dryRun) {
       console.log(JSON.stringify({ to, ...email }, null, 2));
@@ -38,7 +41,7 @@ if (scheduled && !isScheduledPackDayEmailTime(now)) {
       await sendOperationalEmail({
         to,
         ...email,
-        messageId: `<pack-day-efficiency-${cycleDate}@deckfamilyfarm.com>`
+        messageId: `<pack-day-efficiency-${sample ? `sample-${createHash("sha256").update(email.text).digest("hex").slice(0, 12)}-` : ""}${cycleDate}@deckfamilyfarm.com>`
       });
       console.log(`Pack day efficiency email sent to ${to} for ${cycleDate}.`);
     }
