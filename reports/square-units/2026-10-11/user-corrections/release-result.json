@@ -1,0 +1,1079 @@
+{
+  "id": 10,
+  "auditId": 14,
+  "name": "User correction: six products each; Cajun Chaurice $20/lb — October 11",
+  "status": "completed",
+  "isScheduled": false,
+  "scheduledAt": "2026-10-11T20:19:23Z",
+  "startedAt": "2026-10-11T20:19:25Z",
+  "createdAt": "2026-10-11T20:19:23Z",
+  "actions": [
+    {
+      "direction": "outgoing",
+      "platform": "square",
+      "kind": "price",
+      "productId": 805664,
+      "productName": "Hamburger Patties",
+      "packageId": 526717,
+      "packageName": "1.00 lbs",
+      "vendorName": "Deck Family Farm",
+      "status": "completed",
+      "message": "Approved values confirmed remotely.",
+      "staged": {},
+      "localBefore": {
+        "productId": 805664,
+        "packageId": 526717,
+        "vendorName": "Deck Family Farm",
+        "productName": "Hamburger Patties",
+        "categoryName": "Grass-fed Beef 🐮",
+        "sourceUnitPrice": 15.5,
+        "unitOfMeasure": "each",
+        "retailAmount": 1550,
+        "packagePrice": null,
+        "onSale": 0,
+        "saleDiscount": 0,
+        "priceBasis": "vendor-retail-price",
+        "configuredCurrency": "USD"
+      },
+      "localAfter": {
+        "productId": 805664,
+        "packageId": 526717,
+        "vendorName": "Deck Family Farm",
+        "productName": "Hamburger Patties",
+        "categoryName": "Grass-fed Beef 🐮",
+        "sourceUnitPrice": 15.5,
+        "unitOfMeasure": "each",
+        "retailAmount": 1550,
+        "packagePrice": null,
+        "onSale": 0,
+        "saleDiscount": 0,
+        "priceBasis": "vendor-retail-price",
+        "configuredCurrency": "USD"
+      },
+      "mapping": {
+        "linkId": 45,
+        "squareItemId": "ZWZUCQRCDOB2CJF4KCGQJYI5",
+        "squareVariationId": "T5CTPJKL4O3BTPFAD4IEBOYY",
+        "linkApprovedAt": "2026-09-15 12:01:16"
+      },
+      "remoteBefore": {
+        "id": "T5CTPJKL4O3BTPFAD4IEBOYY",
+        "deleted": false,
+        "itemId": "ZWZUCQRCDOB2CJF4KCGQJYI5",
+        "pricingType": "FIXED_PRICING",
+        "amount": 1550,
+        "currency": "USD",
+        "sellingUnit": {
+          "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+          "unit": "lb",
+          "precision": 2,
+          "definition": {
+            "weight_unit": "IMPERIAL_POUND",
+            "type": "TYPE_WEIGHT"
+          }
+        }
+      },
+      "desired": {
+        "id": "T5CTPJKL4O3BTPFAD4IEBOYY",
+        "deleted": false,
+        "itemId": "ZWZUCQRCDOB2CJF4KCGQJYI5",
+        "pricingType": "FIXED_PRICING",
+        "amount": 1550,
+        "currency": "USD",
+        "sellingUnit": {
+          "id": null,
+          "unit": "each/package",
+          "precision": 0,
+          "definition": null
+        }
+      },
+      "payload": {
+        "amount": 1550,
+        "currency": "USD",
+        "sellingUnit": {
+          "id": null,
+          "unit": "each/package",
+          "precision": 0,
+          "definition": null
+        }
+      },
+      "display": {
+        "current": {
+          "price": 15.5,
+          "currency": "USD",
+          "sellingUnit": "lb"
+        },
+        "proposed": {
+          "price": 15.5,
+          "currency": "USD",
+          "sellingUnit": "each"
+        },
+        "basis": "vendor-retail-price"
+      },
+      "localSnapshot": {
+        "productId": 805664,
+        "productName": "Hamburger Patties",
+        "visible": 0,
+        "trackInventory": 0,
+        "inventory": 0,
+        "onSale": 0,
+        "saleDiscount": 0
+      },
+      "id": 1995,
+      "auditId": 14,
+      "result": null,
+      "released": true,
+      "releaseActionId": 613,
+      "checkpoint": {
+        "request": {
+          "type": "ITEM_VARIATION",
+          "id": "T5CTPJKL4O3BTPFAD4IEBOYY",
+          "updated_at": "2026-10-11T19:00:31.546Z",
+          "created_at": "2019-10-10T17:21:28.452Z",
+          "version": 1791745231546,
+          "is_deleted": false,
+          "catalog_v1_ids": [
+            {
+              "catalog_v1_id": "B4CEBE6F-3EAA-4B9A-99E2-46696D3909CD",
+              "location_id": "C0T7DVZY5XVG5"
+            }
+          ],
+          "present_at_all_locations": false,
+          "present_at_location_ids": [
+            "C0T7DVZY5XVG5",
+            "L1MHNE83A8XPY",
+            "L307W0S4THZP3",
+            "L373VS1QADC37",
+            "LJGEXCF3N7XJ4",
+            "LJS8Z7FW504J5",
+            "LKX3NDPZ68H74",
+            "LP5542Q9WCHX2",
+            "LP8AY4081PK5E",
+            "LVKCGC3H1QMYX",
+            "LWREC814AB8A4"
+          ],
+          "item_variation_data": {
+            "item_id": "ZWZUCQRCDOB2CJF4KCGQJYI5",
+            "name": "Natural Hamburger",
+            "ordinal": 1,
+            "pricing_type": "FIXED_PRICING",
+            "price_money": {
+              "amount": 1550,
+              "currency": "USD"
+            },
+            "location_overrides": [
+              {
+                "location_id": "C0T7DVZY5XVG5",
+                "track_inventory": false
+              },
+              {
+                "location_id": "L1MHNE83A8XPY",
+                "track_inventory": false
+              },
+              {
+                "location_id": "L373VS1QADC37",
+                "track_inventory": false
+              },
+              {
+                "location_id": "LJGEXCF3N7XJ4",
+                "track_inventory": false
+              },
+              {
+                "location_id": "LJS8Z7FW504J5",
+                "track_inventory": false
+              },
+              {
+                "location_id": "LKX3NDPZ68H74",
+                "track_inventory": false
+              },
+              {
+                "location_id": "LP5542Q9WCHX2",
+                "track_inventory": false
+              },
+              {
+                "location_id": "LP8AY4081PK5E",
+                "track_inventory": false
+              },
+              {
+                "location_id": "LVKCGC3H1QMYX",
+                "track_inventory": false
+              },
+              {
+                "location_id": "LWREC814AB8A4",
+                "track_inventory": false
+              }
+            ],
+            "track_inventory": false,
+            "inventory_alert_type": "NONE",
+            "service_duration": 0,
+            "available_for_booking": false,
+            "transition_time": 0,
+            "sellable": true,
+            "stockable": true,
+            "channels": [
+              "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+            ]
+          }
+        },
+        "idempotencyKey": "df754503-4215-4938-ba1a-6244761c7f8d"
+      }
+    },
+    {
+      "direction": "outgoing",
+      "platform": "square",
+      "kind": "price",
+      "productId": 805688,
+      "productName": "Natural Ground Beef",
+      "packageId": 526741,
+      "packageName": "1 lbs",
+      "vendorName": "Deck Family Farm",
+      "status": "completed",
+      "message": "Approved values confirmed remotely.",
+      "staged": {},
+      "localBefore": {
+        "productId": 805688,
+        "packageId": 526741,
+        "vendorName": "Deck Family Farm",
+        "productName": "Natural Ground Beef",
+        "categoryName": "Grass-fed Beef 🐮",
+        "sourceUnitPrice": 12,
+        "unitOfMeasure": "each",
+        "retailAmount": 1200,
+        "packagePrice": null,
+        "onSale": 0,
+        "saleDiscount": 0.1,
+        "priceBasis": "vendor-retail-price",
+        "configuredCurrency": "USD"
+      },
+      "localAfter": {
+        "productId": 805688,
+        "packageId": 526741,
+        "vendorName": "Deck Family Farm",
+        "productName": "Natural Ground Beef",
+        "categoryName": "Grass-fed Beef 🐮",
+        "sourceUnitPrice": 12,
+        "unitOfMeasure": "each",
+        "retailAmount": 1200,
+        "packagePrice": null,
+        "onSale": 0,
+        "saleDiscount": 0.1,
+        "priceBasis": "vendor-retail-price",
+        "configuredCurrency": "USD"
+      },
+      "mapping": {
+        "linkId": 61,
+        "squareItemId": "XJV3K7ISGJYS3ERSUYR3I32H",
+        "squareVariationId": "ZJ5C7CRZQNREBLA2VWZU733H",
+        "linkApprovedAt": "2026-09-15 12:03:18"
+      },
+      "remoteBefore": {
+        "id": "ZJ5C7CRZQNREBLA2VWZU733H",
+        "deleted": false,
+        "itemId": "XJV3K7ISGJYS3ERSUYR3I32H",
+        "pricingType": "FIXED_PRICING",
+        "amount": 1200,
+        "currency": "USD",
+        "sellingUnit": {
+          "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+          "unit": "lb",
+          "precision": 2,
+          "definition": {
+            "weight_unit": "IMPERIAL_POUND",
+            "type": "TYPE_WEIGHT"
+          }
+        }
+      },
+      "desired": {
+        "id": "ZJ5C7CRZQNREBLA2VWZU733H",
+        "deleted": false,
+        "itemId": "XJV3K7ISGJYS3ERSUYR3I32H",
+        "pricingType": "FIXED_PRICING",
+        "amount": 1200,
+        "currency": "USD",
+        "sellingUnit": {
+          "id": null,
+          "unit": "each/package",
+          "precision": 0,
+          "definition": null
+        }
+      },
+      "payload": {
+        "amount": 1200,
+        "currency": "USD",
+        "sellingUnit": {
+          "id": null,
+          "unit": "each/package",
+          "precision": 0,
+          "definition": null
+        }
+      },
+      "display": {
+        "current": {
+          "price": 12,
+          "currency": "USD",
+          "sellingUnit": "lb"
+        },
+        "proposed": {
+          "price": 12,
+          "currency": "USD",
+          "sellingUnit": "each"
+        },
+        "basis": "vendor-retail-price"
+      },
+      "localSnapshot": {
+        "productId": 805688,
+        "productName": "Natural Ground Beef",
+        "visible": 1,
+        "trackInventory": 0,
+        "inventory": 0,
+        "onSale": 0,
+        "saleDiscount": 0.1
+      },
+      "id": 1996,
+      "auditId": 14,
+      "result": null,
+      "released": true,
+      "releaseActionId": 614,
+      "checkpoint": {
+        "request": {
+          "type": "ITEM_VARIATION",
+          "id": "ZJ5C7CRZQNREBLA2VWZU733H",
+          "updated_at": "2026-10-11T19:00:35.213Z",
+          "created_at": "2021-03-05T22:00:03.266Z",
+          "version": 1791745235213,
+          "is_deleted": false,
+          "catalog_v1_ids": [
+            {
+              "catalog_v1_id": "07E97511-0C0A-4CAD-8846-A7BBFA35681F",
+              "location_id": "C0T7DVZY5XVG5"
+            }
+          ],
+          "present_at_all_locations": false,
+          "present_at_location_ids": [
+            "C0T7DVZY5XVG5",
+            "L1MHNE83A8XPY",
+            "L307W0S4THZP3",
+            "L373VS1QADC37",
+            "LJGEXCF3N7XJ4",
+            "LJS8Z7FW504J5",
+            "LKX3NDPZ68H74",
+            "LP5542Q9WCHX2",
+            "LP8AY4081PK5E",
+            "LVKCGC3H1QMYX",
+            "LWREC814AB8A4"
+          ],
+          "item_variation_data": {
+            "item_id": "XJV3K7ISGJYS3ERSUYR3I32H",
+            "name": "Natural Ground Beef",
+            "ordinal": 0,
+            "pricing_type": "FIXED_PRICING",
+            "price_money": {
+              "amount": 1200,
+              "currency": "USD"
+            },
+            "track_inventory": false,
+            "inventory_alert_type": "NONE",
+            "service_duration": 0,
+            "sellable": true,
+            "stockable": true,
+            "kitchen_name": "",
+            "channels": [
+              "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+            ]
+          }
+        },
+        "idempotencyKey": "df72c2c8-9821-4cd9-a309-76d73c24439a"
+      }
+    },
+    {
+      "direction": "outgoing",
+      "platform": "square",
+      "kind": "price",
+      "productId": 805689,
+      "productName": "Organic Ground Beef",
+      "packageId": 526742,
+      "packageName": "1 lbs",
+      "vendorName": "Deck Family Farm",
+      "status": "completed",
+      "message": "Approved values confirmed remotely.",
+      "staged": {},
+      "localBefore": {
+        "productId": 805689,
+        "packageId": 526742,
+        "vendorName": "Deck Family Farm",
+        "productName": "Organic Ground Beef",
+        "categoryName": "Grass-fed Beef 🐮",
+        "sourceUnitPrice": 14,
+        "unitOfMeasure": "each",
+        "retailAmount": 1400,
+        "packagePrice": null,
+        "onSale": 0,
+        "saleDiscount": 0.1,
+        "priceBasis": "vendor-retail-price",
+        "configuredCurrency": "USD"
+      },
+      "localAfter": {
+        "productId": 805689,
+        "packageId": 526742,
+        "vendorName": "Deck Family Farm",
+        "productName": "Organic Ground Beef",
+        "categoryName": "Grass-fed Beef 🐮",
+        "sourceUnitPrice": 14,
+        "unitOfMeasure": "each",
+        "retailAmount": 1400,
+        "packagePrice": null,
+        "onSale": 0,
+        "saleDiscount": 0.1,
+        "priceBasis": "vendor-retail-price",
+        "configuredCurrency": "USD"
+      },
+      "mapping": {
+        "linkId": 67,
+        "squareItemId": "XJV3K7ISGJYS3ERSUYR3I32H",
+        "squareVariationId": "6DJNVCZ3SEZG7PYWKJED3HZJ",
+        "linkApprovedAt": "2026-09-15 12:03:47"
+      },
+      "remoteBefore": {
+        "id": "6DJNVCZ3SEZG7PYWKJED3HZJ",
+        "deleted": false,
+        "itemId": "XJV3K7ISGJYS3ERSUYR3I32H",
+        "pricingType": "FIXED_PRICING",
+        "amount": 1400,
+        "currency": "USD",
+        "sellingUnit": {
+          "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+          "unit": "lb",
+          "precision": 2,
+          "definition": {
+            "weight_unit": "IMPERIAL_POUND",
+            "type": "TYPE_WEIGHT"
+          }
+        }
+      },
+      "desired": {
+        "id": "6DJNVCZ3SEZG7PYWKJED3HZJ",
+        "deleted": false,
+        "itemId": "XJV3K7ISGJYS3ERSUYR3I32H",
+        "pricingType": "FIXED_PRICING",
+        "amount": 1400,
+        "currency": "USD",
+        "sellingUnit": {
+          "id": null,
+          "unit": "each/package",
+          "precision": 0,
+          "definition": null
+        }
+      },
+      "payload": {
+        "amount": 1400,
+        "currency": "USD",
+        "sellingUnit": {
+          "id": null,
+          "unit": "each/package",
+          "precision": 0,
+          "definition": null
+        }
+      },
+      "display": {
+        "current": {
+          "price": 14,
+          "currency": "USD",
+          "sellingUnit": "lb"
+        },
+        "proposed": {
+          "price": 14,
+          "currency": "USD",
+          "sellingUnit": "each"
+        },
+        "basis": "vendor-retail-price"
+      },
+      "localSnapshot": {
+        "productId": 805689,
+        "productName": "Organic Ground Beef",
+        "visible": 1,
+        "trackInventory": 0,
+        "inventory": 0,
+        "onSale": 0,
+        "saleDiscount": 0.1
+      },
+      "id": 1997,
+      "auditId": 14,
+      "result": null,
+      "released": true,
+      "releaseActionId": 615,
+      "checkpoint": {
+        "request": {
+          "type": "ITEM_VARIATION",
+          "id": "6DJNVCZ3SEZG7PYWKJED3HZJ",
+          "updated_at": "2026-10-11T19:00:38.864Z",
+          "created_at": "2022-10-14T22:38:37.934Z",
+          "version": 1791745238864,
+          "is_deleted": false,
+          "catalog_v1_ids": [
+            {
+              "catalog_v1_id": "C3B7746C-1041-40B0-815C-A910EA7529E7",
+              "location_id": "C0T7DVZY5XVG5"
+            }
+          ],
+          "present_at_all_locations": false,
+          "present_at_location_ids": [
+            "C0T7DVZY5XVG5",
+            "L1MHNE83A8XPY",
+            "L307W0S4THZP3",
+            "L373VS1QADC37",
+            "LJGEXCF3N7XJ4",
+            "LJS8Z7FW504J5",
+            "LKX3NDPZ68H74",
+            "LP5542Q9WCHX2",
+            "LP8AY4081PK5E",
+            "LVKCGC3H1QMYX",
+            "LWREC814AB8A4"
+          ],
+          "item_variation_data": {
+            "item_id": "XJV3K7ISGJYS3ERSUYR3I32H",
+            "name": "Organic Ground Beef",
+            "ordinal": 1,
+            "pricing_type": "FIXED_PRICING",
+            "price_money": {
+              "amount": 1400,
+              "currency": "USD"
+            },
+            "track_inventory": false,
+            "inventory_alert_type": "NONE",
+            "service_duration": 0,
+            "sellable": true,
+            "stockable": true,
+            "kitchen_name": "",
+            "channels": [
+              "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+            ]
+          }
+        },
+        "idempotencyKey": "f8aba63c-152b-4ddf-bd49-1900a3f1936d"
+      }
+    },
+    {
+      "direction": "outgoing",
+      "platform": "square",
+      "kind": "price",
+      "productId": 805691,
+      "productName": "Ground Pork",
+      "packageId": 526744,
+      "packageName": "1.00 lbs",
+      "vendorName": "Deck Family Farm",
+      "status": "completed",
+      "message": "Approved values confirmed remotely.",
+      "staged": {},
+      "localBefore": {
+        "productId": 805691,
+        "packageId": 526744,
+        "vendorName": "Deck Family Farm",
+        "productName": "Ground Pork",
+        "categoryName": "Pasture-raised Pork 🐖",
+        "sourceUnitPrice": 12,
+        "unitOfMeasure": "each",
+        "retailAmount": 960,
+        "packagePrice": null,
+        "onSale": 1,
+        "saleDiscount": 0.2,
+        "priceBasis": "vendor-retail-price",
+        "configuredCurrency": "USD"
+      },
+      "localAfter": {
+        "productId": 805691,
+        "packageId": 526744,
+        "vendorName": "Deck Family Farm",
+        "productName": "Ground Pork",
+        "categoryName": "Pasture-raised Pork 🐖",
+        "sourceUnitPrice": 12,
+        "unitOfMeasure": "each",
+        "retailAmount": 960,
+        "packagePrice": null,
+        "onSale": 1,
+        "saleDiscount": 0.2,
+        "priceBasis": "vendor-retail-price",
+        "configuredCurrency": "USD"
+      },
+      "mapping": {
+        "linkId": 44,
+        "squareItemId": "ZWYKIFSJHXRJAMUTBROCLXDV",
+        "squareVariationId": "ATTBVR3RYMNJXCOHHWZ7LUE7",
+        "linkApprovedAt": "2026-09-15 12:01:12"
+      },
+      "remoteBefore": {
+        "id": "ATTBVR3RYMNJXCOHHWZ7LUE7",
+        "deleted": false,
+        "itemId": "ZWYKIFSJHXRJAMUTBROCLXDV",
+        "pricingType": "FIXED_PRICING",
+        "amount": 960,
+        "currency": "USD",
+        "sellingUnit": {
+          "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+          "unit": "lb",
+          "precision": 2,
+          "definition": {
+            "weight_unit": "IMPERIAL_POUND",
+            "type": "TYPE_WEIGHT"
+          }
+        }
+      },
+      "desired": {
+        "id": "ATTBVR3RYMNJXCOHHWZ7LUE7",
+        "deleted": false,
+        "itemId": "ZWYKIFSJHXRJAMUTBROCLXDV",
+        "pricingType": "FIXED_PRICING",
+        "amount": 960,
+        "currency": "USD",
+        "sellingUnit": {
+          "id": null,
+          "unit": "each/package",
+          "precision": 0,
+          "definition": null
+        }
+      },
+      "payload": {
+        "amount": 960,
+        "currency": "USD",
+        "sellingUnit": {
+          "id": null,
+          "unit": "each/package",
+          "precision": 0,
+          "definition": null
+        }
+      },
+      "display": {
+        "current": {
+          "price": 9.6,
+          "currency": "USD",
+          "sellingUnit": "lb"
+        },
+        "proposed": {
+          "price": 9.6,
+          "currency": "USD",
+          "sellingUnit": "each"
+        },
+        "basis": "vendor-retail-price"
+      },
+      "localSnapshot": {
+        "productId": 805691,
+        "productName": "Ground Pork",
+        "visible": 1,
+        "trackInventory": 0,
+        "inventory": 0,
+        "onSale": 1,
+        "saleDiscount": 0.2
+      },
+      "id": 1994,
+      "auditId": 14,
+      "result": null,
+      "released": true,
+      "releaseActionId": 612,
+      "checkpoint": {
+        "request": {
+          "type": "ITEM_VARIATION",
+          "id": "ATTBVR3RYMNJXCOHHWZ7LUE7",
+          "updated_at": "2026-10-11T19:00:42.68Z",
+          "created_at": "2019-10-10T17:10:21.402Z",
+          "version": 1791745242680,
+          "is_deleted": false,
+          "catalog_v1_ids": [
+            {
+              "catalog_v1_id": "120369B8-5413-4C79-A497-78D8598B93F9",
+              "location_id": "C0T7DVZY5XVG5"
+            }
+          ],
+          "present_at_all_locations": false,
+          "present_at_location_ids": [
+            "C0T7DVZY5XVG5",
+            "L1MHNE83A8XPY",
+            "L307W0S4THZP3",
+            "L373VS1QADC37",
+            "LJGEXCF3N7XJ4",
+            "LJS8Z7FW504J5",
+            "LKX3NDPZ68H74",
+            "LP5542Q9WCHX2",
+            "LP8AY4081PK5E",
+            "LVKCGC3H1QMYX",
+            "LWREC814AB8A4"
+          ],
+          "item_variation_data": {
+            "item_id": "ZWYKIFSJHXRJAMUTBROCLXDV",
+            "name": "Regular",
+            "ordinal": 1,
+            "pricing_type": "FIXED_PRICING",
+            "price_money": {
+              "amount": 960,
+              "currency": "USD"
+            },
+            "track_inventory": false,
+            "inventory_alert_type": "NONE",
+            "service_duration": 0,
+            "available_for_booking": false,
+            "transition_time": 0,
+            "sellable": true,
+            "stockable": true,
+            "channels": [
+              "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+            ]
+          }
+        },
+        "idempotencyKey": "95d02572-0301-494f-8134-d2251dd88df0"
+      }
+    },
+    {
+      "direction": "outgoing",
+      "platform": "square",
+      "kind": "price",
+      "productId": 813080,
+      "productName": "Pet Food, Organ Blend",
+      "packageId": 535111,
+      "packageName": "1.00 lbs",
+      "vendorName": "Deck Family Farm",
+      "status": "completed",
+      "message": "Approved values confirmed remotely.",
+      "staged": {},
+      "localBefore": {
+        "productId": 813080,
+        "packageId": 535111,
+        "vendorName": "Deck Family Farm",
+        "productName": "Pet Food, Organ Blend",
+        "categoryName": "Pasture-raised Pork 🐖",
+        "sourceUnitPrice": 12,
+        "unitOfMeasure": "each",
+        "retailAmount": 1200,
+        "packagePrice": null,
+        "onSale": 0,
+        "saleDiscount": 0,
+        "priceBasis": "vendor-retail-price",
+        "configuredCurrency": "USD"
+      },
+      "localAfter": {
+        "productId": 813080,
+        "packageId": 535111,
+        "vendorName": "Deck Family Farm",
+        "productName": "Pet Food, Organ Blend",
+        "categoryName": "Pasture-raised Pork 🐖",
+        "sourceUnitPrice": 12,
+        "unitOfMeasure": "each",
+        "retailAmount": 1200,
+        "packagePrice": null,
+        "onSale": 0,
+        "saleDiscount": 0,
+        "priceBasis": "vendor-retail-price",
+        "configuredCurrency": "USD"
+      },
+      "mapping": {
+        "linkId": 73,
+        "squareItemId": "KMIWMJLL7C73ADSABAGDF4KO",
+        "squareVariationId": "U3KGBMTUXU63EPJN6A2CITXP",
+        "linkApprovedAt": "2026-09-15 12:04:20"
+      },
+      "remoteBefore": {
+        "id": "U3KGBMTUXU63EPJN6A2CITXP",
+        "deleted": false,
+        "itemId": "KMIWMJLL7C73ADSABAGDF4KO",
+        "pricingType": "FIXED_PRICING",
+        "amount": 1200,
+        "currency": "USD",
+        "sellingUnit": {
+          "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+          "unit": "lb",
+          "precision": 2,
+          "definition": {
+            "weight_unit": "IMPERIAL_POUND",
+            "type": "TYPE_WEIGHT"
+          }
+        }
+      },
+      "desired": {
+        "id": "U3KGBMTUXU63EPJN6A2CITXP",
+        "deleted": false,
+        "itemId": "KMIWMJLL7C73ADSABAGDF4KO",
+        "pricingType": "FIXED_PRICING",
+        "amount": 1200,
+        "currency": "USD",
+        "sellingUnit": {
+          "id": null,
+          "unit": "each/package",
+          "precision": 0,
+          "definition": null
+        }
+      },
+      "payload": {
+        "amount": 1200,
+        "currency": "USD",
+        "sellingUnit": {
+          "id": null,
+          "unit": "each/package",
+          "precision": 0,
+          "definition": null
+        }
+      },
+      "display": {
+        "current": {
+          "price": 12,
+          "currency": "USD",
+          "sellingUnit": "lb"
+        },
+        "proposed": {
+          "price": 12,
+          "currency": "USD",
+          "sellingUnit": "each"
+        },
+        "basis": "vendor-retail-price"
+      },
+      "localSnapshot": {
+        "productId": 813080,
+        "productName": "Pet Food, Organ Blend",
+        "visible": 1,
+        "trackInventory": 0,
+        "inventory": 0,
+        "onSale": 0,
+        "saleDiscount": 0
+      },
+      "id": 1998,
+      "auditId": 14,
+      "result": null,
+      "released": true,
+      "releaseActionId": 616,
+      "checkpoint": {
+        "request": {
+          "type": "ITEM_VARIATION",
+          "id": "U3KGBMTUXU63EPJN6A2CITXP",
+          "updated_at": "2026-10-11T19:00:51.085Z",
+          "created_at": "2024-08-04T20:25:43.679Z",
+          "version": 1791745251085,
+          "is_deleted": false,
+          "catalog_v1_ids": [
+            {
+              "catalog_v1_id": "F6NYDP4KDYADRIPZ3NA5XNFC",
+              "location_id": "C0T7DVZY5XVG5"
+            }
+          ],
+          "present_at_all_locations": true,
+          "present_at_location_ids": [
+            "L307W0S4THZP3"
+          ],
+          "item_variation_data": {
+            "item_id": "KMIWMJLL7C73ADSABAGDF4KO",
+            "name": "Regular",
+            "ordinal": 1,
+            "pricing_type": "FIXED_PRICING",
+            "price_money": {
+              "amount": 1200,
+              "currency": "USD"
+            },
+            "location_overrides": [
+              {
+                "location_id": "C0T7DVZY5XVG5",
+                "track_inventory": false
+              },
+              {
+                "location_id": "L1MHNE83A8XPY",
+                "track_inventory": false
+              },
+              {
+                "location_id": "L373VS1QADC37",
+                "track_inventory": false
+              },
+              {
+                "location_id": "LJGEXCF3N7XJ4",
+                "track_inventory": false
+              },
+              {
+                "location_id": "LJS8Z7FW504J5",
+                "track_inventory": false
+              },
+              {
+                "location_id": "LKX3NDPZ68H74",
+                "track_inventory": false
+              },
+              {
+                "location_id": "LP5542Q9WCHX2",
+                "track_inventory": false
+              },
+              {
+                "location_id": "LP8AY4081PK5E",
+                "track_inventory": false
+              },
+              {
+                "location_id": "LVKCGC3H1QMYX",
+                "track_inventory": false
+              },
+              {
+                "location_id": "LWREC814AB8A4",
+                "track_inventory": false
+              }
+            ],
+            "inventory_alert_type": "NONE",
+            "service_duration": 0,
+            "sellable": true,
+            "stockable": true,
+            "channels": [
+              "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+              "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+            ]
+          }
+        },
+        "idempotencyKey": "3d527494-c617-4677-abb4-db21f1167fe9"
+      }
+    },
+    {
+      "direction": "outgoing",
+      "platform": "square",
+      "kind": "price",
+      "productId": 816905,
+      "productName": "Cajun Chaurice Sausage Links",
+      "packageId": 539546,
+      "packageName": "4 links/ pack 14 oz pack",
+      "vendorName": "Deck Family Farm's Hyland Artisinal Meats",
+      "status": "completed",
+      "message": "Approved values confirmed remotely.",
+      "staged": {},
+      "localBefore": {
+        "productId": 816905,
+        "packageId": 539546,
+        "vendorName": "Deck Family Farm's Hyland Artisinal Meats",
+        "productName": "Cajun Chaurice Sausage Links",
+        "categoryName": "Sausages & Cured Meats🥓",
+        "sourceUnitPrice": 20,
+        "unitOfMeasure": "lbs",
+        "retailAmount": 2000,
+        "packagePrice": null,
+        "onSale": 0,
+        "saleDiscount": 0,
+        "priceBasis": "vendor-retail-price",
+        "configuredCurrency": "USD"
+      },
+      "localAfter": {
+        "productId": 816905,
+        "packageId": 539546,
+        "vendorName": "Deck Family Farm's Hyland Artisinal Meats",
+        "productName": "Cajun Chaurice Sausage Links",
+        "categoryName": "Sausages & Cured Meats🥓",
+        "sourceUnitPrice": 20,
+        "unitOfMeasure": "lbs",
+        "retailAmount": 2000,
+        "packagePrice": null,
+        "onSale": 0,
+        "saleDiscount": 0,
+        "priceBasis": "vendor-retail-price",
+        "configuredCurrency": "USD"
+      },
+      "mapping": {
+        "linkId": 26,
+        "squareItemId": "BKII4YYPR7FUPZVKDYUHUXVD",
+        "squareVariationId": "WBDNBYBMRDK55JR6NCQG6FGD",
+        "linkApprovedAt": "2026-09-15 11:58:22"
+      },
+      "remoteBefore": {
+        "id": "WBDNBYBMRDK55JR6NCQG6FGD",
+        "deleted": false,
+        "itemId": "BKII4YYPR7FUPZVKDYUHUXVD",
+        "pricingType": "FIXED_PRICING",
+        "amount": 2000,
+        "currency": "USD",
+        "sellingUnit": {
+          "id": null,
+          "unit": "each/package",
+          "precision": 0,
+          "definition": null
+        }
+      },
+      "desired": {
+        "id": "WBDNBYBMRDK55JR6NCQG6FGD",
+        "deleted": false,
+        "itemId": "BKII4YYPR7FUPZVKDYUHUXVD",
+        "pricingType": "FIXED_PRICING",
+        "amount": 2000,
+        "currency": "USD",
+        "sellingUnit": {
+          "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+          "unit": "lb",
+          "precision": 2,
+          "definition": {
+            "weight_unit": "IMPERIAL_POUND",
+            "type": "TYPE_WEIGHT"
+          }
+        }
+      },
+      "payload": {
+        "amount": 2000,
+        "currency": "USD",
+        "sellingUnit": {
+          "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+          "unit": "lb",
+          "precision": 2,
+          "definition": {
+            "weight_unit": "IMPERIAL_POUND",
+            "type": "TYPE_WEIGHT"
+          }
+        }
+      },
+      "display": {
+        "current": {
+          "price": 20,
+          "currency": "USD",
+          "sellingUnit": "each"
+        },
+        "proposed": {
+          "price": 20,
+          "currency": "USD",
+          "sellingUnit": "lb"
+        },
+        "basis": "vendor-retail-price"
+      },
+      "localSnapshot": {
+        "productId": 816905,
+        "productName": "Cajun Chaurice Sausage Links",
+        "visible": 1,
+        "trackInventory": 0,
+        "inventory": 0,
+        "onSale": 0,
+        "saleDiscount": 0
+      },
+      "id": 1992,
+      "auditId": 14,
+      "result": null,
+      "released": true,
+      "releaseActionId": 611,
+      "checkpoint": {
+        "request": {
+          "type": "ITEM_VARIATION",
+          "id": "WBDNBYBMRDK55JR6NCQG6FGD",
+          "updated_at": "2026-10-11T19:15:16.75Z",
+          "created_at": "2023-10-21T15:33:55.927Z",
+          "version": 1791746116750,
+          "is_deleted": false,
+          "catalog_v1_ids": [
+            {
+              "catalog_v1_id": "NIGKVXS7YRUIQD4NW27NAJ7E",
+              "location_id": "C0T7DVZY5XVG5"
+            }
+          ],
+          "present_at_all_locations": true,
+          "item_variation_data": {
+            "item_id": "BKII4YYPR7FUPZVKDYUHUXVD",
+            "name": "Regular",
+            "ordinal": 1,
+            "pricing_type": "FIXED_PRICING",
+            "price_money": {
+              "amount": 2000,
+              "currency": "USD"
+            },
+            "track_inventory": false,
+            "inventory_alert_type": "NONE",
+            "service_duration": 0,
+            "sellable": true,
+            "stockable": true,
+            "channels": [
+              "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+            ],
+            "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ"
+          }
+        },
+        "idempotencyKey": "b726a59a-7a58-4591-9edc-7a5fe7498ce6"
+      }
+    }
+  ]
+}

@@ -1,0 +1,117 @@
+{
+  "productId": 816905,
+  "packageId": 539546,
+  "basis": "4 links/ pack 14 oz pack",
+  "ounces": 14,
+  "pounds": 0.875,
+  "previousWeightOverride": null,
+  "verifiedAt": "2026-10-11T20:48:07.892Z",
+  "pricing": {
+    "profile": {
+      "productId": 816905,
+      "usesSourcePricing": true,
+      "usesNoMarkupPricing": false,
+      "pricingRule": "standard",
+      "unitOfMeasure": "lbs",
+      "sourceUnitPrice": 20,
+      "minWeight": null,
+      "maxWeight": null,
+      "avgWeightOverride": 0.875,
+      "sourceMultiplier": 0.5412,
+      "markupOverride": null,
+      "customerPriceOverrides": [],
+      "guestMarkup": 0.6574,
+      "memberMarkup": 0.6574,
+      "herdShareMarkup": 0.6574,
+      "snapMarkup": 0.6574,
+      "onSale": false,
+      "saleDiscount": 0,
+      "remoteSyncStatus": "pending",
+      "remoteSyncMessage": "User-corrected retail unit/price saved locally; Local Line publication pending.",
+      "remoteSyncedAt": null,
+      "createdAt": "2026-10-11T11:59:38.000Z",
+      "updatedAt": "2026-10-11T10:41:22.000Z"
+    },
+    "packageRows": [
+      {
+        "id": 539546,
+        "name": "4 links/ pack 14 oz pack",
+        "unit": "pk",
+        "chargeType": "package",
+        "chargeUnit": "pk",
+        "quantity": 1,
+        "averageWeight": 0.875,
+        "basePrice": 9.47,
+        "customerPrices": {
+          "guest": {
+            "regular": 15.7,
+            "final": 15.7,
+            "strikethrough": null,
+            "onSale": false,
+            "overridden": false
+          },
+          "member": {
+            "regular": 15.7,
+            "final": 15.7,
+            "strikethrough": null,
+            "onSale": false,
+            "overridden": false
+          },
+          "herdShare": {
+            "regular": 15.7,
+            "final": 15.7,
+            "strikethrough": null,
+            "onSale": false,
+            "overridden": false
+          },
+          "snap": {
+            "regular": 15.7,
+            "final": 15.7,
+            "strikethrough": null,
+            "onSale": false,
+            "overridden": false
+          }
+        }
+      }
+    ],
+    "basePrice": 9.47,
+    "customerPrices": {
+      "guest": {
+        "regular": 15.7,
+        "final": 15.7,
+        "strikethrough": null,
+        "onSale": false,
+        "overridden": false
+      },
+      "member": {
+        "regular": 15.7,
+        "final": 15.7,
+        "strikethrough": null,
+        "onSale": false,
+        "overridden": false
+      },
+      "herdShare": {
+        "regular": 15.7,
+        "final": 15.7,
+        "strikethrough": null,
+        "onSale": false,
+        "overridden": false
+      },
+      "snap": {
+        "regular": 15.7,
+        "final": 15.7,
+        "strikethrough": null,
+        "onSale": false,
+        "overridden": false
+      }
+    },
+    "guestPrice": 15.7,
+    "memberPrice": 15.7,
+    "herdSharePrice": 15.7,
+    "snapPrice": 15.7,
+    "guestRegularPrice": 15.7,
+    "memberRegularPrice": 15.7,
+    "herdShareRegularPrice": 15.7,
+    "snapRegularPrice": 15.7
+  }
+}

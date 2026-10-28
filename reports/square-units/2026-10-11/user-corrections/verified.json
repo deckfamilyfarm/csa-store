@@ -1,0 +1,65 @@
+{
+  "verifiedAt": "2026-10-11T20:19:57.334Z",
+  "auditId": 14,
+  "releaseId": 10,
+  "localUpdated": 7,
+  "squareUpdated": 6,
+  "rows": [
+    {
+      "product": "Pet Food, Organ Blend",
+      "localUnit": "each",
+      "localRetailPrice": 12,
+      "squareUnit": "each/package",
+      "squarePrice": 12,
+      "saleApplied": false
+    },
+    {
+      "product": "Organic Ground Beef",
+      "localUnit": "each",
+      "localRetailPrice": 14,
+      "squareUnit": "each/package",
+      "squarePrice": 14,
+      "saleApplied": false
+    },
+    {
+      "product": "Natural Ground Beef",
+      "localUnit": "each",
+      "localRetailPrice": 12,
+      "squareUnit": "each/package",
+      "squarePrice": 12,
+      "saleApplied": false
+    },
+    {
+      "product": "Hamburger Patties",
+      "localUnit": "each",
+      "localRetailPrice": 15.5,
+      "squareUnit": "each/package",
+      "squarePrice": 15.5,
+      "saleApplied": false
+    },
+    {
+      "product": "Ground Pork",
+      "localUnit": "each",
+      "localRetailPrice": 12,
+      "squareUnit": "each/package",
+      "squarePrice": 9.6,
+      "saleApplied": true
+    },
+    {
+      "product": "Ground Lamb",
+      "localUnit": "each",
+      "localRetailPrice": 17,
+      "squareUnit": "each/package",
+      "squarePrice": 17,
+      "saleApplied": false
+    },
+    {
+      "product": "Cajun Chaurice Sausage Links",
+      "localUnit": "lbs",
+      "localRetailPrice": 20,
+      "squareUnit": "lb",
+      "squarePrice": 20,
+      "saleApplied": false
+    }
+  ]
+}

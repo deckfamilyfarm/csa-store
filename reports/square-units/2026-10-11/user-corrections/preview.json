@@ -1,0 +1,384 @@
+[
+  {
+    "productId": 813080,
+    "name": "Pet Food, Organ Blend",
+    "packageId": 535111,
+    "squareVariationId": "U3KGBMTUXU63EPJN6A2CITXP",
+    "localUnitBefore": "lbs",
+    "localUnitAfter": "each",
+    "localRetailBefore": 12,
+    "localRetailAfter": 12,
+    "saleApplied": false,
+    "squareBefore": {
+      "amount": 1200,
+      "unit": {
+        "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+        "unit": "lb",
+        "precision": 2,
+        "definition": {
+          "weight_unit": "IMPERIAL_POUND",
+          "type": "TYPE_WEIGHT"
+        }
+      }
+    },
+    "proposed": {
+      "amount": 1200,
+      "unit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "profile": {
+      "product_id": 813080,
+      "unit_of_measure": "lbs",
+      "source_unit_price": "12.00",
+      "min_weight": "1.000",
+      "max_weight": "1.000",
+      "avg_weight_override": null,
+      "source_multiplier": "0.5412",
+      "guest_markup": "0.6574",
+      "member_markup": "0.6574",
+      "herd_share_markup": "0.6574",
+      "snap_markup": "0.6574",
+      "on_sale": 0,
+      "sale_discount": null,
+      "remote_sync_status": "applied",
+      "remote_sync_message": "Matched local markups to current Local Line 65.74% values; no remote apply needed.",
+      "remote_synced_at": "2026-04-19T22:01:30.000Z",
+      "created_at": "2026-04-17T06:53:38.000Z",
+      "updated_at": "2026-04-19T22:01:30.000Z",
+      "price_changed_at": "2026-04-10T13:25:39.000Z",
+      "markup_override": null,
+      "customer_price_overrides_json": null
+    }
+  },
+  {
+    "productId": 805689,
+    "name": "Organic Ground Beef",
+    "packageId": 526742,
+    "squareVariationId": "6DJNVCZ3SEZG7PYWKJED3HZJ",
+    "localUnitBefore": "lbs",
+    "localUnitAfter": "each",
+    "localRetailBefore": 14,
+    "localRetailAfter": 14,
+    "saleApplied": false,
+    "squareBefore": {
+      "amount": 1400,
+      "unit": {
+        "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+        "unit": "lb",
+        "precision": 2,
+        "definition": {
+          "weight_unit": "IMPERIAL_POUND",
+          "type": "TYPE_WEIGHT"
+        }
+      }
+    },
+    "proposed": {
+      "amount": 1400,
+      "unit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "profile": {
+      "product_id": 805689,
+      "unit_of_measure": "lbs",
+      "source_unit_price": "14.00",
+      "min_weight": "1.000",
+      "max_weight": "1.000",
+      "avg_weight_override": "0.000",
+      "source_multiplier": "0.5412",
+      "guest_markup": "0.6574",
+      "member_markup": "0.6574",
+      "herd_share_markup": "0.6574",
+      "snap_markup": "0.6574",
+      "on_sale": 1,
+      "sale_discount": "0.1000",
+      "remote_sync_status": "applied",
+      "remote_sync_message": "Scheduled pricelist release applied to Local Line.",
+      "remote_synced_at": "2026-07-30T19:05:21.000Z",
+      "created_at": "2026-04-17T06:53:37.000Z",
+      "updated_at": "2026-07-30T19:05:21.000Z",
+      "price_changed_at": "2026-07-30T19:05:19.000Z",
+      "markup_override": null,
+      "customer_price_overrides_json": null
+    }
+  },
+  {
+    "productId": 805688,
+    "name": "Natural Ground Beef",
+    "packageId": 526741,
+    "squareVariationId": "ZJ5C7CRZQNREBLA2VWZU733H",
+    "localUnitBefore": "lbs",
+    "localUnitAfter": "each",
+    "localRetailBefore": 12,
+    "localRetailAfter": 12,
+    "saleApplied": false,
+    "squareBefore": {
+      "amount": 1200,
+      "unit": {
+        "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+        "unit": "lb",
+        "precision": 2,
+        "definition": {
+          "weight_unit": "IMPERIAL_POUND",
+          "type": "TYPE_WEIGHT"
+        }
+      }
+    },
+    "proposed": {
+      "amount": 1200,
+      "unit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "profile": {
+      "product_id": 805688,
+      "unit_of_measure": "lbs",
+      "source_unit_price": "12.00",
+      "min_weight": "1.000",
+      "max_weight": "1.000",
+      "avg_weight_override": null,
+      "source_multiplier": "0.5412",
+      "guest_markup": "0.6574",
+      "member_markup": "0.6574",
+      "herd_share_markup": "0.6574",
+      "snap_markup": "0.6574",
+      "on_sale": 1,
+      "sale_discount": "0.1000",
+      "remote_sync_status": "applied",
+      "remote_sync_message": "Scheduled pricelist release applied to Local Line.",
+      "remote_synced_at": "2026-07-30T19:05:19.000Z",
+      "created_at": "2026-04-17T06:53:37.000Z",
+      "updated_at": "2026-07-30T19:05:19.000Z",
+      "price_changed_at": "2026-07-30T19:05:17.000Z",
+      "markup_override": null,
+      "customer_price_overrides_json": null
+    }
+  },
+  {
+    "productId": 805664,
+    "name": "Hamburger Patties",
+    "packageId": 526717,
+    "squareVariationId": "T5CTPJKL4O3BTPFAD4IEBOYY",
+    "localUnitBefore": "lbs",
+    "localUnitAfter": "each",
+    "localRetailBefore": 15.5,
+    "localRetailAfter": 15.5,
+    "saleApplied": false,
+    "squareBefore": {
+      "amount": 1550,
+      "unit": {
+        "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+        "unit": "lb",
+        "precision": 2,
+        "definition": {
+          "weight_unit": "IMPERIAL_POUND",
+          "type": "TYPE_WEIGHT"
+        }
+      }
+    },
+    "proposed": {
+      "amount": 1550,
+      "unit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "profile": {
+      "product_id": 805664,
+      "unit_of_measure": "lbs",
+      "source_unit_price": "15.50",
+      "min_weight": "1.000",
+      "max_weight": "1.000",
+      "avg_weight_override": null,
+      "source_multiplier": "0.5412",
+      "guest_markup": "0.6574",
+      "member_markup": "0.6574",
+      "herd_share_markup": "0.6574",
+      "snap_markup": "0.6574",
+      "on_sale": 0,
+      "sale_discount": null,
+      "remote_sync_status": "applied",
+      "remote_sync_message": "Matched local markups to current Local Line 65.74% values; no remote apply needed.",
+      "remote_synced_at": "2026-04-19T22:01:30.000Z",
+      "created_at": "2026-04-17T06:53:36.000Z",
+      "updated_at": "2026-04-19T22:01:30.000Z",
+      "price_changed_at": "2026-04-10T13:25:39.000Z",
+      "markup_override": null,
+      "customer_price_overrides_json": null
+    }
+  },
+  {
+    "productId": 805691,
+    "name": "Ground Pork",
+    "packageId": 526744,
+    "squareVariationId": "ATTBVR3RYMNJXCOHHWZ7LUE7",
+    "localUnitBefore": "lbs",
+    "localUnitAfter": "each",
+    "localRetailBefore": 12,
+    "localRetailAfter": 12,
+    "saleApplied": true,
+    "squareBefore": {
+      "amount": 960,
+      "unit": {
+        "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+        "unit": "lb",
+        "precision": 2,
+        "definition": {
+          "weight_unit": "IMPERIAL_POUND",
+          "type": "TYPE_WEIGHT"
+        }
+      }
+    },
+    "proposed": {
+      "amount": 960,
+      "unit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "profile": {
+      "product_id": 805691,
+      "unit_of_measure": "lbs",
+      "source_unit_price": "12.00",
+      "min_weight": "1.000",
+      "max_weight": "1.000",
+      "avg_weight_override": "0.000",
+      "source_multiplier": "0.5412",
+      "guest_markup": "0.6574",
+      "member_markup": "0.6574",
+      "herd_share_markup": "0.6574",
+      "snap_markup": "0.6574",
+      "on_sale": 1,
+      "sale_discount": "0.2000",
+      "remote_sync_status": "applied",
+      "remote_sync_message": "Scheduled pricelist release applied to Local Line.",
+      "remote_synced_at": "2026-09-03T23:05:21.000Z",
+      "created_at": "2026-04-17T06:53:37.000Z",
+      "updated_at": "2026-09-03T23:05:21.000Z",
+      "price_changed_at": "2026-09-03T23:05:18.000Z",
+      "markup_override": null,
+      "customer_price_overrides_json": null
+    }
+  },
+  {
+    "productId": 813092,
+    "name": "Ground Lamb",
+    "packageId": 535123,
+    "squareVariationId": "I4326UJUHXDELAFK7M2BZ4Z6",
+    "localUnitBefore": "lbs",
+    "localUnitAfter": "each",
+    "localRetailBefore": 17,
+    "localRetailAfter": 17,
+    "saleApplied": false,
+    "squareBefore": {
+      "amount": 1700,
+      "unit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "proposed": {
+      "amount": 1700,
+      "unit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "profile": {
+      "product_id": 813092,
+      "unit_of_measure": "lbs",
+      "source_unit_price": "17.00",
+      "min_weight": "1.000",
+      "max_weight": "1.000",
+      "avg_weight_override": "0.000",
+      "source_multiplier": "0.5412",
+      "guest_markup": "0.6574",
+      "member_markup": "0.6574",
+      "herd_share_markup": "0.6574",
+      "snap_markup": "0.6574",
+      "on_sale": 0,
+      "sale_discount": "0.0000",
+      "remote_sync_status": "applied",
+      "remote_sync_message": "Matched local 66% markups to current Local Line 65.74% values; no remote apply needed.",
+      "remote_synced_at": "2026-04-19T22:05:10.000Z",
+      "created_at": "2026-04-17T06:53:38.000Z",
+      "updated_at": "2026-04-19T22:05:10.000Z",
+      "price_changed_at": "2026-04-10T13:25:39.000Z",
+      "markup_override": null,
+      "customer_price_overrides_json": null
+    }
+  },
+  {
+    "productId": 816905,
+    "name": "Cajun Chaurice Sausage Links",
+    "packageId": 539546,
+    "squareVariationId": "WBDNBYBMRDK55JR6NCQG6FGD",
+    "localUnitBefore": "each",
+    "localUnitAfter": "lbs",
+    "localRetailBefore": 19.99,
+    "localRetailAfter": 20,
+    "saleApplied": false,
+    "squareBefore": {
+      "amount": 2000,
+      "unit": {
+        "id": null,
+        "unit": "each/package",
+        "precision": 0,
+        "definition": null
+      }
+    },
+    "proposed": {
+      "amount": 2000,
+      "unit": {
+        "id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+        "unit": "lb",
+        "precision": 2,
+        "definition": {
+          "weight_unit": "IMPERIAL_POUND",
+          "type": "TYPE_WEIGHT"
+        }
+      }
+    },
+    "profile": {
+      "product_id": 816905,
+      "unit_of_measure": "each",
+      "source_unit_price": null,
+      "min_weight": null,
+      "max_weight": null,
+      "avg_weight_override": null,
+      "source_multiplier": "0.5412",
+      "guest_markup": null,
+      "member_markup": null,
+      "herd_share_markup": null,
+      "snap_markup": null,
+      "on_sale": 0,
+      "sale_discount": null,
+      "remote_sync_status": "pending",
+      "remote_sync_message": null,
+      "remote_synced_at": null,
+      "created_at": "2026-10-11T18:59:38.000Z",
+      "updated_at": "2026-10-11T18:59:38.000Z",
+      "price_changed_at": null,
+      "markup_override": null,
+      "customer_price_overrides_json": null
+    }
+  }
+]
