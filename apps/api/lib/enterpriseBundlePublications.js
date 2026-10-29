@@ -3,7 +3,7 @@ import {getLocalLineBaseUrl,getLocalLineAccessToken} from '../localLineAuth.js';
 import {getBundle} from './enterpriseBundles.js';
 import {getPricingSettings} from './enterprisePricingService.js';
 import {matchLocalLineVendor} from './productVendor.js';
-import {bundleRemoteState,prepareBundlePatch,componentPriceCents} from './enterpriseBundlePublicationCore.js';
+import {bundleRemoteState,prepareBundlePatch,componentPriceCents,assertBundlePilotAllowed} from './enterpriseBundlePublicationCore.js';
 import {digest} from './pricingCutover.js';
 const fail=(message,status=409)=>{throw Object.assign(new Error(message),{status});};
 const actor=user=>Number(user?.userId??user?.id);
@@ -26,7 +26,8 @@ async function inspect(id){
  for(const c of bundle.output.components){
   const [rows]=await db.query('SELECT m.local_line_package_id AS packageId,p.local_line_product_id AS productId FROM local_line_package_meta m JOIN local_line_product_meta p ON p.product_id=m.product_id WHERE m.package_id=?',[c.packageId]);
   if(rows.length!==1||!rows[0].packageId||!rows[0].productId)fail(`${c.name} needs a Local Line mapping.`);
-  components.push({name:c.name,packageId:c.packageId,remotePackageId:Number(rows[0].packageId),remoteProductId:Number(rows[0].productId),quantity:c.quantity,priceCents:c.priceCents});
+  components.push({name:c.name,packageId:c.packageId,remotePackageId:Number(rows[0].packageId),remoteProductId:Number(rows[0].productId),quantity:c.quantity,priceCents:c.priceCents,
+    promotion:c.promotionId?{id:c.promotionId,regularCents:c.promotionRegularCents,saleCents:c.priceCents}:null});
  }
  const remote=await request(`boxes/${bundle.remoteBoxId}/`);
  const prepared=prepareBundlePatch(bundle,remote,lists(),remoteVendor,components);
@@ -41,7 +42,7 @@ async function checkComponents(components){
   if(!pkg)fail('A bundle component package is missing from Local Line.');
   for(const id of lists()){
    const entries=(pkg.price_list_entries||[]).filter(e=>Number(e.price_list_id??e.price_list)===id);
-   if(entries.length!==1||componentPriceCents(pkg,entries[0])!==c.priceCents)fail('Sync individual component prices to all four Local Line baskets before publishing the bundle discount.');
+   if(entries.length!==1||componentPriceCents(pkg,entries[0],c.promotion)!==c.priceCents)fail('Sync individual component prices to all four Local Line baskets before publishing the bundle discount.');
   }
  }
 }
@@ -75,7 +76,7 @@ export async function publishBundle(id,user){
   if(digest(live)!==digest(saved.before))fail('Local Line changed after review. Check the bundle again.');
   const fresh=await inspect(row.bundle_id);
   if(digest(fresh.snapshot.components)!==digest(saved.components)||digest(fresh.snapshot.expected)!==digest(saved.expected))fail('Component mappings or vendor changed after review.');
-  if(process.env.LL_BUNDLE_PUBLICATION_ENABLED!=='true')fail('Bundle publishing requires enabling LL_BUNDLE_PUBLICATION_ENABLED for the reviewed production pilot.',403);
+  assertBundlePilotAllowed(saved.remoteBoxId);
   await db.query("UPDATE enterprise_bundle_publications SET status='publishing',approver_id=?,approved_at=COALESCE(approved_at,UTC_TIMESTAMP()),attempted_at=UTC_TIMESTAMP(),last_error=NULL WHERE id=?",[actor(user),id]);
   try{
     await request(`boxes/${saved.remoteBoxId}/`,saved.patch);

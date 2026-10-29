@@ -61,6 +61,9 @@ test('active sales compare discounted LL prices while regular Square prices stay
  assert.equal(pricingSyncStatus({...revision,promotions:[sale]},discounted,now).allMatched,true);
  assert.deepEqual(orange(pricingSyncStatus({...revision,promotions:[{...sale,squareStatus:'uncertain',status:'partial'}]},discounted,now)),['Sq']);
  assert.equal(pricingSyncStatus({...revision,promotions:[sale]},discounted,Date.parse('2026-10-30')).allMatched,false);
+ const ongoing={...sale,input:{...sale.input,endAt:null}};
+ assert.equal(pricingSyncStatus({...revision,promotions:[ongoing]},discounted,Date.parse('2099-10-30')).allMatched,true);
+ assert.equal(pricingSyncStatus({...revision,promotions:[{...ongoing,status:'cancelling'}]},discounted,now).allMatched,false);
 });
 test('cached fixed-price contradictions cannot show green',()=>{
  assert.deepEqual(orange(pricingSyncStatus(revision,{...record,localLinePrices:record.localLinePrices.map(p=>({...p,adjustmentType:3,adjustmentValue:0}))})),['LL']);

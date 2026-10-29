@@ -1,6 +1,10 @@
 import { roundRatio } from "./enterprisePricingEngine.js";
 
 const fail = message => { throw new Error(message); };
+// A null end is intentional: only an explicit cancellation ends this sale.
+export const promotionEndTime = input => input.endAt == null || input.endAt === '' ? Infinity :
+  Number.isFinite(Date.parse(input.endAt)) ? Date.parse(input.endAt) : -Infinity;
+export const promotionIsActive = (input, now = Date.now()) => Date.parse(input.startAt) <= now && now < promotionEndTime(input);
 const positiveIds = (values, label) => {
   if (!Array.isArray(values) || !values.length) fail(`Select ${label}.`);
   const result = [...new Set(values.map(Number))];
@@ -12,8 +16,9 @@ export function normalizePromotion(input) {
   if (!input || typeof input !== "object") fail("Promotion details are required.");
   const discountBp = Number(input.discountBp);
   if (!Number.isSafeInteger(discountBp) || discountBp <= 0 || discountBp >= 10000) fail("Sale percentage must be between 0% and 100%.");
-  const start = new Date(input.startAt), end = new Date(input.endAt);
-  if (!Number.isFinite(start.getTime()) || !Number.isFinite(end.getTime()) || end <= start) fail("Sale end must follow its start.");
+  const start = new Date(input.startAt), end = input.endAt == null || input.endAt === '' ? null : new Date(input.endAt);
+  if (!input.startAt || !Number.isFinite(start.getTime())) fail("Enter a valid sale start.");
+  if (end && (!Number.isFinite(end.getTime()) || end <= start)) fail("Sale end must follow its start.");
   const channels = [...new Set(input.channels || [])];
   if (!channels.length || channels.some(value => !["localline", "square"].includes(value))) fail("Select Local Line, Square, or both.");
   const packageIds = positiveIds(input.packageIds, "one or more packages");
@@ -23,7 +28,7 @@ export function normalizePromotion(input) {
   try { new Intl.DateTimeFormat("en-US", { timeZone: timezone }); }
   catch { fail("Promotion timezone is invalid."); }
   return { name: String(input.name || "").trim().slice(0, 255), description: String(input.description || "").trim().slice(0, 2000),
-    discountBp, startAt: start.toISOString(), endAt: end.toISOString(), timezone, packageIds, channels, squareLocationIds };
+    discountBp, startAt: start.toISOString(), endAt: end?.toISOString() ?? null, timezone, packageIds, channels, squareLocationIds };
 }
 
 export function promotionPrices(regularPackages, discountBp) {
@@ -36,7 +41,7 @@ export function promotionPrices(regularPackages, discountBp) {
 }
 
 export function promotionsOverlap(left, right) {
-  return left.startAt < right.endAt && right.startAt < left.endAt &&
+  return Date.parse(left.startAt) < promotionEndTime(right) && Date.parse(right.startAt) < promotionEndTime(left) &&
     left.packageIds.some(value => right.packageIds.includes(value)) &&
     left.channels.some(value => right.channels.includes(value));
 }
@@ -113,7 +118,7 @@ function localWallTime(value, timezone) {
     timeZone: timezone, year: "numeric", month: "2-digit", day: "2-digit",
     hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23"
   }).formatToParts(new Date(value)).map(part => [part.type, part.value]));
-  return `${parts.year}${parts.month}${parts.day}T${parts.hour}${parts.minute}${parts.second}`;
+  return { date: `${parts.year}-${parts.month}-${parts.day}`, time: `${parts.hour}:${parts.minute}:${parts.second}` };
 }
 
 export function buildSquarePromotionCatalogObjects(promotionId, promotion, variationIds) {
@@ -124,14 +129,18 @@ export function buildSquarePromotionCatalogObjects(promotionId, promotion, varia
   const locations = promotion.squareLocationIds;
   const id = String(promotionId);
   const discountId = `#csa-promo-${id}-discount`, setId = `#csa-promo-${id}-set`;
-  const periodId = `#csa-promo-${id}-period`, ruleId = `#csa-promo-${id}-rule`;
+  const ruleId = `#csa-promo-${id}-rule`;
   const common = { present_at_all_locations: false, present_at_location_ids: locations };
   const start = localWallTime(promotion.startAt, promotion.timezone);
-  const end = localWallTime(promotion.endAt, promotion.timezone);
+  const end = promotion.endAt == null ? null : localWallTime(promotion.endAt, promotion.timezone);
   return [
     { type: "DISCOUNT", id: discountId, ...common, discount_data: { name: `CSA ${id}: ${promotion.name || "Sale"}`, discount_type: "FIXED_PERCENTAGE", percentage: (promotion.discountBp / 100).toFixed(2) } },
     { type: "PRODUCT_SET", id: setId, ...common, product_set_data: { product_ids_any: variations } },
-    { type: "TIME_PERIOD", id: periodId, ...common, time_period_data: { event: `BEGIN:VEVENT\nDTSTART:${start}\nDTEND:${end}\nEND:VEVENT\n` } },
-    { type: "PRICING_RULE", id: ruleId, ...common, pricing_rule_data: { name: `CSA ${id}: ${promotion.name || "Sale"}`, time_period_ids: [periodId], discount_id: discountId, match_products_id: setId, application_mode: "AUTOMATIC" } }
+    // Native validity bounds support an optional end. No invented expiry or
+    // unsupported iCalendar DTEND; previously frozen requests remain unchanged.
+    { type: "PRICING_RULE", id: ruleId, ...common, pricing_rule_data: { name: `CSA ${id}: ${promotion.name || "Sale"}`,
+      valid_from_date: start.date, valid_from_local_time: start.time,
+      ...(end ? { valid_until_date: end.date, valid_until_local_time: end.time } : {}),
+      discount_id: discountId, match_products_id: setId, application_mode: "AUTOMATIC" } }
   ];
 }

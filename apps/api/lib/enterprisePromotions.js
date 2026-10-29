@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import { getPool } from "../db.js";
 import { ensureEnterprisePricingSchema } from "./enterprisePricingSchema.js";
-import { buildSquarePromotionCatalogObjects, localLineSaleMatches, localLineSalePatch, normalizePromotion, promotionPrices, promotionsOverlap } from "./enterprisePromotionsCore.js";
+import { buildSquarePromotionCatalogObjects, localLineSaleMatches, localLineSalePatch, promotionEndTime, normalizePromotion, promotionPrices, promotionsOverlap } from "./enterprisePromotionsCore.js";
 import { fetchSquare, getSquareConfig, loadSquareMeasurementUnits, squareLocationPriceIssue } from "./squareStoreSync.js";
 import { planSquareUnit } from "./squarePricingUnits.js";
 import { fetchLocalLineProduct, patchLocalLineProduct, loadLocalLineSyncContext, verifyReviewedLocalLineVendor } from "../localLine.js";
@@ -65,7 +65,7 @@ async function frozenPromotion(promotion, connection = getPool()) {
 }
 
 async function checkOverlaps(promotion, excludeId = null, connection = getPool()) {
-  const [rows] = await connection.query("SELECT id, input_json AS inputJson FROM enterprise_promotions WHERE status IN ('approved','scheduled','active','partial')");
+  const [rows] = await connection.query("SELECT id, input_json AS inputJson FROM enterprise_promotions WHERE status IN ('approved','scheduled','active','partial','cancelling')");
   const overlapping = rows.find(row => Number(row.id) !== Number(excludeId) && promotionsOverlap(promotion, parse(row.inputJson)));
   if (overlapping) fail(`Promotion ${overlapping.id} overlaps these packages and channels. Review or cancel it first.`, 409);
 }
@@ -110,7 +110,7 @@ export async function approveEnterprisePromotion(promotionId, user) {
     if (unfinished.length) fail("Resolve the existing price publication before approving this sale.", 409);
     const [settings] = await connection.query("SELECT settings_json AS settingsJson FROM enterprise_pricing_settings_versions WHERE status='active' ORDER BY id DESC LIMIT 1");
     if (parse(settings[0].settingsJson).requireDifferentApprover !== false && actor(user) === Number(row.editor_id)) fail("A different publisher must approve this promotion.", 403);
-    if (new Date(input.endAt).getTime() <= Date.now()) fail("Promotion has already expired. Save a new proposal.", 409);
+    if (promotionEndTime(input) <= Date.now()) fail("Promotion has already expired. Save a new proposal.", 409);
     await checkOverlaps(input, promotionId, connection);
     const refreshed = await frozenPromotion(input, connection);
     if (JSON.stringify(original) !== JSON.stringify(refreshed)) fail("Regular prices or mappings changed. Save a new promotion proposal.", 409);
@@ -214,7 +214,7 @@ export async function publishEnterpriseSquarePromotion(promotionId, user) {
     if (row.square_status === "verified") return view(row);
     squarePublicationAllowed();
     const { input, output } = await assertFrozenPromotion(row, connection);
-    if (Date.parse(input.endAt) <= Date.now()) fail("This sale has ended; its Square discount cannot be published.", 409);
+    if (promotionEndTime(input) <= Date.now()) fail("This sale has ended; its Square discount cannot be published.", 409);
     if (input.channels.includes("localline")) await preflightLocalLinePromotion(output, row.localline_status !== "pending");
     await preflightSquareVariations(output);
     const request = parse(row.square_request_json);
@@ -230,7 +230,7 @@ export async function publishEnterpriseSquarePromotion(promotionId, user) {
       const objects = request.batches[0].objects;
       const mappings = new Map((receipt.id_mappings || []).map(item => [item.client_object_id, item.object_id]));
       const ids = objects.map(object => mappings.get(object.id) || receipt.objects?.find(item => item.id === object.id)?.id);
-      if (ids.some(id => !id)) fail("Square did not return all four managed discount object IDs. Inspect the saved receipt before retrying.", 409);
+      if (ids.some(id => !id)) fail("Square did not return all managed discount object IDs. Inspect the saved receipt before retrying.", 409);
       const confirmed = await fetchSquare("/v2/catalog/batch-retrieve", { method: "POST", body: JSON.stringify({ object_ids: ids, include_related_objects: false }) });
       if (ids.some(id => !(confirmed.objects || []).some(object => object.id === id && !object.is_deleted))) fail("Square has not confirmed every sale rule object yet.", 409);
       await connection.query("UPDATE enterprise_promotions SET square_status='verified', status='scheduled', last_error=NULL, updated_at=UTC_TIMESTAMP() WHERE id=?", [promotionId]);
@@ -287,7 +287,7 @@ export async function publishEnterpriseLocalLinePromotion(promotionId, user = nu
       await connection.query("UPDATE enterprise_promotions SET status='scheduled', updated_at=UTC_TIMESTAMP() WHERE id=?", [promotionId]);
       return getEnterprisePromotion(promotionId);
     }
-    const saleActive = !forceRestore && nowMs < Date.parse(input.endAt);
+    const saleActive = !forceRestore && nowMs < promotionEndTime(input);
     if (saleActive && row.square_status !== "excluded" && row.square_status !== "verified") {
       fail("Square automatic discount must be verified before the Local Line sale begins.", 409);
     }
@@ -329,7 +329,9 @@ export async function publishEnterpriseLocalLinePromotion(promotionId, user = nu
       await event(connection, promotionId, saleActive ? "localline_activated" : "localline_restored", user, { packageIds: input.packageIds });
       return getEnterprisePromotion(promotionId);
     } catch (error) {
-      await connection.query("UPDATE enterprise_promotions SET status='partial', localline_status='uncertain', last_error=?, updated_at=UTC_TIMESTAMP() WHERE id=?", [error.message, promotionId]);
+      // Keep the stop intent durable. A failed restore must retry turning the
+      // sale off, never return to the ordinary activation path in the runner.
+      await connection.query("UPDATE enterprise_promotions SET status=?, localline_status='uncertain', last_error=?, updated_at=UTC_TIMESTAMP() WHERE id=?", [forceRestore ? "cancelling" : "partial", error.message, promotionId]);
       await event(connection, promotionId, "localline_uncertain", user, { error: error.message });
       throw error;
     }
@@ -339,15 +341,15 @@ export async function publishEnterpriseLocalLinePromotion(promotionId, user = nu
 export async function publishEnterprisePromotion(promotionId, user = null, now = new Date()) {
   const promotion = await getEnterprisePromotion(promotionId);
   if (promotion.status === "cancelling") return cancelEnterprisePromotion(promotionId, user);
-  if (promotion.input.channels.includes("square") && promotion.squareStatus !== "verified" && now.getTime() < Date.parse(promotion.input.endAt)) {
+  if (promotion.input.channels.includes("square") && promotion.squareStatus !== "verified" && now.getTime() < promotionEndTime(promotion.input)) {
     await publishEnterpriseSquarePromotion(promotionId, user);
   }
   if (promotion.input.channels.includes("localline")) return publishEnterpriseLocalLinePromotion(promotionId, user, now);
-  if (now.getTime() >= Date.parse(promotion.input.endAt) && promotion.squareStatus === "pending") {
+  if (now.getTime() >= promotionEndTime(promotion.input) && promotion.squareStatus === "pending") {
     await getPool().query("UPDATE enterprise_promotions SET status='expired', square_status='expired', updated_at=UTC_TIMESTAMP() WHERE id=?", [promotionId]);
     return getEnterprisePromotion(promotionId);
   }
-  const status = now.getTime() >= Date.parse(promotion.input.endAt) ? "expired"
+  const status = now.getTime() >= promotionEndTime(promotion.input) ? "expired"
     : now.getTime() >= Date.parse(promotion.input.startAt) ? "active" : "scheduled";
   await getPool().query("UPDATE enterprise_promotions SET status=?, updated_at=UTC_TIMESTAMP() WHERE id=? AND square_status='verified'", [status, promotionId]);
   return getEnterprisePromotion(promotionId);

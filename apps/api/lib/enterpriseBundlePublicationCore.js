@@ -2,6 +2,14 @@ import {digest} from './pricingCutover.js';
 import {scaledInteger} from './enterprisePricingEngine.js';
 const fail=message=>{throw Object.assign(new Error(message),{status:409});};
 const number=value=>value==null?null:Number(value);
+export function assertBundlePilotAllowed(remoteBoxId, env = process.env) {
+  const ids = String(env.LL_BUNDLE_PILOT_BOX_IDS || '').split(',').map(id => id.trim());
+  if (env.LL_BUNDLE_PUBLICATION_ENABLED !== 'true' || !ids.length ||
+      ids.some(id => !/^[1-9]\d*$/.test(id) || !Number.isSafeInteger(Number(id))) ||
+      !ids.map(Number).includes(Number(remoteBoxId))) {
+    throw Object.assign(new Error('Bundle publishing requires an enabled pilot and this Local Line box ID in LL_BUNDLE_PILOT_BOX_IDS.'), { status: 403 });
+  }
+}
 export function bundleRemoteState(remote) {
   return {id:Number(remote.id),name:remote.name,description:remote.description||'',visible:!!remote.visible,vendor:Number(remote.vendor?.id??remote.vendor),price:scaledInteger(remote.price,2),
     inventoryType:remote.inventory_type,trackInventory:!!remote.track_inventory,
@@ -42,8 +50,17 @@ export function prepareBundlePatch(bundle,remote,listIds,remoteVendor,components
   }
   return {before,expected,patch};
 }
-export function componentPriceCents(pkg,entry){
-  if(entry?.on_sale||entry?.on_sale_toggle)fail('Resolve component sales before publishing a bundle.');
+export function componentPriceCents(pkg,entry,promotion=null){
+  const onSale=Boolean(entry?.on_sale||entry?.on_sale_toggle);
+  if(onSale&&!promotion)fail('Resolve component sales before publishing a bundle.');
+  if(promotion){
+    if(!onSale||!Number.isSafeInteger(promotion.id)||promotion.id<=0||
+      !Number.isSafeInteger(promotion.regularCents)||!Number.isSafeInteger(promotion.saleCents)||
+      promotion.saleCents<0||promotion.saleCents>=promotion.regularCents||
+      entry.strikethrough_display_value==null||scaledInteger(entry.strikethrough_display_value,2)!==promotion.regularCents||
+      !entry.adjustment||Number(entry.adjustment_type)!==3||scaledInteger(entry.adjustment_value,2)!==promotion.saleCents)
+      fail('Verify the managed component sale and its regular price in all four baskets.');
+  }
   if(entry?.calculated_value!=null)return scaledInteger(entry.calculated_value,2);
   if(entry?.adjustment&&Number(entry.adjustment_type)===3)return scaledInteger(entry.adjustment_value,2);
   fail(`Verify the current selling price of component package ${pkg.id} in all four baskets.`);

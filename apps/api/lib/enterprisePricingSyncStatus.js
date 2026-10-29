@@ -1,3 +1,4 @@
+import { promotionIsActive, promotionEndTime } from './enterprisePromotionsCore.js';
 import { compareLocalChannelPrices } from './enterprisePricingComparison.js';
 
 const parse = value => {
@@ -38,7 +39,7 @@ export function pricingSyncStatus({ input, output, publications = [], promotions
   // A running sale changes LL package prices, but Square's base rate stays unchanged.
   const expected = output ? structuredClone(output) : null;
   for (const sale of promotions) {
-    if (sale.input?.channels?.includes('localline') && Date.parse(sale.input.startAt) <= now && now < Date.parse(sale.input.endAt)) {
+    if (sale.input?.channels?.includes('localline') && promotionIsActive(sale.input, now)) {
       for (const price of sale.output?.localLinePrices || []) {
         const pkg = expected?.packages?.find(pkg => Number(pkg.packageId) === Number(price.packageId));
         if (pkg) pkg.localLineRegularCents = price.saleCents;
@@ -69,8 +70,8 @@ export function pricingSyncStatus({ input, output, publications = [], promotions
     }
     for (const sale of promotions.filter(sale => sale.input?.channels?.includes(channel.platform))) {
       const channelStatus = channel.platform === 'square' ? sale.squareStatus : sale.localLineStatus;
-      const saleActive = Date.parse(sale.input.startAt) <= now && now < Date.parse(sale.input.endAt);
-      const complete = channel.platform === 'square' ? channelStatus === 'verified' && now < Date.parse(sale.input.endAt)
+      const saleActive = promotionIsActive(sale.input, now);
+      const complete = channel.platform === 'square' ? channelStatus === 'verified' && now < promotionEndTime(sale.input)
         : saleActive ? channelStatus === 'active' : channelStatus === 'restored';
       if (!complete || ['pending', 'cancelling'].includes(sale.status)) reasons.push(`Sale ${sale.status || 'needs checking'}`);
     }

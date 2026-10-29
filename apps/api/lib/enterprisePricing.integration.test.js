@@ -50,6 +50,7 @@ test("saved prices activate locally before independently approved channel public
   const item = { id: "I1", type: "ITEM", version: 1, item_data: { name: "Sausage 12 oz", variations: [variation] } };
   const square = new Map([["I1", item], ["V1", variation]]);
   const writes = [];
+  let failNextSaleRestore = false;
   t.mock.method(globalThis, "fetch", async (url, options = {}) => {
     const parsed = new URL(url), method = options.method || "GET", body = options.body ? JSON.parse(options.body) : null;
     assert.ok(["localline.test", "square.test"].includes(parsed.hostname));
@@ -58,6 +59,9 @@ test("saved prices activate locally before independently approved channel public
     if (parsed.pathname.endsWith("/vendors/")) return json({ results: [{ id: 101, name: "Deck Family Farm" }] });
     if (parsed.pathname.endsWith("/vendors/101/")) return json({ id: 101, name: "Deck Family Farm" });
     if (parsed.pathname.endsWith("/products/1001/")) {
+      if (method === 'PATCH' && failNextSaleRestore && body.packages?.[0]?.price_list_entries?.every(e => e.on_sale_toggle === false)) {
+        throw new Error('Restore connection interrupted');
+      }
       if (method === "PATCH") { writes.push({ platform: "localline", body }); Object.assign(remote, structuredClone(body)); }
       return json(remote);
     }
@@ -159,14 +163,28 @@ test("saved prices activate locally before independently approved channel public
   const expired = await promotions.publishEnterpriseLocalLinePromotion(sale.id, { userId: 2 }, new Date("2026-11-02T17:00:00Z"));
   assert.equal(expired.status, "expired");
   assert.deepEqual(remote.packages[0].price_list_entries.map(row => row.adjustment_value), [10.8, 10.8, 10.8, 10.8]);
-  const secondSale = await promotions.saveEnterprisePromotionDraft({ ...saleInput, name: "Cancelled market sale", startAt: "2026-11-03T16:00:00Z", endAt: "2026-11-04T16:00:00Z" }, { userId: 1 });
+  const secondSale = await promotions.saveEnterprisePromotionDraft({ ...saleInput, name: "Until turned off", startAt: "2026-11-03T16:00:00Z", endAt: null }, { userId: 1 });
   await promotions.approveEnterprisePromotion(secondSale.id, { userId: 2 });
   await promotions.publishEnterprisePromotion(secondSale.id, { userId: 2 });
   await promotions.publishEnterpriseLocalLinePromotion(secondSale.id, { userId: 2 }, new Date("2026-11-03T17:00:00Z"));
-  const cancelled = await promotions.cancelEnterprisePromotion(secondSale.id, { userId: 2 });
+  const future = new Date('2099-12-31T00:00:00Z');
+  assert.equal((await promotions.runDueEnterprisePromotions(future)).find(row=>row.id===secondSale.id).status,'active');
+  const ongoing = (await readSavedEnterprisePricing(pool,[1],future.getTime())).get(1).output.packages[0];
+  assert.equal(ongoing.localLineSaleCents,864);assert.equal(ongoing.squareSaleCents,960);
+  assert.equal((await promotions.getEnterprisePromotion(secondSale.id)).input.endAt,null);
+  await assert.rejects(promotions.saveEnterprisePromotionDraft({...saleInput,startAt:future.toISOString(),endAt:null},{userId:1}),/overlaps/);
+  failNextSaleRestore=true;
+  await assert.rejects(promotions.cancelEnterprisePromotion(secondSale.id, { userId: 2 }),/Restore connection interrupted/);
+  failNextSaleRestore=false;
+  assert.equal((await promotions.getEnterprisePromotion(secondSale.id)).status,'cancelling');
+  await assert.rejects(promotions.saveEnterprisePromotionDraft({...saleInput,startAt:future.toISOString(),endAt:null},{userId:1}),/overlaps/);
+  assert.equal((await promotions.runDueEnterprisePromotions(future)).find(row=>row.id===secondSale.id).status,'cancelled');
+  const cancelled = await promotions.getEnterprisePromotion(secondSale.id);
   assert.equal(cancelled.status, "cancelled");
   assert.equal(cancelled.squareStatus, "cancelled");
   assert.deepEqual(remote.packages[0].price_list_entries.map(row => row.adjustment_value), [10.8, 10.8, 10.8, 10.8]);
+  assert.equal((await readSavedEnterprisePricing(pool,[1],future.getTime())).get(1).output.packages[0].localLineSaleCents,1080);
+  assert.equal((await promotions.cancelEnterprisePromotion(secondSale.id,{userId:2})).status,'cancelled','turning off twice is safe');
   const squareOnly = await promotions.saveEnterprisePromotionDraft({ ...saleInput, name: "Square only", channels: ["square"],
     startAt: "2026-11-05T16:00:00Z", endAt: "2026-11-06T16:00:00Z" }, { userId: 1 });
   await promotions.approveEnterprisePromotion(squareOnly.id, { userId: 2 });

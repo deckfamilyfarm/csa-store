@@ -53,7 +53,7 @@ export function calculateBundle(input, catalog) {
         needed: (old?.needed || 0) + component.quantity * (row.stockUnitsPerPackage || 1) });
     } else capacityKnown = false;
     return { ...component, productId: row.productId, name: row.name, packageName: row.packageName, priceCents: row.priceCents, totalCents,
-      revisionId: row.revisionId, promotionId: row.promotionId || null };
+      revisionId: row.revisionId, promotionId: row.promotionId || null, promotionRegularCents: row.promotionRegularCents ?? null };
   });
   const priceCents = blockers.length ? null : roundRatio(BigInt(subtotal) * BigInt(10000 - discountBp), 10000n);
   const componentCapacity = capacityKnown && resources.size ? Math.max(0, Math.min(...[...resources.values()].map(r => Math.floor(r.stock / r.needed)))) : null;

@@ -1,3 +1,4 @@
+import { promotionIsActive } from './enterprisePromotionsCore.js';
 import { getPool } from '../db.js';
 import { ensureEnterprisePricingSchema } from './enterprisePricingSchema.js';
 import { fingerprint } from './productSyncCore.js';
@@ -21,26 +22,27 @@ export async function bundleCatalog(db = getPool()) {
   const now = Date.now();
   return rows.map(row => {
     const output = parse(row.outputJson), pkg = output?.packages?.find(p => Number(p.packageId) === row.packageId);
-    let priceCents = pkg?.localLineSaleCents ?? null, promotionId = null;
+    let priceCents = pkg?.localLineSaleCents ?? null, promotionId = null, promotionRegularCents = null;
     let blocker = row.deleted ? `${row.name} has been deleted.` : !row.vendorName?.trim() ? `${row.name} needs a vendor.`
       : !pkg ? `${row.name} needs a local FF package price.` : row.latestId !== row.revisionId ? `${row.name} has unapproved pricing changes.` : null;
     const sales = promotions.filter(sale => {
       const input = parse(sale.inputJson);
       return input?.packageIds?.includes(row.packageId) && input.channels?.includes('localline') &&
-        new Date(input.startAt).getTime() <= now && now < new Date(input.endAt).getTime();
+        promotionIsActive(input, now);
     });
     if (sales.length) {
       const sale = sales[0], saleOutput = parse(sale.outputJson), prices = saleOutput?.localLinePrices || [];
       const entry = prices.find(p => p.packageId === row.packageId);
-      if (sales.length !== 1 || sale.status !== 'active' || sale.channelStatus !== 'active' || !Number.isSafeInteger(entry?.saleCents)) blocker = `${row.name}: verify its promotion before pricing this bundle.`;
-      else { priceCents = entry.saleCents; promotionId = sale.id; }
+      if (sales.length !== 1 || sale.status !== 'active' || sale.channelStatus !== 'active' || !Number.isSafeInteger(entry?.saleCents) ||
+        !Number.isSafeInteger(entry?.regularCents) || entry.regularCents !== pkg?.localLineRegularCents || entry.saleCents < 0 || entry.saleCents >= entry.regularCents) blocker = `${row.name}: verify its promotion before pricing this bundle.`;
+      else { priceCents = entry.saleCents; promotionId = sale.id; promotionRegularCents = entry.regularCents; }
     }
     // Unknown, untracked or weight-based stock remains unknown; never infer
     // component capacity from on-farm availability or pounds.
     const packageStock = row.packageTracked && row.packageStock != null ? Number(row.packageStock) : null;
     const productStock = row.productTracked && row.productStock != null && row.trackType === 'package' ? Number(row.productStock) : null;
     return { productId: row.productId, packageId: row.packageId, name: row.name, vendorName: row.vendorName, packageName: row.packageName,
-      deleted: Boolean(row.deleted), revisionId: row.revisionId, priceCents, promotionId, blocker,
+      deleted: Boolean(row.deleted), revisionId: row.revisionId, priceCents, promotionId, promotionRegularCents, blocker,
       stockResource: packageStock != null ? `package:${row.packageId}` : productStock != null ? `product:${row.productId}` : null,
       availableStock: packageStock ?? productStock, stockUnitsPerPackage: 1 };
   });

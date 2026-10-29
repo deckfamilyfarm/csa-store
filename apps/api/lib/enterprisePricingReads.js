@@ -1,3 +1,4 @@
+import { promotionIsActive } from './enterprisePromotionsCore.js';
 import {roundRatio} from './enterprisePricingEngine.js';
 const parse=value=>typeof value==='string'?JSON.parse(value):value;
 // active_revision_id means the saved store price. Channel approval is separate.
@@ -11,7 +12,7 @@ export async function readSavedEnterprisePricing(connection, productIds=null, no
   if(!result.size)return result;
   const [sales]=await connection.query("SELECT status,input_json AS inputJson,output_json AS outputJson,square_status AS squareStatus,localline_status AS localLineStatus FROM enterprise_promotions WHERE status IN ('active','scheduled','partial')");
   for(const row of sales){const input=parse(row.inputJson),output=parse(row.outputJson);
-    if(!(Date.parse(input.startAt)<=now && now<Date.parse(input.endAt)))continue;
+    if(!(promotionIsActive(input, now)))continue;
     for(const price of result.values())for(const pkg of price.output.packages){
       if(!input.packageIds.includes(pkg.packageId))continue;
       const sale=output.localLinePrices?.find(p=>p.packageId===pkg.packageId);

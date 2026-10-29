@@ -13,6 +13,7 @@ export function EnterprisePromotionEditor({ token, product, packages, squareEnab
   const [discountPercent, setDiscountPercent] = useState("20");
   const [startAt, setStartAt] = useState(localDateTime(new Date(Date.now() + 3600000)));
   const [endAt, setEndAt] = useState(localDateTime(new Date(Date.now() + 25 * 3600000)));
+  const [untilTurnedOff, setUntilTurnedOff] = useState(true);
   const [squareIncluded, setSquareIncluded] = useState(Boolean(squareEnabled));
   const [localLineIncluded, setLocalLineIncluded] = useState(true);
   const [squareLocationIds, setSquareLocationIds] = useState("");
@@ -20,13 +21,13 @@ export function EnterprisePromotionEditor({ token, product, packages, squareEnab
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const signature = JSON.stringify([packageIds, name, discountPercent, startAt, endAt, squareIncluded, localLineIncluded, squareLocationIds]);
+  const signature = JSON.stringify([packageIds, name, discountPercent, startAt, untilTurnedOff ? null : endAt, squareIncluded, localLineIncluded, squareLocationIds]);
   const baseline = useRef(signature);
   useEffect(() => { onDirtyChange?.(signature !== baseline.current); }, [signature, onDirtyChange]);
   useEffect(() => { onBusyChange?.(busy); }, [busy, onBusyChange]);
   const input = () => ({
     name, discountBp: Math.round(Number(discountPercent) * 100), packageIds,
-    startAt: new Date(startAt).toISOString(), endAt: new Date(endAt).toISOString(),
+    startAt: new Date(startAt).toISOString(), endAt: untilTurnedOff ? null : new Date(endAt).toISOString(),
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     channels: [localLineIncluded ? "localline" : null, squareIncluded ? "square" : null].filter(Boolean),
     squareLocationIds: squareIncluded ? squareLocationIds.split(",").map(value => value.trim()).filter(Boolean) : []
@@ -48,7 +49,8 @@ export function EnterprisePromotionEditor({ token, product, packages, squareEnab
       <label>Sale name<input className="input" value={name} onChange={event => setName(event.target.value)} /></label>
       <label>Discount %<input className="input" type="number" min="0.01" max="99.99" step="0.01" value={discountPercent} onChange={event => setDiscountPercent(event.target.value)} /></label>
       <label>Start<input className="input" type="datetime-local" value={startAt} onChange={event => setStartAt(event.target.value)} /></label>
-      <label>End<input className="input" type="datetime-local" value={endAt} onChange={event => setEndAt(event.target.value)} /></label>
+      <label><input type="checkbox" checked={untilTurnedOff} onChange={event => setUntilTurnedOff(event.target.checked)} /> Until I turn it off</label>
+      {!untilTurnedOff && <label>End<input className="input" type="datetime-local" value={endAt} onChange={event => setEndAt(event.target.value)} /></label>}
     </div>
     <fieldset><legend>Packages</legend>{packages.map(pkg => <label key={pkg.packageId} style={{ marginRight: 16 }}><input type="checkbox" checked={packageIds.includes(Number(pkg.packageId))} onChange={event => setPackageIds(previous => event.target.checked ? [...previous, Number(pkg.packageId)] : previous.filter(id => id !== Number(pkg.packageId)))} /> {pkg.name}</label>)}</fieldset>
     {squareEnabled && <label><input type="checkbox" checked={localLineIncluded} onChange={event => setLocalLineIncluded(event.target.checked)} /> Include Local Line sale</label>}

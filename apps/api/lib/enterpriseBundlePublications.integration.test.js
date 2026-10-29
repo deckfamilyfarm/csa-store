@@ -31,11 +31,41 @@ test('bundle publication freezes review, holds drift and recovers a lost respons
  await assert.rejects(service.publishBundle(review.id,{userId:1}),/different publisher/);
  await assert.rejects(service.publishBundle(review.id,{userId:2}),/pilot/);assert.equal(writes,0);
  process.env.LL_BUNDLE_PUBLICATION_ENABLED='true';
+ process.env.LL_BUNDLE_PILOT_BOX_IDS='88';
+ await assert.rejects(service.publishBundle(review.id,{userId:2}),/enabled pilot/);assert.equal(writes,0);
+ process.env.LL_BUNDLE_PILOT_BOX_IDS='77';
  componentPrice=11;await assert.rejects(service.publishBundle(review.id,{userId:2}),/Sync individual/);assert.equal(writes,0);componentPrice=10;
  await assert.rejects(service.publishBundle(review.id,{userId:2}),/Response lost/);assert.equal(writes,1);assert.equal((await service.getBundlePublication(review.id)).status,'uncertain');
  await assert.rejects(service.reviewBundlePublication(1,{userId:2}),/existing bundle publication/);
+ // Turning off the pilot must still permit read-only confirmation after a lost response.
+ process.env.LL_BUNDLE_PUBLICATION_ENABLED='false';
  assert.equal((await service.publishBundle(review.id,{userId:2})).status,'verified');assert.equal(writes,1);
  assert.equal((await service.publishBundle(review.id,{userId:2})).status,'verified');assert.equal(writes,1);
  assert.equal(remote.price,12);assert.deepEqual(remote.product_price_list_entries.map(p=>p.box_package_entry.adjustment_value),[19,19,19,19]);
  const next=await service.reviewBundlePublication(1,{userId:2});await db.query('UPDATE enterprise_bundles SET revision=2 WHERE id=1');await assert.rejects(service.publishBundle(next.id,{userId:2}),/changed after review/);assert.equal(writes,1);
+ // A confirmed managed component sale becomes the bundle basis. A legacy sale,
+ // missing basket flag, partial publication or expiration must still hold it.
+ await db.query('UPDATE enterprise_pricing_revisions SET output_json=? WHERE id=1',[JSON.stringify({packages:[{packageId:10,localLineRegularCents:1000,localLineSaleCents:1000}]})]);
+ const saleInput={packageIds:[10],channels:['localline'],startAt:new Date(Date.now()-60000).toISOString(),endAt:null};
+ const saleOutput={localLinePrices:[{packageId:10,regularCents:1000,saleCents:800}]};
+ await db.query("INSERT INTO enterprise_promotions(id,status,input_json,output_json,editor_id,localline_status,created_at,updated_at) VALUES(1,'active',?,?,1,'active',UTC_TIMESTAMP(),UTC_TIMESTAMP())",[JSON.stringify(saleInput),JSON.stringify(saleOutput)]);
+ let missingSaleBasket=false;
+ const priorFetch=globalThis.fetch;
+ t.mock.method(globalThis,'fetch',async(url,options)=>{
+  if(new URL(url).pathname==='/api/products/100/')return new Response(JSON.stringify({id:100,packages:[{id:1000,price_list_entries:[1,2,3,4].map(id=>({price_list_id:id,adjustment:true,adjustment_type:3,adjustment_value:8,on_sale_toggle:!(missingSaleBasket&&id===4),strikethrough_display_value:10}))}]}),{status:200});
+  return priorFetch(url,options);
+ });
+ const saleReview=await service.reviewBundlePublication(1,{userId:2});
+ assert.equal(saleReview.snapshot.expected.lists[0].value,15.2);
+ assert.deepEqual(saleReview.snapshot.components[0].promotion,{id:1,regularCents:1000,saleCents:800});
+ missingSaleBasket=true;await assert.rejects(service.publishBundle(saleReview.id,{userId:2}),/managed component sale/);assert.equal(writes,1);missingSaleBasket=false;
+ await db.query("UPDATE enterprise_promotions SET localline_status='partial' WHERE id=1");
+ await assert.rejects(service.reviewBundlePublication(1,{userId:2}),/verify its promotion/);
+ await db.query("UPDATE enterprise_promotions SET localline_status='active',input_json=? WHERE id=1",[JSON.stringify({...saleInput,endAt:new Date(Date.now()-1000).toISOString()})]);
+ await assert.rejects(service.publishBundle(saleReview.id,{userId:2}),/changed after review/);assert.equal(writes,1);
+ await assert.rejects(service.reviewBundlePublication(1,{userId:2}),/Resolve component sales/);
+ await db.query('UPDATE enterprise_promotions SET input_json=? WHERE id=1',[JSON.stringify(saleInput)]);
+ process.env.LL_BUNDLE_PUBLICATION_ENABLED='true';
+ assert.equal((await service.publishBundle(saleReview.id,{userId:2})).status,'verified');assert.equal(writes,2);
+ assert.deepEqual(remote.product_price_list_entries.map(p=>p.box_package_entry.adjustment_value),[15.2,15.2,15.2,15.2]);assert.equal(remote.price,12);
 });
