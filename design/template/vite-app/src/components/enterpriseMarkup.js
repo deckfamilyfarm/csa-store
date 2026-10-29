@@ -3,6 +3,7 @@ export const markupCategories = {
   perishable: "Perishable",
   shelfStable: "Shelf stable",
   deckHyland: "Deck/Hyland Markup",
+  creamyCow: "Creamy Cow Markup",
   custom: "Custom"
 };
 

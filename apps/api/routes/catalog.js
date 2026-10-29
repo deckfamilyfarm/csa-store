@@ -1,3 +1,4 @@
+import { readSavedEnterprisePricing } from "../lib/enterprisePricingReads.js";
 import express from "express";
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
@@ -1735,18 +1736,8 @@ router.get("/catalog", async (_req, res) => {
     const pricingProfileByProductId = new Map(
       pricingProfileRows.map((row) => [Number(row.productId), row])
     );
-    let enterpriseActiveByProductId = new Map();
-    if (productIds.length) {
-      try {
-        const [activeRows] = await getPool().query(`SELECT s.product_id AS productId, r.output_json AS outputJson
-          FROM enterprise_pricing_product_state s JOIN enterprise_pricing_revisions r ON r.id=s.active_revision_id
-          WHERE s.product_id IN (?) AND r.status IN (?)`, [productIds,
-          process.env.CSA_LOCAL_ONLY === "true" ? ["active", "local-preview"] : ["active"]]);
-        enterpriseActiveByProductId = new Map(activeRows.map(row => [Number(row.productId), typeof row.outputJson === "string" ? JSON.parse(row.outputJson) : row.outputJson]));
-      } catch (error) {
-        if (!isMissingTableError(error, "enterprise_pricing_product_state")) throw error;
-      }
-    }
+    const savedEnterprisePrices = await readSavedEnterprisePricing(getPool(), productIds);
+    const enterpriseActiveByProductId = new Map([...savedEnterprisePrices].map(([id,record])=>[id,record.output]));
     const packageMetaByPackageId = new Map(
       packageMetaRows.map((row) => [Number(row.packageId), row])
     );

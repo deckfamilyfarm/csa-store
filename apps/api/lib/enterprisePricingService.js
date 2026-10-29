@@ -5,6 +5,7 @@ import { computeProductPricingSnapshot, isNoMarkupProduct } from "./productPrici
 import { deriveLegacyPricingEvidence } from "./legacyPricingEvidence.js";
 import { pricingUtcDate as validDate } from "./enterprisePricingDates.js";
 import { readMigrationCatalog } from "./enterprisePricingMigration.js";
+import { matchesPricingSyncFilter, pricingSyncStatus, readPricingChannelRecords } from "./enterprisePricingSyncStatus.js";
 import { compareLocalChannelPrices } from "./enterprisePricingComparison.js";
 
 const parse = (value) => typeof value === "string" ? JSON.parse(value) : value;
@@ -33,7 +34,7 @@ function validateSettings(value) {
   if (!Number.isSafeInteger(localLineDiscountBp) || localLineDiscountBp < 0 || localLineDiscountBp > 10000) failure("Local Line discount must be between 0% and 100%.");
   if (!Number.isSafeInteger(squareIncrementCents) || squareIncrementCents < 1 || squareIncrementCents > 10000) failure("Square rounding increment is invalid.");
   const markupBp = {};
-  for (const key of ["highlyPerishable", "perishable", "shelfStable", "deckHyland"]) {
+  for (const key of ["highlyPerishable", "perishable", "shelfStable", "deckHyland", "creamyCow"]) {
     const amount = Number(value.markupBp?.[key] ?? DEFAULT_PRICING_SETTINGS.markupBp[key]);
     if (!Number.isSafeInteger(amount) || amount < 0 || amount > 100000) failure(`${key} markup is invalid.`);
     markupBp[key] = amount;
@@ -106,7 +107,7 @@ export async function approvePricingSettingsDraft(draftId, user) {
     const settings = validateSettings(parse(rows[0].settings_json));
     const [unfinished] = await connection.query(`SELECT r.id FROM enterprise_pricing_product_state s
       JOIN enterprise_pricing_revisions r ON r.id=s.latest_revision_id
-      WHERE r.status IN ('pending','approved','partial') LIMIT 1`);
+      WHERE r.status IN ('approved','partial') LIMIT 1`);
     if (unfinished.length) failure("Resolve pending and partially published product pricing before activating new global settings.", 409);
     const [activeRows] = await connection.query(`SELECT s.product_id AS productId, s.latest_revision_id AS latestRevisionId,
       s.active_revision_id AS activeRevisionId, r.input_json AS inputJson, latest.status AS latestStatus
@@ -115,6 +116,9 @@ export async function approvePricingSettingsDraft(draftId, user) {
     if (activeRows.some(row => Number(row.latestRevisionId) !== Number(row.activeRevisionId) && row.latestStatus !== "rejected")) failure("Resolve existing product proposals before changing global pricing rules.", 409);
     const affected = await settingsImpact(settings, connection);
     if (affected.some(row => row.blocked)) failure("Resolve missing purchase costs before approving settings.", 409);
+    const [sales] = await connection.query("SELECT input_json AS inputJson FROM enterprise_promotions WHERE status IN ('approved','scheduled','active','partial','cancelling') FOR UPDATE");
+    const affectedPackages = new Set(activeRows.filter(row=>affected.some(item=>item.productId===row.productId)).flatMap(row=>parse(row.inputJson).packages.map(pkg=>pkg.packageId)));
+    if(sales.some(sale=>(parse(sale.inputJson)?.packageIds||[]).some(id=>affectedPackages.has(id)))) failure("Finish or cancel affected sales before changing their pricing settings.",409);
     await connection.query("UPDATE enterprise_pricing_settings_versions SET status='superseded' WHERE status='active'");
     await connection.query("UPDATE enterprise_pricing_settings_versions SET status='active', approved_by=?, approved_at=UTC_TIMESTAMP() WHERE id=?", [actorId(user), draftId]);
     for (const row of activeRows.filter(row => affected.some(item => item.productId === row.productId))) {
@@ -125,7 +129,7 @@ export async function approvePricingSettingsDraft(draftId, user) {
       const [result] = await connection.query(`INSERT INTO enterprise_pricing_revisions
         (product_id, settings_version_id, status, input_json, output_json, editor_id, created_at)
         VALUES (?, ?, 'pending', ?, ?, ?, UTC_TIMESTAMP())`, [row.productId, draftId, JSON.stringify(input), JSON.stringify(output), Number(rows[0].created_by)]);
-      await connection.query("UPDATE enterprise_pricing_product_state SET latest_revision_id=?, updated_at=UTC_TIMESTAMP() WHERE product_id=?", [Number(result.insertId), row.productId]);
+      await connection.query("UPDATE enterprise_pricing_product_state SET latest_revision_id=?, active_revision_id=?, updated_at=UTC_TIMESTAMP() WHERE product_id=?", [Number(result.insertId), Number(result.insertId), row.productId]);
     }
     await connection.commit();
     return { id: Number(draftId), status: "active", pendingProductCount: affected.length };
@@ -139,14 +143,17 @@ export async function listPricingEnterprises() {
   return rows;
 }
 
-async function productRecord(productId, connection = getPool()) {
+async function productRecord(productId, connection = getPool(), { allowMissingVendor = false } = {}) {
   const [rows] = await connection.query(`SELECT p.id, p.name, p.vendor_id AS vendorId, p.category_id AS categoryId,
     v.name AS vendorName, c.name AS categoryName, p.is_deleted AS isDeleted,
     (SELECT COUNT(*) FROM square_variation_links l WHERE l.product_id=p.id AND l.approved_at IS NOT NULL) AS approvedSquareLinks,
     (SELECT local_line_product_id FROM local_line_product_meta m WHERE m.product_id=p.id LIMIT 1) AS localLineProductId
     FROM products p LEFT JOIN vendors v ON v.id=p.vendor_id LEFT JOIN categories c ON c.id=p.category_id WHERE p.id=?`, [productId]);
   if (!rows.length || Number(rows[0].isDeleted)) failure("Product was not found.", 404);
-  if (!rows[0].vendorId || !String(rows[0].vendorName || "").trim()) failure("A named vendor is required before pricing this product.");
+  const [bundleType] = await connection.query('SELECT product_id FROM enterprise_bundle_legacy_products WHERE product_id=?', [productId]);
+  if (bundleType.length) failure('This is a bundle. Open Pricing → Bundles to edit its components and price.', 409);
+  rows[0].vendorRequired = !rows[0].vendorId || !String(rows[0].vendorName || "").trim();
+  if (rows[0].vendorRequired && !allowMissingVendor) failure("This product needs a vendor. Select a vendor in Product info and save it before changing pricing or synchronizing.");
   return rows[0];
 }
 
@@ -174,14 +181,27 @@ function revisionView(row) {
   };
 }
 
-export async function listEnterprisePricingProducts({ search = "", vendorId = null, status = "", pricingUnit = "", markupCategory = "", square = "", sort = "name", sortDirection = "asc", limit = 100, offset = 0 } = {}) {
+export async function listEnterprisePricingProducts({ search = "", vendorId = null, status = "", syncStatus = "", pricingUnit = "", markupCategory = "", square = "", sort = "name", sortDirection = "asc", limit = 100, offset = 0 } = {}) {
+  // Compare the entire filtered catalog before paging, using the same status rules as the badges.
+  if (["inputs", "synced", "localline", "square"].includes(syncStatus)) {
+    const matching = []; let first;
+    for (let cursor = 0; ; cursor += 250) {
+      const batch = await listEnterprisePricingProducts({ search, vendorId, pricingUnit, markupCategory, square, sort, sortDirection, limit: 250, offset: cursor });
+      first ||= batch;
+      matching.push(...batch.rows.filter(row => matchesPricingSyncFilter(row, syncStatus)));
+      if (cursor + batch.rows.length >= batch.total || !batch.rows.length) break;
+    }
+    const size = Math.min(250, Math.max(1, Number(limit) || 100)), start = Math.max(0, Number(offset) || 0);
+    return { ...first, rows: matching.slice(start, start + size), total: matching.length, limit: size, offset: start };
+  }
   await ensureEnterprisePricingSchema();
-  const where = ["COALESCE(p.is_deleted, 0)=0", "LOWER(COALESCE(c.name,'')) <> 'membership'"];
+  const where = ["COALESCE(p.is_deleted, 0)=0", "LOWER(COALESCE(c.name,'')) <> 'membership'",
+    "NOT EXISTS (SELECT 1 FROM enterprise_bundle_legacy_products b WHERE b.product_id=p.id)"];
   const params = [];
   if (search) { where.push("(p.name LIKE ? OR v.name LIKE ?)"); params.push(`%${search}%`, `%${search}%`); }
   if (vendorId) { where.push("p.vendor_id=?"); params.push(id(vendorId, "Vendor ID")); }
   if (["lb", "each"].includes(pricingUnit)) { where.push("JSON_UNQUOTE(JSON_EXTRACT(r.input_json, '$.pricingUnit'))=?"); params.push(pricingUnit); }
-  if (["highlyPerishable", "perishable", "shelfStable", "deckHyland", "custom"].includes(markupCategory)) { where.push("COALESCE(JSON_UNQUOTE(JSON_EXTRACT(r.input_json, '$.markupCategory')), ma.markup_category)=?"); params.push(markupCategory); }
+  if (["highlyPerishable", "perishable", "shelfStable", "deckHyland", "creamyCow", "custom"].includes(markupCategory)) { where.push("COALESCE(JSON_UNQUOTE(JSON_EXTRACT(r.input_json, '$.markupCategory')), ma.markup_category)=?"); params.push(markupCategory); }
   if (["enabled", "disabled"].includes(square)) where.push(`COALESCE(JSON_UNQUOTE(JSON_EXTRACT(r.input_json, '$.squareEnabled')), 'false')='${square === "enabled" ? "true" : "false"}'`);
   if (status === "unresolved") where.push("s.latest_revision_id IS NULL");
   else if (["pending", "approved", "active", "rejected", "partial", "local-preview"].includes(status)) { where.push("r.status=?"); params.push(status); }
@@ -258,15 +278,30 @@ export async function listEnterprisePricingProducts({ search = "", vendorId = nu
     if (!publicationsByRevision.has(revisionId)) publicationsByRevision.set(revisionId, []);
     publicationsByRevision.get(revisionId).push({ platform: publication.platform, status: publication.status });
   }
-  const [saleRows] = productIds.length ? await getPool().query("SELECT status, input_json AS inputJson FROM enterprise_promotions WHERE status IN ('approved','scheduled','active','partial','cancelling')") : [[]];
+  const [saleRows] = productIds.length ? await getPool().query("SELECT status, input_json AS inputJson, output_json AS outputJson, square_status AS squareStatus, localline_status AS localLineStatus FROM enterprise_promotions WHERE status IN ('pending','approved','scheduled','active','partial','cancelling')") : [[]];
+  const promotionsByProduct = new Map();
+  for (const sale of saleRows) {
+    const input = parse(sale.inputJson), output = parse(sale.outputJson);
+    for (const productId of new Set((input?.packageIds || []).map(id => packageProducts.get(Number(id))).filter(Boolean))) {
+      if (!promotionsByProduct.has(productId)) promotionsByProduct.set(productId, []);
+      promotionsByProduct.get(productId).push({ status: sale.status, squareStatus: sale.squareStatus, localLineStatus: sale.localLineStatus, input, output });
+    }
+  }
+  const channelRecords = await readPricingChannelRecords(getPool(), productIds);
   const saleByProduct = new Map();
   for (const sale of saleRows) for (const packageId of parse(sale.inputJson)?.packageIds || []) {
     const productId = packageProducts.get(Number(packageId));
     if (productId && (!saleByProduct.has(productId) || sale.status < saleByProduct.get(productId))) saleByProduct.set(productId, sale.status);
   }
   const pricingSettings = await getPricingSettings();
-  return { rows: rows.map(row => ({
-    id: Number(row.id), name: row.name, thumbnailUrl: row.thumbnailUrl || null, vendorId: row.vendorId, vendorName: row.vendorName,
+  return { rows: rows.map(row => {
+    const input = parse(row.inputJson), output = parse(row.outputJson);
+    const record = channelRecords.get(Number(row.id));
+    const publications = publicationsByRevision.get(Number(row.latestRevisionId)) || [];
+    const fixedDeposit = !output && isNoMarkupProduct(row) ? { input: { squareEnabled: false, pricingUnit: "each" },
+      output: { packages: (record?.packages || []).map(pkg => ({ packageId: Number(pkg.id), localLineRegularCents: pkg.price == null ? null : Math.round(Number(pkg.price) * 100) })) } } : null;
+    return ({
+    id: Number(row.id), type: 'product', name: row.name, thumbnailUrl: row.thumbnailUrl || null, vendorId: row.vendorId, vendorName: row.vendorName,
     markupAssignment: row.assignedMarkupCategory ? { category: row.assignedMarkupCategory, markupBp: pricingSettings.markupBp[row.assignedMarkupCategory] } : null,
     status: row.status || "unresolved", latestRevisionId: row.latestRevisionId, activeRevisionId: row.activeRevisionId,
     editorId: row.editorId, approverId: row.approverId, editorName: row.editorName, approverName: row.approverName,
@@ -274,13 +309,15 @@ export async function listEnterprisePricingProducts({ search = "", vendorId = nu
     approvedSquareLinks: Number(row.approvedSquareLinks), input: parse(row.inputJson), output: parse(row.outputJson),
     buyPrice: row.buyPrice == null ? null : { cents: Math.round(Number(row.buyPrice) * 100),
       revision: Number(row.buyPriceRevision), enterpriseId: Number(row.buyPriceEnterpriseId) },
-    publications: publicationsByRevision.get(Number(row.latestRevisionId)) || [],
+    publications, fixedDeposit: Boolean(fixedDeposit),
+    sync: pricingSyncStatus({ input: fixedDeposit?.input || input, output: fixedDeposit?.output || output,
+      publications, promotions: promotionsByProduct.get(Number(row.id)) || [], localOnly: process.env.CSA_LOCAL_ONLY === "true" }, record),
     sourceEvidence: sampleEvidence.get(Number(row.id)) || null,
     legacy: { pricingUnit: row.legacyPricingUnit === "lbs" ? "lb" : row.legacyPricingUnit || null,
       retailUnitPrice: row.legacyRetailUnitPrice,
       packages: packageRows.filter(pkg => Number(pkg.productId) === Number(row.id))
         .map(pkg => ({ id: Number(pkg.id), name: pkg.name, storedPrice: pkg.price })) }
-  })), total: Number(count[0].total), limit: safeLimit, offset: safeOffset, vendors,
+  }); }), total: Number(count[0].total), limit: safeLimit, offset: safeOffset, vendors,
     enterprises: await listPricingEnterprises() };
 }
 
@@ -291,6 +328,7 @@ export async function enterprisePricingSummary() {
     LEFT JOIN enterprise_pricing_product_state s ON s.product_id=p.id
     LEFT JOIN enterprise_pricing_revisions r ON r.id=s.latest_revision_id
     WHERE COALESCE(p.is_deleted, 0)=0 AND LOWER(COALESCE(c.name,''))<>'membership'
+    AND NOT EXISTS (SELECT 1 FROM enterprise_bundle_legacy_products b WHERE b.product_id=p.id)
     GROUP BY COALESCE(r.status, 'unresolved')`);
   const [problems] = await getPool().query(`SELECT status, COUNT(DISTINCT revision_id) AS total
     FROM enterprise_pricing_publications WHERE status IN ('blocked','failed','partial') GROUP BY status`);
@@ -305,7 +343,7 @@ export async function enterprisePricingSummary() {
 
 export async function getEnterprisePricingProduct(productId) {
   await ensureEnterprisePricingSchema();
-  const product = await productRecord(id(productId, "Product ID"));
+  const product = await productRecord(id(productId, "Product ID"), getPool(), { allowMissingVendor: true });
   const [packages, latest, active, enterprises, settings] = await Promise.all([
     packagesFor(product.id), revisionFor(product.id), revisionFor(product.id, "active"), listPricingEnterprises(), getPricingSettings()
   ]);
@@ -373,14 +411,14 @@ export async function getEnterprisePricingProduct(productId) {
 export async function saveEnterpriseBuyPrice(productId, value, expectedRevision, user) {
   await ensureEnterprisePricingSchema();
   const productIdNumber = id(productId, "Product ID");
+  await productRecord(productIdNumber);
   const cents = scaledInteger(value, 2, "Buy Price");
   if (cents <= 0) failure("Buy Price must be greater than zero.");
   const expected = Number(expectedRevision ?? 0);
   if (!Number.isSafeInteger(expected) || expected < 0) failure("Buy Price revision is invalid.");
-  if (process.env.CSA_LOCAL_ONLY === "true") {
+  {
     const detail = await getEnterprisePricingProduct(productIdNumber);
     if (detail.latest) {
-      if (["approved", "partial"].includes(detail.latest.status)) failure("Finish or resolve the approved publication before editing Buy Price.", 409);
       const input = structuredClone(detail.suggestedInput);
       input.priceEffectiveAt = new Date().toISOString();
       const cost = priceAt(input.purchaseCosts, input.retailEnterpriseId, validDate(input.priceEffectiveAt, "Price effective date"));
@@ -504,6 +542,14 @@ export async function saveEnterprisePricingDraft(productId, input, expectedLates
     await connection.beginTransaction();
     await connection.query("SELECT id FROM products WHERE id=? FOR UPDATE", [productId]);
     const [state] = await connection.query("SELECT latest_revision_id AS latestRevisionId FROM enterprise_pricing_product_state WHERE product_id=? FOR UPDATE", [productId]);
+    if (Date.parse(`${preview.input.priceEffectiveAt.replace(" ", "T")}Z`) > Date.now()) failure("Future prices cannot take effect yet. Save them on their effective date.", 409);
+    const [inFlight] = await connection.query(`SELECT ra.id FROM product_sync_release_actions ra
+      JOIN product_sync_actions a ON a.id=ra.action_id JOIN product_sync_releases r ON r.id=ra.release_id
+      WHERE a.product_id=? AND r.status<>'cancelled' AND ra.status IN ('pending','working','failed','held') LIMIT 1`, [productId]);
+    if (inFlight.length) failure("Resolve the previous publication before editing its prices.", 409);
+    const [sales] = await connection.query("SELECT input_json AS inputJson FROM enterprise_promotions WHERE status IN ('approved','scheduled','active','partial','cancelling') FOR UPDATE");
+    const packageIds = new Set(preview.input.packages.map(pkg => pkg.packageId));
+    if (sales.some(sale => (parse(sale.inputJson)?.packageIds || []).some(pkg => packageIds.has(pkg)))) failure("Finish or cancel the sale before changing regular prices.", 409);
     const current = Number(state[0]?.latestRevisionId || 0);
     if (current !== Number(expectedLatestRevisionId || 0)) failure("Pricing changed since you opened it. Refresh and review before saving.", 409);
     const [buyDraft] = await connection.query(`SELECT revision FROM enterprise_pricing_buy_price_drafts
@@ -526,10 +572,16 @@ export async function saveEnterprisePricingDraft(productId, input, expectedLates
     const revisionId = Number(result.insertId);
     await connection.query(`INSERT INTO enterprise_pricing_product_state (product_id, latest_revision_id, updated_at)
       VALUES (?, ?, UTC_TIMESTAMP()) ON DUPLICATE KEY UPDATE latest_revision_id=VALUES(latest_revision_id), updated_at=VALUES(updated_at)`, [productId, revisionId]);
-    if (localOnly) {
+    {
       await connection.query("UPDATE enterprise_pricing_revisions SET active_at=UTC_TIMESTAMP() WHERE id=?", [revisionId]);
       await connection.query("UPDATE enterprise_pricing_product_state SET active_revision_id=? WHERE product_id=?", [revisionId, productId]);
     }
+    for (const row of preview.input.purchaseCosts) await connection.query(`INSERT IGNORE INTO enterprise_purchase_cost_history
+      (product_id,purchasing_enterprise_id,cost,effective_at,documentation_ref,revision_id,recorded_at)
+      VALUES (?,?,?,?,?,?,UTC_TIMESTAMP())`, [productId,row.enterpriseId,row.cost,row.effectiveAt,row.documentationRef,revisionId]);
+    for (const row of preview.output.wholesale) await connection.query(`INSERT IGNORE INTO enterprise_wholesale_price_history
+      (product_id,selling_enterprise_id,mode,price_cents,markup_bp,cost_enterprise_id,revision_id,recorded_at)
+      VALUES (?,?,?,?,?,?,?,UTC_TIMESTAMP())`, [productId,row.sellingEnterpriseId,row.mode,row.priceCents,row.markupBp ?? null,row.costEnterpriseId ?? null,revisionId]);
     await connection.query("DELETE FROM enterprise_pricing_markup_assignments WHERE product_id=?", [productId]);
     await connection.commit();
     return { revisionId, status, ...preview };
@@ -546,7 +598,7 @@ export async function approveEnterprisePricingRevision(revisionId, user) {
     if (!rows.length) failure("Pricing revision was not found.", 404);
     const revision = revisionView(rows[0]);
     const [state] = await connection.query("SELECT latest_revision_id AS latestRevisionId FROM enterprise_pricing_product_state WHERE product_id=? FOR UPDATE", [revision.productId]);
-    if (Number(state[0]?.latestRevisionId) !== revision.id || revision.status !== "pending") failure("This pricing revision is no longer pending. Refresh and review it.", 409);
+    if (Number(state[0]?.latestRevisionId) !== revision.id || !["pending", "local-preview"].includes(revision.status)) failure("This pricing revision is no longer pending. Refresh and review it.", 409);
     const [buyDraft] = await connection.query(`SELECT purchasing_enterprise_id AS enterpriseId, price
       FROM enterprise_pricing_buy_price_drafts WHERE product_id=? FOR UPDATE`, [revision.productId]);
     const approvedCost = priceAt(revision.input.purchaseCosts, revision.input.retailEnterpriseId, revision.input.priceEffectiveAt);
@@ -579,11 +631,10 @@ export async function approveEnterprisePricingRevision(revisionId, user) {
     const packageIds = new Set(packageRows.map(row => Number(row.packageId)));
     const overlappingSale = promotions.find(row => (parse(row.inputJson)?.packageIds || []).some(packageId => packageIds.has(Number(packageId))));
     if (overlappingSale) failure(`Sale ${overlappingSale.id} uses this product. Finish or cancel the sale before approving a new regular price.`, 409);
-    const [previous] = await connection.query(`SELECT r.output_json AS outputJson FROM enterprise_pricing_product_state s
-      JOIN enterprise_pricing_revisions r ON r.id=s.active_revision_id WHERE s.product_id=?`, [revision.productId]);
-    const old = previous.length ? parse(previous[0].outputJson) : null;
-    const squareChanged = revision.input.squareEnabled && (!old || old.squareUnitCents !== revision.output.squareUnitCents || JSON.stringify(old.packages.map(pkg => pkg.squareVariationCents)) !== JSON.stringify(revision.output.packages.map(pkg => pkg.squareVariationCents)));
-    const localLineChanged = !old || JSON.stringify(old.packages.map(pkg => [pkg.localLineRegularCents, pkg.localLineSaleCents])) !== JSON.stringify(revision.output.packages.map(pkg => [pkg.localLineRegularCents, pkg.localLineSaleCents]));
+    // Local activation is independent of channel verification. Every applicable
+    // destination must be freshly checked, even when the saved price is unchanged.
+    const squareChanged = revision.input.squareEnabled;
+    const localLineChanged = true;
     await connection.query("UPDATE enterprise_pricing_revisions SET status='approved', approver_id=?, approved_at=UTC_TIMESTAMP() WHERE id=?", [actorId(user), revision.id]);
     for (const row of revision.input.purchaseCosts) await connection.query(`INSERT IGNORE INTO enterprise_purchase_cost_history
       (product_id, purchasing_enterprise_id, cost, effective_at, documentation_ref, revision_id, recorded_at)
@@ -594,10 +645,6 @@ export async function approveEnterprisePricingRevision(revisionId, user) {
     for (const [platform, changed] of [["localline", localLineChanged], ["square", squareChanged]]) if (changed) {
       await connection.query(`INSERT INTO enterprise_pricing_publications (revision_id, platform, status, frozen_json, updated_at)
         VALUES (?, ?, 'pending', ?, UTC_TIMESTAMP())`, [revision.id, platform, JSON.stringify({ input: revision.input, output: revision.output, settingsVersionId: revision.settingsVersionId })]);
-    }
-    if (!localLineChanged && !squareChanged) {
-      await connection.query("UPDATE enterprise_pricing_product_state SET active_revision_id=?, migrated_at=COALESCE(migrated_at, UTC_TIMESTAMP()), updated_at=UTC_TIMESTAMP() WHERE product_id=?", [revision.id, revision.productId]);
-      await connection.query("UPDATE enterprise_pricing_revisions SET status='active', active_at=UTC_TIMESTAMP() WHERE id=?", [revision.id]);
     }
     await connection.commit();
     return { revisionId: revision.id, status: localLineChanged || squareChanged ? "approved" : "active", destinations: [localLineChanged ? "localline" : null, squareChanged ? "square" : null].filter(Boolean) };
@@ -650,15 +697,35 @@ export async function rejectEnterprisePricingRevision(revisionId, reason, user) 
   finally { connection.release(); }
 }
 
-export async function listEnterprisePricingReview() {
+export async function getEnterprisePricingSync(productId) {
+  const detail = await getEnterprisePricingProduct(productId);
+  const record = (await readPricingChannelRecords(getPool(), [detail.product.id])).get(Number(detail.product.id));
+  const revision = detail.latest || (isNoMarkupProduct(detail.product) ? { input: { squareEnabled: false, pricingUnit: "each" },
+    output: { packages: record.packages.map(pkg => ({ packageId: Number(pkg.id), localLineRegularCents: pkg.price == null ? null : Math.round(Number(pkg.price) * 100) })) } } : null);
+  // Publication history is local evidence, never an inferred remote purchase cost or markup.
+  const [published] = await getPool().query(`SELECT r.input_json AS inputJson,r.output_json AS outputJson,p.platform,p.verified_at AS verifiedAt
+    FROM enterprise_pricing_publications p JOIN enterprise_pricing_revisions r ON r.id=p.revision_id
+    WHERE r.product_id=? AND p.verified_at IS NOT NULL ORDER BY p.verified_at DESC,p.revision_id DESC`, [detail.product.id]);
+  const previous = [];
+  for (const row of published) if (!previous.some(item => item.platform === row.platform)) previous.push({ platform: row.platform,
+    verifiedAt: row.verifiedAt, input: parse(row.inputJson), output: parse(row.outputJson) });
+  return { localOnly: process.env.CSA_LOCAL_ONLY === "true", revisionId: detail.latest?.id || null,
+    input: revision?.input || null, output: revision?.output || null, previous,
+    comparison: revision ? compareLocalChannelPrices(revision, record) : [],
+    publications: detail.publications };
+}
+
+export async function listEnterprisePricingReview({ productId = null } = {}) {
   await ensureEnterprisePricingSchema();
   const localOnly = process.env.CSA_LOCAL_ONLY === "true";
   const [rows] = await getPool().query(`SELECT r.*, p.name AS productName, v.name AS vendorName,
     s.active_revision_id AS activeRevisionId FROM enterprise_pricing_revisions r
     JOIN enterprise_pricing_product_state s ON s.latest_revision_id=r.id
     JOIN products p ON p.id=r.product_id LEFT JOIN vendors v ON v.id=p.vendor_id
-    WHERE COALESCE(p.is_deleted,0)=0 AND r.status IN ('pending','approved','partial'${localOnly ? ",'local-preview'" : ""})
-    ORDER BY r.created_at DESC, r.id DESC ${localOnly ? "" : "LIMIT 250"}`);
+    WHERE COALESCE(p.is_deleted,0)=0 AND r.status IN ('pending','approved','partial','local-preview'${productId ? ",'active'" : ""})
+    AND NOT EXISTS (SELECT 1 FROM enterprise_bundle_legacy_products b WHERE b.product_id=p.id)
+    ${productId ? "AND r.product_id=?" : ""}
+    ORDER BY r.created_at DESC, r.id DESC ${localOnly ? "" : "LIMIT 250"}`, productId ? [id(productId, "Product ID")] : []);
   const catalog = localOnly ? new Map((await readMigrationCatalog(getPool())).map(record => [Number(record.product.id), record])) : new Map();
   const ids = rows.map(row => Number(row.id));
   const [publications] = ids.length ? await getPool().query("SELECT revision_id AS revisionId, platform, status, audit_id AS auditId, release_id AS releaseId FROM enterprise_pricing_publications WHERE revision_id IN (?)", [ids]) : [[]];
@@ -708,15 +775,20 @@ async function activateIfVerified(revisionId, connection) {
 
 export async function recordEnterpriseAuditResult(auditId, revisionId, connection = getPool()) {
   if (!revisionId) return;
+  const [revisions] = await connection.query("SELECT input_json AS inputJson, output_json AS outputJson, settings_version_id AS settingsVersionId FROM enterprise_pricing_revisions WHERE id=?", [revisionId]);
+  if (!revisions.length) failure("Pricing revision is missing.", 409);
+  const frozen = JSON.stringify({ input: parse(revisions[0].inputJson), output: parse(revisions[0].outputJson), settingsVersionId: revisions[0].settingsVersionId });
   const [actions] = await connection.query("SELECT platform, status FROM product_sync_actions WHERE audit_id=? AND direction='outgoing'", [auditId]);
   for (const platform of ["localline", "square"]) {
     const rows = actions.filter(row => row.platform === platform);
     if (!rows.length) continue;
     const status = rows.every(row => row.status === "synced") ? "verified"
       : rows.some(row => ["blocked", "review", "held"].includes(row.status)) ? "blocked" : "audited";
-    await connection.query(`UPDATE enterprise_pricing_publications SET status=?, audit_id=?,
-      verified_at=IF(?='verified', UTC_TIMESTAMP(), verified_at), updated_at=UTC_TIMESTAMP()
-      WHERE revision_id=? AND platform=? AND status<>'verified'`, [status, auditId, status, revisionId, platform]);
+    await connection.query(`INSERT INTO enterprise_pricing_publications (revision_id,platform,status,audit_id,frozen_json,verified_at,updated_at)
+      VALUES (?,?,?,?,?,IF(?='verified',UTC_TIMESTAMP(),NULL),UTC_TIMESTAMP())
+      ON DUPLICATE KEY UPDATE status=VALUES(status),audit_id=VALUES(audit_id),
+        verified_at=IF(VALUES(status)='verified',UTC_TIMESTAMP(),verified_at),updated_at=UTC_TIMESTAMP()`,
+      [revisionId, platform, status, auditId, frozen, status]);
   }
   await activateIfVerified(revisionId, connection);
 }
@@ -746,6 +818,8 @@ export async function assertLegacyPricingPublicationAllowed(productIds = []) {
   await ensureEnterprisePricingSchema();
   const ids = [...new Set(productIds.map(Number).filter(value => Number.isSafeInteger(value) && value > 0))];
   if (!ids.length) return;
+  const [bundles] = await getPool().query('SELECT product_id FROM enterprise_bundle_legacy_products WHERE product_id IN (?) LIMIT 1', [ids]);
+  if (bundles.length) failure('Bundles use native Local Line box records. Review them under Pricing → Bundles; product publication is blocked.', 409);
   const [rows] = await getPool().query(`SELECT p.name FROM enterprise_pricing_product_state s
     JOIN products p ON p.id=s.product_id
     LEFT JOIN enterprise_pricing_revisions r ON r.id=s.latest_revision_id

@@ -38,7 +38,7 @@ export async function getEnterprisePromotion(promotionId) {
 async function frozenPromotion(promotion, connection = getPool()) {
   const ids = promotion.packageIds;
   const [packages] = await connection.query(`SELECT p.id AS packageId, p.product_id AS productId, p.name AS packageName,
-    s.active_revision_id AS activeRevisionId, r.input_json AS pricingInput, r.output_json AS pricingOutput,
+    s.active_revision_id AS activeRevisionId, r.status AS pricingStatus, r.input_json AS pricingInput, r.output_json AS pricingOutput,
     lm.local_line_package_id AS localLinePackageId, pm.local_line_product_id AS localLineProductId,
     l.square_variation_id AS squareVariationId
     FROM packages p LEFT JOIN enterprise_pricing_product_state s ON s.product_id=p.product_id
@@ -49,7 +49,7 @@ async function frozenPromotion(promotion, connection = getPool()) {
     WHERE p.id IN (?)`, [ids]);
   if (packages.length !== ids.length) fail("One or more packages were not found or have duplicate Square links.", 409);
   const frozen = packages.map(pkg => {
-    if (!pkg.activeRevisionId) fail(`${pkg.packageName}: approve and verify regular enterprise pricing first.`, 409);
+    if (!pkg.activeRevisionId || (process.env.CSA_LOCAL_ONLY !== "true" && pkg.pricingStatus !== "active")) fail(`${pkg.packageName}: approve and verify regular enterprise pricing first.`, 409);
     const input = parse(pkg.pricingInput), output = parse(pkg.pricingOutput);
     const regular = output.packages.find(row => Number(row.packageId) === Number(pkg.packageId));
     if (!regular) fail(`${pkg.packageName}: approved package price is missing.`, 409);

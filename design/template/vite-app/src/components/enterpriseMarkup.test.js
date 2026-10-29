@@ -69,3 +69,9 @@ test("Deck/Hyland preset clears a custom override and uses the configured rate",
   assert.deepEqual(selected, { markupCategory: "deckHyland", customMarkupBp: null });
   assert.equal(markupValue(selected, DEFAULT_PRICING_SETTINGS), 8500);
 });
+
+test('Creamy Cow preset replaces custom markup with the configured 40% category', () => {
+  const selected = selectMarkupCategory('creamyCow', { markupCategory: 'custom', customMarkupBp: 3998 }, DEFAULT_PRICING_SETTINGS);
+  assert.deepEqual(selected, { markupCategory: 'creamyCow', customMarkupBp: null });
+  assert.equal(markupValue(selected, DEFAULT_PRICING_SETTINGS), 4000);
+});

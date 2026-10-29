@@ -209,3 +209,10 @@ test("a failed Google clear aborts the export instead of claiming stale rows wer
   }), /Google Sheets request failed: 403 Forbidden Clear failed/);
   assert.deepEqual(methods, ["GET", "POST"]);
 });
+
+test('migrated exports use saved prices, purchase costs and confirmed sales without legacy formulas',()=>{
+ const fixture=pricingFixture({enterprisePrices:new Map([[42,{input:{pricingUnit:'lb',packages:[{packageId:420,minWeight:3,maxWeight:5}]},output:{squareUnitCents:1000,csaUnitCents:900,buyFromTenThousandths:50000,appliedMarkupBp:10000,packages:[{packageId:420,averageWeightMilliPounds:4000,localLineRegularCents:3600,localLineSaleCents:2880,squareSaleCents:800}]}}]])});
+ const row=exportedProduct(buildPricelistSheetValues(fixture));
+ assert.equal(row.retailSalesPrice,10);assert.equal(row.ffcsaPurchasePrice,20);assert.equal(row.ffcsaMemberSalesPrice,28.8);assert.equal(row.squareSalePrice,8);assert.equal(row.memberMarkup,1);assert.equal(row.FFCSAFactor,'');assert.equal(row.dff_unit_of_measure,'lbs');
+ assert.equal(buildPricelistSheetValues({...fixture,bundleProductIds:[42]}).rowCount,0,'native bundles are excluded from legacy product exports');
+});

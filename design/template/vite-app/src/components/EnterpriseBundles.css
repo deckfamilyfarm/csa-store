@@ -1,0 +1,17 @@
+.pricing-type-tabs{display:flex;align-items:center;gap:8px;margin:0 0 5px;padding:0 12px}
+.pricing-type-tabs h2{font-size:20px;margin:0 12px 0 0}
+.pricing-type-tabs button{border:0;border-bottom:3px solid transparent;background:none;padding:6px 14px;color:#385b43;cursor:pointer}
+.pricing-type-tabs button[aria-selected=true]{border-bottom-color:#366647;font-weight:700;background:#eef5ef}
+.bundle-filters{gap:10px;margin-bottom:10px;align-items:center}.bundle-filters .input{width:auto;max-width:300px}
+.bundle-table-scroll{height:var(--rows-height,65vh);overflow:auto}.bundle-table-scroll thead th{position:sticky;top:0;z-index:1;background:#eef3ed}
+.bundle-review .bundle-table-scroll{height:auto;max-height:360px}.bundle-review{margin:8px 0 20px}
+.enterprise-bundles td{padding:8px;vertical-align:top}.enterprise-bundles small,.bundle-form td small{display:block;color:#647168;font-size:12px}
+.bundle-name{background:none;border:0;color:#356747;text-align:left;cursor:pointer;padding:0;font:inherit;max-width:300px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.bundle-attention,.bundle-matches{border:0;border-radius:4px;font:inherit;font-size:12px;padding:4px 7px;cursor:pointer}.bundle-attention{background:#fff1d9;color:#8a5100}.bundle-matches{background:#e7f2e8;color:#2d633b}
+.bundle-form fieldset{border:0;padding:0;display:grid;gap:12px;min-width:0}.bundle-form label{display:grid;gap:5px}.bundle-form .bundle-check{display:flex;align-items:center;gap:8px}
+.bundle-images{display:flex;flex-wrap:wrap;gap:12px}.bundle-images>div{display:grid;gap:4px}.bundle-images img{width:100px;height:100px;object-fit:cover;border-radius:5px}
+.bundle-price-summary{display:flex;flex-wrap:wrap;gap:25px;background:#eef4ef;padding:13px;border-radius:5px;margin-bottom:14px;font-size:12px}.bundle-price-summary strong{display:block;font-size:20px;margin-top:4px}
+.bundle-form .bundle-quantity{width:75px}.bundle-form .bundle-pricing-inputs{grid-template-columns:1fr 1fr;margin-top:18px}
+.bundle-add-contents{border:1px solid #d5dfd6;padding:10px;margin-top:10px;border-radius:5px}.bundle-add-contents>div{max-height:240px;overflow:auto}
+.bundle-add-contents button{display:block;width:100%;text-align:left;padding:8px;background:white;border:0;border-bottom:1px solid #e6eae6;color:#315a3d;cursor:pointer}.bundle-add-contents small{display:block;color:#666}
+@media(max-width:600px){.bundle-price-summary{gap:12px}.bundle-form .bundle-pricing-inputs{grid-template-columns:1fr}.bundle-filters .input{max-width:100%}}

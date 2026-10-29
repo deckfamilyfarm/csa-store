@@ -1,5 +1,52 @@
 # Production data and enterprise pricing migration
 
+## Reviewed local data: production cutover
+
+Use `apps/api/scripts/pricingCutover.js` to transfer the reviewed local work. **Do not restore the development database over production.** The older conversion commands below create initial proposals from legacy data; they are not the transfer mechanism for the completed local edits.
+
+The cutover compares three sources: the original production snapshot, the reviewed local catalog, and current production. It copies only reviewed catalog fields and enterprise pricing/bundle records. Conflicting edits stop the entire transaction. Orders, users, roles, payments, stock, farm counts, channel receipts, and promotions are excluded. Imported local editor IDs are attributed to the specified real production editor, with the original IDs retained in the migration provenance. The development administrator is never imported.
+
+A new settings version preserves the reviewed monetary outputs while making current revisions publishable under that version. `--allow-same-approver` implements John's October 29 decision: the same authorized person may edit and approve; saving still never publishes. Historical revisions and purchase-cost history are retained. No channel approval or verification is inferred from the development copy.
+
+Rehearsal completed October 29, 2026 on `csa_pricing_local_20261029150000`, separate from the selected development database. The fresh production snapshot contained 88 tables / 280,932 rows. The migration transferred 769 saved pricing records and 10 bundles. Verification confirmed all 78 excluded tables and every existing inventory count unchanged; rollback restored all 88 original tables. Private plans, verification reports and snapshots are under `.local-pricing/cutover/` and must stay out of Git.
+
+### Production sequence (requires deployment approval)
+
+1. Commit and push the reviewed branch. On `ffcsa-server`, the app is `/home/jdeck/code/csa-store`, PM2 process `store`, currently on `main`. Deploy the exact tested commit together with this migration; do not run the old app against migrated data. The shell uses Node 22.17 and the existing PM2 process uses Node 20.19.6. Keep the existing process configuration and `.env`; never use `npm run dev` or copy local credentials on the server.
+2. Pause catalog editing and the CSA catalog-pull / scheduled-price jobs for the cutover window. Keep order/payment maintenance running. Take a fresh complete production backup. Transfer the reviewed local catalog snapshot and original catalog baseline privately; neither belongs in Git. Capture the current commit and crontab for rollback.
+3. From the new checkout, prepare the additive schema, then generate a fresh production comparison. Schema preparation does not activate pricing or contact channels:
+
+   ```sh
+   node --env-file=.env apps/api/scripts/pricingCutover.js --prepare-schema --confirm-database=store --editor-id=5
+   node --env-file=.env apps/api/scripts/pricingCutover.js --baseline=PRIVATE_ORIGINAL_SNAPSHOT --source=PRIVATE_REVIEWED_CATALOG.json --out=PRIVATE_PRODUCTION_PLAN.json --editor-id=5 --allow-same-approver
+   ```
+
+4. Review the resulting conflicts, operation counts and hash. Stop if anything differs from the rehearsed intent. Apply that exact plan with its hash and the fresh backup manifest:
+
+   ```sh
+   node --env-file=.env apps/api/scripts/pricingCutover.js --apply --plan=PRIVATE_PRODUCTION_PLAN.json --approved-hash=REVIEWED_HASH --backup-manifest=PRIVATE_BACKUP/manifest.json --confirm-database=store --editor-id=5
+   ```
+
+   Apply rechecks affected rows inside a transaction. Repeating the same successful plan is a no-op. It makes no Local Line, Square, email, payment or Google requests.
+
+5. Build the frontend and restart only PM2 `store` using its existing configuration. Verify Timesheets login (`deck.john`, linked to CSA user `jdeck` / ID 5), Pricing, Inventory, saved prices and order/payment health. Run `node --env-file=.env apps/api/scripts/pricingDeploymentCheck.js` on the server. Check cached comparisons separately from actual remote verification.
+6. Restore scheduled jobs with the new code. Once local pricing is authoritative, the legacy catalog audit/cache importers run review-only and cannot overwrite catalog, photos or sales. Order/customer/reporting imports remain separate. Old scheduled product releases are held for migrated products before either local changes or remote publication.
+7. Merge the tested refactor into `main`, then align the deployed checkout with that same merged code. A database migration and a Git merge are distinct operations. Publish channel changes separately, beginning with a small reviewed batch.
+
+Before any channel publication, preserve the remaining holds: Green Bag has no remote package; vendorless products cannot be edited/published; ten legacy Local Line sales require explicit reconciliation. Legacy batch 3 has two failed chicken rows and must not be blindly retried. Bundle publication checks all component selling prices in all four baskets first, so sale conflicts also hold dependent bundles. Deposits and Membership keep their special workflows.
+
+Bundle publication has an explicit pilot gate, `LL_BUNDLE_PUBLICATION_ENABLED=true`, and Square automatic discounts retain `SQUARE_PROMOTION_POS_VERIFIED=true` after an actual market POS test. Neither gate was enabled during development. Bundle inventory-mode/stock changes and newly uploaded images require separate validation; publication does not guess or overwrite those fields.
+
+### Rollback
+
+Before channel publication or subsequent edits, reverse the precise applied plan:
+
+```sh
+node --env-file=.env apps/api/scripts/pricingCutover.js --rollback=APPLIED_HASH --confirm-database=store --editor-id=5
+```
+
+Rollback refuses later edits/publications or new references to inserted catalog records. It preserves unrelated inventory changes. Schema and the audit receipt remain. Once data rollback verifies, restore the earlier app commit and restart `store`. Do not downgrade the app first or restore an old full backup over newer orders. If rollback is held, reconcile the affected records explicitly. A rolled-back plan cannot be reapplied; generate a new reviewed plan.
+
 ## Local development
 
 `npm run dev` uses Docker MySQL on `127.0.0.1:33077`, the `csa_local` account, and the database selected in `.local-pricing/active.json`. The selection accepts only `csa_pricing_local` or a timestamped `csa_pricing_local_YYYYMMDDHHMMSS` database. The original fixture database remains available.
@@ -19,7 +66,7 @@ Sign in at `http://127.0.0.1:5176/admin` with `local.admin` / `local-pricing-adm
 
 Pricing saves take effect immediately in the isolated local store. Markup, package, and complete-product saves record a `local-preview` revision and update the active local price in the same transaction. Buy Price changes also recalculate and activate prices when the product has complete pricing inputs. Incomplete products retain the saved cost until their remaining inputs are supplied.
 
-Review & Publish compares these local prices against the imported Square and all four Local Line basket prices, showing differences and missing mappings. Matching imported prices are not a live verification. Saving creates no publication, approval, or remote request. Production saves still require the existing approval and publication flow. Promotional sales remain separately reviewed.
+Review & Publish compares these local prices against the imported Square and all four Local Line basket prices, showing differences and missing mappings. Matching imported prices are not a live verification. Saving creates no publication, approval, or remote request. Production saves also activate the saved store price immediately; channel synchronization requires separate approval and publication. Promotional sales remain separately reviewed.
 
 To bring previously saved pending prices into use in an existing local clone, run `node scripts/local-pricing/activateSavedPrices.mjs`. It validates each record, preserves earlier revisions, reports any held records, and cannot run against a production database.
 

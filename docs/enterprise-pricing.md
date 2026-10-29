@@ -1,6 +1,6 @@
 # Enterprise pricing workbench
 
-The new Store → Pricing and Store → Review & Publish screens use local pricing revisions. A draft never changes the storefront, Square, or Local Line. An approved revision becomes the active local price only after every required remote destination has been checked and verified. Existing products continue using legacy pricing until migrated individually.
+The new Store → Pricing and Store → Review & Publish screens use local pricing revisions. Saving activates the store price immediately, including in production, and records purchase/wholesale history. Saving never writes to Square or Local Line. Channel synchronization requires separate approval, fresh checks, explicit publication and verification. Existing products continue using legacy pricing until migrated individually.
 
 ## Local development
 
@@ -27,15 +27,15 @@ The pricing engine uses integer amounts: purchase costs have four decimal places
 
 ## Review and publication
 
-1. Save a product proposal in Pricing. Enter validated purchase costs and documentation references; historical legacy multipliers do not establish intercompany costs.
-2. A different publisher reviews the frozen output. Production requires separate editor and approver by default.
+1. Save a product price in Pricing; it takes effect in our store immediately. Enter validated purchase costs and documentation references; historical legacy multipliers do not establish intercompany costs.
+2. An authorized publisher reviews the frozen output. The October 29 cutover explicitly allows the same person to edit and approve; the separation setting remains configurable.
 3. Check destinations. The existing Product Sync audit refreshes remote products, variation units, prices, locations, vendor identity, and mappings without writing.
 4. Publish the approved actions. The release checks frozen local and remote baselines again. A blocker in either destination holds coordinated publication for that product. Unrelated products can proceed.
-5. Confirm destination receipts. A partially published product stays partial until all required destinations verify. Only then does its active local pricing revision change.
+5. Confirm destination receipts. A partially published product stays partial until all required destinations verify. Publication failures do not undo saved store prices. A new edit invalidates prior approval; unresolved publications or approved sales hold conflicting edits.
 
 Square eligibility is explicit and distinct from an approved variation mapping. Disabling eligibility does not remove a Square listing. Products without Square eligibility produce no Square price action. Wholesale prices stay local. Deposits, Membership, and unresolved basket-specific overrides stay in the legacy workflow pending reconciliation.
 
-The Migration comparison button uses cached remote data and does not publish or change prices. Treat missing costs, conflicting basket prices, and uncertain mappings as review items.
+The Migration comparison menu item uses cached remote data and does not publish or change prices. Treat missing costs, conflicting basket prices, and uncertain mappings as review items.
 
 ## Sales
 
@@ -54,3 +54,11 @@ node --test scripts/local-pricing/guard.test.mjs
 ```
 
 The opt-in enterprise and Product Sync integration tests use a disposable MySQL socket under `/tmp/csa-product-sync-*` and mock every external request. Run those suites separately because Product Sync uses a process-wide database lock.
+
+## Bundles
+
+Pricing → Bundles stores native Local Line boxes separately from ordinary products. FF bundle selling price is the sum of component package selling prices less the saved discount (initially 5%). Vendor Buy Price is independent. Editing a component price recalculates dependent bundles.
+
+The Sync section checks live component prices, box mappings, vendor and four basket entries, then saves a frozen review. Approve & publish requires publishing permission and Local Line Push. All component basket prices must already match our saved prices. Retries use the same review and verify a lost response before sending again; an uncertain publication blocks replacement reviews. Name, description, visibility, Buy Price, component quantities and basket prices are displayed/reviewed. Inventory-mode/stock changes, unknown images, swaps and missing baskets are held rather than guessed.
+
+Live box publication requires an explicitly approved first-box pilot (`LL_BUNDLE_PUBLICATION_ENABLED=true`). Local tests mock every channel request; they do not establish live Local Line behavior. Square promotions separately require the real POS pilot. See [the migration guide](pricing-migration.md) for the rehearsed rollout and rollback.

@@ -16,6 +16,7 @@ import {
 import { squareUnitSnapshot, unitChangeIssue, planSquareUnit } from './squarePricingUnits.js';
 import { applyEnterpriseLocalLinePrices } from './enterprisePricingPublication.js';
 import { enterpriseRevisionMarker } from './enterprisePricingService.js';
+import { liveLocalLinePriceComparison, refreshEnterprisePriceCache } from './enterprisePricingComparison.js';
 import { same, preflight } from "./productSyncCore.js";
 import { parseJson } from "./productSyncSchema.js";
 import { normalizeCustomerPriceOverrides } from './customerPriceOverrides.js';
@@ -213,6 +214,8 @@ export async function prepareLocalLineAction(product, staged = {}, { onRefresh, 
   action.status = same(action.remoteBefore, action.desired) ? "synced" : "changed";
   action.message = remote ? "" : "Create a new Local Line product, then set the reviewed package prices and images.";
   action.display = { current: action.remoteBefore, proposed: { ...action.desired, ...(createPayload ? { create: createPayload } : {}) } };
+  if (enterpriseRevision) action.display.pricingComparison = liveLocalLinePriceComparison(remote, payload);
+  if (enterpriseRevision && remote) await refreshEnterprisePriceCache(getPool(), product.id, remote, payload);
   return action;
 }
 export async function inspectAction(action, saveCheckpoint = async () => {}) {
@@ -260,6 +263,7 @@ export async function inspectAction(action, saveCheckpoint = async () => {}) {
   const remote = remoteId ? await fetchLocalLineProduct(remoteId, await getLocalLineAccessToken()) : null;
   if (remote?.is_deleted) throw Object.assign(new Error("The Local Line product was deleted. Review its link first."), { hold: true });
   const payload = checkpoint.payload || action.payload;
+  if (action.enterpriseRevisionId && remote) await refreshEnterprisePriceCache(getPool(), action.productId, remote, payload);
   const approvedImages = checkpoint.images?.length === action.imageSources.length ? checkpoint.images : null;
   return {
     local: localLineInputs(context, action.includeInventory !== false, action.includeVisibility !== false), mapping,

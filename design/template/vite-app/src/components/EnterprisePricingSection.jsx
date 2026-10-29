@@ -4,8 +4,11 @@ import { EnterprisePromotionEditor } from "./EnterprisePromotionEditor.jsx";
 import { EnterpriseMarkupCell, MarkupControls, MarkupCalculation } from "./EnterpriseMarkup.jsx";
 import { ProductEditorDialog } from "./ProductEditorDialog.jsx";
 import { ProductEditorInfo } from "./ProductEditorInfo.jsx";
+import { PricingSyncStatus } from "./PricingSyncStatus.jsx";
+import { ProductPricingSync } from "./ProductPricingSync.jsx";
 import { ProductIdentity } from "./ProductIdentity.jsx";
 import { InlinePricingValue } from "./InlinePricingValue.jsx";
+import { EnterpriseBundles } from './EnterpriseBundles.jsx';
 import { usesProductMarkup, retailMarginPercent, isDepositPricing, depositBaseCents, productPricingUnit } from "./enterpriseMarkup.js";
 import "./EnterprisePricingSection.css";
 
@@ -21,7 +24,7 @@ const productHref = id => {
 const columns = [
   ["name", "Product"], ["buyFrom", "Buy Price"],
   ["markup", "Markup"], ["margin", "Margin"], ["csa", "FF Unit Price"],
-  ["llPackage", "FF Package Price"], ["square", "Square"], ["wholesale", "Wholesale"], ["sale", "Sale"], ["status", "Sync / review"]
+  ["llPackage", "FF Package Price"], ["square", "Square"], ["wholesale", "Wholesale"], ["sale", "Sale"], ["sync", "Sync"]
 ];
 const productWarnings = row => {
   const warnings = [...(row.sourceEvidence?.warnings || [])];
@@ -41,6 +44,23 @@ const localDateTime = value => {
 };
 
 export function EnterprisePricingSection({ token, roles = [] }) {
+  const [tab, setTab] = useState(() => new URLSearchParams(window.location.search).get('pricingTab') === 'bundles' ? 'bundles' : 'products');
+  const selectTab = value => {
+    setTab(value);
+    const url = new URL(window.location.href); url.searchParams.set('pricingTab', value);
+    window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
+    requestAnimationFrame(() => window.dispatchEvent(new Event('resize')));
+  };
+  return <div className="pricing-workspace"><div className="pricing-type-tabs"><h2>Pricing</h2><div role="tablist" aria-label="Pricing product type">
+    {['products','bundles'].map(value => <button key={value} role="tab" id={`pricing-${value}-tab`} aria-controls={`pricing-${value}-panel`} aria-selected={tab===value}
+      tabIndex={tab===value?0:-1} onClick={()=>selectTab(value)} onKeyDown={e=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();const next=e.key==='Home'?'products':e.key==='End'?'bundles':value==='products'?'bundles':'products';selectTab(next);document.getElementById(`pricing-${next}-tab`)?.focus();}}}>{value==='products'?'Products':'Bundles'}</button>)}
+  </div></div>
+    <div role="tabpanel" id="pricing-products-panel" aria-labelledby="pricing-products-tab" hidden={tab!=='products'}><EnterpriseProductsSection token={token} roles={roles} /></div>
+    <div role="tabpanel" id="pricing-bundles-panel" aria-labelledby="pricing-bundles-tab" hidden={tab!=='bundles'}><EnterpriseBundles token={token} roles={roles} active={tab==='bundles'} /></div>
+  </div>;
+}
+
+function EnterpriseProductsSection({ token, roles = [] }) {
   const tableScrollRef = useRef(null);
   const productInfoRef = useRef(null);
   const saveBusy = useRef(false);
@@ -61,6 +81,7 @@ export function EnterprisePricingSection({ token, roles = [] }) {
   const [preview, setPreview] = useState(null);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
+  const [editorSection, setEditorSection] = useState(null);
   const [vendorFilter, setVendorFilter] = useState("");
   const [unitFilter, setUnitFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
@@ -93,7 +114,7 @@ export function EnterprisePricingSection({ token, roles = [] }) {
   useEffect(() => {
     let cancelled = false;
     const timer = setTimeout(() => {
-      const params = new URLSearchParams({ search, status, vendorId: vendorFilter, pricingUnit: unitFilter,
+      const params = new URLSearchParams({ search, syncStatus: status, vendorId: vendorFilter, pricingUnit: unitFilter,
         markupCategory: categoryFilter, square: squareFilter, sort: sort.key, sortDirection: sort.direction,
         limit: "100", offset: String(page * 100) });
       adminGet(`enterprise-pricing/products?${params}`, token)
@@ -128,6 +149,7 @@ export function EnterprisePricingSection({ token, roles = [] }) {
 
   useEffect(() => {
     if (!selectedId || !draft || !canEdit || Number(detail?.product.id) !== Number(selectedId) || isDepositPricing(detail?.product)) return;
+    if (detail.product.vendorRequired) { setPreview(null); return; }
     setPreview(null);
     if (draft.customMarkupBp === "") { setMessage("Enter a markup percentage."); return; }
     let cancelled = false;
@@ -160,7 +182,7 @@ export function EnterprisePricingSection({ token, roles = [] }) {
   async function saveBuyPrice(row, value) {
     const saved = await adminPost(`enterprise-pricing/products/${row.id}/buy-price`, token,
       { price: Number(value).toFixed(2), expectedRevision: row.buyPrice?.revision || 0 });
-    setRows(current => current.map(item => item.id === row.id ? { ...item, buyPrice: saved,
+    setRows(current => current.map(item => item.id === row.id ? { ...item, buyPrice: saved, sync: null,
       ...(saved.pricing ? { input: saved.pricing.input, output: saved.pricing.output, status: saved.pricing.status,
         latestRevisionId: saved.pricing.revisionId, activeRevisionId: saved.pricing.revisionId } : {}) } : item));
     if (Number(selectedId) === Number(row.id)) {
@@ -183,8 +205,9 @@ export function EnterprisePricingSection({ token, roles = [] }) {
   const editorDirty = pricingDirty || infoDirty || saleDirty;
   const selectedIndex = rows.findIndex(row => Number(row.id) === Number(selectedId));
   const canLeaveEditor = () => !saveBusy.current && !saleBusy && (!editorDirty || window.confirm("Discard unsaved changes to this product?"));
-  function selectProduct(id, force = false) {
+  function selectProduct(id, force = false, section = null) {
     if (!force && !canLeaveEditor()) return;
+    setEditorSection(section);
     const url = new URL(window.location.href);
     if (id) url.searchParams.set("pricingProduct", String(id)); else url.searchParams.delete("pricingProduct");
     window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
@@ -201,9 +224,10 @@ export function EnterprisePricingSection({ token, roles = [] }) {
           input: draft, expectedLatestRevisionId: detail.latest?.id || null,
           expectedBuyPriceRevision: detail.buyPrice?.revision || 0
         });
+        setRows(current => current.map(row => Number(row.id) === Number(selectedId) ? { ...row, sync: null } : row));
         setPricingBaseline(JSON.stringify(draft));
         setDetailRefresh(value => value + 1);
-        setMessage(result.status === "local-preview" ? "Prices saved and now in use locally." : `Pricing proposal ${result.revisionId} saved for review.`);
+        setMessage("Prices saved and now in use. Channel synchronization is separate.");
       } else setMessage("Product info saved locally.");
       setMarkupRefresh(value => value + 1);
       if (closeAfter && (!saleDirty || window.confirm("Your sale proposal has unsaved changes. Discard it and go back?"))) selectProduct(null, true);
@@ -213,20 +237,19 @@ export function EnterprisePricingSection({ token, roles = [] }) {
 
 
   return <section className="card enterprise-pricing-page">
-    <div className="admin-section-heading"><h2>Pricing</h2></div>
     <div className="admin-grid enterprise-pricing-filters">
       <label>Search<input className="input" value={search} onChange={event => { setSearch(event.target.value); setPage(0); }} placeholder="Product or vendor" /></label>
       <label>Vendor<select className="input" value={vendorFilter} onChange={event => { setVendorFilter(event.target.value); setPage(0); }}><option value="">All vendors</option>{vendors.map(vendor => <option value={vendor.id} key={vendor.id}>{vendorLabel(vendor.name)}</option>)}</select></label>
-      <label>Status<select className="input" value={status} onChange={event => { setStatus(event.target.value); setPage(0); }}><option value="">All</option><option value="unresolved">Needs inputs</option><option value="pending">Awaiting approval</option><option value="approved">Approved</option><option value="partial">Partial</option><option value="active">Active</option>{summary?.localOnly && <option value="local-preview">In use locally</option>}</select></label>
+      <label>Sync status<select className="input" value={status} onChange={event => { setStatus(event.target.value); setPage(0); }}><option value="">All</option><option value="synced">Synced</option><option value="localline">Needs LL sync</option><option value="square">Needs Square sync</option><option value="inputs">Needs pricing inputs</option></select></label>
       <label>Unit<select className="input" value={unitFilter} onChange={event => { setUnitFilter(event.target.value); setPage(0); }}><option value="">All units</option><option value="lb">lb</option><option value="each">each</option></select></label>
-      <label>Markup category<select className="input" value={categoryFilter} onChange={event => { setCategoryFilter(event.target.value); setPage(0); }}><option value="">All categories</option><option value="highlyPerishable">Highly perishable</option><option value="perishable">Perishable</option><option value="shelfStable">Shelf stable</option><option value="deckHyland">Deck/Hyland Markup</option><option value="custom">Custom</option></select></label>
+      <label>Markup category<select className="input" value={categoryFilter} onChange={event => { setCategoryFilter(event.target.value); setPage(0); }}><option value="">All categories</option><option value="highlyPerishable">Highly perishable</option><option value="perishable">Perishable</option><option value="shelfStable">Shelf stable</option><option value="deckHyland">Deck/Hyland Markup</option><option value="creamyCow">Creamy Cow Markup</option><option value="custom">Custom</option></select></label>
       <label>Square<select className="input" value={squareFilter} onChange={event => { setSquareFilter(event.target.value); setPage(0); }}><option value="">All</option><option value="enabled">Enabled</option><option value="disabled">Not sold</option></select></label>
      </div>
     {message && !selectedId && <p role="status">{message}</p>}
     {summary && !summary.localOnly && <p className="small">{summary.byStatus.pending || 0} awaiting approval · {summary.byStatus.approved || 0} ready to check · {summary.byStatus.partial || 0} partially published · {(summary.problems.blocked || 0) + (summary.problems.failed || 0)} requiring review · {summary.sales?.active || 0} active sales · {summary.sales?.partial || 0} sale failures · {summary.byStatus.active || 0} active prices{summary.lastVerifiedAt ? ` · last verified ${new Date(summary.lastVerifiedAt).toLocaleString()}` : ""}</p>}
     <div className="table-wrap enterprise-pricing-table-wrap" ref={tableScrollRef} role="region" aria-label="Pricing table" tabIndex={0}><table className="admin-table enterprise-pricing-table"><thead><tr>{columns.map(([key, label]) =>
-      <th key={key} scope="col" aria-sort={sort.key === key ? sort.direction === "asc" ? "ascending" : "descending" : "none"}>
-        <button type="button" className="enterprise-pricing-sort" onClick={() => changeSort(key)}>{label}<span aria-hidden="true">{sort.key === key ? sort.direction === "asc" ? " ▲" : " ▼" : " ↕"}</span></button>
+      <th key={key} scope="col" aria-sort={key === "sync" ? undefined : sort.key === key ? sort.direction === "asc" ? "ascending" : "descending" : "none"}>
+        {key === "sync" ? label : <button type="button" className="enterprise-pricing-sort" onClick={() => changeSort(key)}>{label}<span aria-hidden="true">{sort.key === key ? sort.direction === "asc" ? " ▲" : " ▼" : " ↕"}</span></button>}
       </th>)}</tr></thead>
       <tbody>{visible.map(row => {
         const source = row.sourceEvidence;
@@ -250,10 +273,10 @@ export function EnterprisePricingSection({ token, roles = [] }) {
           value={row.buyPrice ? (row.buyPrice.cents / 100).toFixed(2) : row.output?.buyFromTenThousandths != null ? (row.output.buyFromTenThousandths / 10000).toFixed(2) : ""}
           onSave={value => saveBuyPrice(row, value)} />}</td>
         <td><EnterpriseMarkupCell row={row} token={token} canEdit={canEdit} onSaved={result => {
-          setRows(current => current.map(item => item.id === row.id ? { ...item, input: result.input, output: result.output,
+          setRows(current => current.map(item => item.id === row.id ? { ...item, input: result.input, output: result.output, sync: null,
             status: result.status, latestRevisionId: result.revisionId, buyPrice: result.buyPrice || item.buyPrice } : item));
           setMarkupRefresh(value => value + 1);
-          setMessage(result.status === "local-preview" ? "Markup saved. Updated prices are now in use locally." : "Markup saved for review before publication.");
+          setMessage("Markup saved. Updated prices are now in use; channel synchronization is separate.");
         }} /></td>
         <td title={`(${row.input?.squareEnabled ? "Square" : "FF unit"} price − Buy Price) ÷ ${row.input?.squareEnabled ? "Square" : "FF unit"} price × 100`}>{margin == null ? "—" : `${Math.round(margin)}%`}</td>
         <td>{row.output ? money(row.output.csaUnitCents) : money(pkg?.estimatedCsaUnitCents)}
@@ -267,7 +290,7 @@ export function EnterprisePricingSection({ token, roles = [] }) {
         <td>{row.output ? row.input?.squareEnabled ? <>{money(row.output.squareUnitCents)}<small title="Local selling unit to publish to Square">{productPricingUnit(row) ? `per ${productPricingUnit(row)}` : "Select pricing unit"}</small></> : missingChannelPrice : source?.square?.length ? source.square.map((price, index) => <div key={index}>{money(price.priceCents)}{price.priceCents != null && <small title="Local selling unit to publish to Square">{productPricingUnit(row) ? `per ${productPricingUnit(row)}` : "Select pricing unit"}</small>}</div>) : missingChannelPrice}</td>
         <td>{row.output?.wholesale?.length ? row.output.wholesale.map(price => `${enterprises.find(item => Number(item.id) === price.sellingEnterpriseId)?.name || price.sellingEnterpriseId}: ${money(price.priceCents)}`).join(" · ") : missingChannelPrice}</td>
         <td>{row.saleStatus || sourceSale(source)}</td>
-        <td>{deposit ? "Fixed deposit" : row.status === "unresolved" ? "Needs review" : row.status === "local-preview" ? "In use locally" : row.status}{row.editorName && <small>Edited {row.editorName}</small>}{row.approverName && <small>Approved {row.approverName}</small>}</td>
+        <td><PricingSyncStatus row={row} onReview={() => selectProduct(row.id, false, "editor-sync")} /></td>
       </tr>; })}</tbody></table></div>
     <div className="admin-actions enterprise-pricing-pagination">
       {summary?.localOnly && <span className="enterprise-pricing-footer-status">{summary.byStatus["local-preview"] || 0} products using local prices · {summary.byStatus.unresolved || 0} need pricing inputs · Review &amp; Publish compares channel prices</span>}
@@ -280,13 +303,14 @@ export function EnterprisePricingSection({ token, roles = [] }) {
       </div>
     </div>}
     {selectedId && <ProductEditorDialog key={selectedId} name={detail?.product.name || rows.find(row => Number(row.id) === Number(selectedId))?.name}
+      initialSection={editorSection}
       busy={loading || saleBusy} dirty={editorDirty} message={message || detailError}
       onClose={() => selectProduct(null)}
       onPrevious={selectedIndex > 0 ? () => selectProduct(rows[selectedIndex - 1].id) : null}
       onNext={selectedIndex >= 0 && selectedIndex < rows.length - 1 ? () => selectProduct(rows[selectedIndex + 1].id) : null}
       sections={[["editor-info", "Product info"], ["editor-inventory", "Inventory"],
         ...(!detail || isDepositPricing(detail.product) ? [] : [["editor-pricing", "Pricing"], ["editor-packages", "Packages"], ["editor-wholesale", "Wholesale"], ["editor-sales", "Sales"]]),
-        ["editor-channels", "Channel prices"]]}
+        ["editor-channels", "Channel prices"], ["editor-sync", "Sync"]]}
       footer={<><button type="button" className="button alt" disabled={loading} onClick={() => selectProduct(null)}>Back</button>
         {(canEdit || roles.some(role => ["admin", "inventory_admin", "pricing_admin", "local_pricelist_admin"].includes(role))) && <>
           <button type="button" className="button alt" disabled={loading || saleBusy || !(pricingDirty || infoDirty) || (pricingDirty && !preview?.output)} onClick={() => save(false)}>{loading ? "Saving…" : "Save"}</button>
@@ -297,10 +321,11 @@ export function EnterprisePricingSection({ token, roles = [] }) {
       {detail && draft && <fieldset id="pricing-product-detail" className="enterprise-pricing-editor" disabled={loading || saleBusy}>
       <ProductEditorInfo ref={productInfoRef} productId={selectedId} token={token} roles={roles} vendors={vendors} busy={loading || saleBusy}
         onDirty={setInfoDirty} onSaved={updates => {
-          setDetail(value => ({ ...value, product: { ...value.product, ...updates } }));
+          setDetail(value => ({ ...value, product: { ...value.product, ...updates,
+            vendorRequired: updates.vendorId ? false : value.product.vendorRequired } }));
           setRows(value => value.map(row => Number(row.id) === Number(selectedId) ? { ...row, ...updates } : row));
         }} />
-      {isDepositPricing(detail.product) ? <p className="small">Fixed deposit amount, with no markup. Managed through the existing deposit workflow.</p> : <p className="small">{summary?.localOnly ? "Saving updates local prices immediately. Review & Publish compares channel prices." : "Save changes locally, then use Review & Publish to approve them."} {detail.product.approvedSquareLinks ? `${detail.product.approvedSquareLinks} Square variation link(s).` : "Square mapping required if enabled."}</p>}
+      {isDepositPricing(detail.product) ? <p className="small">Fixed deposit amount, with no markup. Managed through the existing deposit workflow.</p> : <p className="small">{summary?.localOnly ? "Saving updates local prices immediately. Review & Publish compares channel prices." : "Saving updates our prices immediately. Review & Publish approves channel synchronization."} {detail.product.approvedSquareLinks ? `${detail.product.approvedSquareLinks} Square variation link(s).` : "Square mapping required if enabled."}</p>}
       {!isDepositPricing(detail.product) && <>
       <section id="editor-pricing" className="product-editor-section"><h3>Pricing</h3>
       <div className="admin-grid enterprise-pricing-editor-grid">
@@ -359,6 +384,10 @@ export function EnterprisePricingSection({ token, roles = [] }) {
           {detail.sourceEvidence.packages.map(pkg => <tr key={pkg.name}><td>{pkg.name}</td><td>{money(pkg.storedSourcePriceCents)}</td><td>{detail.sourceEvidence.square.filter(price => price.packageName === pkg.name).map(price => money(price.priceCents)).join(", ") || "—"}</td><td>{money(pkg.estimatedCsaUnitCents)}</td><td>{Object.entries(pkg.basketPricesCents).map(([name, amount]) => `${name}: ${money(amount)}`).join(" · ") || "—"}</td></tr>)}
         </tbody></table></div>
       </details> : <p>No channel prices are available for this product.</p>}
+      </section>
+      <section id="editor-sync" className="product-editor-section"><h3>Sync</h3>
+        <ProductPricingSync key={`${selectedId}-${detail.latest?.id || 0}`} productId={selectedId} token={token} roles={roles}
+          dirty={editorDirty} onChanged={() => setMarkupRefresh(value => value + 1)} />
       </section>
     </fieldset>}
     </ProductEditorDialog>}

@@ -32,7 +32,7 @@ test("fixed 12 oz sausage sold each remains one package and multipacks multiply 
 test("category markups, override, and global discount use deterministic rounding", () => {
   const base = { pricingUnit: "each", squareEnabled: false, packages: [{ packageId: 1, quantity: 1 }] };
   for (const [markupCategory, buyFromPrice, expected] of [
-    ["highlyPerishable", "2.0000", 400], ["perishable", "3.5000", 578], ["shelfStable", "6.0000", 900], ["deckHyland", "10.0000", 1850]
+    ["highlyPerishable", "2.0000", 400], ["perishable", "3.5000", 578], ["shelfStable", "6.0000", 900], ["deckHyland", "10.0000", 1850], ["creamyCow", "15.0000", 2100]
   ]) assert.equal(calculateEnterprisePricing({ ...base, markupCategory, buyFromPrice }).csaUnitCents, expected);
   const custom = calculateEnterprisePricing({ ...base, markupCategory: "shelfStable", customMarkupBp: 5000, buyFromPrice: "2.0000", csaOverride: "3.25" });
   assert.equal(custom.calculatedRetailCents, 300);

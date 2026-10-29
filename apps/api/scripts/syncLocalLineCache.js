@@ -1,3 +1,4 @@
+import { catalogIsLocallyManaged } from "../lib/catalogAuthority.js";
 import fs from "fs";
 import os from "os";
 import path from "path";
@@ -2050,7 +2051,7 @@ export async function runLocalLineCacheSync(options = {}) {
   const reportFile = resolveFromRepoRoot(
     options.reportFile || path.join("tmp", "localline-cache-sync-report.json")
   );
-  const write = Boolean(options.write);
+  let write = Boolean(options.write);
   const forceFull = Boolean(options.forceFull);
   const liveRefreshHours =
     Number.isFinite(options.liveRefreshHours)
@@ -2086,6 +2087,7 @@ export async function runLocalLineCacheSync(options = {}) {
       percent: 44,
       message: "Preparing Local Line cache sync"
     });
+    if (write && await catalogIsLocallyManaged(connection)) write = false;
     await ensureLocalLineSyncSchema(connection);
     const scheduledChangeMap = write
       ? await getActiveScheduledPricelistProductChangeMap(connection)

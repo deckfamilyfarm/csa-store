@@ -5,7 +5,7 @@ import { getTableConfig } from "drizzle-orm/mysql-core";
 import * as schema from "../schema.js";
 
 const socket = process.env.PRODUCT_SYNC_TEST_SOCKET;
-test("approved enterprise prices publish together and activate only after both destinations verify", { skip: !socket }, async t => {
+test("saved prices activate locally before independently approved channel publication", { skip: !socket }, async t => {
   assert.ok(socket.startsWith("/tmp/csa-product-sync-") || socket.startsWith("/private/tmp/csa-product-sync-"));
   const database = `csa_enterprise_test_${process.pid}_${Date.now()}`;
   const root = await mysql.createConnection({ socketPath: socket, user: "root" });
@@ -23,7 +23,7 @@ test("approved enterprise prices publish together and activate only after both d
   t.after(() => pool.end());
   for (const table of [schema.products, schema.packages, schema.vendors, schema.categories, schema.productPricingProfiles,
     schema.productSales, schema.productTags, schema.productImages, schema.productMedia, schema.localLineProductMeta,
-    schema.localLinePackageMeta, schema.users]) {
+    schema.localLinePackageMeta, schema.localLinePriceListEntries, schema.users]) {
     const config = getTableConfig(table);
     const columns = config.columns.map(col => `\`${col.name}\` ${col.getSQLType()}${col.notNull ? " NOT NULL" : ""}${col.autoIncrement ? " AUTO_INCREMENT" : ""}${col.primary ? " PRIMARY KEY" : ""}${col.default !== undefined && (typeof col.default !== "object" || col.default === null) ? ` DEFAULT ${pool.escape(col.default)}` : ""}`);
     for (const index of config.indexes.filter(index => index.config.unique)) columns.push(`UNIQUE KEY \`${index.config.name}\` (${index.config.columns.map(col => `\`${col.name}\``).join(",")})`);
@@ -100,6 +100,12 @@ test("approved enterprise prices publish together and activate only after both d
       { sellingEnterpriseId: ffcsa.id, mode: "markup", costEnterpriseId: ffcsa.id, markupBp: 8000 }
     ] };
   const draft = await pricing.saveEnterprisePricingDraft(1, input, null, { userId: 1 });
+  assert.equal((await pricing.getEnterprisePricingProduct(1)).active?.id, draft.revisionId);
+  assert.equal(writes.length, 0, "saving does not publish");
+  const {readSavedEnterprisePricing}=await import("./enterprisePricingReads.js");
+  assert.equal((await readSavedEnterprisePricing(pool,[1])).get(1).output.csaUnitCents,1080,"public catalog/export reads the saved price before channel approval");
+  assert.equal(await pricing.enterpriseRevisionMarker(1, draft.revisionId), null, "local activation is not approval");
+  assert.equal(Number((await pool.query("SELECT COUNT(*) AS n FROM enterprise_purchase_cost_history WHERE revision_id=?", [draft.revisionId]))[0][0].n), 2, "purchase history is recorded at save");
   assert.equal(draft.output.squareUnitCents, 1200);
   assert.equal(draft.output.csaUnitCents, 1080);
   assert.deepEqual(draft.output.wholesale.map(row => row.priceCents), [800, 900]);
@@ -116,7 +122,7 @@ test("approved enterprise prices publish together and activate only after both d
   }
   assert.equal(auditResult.status, "completed", auditResult.error);
   const actions = (await sync.listProductSyncActions(audit.id, { direction: "outgoing", pageSize: 100 })).rows;
-  assert.deepEqual(actions.map(row => [row.platform, row.status]).sort(), [["localline", "changed"], ["square", "changed"]]);
+  assert.deepEqual(actions.map(row => [row.platform, row.status]).sort(), [["localline", "changed"], ["square", "changed"]], JSON.stringify(actions.map(row => ({platform:row.platform,message:row.message}))));
   assert.equal(writes.length, 0);
   const release = await sync.createProductSyncRelease({ auditId: audit.id, actionIds: actions.map(row => row.id) }, user);
   const finished = await sync.runProductSyncRelease(release.id, { user, allowFuture: true });
@@ -149,12 +155,10 @@ test("approved enterprise prices publish together and activate only after both d
   assert.equal((await pricing.listEnterprisePricingProducts({ limit: 10 })).rows.find(row => row.id === 1)?.saleStatus, "active");
   assert.deepEqual(remote.packages[0].price_list_entries.map(row => row.adjustment_value), [8.64, 8.64, 8.64, 8.64]);
   assert.deepEqual(remote.packages[0].price_list_entries.map(row => row.strikethrough_display_value), [10.8, 10.8, 10.8, 10.8]);
-  const blockedDraft = await pricing.saveEnterprisePricingDraft(1, { ...active.suggestedInput, priceEffectiveAt: "2026-10-21T12:00:00Z", overrideNote: "cost changed during sale" }, active.latest.id, { userId: 1 });
-  await assert.rejects(pricing.approveEnterprisePricingRevision(blockedDraft.revisionId, { userId: 2 }), /Finish or cancel the sale/);
+  await assert.rejects(pricing.saveEnterprisePricingDraft(1, { ...active.suggestedInput, priceEffectiveAt: "2026-10-21T12:00:00Z", overrideNote: "cost changed during sale" }, active.latest.id, { userId: 1 }), /Finish or cancel the sale/);
   const expired = await promotions.publishEnterpriseLocalLinePromotion(sale.id, { userId: 2 }, new Date("2026-11-02T17:00:00Z"));
   assert.equal(expired.status, "expired");
   assert.deepEqual(remote.packages[0].price_list_entries.map(row => row.adjustment_value), [10.8, 10.8, 10.8, 10.8]);
-  await pricing.rejectEnterprisePricingRevision(blockedDraft.revisionId, "Test blocked cost change", { userId: 2 });
   const secondSale = await promotions.saveEnterprisePromotionDraft({ ...saleInput, name: "Cancelled market sale", startAt: "2026-11-03T16:00:00Z", endAt: "2026-11-04T16:00:00Z" }, { userId: 1 });
   await promotions.approveEnterprisePromotion(secondSale.id, { userId: 2 });
   await promotions.publishEnterprisePromotion(secondSale.id, { userId: 2 });
@@ -174,7 +178,8 @@ test("approved enterprise prices publish together and activate only after both d
   const nextInput = { ...active.suggestedInput,
     purchaseCosts: [{ enterpriseId: ffcsa.id, cost: "6.00", effectiveAt: "2026-10-21", documentationRef: "second test transfer" }],
     priceEffectiveAt: "2026-10-21T12:00:00Z" };
-  const nextDraft = await pricing.saveEnterprisePricingDraft(1, nextInput, blockedDraft.revisionId, { userId: 1 });
+  const nextDraft = await pricing.saveEnterprisePricingDraft(1, nextInput, active.latest.id, { userId: 1 });
+  assert.equal(await pricing.getApprovedEnterpriseRevision(1, draft.revisionId), null, "a new save invalidates prior channel approval");
   await pricing.approveEnterprisePricingRevision(nextDraft.revisionId, { userId: 2 });
   const secondAudit = await sync.createProductSyncAudit({ platforms: ["localline", "square"], productIds: [1], productScope: "selected", vendorGroup: "all", enterpriseRevisionId: nextDraft.revisionId }, user);
   let secondAuditResult;
@@ -194,5 +199,17 @@ test("approved enterprise prices publish together and activate only after both d
   const held = await sync.runProductSyncRelease(secondRelease.id, { user, allowFuture: true });
   assert.equal(held.status, "held");
   assert.equal(writes.length, baselineWrites, "Local Line must not publish when Square preflight detects drift");
-  assert.equal((await pricing.getEnterprisePricingProduct(1)).active?.id, draft.revisionId);
+  assert.equal((await pricing.getEnterprisePricingProduct(1)).active?.id, nextDraft.revisionId, "remote failure does not undo the saved local price");
+  const [beforeVendorCheck] = await pool.query("SELECT COUNT(*) AS count FROM enterprise_pricing_revisions");
+  await pool.query("UPDATE products SET vendor_id = NULL WHERE id = 1");
+  const missingVendor = await pricing.getEnterprisePricingProduct(1);
+  assert.equal(missingVendor.product.vendorRequired, true, "details remain accessible so the vendor can be repaired");
+  await assert.rejects(pricing.previewEnterprisePricing(1, nextInput), /needs a vendor/);
+  await assert.rejects(pricing.saveEnterprisePricingDraft(1, nextInput, nextDraft.revisionId, { userId: 1 }), /needs a vendor/);
+  await assert.rejects(pricing.saveEnterpriseBuyPrice(1, "7.00", nextDraft.revisionId, { userId: 1 }), /needs a vendor/);
+  const [afterVendorCheck] = await pool.query("SELECT COUNT(*) AS count FROM enterprise_pricing_revisions");
+  assert.equal(afterVendorCheck[0].count, beforeVendorCheck[0].count, "blocked edits create no pricing history");
+  assert.equal(writes.length, baselineWrites, "vendor checks never publish");
+  await pool.query("UPDATE products SET vendor_id = 1 WHERE id = 1");
+  assert.equal((await pricing.getEnterprisePricingProduct(1)).product.vendorRequired, false);
 });

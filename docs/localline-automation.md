@@ -1,5 +1,7 @@
 # Local Line Automation
 
+After the enterprise-pricing cutover, legacy catalog audit/cache imports automatically run review-only. They cannot overwrite the locally managed catalog, photos or sale settings. Use explicit Product Sync incoming reviews for catalog repairs. Order/customer imports remain separate. Scheduled legacy price releases also refuse migrated products before applying local changes.
+
 CSA Store can run a cron-safe Local Line automation pipeline from the deployed server. The script records an aggregate `automation` job in `local_line_job_runs`, starts the same tracked child jobs used by the Admin UI, and uses a MySQL lock so overlapping cron runs exit instead of running twice.
 
 ## Commands

@@ -3,7 +3,7 @@ import { adminGet, adminPut } from "../adminApi.js";
 import { productCapabilities } from "./productWorkspace.js";
 
 // Retain simple storefront formatting without executing imported HTML.
-function safeDescription(html) {
+export function safeDescription(html) {
   const template = document.createElement("template");
   template.innerHTML = html || "";
   const allowed = new Set(["P", "BR", "DIV", "STRONG", "B", "EM", "I", "U", "UL", "OL", "LI", "H2", "H3", "H4", "A", "SPAN"]);
@@ -60,6 +60,8 @@ export const ProductEditorInfo = forwardRef(function ProductEditorInfo({ product
       {error && <p role="alert">{error} <button type="button" className="button alt" onClick={() => setRetry(value => value + 1)}>Retry</button></p>}
       {!draft && !error && <p>Loading product info…</p>}
       {draft && <div className="product-editor-info-fields">
+        {!vendors.some(vendor => String(vendor.id) === draft.vendorId && vendor.name?.trim()) &&
+          <p role="alert">This product needs a vendor. Choose one below and save before changing pricing, inventory, or synchronizing.</p>}
         <label>Name<input className="input" disabled={!canEdit || busy} value={draft.name} onChange={event => update({ name: event.target.value })} /></label>
         <label>Vendor<select className="input" disabled={!canEdit || busy} value={draft.vendorId} onChange={event => update({ vendorId: event.target.value })}>
           <option value="">Select vendor</option>{vendors.map(vendor => <option key={vendor.id} value={vendor.id}>{vendor.name}</option>)}

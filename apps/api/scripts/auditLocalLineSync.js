@@ -1,3 +1,4 @@
+import { catalogIsLocallyManaged } from "../lib/catalogAuthority.js";
 import { randomUUID } from "node:crypto";
 import fs from "fs";
 import os from "os";
@@ -1612,7 +1613,7 @@ export async function runLocalLineAudit(options = {}) {
   );
   const includeInactive = Boolean(options.includeInactive);
   const skipPricelist = options.skipPricelist !== false;
-  const write = Boolean(options.write);
+  let write = Boolean(options.write);
   const selectedFixKeys = Array.isArray(options.selectedFixKeys)
     ? options.selectedFixKeys.filter(Boolean)
     : [];
@@ -1658,6 +1659,7 @@ export async function runLocalLineAudit(options = {}) {
       percent: 2,
       message: "Authenticating with Local Line"
     });
+    if (write && await catalogIsLocallyManaged(storeConnection)) write = false;
     const token = await getLocalLineAccessToken(baseUrl);
     reportProgress({
       phaseKey: "catalog-sync",

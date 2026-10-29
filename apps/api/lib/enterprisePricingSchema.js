@@ -10,6 +10,31 @@ async function bootstrap() {
   await ensureSquareSyncSchema();
   const pool = getPool();
   for (const sql of [
+    `CREATE TABLE IF NOT EXISTS enterprise_pricing_cutovers (
+      plan_hash CHAR(64) PRIMARY KEY, status VARCHAR(24) NOT NULL, plan_json LONGTEXT NOT NULL,
+      editor_id INT NOT NULL, applied_at DATETIME NOT NULL, rolled_back_at DATETIME
+    ) ENGINE=InnoDB`,
+    `CREATE TABLE IF NOT EXISTS enterprise_bundle_publications (
+      id INT AUTO_INCREMENT PRIMARY KEY, bundle_id INT NOT NULL, status VARCHAR(24) NOT NULL,
+      snapshot_json LONGTEXT NOT NULL, editor_id INT NOT NULL, approver_id INT,
+      created_at DATETIME NOT NULL, approved_at DATETIME, attempted_at DATETIME,
+      verified_at DATETIME, last_error TEXT, INDEX bundle_publication (bundle_id,id)
+    ) ENGINE=InnoDB`,
+    `CREATE TABLE IF NOT EXISTS enterprise_bundles (
+      id INT AUTO_INCREMENT PRIMARY KEY, remote_box_id INT NOT NULL UNIQUE,
+      name VARCHAR(255) NOT NULL, input_json LONGTEXT NOT NULL, source_json LONGTEXT NOT NULL,
+      revision INT NOT NULL DEFAULT 1, edited_by INT NOT NULL,
+      remote_captured_at DATETIME NOT NULL, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL
+    ) ENGINE=InnoDB`,
+    `CREATE TABLE IF NOT EXISTS enterprise_bundle_revisions (
+      id INT AUTO_INCREMENT PRIMARY KEY, bundle_id INT NOT NULL, revision INT NOT NULL,
+      input_json LONGTEXT NOT NULL, output_json LONGTEXT NOT NULL, actor_id INT NOT NULL,
+      created_at DATETIME NOT NULL, UNIQUE KEY bundle_revision (bundle_id,revision)
+    ) ENGINE=InnoDB`,
+    `CREATE TABLE IF NOT EXISTS enterprise_bundle_legacy_products (
+      product_id INT PRIMARY KEY, remote_product_id INT NOT NULL,
+      reason VARCHAR(255) NOT NULL, created_at DATETIME NOT NULL
+    ) ENGINE=InnoDB`,
     `CREATE TABLE IF NOT EXISTS enterprise_pricing_enterprises (
       id INT AUTO_INCREMENT PRIMARY KEY, code VARCHAR(64) NOT NULL UNIQUE, name VARCHAR(255) NOT NULL,
       created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP

@@ -3,10 +3,12 @@ import { adminGet, adminPost } from "../adminApi.js";
 import { useViewportRows } from "./useViewportRows.js";
 import "./EnterpriseReviewSection.css";
 import { LocalPricingSyncReview } from "./LocalPricingSyncReview.jsx";
+import { Comparison } from "./ProductSyncReview.jsx";
+import { EnterpriseBundles } from './EnterpriseBundles.jsx';
 
 const money = cents => cents == null ? "—" : `$${(Number(cents) / 100).toFixed(2)}`;
 
-export function EnterpriseReviewSection({ token, roles = [] }) {
+export function EnterpriseReviewSection({ token, roles = [], productId = null, embedded = false, onChecked, onPublished }) {
   const [revisions, setRevisions] = useState([]);
   const [promotions, setPromotions] = useState([]);
   const [message, setMessage] = useState("");
@@ -14,19 +16,19 @@ export function EnterpriseReviewSection({ token, roles = [] }) {
   const [checks, setChecks] = useState({});
   const [release, setRelease] = useState(null);
   const [localOnly, setLocalOnly] = useState(null);
-  const reviewScrollRef = useViewportRows(16, localOnly === false);
+  const reviewScrollRef = useViewportRows(16, localOnly === false && !embedded);
   const canApprove = roles.some(role => ["admin", "pricing_admin", "pricing_publisher"].includes(role));
   const hasGrant = role => roles.includes("admin") || roles.includes(role);
   useEffect(() => {
     let cancelled = false;
-    adminGet("enterprise-pricing/review", token).then(rows => { if (!cancelled) setRevisions(rows); })
+    adminGet(`enterprise-pricing/review${productId ? `?productId=${productId}` : ""}`, token).then(rows => { if (!cancelled) setRevisions(rows); })
       .catch(error => { if (!cancelled) setMessage(error.message); });
-    adminGet("enterprise-promotions", token).then(rows => { if (!cancelled) setPromotions(rows); })
+    if (!embedded) adminGet("enterprise-promotions", token).then(rows => { if (!cancelled) setPromotions(rows); })
       .catch(error => { if (!cancelled) setMessage(error.message); });
     adminGet("enterprise-pricing/summary", token).then(value => { if (!cancelled) setLocalOnly(value.localOnly === true); })
       .catch(error => { if (!cancelled) setMessage(error.message); });
     return () => { cancelled = true; };
-  }, [token, busy]);
+  }, [token, busy, productId, embedded]);
   async function approve(revision) {
     setBusy(revision.id);
     try {
@@ -39,7 +41,7 @@ export function EnterpriseReviewSection({ token, roles = [] }) {
     const reason = window.prompt(`Why reject ${revision.productName}?`);
     if (!reason?.trim()) return;
     setBusy(revision.id);
-    try { await adminPost(`enterprise-pricing/revisions/${revision.id}/reject`, token, { reason }); setMessage(`${revision.productName}: proposal rejected.`); }
+    try { await adminPost(`enterprise-pricing/revisions/${revision.id}/reject`, token, { reason }); setMessage(`${revision.productName}: channel synchronization declined; saved local prices are unchanged.`); }
     catch (error) { setMessage(error.message); }
     finally { setBusy(null); }
   }
@@ -90,12 +92,13 @@ export function EnterpriseReviewSection({ token, roles = [] }) {
           if (audit?.status === "running") continue;
           const result = await adminGet(`product-sync/audits/${check.auditId}/actions?direction=outgoing&pageSize=100`, token);
           setChecks(previous => ({ ...previous, [revisionId]: { ...check, status: audit.status, actions: result.rows || [], error: audit.error } }));
+          onChecked?.(result.rows || []);
           setBusy(null);
         } catch (error) { setMessage(error.message); }
       }
     }, 2000);
     return () => clearInterval(timer);
-  }, [checks, token]);
+  }, [checks, token, onChecked]);
   useEffect(() => {
     if (!release || ["completed", "partial", "held", "failed", "cancelled"].includes(release.status)) return undefined;
     const timer = setInterval(async () => {
@@ -105,14 +108,16 @@ export function EnterpriseReviewSection({ token, roles = [] }) {
         if (["completed", "partial", "held", "failed"].includes(result.status)) {
           setMessage(`Publication ${result.status}. Review each destination below before retrying.`);
           setBusy(null);
+          onPublished?.();
         }
       } catch (error) { setMessage(error.message); }
     }, 2000);
     return () => clearInterval(timer);
-  }, [release, token]);
+  }, [release, token, onPublished]);
   async function publish(revision, check) {
     const changed = check.actions.filter(action => action.status === "changed");
     if (!changed.length) { setMessage("No remote prices need publication. Check whether this revision is fully verified."); return; }
+    if (embedded && !window.confirm(`Publish the reviewed prices and any listed catalog changes for ${revision.productName} to ${revision.input.squareEnabled ? "Local Line and Square" : "Local Line"}?`)) return;
     setBusy(revision.id);
     try {
       const result = await adminPost("product-sync/releases", token, {
@@ -136,34 +141,37 @@ export function EnterpriseReviewSection({ token, roles = [] }) {
     const packages = action.payload?.packages || [];
     return packages.length ? packages.map(pkg => `${pkg.name || pkg.id}: ${money((pkg.price_list_entries?.[0]?.adjustment_value || 0) * 100)}`).join(" · ") : "Review package prices";
   };
-  return <section className="card enterprise-review-page">
-    <div className="admin-section-heading"><div><h2>Review &amp; Publish</h2>{!localOnly && <p>Review saved price changes before synchronizing Square and Local Line.</p>}</div></div>
+  return <section className={embedded ? "product-sync-actions" : "card enterprise-review-page"}>
+    {!embedded && <div className="admin-section-heading"><div><h2>Review &amp; Publish</h2>{!localOnly && <p>Review saved price changes before synchronizing Square and Local Line.</p>}</div></div>}
     {message && <p role="status">{message}</p>}
+    {!embedded && <details className="review-bundles"><summary>Bundles · Local Line</summary><EnterpriseBundles token={token} roles={roles} review /></details>}
     {localOnly && <LocalPricingSyncReview revisions={revisions} />}
-    <div ref={reviewScrollRef} className={localOnly === false ? "review-publications-scroll" : undefined}>
+    <div ref={reviewScrollRef} className={localOnly === false && !embedded ? "review-publications-scroll" : undefined}>
     {!localOnly && !revisions.length && <p>No pricing changes are waiting for review.</p>}
     {!localOnly && revisions.map(revision => <div className="card" key={revision.id} style={{ marginBottom: 16 }}>
-      <h3>{revision.productName} <small>#{revision.id} · {revision.status}</small></h3>
+      {!embedded && <h3>{revision.productName} <small>#{revision.id} · {revision.status}</small></h3>}
       <p className="small">{revision.vendorName} · Edited by user {revision.editorId} · Settings version {revision.settingsVersionId}</p>
       {revision.publications?.length > 0 && <p className="small">{revision.publications.map(item => `${item.platform}: ${item.status}${item.releaseId ? ` (release ${item.releaseId})` : ""}`).join(" · ")}</p>}
-      {["approved", "partial"].includes(revision.status) && canApprove && [...new Set((revision.publications || []).filter(item => item.releaseId && ["partial", "failed", "publishing"].includes(item.status)).map(item => item.releaseId))].map(id => <button className="button alt" type="button" key={id} disabled={busy === revision.id} onClick={() => retryPublication(revision, id)}>Retry publication {id}</button>)}
-      <div className="table-wrap"><table className="admin-table"><thead><tr><th>Destination</th><th>Proposed regular</th><th>Proposed sale</th><th>Unit / package</th></tr></thead><tbody>
+      {["approved", "partial", "active"].includes(revision.status) && canApprove && [...new Set((revision.publications || []).filter(item => item.releaseId && ["partial", "failed", "publishing"].includes(item.status)).map(item => item.releaseId))].map(id => <button className="button alt" type="button" key={id} disabled={busy === revision.id} onClick={() => retryPublication(revision, id)}>Retry publication {id}</button>)}
+      {!embedded && <div className="table-wrap"><table className="admin-table"><thead><tr><th>Destination</th><th>Proposed regular</th><th>Proposed sale</th><th>Unit / package</th></tr></thead><tbody>
         {revision.input.squareEnabled && <tr><td>Square</td><td>{money(revision.output.squareUnitCents)}</td><td>Separate automatic discount</td><td>per {revision.input.pricingUnit}</td></tr>}
         {revision.output.packages.map(pkg => <tr key={pkg.packageId}><td>Local Line · package {pkg.packageId}</td><td>{money(pkg.localLineRegularCents)}</td><td>{money(pkg.localLineSaleCents)}</td><td>{pkg.quantity ? `${pkg.quantity} each` : `${(pkg.averageWeightMilliPounds / 1000).toFixed(3)} lb (${pkg.weightSource})`}</td></tr>)}
         {revision.output.wholesale?.map(row => <tr key={`wholesale-${row.sellingEnterpriseId}`}><td>Wholesale · enterprise {row.sellingEnterpriseId}</td><td>{money(row.priceCents)}</td><td>—</td><td>per {revision.input.pricingUnit}</td></tr>)}
-      </tbody></table></div>
+      </tbody></table></div>}
       {revision.input.overrideNote && <p className="small">Override note: {revision.input.overrideNote}</p>}
-      {revision.status === "pending" && canApprove && localOnly === false && <div className="admin-actions"><button className="button" type="button" disabled={busy === revision.id} onClick={() => approve(revision)}>Approve revision</button><button className="button alt" type="button" disabled={busy === revision.id} onClick={() => reject(revision)}>Reject</button></div>}
-      {!localOnly && ["approved", "partial"].includes(revision.status) && <>
-        <button className="button alt" type="button" disabled={busy === revision.id} onClick={() => checkDestinations(revision)}>Check destinations</button>
+      {["pending", "local-preview"].includes(revision.status) && canApprove && localOnly === false && <div className="admin-actions"><button className="button" type="button" disabled={busy === revision.id} onClick={() => approve(revision)}>Approve channel sync</button><button className="button alt" type="button" disabled={busy === revision.id} onClick={() => reject(revision)}>Reject</button></div>}
+      {embedded && ["pending", "local-preview"].includes(revision.status) && <p className="small">A pricing publisher must approve the saved inputs before checking and updating channel prices.</p>}
+      {!localOnly && ["approved", "partial", "active"].includes(revision.status) && canApprove && <>
+        <button className="button alt" type="button" disabled={busy === revision.id || checks[revision.id]?.status === "running" || ["queued", "running"].includes(release?.status)} onClick={() => checkDestinations(revision)}>{embedded ? "Check server prices" : "Check destinations"}</button>
         {checks[revision.id] && <div><p className="small">Audit {checks[revision.id].auditId}: {checks[revision.id].status}{checks[revision.id].error ? ` · ${checks[revision.id].error}` : ""}</p>
           {checks[revision.id].actions.map(action => <p className="small" key={action.id}><strong>{action.platform === "square" ? "Square" : "Local Line"}</strong> · {action.packageName || "Product"} · {action.status}: {showActionPrice(action)} {action.message}</p>)}
-          {checks[revision.id].actions.length > 0 && checks[revision.id].actions.every(action => ["changed", "synced"].includes(action.status)) &&
-            <button className="button" type="button" disabled={busy === revision.id || release?.status === "queued" || release?.status === "running"} onClick={() => publish(revision, checks[revision.id])}>Publish approved values</button>}
+          {embedded && checks[revision.id].actions.map(action => <details key={action.id} open><summary>{action.platform === "square" ? "Square" : "Local Line"}: all changes included in this update</summary><Comparison action={action} /></details>)}
+          {checks[revision.id].actions.some(action => action.status === "changed") && checks[revision.id].actions.every(action => !action.released && ["changed", "synced"].includes(action.status)) &&
+            <button className="button" type="button" disabled={busy === revision.id || release?.status === "queued" || release?.status === "running" || !hasGrant("localline_push") || (revision.input.squareEnabled && !hasGrant("square_push"))} onClick={() => publish(revision, checks[revision.id])}>{embedded ? `Update ${revision.input.squareEnabled ? "LL & Square" : "Local Line"} prices` : "Publish approved values"}</button>}
         </div>}
       </>}
     </div>)}
-    <details className="review-sales"><summary>Sales ({promotions.length})</summary>
+    {!embedded && <details className="review-sales"><summary>Sales ({promotions.length})</summary>
     {!promotions.length && <p>No sale proposals yet.</p>}
     {promotions.map(promotion => <div className="card" key={promotion.id} style={{ marginBottom: 16 }}>
       <h4>{promotion.input.name || `Sale ${promotion.id}`} <small>#{promotion.id} · {promotion.status}</small></h4>
@@ -174,7 +182,7 @@ export function EnterpriseReviewSection({ token, roles = [] }) {
       {["approved", "scheduled", "active", "partial"].includes(promotion.status) && canApprove && (!promotion.input.channels.includes("localline") || hasGrant("localline_push")) && (!promotion.input.channels.includes("square") || hasGrant("square_push")) && <button className="button alt" type="button" disabled={busy === `sale-${promotion.id}`} onClick={() => publishPromotion(promotion)}>Publish / verify sale</button>}
       {["pending", "approved", "scheduled", "active", "partial", "cancelling"].includes(promotion.status) && canApprove && (!promotion.input.channels.includes("localline") || hasGrant("localline_push")) && (!promotion.input.channels.includes("square") || hasGrant("square_push")) && <button className="button alt" type="button" disabled={busy === `sale-${promotion.id}`} onClick={() => cancelPromotion(promotion)}>Cancel sale</button>}
     </div>)}
-    </details>
+    </details>}
     {release && <div className="card"><h3>Publication {release.id}: {release.status}</h3>{(release.actions || []).map(action => <p key={action.id} className="small">{action.platform}: {action.status} · {action.message}</p>)}</div>}
     </div>
   </section>;

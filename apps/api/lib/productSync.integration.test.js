@@ -522,5 +522,33 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
   assert.equal(squareObjects.get('V951').item_variation_data.measurement_unit_id, undefined);
   assert.equal(squareObjects.get('V952').item_variation_data.measurement_unit_id, undefined);
   assert.equal((await audit([950], [], { platforms: ['square'] })).rows.length, 0);
+  await t.test('active enterprise pricing can recheck and repair drift with coordinated approvals', async () => {
+    await product(960);
+    Object.assign(process.env, { LL_PRICE_LIST_CSA_MEMBERS_ID: '2', LL_PRICE_LIST_HERDSHARE_ID: '3', LL_PRICE_LIST_SNAP_ID: '4' });
+    const remote = remoteProducts.get(1960);
+    remote.packages[0].price_list_entries = [1,2,3,4].map(price_list => ({...remote.packages[0].price_list_entries[0],price_list,product_price_list_entry:4000+price_list}));
+    const input={squareEnabled:true,pricingUnit:'each',packages:[{packageId:9600,quantity:1}]};
+    const output={squareUnitCents:1000,csaUnitCents:900,packages:[{packageId:9600,localLineRegularCents:900,squareVariationCents:1000}]};
+    const [inserted]=await pool.query(`INSERT INTO enterprise_pricing_revisions (product_id,settings_version_id,status,input_json,output_json,editor_id,approver_id,created_at,approved_at)
+      VALUES (960,1,'active',?,?,1,2,UTC_TIMESTAMP(),UTC_TIMESTAMP())`,[JSON.stringify(input),JSON.stringify(output)]);
+    const revisionId=inserted.insertId;
+    await pool.query("INSERT INTO enterprise_pricing_product_state (product_id,latest_revision_id,active_revision_id,updated_at) VALUES (960,?,?,UTC_TIMESTAMP())",[revisionId,revisionId]);
+    // Tests use only the disposable schema and the existing fake platform transports.
+    await pool.query("INSERT INTO local_line_price_list_entries (product_id,package_id,local_line_package_id,local_line_price_list_id,price_list_id,entry_scope) VALUES (960,9600,2960,1,1,'package')");
+    const beforeWrites=requests.filter(r=>r.method==='PATCH'||r.path.endsWith('batch-upsert')).length;
+    const checked=await audit([960],[],{enterpriseRevisionId:revisionId});
+    assert.equal(checked.rows.length,2);
+    assert.equal(requests.filter(r=>r.method==='PATCH'||r.path.endsWith('batch-upsert')).length,beforeWrites);
+    assert.equal(checked.rows.find(r=>r.platform==='localline').display.pricingComparison[0].currentCents,800);
+    const [[cached]]=await pool.query("SELECT final_price_cache FROM local_line_price_list_entries WHERE product_id=960");assert.equal(Number(cached.final_price_cache),8);
+    await assert.rejects(service.createProductSyncRelease({auditId:checked.audit.id,actionIds:[checked.rows[0].id]},user),/every required destination/);
+    const release=await service.createProductSyncRelease({auditId:checked.audit.id,actionIds:checked.rows.map(r=>r.id)},user);
+    const result=await service.runProductSyncRelease(release.id,{user,allowFuture:true});
+    assert.equal(result.status,'completed',JSON.stringify(result.actions.map(a=>({status:a.status,message:a.message}))));
+    const [[confirmed]]=await pool.query("SELECT final_price_cache FROM local_line_price_list_entries WHERE product_id=960");assert.equal(Number(confirmed.final_price_cache),9);
+    const [publications]=await pool.query("SELECT status FROM enterprise_pricing_publications WHERE revision_id=?",[revisionId]);assert.equal(publications.length,2);assert(publications.every(p=>p.status==='verified'));
+    await pool.query("UPDATE enterprise_pricing_revisions SET status='local-preview' WHERE id=?",[revisionId]);
+    await assert.rejects(service.createProductSyncAudit({platforms:['localline','square'],productIds:[960],enterpriseRevisionId:revisionId},user),/no longer approved/);
+  });
   console.log(`Validated isolated MySQL database ${database}`);
 });

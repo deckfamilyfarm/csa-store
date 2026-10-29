@@ -825,6 +825,8 @@ async function applyItemLocally(item) {
   const connection = await getPool().getConnection();
   try {
     await connection.beginTransaction();
+    const { assertLegacyPricingPublicationAllowed } = await import("./enterprisePricingService.js");
+    await assertLegacyPricingPublicationAllowed([item.productId]);
     const currentSnapshot = await loadCurrentSnapshot(connection, item.productId);
     const conflicts = findSnapshotConflicts(currentSnapshot, item.originalSnapshot || {}, changes);
     if (conflicts.length) {

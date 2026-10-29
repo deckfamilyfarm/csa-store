@@ -71,7 +71,7 @@ export async function createProductSyncAudit(options, user) {
     if (!hasGrant(roles, "pricing_publisher") && !hasGrant(roles, "pricing_admin")) fail("Enterprise pricing checks require Pricing Publisher.", 403);
     if (productIds.length !== 1 || Object.keys(staged).length || options.incoming) fail("Check one approved enterprise pricing revision without staged or incoming changes.");
     const revision = await getApprovedEnterpriseRevision(productIds[0], enterpriseRevisionId);
-    if (!revision || !["approved", "partial"].includes(revision.status)) fail("This enterprise pricing revision is no longer approved. Review the current proposal.", 409);
+    if (!revision || !["approved", "partial", "active"].includes(revision.status)) fail("This enterprise pricing revision is no longer approved. Review the current proposal.", 409);
     const expectedPlatforms = revision.input.squareEnabled ? ["localline", "square"] : ["localline"];
     if (!same(platforms.slice().sort(), expectedPlatforms.slice().sort())) fail("Check every required destination for the approved product.");
   }
@@ -219,7 +219,7 @@ export async function createProductSyncRelease(body, user) {
       if (enterpriseIds.length) {
         if (enterpriseIds.length !== 1 || productIds.length !== 1 || actions.some(action => action.enterpriseRevisionId !== enterpriseIds[0])) fail("Select one complete enterprise pricing revision per publication.");
         const revision = await getApprovedEnterpriseRevision(productIds[0], enterpriseIds[0]);
-        if (!revision || !["approved", "partial"].includes(revision.status)) fail("Enterprise pricing changed after approval. Audit again.", 409);
+        if (!revision || !["approved", "partial", "active"].includes(revision.status)) fail("Enterprise pricing changed after approval. Audit again.", 409);
         const [auditActions] = await connection.query("SELECT id, platform, status, data_json AS dataJson FROM product_sync_actions WHERE audit_id=? AND product_id=? AND direction='outgoing'", [body.auditId, productIds[0]]);
         const required = revision.input.squareEnabled ? ["localline", "square"] : ["localline"];
         if (required.some(platform => !auditActions.some(row => row.platform === platform))) fail("The coordinated audit is missing a required destination.");

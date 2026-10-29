@@ -2,9 +2,15 @@ import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import "./ProductEditorDialog.css";
 
-export function ProductEditorDialog({ name, sections, children, footer, onClose, onPrevious, onNext, busy, dirty, message }) {
+export function ProductEditorDialog({ name, sections, children, footer, onClose, onPrevious, onNext, busy, dirty, message, initialSection, backLabel = 'Back to products', showNeighbors = true }) {
   const dialog = useRef(null);
-  const [active, setActive] = useState(sections[0]?.[0]);
+  const [active, setActive] = useState(initialSection || sections[0]?.[0]);
+  const initialScrollDone = useRef(false);
+  useEffect(() => {
+    if (!initialSection || initialScrollDone.current) return;
+    const target = dialog.current?.querySelector(`#${initialSection}`);
+    if (target) { target.scrollIntoView({ block: "start" }); initialScrollDone.current = true; }
+  }, [initialSection, children]);
   useEffect(() => {
     const element = dialog.current;
     const previousOverflow = document.body.style.overflow;
@@ -22,10 +28,10 @@ export function ProductEditorDialog({ name, sections, children, footer, onClose,
   return createPortal(<dialog ref={dialog} className="product-editor-dialog enterprise-pricing-page" aria-labelledby="product-editor-title"
     onCancel={event => { event.preventDefault(); if (!busy) onClose(); }}>
     <header className="product-editor-header">
-      <div><button autoFocus type="button" className="product-editor-back" disabled={busy} onClick={onClose}>← Back to products</button>
+      <div><button autoFocus type="button" className="product-editor-back" disabled={busy} onClick={onClose}>← {backLabel}</button>
         <h2 id="product-editor-title">Edit {name || "product"}</h2></div>
-      <div className="product-editor-neighbors"><button className="button alt" type="button" disabled={busy || !onPrevious} onClick={onPrevious}>← Previous product</button>
-        <button className="button alt" type="button" disabled={busy || !onNext} onClick={onNext}>Next product →</button></div>
+      {showNeighbors && <div className="product-editor-neighbors"><button className="button alt" type="button" disabled={busy || !onPrevious} onClick={onPrevious}>← Previous product</button>
+        <button className="button alt" type="button" disabled={busy || !onNext} onClick={onNext}>Next product →</button></div>}
     </header>
     <div className="product-editor-body">
       <nav className="product-editor-nav" aria-label="Product sections">{sections.map(([id, label]) => <button key={id} type="button"
