@@ -10,6 +10,8 @@ A new settings version preserves the reviewed monetary outputs while making curr
 
 Rehearsal completed October 29, 2026 on `csa_pricing_local_20261029150000`, separate from the selected development database. The fresh production snapshot contained 88 tables / 280,932 rows. The migration transferred 769 saved pricing records and 10 bundles. Verification confirmed all 78 excluded tables and every existing inventory count unchanged; rollback restored all 88 original tables. Private plans, verification reports and snapshots are under `.local-pricing/cutover/` and must stay out of Git.
 
+Production cutover completed October 29, 2026: 6,662 reviewed operations, 769 saved pricing records and 10 bundles, with no conflicts. The fresh backup contains 88 tables / 280,949 rows. Every migrated field was checked against the plan; inventory, users, role assignments and legacy sales matched their pre-cutover fingerprints. Authenticated pricing/inventory API checks and the public admin health check passed. Private backup, plan, verification and deployment receipts are in `/home/jdeck/csa-rollouts/20261029-226669f/`, with a checksum-verified backup copy under the local `.local-pricing/cutover/` directory. No Square or Local Line publication was performed; the sales-adoption and channel-pilot holds below still apply.
+
 ### Production sequence (requires deployment approval)
 
 1. Commit and push the reviewed branch. On `ffcsa-server`, the app is `/home/jdeck/code/csa-store`, PM2 process `store`, currently on `main`. Deploy the exact tested commit together with this migration; do not run the old app against migrated data. The shell uses Node 22.17 and the existing PM2 process uses Node 20.19.6. Keep the existing process configuration and `.env`; never use `npm run dev` or copy local credentials on the server.
@@ -56,6 +58,8 @@ node --env-file=.env apps/api/scripts/pricingCutover.js --rollback=APPLIED_HASH 
 ```
 
 Rollback refuses later edits/publications or new references to inserted catalog records. It preserves unrelated inventory changes. Schema and the audit receipt remain. Once data rollback verifies, restore the earlier app commit and restart `store`. Do not downgrade the app first or restore an old full backup over newer orders. If rollback is held, reconcile the affected records explicitly. A rolled-back plan cannot be reapplied; generate a new reviewed plan.
+
+Rollback compares DECIMAL scale and date-only DATETIME inputs using their database types (for example, `50.00` equals stored `50.0000`), while still rejecting actual value changes. Text and JSON comparisons remain exact.
 
 ## Local development
 

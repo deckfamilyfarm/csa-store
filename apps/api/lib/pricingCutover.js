@@ -23,6 +23,17 @@ export const digest = value => crypto.createHash('sha256').update(canonical(valu
 const descriptionText = value => String(value??'').replace(/<[^>]*>/g,' ').replace(/&nbsp;/gi,' ').replace(/&amp;/gi,'&').replace(/&quot;/gi,'"').replace(/&#39;|&apos;/gi,"'").replace(/\s+/g,' ').trim();
 const equalField=(field,a,b)=>field==='description'?descriptionText(a)===descriptionText(b):equal(a,b);
 const equal = (a,b) => canonical(a ?? null) === canonical(b ?? null);
+// MySQL pads DECIMAL scale and expands date-only DATETIME values on insertion.
+// Compare those typed values without floating point or weakening text/JSON checks.
+export function databaseFieldEqual(actual, expected, type) {
+  const normalize = value => {
+    if(value == null)return null;
+    if(type==='decimal' && /^-?\d+(?:\.\d+)?$/.test(String(value)))return String(value).replace(/(\.\d*?)0+$/,'$1').replace(/\.$/,'');
+    if(['datetime','timestamp'].includes(type) && /^\d{4}-\d{2}-\d{2}$/.test(String(value)))return `${value} 00:00:00`;
+    return value;
+  };
+  return equal(normalize(actual),normalize(expected));
+}
 const pick = (row, fields) => row ? Object.fromEntries(fields.filter(k => Object.hasOwn(row,k)).map(k => [k,row[k]])) : null;
 const map = (rows,key) => new Map((rows || []).map(row => [String(row[key]),row]));
 const deletable = new Set(['product_images','product_media','local_line_package_meta']);
@@ -144,12 +155,14 @@ export async function rollbackCutover(db, hash) {
     const [[bundles]]=await db.query('SELECT COUNT(*) AS total FROM enterprise_bundle_publications');
     if (Number(pub.total) || Number(bundles.total)) throw new Error('Channel reviews/publications exist; automatic rollback is held.');
     const plan=JSON.parse(receipt.plan_json);
+    const [columns]=await db.query('SELECT TABLE_NAME AS tableName,COLUMN_NAME AS columnName,DATA_TYPE AS dataType FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE()');
+    const types=new Map(columns.map(c=>[`${c.tableName}.${c.columnName}`,c.dataType]));
     const expectedRevisions=plan.operations.filter(o=>o.table==='enterprise_pricing_revisions').length;
     const [[count]]=await db.query('SELECT COUNT(*) AS total FROM enterprise_pricing_revisions');
     if (Number(count.total)!==expectedRevisions) throw new Error('Pricing changed after migration; rollback is held.');
     for (const op of [...plan.operations].reverse()) {
       const [[current]]=await db.query(`SELECT * FROM \`${op.table}\` WHERE \`${op.key}\`=? FOR UPDATE`,[op.id]);
-      if (op.after ? !current || Object.keys(op.after).some(k=>!equal(current[k],op.after[k])) : !!current) throw new Error(`Record changed after migration: ${op.table} ${op.id}.`);
+      if (op.after ? !current || Object.keys(op.after).some(k=>!databaseFieldEqual(current[k],op.after[k],types.get(`${op.table}.${k}`))) : !!current) throw new Error(`Record changed after migration: ${op.table} ${op.id}.`);
       if (op.kind==='insert') {
         const reference={vendors:'vendor_id',categories:'category_id',products:'product_id',packages:'package_id'}[op.table];
         if(reference){
