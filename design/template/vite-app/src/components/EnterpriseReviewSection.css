@@ -1,0 +1,16 @@
+.enterprise-review-page { min-width: 0; padding: 10px 12px 6px; }
+.enterprise-review-page > .admin-section-heading { margin: 0 0 6px; }
+.enterprise-review-page h2 { font-size: 20px; margin: 0; }
+.enterprise-review-page .admin-section-heading p,
+.enterprise-review-page .review-environment-note { font-size: 12px; margin: 4px 0 6px; }
+.enterprise-review-page .admin-actions { margin: 6px 0; gap: 8px; }
+.enterprise-review-page .review-filters { display: flex; flex-wrap: wrap; align-items: center; font-size: 12px; }
+.enterprise-review-page .review-filters .input { width: min(260px, 100%); min-height: 30px; padding: 5px 8px; font-size: 13px; }
+.enterprise-review-page .button { min-height: 26px; padding: 3px 9px; font-size: 12px; }
+.review-table-scroll, .review-publications-scroll { max-height: var(--rows-height, 60vh); overflow: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
+.review-table-scroll > .admin-table { overflow: visible; border-collapse: separate; border-spacing: 0; }
+.review-table-scroll > .admin-table > thead > tr > th { position: sticky; top: 0; z-index: 2; background: #f7f2e8; box-shadow: 0 1px 0 var(--line); }
+.review-table-scroll .admin-table th, .review-table-scroll .admin-table td { padding: 7px 10px; }
+.enterprise-review-page .review-pagination { font-size: 12px; margin: 4px 0; }
+.review-sales { margin-top: 4px; font-size: 13px; }
+.review-sales > summary { cursor: pointer; font-weight: 600; }

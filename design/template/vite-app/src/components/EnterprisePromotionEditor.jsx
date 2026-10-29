@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { adminPost } from "../adminApi.js";
 
 const dollars = cents => cents == null ? "—" : `$${(Number(cents) / 100).toFixed(2)}`;
@@ -7,7 +7,7 @@ const localDateTime = date => {
   return copy.toISOString().slice(0, 16);
 };
 
-export function EnterprisePromotionEditor({ token, product, packages, squareEnabled, onSaved }) {
+export function EnterprisePromotionEditor({ token, product, packages, squareEnabled, onSaved, onDirtyChange, onBusyChange }) {
   const [packageIds, setPackageIds] = useState([]);
   const [name, setName] = useState("");
   const [discountPercent, setDiscountPercent] = useState("20");
@@ -20,6 +20,10 @@ export function EnterprisePromotionEditor({ token, product, packages, squareEnab
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
 
+  const signature = JSON.stringify([packageIds, name, discountPercent, startAt, endAt, squareIncluded, localLineIncluded, squareLocationIds]);
+  const baseline = useRef(signature);
+  useEffect(() => { onDirtyChange?.(signature !== baseline.current); }, [signature, onDirtyChange]);
+  useEffect(() => { onBusyChange?.(busy); }, [busy, onBusyChange]);
   const input = () => ({
     name, discountBp: Math.round(Number(discountPercent) * 100), packageIds,
     startAt: new Date(startAt).toISOString(), endAt: new Date(endAt).toISOString(),
@@ -33,7 +37,7 @@ export function EnterprisePromotionEditor({ token, product, packages, squareEnab
       const value = await adminPost(save ? "enterprise-promotions" : "enterprise-promotions/preview", token, { input: input() });
       setPreview(value);
       setMessage(save ? `Sale proposal ${value.id} saved for separate approval.` : "Sale preview is ready. Regular prices stay unchanged.");
-      if (save) onSaved?.();
+      if (save) { baseline.current = signature; onDirtyChange?.(false); onSaved?.(); }
     } catch (error) { setPreview(null); setMessage(error.message); }
     finally { setBusy(false); }
   }

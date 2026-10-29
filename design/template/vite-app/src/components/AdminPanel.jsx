@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { AdminContentSection } from "./AdminContentSection.jsx";
 import { AdminLiabilityReleasesSection } from "./AdminLiabilityReleasesSection.jsx";
 import { AdminMarketingSection } from "./AdminMarketingSection.jsx";
@@ -12,6 +13,7 @@ import { CustomerPricingEditor } from './CustomerPricingEditor.jsx';
 import { categoryLabel } from "../categoryLabel.js";
 import { productCapabilities, buildProductDraftFromProduct, createDraftPackage, hydrateProductDraft, dirtyFields, hasDraftChanges, acknowledgeSave, saveProductDraft, saveInventoryDraft, INVENTORY_FIELDS, unsupportedScheduleFields, buildScheduleUpdate } from "./productWorkspace.js";
 import { AdminProductSyncSection } from "./AdminProductSyncSection.jsx";
+import { EnterpriseMigrationSection } from "./EnterpriseMigrationSection.jsx";
 import { EnterprisePricingSection } from "./EnterprisePricingSection.jsx";
 import { EnterpriseReviewSection } from "./EnterpriseReviewSection.jsx";
 import { EnterprisePricingSettings } from "./EnterprisePricingSettings.jsx";
@@ -64,6 +66,7 @@ function canAccessAdminSection(roleKeys, section) {
     case "pricing":
     case "inventory":
       return productCapabilities(roleKeys).view;
+    case "migrationComparison":
     case "enterprisePricing":
     case "reviewPublish":
       return roleKeys.some(role => ["pricing_editor", "pricing_publisher", "pricing_admin", "local_pricelist_admin"].includes(role));
@@ -138,6 +141,7 @@ const ADMIN_NAV_GROUPS = [
       { section: "enterprisePricing", label: "Pricing" },
       { section: "inventory", label: "Inventory" },
       { section: "reviewPublish", label: "Review & Publish" },
+      { section: "migrationComparison", label: "Migration comparison" },
       { section: "storefront", label: "Storefront" },
       { section: "turkeyPreorders", label: "Turkey Preorders" },
       { section: "localLine", label: "Local Line Data" },
@@ -617,7 +621,7 @@ function vendorPricingDraftEquals(vendor, draft) {
 }
 
 
-export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
+export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh, sessionTarget }) {
   const [token, setToken] = useState(() => localStorage.getItem("adminToken") || "");
   const [currentAdmin, setCurrentAdmin] = useState(null);
   const [loginState, setLoginState] = useState({ username: "", password: "", error: "" });
@@ -3478,24 +3482,20 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
   }
 
 
-  return (
-    <div className="container admin-panel">
+  const sessionControls = (
       <div className="admin-session-bar">
         <span className="small">{currentAdmin?.name || currentAdmin?.username || "Admin"}</span>
         <button className="button alt" type="button" onClick={handleSignOut}>Sign out</button>
       </div>
+  );
+  return (
+    <div className={`container admin-panel${["enterprisePricing", "inventory", "reviewPublish", "migrationComparison"].includes(activeSection) ? " admin-panel-pricing" : ""}`}>
+      {sessionTarget ? createPortal(sessionControls, sessionTarget) : sessionControls}
       {message && <div className="small">{message}</div>}
       {loading && <div className="small">Loading...</div>}
 
       <div className="admin-layout">
         <aside className="admin-nav" ref={adminNavRef}>
-          <nav className="admin-breadcrumb" aria-label="Admin breadcrumb">
-            <ol>
-              <li>Admin</li>
-              <li>{activeAdminNavGroup?.label || "Dashboard"}</li>
-              <li aria-current="page">{activeAdminSectionTitle}</li>
-            </ol>
-          </nav>
           {ADMIN_NAV_GROUPS.map((group) => {
             const isOpen = openAdminNavGroup === group.key;
             const hasActiveItem = group.key === activeAdminNavGroupKey;
@@ -3554,6 +3554,13 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
               </div>
             );
           })}
+          <nav className="admin-breadcrumb" aria-label="Admin breadcrumb">
+            <ol>
+              <li>Admin</li>
+              <li>{activeAdminNavGroup?.label || "Dashboard"}</li>
+              <li aria-current="page">{activeAdminSectionTitle}</li>
+            </ol>
+          </nav>
         </aside>
 
         <div className="admin-content">
@@ -4517,11 +4524,15 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh }) {
           )}
 
           {activeSection === "enterprisePricing" && canAccessAdminSection(currentAdminRoles, "enterprisePricing") && (
-            <EnterprisePricingSection token={token} roles={currentAdminRoles} onOpenReview={() => setActiveSection("reviewPublish")} />
+            <EnterprisePricingSection token={token} roles={currentAdminRoles} />
+          )}
+
+          {activeSection === "migrationComparison" && canAccessAdminSection(currentAdminRoles, "migrationComparison") && (
+            <EnterpriseMigrationSection token={token} />
           )}
 
           {activeSection === "reviewPublish" && canAccessAdminSection(currentAdminRoles, "reviewPublish") && (
-            <EnterpriseReviewSection token={token} roles={currentAdminRoles} onOpenPricing={() => setActiveSection("enterprisePricing")} />
+            <EnterpriseReviewSection token={token} roles={currentAdminRoles} />
           )}
 
           {activeSection === "enterprisePricingSettings" && canAccessAdminSection(currentAdminRoles, "enterprisePricingSettings") && (

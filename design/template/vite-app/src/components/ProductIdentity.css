@@ -1,0 +1,7 @@
+.product-identity { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.product-identity > img { width: 40px; height: 40px; flex: 0 0 40px; object-fit: cover; background: #f6f6f6; }
+.product-identity-copy { min-width: 0; }
+.product-identity-copy > strong { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; font-size: 14px; line-height: 18px; overflow-wrap: anywhere; }
+.product-identity-copy > strong > a { color: inherit; text-decoration: none; }
+.product-identity-copy > strong > a:hover { text-decoration: underline; }
+.product-identity-meta { display: block; font-size: 12px; line-height: 16px; color: #777; overflow-wrap: anywhere; }

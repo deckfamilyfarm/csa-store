@@ -12,7 +12,7 @@ export function EnterprisePricingSettings({ token }) {
     const [settings, proposal] = await Promise.all([
       adminGet("enterprise-pricing/settings", token), adminGet("enterprise-pricing/settings/draft", token)
     ]);
-    setCurrent(settings); setDraft(proposal?.settings || settings); setPending(proposal);
+    setCurrent(settings); setDraft(proposal ? { ...proposal.settings, markupBp: { ...settings.markupBp, ...proposal.settings.markupBp } } : settings); setPending(proposal);
   }
   useEffect(() => { reload().catch(error => setMessage(error.message)); }, [token]);
   const update = patch => { setDraft(previous => ({ ...previous, ...patch })); setImpact(null); };
@@ -47,6 +47,7 @@ export function EnterprisePricingSettings({ token }) {
       <label>Highly perishable markup %<input className="input" type="number" step="0.01" value={draft.markupBp.highlyPerishable / 100} onChange={event => updateMarkup("highlyPerishable", event.target.value)} /></label>
       <label>Perishable markup %<input className="input" type="number" step="0.01" value={draft.markupBp.perishable / 100} onChange={event => updateMarkup("perishable", event.target.value)} /></label>
       <label>Shelf stable markup %<input className="input" type="number" step="0.01" value={draft.markupBp.shelfStable / 100} onChange={event => updateMarkup("shelfStable", event.target.value)} /></label>
+      <label>Deck/Hyland Markup %<input className="input" type="number" step="0.01" value={draft.markupBp.deckHyland / 100} onChange={event => updateMarkup("deckHyland", event.target.value)} /></label>
       <label>Different editor and approver<input type="checkbox" checked={draft.requireDifferentApprover !== false} onChange={event => update({ requireDifferentApprover: event.target.checked })} /></label>
       {[["deck", "Deck"], ["hyland", "Hyland"], ["creamyCow", "Creamy Cow"], ["other", "Other vendors"]].map(([key, label]) =>
         <label key={key}>Square default · {label}<input type="checkbox" checked={Boolean(draft.squareDefaults?.[key])} onChange={event => updateSquareDefault(key, event.target.checked)} /></label>)}

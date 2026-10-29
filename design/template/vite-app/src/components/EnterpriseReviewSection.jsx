@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { adminGet, adminPost } from "../adminApi.js";
+import { useViewportRows } from "./useViewportRows.js";
+import "./EnterpriseReviewSection.css";
+import { LocalPricingSyncReview } from "./LocalPricingSyncReview.jsx";
 
 const money = cents => cents == null ? "—" : `$${(Number(cents) / 100).toFixed(2)}`;
 
-export function EnterpriseReviewSection({ token, roles = [], onOpenPricing }) {
+export function EnterpriseReviewSection({ token, roles = [] }) {
   const [revisions, setRevisions] = useState([]);
   const [promotions, setPromotions] = useState([]);
   const [message, setMessage] = useState("");
@@ -11,6 +14,7 @@ export function EnterpriseReviewSection({ token, roles = [], onOpenPricing }) {
   const [checks, setChecks] = useState({});
   const [release, setRelease] = useState(null);
   const [localOnly, setLocalOnly] = useState(null);
+  const reviewScrollRef = useViewportRows(16, localOnly === false);
   const canApprove = roles.some(role => ["admin", "pricing_admin", "pricing_publisher"].includes(role));
   const hasGrant = role => roles.includes("admin") || roles.includes(role);
   useEffect(() => {
@@ -28,14 +32,6 @@ export function EnterpriseReviewSection({ token, roles = [], onOpenPricing }) {
     try {
       const result = await adminPost(`enterprise-pricing/revisions/${revision.id}/approve`, token, {});
       setMessage(result.destinations.length ? `${revision.productName}: approved for ${result.destinations.join(" and ")}; publication pending.` : `${revision.productName}: approved locally.`);
-    } catch (error) { setMessage(error.message); }
-    finally { setBusy(null); }
-  }
-  async function applyLocally(revision) {
-    setBusy(revision.id);
-    try {
-      await adminPost(`enterprise-pricing/revisions/${revision.id}/activate-local`, token, {});
-      setMessage(`${revision.productName}: regular pricing applied to the local application.`);
     } catch (error) { setMessage(error.message); }
     finally { setBusy(null); }
   }
@@ -140,11 +136,13 @@ export function EnterpriseReviewSection({ token, roles = [], onOpenPricing }) {
     const packages = action.payload?.packages || [];
     return packages.length ? packages.map(pkg => `${pkg.name || pkg.id}: ${money((pkg.price_list_entries?.[0]?.adjustment_value || 0) * 100)}`).join(" · ") : "Review package prices";
   };
-  return <section className="card">
-    <div className="admin-section-heading"><div><h2>Review &amp; Publish</h2><p>One product revision covers every applicable destination. Publication remains separate from approval.</p></div><button className="button alt" type="button" onClick={onOpenPricing}>Pricing</button></div>
+  return <section className="card enterprise-review-page">
+    <div className="admin-section-heading"><div><h2>Review &amp; Publish</h2>{!localOnly && <p>Review saved price changes before synchronizing Square and Local Line.</p>}</div></div>
     {message && <p role="status">{message}</p>}
-    {!revisions.length && <p>No pricing proposals are waiting for review.</p>}
-    {revisions.map(revision => <div className="card" key={revision.id} style={{ marginBottom: 16 }}>
+    {localOnly && <LocalPricingSyncReview revisions={revisions} />}
+    <div ref={reviewScrollRef} className={localOnly === false ? "review-publications-scroll" : undefined}>
+    {!localOnly && !revisions.length && <p>No pricing changes are waiting for review.</p>}
+    {!localOnly && revisions.map(revision => <div className="card" key={revision.id} style={{ marginBottom: 16 }}>
       <h3>{revision.productName} <small>#{revision.id} · {revision.status}</small></h3>
       <p className="small">{revision.vendorName} · Edited by user {revision.editorId} · Settings version {revision.settingsVersionId}</p>
       {revision.publications?.length > 0 && <p className="small">{revision.publications.map(item => `${item.platform}: ${item.status}${item.releaseId ? ` (release ${item.releaseId})` : ""}`).join(" · ")}</p>}
@@ -155,7 +153,7 @@ export function EnterpriseReviewSection({ token, roles = [], onOpenPricing }) {
         {revision.output.wholesale?.map(row => <tr key={`wholesale-${row.sellingEnterpriseId}`}><td>Wholesale · enterprise {row.sellingEnterpriseId}</td><td>{money(row.priceCents)}</td><td>—</td><td>per {revision.input.pricingUnit}</td></tr>)}
       </tbody></table></div>
       {revision.input.overrideNote && <p className="small">Override note: {revision.input.overrideNote}</p>}
-      {revision.status === "pending" && canApprove && localOnly !== null && <div className="admin-actions"><button className="button" type="button" disabled={busy === revision.id} onClick={() => localOnly ? applyLocally(revision) : approve(revision)}>{localOnly ? "Apply regular prices locally" : "Approve revision"}</button><button className="button alt" type="button" disabled={busy === revision.id} onClick={() => reject(revision)}>Reject</button></div>}
+      {revision.status === "pending" && canApprove && localOnly === false && <div className="admin-actions"><button className="button" type="button" disabled={busy === revision.id} onClick={() => approve(revision)}>Approve revision</button><button className="button alt" type="button" disabled={busy === revision.id} onClick={() => reject(revision)}>Reject</button></div>}
       {!localOnly && ["approved", "partial"].includes(revision.status) && <>
         <button className="button alt" type="button" disabled={busy === revision.id} onClick={() => checkDestinations(revision)}>Check destinations</button>
         {checks[revision.id] && <div><p className="small">Audit {checks[revision.id].auditId}: {checks[revision.id].status}{checks[revision.id].error ? ` · ${checks[revision.id].error}` : ""}</p>
@@ -165,7 +163,7 @@ export function EnterpriseReviewSection({ token, roles = [], onOpenPricing }) {
         </div>}
       </>}
     </div>)}
-    <h3>Sales</h3>
+    <details className="review-sales"><summary>Sales ({promotions.length})</summary>
     {!promotions.length && <p>No sale proposals yet.</p>}
     {promotions.map(promotion => <div className="card" key={promotion.id} style={{ marginBottom: 16 }}>
       <h4>{promotion.input.name || `Sale ${promotion.id}`} <small>#{promotion.id} · {promotion.status}</small></h4>
@@ -176,6 +174,8 @@ export function EnterpriseReviewSection({ token, roles = [], onOpenPricing }) {
       {["approved", "scheduled", "active", "partial"].includes(promotion.status) && canApprove && (!promotion.input.channels.includes("localline") || hasGrant("localline_push")) && (!promotion.input.channels.includes("square") || hasGrant("square_push")) && <button className="button alt" type="button" disabled={busy === `sale-${promotion.id}`} onClick={() => publishPromotion(promotion)}>Publish / verify sale</button>}
       {["pending", "approved", "scheduled", "active", "partial", "cancelling"].includes(promotion.status) && canApprove && (!promotion.input.channels.includes("localline") || hasGrant("localline_push")) && (!promotion.input.channels.includes("square") || hasGrant("square_push")) && <button className="button alt" type="button" disabled={busy === `sale-${promotion.id}`} onClick={() => cancelPromotion(promotion)}>Cancel sale</button>}
     </div>)}
+    </details>
     {release && <div className="card"><h3>Publication {release.id}: {release.status}</h3>{(release.actions || []).map(action => <p key={action.id} className="small">{action.platform}: {action.status} · {action.message}</p>)}</div>}
+    </div>
   </section>;
 }

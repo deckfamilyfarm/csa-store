@@ -2869,7 +2869,7 @@ img {
 }
 
 .admin-panel {
-  padding: 20px 0 40px;
+  padding: 8px 0 24px;
 }
 
 .utility-bar.admin-header,
@@ -2883,6 +2883,47 @@ img {
   justify-content: flex-end;
   gap: 12px;
   margin-bottom: 16px;
+}
+
+.utility-bar.admin-header {
+  margin-top: 6px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.admin-header .brand { min-width: 0; margin-bottom: 0; }
+.admin-header .brand img { height: 44px; width: auto; }
+.admin-header .brand-title { font-size: 19px; }
+.admin-header-session { margin-left: auto; }
+.admin-header-session .admin-session-bar { margin-bottom: 0; }
+.admin-header-session .button { padding: 6px 12px; }
+
+@media (max-width: 600px) {
+  .utility-bar.admin-header { gap: 10px; }
+  .admin-header .brand { gap: 8px; }
+  .admin-header .brand img { width: 44px; flex: 0 0 44px; }
+  .admin-header .brand-title { font-size: 16px; letter-spacing: 0; }
+  .admin-header-session { max-width: 140px; }
+  .admin-header-session .admin-session-bar { flex-direction: column; align-items: flex-end; gap: 4px; text-align: right; }
+}
+
+.admin-panel-pricing .admin-nav {
+  position: relative;
+  top: auto;
+  padding: 6px 8px;
+  gap: 6px;
+  align-items: center;
+}
+
+.admin-panel-pricing .admin-layout { gap: 6px; }
+.admin-panel-pricing { padding-bottom: 4px; }
+.admin-panel-pricing .admin-nav-group { min-width: 130px; }
+.admin-panel-pricing .admin-nav-group-button { padding: 6px 9px; min-height: 32px; font-size: 13px; }
+
+@media (min-width: 1100px) {
+  .admin-panel-pricing .admin-breadcrumb { padding: 0 0 0 12px; }
+  .admin-panel-pricing .admin-breadcrumb [aria-current="page"] { font-size: 13px; }
 }
 
 .admin-layout {
@@ -2987,13 +3028,16 @@ img {
 }
 
 .admin-breadcrumb {
-  flex: 1 1 100%;
+  flex: 0 1 auto;
+  align-self: center;
+  margin-left: auto;
   min-width: 0;
   padding: 0 2px 2px;
 }
 
 .admin-breadcrumb ol {
   display: flex;
+  justify-content: flex-end;
   align-items: baseline;
   flex-wrap: wrap;
   gap: 6px;

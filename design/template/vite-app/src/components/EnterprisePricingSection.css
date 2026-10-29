@@ -1,16 +1,26 @@
 .enterprise-pricing-page {
   min-width: 0;
-  padding: clamp(16px, 2vw, 28px);
+  padding: 12px;
+  padding-bottom: 6px;
 }
+
+.enterprise-pricing-page > .enterprise-pricing-pagination { margin: 4px 0 0; gap: 8px; font-size: 12px; }
+.enterprise-pricing-footer-status { margin-right: auto; }
+.enterprise-pricing-page-controls { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.admin-panel .enterprise-pricing-pagination .button { min-height: 26px; padding: 3px 9px; font-size: 12px; }
 
 .enterprise-pricing-page .admin-section-heading {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 12px 24px;
-  margin-bottom: 18px;
+  gap: 6px 12px;
+  margin-bottom: 8px;
 }
+
+.enterprise-pricing-page > .admin-section-heading h2 { font-size: 20px; margin: 0; }
+.enterprise-pricing-page > .admin-section-heading .button { padding: 6px 12px; }
+.enterprise-pricing-page > p { margin: 8px 0; }
 
 .enterprise-pricing-page .admin-section-heading h2,
 .enterprise-pricing-page .admin-section-heading h3,
@@ -27,6 +37,13 @@
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
   gap: 14px;
 }
+
+.enterprise-pricing-filters {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
+  gap: 8px;
+}
+.enterprise-pricing-filters label { font-size: 12px; gap: 3px; }
+.enterprise-pricing-filters .input { padding: 6px 9px; font-size: 13px; min-height: 32px; }
 
 .enterprise-pricing-page label {
   display: grid;
@@ -49,11 +66,26 @@
 .enterprise-pricing-table-wrap {
   border: 1px solid var(--line);
   border-radius: 12px;
+  max-height: var(--pricing-table-height, 60vh);
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
 }
 
 .enterprise-pricing-table {
   min-width: 1180px;
   border: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: visible;
+}
+
+.enterprise-pricing-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #f7f2e8;
+  box-shadow: 0 1px 0 var(--line);
 }
 
 .enterprise-pricing-table th,
@@ -70,16 +102,11 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  max-width: 260px;
-  white-space: nowrap;
+  width: 260px;
+  white-space: normal;
 }
 
-.enterprise-pricing-product-line a {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+
 
 .enterprise-pricing-sort,
 .enterprise-pricing-warning {
@@ -190,23 +217,27 @@
 }
 
 .enterprise-markup-cell { min-width: 115px; }
-.enterprise-pricing-page .enterprise-pricing-edit-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  flex: none;
-  border: 0;
-  border-radius: 5px;
-  background: transparent;
+.enterprise-pricing-page .enterprise-pricing-edit-value {
   padding: 0;
-  color: var(--accent, #325b45);
+  border: 0;
+  background: transparent;
+  color: #285c37;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font: inherit;
   cursor: pointer;
 }
-.enterprise-pricing-edit-icon:hover { background: #e8efe6; }
-.enterprise-pricing-edit-icon:focus-visible { outline: 2px solid var(--accent, #325b45); outline-offset: 2px; }
-.enterprise-markup-inline { width: 300px; white-space: normal; }
+.enterprise-pricing-edit-value:focus-visible { outline: 2px solid #285c37; outline-offset: 3px; }
+.enterprise-markup-category,
+.enterprise-pricing-page .enterprise-markup-category .enterprise-pricing-edit-value {
+  font-style: italic;
+  text-decoration: none;
+}
+.enterprise-pricing-value-editor .input { width: 95px; min-width: 0; padding: 5px; }
+.enterprise-pricing-value-editor small[role="alert"] { max-width: 220px; white-space: normal; color: #a12c22; }
+.enterprise-markup-inline { width: 190px; white-space: normal; }
+.enterprise-markup-inline .input { padding: 5px 7px; font-size: 13px; width: 100%; }
+.enterprise-markup-custom { display: flex; align-items: center; gap: 5px; }
 .enterprise-markup-controls { display: grid; gap: 8px; }
 .enterprise-markup-controls input { max-width: 120px; }
 .enterprise-markup-controls button { justify-self: start; }

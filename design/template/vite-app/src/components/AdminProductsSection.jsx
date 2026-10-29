@@ -822,6 +822,7 @@ export function AdminProductsSection({
           </select>
         </label>}
       </div>
+      <div className={compactInventory ? "compact-inventory-tools" : undefined}>
       {compactInventory && <>
         <div className="compact-inventory-tabs" role="group" aria-label="Farm inventory status">
           {[["all", "All"], ["not-checked", "Not checked"], ["checked", "Checked"]].map(([key, label]) =>
@@ -863,6 +864,7 @@ export function AdminProductsSection({
             </>
           ) : null}
         </div>
+      </div>
       </div>
       {view === "pricing" && columnsOpen ? (
         <div className="products-columns" id="products-columns">

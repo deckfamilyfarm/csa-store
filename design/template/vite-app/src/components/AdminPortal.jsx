@@ -3,6 +3,7 @@ import { AdminPanel } from './AdminPanel.jsx';
 
 export function AdminPortal() {
   const [ready, setReady] = useState(false);
+  const [sessionTarget, setSessionTarget] = useState(null);
 
   useEffect(() => {
     document.title = 'Full Farm CSA Admin';
@@ -30,8 +31,9 @@ export function AdminPortal() {
             <img src="/images/full-farm-csa-logo.png" alt="Full Farm CSA" />
             <span className="brand-title">Full Farm CSA Admin</span>
           </div>
+          <div className="admin-header-session" ref={setSessionTarget} />
         </div>
-        {ready ? <AdminPanel /> : <p className="container">Opening admin…</p>}
+        {ready ? <AdminPanel sessionTarget={sessionTarget} /> : <p className="container">Opening admin…</p>}
       </main>
     </div>
   );

@@ -37,6 +37,10 @@ async function bootstrap() {
       UNIQUE KEY purchase_cost_revision (revision_id, purchasing_enterprise_id, effective_at),
       INDEX cost_product_enterprise (product_id, purchasing_enterprise_id, effective_at)
     ) ENGINE=InnoDB`,
+    `CREATE TABLE IF NOT EXISTS enterprise_pricing_markup_assignments (
+      product_id INT PRIMARY KEY, markup_category VARCHAR(64) NOT NULL,
+      assigned_by INT NOT NULL, assigned_at DATETIME NOT NULL
+    ) ENGINE=InnoDB`,
     `CREATE TABLE IF NOT EXISTS enterprise_pricing_buy_price_drafts (
       product_id INT PRIMARY KEY, purchasing_enterprise_id INT NOT NULL,
       price DECIMAL(14,2) NOT NULL, revision INT NOT NULL DEFAULT 1,

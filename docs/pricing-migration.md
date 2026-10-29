@@ -17,7 +17,11 @@ Restore creates a fresh local schema and verifies snapshot checksums, exact tabl
 
 Sign in at `http://127.0.0.1:5176/admin` with `local.admin` / `local-pricing-admin`. The clone adds this local administrator; existing production user records and password hashes are preserved. Local Line, Square, Timesheets, payments, email, and cloud credentials are removed from the local API environment, and outbound network connections are blocked. Catalog price-list IDs are loaded from the clone so the legacy screens still calculate correctly.
 
-Pricing shows the new model. Review & Publish offers **Apply regular prices locally** for pending proposals. This operation updates local storefront pricing and records `local-preview`; it creates no approval, external publication, or verified remote receipt. The endpoint refuses connected environments. Sales requiring reconciliation remain pending and their legacy behavior remains until you choose a local regular-price proposal. Actual Square checkout and remote publication need separate integration testing.
+Pricing saves take effect immediately in the isolated local store. Markup, package, and complete-product saves record a `local-preview` revision and update the active local price in the same transaction. Buy Price changes also recalculate and activate prices when the product has complete pricing inputs. Incomplete products retain the saved cost until their remaining inputs are supplied.
+
+Review & Publish compares these local prices against the imported Square and all four Local Line basket prices, showing differences and missing mappings. Matching imported prices are not a live verification. Saving creates no publication, approval, or remote request. Production saves still require the existing approval and publication flow. Promotional sales remain separately reviewed.
+
+To bring previously saved pending prices into use in an existing local clone, run `node scripts/local-pricing/activateSavedPrices.mjs`. It validates each record, preserves earlier revisions, reports any held records, and cannot run against a production database.
 
 Switch back without deleting either database:
 

@@ -1,3 +1,4 @@
+import { isNoMarkupProduct } from "./productPricing.js";
 import { averagePackageWeight, roundRatio, scaledInteger } from "./enterprisePricingEngine.js";
 
 // Read-only evidence from the existing store database.
@@ -15,6 +16,7 @@ const basketNames = ["Guest Basket", "CSA Members", "Herd Share Members", "SNAP"
 // are converted to a per-item amount. Missing units retain a package amount
 // until a pricing unit is selected for a proposal.
 export function deriveMigrationBuyPrice(record) {
+  if (isNoMarkupProduct(record?.product)) return null;
   const profile = record?.profile || {};
   const unit = profile.pricingUnit === "lbs" ? "lb" : profile.pricingUnit === "each" ? "each" : null;
   const packages = record?.packages || [];
@@ -44,7 +46,8 @@ export function deriveLegacyPricingEvidence(record, capturedAt = null) {
   const vendor = record.product || {};
   const unit = profile.pricingUnit === "lbs" ? "lb" : profile.pricingUnit === "each" ? "each" : null;
   const vendorMarkup = numberOrNull(vendor.vendorPriceListMarkup);
-  const markup = vendorMarkup !== null && vendorMarkup > 0 ? vendorMarkup
+  const deposit = isNoMarkupProduct(vendor);
+  const markup = deposit ? 0 : vendorMarkup !== null && vendorMarkup > 0 ? vendorMarkup
     : numberOrNull(profile.markupOverride) ?? numberOrNull(profile.guestMarkup)
       ?? numberOrNull(vendor.vendorGuestMarkup);
   const saleFlag = Boolean(Number(record.sale?.onSale));
@@ -72,7 +75,13 @@ export function deriveLegacyPricingEvidence(record, capturedAt = null) {
       crossedOutPriceCents: listRows.map(row => cents(row.crossedOutPrice)).find(value => value > 0) || null
     };
   });
+  const warnings = deposit ? (record.localLinePrices || []).filter(row =>
+    Number(row.adjustmentType) === 3 && cents(row.adjustmentValue) !== null && cents(row.finalPrice) !== null
+    && cents(row.adjustmentValue) !== cents(row.finalPrice))
+    .map(row => `${row.listName}: stored fixed adjustment $${Number(row.adjustmentValue).toFixed(2)} differs from the cached selling price $${Number(row.finalPrice).toFixed(2)}. Review before publication.`) : [];
   return {
+    pricingRule: deposit ? "deposit-no-markup" : "standard",
+    warnings,
     capturedAt,
     unit,
     sourceRetailUnitCents: cents(profile.sourceUnitPrice),

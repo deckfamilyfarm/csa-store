@@ -3,7 +3,7 @@
 export const DEFAULT_PRICING_SETTINGS = Object.freeze({
   localLineDiscountBp: 1000,
   squareIncrementCents: 50,
-  markupBp: Object.freeze({ highlyPerishable: 10000, perishable: 6000, shelfStable: 4500 }),
+  markupBp: Object.freeze({ highlyPerishable: 10000, perishable: 6500, shelfStable: 5000, deckHyland: 8500 }),
   squareDefaults: Object.freeze({ deck: true, hyland: true, creamyCow: false, other: false }),
   requireDifferentApprover: true
 });
@@ -57,7 +57,7 @@ export function calculateEnterprisePricing(input, settings = DEFAULT_PRICING_SET
   if (!cost) fail("Buy Price must be greater than zero.");
   const defaults = settings.markupBp || {};
   const category = input.markupCategory;
-  if (!["highlyPerishable", "perishable", "shelfStable", "custom"].includes(category)) fail("Choose a markup category.");
+  if (!["highlyPerishable", "perishable", "shelfStable", "deckHyland", "custom"].includes(category)) fail("Choose a markup category.");
   const markupBp = input.customMarkupBp === null || input.customMarkupBp === undefined || input.customMarkupBp === ""
     ? defaults[category] : input.customMarkupBp;
   if (markupBp === undefined || markupBp === null) fail("This markup category needs a custom percentage.");

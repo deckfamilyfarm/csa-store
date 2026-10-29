@@ -168,6 +168,7 @@ function writeCachedSubscribeDropSites(sites) {
 }
 
 export function Storefront() {
+  const [adminSessionTarget, setAdminSessionTarget] = useState(null);
   const experienceMode = getExperienceMode();
   const isStandaloneExperience = experienceMode === "subscribe" || experienceMode === "dropsites";
   const initialLiabilitySlug = getLiabilityReleaseSlug();
@@ -784,12 +785,13 @@ export function Storefront() {
   return (
     <div className="page">
       <main>
-        {experienceMode !== "subscribe" && experienceMode !== "dropsites" && view !== "subscribe" && !isAccountView && !isLiabilityView && !isDropsitesView && !isPublicHomeView ? (
+        {isAdminView || (experienceMode !== "subscribe" && experienceMode !== "dropsites" && view !== "subscribe" && !isAccountView && !isLiabilityView && !isDropsitesView && !isPublicHomeView) ? (
           <div className={`utility-bar${isAdminView ? " admin-header" : ""}`}>
             <div className="brand">
               <img src="/images/full-farm-csa-logo.png" alt={brand} />
               <span className="brand-title">Full Farm CSA</span>
             </div>
+            {isAdminView && <div className="admin-header-session" ref={setAdminSessionTarget} />}
             {showMemberCart ? (
               <div className="utility-actions">
                 <button className="button alt" type="button">Cart (2)</button>
@@ -806,7 +808,7 @@ export function Storefront() {
           }
         >
           {isAdminView ? (
-            <AdminPanel onCatalogRefresh={reloadCatalog} onSiteContentRefresh={reloadSiteContent} />
+            <AdminPanel sessionTarget={adminSessionTarget} onCatalogRefresh={reloadCatalog} onSiteContentRefresh={reloadSiteContent} />
           ) : isLiabilityView ? (
             <LiabilityReleasePage slug={liabilitySlug} />
           ) : isDropsitesView ? (

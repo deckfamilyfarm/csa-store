@@ -23,3 +23,22 @@ test("migration holds conflicting packages and retains missing unit for review",
   assert.deepEqual(deriveMigrationBuyPrice({ packages: [{ price: "15.00", numOfItems: 1 }] }),
     { cents: 1500, unit: null, basis: "package" });
 });
+
+test("deposits retain zero markup even when vendor and profile defaults differ", async () => {
+  const { deriveLegacyPricingEvidence } = await import('./legacyPricingEvidence.js');
+  const record = { product: { name: 'Animal Side Deposit', vendorPriceListMarkup: 1.4 },
+    profile: { pricingUnit: 'each', guestMarkup: 0.6, sourceUnitPrice: 200 },
+    packages: [{ id: 1, name: 'ea', price: '200.00', numOfItems: 1 }],
+    localLinePrices: ['Guest Basket', 'CSA Members', 'Herd Share Members', 'SNAP'].map(listName =>
+      ({ packageId: 1, listName, adjustmentType: 3, adjustmentValue: '200.00', finalPrice: '200.00' })) };
+  const evidence = deriveLegacyPricingEvidence(record);
+  assert.equal(evidence.pricingRule, 'deposit-no-markup');
+  assert.equal(evidence.markupPercent, 0);
+  assert.equal(evidence.packages[0].displayedPriceCents, 20000);
+  assert.equal(evidence.packages[0].estimatedCsaUnitCents, 20000);
+  assert.deepEqual(evidence.warnings, []);
+  assert.equal(deriveMigrationBuyPrice(record), null, 'Deposit amount is not inferred as an enterprise purchase cost');
+  const conflict = deriveLegacyPricingEvidence({ ...record, localLinePrices: record.localLinePrices.map(row => ({ ...row, adjustmentValue: 0 })) });
+  assert.equal(conflict.warnings.length, 4);
+  assert.equal(conflict.packages[0].displayedPriceCents, 20000, 'Keep cached price and flag conflicting fixed adjustment');
+});
