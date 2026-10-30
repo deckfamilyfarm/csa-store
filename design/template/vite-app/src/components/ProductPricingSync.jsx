@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { adminGet, adminPost } from "../adminApi.js";
-import { canSyncLocalLine, publicationRunning, publicationMessage, syncProductLocalLine } from "./productPricingSyncFlow.js";
+import { canSyncPlatforms, publicationRunning, publicationMessage, syncProductChannels, samePlatforms, releasePlatforms, channelNames } from "./productPricingSyncFlow.js";
 import "./EnterpriseReviewSection.css";
 
 export function ProductPricingSync({ productId, token, roles, dirty, onChanged, onRequestBusy }) {
@@ -9,6 +9,7 @@ export function ProductPricingSync({ productId, token, roles, dirty, onChanged, 
   const [connectionError, setConnectionError] = useState(""), [lastContact, setLastContact] = useState(null);
   const [now, setNow] = useState(Date.now()), [loading, setLoading] = useState(true);
   const [job, setJob] = useState(null);
+  const [selectedPlatforms, setSelectedPlatforms] = useState(['localline']);
   const mounted = useRef(false), callbacks = useRef({ onChanged, onRequestBusy });
   callbacks.current = { onChanged, onRequestBusy };
   const storageKey = `product-localline-sync:${productId}`;
@@ -32,13 +33,16 @@ export function ProductPricingSync({ productId, token, roles, dirty, onChanged, 
         let saved;
         try { saved = JSON.parse(localStorage.getItem(storageKey) || 'null'); } catch { saved = null; }
         setJob(saved);
-        const releaseId = saved?.releaseId || (!saved && result.latestLocalLineReleaseId);
+        const releaseId = saved?.releaseId || (!saved && (result.latestPricingReleaseId || result.latestLocalLineReleaseId));
         if (releaseId) {
           // Retain this receipt even if the progress connection fails. A retry
           // must recover the existing update before starting another one.
-          if (!saved) saveJob({ releaseId });
+          if (!saved) saveJob({ releaseId, platforms:result.latestPricingReleasePlatforms?.length ? result.latestPricingReleasePlatforms : ['localline'] });
           const receipt = await get(`product-sync/releases/${releaseId}/progress`);
-          if (!cancelled) { setRelease(receipt); if (['completed', 'cancelled'].includes(receipt.status)) saveJob(null); }
+          if (!cancelled) { setRelease(receipt);
+            if (['completed', 'cancelled'].includes(receipt.status)) saveJob(null);
+            else saveJob({...saved, releaseId, platforms:releasePlatforms(receipt)});
+          }
         }
       } catch (e) { if (!cancelled) setError(e.message); }
       finally { if (!cancelled) setLoading(false); }
@@ -73,8 +77,9 @@ export function ProductPricingSync({ productId, token, roles, dirty, onChanged, 
     return () => clearInterval(timer);
   }, [Boolean(request), running]);
 
-  async function sync() {
-    if (request || running || dirty || !canSyncLocalLine(roles)) return;
+  async function sync(platforms) {
+    if (request || running || dirty || !canSyncPlatforms(roles, platforms)) return;
+    setSelectedPlatforms(platforms);
     setError(""); setConnectionError(""); setRequest("Connecting to the server…");
     callbacks.current.onRequestBusy?.(true);
     try {
@@ -82,44 +87,52 @@ export function ProductPricingSync({ productId, token, roles, dirty, onChanged, 
       const current = await get(`enterprise-pricing/products/${productId}/sync`);
       setData(current);
       let next;
+      if (release && ['failed','partial','held'].includes(release.status) && !samePlatforms(platforms,releasePlatforms(release)))
+        throw new Error(`Resolve or retry the previous ${channelNames(releasePlatforms(release))} sync first.`);
       if (release && ['failed', 'partial', 'held'].includes(release.status)) {
         if (release.actions?.some(a => a.status === 'held')) {
           setRequest('Rechecking the issue against your saved prices…');
           const audit = await post(`product-sync/releases/${release.id}/review`, {});
-          const resumed = { auditId: audit.id, revisionId: current.revisionId };
+          const reviewed = await get(`product-sync/audits/${audit.id}`);
+          const retryPlatforms = reviewed.options.platforms;
+          if (retryPlatforms.some(platform => !platforms.includes(platform))) throw new Error('The new review includes an unselected destination. Reopen Sync to review it.');
+          const resumed = { auditId: audit.id, revisionId: current.revisionId, platforms:retryPlatforms };
           saveJob(resumed);
-          next = await syncProductLocalLine({ productId, data: current, resume: resumed, get, post, saveJob, progress: setRequest });
+          next = await syncProductChannels({ platforms:retryPlatforms, productId, data: current, resume: resumed, get, post, saveJob, progress: setRequest });
         } else {
-          setRequest('Retrying the saved Local Line update…');
+          setRequest(`Retrying the saved ${channelNames(platforms)} update…`);
           next = await post(`product-sync/releases/${release.id}/retry`, { background: true });
         }
       } else {
         setRelease(null);
-        next = await syncProductLocalLine({ productId, data: current, resume: job, get, post, saveJob, progress: setRequest });
+        next = await syncProductChannels({ platforms, productId, data: current, resume: job, get, post, saveJob, progress: setRequest });
       }
       if (!mounted.current) return;
       setRelease(next);
       if (next.status === 'completed') { saveJob(null); callbacks.current.onChanged?.(); }
-    } catch (e) { if (mounted.current) setError(e.message); }
+    } catch (e) { if (mounted.current) { setError(e.message); callbacks.current.onChanged?.(); } }
     finally { if (mounted.current) { setRequest(""); callbacks.current.onRequestBusy?.(false); } }
   }
   const active = !!request || running;
   return <div className="product-pricing-sync">
     <div className="admin-actions product-sync-actions">
-      <button type="button" className="button" onClick={sync}
-        disabled={loading || active || dirty || data?.localOnly || !data || !canSyncLocalLine(roles)}>
-        {active ? 'Syncing Local Line…' : job ? 'Resume sync' : 'Sync Local Line'}
-      </button>
-      {data?.sale?.discountBp > 0 && <span>{data.sale.discountBp / 100}% sale included</span>}
+      {[
+        {label:'Sync Local Line',platforms:['localline']},
+        ...(data?.input?.squareEnabled ? [{label:'Sync Square',platforms:['square']},{label:'Sync Both',platforms:['localline','square']}] : [])
+      ].map(choice => <button key={choice.label} type="button" className="button" onClick={() => sync(choice.platforms)}
+        disabled={loading || active || dirty || data?.localOnly || !data || !canSyncPlatforms(roles,choice.platforms)
+          || Boolean(job && !samePlatforms(job.platforms || ['localline'],choice.platforms))}>
+        {active && samePlatforms(selectedPlatforms,choice.platforms) ? 'Syncing…' : job && samePlatforms(job.platforms || ['localline'],choice.platforms) ? `Resume ${channelNames(choice.platforms)} sync` : choice.label}
+      </button>)}
+      {data?.sale?.discountBp > 0 && <span>{data.sale.discountBp / 100}% Local Line sale</span>}
     </div>
     {loading && <p role="status">Loading sync status…</p>}
     {dirty && <p>Save your changes before syncing.</p>}
-    {!canSyncLocalLine(roles) && <p>A Pricing Publisher with Local Line Push permission can sync this product.</p>}
+    {!canSyncPlatforms(roles,['localline']) && !canSyncPlatforms(roles,['square']) && <p>A Pricing Publisher with the selected channel’s Push permission can sync this product.</p>}
     {data?.localOnly && <p>Local test mode: remote updates are disabled.</p>}
-    {!active && data?.syncBlocker && <p role="alert">{data.syncBlocker}</p>}
     {(request || release) && <div className="product-connection-progress">
       <strong role="status" aria-live="polite">{request || publicationMessage(release)}</strong>
-      {active && <progress aria-label="Syncing Local Line" />}
+      {active && <progress aria-label="Synchronizing channel prices" />}
       {request ? <p>Keep this window open until we confirm the server has received your update.</p>
         : running ? <p>You can close this window. The server will finish the update. Reopen Sync to see the result.</p>
         : <p>You can close this window.{release?.finishedAt && ` Last sync: ${new Date(release.finishedAt).toLocaleString()}.`}</p>}
@@ -128,6 +141,5 @@ export function ProductPricingSync({ productId, token, roles, dirty, onChanged, 
     </div>}
     {error && <p role="alert">Sync could not finish: {error}</p>}
     {connectionError && <p role="alert">Connection interrupted; retrying the status check. The update may still be running. {connectionError}</p>}
-    {data?.input?.squareEnabled && <p className="small">Square is separate. Use Review &amp; Publish when you are ready to update Square.</p>}
   </div>;
 }

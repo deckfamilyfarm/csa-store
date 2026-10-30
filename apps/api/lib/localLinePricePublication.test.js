@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {validateLocalLinePriceScope,priceOnlyLocalLinePayload,LOCAL_LINE_PRICE_SCOPE} from './localLinePricePublication.js';
+import {validateLocalLinePriceScope,priceOnlyLocalLinePayload,LOCAL_LINE_PRICE_SCOPE,validateSelectedPriceScope,SELECTED_PRICE_SCOPE} from './localLinePricePublication.js';
 test('Local Line-only scope cannot authorize Square, incoming, staging, or unapproved legacy prices',()=>{
   const options={publicationScope:LOCAL_LINE_PRICE_SCOPE,platforms:['localline'],enterpriseRevisionId:1};
   assert.equal(validateLocalLinePriceScope(options),true);
@@ -23,4 +23,13 @@ test('price-only update uses each package price, supports ending sales, and pres
   assert.equal(priceOnlyLocalLinePayload(regular,remote,{discountBp:0},[1,3,4]).packages[0].price_list_entries.length,2);
   remote.packages[0].price_list_entries=[];
   assert.throws(()=>priceOnlyLocalLinePayload(regular,remote,{discountBp:0},[1,3,4]),/valid active/);
+});
+
+test('selected price scopes require explicit destinations and retain legacy Local Line isolation',()=>{
+ const options={publicationScope:SELECTED_PRICE_SCOPE,platforms:['square'],enterpriseRevisionId:1};
+ assert.equal(validateSelectedPriceScope(options),true);
+ assert.equal(validateSelectedPriceScope({...options,platforms:['localline','square']}),true);
+ for(const patch of [{platforms:[]},{platforms:['square','square']},{platforms:['bad']},{incoming:true},{staged:{1:{onSale:true}}},{enterpriseRevisionId:null}])
+  assert.throws(()=>validateSelectedPriceScope({...options,...patch}));
+ assert.throws(()=>validateLocalLinePriceScope(options));
 });

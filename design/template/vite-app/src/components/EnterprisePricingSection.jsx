@@ -11,6 +11,7 @@ import { EnterpriseProductCreate } from "./EnterpriseProductCreate.jsx";
 import { ProductEditorInfo } from "./ProductEditorInfo.jsx";
 import { PricingSyncStatus } from "./PricingSyncStatus.jsx";
 import { ProductPricingWarnings } from "./ProductPricingWarnings.jsx";
+import { productPricingWarnings as productWarnings } from './pricingWarningDetails.js';
 import { ProductPricingSync } from "./ProductPricingSync.jsx";
 import { ProductIdentity } from "./ProductIdentity.jsx";
 import { InlinePricingValue } from "./InlinePricingValue.jsx";
@@ -31,15 +32,6 @@ const columns = [
   ["markup", "Markup"], ["csa", "FF Unit Price"],
   ["sale", "Sale"], ["llPackage", "FF Package Price"], ["square", "Square"], ["wholesale", "Wholesale"], ["visibility", "FF Visible"], ["inventory", "FF Inventory"], ["sync", "Sync"]
 ];
-const productWarnings = row => {
-  const warnings = [...(row.sourceEvidence?.warnings || [])];
-  if (row.status === "partial") warnings.push("This pricing revision is only partially published. Review both destinations.");
-  if (row.status === "rejected") warnings.push("The latest pricing proposal was rejected.");
-  for (const publication of row.publications || []) {
-    if (["blocked", "failed", "partial"].includes(publication.status)) warnings.push(`${publication.platform === "square" ? "Square" : "Local Line"} publication: ${publication.status}.`);
-  }
-  return warnings;
-};
 
 export function EnterprisePricingSection({ token, roles = [] }) {
   const [creating, setCreating] = useState(false);

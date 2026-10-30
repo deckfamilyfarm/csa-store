@@ -474,4 +474,53 @@ test("saved prices activate locally before independently approved channel public
     assert.match(held.actions[0].message,/Local inputs changed/);
   });
 
+  await t.test('editor can sync Square alone or both, records explicit attempts, and holds unsafe sales', async()=>{
+    await pool.query("UPDATE enterprise_promotions SET status='cancelled'");
+    await pool.query('UPDATE enterprise_product_sales SET discount_bp=0,revision=revision+1 WHERE product_id=1');
+    await pool.query("UPDATE product_sync_release_actions SET status='cancelled' WHERE status IN ('pending','working','failed','held')");
+    const current=await pricing.getEnterprisePricingProduct(1);
+    const input={...current.latest.input,squareEnabled:true,customMarkupBp:10000,markupCategory:'custom'};
+    const draft=await pricing.saveEnterprisePricingDraft(1,input,current.latest.id,{userId:1});
+    await pricing.approveEnterprisePricingRevision(draft.revisionId,user);
+    const opts={platforms:['square'],productIds:[1],productScope:'selected',vendorGroup:'all',enterpriseRevisionId:draft.revisionId,
+      publicationScope:'enterprise-selected-prices',productEditorSync:true};
+    const check=async(options=opts)=>{
+      const audit=await sync.createProductSyncAudit(options,user);
+      for(let i=0;i<150;i++){if((await sync.getProductSyncAudit(audit.id)).status!=='running')break;await new Promise(r=>setTimeout(r,20));}
+      return {audit,actions:(await sync.listProductSyncActions(audit.id,{})).rows};
+    };
+    const plain=await check({...opts,productEditorSync:false});
+    let row=(await pricing.listEnterprisePricingProducts({search:'Sausage 12 oz'})).rows.find(r=>r.id===1);
+    assert.equal(row.publications.find(p=>p.platform==='square').attempted,false,'an audit alone is not an explicit sync attempt');
+    const before=writes.length, llBefore=structuredClone(remote);
+    let {audit,actions}=await check();
+    assert.ok(actions.length && actions.every(a=>a.platform==='square'&&['changed','synced'].includes(a.status)),JSON.stringify(actions));
+    await assert.rejects(sync.createProductSyncRelease({auditId:audit.id,actionIds:actions.map(a=>a.id)}, {userId:2,adminRoles:['pricing_publisher','localline_push']}),/Square|square/);
+    let release=await sync.createProductSyncRelease({auditId:audit.id,actionIds:actions.map(a=>a.id)},user);
+    assert.equal((await sync.runProductSyncRelease(release.id,{user,allowFuture:true})).status,'completed');
+    assert.ok(writes.slice(before).length>0 && writes.slice(before).every(w=>w.platform==='square'));
+    assert.deepEqual(remote,llBefore,'Square-only sync cannot change Local Line');
+    row=(await pricing.listEnterprisePricingProducts({search:'Sausage 12 oz'})).rows.find(r=>r.id===1);
+    assert.equal(row.publications.find(p=>p.platform==='square').attempted,true);
+    ({audit,actions}=await check({...opts,platforms:['localline','square']}));
+    assert.deepEqual([...new Set(actions.map(a=>a.platform))].sort(),['localline','square']);
+    await assert.rejects(sync.createProductSyncRelease({auditId:audit.id,actionIds:actions.filter(a=>a.platform==='localline').map(a=>a.id)},user),/every required/);
+    release=await sync.createProductSyncRelease({auditId:audit.id,actionIds:actions.map(a=>a.id)},user);
+    assert.equal((await sync.runProductSyncRelease(release.id,{user,allowFuture:true})).status,'completed');
+    const {saveProductSale}=await import('./enterpriseProductSales.js');
+    const [[state]]=await pool.query('SELECT revision FROM enterprise_product_sales WHERE product_id=1');
+    await saveProductSale(1,{discountBp:1000,expectedRevision:Number(state.revision),expectedPricingRevision:draft.revisionId},{userId:1});
+    const preSaleWrites=writes.length;
+    ({audit,actions}=await check({...opts,platforms:['localline','square']}));
+    assert.ok(actions.some(a=>a.platform==='square'&&a.status==='blocked'&&/automatic discount/.test(a.message)));
+    await assert.rejects(sync.createProductSyncRelease({auditId:audit.id,actionIds:actions.filter(a=>a.platform==='localline').map(a=>a.id)},user),/blocker/);
+    assert.equal(writes.length,preSaleWrites,'a blocked Square sale prevents both destinations from publishing');
+    const fresh=await pricing.getEnterprisePricingProduct(1);
+    await pool.query("UPDATE enterprise_promotions SET status='cancelled'");
+    await pool.query('UPDATE enterprise_product_sales SET discount_bp=0 WHERE product_id=1');
+    const disabled=await pricing.saveEnterprisePricingDraft(1,{...fresh.latest.input,squareEnabled:false},fresh.latest.id,{userId:1});
+    await pricing.approveEnterprisePricingRevision(disabled.revisionId,user);
+    await assert.rejects(sync.createProductSyncAudit({...opts,enterpriseRevisionId:disabled.revisionId},user),/not enabled/);
+  });
+
 });

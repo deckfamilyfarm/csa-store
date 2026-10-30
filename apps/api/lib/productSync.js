@@ -1,4 +1,4 @@
-import { validateLocalLinePriceScope } from './localLinePricePublication.js';
+import { validateLocalLinePriceScope, validateSelectedPriceScope } from './localLinePricePublication.js';
 import { getPool } from "../db.js";
 import { validateSavedProductVendor } from "./productVendor.js";
 import { isLocalLineEnabled } from "../localLine.js";
@@ -57,7 +57,8 @@ async function storeAction(auditId, action) {
 }
 export async function createProductSyncAudit(options, user) {
   await ensureProductSyncSchema();
-  const localLinePricesOnly = validateLocalLinePriceScope(options);
+  const selectedPrices = validateSelectedPriceScope(options);
+  const localLinePricesOnly = !selectedPrices && validateLocalLinePriceScope(options);
   const roles = user.adminRoles || [];
   const platforms = [...new Set(options.platforms || [])];
   if (!platforms.length || platforms.some(platform => !PLATFORM_LABEL[platform])) fail("Select Local Line, Square, or both.");
@@ -74,11 +75,12 @@ export async function createProductSyncAudit(options, user) {
     if (productIds.length !== 1 || Object.keys(staged).length || options.incoming) fail("Check one approved enterprise pricing revision without staged or incoming changes.");
     const revision = await getApprovedEnterpriseRevision(productIds[0], enterpriseRevisionId);
     if (!revision || !["approved", "partial", "active"].includes(revision.status)) fail("This enterprise pricing revision is no longer approved. Review the current proposal.", 409);
-    const expectedPlatforms = !localLinePricesOnly && revision.input.squareEnabled ? ["localline", "square"] : ["localline"];
+    if (selectedPrices && platforms.includes('square') && !revision.input.squareEnabled) fail('This product is not enabled for Square.',409);
+    const expectedPlatforms = selectedPrices ? platforms : !localLinePricesOnly && revision.input.squareEnabled ? ["localline", "square"] : ["localline"];
     if (!same(platforms.slice().sort(), expectedPlatforms.slice().sort())) fail("Check every required destination for the approved product.");
   }
   if (Object.keys(staged).some(id => productIds.length && !productIds.includes(Number(id)))) fail("Staged products must be in the audit scope.");
-  const normalized = { platforms, staged, productIds, enterpriseRevisionId, ...(localLinePricesOnly ? { publicationScope: options.publicationScope } : {}), productScope: auditProductScope(options, productIds), incoming: Boolean(options.incoming), vendorGroup: auditVendorGroup(options) };
+  const normalized = { platforms, staged, productIds, enterpriseRevisionId, ...((localLinePricesOnly || selectedPrices) ? { publicationScope: options.publicationScope, productEditorSync: options.productEditorSync === true } : {}), productScope: auditProductScope(options, productIds), incoming: Boolean(options.incoming), vendorGroup: auditVendorGroup(options) };
   const [result] = await getPool().query(`INSERT INTO product_sync_audits (status, options_json, created_by, created_at) VALUES ('running', ?, ?, UTC_TIMESTAMP())`, [JSON.stringify(normalized), user.userId || user.adminId || null]);
   const id = Number(result.insertId);
   // Work survives navigation. All progress and results are stored centrally.
@@ -133,7 +135,11 @@ async function runProductSyncAudit(id, options, userId) {
           for (const action of await prepareIncomingActions(catalog, incomingIds)) await save(action);
         }
       }
-    } catch (error) { errors.push(`${PLATFORM_LABEL[platform]}: ${error.message}`); }
+    } catch (error) {
+      if (validateSelectedPriceScope(options)) for (const product of products) await save({direction:'outgoing',platform,
+        kind:'error',productId:Number(product.id),productName:product.name,status:'blocked',message:error.message});
+      else errors.push(`${PLATFORM_LABEL[platform]}: ${error.message}`);
+    }
   }
   const [counts] = await getPool().query("SELECT platform, direction, status, COUNT(*) AS count FROM product_sync_actions WHERE audit_id=? GROUP BY platform, direction, status", [id]);
   await getPool().query("UPDATE product_sync_audits SET status=?, summary_json=?, error_message=?, finished_at=UTC_TIMESTAMP() WHERE id=?", [errors.length ? "partial" : "completed", JSON.stringify(counts), errors.join(" ") || null, id]);
@@ -223,7 +229,9 @@ export async function createProductSyncRelease(body, user) {
         const revision = await getApprovedEnterpriseRevision(productIds[0], enterpriseIds[0]);
         if (!revision || !["approved", "partial", "active"].includes(revision.status)) fail("Enterprise pricing changed after approval. Audit again.", 409);
         const [auditActions] = await connection.query("SELECT id, platform, status, data_json AS dataJson FROM product_sync_actions WHERE audit_id=? AND product_id=? AND direction='outgoing'", [body.auditId, productIds[0]]);
-        const required = !validateLocalLinePriceScope(audit.options) && revision.input.squareEnabled ? ["localline", "square"] : ["localline"];
+        const selectedPrices = validateSelectedPriceScope(audit.options);
+        if (selectedPrices && audit.options.platforms.includes('square') && !revision.input.squareEnabled) fail('This product is not enabled for Square.',409);
+        const required = selectedPrices ? audit.options.platforms : !validateLocalLinePriceScope(audit.options) && revision.input.squareEnabled ? ["localline", "square"] : ["localline"];
         if (required.some(platform => !auditActions.some(row => row.platform === platform))) fail("The coordinated audit is missing a required destination.");
         if (auditActions.some(row => ["blocked", "review", "held"].includes(row.status))) fail("Resolve every destination blocker before publishing this product.");
         if (auditActions.some(row => ["changed", "synced"].includes(row.status) && !actions.some(action => action.id === Number(row.id)))) fail("Select every required destination action for this product.");
@@ -239,7 +247,7 @@ export async function createProductSyncRelease(body, user) {
       // A laptop-owned price batch must not be resumed by an older deployed
       // scheduler that lacks sale-baseline support. The CLI resumes its receipt
       // explicitly with allowFuture; this is not a customer-scheduled release.
-      const localWorkerOnly = body.localWorkerOnly && validateLocalLinePriceScope(audit.options);
+      const localWorkerOnly = body.localWorkerOnly && !validateSelectedPriceScope(audit.options) && validateLocalLinePriceScope(audit.options);
       const [result] = await connection.query(`INSERT INTO product_sync_releases (audit_id, name, status, scheduled_at, is_scheduled, created_by, created_at)
         VALUES (?, ?, 'scheduled', ?, ?, ?, UTC_TIMESTAMP())`, [body.auditId, String(body.name || "Product release").slice(0, 255), localWorkerOnly ? "9999-01-01 00:00:00" : scheduledAt || utcNow(), Number(Boolean(scheduledAt)), user.userId || user.adminId || null]);
       const releaseId = Number(result.insertId);

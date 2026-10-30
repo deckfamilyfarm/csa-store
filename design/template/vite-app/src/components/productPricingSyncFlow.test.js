@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { syncProductLocalLine, canSyncLocalLine, publicationMessage } from './productPricingSyncFlow.js';
+import { syncProductLocalLine, syncProductChannels, canSyncPlatforms, canSyncLocalLine, publicationMessage } from './productPricingSyncFlow.js';
 const data = { revisionId: 12, revisionStatus: 'active' };
 const action = { id: 7, platform: 'localline', productId: 1, status: 'changed' };
 function harness({ actions = [action], receipt = null, releaseError = false } = {}) {
@@ -92,4 +92,28 @@ test('progress describes the real server stage and preserves failure details', (
   assert.match(publicationMessage({ status: 'running', actions: [{status:'working',message:'Applying approved values.'}] }), /Updating prices and sale on Local Line/);
   assert.match(publicationMessage({ status: 'running', actions: [{status:'working',message:'Confirming the published values with the destination.'}] }), /Verifying/);
   assert.match(publicationMessage({ status: 'held', actions: [{status:'held',message:'Remote price changed since review.'}] }), /Remote price changed since review/);
+});
+
+test('Square-only and Both sync include exactly the selected destinations', async()=>{
+  for(const platforms of [['square'],['localline','square']]) {
+    const h=harness({actions:platforms.map((platform,i)=>({...action,id:7+i,platform}))});
+    await syncProductChannels({...h.args,data:{...data,input:{squareEnabled:true}},platforms});
+    assert.deepEqual(h.posts[0].body.platforms,platforms);
+    assert.equal(h.posts[0].body.productEditorSync,true);
+    assert.equal(h.posts[0].body.publicationScope,'enterprise-selected-prices');
+    assert.equal(h.posts[1].body.actionIds.length,platforms.length);
+  }
+});
+test('Both sync refuses partial checks; recovery cannot switch destinations', async()=>{
+  const h=harness();
+  await assert.rejects(syncProductChannels({...h.args,data:{...data,input:{squareEnabled:true}},platforms:['localline','square']}));
+  assert.equal(h.posts.length,1);
+  await assert.rejects(syncProductChannels({...h.args,data:{...data,input:{squareEnabled:true}},platforms:['square'],resume:{auditId:4,platforms:['localline']}}),/original destinations/);
+});
+test('Square eligibility and selected destination permissions are enforced',async()=>{
+  const h=harness();
+  await assert.rejects(syncProductChannels({...h.args,platforms:['square']}),/not enabled/);
+  assert.equal(h.posts.length,0);
+  assert.equal(canSyncPlatforms(['pricing_publisher','square_push'],['square']),true);
+  assert.equal(canSyncPlatforms(['pricing_publisher','square_push'],['square','localline']),false);
 });

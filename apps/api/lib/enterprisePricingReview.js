@@ -1,5 +1,16 @@
 // Recover the latest check for each exact pricing revision, including interrupted
 // checks and release receipts. Older revisions must never authorize newer prices.
+export async function readPricingPublicationAttempts(pool, revisionIds) {
+  if (!revisionIds.length) return new Set();
+  const [rows] = await pool.query(`SELECT DISTINCT a.platform,
+    JSON_UNQUOTE(JSON_EXTRACT(au.options_json,'$.enterpriseRevisionId')) AS revisionId
+    FROM product_sync_actions a JOIN product_sync_audits au ON au.id=a.audit_id
+    WHERE JSON_UNQUOTE(JSON_EXTRACT(au.options_json,'$.enterpriseRevisionId')) IN (?)
+      AND (JSON_EXTRACT(au.options_json,'$.productEditorSync')=true
+        OR EXISTS(SELECT 1 FROM product_sync_release_actions ra WHERE ra.action_id=a.id))`, [revisionIds.map(String)]);
+  return new Set(rows.map(row=>`${row.revisionId}:${row.platform}`));
+}
+
 export async function readEnterpriseReviewChecks(pool, revisionIds) {
   if (!revisionIds.length) return new Map();
   const [audits] = await pool.query(`SELECT a.id,a.status,a.error_message AS error,

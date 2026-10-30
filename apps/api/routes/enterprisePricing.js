@@ -2,6 +2,8 @@ import { refreshFullFarmInventory } from "../lib/inventorySync.js";
 import { saveProductSale } from "../lib/enterpriseProductSales.js";
 import { createEnterpriseProduct, previewEnterpriseProductCreation } from "../lib/enterpriseProductCreation.js";
 import express from "express";
+import { hasAdminPermission } from '../lib/adminRoles.js';
+import { SELECTED_PRICE_SCOPE, validateSelectedPriceScope } from '../lib/localLinePricePublication.js';
 import { requireAdminPermission } from "../middleware/auth.js";
 import { listBundles, getBundle, previewBundle, saveBundle, createBundle } from '../lib/enterpriseBundles.js';
 import {
@@ -56,6 +58,13 @@ router.post("/revisions/:id/approve", approve, route(req => approveEnterprisePri
 // still requires a frozen audit and the existing release authorization checks.
 router.post("/revisions/:id/approve-localline", approve, requireAdminPermission("localline_push"),
   route(req => approveEnterprisePricingRevision(req.params.id, req.admin, { localLinePricesOnly: true })));
+router.post('/revisions/:id/approve-channels', approve, route(req => {
+  const platforms = req.body?.platforms;
+  validateSelectedPriceScope({publicationScope:SELECTED_PRICE_SCOPE,platforms,enterpriseRevisionId:req.params.id});
+  if (platforms.some(platform => !hasAdminPermission(req.admin.adminRoles || [],`${platform}_push`)))
+    throw Object.assign(new Error('Publishing permission is required for every selected destination.'),{status:403});
+  return approveEnterprisePricingRevision(req.params.id,req.admin,{localLinePricesOnly:!platforms.includes('square')});
+}));
 router.post("/revisions/:id/activate-local", approve, route(req => activateEnterprisePricingLocally(req.params.id, req.admin)));
 router.post("/revisions/:id/reject", approve, route(req => rejectEnterprisePricingRevision(req.params.id, req.body?.reason, req.admin)));
 router.get("/migration-report", route(req => enterprisePricingMigrationReport(req.query)));

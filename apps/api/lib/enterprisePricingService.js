@@ -1,6 +1,6 @@
 import { readProductSales, effectiveProductSale, applySaleOutput, salePrice } from "./enterpriseProductSales.js";
 import { isRetiredLocalLineList } from "./localLinePricingLists.js";
-import { readEnterpriseReviewChecks } from "./enterprisePricingReview.js";
+import { readEnterpriseReviewChecks, readPricingPublicationAttempts } from "./enterprisePricingReview.js";
 import { ensureProductSyncSchema } from "./productSyncSchema.js";
 import { getPool } from "../db.js";
 import { calculateEnterprisePricing, scaledInteger, roundRatio, DEFAULT_PRICING_SETTINGS } from "./enterprisePricingEngine.js";
@@ -284,10 +284,12 @@ export async function listEnterprisePricingProducts({ search = "", vendorId = nu
     "SELECT revision_id AS revisionId, platform, status FROM enterprise_pricing_publications WHERE revision_id IN (?)", [revisionIds]
   ) : [[]];
   const publicationsByRevision = new Map();
+  const publicationAttempts = await readPricingPublicationAttempts(getPool(), revisionIds);
   for (const publication of publicationRows) {
     const revisionId = Number(publication.revisionId);
     if (!publicationsByRevision.has(revisionId)) publicationsByRevision.set(revisionId, []);
-    publicationsByRevision.get(revisionId).push({ platform: publication.platform, status: publication.status });
+    publicationsByRevision.get(revisionId).push({ platform: publication.platform, status: publication.status,
+      attempted: publicationAttempts.has(`${revisionId}:${publication.platform}`) });
   }
   const [saleRows] = productIds.length ? await getPool().query("SELECT id, status, input_json AS inputJson, output_json AS outputJson, square_status AS squareStatus, localline_status AS localLineStatus FROM enterprise_promotions WHERE status IN ('pending','approved','scheduled','active','partial','cancelling')") : [[]];
   const promotionsByProduct = new Map();
@@ -744,14 +746,15 @@ export async function getEnterprisePricingSync(productId) {
     packages: revision.output.packages.map(pkg => ({ ...pkg,
       localLineRegularCents: salePrice(pkg.localLineRegularCents, sale.discountBp) })) } } : revision;
   await ensureProductSyncSchema();
-  const [recent] = await getPool().query(`SELECT r.id FROM product_sync_releases r
+  const [recent] = await getPool().query(`SELECT r.id,au.options_json AS optionsJson FROM product_sync_releases r
     JOIN product_sync_release_actions ra ON ra.release_id=r.id
     JOIN product_sync_actions a ON a.id=ra.action_id
     JOIN product_sync_audits au ON au.id=a.audit_id
-    WHERE a.product_id=? AND JSON_UNQUOTE(JSON_EXTRACT(au.options_json,'$.publicationScope'))='localline-prices-and-sales'
+    WHERE a.product_id=? AND JSON_UNQUOTE(JSON_EXTRACT(au.options_json,'$.publicationScope')) IN ('localline-prices-and-sales','enterprise-selected-prices')
     ORDER BY r.id DESC LIMIT 1`, [detail.product.id]);
   return { localOnly: process.env.CSA_LOCAL_ONLY === "true", revisionId: detail.latest?.id || null,
-    revisionStatus: detail.latest?.status || null, sale, syncBlocker, latestLocalLineReleaseId: recent[0]?.id || null,
+    revisionStatus: detail.latest?.status || null, sale, syncBlocker, latestPricingReleaseId: recent[0]?.id || null, latestLocalLineReleaseId: recent[0]?.id || null,
+    latestPricingReleasePlatforms: parse(recent[0]?.optionsJson)?.platforms || [],
     input: revision?.input || null, output: revision?.output || null, previous,
     comparison: comparisonRevision ? compareLocalChannelPrices(comparisonRevision, record) : [],
     publications: detail.publications };

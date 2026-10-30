@@ -1,4 +1,4 @@
-import { localLineSaleSnapshot, priceOnlyLocalLinePayload } from './localLinePricePublication.js';
+import { localLineSaleSnapshot, priceOnlyLocalLinePayload, squarePriceSaleSnapshot, SELECTED_PRICE_SCOPE } from './localLinePricePublication.js';
 import { LOCAL_LINE_PRICING_POLICY, validateProductBasketMappings, localLineBasketSnapshot } from "./localLinePricingLists.js";
 import crypto from "node:crypto";
 import { getDb, getPool } from "../db.js";
@@ -109,7 +109,9 @@ function squareInputs(row, packages, audit) {
   };
 }
 const squareMapping = row => row ? pick(row, ["linkId", "squareItemId", "squareVariationId", "linkApprovedAt"]) : null;
-export async function prepareSquareActions({ productIds = [], staged = {}, includeAllProducts = false, enterpriseRevision = null } = {}) {
+export async function prepareSquareActions({ productIds = [], staged = {}, includeAllProducts = false, enterpriseRevision = null, publicationScope = null } = {}) {
+  const squareSale = enterpriseRevision && publicationScope === SELECTED_PRICE_SCOPE
+    ? await squarePriceSaleSnapshot(getPool(),enterpriseRevision.productId,enterpriseRevision.output.packages) : null;
   const rows = (await loadApprovedSquarePricingRows([], { includeAllProducts: true })).filter(row =>
     (!productIds.length || productIds.includes(Number(row.productId))) &&
     (includeAllProducts || /deck family farm/i.test(row.vendorName || "")));
@@ -137,7 +139,8 @@ export async function prepareSquareActions({ productIds = [], staged = {}, inclu
         catch (error) { problems.push(error.message); }
       }
       const current = squareProjection(remote, units);
-      const baseline = { ...squareInputs(row, packagesByProductId.get(Number(row.productId)) || [], before), enterpriseRevisionId: enterpriseRevision.id };
+      const baseline = { ...squareInputs(row, packagesByProductId.get(Number(row.productId)) || [], before), enterpriseRevisionId: enterpriseRevision.id,
+        ...(squareSale ? {squareSale} : {}) };
       return {
         direction: "outgoing", platform: "square", kind: "price", productId: Number(row.productId), productName: row.productName,
         packageId: Number(row.packageId), packageName: audit.packageName, vendorName: row.vendorName,
@@ -248,6 +251,7 @@ export async function inspectAction(action, saveCheckpoint = async () => {}) {
       const audit = buildSquarePriceAuditRow(row, packagesByProductId, metaByPackageId, units);
       local = squareInputs(row, packagesByProductId.get(action.productId) || [], audit);
       if (action.enterpriseRevisionId) local.enterpriseRevisionId = await enterpriseRevisionMarker(action.productId, action.enterpriseRevisionId);
+      if (action.localBefore?.squareSale) local.squareSale = await squarePriceSaleSnapshot(getPool(),action.productId,packagesByProductId.get(action.productId) || []);
     }
     return { local, mapping: squareMapping(row), remote: squareProjection(remote, units), desired: action.desired, object: remote };
   }
