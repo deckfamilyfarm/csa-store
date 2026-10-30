@@ -149,7 +149,7 @@ export async function listPricingEnterprises() {
 
 async function productRecord(productId, connection = getPool(), { allowMissingVendor = false } = {}) {
   const [rows] = await connection.query(`SELECT p.id, p.name, p.vendor_id AS vendorId, p.category_id AS categoryId,
-    v.name AS vendorName, c.name AS categoryName, p.is_deleted AS isDeleted,
+    v.name AS vendorName, c.name AS categoryName, p.exclude_from_snap AS excludeFromSnap, p.exclude_from_guest AS excludeFromGuest, p.is_deleted AS isDeleted,
     (SELECT COUNT(*) FROM square_variation_links l WHERE l.product_id=p.id AND l.approved_at IS NOT NULL) AS approvedSquareLinks,
     (SELECT local_line_product_id FROM local_line_product_meta m WHERE m.product_id=p.id LIMIT 1) AS localLineProductId
     FROM products p LEFT JOIN vendors v ON v.id=p.vendor_id LEFT JOIN categories c ON c.id=p.category_id WHERE p.id=?`, [productId]);
@@ -185,12 +185,12 @@ function revisionView(row) {
   };
 }
 
-export async function listEnterprisePricingProducts({ search = "", vendorId = null, status = "", syncStatus = "", sale = "", visibility = "", pricingUnit = "", markupCategory = "", square = "", sort = "name", sortDirection = "asc", limit = 100, offset = 0 } = {}) {
+export async function listEnterprisePricingProducts({ search = "", vendorId = null, status = "", syncStatus = "", sale = "", visibility = "", snapEligibility = "", guestEligibility = "", pricingUnit = "", markupCategory = "", square = "", sort = "name", sortDirection = "asc", limit = 100, offset = 0 } = {}) {
   // Compare the entire filtered catalog before paging, using the same status rules as the badges.
   if (["inputs", "synced", "localline", "square"].includes(syncStatus) || ["on", "off"].includes(sale)) {
     const matching = []; let first;
     for (let cursor = 0; ; cursor += 250) {
-      const batch = await listEnterprisePricingProducts({ search, vendorId, visibility, pricingUnit, markupCategory, square, sort, sortDirection, limit: 250, offset: cursor });
+      const batch = await listEnterprisePricingProducts({ search, vendorId, visibility, snapEligibility, guestEligibility, pricingUnit, markupCategory, square, sort, sortDirection, limit: 250, offset: cursor });
       first ||= batch;
       matching.push(...batch.rows.filter(row => matchesPricingSyncFilter(row, syncStatus) && (!sale || (sale === "on" ? row.sale?.active : !row.sale?.active))));
       if (cursor + batch.rows.length >= batch.total || !batch.rows.length) break;
@@ -208,6 +208,9 @@ export async function listEnterprisePricingProducts({ search = "", vendorId = nu
   if (["highlyPerishable", "perishable", "shelfStable", "deckHyland", "creamyCow", "custom"].includes(markupCategory)) { where.push("COALESCE(JSON_UNQUOTE(JSON_EXTRACT(r.input_json, '$.markupCategory')), ma.markup_category)=?"); params.push(markupCategory); }
   if (["enabled", "disabled"].includes(square)) where.push(`COALESCE(JSON_UNQUOTE(JSON_EXTRACT(r.input_json, '$.squareEnabled')), 'false')='${square === "enabled" ? "true" : "false"}'`);
   if (["visible", "hidden"].includes(visibility)) { where.push("COALESCE(p.visible,0)=?"); params.push(visibility === "visible" ? 1 : 0); }
+  for (const [filter,column] of [[snapEligibility,'exclude_from_snap'],[guestEligibility,'exclude_from_guest']]) {
+    if (['excluded','included'].includes(filter)) { where.push(`p.${column}=?`); params.push(filter==='excluded'?1:0); }
+  }
   if (status === "unresolved") where.push("s.latest_revision_id IS NULL");
   else if (["pending", "approved", "active", "rejected", "partial", "local-preview"].includes(status)) { where.push("r.status=?"); params.push(status); }
   const from = `FROM products p LEFT JOIN vendors v ON v.id=p.vendor_id LEFT JOIN categories c ON c.id=p.category_id
@@ -244,7 +247,7 @@ export async function listEnterprisePricingProducts({ search = "", vendorId = nu
   const order = `${sortExpression} ${sortDirection === "desc" ? "DESC" : "ASC"}, p.name ASC, p.id ASC`;
   const safeLimit = Math.min(250, Math.max(1, Number(limit) || 100));
   const safeOffset = Math.max(0, Number(offset) || 0);
-  const [rows] = await getPool().query(`SELECT p.id, p.name, p.visible AS ffVisible, p.inventory AS ffInventory, p.track_inventory AS ffTrackInventory, p.thumbnail_url AS thumbnailUrl, v.name AS vendorName, p.vendor_id AS vendorId,
+  const [rows] = await getPool().query(`SELECT p.id, p.name, p.exclude_from_snap AS excludeFromSnap, p.exclude_from_guest AS excludeFromGuest, p.visible AS ffVisible, p.inventory AS ffInventory, p.track_inventory AS ffTrackInventory, p.thumbnail_url AS thumbnailUrl, v.name AS vendorName, p.vendor_id AS vendorId,
     pp.unit_of_measure AS legacyPricingUnit, pp.source_unit_price AS legacyRetailUnitPrice, ma.markup_category AS assignedMarkupCategory,
     bp.price AS buyPrice, bp.revision AS buyPriceRevision, bp.purchasing_enterprise_id AS buyPriceEnterpriseId,
     s.latest_revision_id AS latestRevisionId, s.active_revision_id AS activeRevisionId,
@@ -314,6 +317,7 @@ export async function listEnterprisePricingProducts({ search = "", vendorId = nu
     return ({
     id: Number(row.id), type: 'product', name: row.name, ffVisible: Boolean(Number(row.ffVisible)), ffInventory: row.ffInventory == null ? null : Number(row.ffInventory), ffTrackInventory: Boolean(Number(row.ffTrackInventory)), thumbnailUrl: row.thumbnailUrl || null, vendorId: row.vendorId, vendorName: row.vendorName,
     markupAssignment: row.assignedMarkupCategory ? { category: row.assignedMarkupCategory, markupBp: pricingSettings.markupBp[row.assignedMarkupCategory] } : null,
+    excludeFromSnap: Boolean(row.excludeFromSnap), excludeFromGuest: Boolean(row.excludeFromGuest),
     status: row.status || "unresolved", latestRevisionId: row.latestRevisionId, activeRevisionId: row.activeRevisionId,
     editorId: row.editorId, approverId: row.approverId, editorName: row.editorName, approverName: row.approverName,
     saleStatus: saleByProduct.get(Number(row.id)) || null,
@@ -612,7 +616,7 @@ export async function persistEnterprisePricingRevision(connection, productId, pr
   return { revisionId, status };
 }
 
-export async function approveEnterprisePricingRevision(revisionId, user) {
+export async function approveEnterprisePricingRevision(revisionId, user, { localLinePricesOnly = false } = {}) {
   await ensureEnterprisePricingSchema();
   const connection = await getPool().getConnection();
   try {
@@ -646,7 +650,7 @@ export async function approveEnterprisePricingRevision(revisionId, user) {
       pp.customer_price_overrides_json AS customerOverrides
       FROM products p LEFT JOIN product_sales ps ON ps.product_id=p.id
       LEFT JOIN product_pricing_profiles pp ON pp.product_id=p.id WHERE p.id=?`, [revision.productId]);
-    if (Number(legacySales[0]?.onSale)) failure("This product has an active legacy sale. Reconcile its promotion before migrating the regular price.", 409);
+    if (!localLinePricesOnly && Number(legacySales[0]?.onSale)) failure("This product has an active legacy sale. Reconcile its promotion before migrating the regular price.", 409);
     if (legacySales[0]?.customerOverrides && (parse(legacySales[0].customerOverrides) || []).some(row => !isRetiredLocalLineList(row.priceListId))) failure("This product has basket-specific price overrides. Review and reconcile them before using one price for all three active baskets.", 409);
     const packageRows = await packagesFor(revision.productId, connection);
     if (packageRows.length !== revision.input.packages.length || packageRows.some(row => !revision.input.packages.some(pkg => pkg.packageId === Number(row.packageId)))) failure("Packages changed. Recalculate and review pricing.", 409);

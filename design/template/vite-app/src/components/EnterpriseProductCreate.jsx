@@ -5,7 +5,7 @@ import { ProductInfoFields, safeDescription } from "./ProductEditorInfo.jsx";
 import { ProductPricingFields } from "./ProductPricingFields.jsx";
 
 const recoveryKey = "enterprise-product-create-request";
-const emptyProduct = { name: "", vendorId: "", categoryId: "", description: "" };
+const emptyProduct = { name: "", vendorId: "", categoryId: "", description: "", excludeFromSnap:false, excludeFromGuest:false };
 function savedRequest() {
   try { return JSON.parse(sessionStorage.getItem(recoveryKey)); } catch { return null; }
 }

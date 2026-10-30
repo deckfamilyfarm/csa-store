@@ -1,3 +1,4 @@
+import { validateLocalLinePriceScope } from './localLinePricePublication.js';
 import { getPool } from "../db.js";
 import { validateSavedProductVendor } from "./productVendor.js";
 import { isLocalLineEnabled } from "../localLine.js";
@@ -56,6 +57,7 @@ async function storeAction(auditId, action) {
 }
 export async function createProductSyncAudit(options, user) {
   await ensureProductSyncSchema();
+  const localLinePricesOnly = validateLocalLinePriceScope(options);
   const roles = user.adminRoles || [];
   const platforms = [...new Set(options.platforms || [])];
   if (!platforms.length || platforms.some(platform => !PLATFORM_LABEL[platform])) fail("Select Local Line, Square, or both.");
@@ -72,11 +74,11 @@ export async function createProductSyncAudit(options, user) {
     if (productIds.length !== 1 || Object.keys(staged).length || options.incoming) fail("Check one approved enterprise pricing revision without staged or incoming changes.");
     const revision = await getApprovedEnterpriseRevision(productIds[0], enterpriseRevisionId);
     if (!revision || !["approved", "partial", "active"].includes(revision.status)) fail("This enterprise pricing revision is no longer approved. Review the current proposal.", 409);
-    const expectedPlatforms = revision.input.squareEnabled ? ["localline", "square"] : ["localline"];
+    const expectedPlatforms = !localLinePricesOnly && revision.input.squareEnabled ? ["localline", "square"] : ["localline"];
     if (!same(platforms.slice().sort(), expectedPlatforms.slice().sort())) fail("Check every required destination for the approved product.");
   }
   if (Object.keys(staged).some(id => productIds.length && !productIds.includes(Number(id)))) fail("Staged products must be in the audit scope.");
-  const normalized = { platforms, staged, productIds, enterpriseRevisionId, productScope: auditProductScope(options, productIds), incoming: Boolean(options.incoming), vendorGroup: auditVendorGroup(options) };
+  const normalized = { platforms, staged, productIds, enterpriseRevisionId, ...(localLinePricesOnly ? { publicationScope: options.publicationScope } : {}), productScope: auditProductScope(options, productIds), incoming: Boolean(options.incoming), vendorGroup: auditVendorGroup(options) };
   const [result] = await getPool().query(`INSERT INTO product_sync_audits (status, options_json, created_by, created_at) VALUES ('running', ?, ?, UTC_TIMESTAMP())`, [JSON.stringify(normalized), user.userId || user.adminId || null]);
   const id = Number(result.insertId);
   // Work survives navigation. All progress and results are stored centrally.
@@ -122,7 +124,7 @@ async function runProductSyncAudit(id, options, userId) {
         await Promise.all(Array.from({ length: Math.min(4, products.length) }, async () => {
           while (nextIndex < products.length) {
             const product = products[nextIndex++];
-              try { await save(await prepareLocalLineAction(product, options.staged[product.id] || {}, { enterpriseRevision, onRefresh: () => getPool().query("UPDATE product_sync_audits SET localline_refreshed_at=UTC_TIMESTAMP(), progress_at=UTC_TIMESTAMP() WHERE id=?", [id]) })); }
+              try { await save(await prepareLocalLineAction(product, options.staged[product.id] || {}, { enterpriseRevision, localLinePricesOnly: Boolean(options.publicationScope), onRefresh: () => getPool().query("UPDATE product_sync_audits SET localline_refreshed_at=UTC_TIMESTAMP(), progress_at=UTC_TIMESTAMP() WHERE id=?", [id]) })); }
             catch (error) { await save({ direction: "outgoing", platform, kind: "error", productId: Number(product.id), productName: product.name, vendorName: product.vendorName, status: "blocked", message: error.message }); }
           }
         }));
@@ -221,7 +223,7 @@ export async function createProductSyncRelease(body, user) {
         const revision = await getApprovedEnterpriseRevision(productIds[0], enterpriseIds[0]);
         if (!revision || !["approved", "partial", "active"].includes(revision.status)) fail("Enterprise pricing changed after approval. Audit again.", 409);
         const [auditActions] = await connection.query("SELECT id, platform, status, data_json AS dataJson FROM product_sync_actions WHERE audit_id=? AND product_id=? AND direction='outgoing'", [body.auditId, productIds[0]]);
-        const required = revision.input.squareEnabled ? ["localline", "square"] : ["localline"];
+        const required = !validateLocalLinePriceScope(audit.options) && revision.input.squareEnabled ? ["localline", "square"] : ["localline"];
         if (required.some(platform => !auditActions.some(row => row.platform === platform))) fail("The coordinated audit is missing a required destination.");
         if (auditActions.some(row => ["blocked", "review", "held"].includes(row.status))) fail("Resolve every destination blocker before publishing this product.");
         if (auditActions.some(row => ["changed", "synced"].includes(row.status) && !actions.some(action => action.id === Number(row.id)))) fail("Select every required destination action for this product.");
@@ -234,8 +236,12 @@ export async function createProductSyncRelease(body, user) {
       const [legacy] = await connection.query(`SELECT i.product_name FROM pricelist_change_items i JOIN pricelist_change_batches b ON b.id=i.batch_id
         WHERE i.product_id IN (?) AND b.status IN ('scheduled','running') AND i.status IN ('pending','local_applied')`, [productIds]);
       if (conflicts.length || legacy.length) fail(`${conflicts[0]?.product_name || legacy[0]?.product_name} already has unfinished release actions. Resolve or review that release first.`, 409);
+      // A laptop-owned price batch must not be resumed by an older deployed
+      // scheduler that lacks sale-baseline support. The CLI resumes its receipt
+      // explicitly with allowFuture; this is not a customer-scheduled release.
+      const localWorkerOnly = body.localWorkerOnly && validateLocalLinePriceScope(audit.options);
       const [result] = await connection.query(`INSERT INTO product_sync_releases (audit_id, name, status, scheduled_at, is_scheduled, created_by, created_at)
-        VALUES (?, ?, 'scheduled', ?, ?, ?, UTC_TIMESTAMP())`, [body.auditId, String(body.name || "Product release").slice(0, 255), scheduledAt || utcNow(), Number(Boolean(scheduledAt)), user.userId || user.adminId || null]);
+        VALUES (?, ?, 'scheduled', ?, ?, ?, UTC_TIMESTAMP())`, [body.auditId, String(body.name || "Product release").slice(0, 255), localWorkerOnly ? "9999-01-01 00:00:00" : scheduledAt || utcNow(), Number(Boolean(scheduledAt)), user.userId || user.adminId || null]);
       const releaseId = Number(result.insertId);
       const productValues = productIds.map(productId => {
         const productActions = actions.filter(action => action.productId === productId);
@@ -345,6 +351,19 @@ export async function listProductSyncReleases() {
   const legacy = await listScheduledPricelistBatches({ limit: 50 });
   return { releases, legacy: Array.isArray(legacy) ? legacy : legacy.batches || [] };
 }
+async function recordLocalLinePriceSales(release, connection, user) {
+  for (const action of release.actions.filter(a => a.status === 'completed' && a.localLinePricesOnly && a.localBefore.localLineSale?.promotionId)) {
+    const sale = action.localBefore.localLineSale;
+    await connection.query(`UPDATE enterprise_promotions p JOIN enterprise_product_sales s ON s.promotion_id=p.id
+      SET p.localline_status=?,p.updated_at=UTC_TIMESTAMP()
+      WHERE p.id=? AND s.revision=? AND p.status IN ('pending','cancelled')`,
+      [sale.discountBp ? 'active' : 'restored', sale.promotionId, sale.revision]);
+    await connection.query(`INSERT INTO enterprise_promotion_events(promotion_id,event,actor_id,details_json,created_at)
+      SELECT ?, 'localline_price_release_verified', ?, ?, UTC_TIMESTAMP()
+      WHERE NOT EXISTS(SELECT 1 FROM enterprise_promotion_events WHERE promotion_id=? AND event='localline_price_release_verified' AND JSON_EXTRACT(details_json,'$.releaseId')=?)`,
+      [sale.promotionId,user?.userId || null,JSON.stringify({releaseId:release.id,actionId:action.id,sale}),sale.promotionId,release.id]);
+  }
+}
 export async function runProductSyncRelease(id, { user = null, allowFuture = false } = {}) {
   await ensureProductSyncSchema();
   return withSyncLock("csa-store:scheduled-pricelist-releases", async connection => runReleaseLocked(id, connection, { user, allowFuture }));
@@ -354,7 +373,11 @@ async function runReleaseLocked(id, connection, { user, allowFuture }) {
   if (user) authorizeRelease(user.adminRoles || [], release.actions.filter(action => !["completed", "cancelled"].includes(action.status)), release.isScheduled);
   if (release.status === "cancelled") fail("This release was cancelled.");
   if (!allowFuture && Date.parse(release.scheduledAt) > Date.now()) fail("Release is not due yet.");
-  if (release.status === "completed") return release;
+  if (release.status === "completed") {
+    await recordEnterpriseReleaseResult(release, connection);
+    await recordLocalLinePriceSales(release, connection, user);
+    return release;
+  }
   await connection.query("UPDATE product_sync_releases SET status='running', started_at=COALESCE(started_at, UTC_TIMESTAMP()), finished_at=NULL WHERE id=?", [id]);
   const [products] = await connection.query("SELECT * FROM product_sync_release_products WHERE release_id=? ORDER BY product_id", [id]);
   for (const product of products) {
@@ -403,6 +426,7 @@ async function runReleaseLocked(id, connection, { user, allowFuture }) {
   const status = releaseStatus(release.actions);
   await connection.query("UPDATE product_sync_releases SET status=?, finished_at=UTC_TIMESTAMP() WHERE id=?", [status, id]);
   await recordEnterpriseReleaseResult(release, connection);
+  await recordLocalLinePriceSales(release, connection, user);
   return getProductSyncRelease(id);
 }
 export async function runDueProductSyncReleases({ lockConnection = null } = {}) {
@@ -437,10 +461,11 @@ export async function reviewProductSyncRelease(id, user) {
     if (["scheduled", "queued", "running"].includes(release.status)) fail("Wait for this release to finish, or cancel it before auditing again.");
     await connection.query("UPDATE product_sync_release_actions SET status='cancelled', message='Superseded by a new review.' WHERE release_id=? AND status IN ('held','failed')", [id]);
   });
+  const sourceAudit = await getProductSyncAudit(release.auditId);
   const unfinished = release.actions.filter(action => ["held", "failed"].includes(action.status));
   if (!unfinished.length) fail("No unfinished actions need review.");
   const [products] = await getPool().query("SELECT * FROM product_sync_release_products WHERE release_id=?", [id]);
-  return createProductSyncAudit({ platforms: [...new Set(unfinished.map(action => action.platform))], productIds: [...new Set(unfinished.map(action => action.productId))], includeAllProducts: true,
+  return createProductSyncAudit({ enterpriseRevisionId: sourceAudit.options.enterpriseRevisionId, publicationScope: sourceAudit.options.publicationScope, vendorGroup: sourceAudit.options.vendorGroup, incoming: false, platforms: [...new Set(unfinished.map(action => action.platform))], productIds: [...new Set(unfinished.map(action => action.productId))], includeAllProducts: true,
     staged: products.filter(product => unfinished.some(action => action.productId === Number(product.product_id)) && !product.local_applied_at && Object.keys(parseJson(product.staged_json, {})).length).map(product => ({ productId: product.product_id, changes: parseJson(product.staged_json) })) }, user);
 }
 export async function applyProductSyncIncoming(body, user) {

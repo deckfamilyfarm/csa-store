@@ -1,7 +1,7 @@
-import { activeLocalLinePriceListIds, validateActiveLocalLinePriceListIds } from "./localLinePricingLists.js";
+import { activeLocalLinePriceListIds, validateActiveLocalLinePriceListIds, enrolledLocalLineLists } from "./localLinePricingLists.js";
 // Convert an already reviewed Local Line update into the enterprise price
 // snapshot. The existing builder still owns vendor, product, package, and list
-// mapping checks; this function only replaces the three active selling prices.
+// mapping checks; this function only replaces eligible basket selling prices.
 export function applyEnterpriseLocalLinePrices(payload, context, revision, listIds = activeLocalLinePriceListIds()) {
   if (!revision || !payload?.packages?.length) throw new Error("A reviewed Local Line payload is required.");
   if (Number(revision.output?.saleBp || 0) > 0) throw new Error("Enterprise sales require the separate promotion publication workflow.");
@@ -19,9 +19,8 @@ export function applyEnterpriseLocalLinePrices(payload, context, revision, listI
       const price = expected.get(localPackageId);
       if (!price || price.localLineRegularCents === null) throw new Error(`Package ${pkg.name || pkg.id} has no approved calculated price.`);
       const entries = pkg.price_list_entries || [];
-      if (entries.length !== listIds.length || listIds.some(id => entries.filter(row => Number(row.price_list) === id).length !== 1)) {
-        throw new Error(`Package ${pkg.name || pkg.id} must have all three active Local Line baskets (Guest Basket, Herd Share Members, SNAP) before enterprise pricing can publish.`);
-      }
+      const enrolled = enrolledLocalLineLists(pkg, listIds);
+      if (entries.length !== enrolled.length) throw new Error('Price publication contains an unconfigured basket. Review its mapping.');
       const regular = price.localLineRegularCents / 100;
       return {
         ...pkg, unit_price: regular, package_price: regular, package_unit_price: regular,

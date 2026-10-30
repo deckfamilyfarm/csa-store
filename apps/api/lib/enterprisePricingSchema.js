@@ -1,4 +1,4 @@
-import { getPool, ensureSquareSyncSchema } from "../db.js";
+import { getPool, ensureSquareSyncSchema, ensureProductBasketSchema } from "../db.js";
 
 let schemaPromise;
 export async function ensureEnterprisePricingSchema() {
@@ -8,8 +8,15 @@ export async function ensureEnterprisePricingSchema() {
 
 async function bootstrap() {
   await ensureSquareSyncSchema();
+  await ensureProductBasketSchema();
   const pool = getPool();
   for (const sql of [
+    `CREATE TABLE IF NOT EXISTS enterprise_pricing_repair_receipts (
+      repair_key VARCHAR(64) PRIMARY KEY,actor_id INT NOT NULL,details_json LONGTEXT NOT NULL,applied_at DATETIME NOT NULL
+    ) ENGINE=InnoDB`,
+    `CREATE TABLE IF NOT EXISTS product_basket_eligibility_migrations (
+      migration_key VARCHAR(64) PRIMARY KEY, actor_id INT NOT NULL, details_json LONGTEXT NOT NULL, applied_at DATETIME NOT NULL
+    ) ENGINE=InnoDB`,
     `CREATE TABLE IF NOT EXISTS enterprise_product_sales (
       product_id INT PRIMARY KEY, revision INT NOT NULL DEFAULT 0, discount_bp INT NOT NULL,
       promotion_id INT NULL, editor_id INT NOT NULL, updated_at DATETIME NOT NULL

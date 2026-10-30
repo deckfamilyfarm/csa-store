@@ -32,6 +32,8 @@ export const products = mysqlTable("products", {
   visible: tinyint("visible"),
   trackInventory: tinyint("track_inventory"),
   inventory: int("inventory"),
+  excludeFromSnap: tinyint("exclude_from_snap").notNull().default(0),
+  excludeFromGuest: tinyint("exclude_from_guest").notNull().default(0),
   stockOnFarm: tinyint("stock_on_farm").default(null),
   stockOnFarmLbs: decimal("stock_on_farm_lbs", { precision: 10, scale: 3 }).default(null),
   farmStockRevision: int("farm_stock_revision").notNull().default(0),

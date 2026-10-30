@@ -111,7 +111,7 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
   }
   await product(1);
   const first = await audit([1], [{ productId: 1, changes: { inventory: 15, onSale: 1, saleDiscount: 0.1 } }]);
-  assert.equal(first.rows.length, 2);
+  assert.equal(first.rows.length, 2, JSON.stringify(await service.listProductSyncActions(first.audit.id, {})));
   assert.equal(first.audit.options.auditedProductCount, 1);
   assert.equal(first.audit.overview.find(row => row.platform === "square").changedProducts, 1);
   assert.equal(requests.filter(request => request.method === "PATCH" || request.path.endsWith("/batch-upsert")).length, 0, "Audits cannot publish");

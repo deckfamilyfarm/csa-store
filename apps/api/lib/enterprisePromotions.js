@@ -1,3 +1,4 @@
+import { validateProductBasketMappings } from './localLinePricingLists.js';
 import { activeLocalLinePriceListIds } from "./localLinePricingLists.js";
 import crypto from "node:crypto";
 import { getPool } from "../db.js";
@@ -39,10 +40,11 @@ export async function getEnterprisePromotion(promotionId) {
 async function frozenPromotion(promotion, connection = getPool()) {
   const ids = promotion.packageIds;
   const [packages] = await connection.query(`SELECT p.id AS packageId, p.product_id AS productId, p.name AS packageName,
+    prod.exclude_from_snap AS excludeFromSnap,prod.exclude_from_guest AS excludeFromGuest,
     s.active_revision_id AS activeRevisionId, r.status AS pricingStatus, r.input_json AS pricingInput, r.output_json AS pricingOutput,
     lm.local_line_package_id AS localLinePackageId, pm.local_line_product_id AS localLineProductId,
     l.square_variation_id AS squareVariationId
-    FROM packages p LEFT JOIN enterprise_pricing_product_state s ON s.product_id=p.product_id
+    FROM packages p JOIN products prod ON prod.id=p.product_id LEFT JOIN enterprise_pricing_product_state s ON s.product_id=p.product_id
     LEFT JOIN enterprise_pricing_revisions r ON r.id=s.active_revision_id
     LEFT JOIN local_line_package_meta lm ON lm.package_id=p.id
     LEFT JOIN local_line_product_meta pm ON pm.product_id=p.product_id
@@ -60,7 +62,7 @@ async function frozenPromotion(promotion, connection = getPool()) {
       activeRevisionId: Number(pkg.activeRevisionId), localLinePackageId: pkg.localLinePackageId,
       localLineProductId: pkg.localLineProductId, squareVariationId: pkg.squareVariationId,
       localLineRegularCents: regular.localLineRegularCents, squareRegularCents: regular.squareVariationCents,
-      pricingUnit: input.pricingUnit };
+      pricingUnit: input.pricingUnit, excludeFromSnap:Boolean(pkg.excludeFromSnap),excludeFromGuest:Boolean(pkg.excludeFromGuest) };
   });
   return { packages: frozen, localLinePrices: promotionPrices(frozen, promotion.endSale ? 0 : promotion.discountBp) };
 }
@@ -273,6 +275,7 @@ async function preflightLocalLinePromotion(output, allowAppliedSale = false) {
     requireProductVendor(context.product, context.vendor);
     if (Number(context.remoteId) !== Number(selected[0].localLineProductId)) fail("Local Line product mapping changed. Review the sale again.", 409);
     const remote = await fetchLocalLineProduct(context.remoteId, token);
+    validateProductBasketMappings(remote, context.product, context.vendor?.name);
     await verifyReviewedLocalLineVendor(context, Number(remote.vendor?.id ?? remote.vendor), token);
     for (const pkg of selected) {
       if (!localLineSaleMatches(remote, [pkg], listIds, false) && !(allowAppliedSale && localLineSaleMatches(remote, [pkg], listIds, true))) {
@@ -317,6 +320,7 @@ export async function publishEnterpriseLocalLinePromotion(promotionId, user = nu
         requireProductVendor(context.product, context.vendor);
         if (Number(context.remoteId) !== Number(selected[0].localLineProductId)) fail("Local Line product mapping changed. Review the sale again.", 409);
         const remote = await fetchLocalLineProduct(context.remoteId, token);
+    validateProductBasketMappings(remote, context.product, context.vendor?.name);
         const remoteVendor = Number(remote.vendor?.id ?? remote.vendor);
         await verifyReviewedLocalLineVendor(context, remoteVendor, token);
         for (const pkg of selected) {

@@ -22,7 +22,7 @@ test('bundle import, local editing, dependent pricing, history and permission bo
   ])await pool.query(sql);
   const {ensureEnterprisePricingSchema}=await import('./enterprisePricingSchema.js');await ensureEnterprisePricingSchema();
   await pool.query("INSERT INTO vendors VALUES (1,'Farm')");
-  await pool.query("INSERT INTO products VALUES (1,'Pork',1,NULL,0,1,20),(2,'Beef',1,NULL,0,1,30),(3,'Legacy bundle',1,NULL,0,0,0)");
+  await pool.query("INSERT INTO products(id,name,vendor_id,category_id,is_deleted,track_inventory,inventory) VALUES (1,'Pork',1,NULL,0,1,20),(2,'Beef',1,NULL,0,1,30),(3,'Legacy bundle',1,NULL,0,0,0)");
   await pool.query("INSERT INTO packages VALUES (10,1,'1 lb',0,NULL,1,'package'),(20,2,'1 lb',0,NULL,1,'package')");
   await pool.query('INSERT INTO local_line_product_meta VALUES(3,300)');
   await pool.query('INSERT INTO local_line_package_meta VALUES(10,100),(20,200)');

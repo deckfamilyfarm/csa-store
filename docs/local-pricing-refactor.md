@@ -172,3 +172,83 @@ add `--apply` to apply that frozen plan. It writes local pending revisions only,
 checks concurrent edits and in-flight publication, and keeps original records in
 the private plan file. Deploy the updated pricing code before editing these costs
 through an older deployed server, whose normalizer does not support the new fields.
+
+### Unattended Local Line prices and sales
+
+`apps/api/scripts/publishLocalLinePrices.js` freezes the saved product pricing and
+sale versions, checks every eligible product against live Local Line, and uses
+persisted Product Sync audits/releases to publish changes. It excludes Square at
+both the audit and network boundaries. Only package prices, sale flags, and their
+crossed-out regular prices are sent, along with the verified vendor required by
+Local Line. Inventory, visibility, descriptions, images, and package definitions
+are preserved. Guest, Herd Share, and SNAP remain the three active baskets.
+
+From the repository root, prepare a run (no channel writes):
+
+```sh
+node --env-file=.env apps/api/scripts/publishLocalLinePrices.js --dir=.local-pricing/ll-publication
+```
+
+After authorization to publish, start it detached from the terminal:
+
+```sh
+node scripts/local-pricing/startLocalLinePriceBatch.mjs --dir=.local-pricing/ll-publication
+```
+
+Keep the Mac plugged in with its lid open. `caffeinate` prevents idle sleep while
+the batch runs; it does not guarantee operation with the lid closed. The dev
+server does not need to run. A browser or terminal window may be closed.
+
+The run directory contains `summary.txt`, `results.csv`, `progress.log`, and the
+private `run.json` frozen inputs and receipts. Check progress with `cat` or `tail`.
+The report is updated after every product and finalized at completion. Errors,
+missing pricing inputs, mappings, special promotions, and drift are retained for
+review while unrelated products continue. Products edited after the snapshot
+are held. Membership and legacy bundle product records are excluded. Native
+bundles run last through their existing component checks and pilot allowlist;
+updates that also require catalog or component changes are held.
+
+Restart with the same directory to resume existing receipts. Completed products
+are not resent; interrupted releases verify the remote result before any retry.
+Attention rows are not automatically reapproved. Resolve them and prepare a new
+run, reviewing any existing held/failed release first. Do not delete the run
+files to retry uncertain publications. For a graceful stop, send SIGTERM to the
+`pid` in `run.json`; it finishes the current product and saves its receipt.
+
+Laptop-owned releases use an internal far-future scheduling sentinel, with
+`is_scheduled=false`, so the older deployed hourly runner cannot execute them.
+Only the local batch explicitly resumes them with `allowFuture`. Do not change
+that timestamp or manually hand such a release to an older server. Sale receipts
+update Local Line verification without approving or scheduling Square discounts.
+
+### Product basket exclusions
+
+`products.exclude_from_guest` and `products.exclude_from_snap` are independent,
+non-null product flags (API fields `excludeFromGuest` and `excludeFromSnap`).
+Startup adds the columns before catalog reads. Pricing offers Guest and SNAP
+filters; the shared product creation/edit form exposes both checkboxes.
+Duplicates preserve them; catalog imports must preserve existing values.
+New Creamy Cow products default to Guest exclusion. Hard cheeses can be
+explicitly allowed; this is not inferred automatically from names.
+
+Local edits require the prior checkbox values (`expectedBasketEligibility`)
+and reject stale changes. They do not automatically change channel enrollment.
+Price and sale publication validates actual package listings against the saved
+exclusions, freezes that membership, and updates only eligible baskets.
+A mismatch requires a reviewed listing repair. Retired CSA Members remains
+excluded; Herd Share is still required.
+
+The reviewed October 30 seed is implemented in
+`apps/api/scripts/seedProductBasketExclusions.js`. It uses the private failed-batch
+analysis, checks the cached enrollment before applying, and records a database
+receipt so subsequent checkbox edits are never overwritten by reruns. The
+user subsequently approved Guest enrollment for 21 aged Gouda, Heidi, Hispanico,
+Toma, and Asiago products; those repairs have separate durable receipts.
+Milk, yogurt, butter, cream, fresh cheeses, and the raw-dairy add-on remain
+Guest-excluded. Other cheese exceptions require explicit review.
+
+`apps/api/scripts/repairPricingBatchInputs.js` previews and transactionally applies
+the specifically approved vendor/cost/override repairs using a frozen input
+hash and database receipt. It does not call either channel. The scoped retry
+uses `.local-pricing/ll-bulk/retry-2026-10-30/`; inspect its `summary.txt`,
+`results.csv`, and `run.json` for completed, held, and resumable publications.

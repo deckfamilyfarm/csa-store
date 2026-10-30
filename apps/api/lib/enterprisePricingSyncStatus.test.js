@@ -76,3 +76,11 @@ test('channel reads are scoped SELECTs and deleted Square listings are unknown',
  assert.equal(records.get(1).squarePrices[0].priceCents,null);
  assert.equal((await readPricingChannelRecords(pool,[])).size,0);assert.equal(calls.length,3);
 });
+
+test('a Local Line-only sale receipt turns LL green while Square remains pending',()=>{
+ const sale={id:9,status:'pending',squareStatus:null,localLineStatus:'active',input:{channels:['localline','square'],startAt:'2026-01-01T00:00:00Z',endAt:null},output:{localLinePrices:[]}};
+ const desiredSale={active:true,discountBp:1000,promotionId:9};
+ const discounted={...record,localLinePrices:record.localLinePrices.map(p=>({...p,finalPrice:'8.10'}))};
+ assert.deepEqual(orange(pricingSyncStatus({...revision,desiredSale,promotions:[sale]},discounted)),['Sq']);
+ assert.deepEqual(orange(pricingSyncStatus({...revision,desiredSale,promotions:[{...sale,localLineStatus:null}]},discounted)),['LL','Sq']);
+});

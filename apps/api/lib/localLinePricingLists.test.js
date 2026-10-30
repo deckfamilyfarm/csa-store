@@ -18,8 +18,8 @@ test('CSA Members cannot be re-enabled by a lingering environment variable or fr
   const result=applyEnterpriseLocalLinePrices(payload,{packages:[{id:10}],packageMeta:[{packageId:10,localLinePackageId:20}]},{output:{packages:[{packageId:10,localLineRegularCents:1680}]}});
   assert.deepEqual(result.packages[0].price_list_entries.map(row=>row.price_list),[1,3,4]);
   assert(result.packages[0].price_list_entries.every(row=>row.adjustment_value===16.8));
-  assert.throws(()=>applyEnterpriseLocalLinePrices({...payload,packages:[{...payload.packages[0],price_list_entries:payload.packages[0].price_list_entries.slice(0,2)}]},
-    {packages:[{id:10}],packageMeta:[{packageId:10,localLinePackageId:20}]},{output:{packages:[{packageId:10,localLineRegularCents:1680}]}}), /three active/);
+  assert.doesNotThrow(()=>applyEnterpriseLocalLinePrices({...payload,packages:[{...payload.packages[0],price_list_entries:payload.packages[0].price_list_entries.slice(0,2)}]},
+    {packages:[{id:10}],packageMeta:[{packageId:10,localLinePackageId:20}]},{output:{packages:[{packageId:10,localLineRegularCents:1680}]}}));
 });
 test('retired prices cannot cause comparison differences, and sales omit their mappings', () => {
   const record={packages:[{id:10,metadata:{localLinePackageId:20}}],squarePrices:[],localLinePrices:[...ACTIVE_LOCAL_LINE_BASKETS.map(list=>({listName:list.name,packageId:10,finalPrice:16.8})),{listName:'CSA Members',packageId:10,finalPrice:999}]};

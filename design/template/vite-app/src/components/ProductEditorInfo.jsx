@@ -18,7 +18,7 @@ export function safeDescription(html) {
   return template.innerHTML;
 }
 const fields = product => ({ name: product.name || "", vendorId: String(product.vendorId || ""),
-  categoryId: String(product.categoryId || ""), description: safeDescription(product.description) });
+  excludeFromSnap: Boolean(product.excludeFromSnap), excludeFromGuest: Boolean(product.excludeFromGuest), categoryId: String(product.categoryId || ""), description: safeDescription(product.description) });
 
 export const ProductEditorInfo = forwardRef(function ProductEditorInfo({ productId, token, roles, vendors, busy, onDirty, onSaved, onImageBusy }, ref) {
   const [product, setProduct] = useState(null);
@@ -45,7 +45,8 @@ export const ProductEditorInfo = forwardRef(function ProductEditorInfo({ product
       if (!canEdit) throw new Error("You do not have permission to edit product info.");
       if (!draft.name.trim() || !draft.vendorId) throw new Error("Product name and vendor are required.");
       const payload = Object.fromEntries(Object.keys(draft).filter(key => draft[key] !== baseline[key]).map(key =>
-        [key, key === "vendorId" ? Number(draft[key]) : key === "categoryId" ? Number(draft[key]) || null : key === "description" ? safeDescription(draft[key]) : draft[key].trim()]));
+        [key, typeof draft[key] === "boolean" ? draft[key] : key === "vendorId" ? Number(draft[key]) : key === "categoryId" ? Number(draft[key]) || null : key === "description" ? safeDescription(draft[key]) : draft[key].trim()]));
+      if (["excludeFromSnap","excludeFromGuest"].some(k=>k in payload)) payload.expectedBasketEligibility = {excludeFromSnap:baseline.excludeFromSnap,excludeFromGuest:baseline.excludeFromGuest};
       const result = await adminPut(`products/${productId}`, token, payload);
       if (!result.ok) throw new Error("Product info was not saved.");
       const saved = { ...draft, ...(payload.description !== undefined ? { description: payload.description } : {}) };
@@ -80,12 +81,17 @@ export function ProductInfoFields({ draft, baseline, vendors, categories, disabl
   useEffect(() => { if (description.current) description.current.innerHTML = baseline?.description || ""; }, [baseline?.description]);
   return <>
         <label>Name<input className="input" disabled={disabled} value={draft.name} onChange={event => update({ name: event.target.value })} /></label>
-        <label>Vendor<select className="input" disabled={disabled} value={draft.vendorId} onChange={event => update({ vendorId: event.target.value })}>
+        <label>Vendor<select className="input" disabled={disabled} value={draft.vendorId} onChange={event => update({ vendorId: event.target.value, ...(/creamy cow/i.test(vendors.find(v=>String(v.id)===event.target.value)?.name || "") ? {excludeFromGuest:true} : {}) })}>
           <option value="">Select vendor</option>{vendors.map(vendor => <option key={vendor.id} value={vendor.id}>{vendor.name}</option>)}
         </select></label>
         <label>Category<select className="input" disabled={disabled} value={draft.categoryId} onChange={event => update({ categoryId: event.target.value })}>
           <option value="">Uncategorized</option>{categories.filter(category => category.name?.toLowerCase() !== "membership").map(category => <option key={category.id} value={category.id}>{category.name}</option>)}
         </select></label>
+        <div className="product-basket-exclusions">
+          <label><input type="checkbox" disabled={disabled} checked={Boolean(draft.excludeFromSnap)} onChange={e=>update({excludeFromSnap:e.target.checked})} /> Exclude from SNAP</label>
+          <label><input type="checkbox" disabled={disabled} checked={Boolean(draft.excludeFromGuest)} onChange={e=>update({excludeFromGuest:e.target.checked})} /> Exclude from Guest</label>
+          {/creamy cow/i.test(vendors.find(v=>String(v.id)===String(draft.vendorId))?.name || '') && <span className="small">Creamy Cow: only hard cheeses may be offered to guests.</span>}
+        </div>
         <div><span id="editor-description-label">Description</span>
           <div className="product-editor-description" ref={description} role="textbox" aria-labelledby="editor-description-label" aria-multiline="true"
             contentEditable={!disabled} suppressContentEditableWarning onInput={event => update({ description: safeDescription(event.currentTarget.innerHTML) })}

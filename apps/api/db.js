@@ -13,6 +13,7 @@ let adminPricelistIndexesPromise;
 let vendorPricingSchemaPromise;
 let productPricingSchemaPromise;
 let farmStockSchemaPromise;
+let basketEligibilitySchemaPromise;
 let subscriberCaptureSchemaPromise;
 let siteContentSchemaPromise;
 let marketingSchemaPromise;
@@ -37,6 +38,8 @@ const VENDOR_PRICING_COLUMN_STATEMENTS = [
 ];
 
 const PRODUCT_PRICING_COLUMN_STATEMENTS = [
+  { tableName: "products", columnName: "exclude_from_snap", definition: "exclude_from_snap TINYINT(1) NOT NULL DEFAULT 0" },
+  { tableName: "products", columnName: "exclude_from_guest", definition: "exclude_from_guest TINYINT(1) NOT NULL DEFAULT 0" },
   {
     tableName: "product_pricing_profiles",
     columnName: "price_changed_at",
@@ -3491,3 +3494,14 @@ export function isMissingTableError(error, tableName = "") {
 }
 
 export { schema, relations };
+
+export async function ensureProductBasketSchema(connection = getPool()) {
+  const migrate = async () => {
+    for(const name of ['exclude_from_snap','exclude_from_guest']) if(!await columnExists(connection,'products',name)) {
+      try { await connection.query(`ALTER TABLE products ADD COLUMN ${name} TINYINT(1) NOT NULL DEFAULT 0`); }
+      catch(error) { if(error.code !== 'ER_DUP_FIELDNAME') throw error; }
+    }
+  };
+  if(connection !== getPool()) return migrate();
+  return basketEligibilitySchemaPromise ||= migrate().catch(error=>{basketEligibilitySchemaPromise=null;throw error;});
+}

@@ -19,7 +19,7 @@ export async function bundleCatalog(db = getPool()) {
     LEFT JOIN enterprise_pricing_revisions r ON r.id=s.active_revision_id
     WHERE LOWER(COALESCE(c.name,'')) <> 'membership'
       AND NOT EXISTS (SELECT 1 FROM enterprise_bundle_legacy_products b WHERE b.product_id=p.id)`);
-  const [promotions] = await db.query("SELECT id,status,input_json AS inputJson,output_json AS outputJson,localline_status AS channelStatus FROM enterprise_promotions WHERE status IN ('approved','scheduled','active','partial','cancelling')");
+  const [promotions] = await db.query("SELECT id,status,input_json AS inputJson,output_json AS outputJson,localline_status AS channelStatus FROM enterprise_promotions WHERE status IN ('approved','scheduled','active','partial','cancelling') OR (status='pending' AND localline_status='active')");
   const desiredSales = await readProductSales(db, rows.map(r=>Number(r.productId)));
   const now = Date.now();
   return rows.map(row => {
@@ -33,9 +33,9 @@ export async function bundleCatalog(db = getPool()) {
         promotionIsActive(input, now);
     });
     const desired = desiredSales.get(Number(row.productId));
-    if (desired && pkg) { priceCents = salePrice(pkg.localLineRegularCents, Number(desired.discount_bp)); promotionId=desired.promotion_id; promotionRegularCents=pkg.localLineRegularCents;
+    if (desired && pkg) { priceCents = salePrice(pkg.localLineRegularCents, Number(desired.discount_bp)); promotionId=Number(desired.discount_bp)>0?desired.promotion_id:null; promotionRegularCents=promotionId?pkg.localLineRegularCents:null;
       const published=promotions.find(p=>Number(p.id)===Number(desired.promotion_id));
-      if(Number(desired.discount_bp)>0 && (published?.status!=='active'||published?.channelStatus!=='active')) blocker=`${row.name}: publish its saved sale before publishing this bundle.`;
+      if(Number(desired.discount_bp)>0 && (published?.channelStatus!=='active'|| !(published?.status==='active'||(published?.status==='pending'&&Number(parse(published.inputJson).regularRevisionId)===Number(row.revisionId))))) blocker=`${row.name}: publish its saved sale before publishing this bundle.`;
       if(Number(desired.discount_bp)===0 && sales.some(p=>p.channelStatus==='active')) blocker=`${row.name}: finish removing its channel sale before publishing this bundle.`;
     }
     else if (sales.length) {

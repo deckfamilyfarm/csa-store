@@ -10,7 +10,8 @@ export function liveLocalLinePriceComparison(remote, payload) {
       const old = entries.length === 1 ? entries[0] : null;
       const amount = old?.calculated_value ?? (Number(old?.adjustment_type) === 3 ? old.adjustment_value : null);
       const currentCents = amount == null || !Number.isFinite(Number(amount)) ? null : Math.round(Number(amount) * 100);
-      const localCents = entry.calculated_value == null ? null : Math.round(Number(entry.calculated_value) * 100);
+      const proposedAmount = entry.calculated_value ?? (Number(entry.adjustment_type) === 3 ? entry.adjustment_value : null);
+      const localCents = proposedAmount == null ? null : Math.round(Number(proposedAmount) * 100);
       return { destination: "Local Line", label: `${pkg.name || current?.name || `Package ${pkg.id}`} · basket ${entry.price_list}`,
         packageName: pkg.name || current?.name || `Package ${pkg.id}`,
         listName: ACTIVE_LOCAL_LINE_BASKETS.find(list => Number(process.env[list.env]) === Number(entry.price_list))?.name || null,
@@ -39,7 +40,10 @@ export function compareLocalChannelPrices(revision, record) {
   for (const pkg of revision.output.packages) {
     const source = record?.packages.find(item => Number(item.id) === pkg.packageId);
     const name = source?.name || `Package ${pkg.packageId}`;
-    for (const basket of baskets) {
+    const enrolled = record?.expectedLocalLineListIds ?? source?.metadata?.localLineListIds;
+    const expectedBaskets = enrolled ? ACTIVE_LOCAL_LINE_BASKETS.filter(b => enrolled.includes(Number(process.env[b.env]))).map(b=>b.name) : baskets;
+    if (enrolled && !expectedBaskets.length) add('Local Line', `${name} · basket mapping needed`, null, pkg.localLineRegularCents, false);
+    for (const basket of expectedBaskets) {
       const prices = (record?.localLinePrices || []).filter(item => Number(item.packageId) === pkg.packageId && item.listName === basket);
       const price = prices.length === 1 ? prices[0].finalPrice : null;
       add("Local Line", `${name} · ${basket}`, price == null ? null : Math.round(Number(price) * 100), pkg.localLineRegularCents,

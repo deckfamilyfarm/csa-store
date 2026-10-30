@@ -91,6 +91,8 @@ function EnterpriseProductsSection({ token, roles = [], createdProductId }) {
   const [vendorFilter, setVendorFilter] = useState("");
   const [unitFilter, setUnitFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
+  const [snapEligibility, setSnapEligibility] = useState("");
+  const [guestEligibility, setGuestEligibility] = useState("");
   const [visibilityFilter, setVisibilityFilter] = useState("");
   const [saleFilter, setSaleFilter] = useState("");
   const [squareFilter, setSquareFilter] = useState("");
@@ -139,14 +141,14 @@ function EnterpriseProductsSection({ token, roles = [], createdProductId }) {
     let cancelled = false;
     const timer = setTimeout(() => {
       const params = new URLSearchParams({ search, syncStatus: status, vendorId: vendorFilter, pricingUnit: unitFilter,
-        markupCategory: categoryFilter, square: squareFilter, sale: saleFilter, visibility: visibilityFilter, sort: sort.key, sortDirection: sort.direction,
+        markupCategory: categoryFilter, square: squareFilter, sale: saleFilter, visibility: visibilityFilter, snapEligibility, guestEligibility, sort: sort.key, sortDirection: sort.direction,
         limit: "100", offset: String(page * 100) });
       adminGet(`enterprise-pricing/products?${params}`, token)
         .then(data => { if (!cancelled) { setRows(data.rows); setInventoryPageVersion(v=>v+1); setVendors(data.vendors); setEnterprises(data.enterprises); setTotal(data.total); } })
         .catch(error => { if (!cancelled) setMessage(error.message); });
     }, 200);
     return () => { cancelled = true; clearTimeout(timer); };
-  }, [token, search, status, vendorFilter, unitFilter, categoryFilter, squareFilter, saleFilter, visibilityFilter, sort, page, loading, markupRefresh]);
+  }, [token, search, status, vendorFilter, unitFilter, categoryFilter, squareFilter, saleFilter, visibilityFilter, snapEligibility, guestEligibility, sort, page, loading, markupRefresh]);
   async function refreshInventory() {
     if(inventoryRefreshBusy.current||summary?.localOnly!==false||!rows.length)return;
     inventoryRefreshBusy.current=true;setInventoryRefreshing(true);
@@ -277,6 +279,8 @@ function EnterpriseProductsSection({ token, roles = [], createdProductId }) {
       <label>Square<select className="input" value={squareFilter} onChange={event => { setSquareFilter(event.target.value); setPage(0); }}><option value="">All</option><option value="enabled">Enabled</option><option value="disabled">Not sold</option></select></label>
       <label>Sale<select className="input" value={saleFilter} onChange={e=>{setSaleFilter(e.target.value);setPage(0);}}><option value="">All</option><option value="on">On sale</option><option value="off">Not on sale</option></select></label>
       <button className="button alt" type="button" disabled={inventoryRefreshing||summary?.localOnly!==false} onClick={refreshInventory}>{inventoryRefreshing?'Checking FF inventory…':'Refresh FF inventory'}</button>
+      <label>SNAP<select className="input" value={snapEligibility} onChange={e=>{setSnapEligibility(e.target.value);setPage(0);}}><option value="">All</option><option value="excluded">Excluded</option><option value="included">Not excluded</option></select></label>
+      <label>Guest<select className="input" value={guestEligibility} onChange={e=>{setGuestEligibility(e.target.value);setPage(0);}}><option value="">All</option><option value="excluded">Excluded</option><option value="included">Not excluded</option></select></label>
       <label>FF visibility<select className="input" value={visibilityFilter} onChange={e=>{setVisibilityFilter(e.target.value);setPage(0);}}><option value="">All</option><option value="visible">Visible</option><option value="hidden">Hidden</option></select></label>
      </div>
     {message && !selectedId && <p role="status">{message}</p>}

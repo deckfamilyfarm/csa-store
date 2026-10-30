@@ -1,4 +1,4 @@
-import { validateActiveLocalLinePriceListIds, isRetiredLocalLineList } from "./localLinePricingLists.js";
+import { validateActiveLocalLinePriceListIds, isRetiredLocalLineList, enrolledLocalLineLists } from "./localLinePricingLists.js";
 import { roundRatio } from "./enterprisePricingEngine.js";
 
 const fail = message => { throw new Error(message); };
@@ -83,10 +83,10 @@ export function localLineSalePatch(remote, selectedPackages, priceListIds, saleA
       };
     }
     const selected = wanted.get(Number(pkg.id));
-    const entries = lists.map(listId => {
+    const entries = enrolledLocalLineLists(pkg, lists).map(listId => {
       const row = (pkg.price_list_entries || []).find(entry => Number(entry.price_list_id ?? entry.price_list) === listId);
       const entryId = Number(row?.product_price_list_entry ?? row?.id);
-      if (!Number.isSafeInteger(entryId) || entryId <= 0) fail(`${pkg.name || pkg.id} needs all three active mapped Local Line baskets.`);
+      if (!Number.isSafeInteger(entryId) || entryId <= 0) fail(`${pkg.name || pkg.id} needs a valid mapping for each enrolled Local Line basket.`);
       const amount = (saleActive ? selected.saleCents : selected.regularCents) / 100;
       return { adjustment: true, adjustment_type: 3, adjustment_value: amount,
         price_list: listId, product_price_list_entry: entryId,

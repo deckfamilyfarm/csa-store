@@ -1,4 +1,4 @@
-import { isRetiredLocalLineList } from "./localLinePricingLists.js";
+import { isRetiredLocalLineList, expectedLocalLineLists } from "./localLinePricingLists.js";
 import { salePrice } from './enterpriseProductSales.js';
 import { promotionIsActive, promotionEndTime } from './enterprisePromotionsCore.js';
 import { compareLocalChannelPrices } from './enterprisePricingComparison.js';
@@ -19,8 +19,8 @@ export async function readPricingChannelRecords(pool, productIds) {
   const records = new Map(productIds.map(id => [Number(id), { packages: [], localLinePrices: [], squarePrices: [] }]));
   if (!productIds.length) return records;
   const [[packages], [prices], [square]] = await Promise.all([
-    pool.query(`SELECT p.id,p.product_id AS productId,p.name,p.price,m.local_line_package_id AS remoteId
-      FROM packages p LEFT JOIN local_line_package_meta m ON m.package_id=p.id WHERE p.product_id IN (?)`, [productIds]),
+    pool.query(`SELECT p.id,p.product_id AS productId,p.name,p.price,prod.exclude_from_snap AS excludeFromSnap,prod.exclude_from_guest AS excludeFromGuest,m.local_line_package_id AS remoteId,lm.raw_json AS productRawJson
+      FROM packages p JOIN products prod ON prod.id=p.product_id LEFT JOIN local_line_package_meta m ON m.package_id=p.id LEFT JOIN local_line_product_meta lm ON lm.product_id=p.product_id WHERE p.product_id IN (?)`, [productIds]),
     pool.query(`SELECT product_id AS productId,package_id AS packageId,price_list_name AS listName,local_line_price_list_id AS listId,
       final_price_cache AS finalPrice,adjustment_type AS adjustmentType,adjustment_value AS adjustmentValue
       FROM local_line_price_list_entries WHERE product_id IN (?)`, [productIds]),
@@ -29,7 +29,13 @@ export async function readPricingChannelRecords(pool, productIds) {
       FROM square_variation_links l LEFT JOIN square_catalog_variations v ON v.square_variation_id=l.square_variation_id
       WHERE l.product_id IN (?) AND l.approved_at IS NOT NULL`, [productIds])
   ]);
-  for (const row of packages) records.get(Number(row.productId))?.packages.push({ ...row, metadata: { localLinePackageId: row.remoteId } });
+  for (const row of packages) {
+    if(row.excludeFromSnap !== undefined) records.get(Number(row.productId)).expectedLocalLineListIds=expectedLocalLineLists(row);
+    const remotePackage = parse(row.productRawJson)?.packages?.find(p=>Number(p.id)===Number(row.remoteId));
+    const {productRawJson,...fields}=row;
+    records.get(Number(row.productId))?.packages.push({ ...fields, metadata: { localLinePackageId: row.remoteId,
+      ...(remotePackage ? {localLineListIds: (remotePackage.price_list_entries || []).map(e=>Number(e.price_list_id ?? e.price_list))} : {}) } });
+  }
   for (const row of prices.filter(row => !isRetiredLocalLineList(row.listId, row.listName))) records.get(Number(row.productId))?.localLinePrices.push(row);
   for (const row of square) records.get(Number(row.productId))?.squarePrices.push({ ...row, priceCents: Number(row.isDeleted) ? null : row.priceCents });
   return records;
@@ -70,6 +76,8 @@ export function pricingSyncStatus({ input, output, publications = [], promotions
         if (data?.location_overrides?.some(location => location.price_money)) reasons.push('Square location price needs checking');
       }
     } else {
+      if (record?.expectedLocalLineListIds && record.packages.some(p => p.metadata.localLineListIds &&
+        p.metadata.localLineListIds.filter(id=>!isRetiredLocalLineList(id)).some(id=>!record.expectedLocalLineListIds.includes(id)))) reasons.push('Channel basket availability differs from saved exclusions');
       if ((record?.localLinePrices || []).some(price => Number(price.adjustmentType) === 3 && price.adjustmentValue != null && price.finalPrice != null
         && Math.round(Number(price.adjustmentValue) * 100) !== Math.round(Number(price.finalPrice) * 100))) reasons.push('Local Line fixed price needs checking');
     }
@@ -78,7 +86,7 @@ export function pricingSyncStatus({ input, output, publications = [], promotions
       const saleActive = promotionIsActive(sale.input, now);
       const complete = channel.platform === 'square' ? channelStatus === 'verified' && now < promotionEndTime(sale.input)
         : saleActive ? channelStatus === 'active' : channelStatus === 'restored';
-      if (!complete || ['pending', 'cancelling'].includes(sale.status)) reasons.push(`Sale ${sale.status || 'needs checking'}`);
+      if (!complete || (channel.platform === 'square' && sale.status === 'pending') || sale.status === 'cancelling') reasons.push(`Sale ${sale.status || 'needs checking'}`);
     }
     channel.state = reasons.length ? 'attention' : 'matched';
     channel.reason = [...new Set(reasons)].join('; ') || (localOnly ? 'Prices match imported channel data' : 'Prices match the latest channel check');

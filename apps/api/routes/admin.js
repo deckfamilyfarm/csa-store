@@ -1,3 +1,4 @@
+import { productBasketFlags, BASKET_FLAG_KEYS } from '../lib/productBasketEligibility.js';
 import { copyEnterprisePricing } from "../lib/duplicateEnterprisePricing.js";
 import { ensureEnterprisePricingSchema } from "../lib/enterprisePricingSchema.js";
 import { requireProductPricingUnit } from '../lib/productPricingUnitInput.js';
@@ -2933,6 +2934,7 @@ async function createLocalProductRecord(connection, payload) {
 
   const productRecord = {
     id: productId,
+    ...productBasketFlags(payload, vendor.name),
     name: String(payload.name || "").trim(),
     description: payload.description || "",
     visible: payload.visible ? 1 : 0,
@@ -2954,8 +2956,8 @@ async function createLocalProductRecord(connection, payload) {
     `
       INSERT INTO products (
         id, name, description, visible, track_inventory, inventory,
-        category_id, vendor_id, thumbnail_url, created_at, updated_at, is_deleted
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        category_id, vendor_id, thumbnail_url, created_at, updated_at, is_deleted, exclude_from_snap, exclude_from_guest
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `,
     [
       productRecord.id,
@@ -2969,7 +2971,7 @@ async function createLocalProductRecord(connection, payload) {
       productRecord.thumbnailUrl,
       productRecord.createdAt,
       productRecord.updatedAt,
-      productRecord.isDeleted
+      productRecord.isDeleted, Number(productRecord.excludeFromSnap), Number(productRecord.excludeFromGuest)
     ]
   );
 
@@ -3395,6 +3397,8 @@ async function duplicateLocalProductRecord(connection, sourceProductId, { forPri
   );
   const created = await createLocalProductRecord(connection, {
     pricingProfile: { unitOfMeasure: profileRows[0]?.unit_of_measure || (isSourcePricingVendor(sourceVendor) ? null : 'each') },
+    excludeFromSnap: Boolean(sourceProduct.exclude_from_snap),
+    excludeFromGuest: Boolean(sourceProduct.exclude_from_guest),
     name: `${sourceProduct.name} Copy`,
     description: sourceProduct.description || "",
     visible: forPricing ? false : Boolean(sourceProduct.visible),
@@ -10726,15 +10730,24 @@ router.put("/products/:id", requireAdminPermission(["inventory_admin", "pricing_
   try { vendor = await validateVendorAssignment(pool, Object.hasOwn(updates, "vendorId") ? updates.vendorId : existing.vendorId); }
   catch (error) { return res.status(error.status || 500).json({ error: error.message }); }
 
+  let basketFlags;
+  try { basketFlags = productBasketFlags(updates, vendor.name, existing); }
+  catch(error) { return res.status(error.status || 400).json({error:error.message}); }
+  const savingBasketFlags = BASKET_FLAG_KEYS.some(k => Object.hasOwn(updates,k));
+  const changingBasketFlags = BASKET_FLAG_KEYS.some(k => Boolean(existing[k]) !== basketFlags[k]);
+  if (changingBasketFlags && (!updates.expectedBasketEligibility || BASKET_FLAG_KEYS.some(k => updates.expectedBasketEligibility[k] !== Boolean(existing[k])))) {
+    return res.status(409).json({error:'Basket exclusions changed. Refresh the product before saving.'});
+  }
   const nextName = updates.name ?? existing.name ?? null;
   const nextDescription = updates.description ?? existing.description ?? null;
   const nextVisible = updates.visible ?? existing.visible ?? null;
   const nextTrackInventory = updates.trackInventory ?? existing.trackInventory ?? null;
   const nextInventory = updates.inventory ?? existing.inventory ?? null;
 
-  await db
+  const [basketSave] = await db
     .update(products)
     .set({
+      ...Object.fromEntries(BASKET_FLAG_KEYS.filter(k => Object.hasOwn(updates, k)).map(k=>[k,Number(basketFlags[k])])),
       name: updates.name ?? undefined,
       description: updates.description ?? undefined,
       visible: updates.visible ?? undefined,
@@ -10744,9 +10757,10 @@ router.put("/products/:id", requireAdminPermission(["inventory_admin", "pricing_
       vendorId: Object.hasOwn(updates, "vendorId") ? Number(vendor.id) : undefined,
       thumbnailUrl: updates.thumbnailUrl ?? undefined
     })
-    .where(eq(products.id, id));
+    .where(savingBasketFlags ? and(eq(products.id, id), eq(products.excludeFromGuest, Number(existing.excludeFromGuest)), eq(products.excludeFromSnap, Number(existing.excludeFromSnap))) : eq(products.id, id));
+  if (savingBasketFlags && !basketSave.affectedRows) return res.status(409).json({error:"Basket exclusions changed. Refresh the product before saving."});
 
-  const remoteRelevantChanged =
+  const remoteRelevantChanged = changingBasketFlags ||
     String(nextName ?? "") !== String(existing.name ?? "") ||
     String(nextDescription ?? "") !== String(existing.description ?? "") ||
     Number(nextVisible ?? 0) !== Number(existing.visible ?? 0) ||

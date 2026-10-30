@@ -22,6 +22,15 @@ Square selling units are part of pricing approval. `squarePricingUnits.js` requi
 
 Unit regressions: `node --test apps/api/lib/squarePricingUnits.test.js apps/api/lib/productPricingUnitInput.test.js apps/api/lib/squareProductCreation.test.js design/template/vite-app/src/components/productSyncView.test.js design/template/vite-app/src/components/squareMatchPublication.test.js`. The disposable-database Product Sync and Square creation integration suites also cover unit-only publication, required units on actual product creation routes, and frozen unit recovery after a lost response.
 
+## Local Line basket eligibility
+
+- Product-level `products.exclude_from_guest` and `products.exclude_from_snap` are independent of markup and sales. API/UI names are `excludeFromGuest` and `excludeFromSnap`.
+- Creamy Cow dairy requires a herd-share agreement and defaults to Exclude from Guest. Hard cheeses are the only exception eligible for Guest Basket. Use an explicitly reviewed product checkbox for hard-cheese exceptions; do not infer hard-cheese status from a vendor-wide rule or product name. Preserve existing exclusions when importing.
+- Certain home goods are deliberately excluded from SNAP. Preserve the explicitly saved checkbox; do not infer SNAP eligibility from vendor or automatically add missing listings.
+- Pricing applies one selling price to the product's eligible baskets. Guest/SNAP exclusions are not missing-price errors. Herd Share remains expected. CSA Members is retired.
+- Exclusion edits save locally and mark publication pending. Publication must compare the saved exclusions against live basket enrollment and hold mismatches for review; ordinary price publication must never enroll a product in another basket. Freeze exclusions and live basket membership so drift invalidates review.
+- Existing intentional exclusions were reviewed in the 2026-10-30 Local Line batch. Preserve them through imports, package edits and duplication. Product creation/edit screens and Pricing filters expose both checkboxes.
+
 ## Local Line API
 
 The integration targets the Local Line Backoffice v2 API:

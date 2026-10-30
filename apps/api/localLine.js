@@ -1,4 +1,4 @@
-import { assertNoRetiredLocalLinePrices } from "./lib/localLinePricingLists.js";
+import { assertNoRetiredLocalLinePrices, expectedLocalLineLists, validateProductBasketMappings } from "./lib/localLinePricingLists.js";
 import { eq } from "drizzle-orm";
 import { requireProductVendor, requireVendorId, matchLocalLineVendor, confirmLocalLineVendor } from "./lib/productVendor.js";
 import { findCustomerPriceOverride, customerOverridePrice, assertProductWideSaleAllowed } from './lib/customerPriceOverrides.js';
@@ -817,7 +817,8 @@ export function buildLocalLinePricePayload(context, llProduct, changes = {}) {
     packageMetaByPackageId,
     vendor: vendorRows[0] || null
   });
-  const priceLists = getPriceListDefinitions(resolvedProfile);
+  if (Number(llProduct?.id) > 0 && (Boolean(product.excludeFromSnap) || Boolean(product.excludeFromGuest))) validateProductBasketMappings(llProduct, product, vendor.name);
+  const priceLists = getPriceListDefinitions(resolvedProfile).filter(list => (!product.excludeFromGuest && !product.excludeFromSnap) || expectedLocalLineLists(product).includes(list.id));
   if (!priceLists || Object.keys(priceLists).length === 0) {
     throw new Error("No Local Line price lists are configured for this product.");
   }
@@ -987,7 +988,7 @@ export function buildLocalLineCreatePayload(context, productUnits) {
     packageMetaByPackageId,
     vendor: context.vendor
   });
-  const priceLists = getPriceListDefinitions(resolvedProfile);
+  const priceLists = getPriceListDefinitions(resolvedProfile).filter(list => (!product.excludeFromGuest && !product.excludeFromSnap) || expectedLocalLineLists(product).includes(list.id));
   if (!priceLists.length) {
     throw new Error("No Local Line price lists are configured for this product.");
   }

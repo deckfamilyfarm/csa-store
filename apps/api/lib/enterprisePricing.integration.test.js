@@ -298,7 +298,7 @@ test("saved prices activate locally before independently approved channel public
     const creation = await import("./enterpriseProductCreation.js");
     await pool.query("INSERT INTO vendors (id,name) VALUES (2,'Test Produce Vendor')");
     const enterpriseId = (await pricing.listPricingEnterprises())[0].id;
-    const body = { product: { name: "Test Shallots", vendorId: 2, categoryId: 1, description: "Farm produce" },
+    const body = { product: { name: "Test Shallots", vendorId: 2, categoryId: 1, description: "Farm produce", excludeFromSnap: true, excludeFromGuest: false },
       input: { retailEnterpriseId: enterpriseId, priceEffectiveAt: "2026-01-02T00:00:00Z", pricingUnit: "lb",
         markupCategory: "perishable", customMarkupBp: null, squareEnabled: false, saleBp: 0,
         purchaseCosts: [{ enterpriseId, cost: "2.00", effectiveAt: "2026-01-01" }],
@@ -322,6 +322,10 @@ test("saved prices activate locally before independently approved channel public
     const [[catalog]] = await pool.query("SELECT * FROM products WHERE id=?", [created.productId]);
     assert.equal(catalog.visible, 0); assert.equal(catalog.inventory, 0); assert.equal(catalog.track_inventory, 0);
     assert.equal(catalog.stock_on_farm, null); assert.equal(catalog.stock_on_farm_lbs, null);
+    assert.equal(catalog.exclude_from_snap, 1); assert.equal(catalog.exclude_from_guest, 0);
+    const exclusions = await pricing.listEnterprisePricingProducts({ snapEligibility: 'excluded', guestEligibility: 'included', search: 'Test Shallots', limit: 1 });
+    assert.equal(exclusions.total, 1); assert.equal(exclusions.rows[0].excludeFromSnap, true);
+    assert.equal((await pricing.listEnterprisePricingProducts({snapEligibility:'included',search:'Test Shallots'})).total, 0);
     const [packages] = await pool.query("SELECT * FROM packages WHERE product_id=? ORDER BY id", [created.productId]);
     assert.deepEqual(packages.map(row => Number(row.price)), [3, 6]);
     assert.deepEqual(packages.map(row => row.id), saved.active.input.packages.map(row => row.packageId));
@@ -366,7 +370,8 @@ test("saved prices activate locally before independently approved channel public
     assert.equal(writes.length, writesBefore, "creation never calls either channel");
     const { default: express } = await import("express");
     const { default: router } = await import("../routes/enterprisePricing.js");
-    const app = express(); app.use(express.json()); app.use((req,res,next) => { req.admin = { userId: 1, adminRoles: [req.headers['x-test-role'] || 'pricing_publisher'] }; next(); }); app.use(router);
+    const { default: adminRouter } = await import("../routes/admin.js");
+    const app = express(); app.use(express.json()); app.use((req,res,next) => { req.admin = { userId: 1, adminRoles: [req.headers['x-test-role'] || 'pricing_publisher'] }; next(); }); app.use("/admin",adminRouter); app.use(router);
     const server = app.listen(0, "127.0.0.1"); await new Promise(resolve => server.once("listening", resolve));
     try {
       const url = `http://127.0.0.1:${server.address().port}`;
@@ -374,7 +379,69 @@ test("saved prices activate locally before independently approved channel public
       assert.equal(response.status, 403, "a publisher cannot create products");
       const permitted = await nativeFetch(`${url}/products`, { method: "POST", headers: { "Content-Type": "application/json", "x-test-role": "pricing_editor" }, body: JSON.stringify(each) });
       assert.equal(permitted.status, 200); assert.equal((await permitted.json()).productId, eachSaved.productId);
+      const editBasket = (body,role='pricing_editor') => nativeFetch(`${url}/admin/products/${created.productId}`, {method:'PUT',headers:{'Content-Type':'application/json','x-test-role':role},body:JSON.stringify(body)});
+      assert.equal((await editBasket({excludeFromGuest:true},'pricing_publisher')).status,403);
+      assert.equal((await editBasket({excludeFromGuest:'true'})).status,400);
+      assert.equal((await editBasket({excludeFromGuest:true})).status,409);
+      const basketSaved=await editBasket({excludeFromGuest:true,expectedBasketEligibility:{excludeFromGuest:false,excludeFromSnap:true}});
+      assert.equal(basketSaved.status,200,await basketSaved.text());
+      assert.equal((await editBasket({excludeFromGuest:false,expectedBasketEligibility:{excludeFromGuest:false,excludeFromSnap:true}})).status,409);
+      assert.equal((await editBasket({name:'Renamed shallots'})).status,200);
+      const [[basketRow]]=await pool.query('SELECT exclude_from_guest,exclude_from_snap FROM products WHERE id=?',[created.productId]);
+      assert.equal(basketRow.exclude_from_guest,1);assert.equal(basketRow.exclude_from_snap,1);
+      assert.equal(writes.length,writesBefore,'Editing basket exclusions never publishes');
+
     } finally { await new Promise(resolve => server.close(resolve)); }
+  });
+
+  await t.test('Local Line-only prices include sales, preserve inventory, freeze sale edits, and never publish Square', async () => {
+    await pool.query("UPDATE enterprise_promotions SET status='cancelled'");
+    await pool.query("UPDATE product_sync_release_actions SET status='cancelled' WHERE status IN ('pending','working','failed','held')");
+    const current = await pricing.getEnterprisePricingProduct(1);
+    const draft = await pricing.saveEnterprisePricingDraft(1, { ...(current.latest || current.active).input, priceEffectiveAt: '2026-10-21',
+      squareEnabled: true, saleBp: 0 }, current.latest.id, { userId: 1 });
+    const { saveProductSale } = await import('./enterpriseProductSales.js');
+    const [[saleState]] = await pool.query('SELECT revision FROM enterprise_product_sales WHERE product_id=1');
+    await saveProductSale(1, {discountBp:1000, expectedRevision:Number(saleState?.revision||0), expectedPricingRevision:draft.revisionId}, {userId:1});
+    // Historical disabled sale discounts must not fabricate staged local drift.
+    await pool.query('UPDATE product_sales SET sale_discount=NULL,on_sale=0 WHERE product_id=1');
+    await pool.query('UPDATE product_pricing_profiles SET sale_discount=0.1,on_sale=0 WHERE product_id=1');
+    await pricing.approveEnterprisePricingRevision(draft.revisionId, user, {localLinePricesOnly:true});
+    const opts = {platforms:['localline'], productIds:[1], productScope:'selected', vendorGroup:'all',
+      enterpriseRevisionId:draft.revisionId, publicationScope:'localline-prices-and-sales'};
+    await assert.rejects(sync.createProductSyncAudit({...opts,platforms:['square']},user), /Local Line only/);
+    const check = async () => {
+      const a = await sync.createProductSyncAudit(opts,user);
+      for(let i=0;i<100;i++){if((await sync.getProductSyncAudit(a.id)).status!=='running')break; await new Promise(r=>setTimeout(r,20));}
+      const rows=(await sync.listProductSyncActions(a.id, {})).rows;
+      assert.equal(rows.length,1); assert.equal(rows[0].platform,'localline');
+      assert.ok(['changed','synced'].includes(rows[0].status), rows[0].message);
+      return {a,rows};
+    };
+    const before = writes.length;
+    remote.inventory=7; remote.track_inventory=true; remote.visible=false; remote.description='Remote description';
+    let {a,rows}=await check();
+    assert.deepEqual(Object.keys(rows[0].payload).sort(),['packages','vendor']);
+    assert.equal(rows[0].imageSources.length,0);
+    assert.deepEqual(rows[0].localBefore,rows[0].localAfter,'a price-only release stages no legacy sale normalization');
+    assert.ok(rows[0].payload.packages[0].price_list_entries.every(e=>e.on_sale_toggle===true));
+    const r=await sync.createProductSyncRelease({auditId:a.id,actionIds:rows.map(a=>a.id),localWorkerOnly:true},user);
+    assert.match((await sync.getProductSyncRelease(r.id)).scheduledAt,/^9999/);
+    const done=await sync.runProductSyncRelease(r.id,{user,allowFuture:true});
+    assert.equal(done.status,'completed',JSON.stringify(done.actions.map(a=>a.message)));
+    assert.ok(writes.slice(before).every(w=>w.platform==='localline'));
+    assert.equal(remote.inventory,7);assert.equal(remote.visible,false);assert.equal(remote.description,'Remote description');
+    const [[publication]]=await pool.query("SELECT status FROM enterprise_pricing_publications WHERE revision_id=? AND platform='square'",[draft.revisionId]);
+    assert.equal(publication.status,'pending');
+    const [[sale]]=await pool.query("SELECT p.status,p.square_status,p.localline_status FROM enterprise_product_sales s JOIN enterprise_promotions p ON p.id=s.promotion_id WHERE s.product_id=1");
+    assert.equal(sale.status,'pending');assert.notEqual(sale.square_status,'verified');assert.equal(sale.localline_status,'active');
+    assert.equal((await sync.runProductSyncRelease(r.id,{user,allowFuture:true})).status,'completed');
+    ({a,rows}=await check());
+    const stale=await sync.createProductSyncRelease({auditId:a.id,actionIds:rows.map(a=>a.id),localWorkerOnly:true},user);
+    await pool.query('UPDATE enterprise_product_sales SET discount_bp=2000,revision=revision+1 WHERE product_id=1');
+    const held=await sync.runProductSyncRelease(stale.id,{user,allowFuture:true});
+    assert.equal(held.status,'held');
+    assert.match(held.actions[0].message,/Local inputs changed/);
   });
 
 });

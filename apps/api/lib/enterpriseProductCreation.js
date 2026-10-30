@@ -1,3 +1,4 @@
+import { productBasketFlags } from './productBasketEligibility.js';
 import { createHash } from "node:crypto";
 import { getPool } from "../db.js";
 import { validateVendorAssignment } from "./productVendor.js";
@@ -20,7 +21,7 @@ async function prepare(body, db = getPool()) {
     categoryName = category.name;
   }
   const product = { name, vendorId: Number(vendor.id), vendorName: vendor.name, categoryId, categoryName,
-    description: String(body.product.description || "") };
+    ...productBasketFlags(body.product, vendor.name), description: String(body.product.description || "") };
   if (Buffer.byteLength(product.description) > 60000) fail("The description is too long.");
   if (!Array.isArray(body.input?.packages) || !body.input.packages.length || body.input.packages.length > 100) fail("Add 1–100 packages.");
   const packages = body.input.packages.map(pkg => {
@@ -66,9 +67,9 @@ export async function createEnterpriseProduct(body, user) {
     const productId = Number(lastProduct?.id || 0) + 1;
     let packageId = Number(lastPackage?.id || 0) + 1;
     await connection.query(`INSERT INTO products
-      (id,name,description,vendor_id,category_id,visible,track_inventory,inventory,is_deleted,created_at,updated_at)
-      VALUES (?,?,?,?,?,0,0,0,0,UTC_TIMESTAMP(),UTC_TIMESTAMP())`,
-    [productId, preview.product.name, preview.product.description, preview.product.vendorId, preview.product.categoryId]);
+      (id,name,description,vendor_id,category_id,exclude_from_snap,exclude_from_guest,visible,track_inventory,inventory,is_deleted,created_at,updated_at)
+      VALUES (?,?,?,?,?,?,?,0,0,0,0,UTC_TIMESTAMP(),UTC_TIMESTAMP())`,
+    [productId, preview.product.name, preview.product.description, preview.product.vendorId, preview.product.categoryId, Number(preview.product.excludeFromSnap), Number(preview.product.excludeFromGuest)]);
     const mappedInput = structuredClone(preview.input);
     for (const [index, pkg] of preview.packages.entries()) {
       const output = preview.output.packages[index];

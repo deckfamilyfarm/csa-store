@@ -6,6 +6,7 @@ import express from "express";
 import cors from "cors";
 import {
   ensureFarmStockSchema,
+  ensureProductBasketSchema,
   ensureLiabilityReleaseSchema,
   ensureLocalLineSyncSchema,
   ensureSquareSyncSchema,
@@ -57,6 +58,7 @@ app.use("/api", (_req, res, next) => {
 initDb();
 // Product reads include this local-only column. Finish migration before serving requests.
 await ensureFarmStockSchema();
+await ensureProductBasketSchema();
 ensureLocalLineSyncSchema().catch((err) => {
   console.error("Local Line schema bootstrap failed:", err.message);
 });

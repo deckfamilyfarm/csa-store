@@ -19,5 +19,5 @@ test("missing basket mapping holds the product", () => {
     { packages: [{ id: 10 }], packageMeta: [{ packageId: 10, localLinePackageId: 20 }] },
     { output: { packages: [{ packageId: 10, localLineRegularCents: 3600 }] } }
     , [1, 3, 4]
-  ), /three active/);
+  ), /valid active/);
 });
