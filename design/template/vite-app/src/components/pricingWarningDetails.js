@@ -29,3 +29,20 @@ export function pricingWarningDetails(revision, row = null) {
   }
   return details.filter((item, index) => details.findIndex(other => other.label === item.label && other.message === item.message) === index);
 }
+
+export function pricingChannelStatuses(row, review) {
+  const details = pricingWarningDetails(review, row);
+  return ['localline', ...(row.input?.squareEnabled === true ? ['square'] : [])].map(platform => {
+    const label = platform === 'square' ? 'Square' : 'Local Line';
+    const channel = row.sync?.channels?.find(item => item.platform === platform);
+    const actions = (review?.check?.actions || []).filter(action => action.platform === platform);
+    let message;
+    if (actions.some(action => ['queued', 'running'].includes(action.publicationStatus))) message = 'Sync in progress.';
+    else if (channel?.state === 'matched') message = row.publications?.some(p => p.platform === platform && p.status === 'verified')
+      ? 'Sync succeeded.' : 'Prices match the latest stored check.';
+    else message = details.filter(detail => detail.label === label || detail.label.startsWith(`${label} ·`))
+      .map(detail => `${detail.label === label ? '' : `${detail.label.slice(label.length + 3)}: `}${detail.message}`).join(' ')
+      || `Status needs checking. ${platform === 'square' ? 'Open Review & Publish.' : 'Open Sync.'}`;
+    return { platform, message };
+  });
+}

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { adminGet } from "../adminApi.js";
-import { pricingWarningDetails } from "./pricingWarningDetails.js";
+import { pricingWarningDetails, pricingChannelStatuses } from "./pricingWarningDetails.js";
 
 export function ProductPricingWarnings({ row, token, onOpenSync }) {
   const [review, setReview] = useState(null);
@@ -17,18 +17,14 @@ export function ProductPricingWarnings({ row, token, onOpenSync }) {
     return () => { cancelled = true; };
   }, [row.id, token, retry]);
   const details = pricingWarningDetails(review, row);
+  const statuses = pricingChannelStatuses(row, review);
   const localLineMatched = row.sync?.channels?.some(channel => channel.platform === 'localline' && channel.state === 'matched');
   return <>
-    {localLineMatched && <p>{row.publications?.some(p => p.platform === 'localline' && p.status === 'verified')
-      ? 'Local Line sync succeeded.' : 'Local Line prices match the latest stored check.'}</p>}
+    {statuses.map(status => <p key={status.platform}><strong>{status.platform === 'square' ? 'Square Status:' : 'Local Line Status:'}</strong>{' '}{status.message}</p>)}
     {!!row.sourceEvidence?.warnings?.length && <ul>{row.sourceEvidence.warnings.map((warning, index) => <li key={index}>{warning}</li>)}</ul>}
     {loading ? <p role="status">Loading the saved server-check details…</p> : error ?
       <p role="alert">Could not load the warning details: {error} <button className="button alt" type="button" onClick={() => setRetry(value => value + 1)}>Retry</button></p>
-      : details.length ? <ul>{details.map((detail, index) => <li key={index}><strong>{detail.label}:</strong> {detail.message}</li>)}</ul>
-      : <p>{review?.check?.status === "running" ? "The server is still checking this product. Open Sync to follow progress."
-        : review?.check?.actions?.some(action => ["queued", "running"].includes(action.publicationStatus)) ? "An update is running on the server. Open Sync to follow progress."
-        : review?.check?.status === "completed" && review.check.actions?.length ? "No unresolved issues were found in this check."
-        : "No detailed reason was saved with this status. Open Sync and check server prices to get the current explanation."}</p>}
+      : details.filter(detail => detail.label === 'Server check').map((detail, index) => <p role="alert" key={index}>{detail.message}</p>)}
     {review?.status === "rejected" && <p>The pricing proposal was rejected. Open Sync to review the saved inputs.</p>}
     {!localLineMatched && <button className="button alt" type="button" onClick={onOpenSync}>Open this product’s Sync</button>}
   </>;
