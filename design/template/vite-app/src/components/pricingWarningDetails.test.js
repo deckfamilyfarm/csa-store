@@ -14,3 +14,29 @@ test("warning details include package blockers, audit errors and publication fai
   ]);
   assert.deepEqual(pricingWarningDetails(null), []);
 });
+
+test('a successful Local Line-only check cannot hide the outstanding Square mapping', () => {
+  const review = {check:{status:'completed',actions:[{platform:'localline',status:'changed',releaseStatus:'completed'}]}};
+  const row = {approvedSquareLinks:0,sync:{channels:[
+    {platform:'localline',state:'matched'},
+    {platform:'square',state:'attention',reason:'Channel price or mapping needs checking; Publication blocked'}
+  ]}};
+  const result = pricingWarningDetails(review,row);
+  assert.equal(result.length,1);
+  assert.equal(result[0].label,'Square');
+  assert.match(result[0].message,/no approved Square variation link/);
+});
+
+test('verified current destination suppresses an old blocker while preserving the other failure', () => {
+  const review = {check:{actions:[{platform:'localline',status:'blocked',message:'Old Local Line issue'},
+    {platform:'square',status:'changed',releaseStatus:'failed',releaseMessage:'Square connection interrupted'}]}};
+  assert.deepEqual(pricingWarningDetails(review,{sync:{channels:[{platform:'localline',state:'matched'},
+    {platform:'square',state:'attention',reason:'Publication failed'}]}}),
+    [{label:'Square',message:'Square connection interrupted'}]);
+});
+
+test('Square pending publication is explained even when the latest audit omits Square', () => {
+  assert.deepEqual(pricingWarningDetails(null,{approvedSquareLinks:1,sync:{channels:[
+    {platform:'square',state:'attention',reason:'Publication pending'}]}}),
+    [{label:'Square',message:'Square changes have not been published yet. Review them in Review & Publish.'}]);
+});
