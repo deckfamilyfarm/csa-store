@@ -1,3 +1,4 @@
+import { validateActiveLocalLinePriceListIds, isRetiredLocalLineList } from "./localLinePricingLists.js";
 import { roundRatio } from "./enterprisePricingEngine.js";
 
 const fail = message => { throw new Error(message); };
@@ -36,7 +37,7 @@ export function promotionPrices(regularPackages, discountBp) {
     if (!Number.isSafeInteger(pkg.localLineRegularCents) || pkg.localLineRegularCents < 0) fail("A package has no approved regular Local Line price.");
     const saleCents = roundRatio(BigInt(pkg.localLineRegularCents) * BigInt(10000 - discountBp), 10000n);
     return { packageId: Number(pkg.packageId), regularCents: pkg.localLineRegularCents, saleCents,
-      baskets: Object.fromEntries(["guest", "member", "herdShare", "snap"].map(key => [key, saleCents])) };
+      baskets: Object.fromEntries(["guest", "herdShare", "snap"].map(key => [key, saleCents])) };
   });
 }
 
@@ -46,12 +47,12 @@ export function promotionsOverlap(left, right) {
     left.channels.some(value => right.channels.includes(value));
 }
 
-// A sale changes the four existing basket entries for a reviewed package. Keep
+// A sale changes the three active basket entries for a reviewed package. Keep
 // the regular unit price so the Local Line sale display can cross it out.
 export function localLineSalePatch(remote, selectedPackages, priceListIds, saleActive) {
   if (!remote || !Array.isArray(remote.packages)) fail("Refresh the Local Line product before publishing a sale.");
   const lists = [...new Set(priceListIds.map(Number))];
-  if (lists.length !== 4 || lists.some(value => !Number.isSafeInteger(value) || value <= 0)) fail("Configure four distinct Local Line price lists.");
+  validateActiveLocalLinePriceListIds(priceListIds.map(Number));
   const wanted = new Map(selectedPackages.map(pkg => [Number(pkg.localLinePackageId), pkg]));
   const packages = remote.packages.map(pkg => {
     if (!wanted.has(Number(pkg.id))) {
@@ -63,7 +64,7 @@ export function localLineSalePatch(remote, selectedPackages, priceListIds, saleA
         unit_price: Number(pkg.unit_price),
         ...(pkg.inventory_per_unit == null ? {} : { inventory_per_unit: Number(pkg.inventory_per_unit) }),
         ...(pkg.package_code == null ? {} : { package_code: pkg.package_code }),
-        price_list_entries: pkg.price_list_entries.map(entry => {
+        price_list_entries: pkg.price_list_entries.filter(entry => !isRetiredLocalLineList(entry.price_list_id ?? entry.price_list)).map(entry => {
           const priceListId = Number(entry.price_list_id ?? entry.price_list);
           const entryId = Number(entry.product_price_list_entry ?? entry.id);
           const type = Number(entry.adjustment_type), value = Number(entry.adjustment_value);
@@ -85,7 +86,7 @@ export function localLineSalePatch(remote, selectedPackages, priceListIds, saleA
     const entries = lists.map(listId => {
       const row = (pkg.price_list_entries || []).find(entry => Number(entry.price_list_id ?? entry.price_list) === listId);
       const entryId = Number(row?.product_price_list_entry ?? row?.id);
-      if (!Number.isSafeInteger(entryId) || entryId <= 0) fail(`${pkg.name || pkg.id} needs all four mapped Local Line baskets.`);
+      if (!Number.isSafeInteger(entryId) || entryId <= 0) fail(`${pkg.name || pkg.id} needs all three active mapped Local Line baskets.`);
       const amount = (saleActive ? selected.saleCents : selected.regularCents) / 100;
       return { adjustment: true, adjustment_type: 3, adjustment_value: amount,
         price_list: listId, product_price_list_entry: entryId,

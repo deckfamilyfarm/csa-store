@@ -5,7 +5,7 @@ test('bundle publication freezes review, holds drift and recovers a lost respons
  const database=`csa_bundle_publish_${process.pid}_${Date.now()}`,root=await mysql.createConnection({socketPath:socket,user:'root'});await root.query(`CREATE DATABASE \`${database}\``);await root.end();
  Object.assign(process.env,{STORE_DB_HOST:'127.0.0.1',STORE_DB_PORT:'1',STORE_DB_DATABASE:database,STORE_DB_USER:'root',STORE_DB_PASSWORD:'',CSA_LOCAL_ONLY:'false',LL_BASEURL:'https://localline.test/api/',LL_USERNAME:'test',LL_PASSWORD:'test',LL_PRICE_LIST_GUEST_ID:'1',LL_PRICE_LIST_CSA_MEMBERS_ID:'2',LL_PRICE_LIST_HERDSHARE_ID:'3',LL_PRICE_LIST_SNAP_ID:'4'});
  const {getPool}=await import('../db.js');const db=getPool();db.pool.config.connectionConfig.socketPath=socket;t.after(()=>db.end());
- for(const sql of ['CREATE TABLE vendors(id INT PRIMARY KEY,name VARCHAR(255))','CREATE TABLE categories(id INT PRIMARY KEY,name VARCHAR(255))','CREATE TABLE products(id INT PRIMARY KEY,name VARCHAR(255),vendor_id INT,category_id INT,is_deleted INT,track_inventory INT,inventory INT)','CREATE TABLE packages(id INT PRIMARY KEY,product_id INT,name VARCHAR(255),track_inventory INT,inventory INT,num_of_items INT,track_type VARCHAR(30))','CREATE TABLE local_line_product_meta(product_id INT,local_line_product_id INT)','CREATE TABLE local_line_package_meta(package_id INT,product_id INT,local_line_package_id INT)'])await db.query(sql);
+ for(const sql of ['CREATE TABLE product_sales(product_id INT PRIMARY KEY,on_sale INT,sale_discount DECIMAL(10,4))','CREATE TABLE product_pricing_profiles(product_id INT PRIMARY KEY,on_sale INT,sale_discount DECIMAL(10,4))','CREATE TABLE vendors(id INT PRIMARY KEY,name VARCHAR(255))','CREATE TABLE categories(id INT PRIMARY KEY,name VARCHAR(255))','CREATE TABLE products(id INT PRIMARY KEY,name VARCHAR(255),vendor_id INT,category_id INT,is_deleted INT,track_inventory INT,inventory INT)','CREATE TABLE packages(id INT PRIMARY KEY,product_id INT,name VARCHAR(255),track_inventory INT,inventory INT,num_of_items INT,track_type VARCHAR(30))','CREATE TABLE local_line_product_meta(product_id INT,local_line_product_id INT)','CREATE TABLE local_line_package_meta(package_id INT,product_id INT,local_line_package_id INT)'])await db.query(sql);
  const {ensureEnterprisePricingSchema}=await import('./enterprisePricingSchema.js');await ensureEnterprisePricingSchema();
  await db.query("INSERT INTO vendors VALUES(2,'Farm')");await db.query("INSERT INTO products VALUES(1,'Beef',2,NULL,0,0,0)");await db.query("INSERT INTO packages VALUES(10,1,'1 lb',0,0,1,'package')");await db.query('INSERT INTO local_line_product_meta VALUES(1,100)');await db.query('INSERT INTO local_line_package_meta VALUES(10,1,1000)');
  await db.query("INSERT INTO enterprise_pricing_revisions (id,product_id,settings_version_id,status,input_json,output_json,editor_id,created_at) VALUES(1,1,1,'active','{}',?,1,UTC_TIMESTAMP())",[JSON.stringify({packages:[{packageId:10,localLineSaleCents:1000}]})]);await db.query('INSERT INTO enterprise_pricing_product_state(product_id,latest_revision_id,active_revision_id,updated_at) VALUES(1,1,1,UTC_TIMESTAMP())');
@@ -41,7 +41,7 @@ test('bundle publication freezes review, holds drift and recovers a lost respons
  process.env.LL_BUNDLE_PUBLICATION_ENABLED='false';
  assert.equal((await service.publishBundle(review.id,{userId:2})).status,'verified');assert.equal(writes,1);
  assert.equal((await service.publishBundle(review.id,{userId:2})).status,'verified');assert.equal(writes,1);
- assert.equal(remote.price,12);assert.deepEqual(remote.product_price_list_entries.map(p=>p.box_package_entry.adjustment_value),[19,19,19,19]);
+ assert.equal(remote.price,12);assert.deepEqual(remote.product_price_list_entries.map(p=>p.box_package_entry.adjustment_value),[19,50,19,19]);
  const next=await service.reviewBundlePublication(1,{userId:2});await db.query('UPDATE enterprise_bundles SET revision=2 WHERE id=1');await assert.rejects(service.publishBundle(next.id,{userId:2}),/changed after review/);assert.equal(writes,1);
  // A confirmed managed component sale becomes the bundle basis. A legacy sale,
  // missing basket flag, partial publication or expiration must still hold it.
@@ -67,5 +67,5 @@ test('bundle publication freezes review, holds drift and recovers a lost respons
  await db.query('UPDATE enterprise_promotions SET input_json=? WHERE id=1',[JSON.stringify(saleInput)]);
  process.env.LL_BUNDLE_PUBLICATION_ENABLED='true';
  assert.equal((await service.publishBundle(saleReview.id,{userId:2})).status,'verified');assert.equal(writes,2);
- assert.deepEqual(remote.product_price_list_entries.map(p=>p.box_package_entry.adjustment_value),[15.2,15.2,15.2,15.2]);assert.equal(remote.price,12);
+ assert.deepEqual(remote.product_price_list_entries.map(p=>p.box_package_entry.adjustment_value),[15.2,50,15.2,15.2]);assert.equal(remote.price,12);
 });

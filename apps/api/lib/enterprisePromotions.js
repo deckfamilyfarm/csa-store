@@ -1,3 +1,4 @@
+import { activeLocalLinePriceListIds } from "./localLinePricingLists.js";
 import crypto from "node:crypto";
 import { getPool } from "../db.js";
 import { ensureEnterprisePricingSchema } from "./enterprisePricingSchema.js";
@@ -61,12 +62,12 @@ async function frozenPromotion(promotion, connection = getPool()) {
       localLineRegularCents: regular.localLineRegularCents, squareRegularCents: regular.squareVariationCents,
       pricingUnit: input.pricingUnit };
   });
-  return { packages: frozen, localLinePrices: promotionPrices(frozen, promotion.discountBp) };
+  return { packages: frozen, localLinePrices: promotionPrices(frozen, promotion.endSale ? 0 : promotion.discountBp) };
 }
 
 async function checkOverlaps(promotion, excludeId = null, connection = getPool()) {
-  const [rows] = await connection.query("SELECT id, input_json AS inputJson FROM enterprise_promotions WHERE status IN ('approved','scheduled','active','partial','cancelling')");
-  const overlapping = rows.find(row => Number(row.id) !== Number(excludeId) && promotionsOverlap(promotion, parse(row.inputJson)));
+  const [rows] = await connection.query("SELECT id, status, input_json AS inputJson FROM enterprise_promotions WHERE status IN ('pending','approved','scheduled','active','partial','cancelling')");
+  const overlapping = rows.find(row => (row.status !== 'pending' || parse(row.inputJson)?.localProductId) && !promotion.supersedes?.includes(Number(row.id)) && Number(row.id) !== Number(excludeId) && promotionsOverlap(promotion, parse(row.inputJson)));
   if (overlapping) fail(`Promotion ${overlapping.id} overlaps these packages and channels. Review or cancel it first.`, 409);
 }
 
@@ -95,7 +96,12 @@ export async function approveEnterprisePromotion(promotionId, user) {
     const [rows] = await connection.query("SELECT * FROM enterprise_promotions WHERE id=? FOR UPDATE", [promotionId]);
     if (!rows.length || rows[0].status !== "pending") fail("Promotion is no longer pending.", 409);
     const row = rows[0], input = parse(row.input_json), original = parse(row.output_json);
-    const productIds = [...new Set(original.packages.map(pkg => Number(pkg.productId)))];
+    if(input.localProductId) {
+      const [states]=await connection.query('SELECT promotion_id FROM enterprise_product_sales WHERE product_id=? FOR UPDATE',[input.localProductId]);
+      if(Number(states[0]?.promotion_id)!==Number(promotionId)) fail('The local sale changed. Review its latest version.',409);
+      if(input.channels.includes('square') && !input.squareLocationIds?.length) fail('Configure the Square sale locations before approval.',409);
+    }
+    const productIds = input.localProductId ? [input.localProductId] : [...new Set(original.packages.map(pkg => Number(pkg.productId)))];
     const [pricingStates] = await connection.query(`SELECT s.product_id AS productId, s.latest_revision_id AS latestRevisionId,
       s.active_revision_id AS activeRevisionId, r.status AS latestStatus
       FROM enterprise_pricing_product_state s LEFT JOIN enterprise_pricing_revisions r ON r.id=s.latest_revision_id
@@ -113,8 +119,10 @@ export async function approveEnterprisePromotion(promotionId, user) {
     if (promotionEndTime(input) <= Date.now()) fail("Promotion has already expired. Save a new proposal.", 409);
     await checkOverlaps(input, promotionId, connection);
     const refreshed = await frozenPromotion(input, connection);
-    if (JSON.stringify(original) !== JSON.stringify(refreshed)) fail("Regular prices or mappings changed. Save a new promotion proposal.", 409);
-    const squareObjects = input.channels.includes("square")
+    if(input.localProductId && refreshed.packages.some(p=>Number(p.activeRevisionId)!==Number(input.regularRevisionId))) fail('Regular pricing changed. Save the sale again before approval.',409);
+    if (!input.localProductId && JSON.stringify(original) !== JSON.stringify(refreshed)) fail("Regular prices or mappings changed. Save a new promotion proposal.", 409);
+    if(input.localProductId) await connection.query('UPDATE enterprise_promotions SET output_json=? WHERE id=?',[JSON.stringify(refreshed),promotionId]);
+    const squareObjects = !input.endSale && input.channels.includes("square")
       ? buildSquarePromotionCatalogObjects(promotionId, input, refreshed.packages.map(pkg => pkg.squareVariationId)) : [];
     const squareRequest = squareObjects.length ? { idempotency_key: crypto.randomUUID(), batches: [{ objects: squareObjects }] } : null;
     await connection.query(`UPDATE enterprise_promotions SET status='approved', approver_id=?, approved_at=UTC_TIMESTAMP(),
@@ -245,7 +253,7 @@ export async function publishEnterpriseSquarePromotion(promotionId, user) {
 }
 
 function priceListIds() {
-  return ["LL_PRICE_LIST_GUEST_ID", "LL_PRICE_LIST_CSA_MEMBERS_ID", "LL_PRICE_LIST_HERDSHARE_ID", "LL_PRICE_LIST_SNAP_ID"].map(key => Number(process.env[key]));
+  return activeLocalLinePriceListIds();
 }
 
 async function preflightLocalLinePromotion(output, allowAppliedSale = false) {
@@ -320,7 +328,7 @@ export async function publishEnterpriseLocalLinePromotion(promotionId, user = nu
           const payload = localLineSalePatch(remote, selected, listIds, saleActive);
           await patchLocalLineProduct(context.remoteId, token, payload);
           const confirmed = await fetchLocalLineProduct(context.remoteId, token);
-          if (!localLineSaleMatches(confirmed, selected, listIds, saleActive)) fail("Local Line did not confirm all four sale basket prices. Review the remote product before retrying.", 409);
+          if (!localLineSaleMatches(confirmed, selected, listIds, saleActive)) fail("Local Line did not confirm all three active sale basket prices. Review the remote product before retrying.", 409);
         }
       }
       const status = saleActive ? "active" : forceRestore ? "cancelled" : "expired";
@@ -339,8 +347,36 @@ export async function publishEnterpriseLocalLinePromotion(promotionId, user = nu
 }
 
 export async function publishEnterprisePromotion(promotionId, user = null, now = new Date()) {
+  const promotion=await getEnterprisePromotion(promotionId);
+  if(!promotion.input.localProductId) return publishPromotion(promotionId,user,now);
+  const db=await getPool().getConnection(), lock=`csa-product-sale-${promotion.input.localProductId}`;
+  let acquired=false;
+  try {
+    const [held]=await db.query('SELECT GET_LOCK(?,0) AS acquired',[lock]);
+    acquired=Number(held[0].acquired)===1;
+    if(!acquired) fail('This product sale is being saved or published. Try again shortly.',409);
+    return await publishPromotion(promotionId,user,now);
+  } finally {if(acquired) await db.query('SELECT RELEASE_LOCK(?)',[lock]);db.release();}
+}
+async function publishPromotion(promotionId, user = null, now = new Date()) {
   const promotion = await getEnterprisePromotion(promotionId);
   if (promotion.status === "cancelling") return cancelEnterprisePromotion(promotionId, user);
+  if(promotion.input.localProductId) {
+    if(!['approved','scheduled','active','partial'].includes(promotion.status)) fail('Approve the sale before publishing.',409);
+    const [states]=await getPool().query('SELECT promotion_id FROM enterprise_product_sales WHERE product_id=?',[promotion.input.localProductId]);
+    if(Number(states[0]?.promotion_id)!==Number(promotionId)) fail('The local sale changed. Review its latest version.',409);
+    // Validate both destinations before retiring the old managed sale.
+    if(promotion.input.channels.includes('square')) { squarePublicationAllowed(); await preflightSquareVariations(promotion.output); }
+    for(const previous of promotion.input.supersedes || []) {
+      const old=await getEnterprisePromotion(previous);
+      if(!['cancelled','expired'].includes(old.status) && old.input.channels.includes('localline')) await preflightLocalLinePromotion(old.output,true);
+    }
+    for(const previous of promotion.input.supersedes || []) await cancelEnterprisePromotion(previous,user);
+    if(promotion.input.endSale) {
+      await getPool().query("UPDATE enterprise_promotions SET status='cancelled',square_status='cancelled',localline_status='restored',updated_at=UTC_TIMESTAMP() WHERE id=?",[promotionId]);
+      return getEnterprisePromotion(promotionId);
+    }
+  }
   if (promotion.input.channels.includes("square") && promotion.squareStatus !== "verified" && now.getTime() < promotionEndTime(promotion.input)) {
     await publishEnterpriseSquarePromotion(promotionId, user);
   }
@@ -356,6 +392,8 @@ export async function publishEnterprisePromotion(promotionId, user = null, now =
 }
 
 export async function cancelEnterprisePromotion(promotionId, user) {
+  const [desired]=await getPool().query('SELECT product_id FROM enterprise_product_sales WHERE promotion_id=?',[promotionId]);
+  if(desired.length) fail('Set the product sale to 0% in Pricing, then publish that change.',409);
   const marked = await lockedPromotion(promotionId, async (row, connection) => {
     if (["cancelled", "expired"].includes(row.status)) return view(row);
     if (!["pending", "approved", "scheduled", "active", "partial", "cancelling"].includes(row.status)) fail("This sale cannot be cancelled.", 409);

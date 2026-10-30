@@ -5,7 +5,7 @@ import { EnterpriseReviewSection } from "./EnterpriseReviewSection.jsx";
 const money = cents => cents == null ? "—" : `$${(Number(cents) / 100).toFixed(2)}`;
 const percent = bp => bp == null ? "—" : `${Number(bp) / 100}%`;
 
-export function ProductPricingSync({ productId, token, roles, dirty, onChanged }) {
+export function ProductPricingSync({ productId, token, roles, dirty, onChanged, onRequestBusy }) {
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
   const [refresh, setRefresh] = useState(0);
@@ -51,7 +51,7 @@ export function ProductPricingSync({ productId, token, roles, dirty, onChanged }
         <p className="small">Local test mode: server checks and remote updates are disabled.</p>
         <div className="admin-actions"><button className="button alt" type="button" disabled={dirty} onClick={() => { setRefresh(value => value + 1); onChanged?.(); }}>Recheck imported prices</button>
           <button className="button" type="button" disabled>Update remote prices</button></div>
-      </> : <fieldset disabled={dirty}><EnterpriseReviewSection token={token} roles={roles} productId={productId} embedded onChecked={checked} onPublished={published} /></fieldset>}
+      </> : <fieldset disabled={dirty}><EnterpriseReviewSection token={token} roles={roles} productId={productId} embedded onRequestBusy={onRequestBusy} onChecked={checked} onPublished={published} /></fieldset>}
     </>}
   </div>;
 }

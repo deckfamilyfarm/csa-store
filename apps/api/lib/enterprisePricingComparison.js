@@ -1,4 +1,5 @@
-const baskets = ["Guest Basket", "CSA Members", "Herd Share Members", "SNAP"];
+import { ACTIVE_LOCAL_LINE_BASKETS } from "./localLinePricingLists.js";
+const baskets = ACTIVE_LOCAL_LINE_BASKETS.map(list => list.name);
 // Freeze the actual server selling prices alongside the audited publication payload.
 // Unknown server calculations stay unknown rather than becoming guessed prices.
 export function liveLocalLinePriceComparison(remote, payload) {
@@ -11,6 +12,8 @@ export function liveLocalLinePriceComparison(remote, payload) {
       const currentCents = amount == null || !Number.isFinite(Number(amount)) ? null : Math.round(Number(amount) * 100);
       const localCents = entry.calculated_value == null ? null : Math.round(Number(entry.calculated_value) * 100);
       return { destination: "Local Line", label: `${pkg.name || current?.name || `Package ${pkg.id}`} · basket ${entry.price_list}`,
+        packageName: pkg.name || current?.name || `Package ${pkg.id}`,
+        listName: ACTIVE_LOCAL_LINE_BASKETS.find(list => Number(process.env[list.env]) === Number(entry.price_list))?.name || null,
         remotePackageId: Number(pkg.id), remoteListId: Number(entry.price_list),
         currentCents, localCents, status: currentCents == null || localCents == null ? "needs-check" : currentCents === localCents ? "matches" : "different" };
     });

@@ -14,3 +14,34 @@
 .enterprise-review-page .review-pagination { font-size: 12px; margin: 4px 0; }
 .review-sales { margin-top: 4px; font-size: 13px; }
 .review-sales > summary { cursor: pointer; font-weight: 600; }
+.review-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
+.review-heading [role="tablist"] { display: flex; gap: 4px; }
+.enterprise-review-page .review-filters { gap: 6px; margin-bottom: 6px; }
+.enterprise-review-page .review-filters select.input { width: auto; max-width: 220px; }
+.review-message { margin: 4px 0; font-size: 13px; }
+.review-product-table { width: 100%; font-size: 13px; }
+.review-product-table th, .review-product-table td { text-align: left; vertical-align: middle; }
+.review-product-table td { white-space: nowrap; }
+.review-product-table td:nth-child(2) { min-width: 180px; max-width: 270px; white-space: normal; }
+.review-product-table .product-identity-copy > strong { -webkit-line-clamp: 1; }
+.review-product-table td:last-child { max-width: 300px; }
+.review-warning { display: block; overflow: hidden; text-overflow: ellipsis; max-width: 300px; color: #8c4807; font-size: 11px; }
+.review-status { border: 0; background: transparent; color: #875000; text-decoration: underline; padding: 0; font: inherit; cursor: pointer; }
+.review-status.synced { color: #26703b; }
+.review-status.attention { color: #a34b00; }
+.review-status.publishing, .review-status.checking { color: #285f88; }
+.review-detail-overlay { position: fixed; inset: 0; background: #0006; z-index: 1000; display: grid; place-items: center; padding: 16px; }
+.review-detail-dialog { background: var(--paper, white); color: var(--ink, #222); border-radius: 10px; padding: 16px; width: min(1000px, 100%); max-height: 90vh; overflow: auto; box-sizing: border-box; }
+.review-detail-dialog h3 { margin: 0; }
+.review-detail-dialog .admin-table { width: 100%; }
+@media (max-width: 600px) { .review-heading { flex-wrap: wrap; } .review-detail-overlay { padding: 6px; } }
+
+.product-connection-progress { border: 1px solid #b9cdbc; border-radius: 10px; background: #f0f6f1; padding: 12px 16px; margin: 12px 0; }
+.product-connection-progress p { margin: 6px 0; }
+.product-connection-progress progress { display: block; width: 100%; margin: 10px 0; accent-color: #326944; }
+.product-connection-progress ul { padding-left: 20px; margin: 8px 0; }
+.product-connection-progress li { margin: 5px 0; }
+
+.sync-basket-label { display: block; font-weight: normal; color: #59645d; }
+.sync-technical-details { margin-top: 10px; }
+.sync-technical-details > summary { font-size: 12px; color: #59645d; cursor: pointer; }

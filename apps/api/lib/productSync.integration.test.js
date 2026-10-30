@@ -316,7 +316,7 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
   assert.equal((await waitForRelease(approval.id)).status,"completed");
   assert.equal((await waitForRelease(nextApproval.id)).status,"completed");
   assert.equal(requests.filter(row=>row.path.endsWith('/products/1120/')&&row.method==='PATCH').length,1,"Retries and status polling never resend the confirmed Local Line change");
-  const {saveInventoryToLocalLine}=await import('./inventorySync.js');
+  const {refreshFullFarmInventory,saveInventoryToLocalLine}=await import('./inventorySync.js');
   const inventoryUser = { userId: 1, adminRoles: ["inventory_admin"] };
   await product(130);
   await pool.query("UPDATE product_pricing_profiles SET remote_sync_status='synced', updated_at='2026-01-01', remote_synced_at='2026-01-02' WHERE product_id=130");
@@ -350,6 +350,14 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
   assert.equal(Number(farmAfterRelease.stock_on_farm_lbs), 18.5, 'Pricing releases preserve the physical farm count');
   assert.equal(remoteProducts.get(1130).inventory,7,"Product Sync must not overwrite inventory");
   assert.equal(remoteProducts.get(1130).visible,false,"An unrelated pricing release must not overwrite visibility");
+  remoteProducts.get(1130).inventory=3;
+  const beforeConflict=requests.filter(r=>r.method==='PATCH').length;
+  await assert.rejects(saveInventoryToLocalLine(130,{inventory:8},inventoryUser,{inventory:7,trackInventory:true}),e=>e.status===409&&e.inventoryConflict.inventory===3);
+  assert.equal(requests.filter(r=>r.method==='PATCH').length,beforeConflict,'stale stock never sends a PATCH');
+  assert.equal((await pool.query('SELECT inventory FROM products WHERE id=130'))[0][0].inventory,3);
+  remoteProducts.get(1130).inventory=2;
+  const fresh=await refreshFullFarmInventory([130]);assert.equal(fresh.rows[0].inventory,2);
+  assert.equal(requests.filter(r=>r.method==='PATCH').length,beforeConflict,'refresh only reads the channel');
   await pool.query("UPDATE product_pricing_profiles SET remote_sync_status='pending' WHERE product_id=130");
   await saveInventoryToLocalLine(130,{inventory:6},inventoryUser);
   await saveInventoryToLocalLine(130,{visible:1},inventoryUser);
@@ -547,6 +555,20 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
     assert.equal(result.status,'completed',JSON.stringify(result.actions.map(a=>({status:a.status,message:a.message}))));
     const [[confirmed]]=await pool.query("SELECT final_price_cache FROM local_line_price_list_entries WHERE product_id=960");assert.equal(Number(confirmed.final_price_cache),9);
     const [publications]=await pool.query("SELECT status FROM enterprise_pricing_publications WHERE revision_id=?",[revisionId]);assert.equal(publications.length,2);assert(publications.every(p=>p.status==='verified'));
+    // Pricing's duplicate entry point retains the model, with independent stock and approval.
+    await pool.query("UPDATE enterprise_pricing_revisions SET input_json=?,output_json=? WHERE id=?",[JSON.stringify({...input,purchaseCosts:[],wholesale:[],markupCategory:'shelfStable',saleBp:0}),JSON.stringify({...output,wholesale:[],saleBp:0}),revisionId]);
+    const duplicate=await saveRoute('post','/products/:id/duplicate',{id:960},{forPricing:true});
+    assert.equal(duplicate.statusCode,200,JSON.stringify(duplicate.body));
+    const duplicateId=duplicate.body.productId;
+    const [[copied]]=await pool.query('SELECT * FROM products WHERE id=?',[duplicateId]);
+    assert.equal(Number(copied.inventory),0);assert.equal(Number(copied.visible),0);assert.equal(copied.stock_on_farm,null);
+    const [[newRevision]]=await pool.query('SELECT * FROM enterprise_pricing_revisions WHERE product_id=?',[duplicateId]);
+    assert.equal(newRevision.status,'pending');assert.equal(newRevision.approver_id,null);
+    const copiedInput=JSON.parse(newRevision.input_json),copiedOutput=JSON.parse(newRevision.output_json);
+    assert.equal(copiedInput.markupCategory,'shelfStable');assert.notEqual(copiedInput.packages[0].packageId,9600);
+    assert.equal(copiedOutput.squareUnitCents,1000);
+    assert.equal((await pool.query('SELECT COUNT(*) n FROM square_variation_links WHERE product_id=?',[duplicateId]))[0][0].n,0);
+    assert.equal((await pool.query('SELECT COUNT(*) n FROM enterprise_pricing_publications WHERE revision_id=?',[newRevision.id]))[0][0].n,0);
     await pool.query("UPDATE enterprise_pricing_revisions SET status='local-preview' WHERE id=?",[revisionId]);
     await assert.rejects(service.createProductSyncAudit({platforms:['localline','square'],productIds:[960],enterpriseRevisionId:revisionId},user),/no longer approved/);
   });

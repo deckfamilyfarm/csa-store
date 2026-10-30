@@ -63,3 +63,112 @@ The preset defaults are Highly perishable 100%, Perishable 65%, Shelf stable 50%
 `node scripts/local-pricing/applyMarkupPresets.mjs` previews the requested local assignments. Add `--apply` to activate a new local settings version and save local pricing revisions. The script uses only the selected Docker database, blocks external connections, and records before/after values and results under `.local-pricing/markup-presets-*.json`. It assigns eligible Deck/Hyland products first, then products whose configured markup is 43–48% inclusive to Shelf stable. Deposits and membership products are excluded and verified unchanged. Fixed retail overrides remain intact.
 
 Products lacking complete pricing inputs retain their category in `enterprise_pricing_markup_assignments`; no costs or units are invented. The editor loads that category, and a successful pricing save consumes the pending assignment in the same transaction. These assignments and schema changes do not authorize external publication. Restart `npm run dev` after updating backend code.
+
+### Local UI and API connected to the production database
+
+Run `npm run dev:connected` and open `http://127.0.0.1:5180/admin`. Both development commands watch backend imports and restart the API after code changes. Processes started before watch mode was added need one manual restart; refreshing the browser alone does not reload an older API.
+This deliberately uses the database, Timesheets login, and integration credentials
+in the root `.env`. Saved product edits affect the production database. Sign in
+with your normal server account. Review & Publish still requires explicit approval
+and publication; starting this command does not run a catalog sync or seed users.
+The API binds to loopback on port 5181; both processes stop with Ctrl-C.
+`npm run dev` continues to use the isolated Docker database on ports 5176/5177.
+
+Review & Publish → Products shows all current pricing revisions, with search,
+vendor/status filters, and a checkbox selecting all matching rows. Changing a
+filter clears selection. **Approve & check selected** approves saved inputs and
+checks applicable channels without publishing. Review the prices and open a
+product for the full package/basket comparison and saved warnings, then use
+**Publish selected** to submit only ready, selected products. Blocked products are
+skipped. Each product retains its coordinated channel approval and durable release
+receipt. Failed publications offer a retry of that receipt; refreshing the page
+recovers saved audit warnings and publication progress. Bundles and Sales retain
+their separate review controls in tabs.
+
+### Retired CSA Members price list
+
+CSA Members (Local Line list 2718) is no longer an active pricing destination.
+Regular pricing, promotions, bundles, new product mappings, comparisons, and
+migration previews use Guest Basket, Herd Share Members, and SNAP. Missing one
+of those three still blocks publication. Old frozen product approvals require a
+fresh check; previously reviewed bundle publications also detect the list change.
+The old environment ID remains available to identify and reject retired payloads.
+Historical list entries and prices are retained; cache refreshes keep the list inactive.
+
+The idempotent database retirement is:
+`node --env-file=.env apps/api/scripts/retireCsaMembersPriceList.js --apply --backup=PRIVATE_PATH.json`
+Without `--apply`, it previews the affected list. The backup path must be new.
+This updates only the local/server database's `price_lists.active` flag, never the
+remote list, memberships, or published prices. Deploy the corresponding code to
+every running publisher before treating retirement as active across all servers.
+
+### Creating products in Pricing
+
+Store → Pricing → Products → **Add product** uses the same metadata, pricing,
+package, and wholesale controls as the product editor. Select an explicit pricing
+unit (each or lb) for any vendor; a fixed 12 oz package sold each has quantity 1.
+Vendor selection suggests the configured Square eligibility and markup preset.
+Deposits and Membership stay in their existing workflows.
+
+`POST /api/admin/enterprise-pricing/products/preview` validates the draft with the
+shared pricing engine. `POST /api/admin/enterprise-pricing/products` requires its
+preview hash and a creation key. One transaction saves the hidden product,
+packages, active local pricing revision, cost/wholesale history, and retry receipt.
+Stock starts at zero, tracking is off, and on-farm status/pounds remain unknown.
+No Local Line or Square requests run during creation. Pricing editors can create;
+publish-only users cannot. Channel approval remains a separate action.
+
+Photos upload after product creation and can be retried without creating another
+product. The existing product editor also supports photo uploads and removal.
+Image uploads require the existing Spaces configuration; photo storage is not
+part of the catalog/pricing database transaction. An uncertain creation request
+is retained in the browser tab for retry with its original key and frozen values.
+
+Regression coverage: the new-product subtest in
+`apps/api/lib/enterprisePricing.integration.test.js` uses the disposable
+`PRODUCT_SYNC_TEST_SOCKET` database convention and mocks all channel requests.
+
+### Inline product sales
+
+Pricing has an All / On sale / Not on sale filter and a `set` control immediately
+before FF Package Price. Enter a percentage (0–99.99), then Enter, Tab, or leave
+the field to save locally. Zero or blank removes it; Escape cancels. Sales run
+until turned off and apply to all packages and eligible channels. Review & Publish
+→ Sales approves and publishes changes; local saves make no channel requests.
+Square uses managed automatic discounts and keeps its normal catalog prices.
+
+The additive `enterprise_product_sales` table holds versioned desired local sales;
+`enterprise_promotions` retains immutable approved payloads and publication receipts.
+Existing explicit product sale flags/percentages remain visible until edited. An
+explicit product sale-off flag wins over obsolete formula-profile sale defaults.
+Editing adopts the versioned model and records prior legacy fields in the sale event.
+Scheduled, partial-package, or channel-specific promotions require detailed review.
+Regular channel pricing and Square locations must be verified before sale approval.
+Bundle publication waits for component sale publication to finish.
+
+`node --env-file=.env apps/api/scripts/clearInactiveSaleDiscounts.js` previews
+inactive local discount cleanup. Add `--apply` to clear only rows with both local
+sale flags off and no pending/active promotion. Original values are saved under
+`.local-pricing/sale-cleanup/`; channel caches and remote catalogs are untouched.
+
+### Package-specific Buy Prices
+
+Each/package products can store a `packageBuyPrice` (two decimal places) on each
+pricing input package, bound to `packageBuyPriceEnterpriseId`. This is the total
+cost of that package, not a per-item cost to multiply by quantity. Blank inherits
+the default Buy Price × quantity. Per-pound products continue to use unit cost
+and reviewed weights. Product retail overrides still take precedence.
+
+Package costs are retained in immutable pricing revisions and survive markup
+changes, creation, duplication, and settings recalculation. The Pricing table
+shows these costs by package; Product → Packages edits them. Square-enabled each
+packages round their own calculated retail prices before the FF discount. Changing
+purchasing enterprises requires reviewing or clearing the bound package costs.
+
+Migration now preserves differing each-package costs. The controlled repair for
+the seven previously flattened products is `apps/api/scripts/repairPackageBuyPrices.js`:
+preview using `node --env-file=.env apps/api/scripts/repairPackageBuyPrices.js`, then
+add `--apply` to apply that frozen plan. It writes local pending revisions only,
+checks concurrent edits and in-flight publication, and keeps original records in
+the private plan file. Deploy the updated pricing code before editing these costs
+through an older deployed server, whose normalizer does not support the new fields.

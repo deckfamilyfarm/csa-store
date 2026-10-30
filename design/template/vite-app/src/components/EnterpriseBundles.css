@@ -1,7 +1,7 @@
 .pricing-type-tabs{display:flex;align-items:center;gap:8px;margin:0 0 5px;padding:0 12px}
 .pricing-type-tabs h2{font-size:20px;margin:0 12px 0 0}
-.pricing-type-tabs button{border:0;border-bottom:3px solid transparent;background:none;padding:6px 14px;color:#385b43;cursor:pointer}
-.pricing-type-tabs button[aria-selected=true]{border-bottom-color:#366647;font-weight:700;background:#eef5ef}
+.pricing-type-tabs button[role=tab]{border:0;border-bottom:3px solid transparent;background:none;padding:6px 14px;color:#385b43;cursor:pointer}
+.pricing-type-tabs button[role=tab][aria-selected=true]{border-bottom-color:#366647;font-weight:700;background:#eef5ef}
 .bundle-filters{gap:10px;margin-bottom:10px;align-items:center}.bundle-filters .input{width:auto;max-width:300px}
 .bundle-table-scroll{height:var(--rows-height,65vh);overflow:auto}.bundle-table-scroll thead th{position:sticky;top:0;z-index:1;background:#eef3ed}
 .bundle-review .bundle-table-scroll{height:auto;max-height:360px}.bundle-review{margin:8px 0 20px}

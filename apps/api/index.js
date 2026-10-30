@@ -117,6 +117,8 @@ const onListening = () => {
 
 if (process.env.CSA_LOCAL_ONLY === "true") {
   app.listen(port, "127.0.0.1", onListening);
+} else if (process.env.API_BIND_HOST) {
+  app.listen(port, process.env.API_BIND_HOST, onListening);
 } else {
   app.listen(port, onListening);
 }

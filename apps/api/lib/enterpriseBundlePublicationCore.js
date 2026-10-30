@@ -1,3 +1,4 @@
+import { validateActiveLocalLinePriceListIds } from "./localLinePricingLists.js";
 import {digest} from './pricingCutover.js';
 import {scaledInteger} from './enterprisePricingEngine.js';
 const fail=message=>{throw Object.assign(new Error(message),{status:409});};
@@ -22,7 +23,7 @@ export function bundleRemoteState(remote) {
 export function prepareBundlePatch(bundle,remote,listIds,remoteVendor,components) {
   if(bundle.output.blockers.length)fail(bundle.output.blockers.join(' '));
   if(remote.is_deleted||remote.has_swaps||remote.ownership!=='MANAGED')fail('Deleted, shared or swappable bundles require manual review.');
-  if(listIds.length!==4||new Set(listIds).size!==4||listIds.some(id=>!Number.isSafeInteger(id)||id<=0))fail('Configure four distinct Local Line baskets.');
+  validateActiveLocalLinePriceListIds(listIds);
   if(remote.box_contents?.length!==1)fail('This bundle has an unsupported contents layout.');
   const mode=remote.track_inventory?remote.inventory_type==='dynamic'?'components':'separate':'untracked';
   if(bundle.input.inventoryMode!==mode)fail('Inventory mode changes require a separate inventory review.');
@@ -59,9 +60,9 @@ export function componentPriceCents(pkg,entry,promotion=null){
       promotion.saleCents<0||promotion.saleCents>=promotion.regularCents||
       entry.strikethrough_display_value==null||scaledInteger(entry.strikethrough_display_value,2)!==promotion.regularCents||
       !entry.adjustment||Number(entry.adjustment_type)!==3||scaledInteger(entry.adjustment_value,2)!==promotion.saleCents)
-      fail('Verify the managed component sale and its regular price in all four baskets.');
+      fail('Verify the managed component sale and its regular price in all three active baskets.');
   }
   if(entry?.calculated_value!=null)return scaledInteger(entry.calculated_value,2);
   if(entry?.adjustment&&Number(entry.adjustment_type)===3)return scaledInteger(entry.adjustment_value,2);
-  fail(`Verify the current selling price of component package ${pkg.id} in all four baskets.`);
+  fail(`Verify the current selling price of component package ${pkg.id} in all three active baskets.`);
 }

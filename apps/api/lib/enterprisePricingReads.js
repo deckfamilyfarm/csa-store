@@ -1,3 +1,4 @@
+import { readProductSales, effectiveProductSale, applySaleOutput } from "./enterpriseProductSales.js";
 import { promotionIsActive } from './enterprisePromotionsCore.js';
 import {roundRatio} from './enterprisePricingEngine.js';
 const parse=value=>typeof value==='string'?JSON.parse(value):value;
@@ -19,6 +20,13 @@ export async function readSavedEnterprisePricing(connection, productIds=null, no
       if(input.channels.includes('localline')&&row.localLineStatus==='active'&&sale)pkg.localLineSaleCents=sale.saleCents;
       if(input.channels.includes('square')&&row.squareStatus==='verified'&&pkg.squareVariationCents!=null)pkg.squareSaleCents=roundRatio(BigInt(pkg.squareVariationCents)*BigInt(10000-input.discountBp),10000n);
     }
+  }
+  const states = await readProductSales(connection, [...result.keys()]);
+  for (const [id, price] of result) if(states.has(id)) {
+    const state=states.get(id);
+    if(state.inherited && sales.some(row=>parse(row.inputJson)?.packageIds?.some(id=>price.output.packages.some(p=>p.packageId===id)))) continue;
+    const sale={active:Number(state.discount_bp)>0, discountBp:Number(state.discount_bp), channels:price.input.squareEnabled?['localline','square']:['localline']};
+    price.output=applySaleOutput(price.output,sale);
   }
   return result;
 }

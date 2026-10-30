@@ -1,3 +1,7 @@
+import { readProductSales, effectiveProductSale, applySaleOutput } from "./enterpriseProductSales.js";
+import { isRetiredLocalLineList } from "./localLinePricingLists.js";
+import { readEnterpriseReviewChecks } from "./enterprisePricingReview.js";
+import { ensureProductSyncSchema } from "./productSyncSchema.js";
 import { getPool } from "../db.js";
 import { calculateEnterprisePricing, scaledInteger, roundRatio, DEFAULT_PRICING_SETTINGS } from "./enterprisePricingEngine.js";
 import { ensureEnterprisePricingSchema } from "./enterprisePricingSchema.js";
@@ -181,14 +185,14 @@ function revisionView(row) {
   };
 }
 
-export async function listEnterprisePricingProducts({ search = "", vendorId = null, status = "", syncStatus = "", pricingUnit = "", markupCategory = "", square = "", sort = "name", sortDirection = "asc", limit = 100, offset = 0 } = {}) {
+export async function listEnterprisePricingProducts({ search = "", vendorId = null, status = "", syncStatus = "", sale = "", visibility = "", pricingUnit = "", markupCategory = "", square = "", sort = "name", sortDirection = "asc", limit = 100, offset = 0 } = {}) {
   // Compare the entire filtered catalog before paging, using the same status rules as the badges.
-  if (["inputs", "synced", "localline", "square"].includes(syncStatus)) {
+  if (["inputs", "synced", "localline", "square"].includes(syncStatus) || ["on", "off"].includes(sale)) {
     const matching = []; let first;
     for (let cursor = 0; ; cursor += 250) {
-      const batch = await listEnterprisePricingProducts({ search, vendorId, pricingUnit, markupCategory, square, sort, sortDirection, limit: 250, offset: cursor });
+      const batch = await listEnterprisePricingProducts({ search, vendorId, visibility, pricingUnit, markupCategory, square, sort, sortDirection, limit: 250, offset: cursor });
       first ||= batch;
-      matching.push(...batch.rows.filter(row => matchesPricingSyncFilter(row, syncStatus)));
+      matching.push(...batch.rows.filter(row => matchesPricingSyncFilter(row, syncStatus) && (!sale || (sale === "on" ? row.sale?.active : !row.sale?.active))));
       if (cursor + batch.rows.length >= batch.total || !batch.rows.length) break;
     }
     const size = Math.min(250, Math.max(1, Number(limit) || 100)), start = Math.max(0, Number(offset) || 0);
@@ -203,6 +207,7 @@ export async function listEnterprisePricingProducts({ search = "", vendorId = nu
   if (["lb", "each"].includes(pricingUnit)) { where.push("JSON_UNQUOTE(JSON_EXTRACT(r.input_json, '$.pricingUnit'))=?"); params.push(pricingUnit); }
   if (["highlyPerishable", "perishable", "shelfStable", "deckHyland", "creamyCow", "custom"].includes(markupCategory)) { where.push("COALESCE(JSON_UNQUOTE(JSON_EXTRACT(r.input_json, '$.markupCategory')), ma.markup_category)=?"); params.push(markupCategory); }
   if (["enabled", "disabled"].includes(square)) where.push(`COALESCE(JSON_UNQUOTE(JSON_EXTRACT(r.input_json, '$.squareEnabled')), 'false')='${square === "enabled" ? "true" : "false"}'`);
+  if (["visible", "hidden"].includes(visibility)) { where.push("COALESCE(p.visible,0)=?"); params.push(visibility === "visible" ? 1 : 0); }
   if (status === "unresolved") where.push("s.latest_revision_id IS NULL");
   else if (["pending", "approved", "active", "rejected", "partial", "local-preview"].includes(status)) { where.push("r.status=?"); params.push(status); }
   const from = `FROM products p LEFT JOIN vendors v ON v.id=p.vendor_id LEFT JOIN categories c ON c.id=p.category_id
@@ -228,6 +233,8 @@ export async function listEnterprisePricingProducts({ search = "", vendorId = nu
     square: "CAST(JSON_UNQUOTE(JSON_EXTRACT(r.output_json, '$.squareUnitCents')) AS SIGNED)",
     csa: "CAST(JSON_UNQUOTE(JSON_EXTRACT(r.output_json, '$.csaUnitCents')) AS SIGNED)",
     llPackage: "CAST(JSON_UNQUOTE(JSON_EXTRACT(r.output_json, '$.packages[0].localLineRegularCents')) AS SIGNED)",
+    visibility: "COALESCE(p.visible,0)",
+    inventory: "CASE WHEN p.track_inventory=1 THEN p.inventory ELSE NULL END",
     wholesale: "CAST(JSON_UNQUOTE(JSON_EXTRACT(r.output_json, '$.wholesale[0].priceCents')) AS SIGNED)",
     sale: `(SELECT MIN(ep.status) FROM enterprise_promotions ep JOIN packages sale_pkg ON sale_pkg.product_id=p.id
       WHERE ep.status IN ('approved','scheduled','active','partial','cancelling')
@@ -237,7 +244,7 @@ export async function listEnterprisePricingProducts({ search = "", vendorId = nu
   const order = `${sortExpression} ${sortDirection === "desc" ? "DESC" : "ASC"}, p.name ASC, p.id ASC`;
   const safeLimit = Math.min(250, Math.max(1, Number(limit) || 100));
   const safeOffset = Math.max(0, Number(offset) || 0);
-  const [rows] = await getPool().query(`SELECT p.id, p.name, p.thumbnail_url AS thumbnailUrl, v.name AS vendorName, p.vendor_id AS vendorId,
+  const [rows] = await getPool().query(`SELECT p.id, p.name, p.visible AS ffVisible, p.inventory AS ffInventory, p.track_inventory AS ffTrackInventory, p.thumbnail_url AS thumbnailUrl, v.name AS vendorName, p.vendor_id AS vendorId,
     pp.unit_of_measure AS legacyPricingUnit, pp.source_unit_price AS legacyRetailUnitPrice, ma.markup_category AS assignedMarkupCategory,
     bp.price AS buyPrice, bp.revision AS buyPriceRevision, bp.purchasing_enterprise_id AS buyPriceEnterpriseId,
     s.latest_revision_id AS latestRevisionId, s.active_revision_id AS activeRevisionId,
@@ -278,13 +285,13 @@ export async function listEnterprisePricingProducts({ search = "", vendorId = nu
     if (!publicationsByRevision.has(revisionId)) publicationsByRevision.set(revisionId, []);
     publicationsByRevision.get(revisionId).push({ platform: publication.platform, status: publication.status });
   }
-  const [saleRows] = productIds.length ? await getPool().query("SELECT status, input_json AS inputJson, output_json AS outputJson, square_status AS squareStatus, localline_status AS localLineStatus FROM enterprise_promotions WHERE status IN ('pending','approved','scheduled','active','partial','cancelling')") : [[]];
+  const [saleRows] = productIds.length ? await getPool().query("SELECT id, status, input_json AS inputJson, output_json AS outputJson, square_status AS squareStatus, localline_status AS localLineStatus FROM enterprise_promotions WHERE status IN ('pending','approved','scheduled','active','partial','cancelling')") : [[]];
   const promotionsByProduct = new Map();
   for (const sale of saleRows) {
     const input = parse(sale.inputJson), output = parse(sale.outputJson);
     for (const productId of new Set((input?.packageIds || []).map(id => packageProducts.get(Number(id))).filter(Boolean))) {
       if (!promotionsByProduct.has(productId)) promotionsByProduct.set(productId, []);
-      promotionsByProduct.get(productId).push({ status: sale.status, squareStatus: sale.squareStatus, localLineStatus: sale.localLineStatus, input, output });
+      promotionsByProduct.get(productId).push({ id: Number(sale.id), status: sale.status, squareStatus: sale.squareStatus, localLineStatus: sale.localLineStatus, input, output });
     }
   }
   const channelRecords = await readPricingChannelRecords(getPool(), productIds);
@@ -293,25 +300,29 @@ export async function listEnterprisePricingProducts({ search = "", vendorId = nu
     const productId = packageProducts.get(Number(packageId));
     if (productId && (!saleByProduct.has(productId) || sale.status < saleByProduct.get(productId))) saleByProduct.set(productId, sale.status);
   }
+  const saleStates = await readProductSales(getPool(), productIds);
   const pricingSettings = await getPricingSettings();
   return { rows: rows.map(row => {
     const input = parse(row.inputJson), output = parse(row.outputJson);
     const record = channelRecords.get(Number(row.id));
+    const desiredSale=saleStates.get(Number(row.id));
+    const relatedSales=promotionsByProduct.get(Number(row.id)) || [];
+    const sale = effectiveProductSale(row.id, output?.packages || [], desiredSale?.inherited && relatedSales.length ? null : desiredSale, relatedSales, Date.now(), input?.squareEnabled===true);
     const publications = publicationsByRevision.get(Number(row.latestRevisionId)) || [];
     const fixedDeposit = !output && isNoMarkupProduct(row) ? { input: { squareEnabled: false, pricingUnit: "each" },
       output: { packages: (record?.packages || []).map(pkg => ({ packageId: Number(pkg.id), localLineRegularCents: pkg.price == null ? null : Math.round(Number(pkg.price) * 100) })) } } : null;
     return ({
-    id: Number(row.id), type: 'product', name: row.name, thumbnailUrl: row.thumbnailUrl || null, vendorId: row.vendorId, vendorName: row.vendorName,
+    id: Number(row.id), type: 'product', name: row.name, ffVisible: Boolean(Number(row.ffVisible)), ffInventory: row.ffInventory == null ? null : Number(row.ffInventory), ffTrackInventory: Boolean(Number(row.ffTrackInventory)), thumbnailUrl: row.thumbnailUrl || null, vendorId: row.vendorId, vendorName: row.vendorName,
     markupAssignment: row.assignedMarkupCategory ? { category: row.assignedMarkupCategory, markupBp: pricingSettings.markupBp[row.assignedMarkupCategory] } : null,
     status: row.status || "unresolved", latestRevisionId: row.latestRevisionId, activeRevisionId: row.activeRevisionId,
     editorId: row.editorId, approverId: row.approverId, editorName: row.editorName, approverName: row.approverName,
     saleStatus: saleByProduct.get(Number(row.id)) || null,
-    approvedSquareLinks: Number(row.approvedSquareLinks), input: parse(row.inputJson), output: parse(row.outputJson),
+    approvedSquareLinks: Number(row.approvedSquareLinks), input: parse(row.inputJson), output: applySaleOutput(output, sale), sale,
     buyPrice: row.buyPrice == null ? null : { cents: Math.round(Number(row.buyPrice) * 100),
       revision: Number(row.buyPriceRevision), enterpriseId: Number(row.buyPriceEnterpriseId) },
     publications, fixedDeposit: Boolean(fixedDeposit),
     sync: pricingSyncStatus({ input: fixedDeposit?.input || input, output: fixedDeposit?.output || output,
-      publications, promotions: promotionsByProduct.get(Number(row.id)) || [], localOnly: process.env.CSA_LOCAL_ONLY === "true" }, record),
+      publications, promotions: promotionsByProduct.get(Number(row.id)) || [], desiredSale: saleStates.has(Number(row.id)) ? sale : null, localOnly: process.env.CSA_LOCAL_ONLY === "true" }, record),
     sourceEvidence: sampleEvidence.get(Number(row.id)) || null,
     legacy: { pricingUnit: row.legacyPricingUnit === "lbs" ? "lb" : row.legacyPricingUnit || null,
       retailUnitPrice: row.legacyRetailUnitPrice,
@@ -461,7 +472,7 @@ function priceAt(costs, enterpriseId, at) {
     .sort((a, b) => b.effectiveAt.localeCompare(a.effectiveAt))[0] || null;
 }
 
-function normalizeInput(input, product, packageRows, enterprises, settings) {
+export function normalizeInput(input, product, packageRows, enterprises, settings) {
   if (!input || typeof input !== "object" || Array.isArray(input)) failure("Pricing inputs are required.");
   if (String(product.categoryName || "").toLowerCase() === "membership" || /deposit/i.test(product.name)) failure("Membership and deposit pricing remain in the existing workflow until their replacement rules are reviewed.");
   const enterpriseIds = new Set(enterprises.map(row => Number(row.id)));
@@ -486,7 +497,12 @@ function normalizeInput(input, product, packageRows, enterprises, settings) {
     const packageId = id(row.packageId, "Package ID");
     if (!required.has(packageId) || seen.has(packageId)) failure("Package list changed or contains duplicates. Refresh and review it.");
     seen.add(packageId);
+    const hasPackageCost=row.packageBuyPrice!==null && row.packageBuyPrice!==undefined && row.packageBuyPrice!=='';
+    if(hasPackageCost && row.packageBuyPriceEnterpriseId!=null && Number(row.packageBuyPriceEnterpriseId)!==retailEnterpriseId) failure('Package Buy Prices belong to another purchasing enterprise. Review or clear them before changing enterprises.');
+    const packageCost=hasPackageCost?scaledInteger(row.packageBuyPrice,2,'Package Buy Price'):null;
+    if(packageCost!==null && packageCost<=0) failure('Package Buy Price must be greater than zero.');
     return { packageId, quantity: row.quantity ?? 1,
+      ...(hasPackageCost?{packageBuyPrice:(packageCost/100).toFixed(2),packageBuyPriceEnterpriseId:retailEnterpriseId}:{}),
       minWeight: row.minWeight || null, maxWeight: row.maxWeight || null,
       avgWeightOverride: row.avgWeightOverride || null, cachedWeight: row.cachedWeight || null };
   });
@@ -557,6 +573,16 @@ export async function saveEnterprisePricingDraft(productId, input, expectedLates
     if (expectedBuyPriceRevision !== null && Number(buyDraft[0]?.revision || 0) !== Number(expectedBuyPriceRevision)) {
       failure("Buy Price changed since you opened this proposal. Refresh and review.", 409);
     }
+    const { revisionId } = await persistEnterprisePricingRevision(connection, productId, preview, user, Number(buyDraft[0]?.revision || 0));
+    await connection.commit();
+    return { revisionId, status, ...preview };
+  } catch (error) { await connection.rollback(); throw error; }
+  finally { connection.release(); }
+}
+
+// Caller owns the transaction; creation and edits share the same pricing history writes.
+export async function persistEnterprisePricingRevision(connection, productId, preview, user, buyDraftRevision = 0) {
+  const status = process.env.CSA_LOCAL_ONLY === "true" ? "local-preview" : "pending";
     const retailCost = priceAt(preview.input.purchaseCosts, preview.input.retailEnterpriseId, preview.input.priceEffectiveAt);
     await connection.query(`INSERT INTO enterprise_pricing_buy_price_drafts
       (product_id,purchasing_enterprise_id,price,revision,edited_by,updated_at)
@@ -564,7 +590,7 @@ export async function saveEnterprisePricingDraft(productId, input, expectedLates
       ON DUPLICATE KEY UPDATE purchasing_enterprise_id=VALUES(purchasing_enterprise_id),
         price=VALUES(price), revision=revision+1, edited_by=VALUES(edited_by), updated_at=VALUES(updated_at)`,
     [productId, preview.input.retailEnterpriseId, retailCost.cost,
-      Number(buyDraft[0]?.revision || 0) + 1, actorId(user)]);
+      Number(buyDraftRevision) + 1, actorId(user)]);
     const [result] = await connection.query(`INSERT INTO enterprise_pricing_revisions
       (product_id, settings_version_id, status, input_json, output_json, editor_id, created_at)
       VALUES (?, ?, ?, ?, ?, ?, UTC_TIMESTAMP())`,
@@ -583,10 +609,7 @@ export async function saveEnterprisePricingDraft(productId, input, expectedLates
       (product_id,selling_enterprise_id,mode,price_cents,markup_bp,cost_enterprise_id,revision_id,recorded_at)
       VALUES (?,?,?,?,?,?,?,UTC_TIMESTAMP())`, [productId,row.sellingEnterpriseId,row.mode,row.priceCents,row.markupBp ?? null,row.costEnterpriseId ?? null,revisionId]);
     await connection.query("DELETE FROM enterprise_pricing_markup_assignments WHERE product_id=?", [productId]);
-    await connection.commit();
-    return { revisionId, status, ...preview };
-  } catch (error) { await connection.rollback(); throw error; }
-  finally { connection.release(); }
+  return { revisionId, status };
 }
 
 export async function approveEnterprisePricingRevision(revisionId, user) {
@@ -624,7 +647,7 @@ export async function approveEnterprisePricingRevision(revisionId, user) {
       FROM products p LEFT JOIN product_sales ps ON ps.product_id=p.id
       LEFT JOIN product_pricing_profiles pp ON pp.product_id=p.id WHERE p.id=?`, [revision.productId]);
     if (Number(legacySales[0]?.onSale)) failure("This product has an active legacy sale. Reconcile its promotion before migrating the regular price.", 409);
-    if (legacySales[0]?.customerOverrides && (parse(legacySales[0].customerOverrides)?.length || 0) > 0) failure("This product has basket-specific price overrides. Review and reconcile them before using one price for all four baskets.", 409);
+    if (legacySales[0]?.customerOverrides && (parse(legacySales[0].customerOverrides) || []).some(row => !isRetiredLocalLineList(row.priceListId))) failure("This product has basket-specific price overrides. Review and reconcile them before using one price for all three active baskets.", 409);
     const packageRows = await packagesFor(revision.productId, connection);
     if (packageRows.length !== revision.input.packages.length || packageRows.some(row => !revision.input.packages.some(pkg => pkg.packageId === Number(row.packageId)))) failure("Packages changed. Recalculate and review pricing.", 409);
     const [promotions] = await connection.query("SELECT id, input_json AS inputJson FROM enterprise_promotions WHERE status IN ('approved','scheduled','active','partial','cancelling') FOR UPDATE");
@@ -722,15 +745,19 @@ export async function listEnterprisePricingReview({ productId = null } = {}) {
     s.active_revision_id AS activeRevisionId FROM enterprise_pricing_revisions r
     JOIN enterprise_pricing_product_state s ON s.latest_revision_id=r.id
     JOIN products p ON p.id=r.product_id LEFT JOIN vendors v ON v.id=p.vendor_id
-    WHERE COALESCE(p.is_deleted,0)=0 AND r.status IN ('pending','approved','partial','local-preview'${productId ? ",'active'" : ""})
+    WHERE COALESCE(p.is_deleted,0)=0 AND r.status IN ('pending','approved','partial','local-preview','active')
     AND NOT EXISTS (SELECT 1 FROM enterprise_bundle_legacy_products b WHERE b.product_id=p.id)
     ${productId ? "AND r.product_id=?" : ""}
-    ORDER BY r.created_at DESC, r.id DESC ${localOnly ? "" : "LIMIT 250"}`, productId ? [id(productId, "Product ID")] : []);
-  const catalog = localOnly ? new Map((await readMigrationCatalog(getPool())).map(record => [Number(record.product.id), record])) : new Map();
+    ORDER BY p.name, p.id`, productId ? [id(productId, "Product ID")] : []);
+  const catalog = localOnly ? new Map((await readMigrationCatalog(getPool())).map(record => [Number(record.product.id), record]))
+    : await readPricingChannelRecords(getPool(), rows.map(row => Number(row.product_id)));
+  await ensureProductSyncSchema();
+  const checks = await readEnterpriseReviewChecks(getPool(), rows.map(row => Number(row.id)));
   const ids = rows.map(row => Number(row.id));
   const [publications] = ids.length ? await getPool().query("SELECT revision_id AS revisionId, platform, status, audit_id AS auditId, release_id AS releaseId FROM enterprise_pricing_publications WHERE revision_id IN (?)", [ids]) : [[]];
   return rows.map(row => ({ ...revisionView(row), productName: row.productName, vendorName: row.vendorName,
-    ...(localOnly ? { comparison: compareLocalChannelPrices(revisionView(row), catalog.get(Number(row.product_id))) } : {}),
+    comparison: compareLocalChannelPrices(revisionView(row), catalog.get(Number(row.product_id))),
+    check: checks.get(Number(row.id)) || null,
     activeRevisionId: row.activeRevisionId, publications: publications.filter(item => Number(item.revisionId) === Number(row.id)) }));
 }
 

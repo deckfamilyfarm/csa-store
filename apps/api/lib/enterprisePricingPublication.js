@@ -1,9 +1,11 @@
+import { activeLocalLinePriceListIds, validateActiveLocalLinePriceListIds } from "./localLinePricingLists.js";
 // Convert an already reviewed Local Line update into the enterprise price
 // snapshot. The existing builder still owns vendor, product, package, and list
-// mapping checks; this function only replaces the four selling prices.
-export function applyEnterpriseLocalLinePrices(payload, context, revision) {
+// mapping checks; this function only replaces the three active selling prices.
+export function applyEnterpriseLocalLinePrices(payload, context, revision, listIds = activeLocalLinePriceListIds()) {
   if (!revision || !payload?.packages?.length) throw new Error("A reviewed Local Line payload is required.");
   if (Number(revision.output?.saleBp || 0) > 0) throw new Error("Enterprise sales require the separate promotion publication workflow.");
+  validateActiveLocalLinePriceListIds(listIds);
   const packageByRemoteId = new Map(context.packages.map(pkg => {
     const meta = context.packageMeta.find(row => Number(row.packageId) === Number(pkg.id));
     return [Number(meta?.localLinePackageId || pkg.id), Number(pkg.id)];
@@ -17,8 +19,8 @@ export function applyEnterpriseLocalLinePrices(payload, context, revision) {
       const price = expected.get(localPackageId);
       if (!price || price.localLineRegularCents === null) throw new Error(`Package ${pkg.name || pkg.id} has no approved calculated price.`);
       const entries = pkg.price_list_entries || [];
-      if (entries.length !== 4 || new Set(entries.map(row => Number(row.price_list))).size !== 4) {
-        throw new Error(`Package ${pkg.name || pkg.id} must have all four distinct Local Line baskets before enterprise pricing can publish.`);
+      if (entries.length !== listIds.length || listIds.some(id => entries.filter(row => Number(row.price_list) === id).length !== 1)) {
+        throw new Error(`Package ${pkg.name || pkg.id} must have all three active Local Line baskets (Guest Basket, Herd Share Members, SNAP) before enterprise pricing can publish.`);
       }
       const regular = price.localLineRegularCents / 100;
       return {

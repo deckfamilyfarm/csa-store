@@ -121,11 +121,6 @@ function buildPriceListsFromEnv() {
       markup: parseNumber(process.env.LL_PRICE_LIST_GUEST_MARKUP, defaultGuest)
     },
     {
-      key: "CSA Members",
-      id: parseNumber(process.env.LL_PRICE_LIST_CSA_MEMBERS_ID),
-      markup: parseNumber(process.env.LL_PRICE_LIST_CSA_MEMBERS_MARKUP, defaultMember)
-    },
-    {
       key: "Herd Share Members",
       id: parseNumber(process.env.LL_PRICE_LIST_HERDSHARE_ID),
       markup: parseNumber(process.env.LL_PRICE_LIST_HERDSHARE_MARKUP, defaultMember)

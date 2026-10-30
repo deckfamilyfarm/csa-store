@@ -2,7 +2,7 @@ export const markupCategories = {
   highlyPerishable: "Highly perishable",
   perishable: "Perishable",
   shelfStable: "Shelf stable",
-  deckHyland: "Deck/Hyland Markup",
+  deckHyland: "DFF markup",
   creamyCow: "Creamy Cow Markup",
   custom: "Custom"
 };

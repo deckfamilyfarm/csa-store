@@ -10,7 +10,7 @@ export function BundleSync({id,token,roles,localOnly,dirty,publicationId,onPubli
  async function publish(){if(!window.confirm('Approve and publish these reviewed bundle changes to Local Line?'))return;setBusy(true);setMessage('');try{const r=await adminPost(`enterprise-pricing/bundle-publications/${receipt.id}/publish`,token,{});setReceipt(r);setMessage(r.status==='verified'?'Local Line confirmed the bundle update.':r.status);onPublished?.();}catch(e){setMessage(e.message);try{setReceipt(await adminGet(`enterprise-pricing/bundle-publications/${receipt.id}`,token));}catch{}}finally{setBusy(false);}}
  const snap=receipt?.snapshot;
  return <div>{localOnly?<p className="small">Channel access is disabled in local testing.</p>:<>
-  <p className="small">Sync component prices first. Checking confirms the bundle discount against all four baskets. Inventory changes are reviewed separately.</p>
+  <p className="small">Sync component prices first. Checking confirms the bundle discount against all three active baskets. Inventory changes are reviewed separately.</p>
   {publisher&&grant('localline_pull')&&<button className="button alt" disabled={busy||dirty||['publishing','uncertain'].includes(receipt?.status)} onClick={check}>Check Local Line</button>}
   {snap&&<><p>Review #{receipt.id} · {receipt.status}</p><table className="admin-table"><thead><tr><th>Field</th><th>Channel</th><th>Saved bundle</th></tr></thead><tbody>
    <tr><td>Name</td><td>{snap.before.name}</td><td>{snap.expected.name}</td></tr>

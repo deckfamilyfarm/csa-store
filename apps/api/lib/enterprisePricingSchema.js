@@ -10,6 +10,15 @@ async function bootstrap() {
   await ensureSquareSyncSchema();
   const pool = getPool();
   for (const sql of [
+    `CREATE TABLE IF NOT EXISTS enterprise_product_sales (
+      product_id INT PRIMARY KEY, revision INT NOT NULL DEFAULT 0, discount_bp INT NOT NULL,
+      promotion_id INT NULL, editor_id INT NOT NULL, updated_at DATETIME NOT NULL
+    ) ENGINE=InnoDB`,
+    `CREATE TABLE IF NOT EXISTS enterprise_product_creations (
+      creation_key VARCHAR(64) PRIMARY KEY, request_hash CHAR(64) NOT NULL,
+      editor_id INT NOT NULL, product_id INT NOT NULL, revision_id INT NOT NULL,
+      created_at DATETIME NOT NULL
+    ) ENGINE=InnoDB`,
     `CREATE TABLE IF NOT EXISTS enterprise_pricing_cutovers (
       plan_hash CHAR(64) PRIMARY KEY, status VARCHAR(24) NOT NULL, plan_json LONGTEXT NOT NULL,
       editor_id INT NOT NULL, applied_at DATETIME NOT NULL, rolled_back_at DATETIME
@@ -21,10 +30,11 @@ async function bootstrap() {
       verified_at DATETIME, last_error TEXT, INDEX bundle_publication (bundle_id,id)
     ) ENGINE=InnoDB`,
     `CREATE TABLE IF NOT EXISTS enterprise_bundles (
-      id INT AUTO_INCREMENT PRIMARY KEY, remote_box_id INT NOT NULL UNIQUE,
+      id INT AUTO_INCREMENT PRIMARY KEY, remote_box_id INT NULL UNIQUE,
+      creation_key VARCHAR(64) NULL UNIQUE,
       name VARCHAR(255) NOT NULL, input_json LONGTEXT NOT NULL, source_json LONGTEXT NOT NULL,
       revision INT NOT NULL DEFAULT 1, edited_by INT NOT NULL,
-      remote_captured_at DATETIME NOT NULL, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL
+      remote_captured_at DATETIME NULL, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL
     ) ENGINE=InnoDB`,
     `CREATE TABLE IF NOT EXISTS enterprise_bundle_revisions (
       id INT AUTO_INCREMENT PRIMARY KEY, bundle_id INT NOT NULL, revision INT NOT NULL,
@@ -107,6 +117,13 @@ async function bootstrap() {
       INDEX promotion_events (promotion_id, id)
     ) ENGINE=InnoDB`
   ]) await pool.query(sql);
+  const [bundleColumns] = await pool.query("SHOW COLUMNS FROM enterprise_bundles");
+  if (bundleColumns.find(column => column.Field === 'remote_box_id')?.Null === 'NO') {
+    await pool.query("ALTER TABLE enterprise_bundles MODIFY remote_box_id INT NULL, MODIFY remote_captured_at DATETIME NULL");
+  }
+  if (!bundleColumns.some(column => column.Field === 'creation_key')) {
+    await pool.query("ALTER TABLE enterprise_bundles ADD COLUMN creation_key VARCHAR(64) NULL UNIQUE");
+  }
   for (const [code, name] of [["ffcsa", "Full Farm CSA"], ["deck", "Deck Family Farm"], ["hyland", "Hyland"], ["creamy-cow", "Creamy Cow"]]) {
     await pool.query("INSERT IGNORE INTO enterprise_pricing_enterprises (code, name) VALUES (?, ?)", [code, name]);
   }

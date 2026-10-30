@@ -1,3 +1,5 @@
+import { isRetiredLocalLineList } from "./localLinePricingLists.js";
+import { salePrice } from './enterpriseProductSales.js';
 import { promotionIsActive, promotionEndTime } from './enterprisePromotionsCore.js';
 import { compareLocalChannelPrices } from './enterprisePricingComparison.js';
 
@@ -19,7 +21,7 @@ export async function readPricingChannelRecords(pool, productIds) {
   const [[packages], [prices], [square]] = await Promise.all([
     pool.query(`SELECT p.id,p.product_id AS productId,p.name,p.price,m.local_line_package_id AS remoteId
       FROM packages p LEFT JOIN local_line_package_meta m ON m.package_id=p.id WHERE p.product_id IN (?)`, [productIds]),
-    pool.query(`SELECT product_id AS productId,package_id AS packageId,price_list_name AS listName,
+    pool.query(`SELECT product_id AS productId,package_id AS packageId,price_list_name AS listName,local_line_price_list_id AS listId,
       final_price_cache AS finalPrice,adjustment_type AS adjustmentType,adjustment_value AS adjustmentValue
       FROM local_line_price_list_entries WHERE product_id IN (?)`, [productIds]),
     pool.query(`SELECT l.product_id AS productId,l.package_id AS packageId,v.price_amount AS priceCents,
@@ -28,30 +30,33 @@ export async function readPricingChannelRecords(pool, productIds) {
       WHERE l.product_id IN (?) AND l.approved_at IS NOT NULL`, [productIds])
   ]);
   for (const row of packages) records.get(Number(row.productId))?.packages.push({ ...row, metadata: { localLinePackageId: row.remoteId } });
-  for (const row of prices) records.get(Number(row.productId))?.localLinePrices.push(row);
+  for (const row of prices.filter(row => !isRetiredLocalLineList(row.listId, row.listName))) records.get(Number(row.productId))?.localLinePrices.push(row);
   for (const row of square) records.get(Number(row.productId))?.squarePrices.push({ ...row, priceCents: Number(row.isDeleted) ? null : row.priceCents });
   return records;
 }
 
-export function pricingSyncStatus({ input, output, publications = [], promotions = [], localOnly = false }, record, now = Date.now()) {
+export function pricingSyncStatus({ input, output, publications = [], promotions = [], desiredSale = null, localOnly = false }, record, now = Date.now()) {
   const enabled = input?.squareEnabled === true;
   const channels = [{ platform: 'localline', label: 'LL' }, ...(enabled ? [{ platform: 'square', label: 'Sq' }] : [])];
   // A running sale changes LL package prices, but Square's base rate stays unchanged.
   const expected = output ? structuredClone(output) : null;
   for (const sale of promotions) {
-    if (sale.input?.channels?.includes('localline') && promotionIsActive(sale.input, now)) {
+    if ((!desiredSale || Number(sale.id) === Number(desiredSale.promotionId)) && !sale.input?.endSale && sale.input?.channels?.includes('localline') && promotionIsActive(sale.input, now)) {
       for (const price of sale.output?.localLinePrices || []) {
         const pkg = expected?.packages?.find(pkg => Number(pkg.packageId) === Number(price.packageId));
         if (pkg) pkg.localLineRegularCents = price.saleCents;
       }
     }
   }
+  if(desiredSale && expected) for(const pkg of expected.packages) pkg.localLineRegularCents=salePrice(output.packages.find(p=>p.packageId===pkg.packageId).localLineRegularCents,desiredSale.active?desiredSale.discountBp:0);
+  if (record) record = { ...record, localLinePrices: (record.localLinePrices || []).filter(row => !isRetiredLocalLineList(row.listId, row.listName)) };
   const comparisons = expected ? compareLocalChannelPrices({ input, output: expected }, record) : [];
   for (const channel of channels) {
     const destination = channel.platform === 'square' ? 'Square' : 'Local Line';
     const rows = comparisons.filter(row => row.destination === destination);
     const publication = publications.find(item => item.platform === channel.platform);
     const reasons = [];
+    if(channel.platform==='square' && desiredSale?.active && !promotions.some(s=>Number(s.id)===Number(desiredSale.promotionId)&&s.squareStatus==='verified')) reasons.push('Sale discount needs publication or verification');
     if (!expected || !rows.length) reasons.push('Pricing inputs or packages need review');
     if (expected && record && (record.packages.length !== expected.packages.length || record.packages.some(pkg => !expected.packages.some(item => Number(item.packageId) === Number(pkg.id))))) reasons.push('Package definitions changed');
     if (rows.some(row => row.status === 'different')) reasons.push('Price update needed');

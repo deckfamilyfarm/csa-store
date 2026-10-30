@@ -70,7 +70,7 @@ export async function saveInventoryDraft(entry, capabilities, api) {
       if (!capabilities.inventoryPush) throw new Error("Inventory Admin, or product editing and Local Line Push permissions, are required.");
       const changes = Object.fromEntries(fields.map(key => [key, Number(entry.values[key])]));
       if (Object.hasOwn(changes, "inventory") && (!Number.isInteger(changes.inventory) || changes.inventory < 0)) throw new Error("Full Farm Stock must be a nonnegative whole number.");
-      const response = await api.post(`products/${entry.meta.productId}/inventory`, { changes });
+      const response = await api.post(`products/${entry.meta.productId}/inventory`, { changes, ...(Object.hasOwn(changes,"inventory") ? {expectedInventory:{inventory:Number(entry.defaults.inventory),trackInventory:Boolean(entry.defaults.trackInventory)}} : {}) });
       if (!response?.ok || !response?.localLineUpdate) throw new Error(response?.message || "Local Line inventory was not confirmed.");
       result.savedFields.push(...fields);
     } catch (error) { result.errors.push(`Full Farm: ${error.message || "Inventory update failed."}`); }
@@ -88,10 +88,11 @@ export function productCapabilities(roles = []) {
       "pricing_admin",
       "local_pricelist_admin",
       "inventory_admin",
+      "pricing_editor",
       "localline_pull",
       "localline_push",
     ),
-    edit: has("inventory_admin", "pricing_admin", "local_pricelist_admin"),
+    edit: has("inventory_admin", "pricing_admin", "pricing_editor", "local_pricelist_admin"),
     pricing: has("pricing_admin", "local_pricelist_admin"),
     cachedPricing: has("pricing_admin"),
     push: has("localline_push"),

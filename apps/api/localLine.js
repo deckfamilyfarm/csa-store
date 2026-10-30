@@ -1,3 +1,4 @@
+import { assertNoRetiredLocalLinePrices } from "./lib/localLinePricingLists.js";
 import { eq } from "drizzle-orm";
 import { requireProductVendor, requireVendorId, matchLocalLineVendor, confirmLocalLineVendor } from "./lib/productVendor.js";
 import { findCustomerPriceOverride, customerOverridePrice, assertProductWideSaleAllowed } from './lib/customerPriceOverrides.js';
@@ -64,11 +65,6 @@ function buildPriceListsFromEnv() {
       key: "Guest Basket",
       id: parseNumber(process.env.LL_PRICE_LIST_GUEST_ID),
       markup: parseNumber(process.env.LL_PRICE_LIST_GUEST_MARKUP, defaultGuest)
-    },
-    {
-      key: "CSA Members",
-      id: parseNumber(process.env.LL_PRICE_LIST_CSA_MEMBERS_ID),
-      markup: parseNumber(process.env.LL_PRICE_LIST_CSA_MEMBERS_MARKUP, defaultMember)
     },
     {
       key: "Herd Share Members",
@@ -175,6 +171,7 @@ async function fetchLocalLineProduct(productId, accessToken) {
 }
 
 async function patchLocalLineProduct(productId, accessToken, payload) {
+  assertNoRetiredLocalLinePrices(payload);
   const url = `${LL_BASEURL}products/${productId}/`;
   const companyBaseUrl = process.env.LL_COMPANY_BASEURL || "";
   const response = await fetchLocalLineWithRetry(url, {
@@ -219,6 +216,7 @@ async function deleteLocalLineProduct(productId, accessToken) {
 }
 
 async function createLocalLineProduct(accessToken, payload) {
+  assertNoRetiredLocalLinePrices(payload);
   const url = `${LL_BASEURL}products/`;
   const companyBaseUrl = process.env.LL_COMPANY_BASEURL || "";
   // Retrying a POST after a lost response can create a duplicate product.

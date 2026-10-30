@@ -267,3 +267,42 @@
 .pricing-sync-badge { min-width: 27px; padding: 3px 6px; border-radius: 5px; background: #fff0d5; border: 1px solid #dfa650; color: #94500b; font-size: 12px; font-weight: 700; text-align: center; }
 .pricing-sync-check { display: grid; place-items: center; width: 25px; height: 25px; border-radius: 50%; background: #e5f2e8; color: #216438; font-size: 18px; font-weight: 700; }
 .pricing-sync-status:focus-visible { outline: 2px solid #325b45; outline-offset: 3px; border-radius: 5px; }
+
+/* Compact filters retain full-width editing fields in the product dialog. */
+.enterprise-pricing-filters { display:flex; flex-wrap:wrap; gap:6px 10px; }
+.enterprise-pricing-filters label { flex:0 1 125px; }
+.enterprise-pricing-filters label:first-child { flex-basis:190px; }
+.enterprise-pricing-filters label:nth-child(2) { flex-basis:170px; }
+.enterprise-pricing-filters label:nth-child(4) { flex-basis:80px; }
+.enterprise-pricing-filters label:nth-child(5) { flex-basis:170px; }
+.enterprise-pricing-filters .input { padding:4px 7px; min-height:30px; }
+.enterprise-sale-inline { display:flex; flex-wrap:wrap; align-items:center; gap:3px; max-width:170px; }
+.enterprise-sale-inline input { width:75px; padding:4px; }
+.enterprise-sale-inline small { flex-basis:100%; }
+.enterprise-sale-price s { color:#68746c; }
+.enterprise-sale-price strong { color:#23683c; white-space:nowrap; }
+.enterprise-visibility-button { border:1px solid #b7c8bc; border-radius:999px; padding:3px 10px; font:inherit; font-size:12px; cursor:pointer; white-space:nowrap; }
+.enterprise-visibility-button.is-visible { color:#22603b; background:#e6f2e9; }
+.enterprise-visibility-button.is-hidden { color:#5e645f; background:#f0f1f0; border-color:#d1d5d2; }
+.enterprise-visibility-button:disabled { cursor:default; }
+.enterprise-visibility-button:focus-visible { outline:2px solid #22603b; outline-offset:2px; }
+.enterprise-visibility-cell small { max-width:200px; white-space:normal; }
+/* Compact switches and stock steppers matching the catalog controls. */
+.enterprise-visibility-button { display:inline-flex; align-items:center; position:relative; width:36px; height:28px; padding:2px; border:0; border-radius:999px; transition:background .15s; }
+.enterprise-visibility-button.is-visible,.enterprise-visibility-button.is-hidden { background:transparent; }
+.enterprise-visibility-button::before { content:""; position:absolute; left:2.4px; top:5.6px; width:31.2px; height:16.8px; border-radius:999px; background:#e4e5e4; }
+.enterprise-visibility-button.is-visible::before { background:#3d704f; }
+
+.enterprise-visibility-thumb { display:flex; align-items:center; justify-content:center; position:absolute; left:4.8px; top:8px; width:12px; height:12px; border-radius:50%; background:#fff; color:#999f9b; font-size:9.6px; font-weight:700; transform:translateX(0); transition:transform .15s; }
+.enterprise-visibility-button.is-visible .enterprise-visibility-thumb { transform:translateX(14.4px); }
+.enterprise-visibility-button[aria-busy=true] { opacity:.65; }
+.enterprise-inventory-stepper { display:inline-flex; align-items:stretch; gap:3px; padding:2px; border-radius:6px; background:#f3f3f3; }
+.enterprise-inventory-stepper button,.enterprise-inventory-stepper .input { height:32px; border:1px solid #d4d6d4; border-radius:4px; background:#fff; color:#454945; }
+.enterprise-inventory-stepper button { width:30px; padding:0; font-size:23px; line-height:1; cursor:pointer; }
+.enterprise-inventory-stepper .input { width:55px; min-width:0; padding:3px; text-align:center; font-size:14px; font-weight:600; appearance:textfield; }
+.enterprise-inventory-stepper input::-webkit-inner-spin-button,.enterprise-inventory-stepper input::-webkit-outer-spin-button { appearance:none; margin:0; }
+.enterprise-inventory-stepper button:disabled { color:#b5b9b5; cursor:default; background:#fafafa; }
+.enterprise-inventory-stepper button:focus-visible { outline:2px solid #3d704f; outline-offset:1px; }
+.enterprise-inventory-untracked { color:#777; white-space:nowrap; font-size:13px; }
+.enterprise-inventory-cell small { max-width:180px; white-space:normal; }
+@media(prefers-reduced-motion:reduce) { .enterprise-visibility-button,.enterprise-visibility-thumb { transition:none; } }

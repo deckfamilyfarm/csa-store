@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import "./ProductEditorDialog.css";
 
-export function ProductEditorDialog({ name, sections, children, footer, onClose, onPrevious, onNext, busy, dirty, message, initialSection, backLabel = 'Back to products', showNeighbors = true }) {
+export function ProductEditorDialog({ name, title, sections, children, footer, onClose, onPrevious, onNext, busy, dirty, message, initialSection, backLabel = 'Back to products', showNeighbors = true }) {
   const dialog = useRef(null);
   const [active, setActive] = useState(initialSection || sections[0]?.[0]);
   const initialScrollDone = useRef(false);
@@ -29,7 +29,7 @@ export function ProductEditorDialog({ name, sections, children, footer, onClose,
     onCancel={event => { event.preventDefault(); if (!busy) onClose(); }}>
     <header className="product-editor-header">
       <div><button autoFocus type="button" className="product-editor-back" disabled={busy} onClick={onClose}>← {backLabel}</button>
-        <h2 id="product-editor-title">Edit {name || "product"}</h2></div>
+        <h2 id="product-editor-title">{title || `Edit ${name || "product"}`}</h2></div>
       {showNeighbors && <div className="product-editor-neighbors"><button className="button alt" type="button" disabled={busy || !onPrevious} onClick={onPrevious}>← Previous product</button>
         <button className="button alt" type="button" disabled={busy || !onNext} onClick={onNext}>Next product →</button></div>}
     </header>

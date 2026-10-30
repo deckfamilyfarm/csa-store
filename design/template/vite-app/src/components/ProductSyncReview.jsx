@@ -1,3 +1,4 @@
+import { productSyncSummary, syncMoney } from "./productSyncSummary.js";
 import React, { useEffect, useState } from "react";
 import { PLATFORM_NAMES, comparisonRows, comparisonGroups, isReleaseActive, releaseProgress, elapsedText } from "./productSyncView.js";
 
@@ -32,11 +33,25 @@ export function ReleaseProgress({ release, error, onDismiss }) {
     {error && <p className="small" role="status">Progress connection interrupted. Showing the last saved status and reconnecting… {error}</p>}
   </div>;
 }
+function ComparisonTables({ groups, action }) {
+  return groups.map(group => <div key={group.title}><strong>{group.title}</strong><table><thead><tr><th>Field</th><th>{action.direction === "incoming" ? "Current local value" : `Current ${PLATFORM_NAMES[action.platform]} value`}</th><th>Proposed value</th></tr></thead>
+    <tbody>{group.rows.map(row => <tr key={row.key}><th scope="row">{row.label}</th><td>{valueText(row.current)}</td><td>{valueText(row.proposed)}</td></tr>)}</tbody></table></div>);
+}
 export function Comparison({ action, all = false }) {
   const groups = comparisonGroups(action, !all);
-  return <div className="sync-comparison">{groups.map(group => <div key={group.title}><strong>{group.title}</strong><table><thead><tr><th>Field</th><th>{action.direction === "incoming" ? "Current local value" : `Current ${PLATFORM_NAMES[action.platform]} value`}</th><th>Proposed value</th></tr></thead>
-    <tbody>{group.rows.map(row => <tr key={row.key}><th scope="row">{row.label}</th><td>{valueText(row.current)}</td><td>{valueText(row.proposed)}</td></tr>)}</tbody></table></div>)}
-    {!groups.length && <p className="small">Remote values match. {Object.keys(action.staged || {}).length ? "Staged local changes will apply at release." : "No changes."}</p>}
+  const summary = productSyncSummary(action);
+  return <div className="sync-comparison">
+    {summary ? <>
+      {!!summary.prices.length && <table><thead><tr><th>Package / price</th><th>Current customer price</th><th>New customer price</th></tr></thead>
+        <tbody>{summary.prices.map((row, index) => <tr key={index}><th scope="row">{row.package}
+          {!!row.baskets.length && <small className="sync-basket-label">{row.baskets.length === row.totalBaskets ? `All ${row.totalBaskets} baskets` : row.baskets.join(", ")}</small>}</th>
+          <td>{syncMoney(row.currentCents)}{row.currentUnit ? ` / ${row.currentUnit}` : ""}</td>
+          <td>{syncMoney(row.localCents)}{row.proposedUnit ? ` / ${row.proposedUnit}` : ""}{row.currentCents != null && row.localCents === row.currentCents && row.currentUnit === row.proposedUnit ? " · unchanged" : ""}</td></tr>)}</tbody></table>}
+      {summary.notes.map(note => <p className="small" key={note}>{note}</p>)}
+      <ComparisonTables groups={summary.otherGroups} action={action} />
+      {!summary.changed && <p className="small">Channel values match. No changes.</p>}
+      {!!groups.length && <details className="sync-technical-details"><summary>Technical details</summary><ComparisonTables groups={groups} action={action} /></details>}
+    </> : <><ComparisonTables groups={groups} action={action} />{!groups.length && <p className="small">Remote values match. No changes.</p>}</>}
     {Object.keys(action.staged || {}).length > 0 && <p className="small">Staged locally: {Object.entries(action.staged).map(([key, value]) => `${fieldLabel(key)}: ${value}`).join(" · ")}</p>}
   </div>;
 }

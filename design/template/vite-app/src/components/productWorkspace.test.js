@@ -276,7 +276,7 @@ test("Inventory saves push only dirty stock, tracking, and visibility fields and
   const result=await saveInventoryDraft(entry,productCapabilities(["inventory_admin"]),{
     post:async(path,body)=>{
       assert.equal(path,"products/7/inventory");
-      assert.deepEqual(body,{changes:{inventory:5,trackInventory:0,visible:0}});
+      assert.deepEqual(body,{changes:{inventory:5,trackInventory:0,visible:0},expectedInventory:{inventory:12,trackInventory:true}});
       return {ok:true,localLineUpdate:true};
     }
   });
@@ -296,7 +296,7 @@ test("inventory saves preserve existing authorized editors and reject other role
       post: async (path, body) => { calls.push({ path, body }); return { ok: true, localLineUpdate: true }; },
     });
     assert.equal(result.ok, true, roles.join(","));
-    assert.deepEqual(calls, [{ path: "products/7/inventory", body: { changes: { inventory: 5 } } }]);
+    assert.deepEqual(calls, [{ path: "products/7/inventory", body: { changes: { inventory: 5 }, expectedInventory:{inventory:12,trackInventory:true} } }]);
   }
   for (const roles of [[], ["pricing_admin"], ["local_pricelist_admin"], ["localline_push"], ["localline_pull"], ["membership_admin", "localline_push"]]) {
     const result = await saveInventoryDraft(entry, productCapabilities(roles), { post: () => assert.fail("No inventory publishing permission") });
@@ -471,7 +471,7 @@ test("mixed inventory saves acknowledge successes independently and retry only f
     const calls = [];
     const result = await saveInventoryDraft(draft, productCapabilities(['inventory_admin']), {
       put: async (_path, body) => { calls.push('farm'); if (failedDomain === 'farm') throw new Error('Local failure'); return { ok: true, ...body, farmStockRevision: 1 }; },
-      post: async (_path, body) => { calls.push('full'); assert.deepEqual(body, { changes: { inventory: 0 } }); if (failedDomain === 'full') throw new Error('Local Line unavailable'); return { ok: true, localLineUpdate: true }; }
+      post: async (_path, body) => { calls.push('full'); assert.deepEqual(body, { changes: { inventory: 0 }, expectedInventory:{inventory:12,trackInventory:true} }); if (failedDomain === 'full') throw new Error('Local Line unavailable'); return { ok: true, localLineUpdate: true }; }
     });
     assert.deepEqual(calls, ['farm', 'full']);
     assert.equal(result.partial, true);

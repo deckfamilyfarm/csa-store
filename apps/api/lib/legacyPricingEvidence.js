@@ -1,3 +1,4 @@
+import { ACTIVE_LOCAL_LINE_BASKETS } from "./localLinePricingLists.js";
 import { isNoMarkupProduct } from "./productPricing.js";
 import { averagePackageWeight, roundRatio, scaledInteger } from "./enterprisePricingEngine.js";
 
@@ -9,7 +10,7 @@ const cents = value => {
   return amount === null ? null : Math.round(amount * 100);
 };
 
-const basketNames = ["Guest Basket", "CSA Members", "Herd Share Members", "SNAP"];
+const basketNames = ACTIVE_LOCAL_LINE_BASKETS.map(list => list.name);
 
 // The local sample migration uses the stored package price as its starting Buy
 // Price. Weighted packages are converted to a per-pound amount; each packages

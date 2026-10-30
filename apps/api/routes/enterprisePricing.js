@@ -1,6 +1,9 @@
+import { refreshFullFarmInventory } from "../lib/inventorySync.js";
+import { saveProductSale } from "../lib/enterpriseProductSales.js";
+import { createEnterpriseProduct, previewEnterpriseProductCreation } from "../lib/enterpriseProductCreation.js";
 import express from "express";
 import { requireAdminPermission } from "../middleware/auth.js";
-import { listBundles, getBundle, previewBundle, saveBundle } from '../lib/enterpriseBundles.js';
+import { listBundles, getBundle, previewBundle, saveBundle, createBundle } from '../lib/enterpriseBundles.js';
 import {
   approveEnterprisePricingRevision, enterprisePricingMigrationReport, enterprisePricingSummary, getEnterprisePricingProduct,
   getPricingSettings, getPricingSettingsDraft, listEnterprisePricingProducts, listEnterprisePricingReview,
@@ -21,6 +24,7 @@ const route = fn => async (req, res) => {
 
 router.use(view);
 router.get('/bundles', route(() => listBundles()));
+router.post('/bundles', edit, route(req => createBundle(req.body, req.admin)));
 router.post('/bundles/:id/review', approve, requireAdminPermission('localline_pull'), route(req => reviewBundlePublication(req.params.id,req.admin)));
 router.get('/bundle-publications/:id', route(req => getBundlePublication(req.params.id)));
 router.post('/bundle-publications/:id/publish', approve, requireAdminPermission('localline_push'), route(req => publishBundle(req.params.id,req.admin)));
@@ -34,9 +38,13 @@ router.post("/settings/preview", requireAdminPermission("pricing_admin"), route(
 router.post("/settings/drafts", requireAdminPermission("pricing_admin"), route(req => savePricingSettingsDraft(req.body?.settings, req.admin)));
 router.post("/settings/drafts/:id/approve", requireAdminPermission("pricing_admin"), route(req => approvePricingSettingsDraft(req.params.id, req.admin)));
 router.get("/enterprises", route(() => listPricingEnterprises()));
+router.post("/products/preview", edit, route(req => previewEnterpriseProductCreation(req.body)));
+router.post("/products", edit, route(req => createEnterpriseProduct(req.body, req.admin)));
+router.post("/inventory/refresh", route(req => refreshFullFarmInventory(req.body?.productIds)));
 router.get("/products", route(req => listEnterprisePricingProducts(req.query)));
 router.get("/summary", route(() => enterprisePricingSummary()));
 router.get("/products/:id", route(req => getEnterprisePricingProduct(req.params.id)));
+router.post("/products/:id/sale", edit, route(req => saveProductSale(req.params.id, req.body, req.admin)));
 router.get("/products/:id/sync", route(req => getEnterprisePricingSync(req.params.id)));
 router.post("/products/:id/buy-price", edit, route(req => saveEnterpriseBuyPrice(
   req.params.id, req.body?.price, req.body?.expectedRevision, req.admin)));

@@ -4,6 +4,7 @@ import mysql from "mysql2/promise";
 import { getTableConfig } from "drizzle-orm/mysql-core";
 import * as schema from "../schema.js";
 
+const nativeFetch = globalThis.fetch;
 const socket = process.env.PRODUCT_SYNC_TEST_SOCKET;
 test("saved prices activate locally before independently approved channel publication", { skip: !socket }, async t => {
   assert.ok(socket.startsWith("/tmp/csa-product-sync-") || socket.startsWith("/private/tmp/csa-product-sync-"));
@@ -128,11 +129,28 @@ test("saved prices activate locally before independently approved channel public
   const actions = (await sync.listProductSyncActions(audit.id, { direction: "outgoing", pageSize: 100 })).rows;
   assert.deepEqual(actions.map(row => [row.platform, row.status]).sort(), [["localline", "changed"], ["square", "changed"]], JSON.stringify(actions.map(row => ({platform:row.platform,message:row.message}))));
   assert.equal(writes.length, 0);
+  const { readEnterpriseReviewChecks } = await import("./enterprisePricingReview.js");
+  const reviewRows = await pricing.listEnterprisePricingReview();
+  assert.equal(reviewRows.find(row => row.id === draft.revisionId)?.check?.auditId, audit.id);
+  assert.equal(reviewRows.find(row => row.id === draft.revisionId)?.comparison.length, 4);
+  const restoredCheck = (await readEnterpriseReviewChecks(pool, [draft.revisionId])).get(draft.revisionId);
+  assert.equal(restoredCheck.auditId, audit.id);
+  assert.deepEqual(restoredCheck.actions.map(action => action.id), actions.map(action => action.id));
+  assert.equal((await readEnterpriseReviewChecks(pool, [999999])).size, 0, "old approval does not authorize a different revision");
   const release = await sync.createProductSyncRelease({ auditId: audit.id, actionIds: actions.map(row => row.id) }, user);
   const finished = await sync.runProductSyncRelease(release.id, { user, allowFuture: true });
   assert.equal(finished.status, "completed");
+  const restoredRelease = (await readEnterpriseReviewChecks(pool, [draft.revisionId])).get(draft.revisionId);
+  assert.ok(restoredRelease.actions.every(action => action.releaseId === release.id && action.releaseStatus === "completed" && action.publicationStatus === "completed"));
+  const [interruptedAudit] = await pool.query("INSERT INTO product_sync_audits (status,options_json,created_at,error_message) VALUES ('failed',?,UTC_TIMESTAMP(),'Check interrupted')", [JSON.stringify({ enterpriseRevisionId: draft.revisionId })]);
+  const interrupted = (await readEnterpriseReviewChecks(pool, [draft.revisionId])).get(draft.revisionId);
+  assert.equal(interrupted.auditId, interruptedAudit.insertId);
+  assert.equal(interrupted.error, 'Check interrupted');
+  assert.deepEqual(interrupted.actions, [], "never fall back to an older successful audit");
+  await pool.query("DELETE FROM product_sync_audits WHERE id=?", [interruptedAudit.insertId]);
+
   assert.deepEqual(writes.map(row => row.platform).sort(), ["localline", "square"]);
-  assert.deepEqual(remote.packages[0].price_list_entries.map(row => row.adjustment_value), [10.8, 10.8, 10.8, 10.8]);
+  assert.deepEqual(remote.packages[0].price_list_entries.map(row => row.adjustment_value), [10.8, 10.8, 10.8]);
   assert.equal(square.get("V1").item_variation_data.price_money.amount, 1200);
   const active = await pricing.getEnterprisePricingProduct(1);
   assert.equal(active.active?.id, draft.revisionId);
@@ -143,6 +161,52 @@ test("saved prices activate locally before independently approved channel public
   assert.equal(migration.find(row => row.productId === 1)?.proposedPrice, 10.8);
 
   const promotions = await import("./enterprisePromotions.js");
+  await t.test("FF visibility filters compose with sale and sync filters before pagination", async () => {
+    assert.equal((await pricing.listEnterprisePricingProducts({visibility:'visible'})).rows.find(r=>r.id===1).ffVisible,true);
+    const untracked=(await pricing.listEnterprisePricingProducts({})).rows.find(r=>r.id===1);
+    assert.equal(untracked.ffTrackInventory,false);
+    await pool.query('UPDATE products SET track_inventory=1,inventory=5 WHERE id=1');
+    const stock=(await pricing.listEnterprisePricingProducts({sort:'inventory'})).rows.find(r=>r.id===1);
+    assert.equal(stock.ffTrackInventory,true);assert.equal(stock.ffInventory,5);
+    await pool.query('UPDATE products SET track_inventory=0,inventory=0 WHERE id=1');
+    await pool.query('UPDATE products SET visible=0 WHERE id=1');
+    await pool.query('UPDATE product_sales SET on_sale=1,sale_discount=0.10 WHERE product_id=1');
+    assert.equal((await pricing.listEnterprisePricingProducts({visibility:'visible',sale:'on'})).total,0);
+    const hidden=await pricing.listEnterprisePricingProducts({visibility:'hidden',sale:'on',limit:1});
+    assert.equal(hidden.total,1);assert.equal(hidden.rows[0].ffVisible,false);
+    assert.equal((await pricing.listEnterprisePricingProducts({visibility:'hidden',sale:'on',limit:1,offset:1})).rows.length,0);
+    assert.equal((await pricing.listEnterprisePricingProducts({visibility:'visible',syncStatus:'square'})).total,0);
+    await pool.query('UPDATE products SET visible=1 WHERE id=1');
+    await pool.query('UPDATE product_sales SET on_sale=0,sale_discount=0 WHERE product_id=1');
+  });
+  await t.test("inline sale saves locally, filters, publishes, and turns off without changing regular prices", async () => {
+    const {saveProductSale}=await import('./enterpriseProductSales.js');
+    process.env.SQUARE_LOCATION_ID='L1';
+    const baseline=writes.length;
+    await pool.query('UPDATE product_sales SET on_sale=1,sale_discount=0.10 WHERE product_id=1');
+    assert.equal((await pricing.listEnterprisePricingProducts({sale:'on'})).rows.find(r=>r.id===1).sale.discountBp,1000);
+    assert.equal((await readSavedEnterprisePricing(pool,[1])).get(1).output.packages[0].localLineSaleCents,972);
+    await pool.query('UPDATE product_sales SET on_sale=0 WHERE product_id=1');
+    await pool.query('UPDATE product_pricing_profiles SET on_sale=1,sale_discount=0.10 WHERE product_id=1');
+    assert.equal((await pricing.listEnterprisePricingProducts({sale:'on'})).rows.some(r=>r.id===1),false,'explicit off wins over stale profile flag');
+    const saved=await saveProductSale(1,{discountBp:2000,expectedRevision:0,expectedPricingRevision:draft.revisionId},{userId:1});
+    assert.equal(writes.length,baseline);
+    const listed=(await pricing.listEnterprisePricingProducts({sale:'on'})).rows.find(r=>r.id===1);
+    assert.equal(listed.output.packages[0].localLineSaleCents,864);
+    assert.equal(listed.output.squareSaleUnitCents,960);
+    assert.equal((await pricing.listEnterprisePricingProducts({sale:'off'})).rows.some(r=>r.id===1),false);
+    assert.equal((await readSavedEnterprisePricing(pool,[1])).get(1).output.packages[0].localLineSaleCents,864);
+    await assert.rejects(saveProductSale(1,{discountBp:1500,expectedRevision:0,expectedPricingRevision:draft.revisionId},{userId:1}),/another window/);
+    await promotions.approveEnterprisePromotion(saved.promotionId,{userId:2});
+    await promotions.publishEnterprisePromotion(saved.promotionId,{userId:2});
+    assert.equal(square.get('V1').item_variation_data.price_money.amount,1200);
+    const off=await saveProductSale(1,{discountBp:0,expectedRevision:1,expectedPricingRevision:draft.revisionId},{userId:1});
+    assert.equal((await readSavedEnterprisePricing(pool,[1])).get(1).output.packages[0].localLineSaleCents,1080);
+    await promotions.approveEnterprisePromotion(off.promotionId,{userId:2});
+    await promotions.publishEnterprisePromotion(off.promotionId,{userId:2});
+    assert.equal((await promotions.getEnterprisePromotion(saved.promotionId)).status,'cancelled');
+    await pool.query('DELETE FROM enterprise_product_sales WHERE product_id=1');
+  });
   const saleInput = { name: "Market sausage", discountBp: 2000, packageIds: [10],
     startAt: "2026-11-01T16:00:00Z", endAt: "2026-11-02T16:00:00Z", timezone: "America/Los_Angeles",
     channels: ["localline", "square"], squareLocationIds: ["MARKET"] };
@@ -157,12 +221,12 @@ test("saved prices activate locally before independently approved channel public
   assert.equal(activated.status, "active");
   assert.equal(await pricing.enterpriseRevisionMarker(1, draft.revisionId), null, "approved sale freezes regular-price publication");
   assert.equal((await pricing.listEnterprisePricingProducts({ limit: 10 })).rows.find(row => row.id === 1)?.saleStatus, "active");
-  assert.deepEqual(remote.packages[0].price_list_entries.map(row => row.adjustment_value), [8.64, 8.64, 8.64, 8.64]);
-  assert.deepEqual(remote.packages[0].price_list_entries.map(row => row.strikethrough_display_value), [10.8, 10.8, 10.8, 10.8]);
+  assert.deepEqual(remote.packages[0].price_list_entries.map(row => row.adjustment_value), [8.64, 8.64, 8.64]);
+  assert.deepEqual(remote.packages[0].price_list_entries.map(row => row.strikethrough_display_value), [10.8, 10.8, 10.8]);
   await assert.rejects(pricing.saveEnterprisePricingDraft(1, { ...active.suggestedInput, priceEffectiveAt: "2026-10-21T12:00:00Z", overrideNote: "cost changed during sale" }, active.latest.id, { userId: 1 }), /Finish or cancel the sale/);
   const expired = await promotions.publishEnterpriseLocalLinePromotion(sale.id, { userId: 2 }, new Date("2026-11-02T17:00:00Z"));
   assert.equal(expired.status, "expired");
-  assert.deepEqual(remote.packages[0].price_list_entries.map(row => row.adjustment_value), [10.8, 10.8, 10.8, 10.8]);
+  assert.deepEqual(remote.packages[0].price_list_entries.map(row => row.adjustment_value), [10.8, 10.8, 10.8]);
   const secondSale = await promotions.saveEnterprisePromotionDraft({ ...saleInput, name: "Until turned off", startAt: "2026-11-03T16:00:00Z", endAt: null }, { userId: 1 });
   await promotions.approveEnterprisePromotion(secondSale.id, { userId: 2 });
   await promotions.publishEnterprisePromotion(secondSale.id, { userId: 2 });
@@ -182,7 +246,7 @@ test("saved prices activate locally before independently approved channel public
   const cancelled = await promotions.getEnterprisePromotion(secondSale.id);
   assert.equal(cancelled.status, "cancelled");
   assert.equal(cancelled.squareStatus, "cancelled");
-  assert.deepEqual(remote.packages[0].price_list_entries.map(row => row.adjustment_value), [10.8, 10.8, 10.8, 10.8]);
+  assert.deepEqual(remote.packages[0].price_list_entries.map(row => row.adjustment_value), [10.8, 10.8, 10.8]);
   assert.equal((await readSavedEnterprisePricing(pool,[1],future.getTime())).get(1).output.packages[0].localLineSaleCents,1080);
   assert.equal((await promotions.cancelEnterprisePromotion(secondSale.id,{userId:2})).status,'cancelled','turning off twice is safe');
   const squareOnly = await promotions.saveEnterprisePromotionDraft({ ...saleInput, name: "Square only", channels: ["square"],
@@ -230,4 +294,87 @@ test("saved prices activate locally before independently approved channel public
   assert.equal(writes.length, baselineWrites, "vendor checks never publish");
   await pool.query("UPDATE products SET vendor_id = 1 WHERE id = 1");
   assert.equal((await pricing.getEnterprisePricingProduct(1)).product.vendorRequired, false);
+  await t.test("new enterprise products save atomically, recover retries, and support weighted third-party pricing", async () => {
+    const creation = await import("./enterpriseProductCreation.js");
+    await pool.query("INSERT INTO vendors (id,name) VALUES (2,'Test Produce Vendor')");
+    const enterpriseId = (await pricing.listPricingEnterprises())[0].id;
+    const body = { product: { name: "Test Shallots", vendorId: 2, categoryId: 1, description: "Farm produce" },
+      input: { retailEnterpriseId: enterpriseId, priceEffectiveAt: "2026-01-02T00:00:00Z", pricingUnit: "lb",
+        markupCategory: "perishable", customMarkupBp: null, squareEnabled: false, saleBp: 0,
+        purchaseCosts: [{ enterpriseId, cost: "2.00", effectiveAt: "2026-01-01" }],
+        packages: [{ packageId: 1, name: "1–2 lb bag", minWeight: 1, maxWeight: 2 }, { packageId: 2, name: "3 lb bag", avgWeightOverride: 3 }],
+        wholesale: [{ sellingEnterpriseId: enterpriseId, mode: "markup", markupBp: 2500, costEnterpriseId: enterpriseId }] },
+      creationKey: "test-weighted-product-create" };
+    const preview = await creation.previewEnterpriseProductCreation(body);
+    body.previewHash = preview.previewHash;
+    assert.equal(preview.output.squareUnitCents, null);
+    assert.equal(preview.output.csaUnitCents, 330);
+    assert.equal(preview.output.packages[0].localLineRegularCents, 495);
+    const writesBefore = writes.length;
+    const [created, retry] = await Promise.all([creation.createEnterpriseProduct(body, { userId: 1 }), creation.createEnterpriseProduct(body, { userId: 1 })]);
+    assert.equal(created.productId, retry.productId);
+    const saved = await pricing.getEnterprisePricingProduct(created.productId);
+    assert.equal(saved.active.id, created.revisionId);
+    assert.equal(saved.active.input.pricingUnit, "lb");
+    assert.equal(saved.active.output.wholesale[0].priceCents, 250);
+    assert.equal(saved.active.output.packages[0].localLineRegularCents, 495);
+    assert.equal(saved.active.approverId ?? null, null);
+    const [[catalog]] = await pool.query("SELECT * FROM products WHERE id=?", [created.productId]);
+    assert.equal(catalog.visible, 0); assert.equal(catalog.inventory, 0); assert.equal(catalog.track_inventory, 0);
+    assert.equal(catalog.stock_on_farm, null); assert.equal(catalog.stock_on_farm_lbs, null);
+    const [packages] = await pool.query("SELECT * FROM packages WHERE product_id=? ORDER BY id", [created.productId]);
+    assert.deepEqual(packages.map(row => Number(row.price)), [3, 6]);
+    assert.deepEqual(packages.map(row => row.id), saved.active.input.packages.map(row => row.packageId));
+    assert.ok(packages.every(row => row.visible === 0 && row.package_code === null));
+    assert.equal((await pool.query("SELECT COUNT(*) n FROM enterprise_purchase_cost_history WHERE product_id=?", [created.productId]))[0][0].n, 1);
+    assert.equal((await pool.query("SELECT COUNT(*) n FROM square_variation_links WHERE product_id=?", [created.productId]))[0][0].n, 0);
+    assert.equal((await pool.query("SELECT local_line_product_id FROM local_line_product_meta WHERE product_id=?", [created.productId]))[0][0].local_line_product_id, 0);
+    await assert.rejects(creation.createEnterpriseProduct({ ...body, product: { ...body.product, name: "Changed" } }, { userId: 1 }), /already used/);
+    await assert.rejects(creation.createEnterpriseProduct(body, { userId: 2 }), /already used/);
+    await assert.rejects(creation.createEnterpriseProduct({ ...body, creationKey: "test-stale-preview-create", previewHash: "stale" }, { userId: 1 }), /rules changed/);
+    await assert.rejects(creation.previewEnterpriseProductCreation({ ...body, product: { ...body.product, vendorId: 999 } }), /vendor/);
+    await assert.rejects(creation.previewEnterpriseProductCreation({ ...body, product: { ...body.product, name: "Deposit" } }), /deposit pricing/);
+    await assert.rejects(creation.previewEnterpriseProductCreation({ ...body, input: { ...body.input, saleBp: 2000 } }), /separately approved/);
+    const each = { ...body, creationKey: "test-each-product-create", product: { ...body.product, vendorId: 1, name: "Test Sausage" },
+      input: { ...body.input, pricingUnit: "each", squareEnabled: true, markupCategory: "deckHyland", packages: [{ packageId: 1, name: "12 oz", quantity: 1 }] } };
+    each.previewHash = (await creation.previewEnterpriseProductCreation(each)).previewHash;
+    // Force a late SQL failure after catalog/packages/revision have been inserted.
+    const [[before]] = await pool.query("SELECT COUNT(*) n FROM products");
+    await pool.query("CREATE TRIGGER test_fail_cost BEFORE INSERT ON enterprise_purchase_cost_history FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='test late creation failure'");
+    await assert.rejects(creation.createEnterpriseProduct(each, { userId: 1 }), /test late creation failure/);
+    await pool.query("DROP TRIGGER test_fail_cost");
+    assert.equal((await pool.query("SELECT COUNT(*) n FROM products"))[0][0].n, before.n);
+    assert.equal((await pool.query("SELECT COUNT(*) n FROM enterprise_product_creations WHERE creation_key=?", [each.creationKey]))[0][0].n, 0);
+    const eachSaved = await creation.createEnterpriseProduct(each, { userId: 1 });
+    const eachDetail = await pricing.getEnterprisePricingProduct(eachSaved.productId);
+    assert.equal(eachDetail.active.output.squareUnitCents, 350);
+    assert.equal(eachDetail.active.output.csaUnitCents, 315);
+    assert.equal(eachDetail.active.output.packages[0].localLineRegularCents, 315);
+    assert.equal(eachDetail.active.input.packages[0].quantity, 1, "12 oz is descriptive, not a pound conversion");
+    const packBody={...body,creationKey:'test-package-buy-prices',product:{...body.product,name:'Test distinct pack costs'},input:{...body.input,pricingUnit:'each',markupCategory:'shelfStable',squareEnabled:false,
+      packages:[{packageId:1,name:'2 pack',quantity:1,packageBuyPrice:'3.00'},{packageId:2,name:'5 pack',quantity:1,packageBuyPrice:'5.00'}]}};
+    packBody.previewHash=(await creation.previewEnterpriseProductCreation(packBody)).previewHash;
+    const packSaved=await creation.createEnterpriseProduct(packBody,{userId:1});
+    const packDetail=await pricing.getEnterprisePricingProduct(packSaved.productId);
+    assert.deepEqual(packDetail.active.output.packages.map(p=>p.localLineRegularCents),[450,750]);
+    assert.deepEqual((await pool.query('SELECT price FROM packages WHERE product_id=? ORDER BY id',[packSaved.productId]))[0].map(p=>Number(p.price)),[3,5]);
+    const edited=await pricing.saveEnterprisePricingDraft(packSaved.productId,{...packDetail.active.input,customMarkupBp:10000},packDetail.latest.id,{userId:1},packDetail.buyPrice.revision);
+    assert.deepEqual(edited.output.packages.map(p=>p.localLineRegularCents),[600,1000]);
+    assert.equal(edited.input.packages[1].packageBuyPrice,'5.00');
+    const {readSavedEnterprisePricing:readPackages}=await import('./enterprisePricingReads.js');
+    assert.equal((await readPackages(pool,[packSaved.productId])).get(packSaved.productId).output.packages[1].localLineRegularCents,1000);
+    assert.equal(writes.length, writesBefore, "creation never calls either channel");
+    const { default: express } = await import("express");
+    const { default: router } = await import("../routes/enterprisePricing.js");
+    const app = express(); app.use(express.json()); app.use((req,res,next) => { req.admin = { userId: 1, adminRoles: [req.headers['x-test-role'] || 'pricing_publisher'] }; next(); }); app.use(router);
+    const server = app.listen(0, "127.0.0.1"); await new Promise(resolve => server.once("listening", resolve));
+    try {
+      const url = `http://127.0.0.1:${server.address().port}`;
+      const response = await nativeFetch(`${url}/products`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(each) });
+      assert.equal(response.status, 403, "a publisher cannot create products");
+      const permitted = await nativeFetch(`${url}/products`, { method: "POST", headers: { "Content-Type": "application/json", "x-test-role": "pricing_editor" }, body: JSON.stringify(each) });
+      assert.equal(permitted.status, 200); assert.equal((await permitted.json()).productId, eachSaved.productId);
+    } finally { await new Promise(resolve => server.close(resolve)); }
+  });
+
 });

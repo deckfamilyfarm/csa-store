@@ -58,6 +58,6 @@ export function EnterprisePromotionEditor({ token, product, packages, squareEnab
     {squareIncluded && <label>Square location IDs<input className="input" placeholder="Comma-separated Square location IDs" value={squareLocationIds} onChange={event => setSquareLocationIds(event.target.value)} /></label>}
     <div className="admin-actions"><button className="button alt" type="button" disabled={busy} onClick={() => submit(false)}>Preview sale</button><button className="button" type="button" disabled={busy || !preview} onClick={() => submit(true)}>Save sale proposal</button></div>
     {message && <p role="status">{message}</p>}
-    {localLineIncluded && preview?.output?.localLinePrices?.map(row => <p className="small" key={row.packageId}>Package {row.packageId}: {dollars(row.regularCents)} regular → {dollars(row.saleCents)} sale in all four Local Line baskets.</p>)}
+    {localLineIncluded && preview?.output?.localLinePrices?.map(row => <p className="small" key={row.packageId}>Package {row.packageId}: {dollars(row.regularCents)} regular → {dollars(row.saleCents)} sale in all three active Local Line baskets.</p>)}
   </details>;
 }

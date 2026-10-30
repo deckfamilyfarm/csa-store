@@ -2608,7 +2608,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh, sessionTarg
   const currentAdminRoles = currentAdmin?.adminRoles || [];
   const canManagePricing = hasRole(currentAdmin?.adminRoles || [], "pricing_admin");
   const showProductEditor =
-    isProductWorkspace && capabilities.view &&
+    capabilities.view && isProductWorkspace &&
     (productEditorMode === "new" || (selectedProductId && activeProduct));
 
   useEffect(() => {

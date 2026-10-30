@@ -335,12 +335,6 @@ export function getPriceListDefinitions(profile) {
       markup: profile.guestMarkup
     },
     {
-      key: "member",
-      name: "CSA Members",
-      id: parsePriceListId(process.env.LL_PRICE_LIST_CSA_MEMBERS_ID),
-      markup: profile.memberMarkup
-    },
-    {
       key: "herdShare",
       name: "Herd Share Members",
       id: parsePriceListId(process.env.LL_PRICE_LIST_HERDSHARE_ID),

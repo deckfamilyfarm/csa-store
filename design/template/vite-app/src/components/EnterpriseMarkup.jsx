@@ -35,15 +35,19 @@ export function MarkupControls({ input, settings, vendor, name, disabled, onChan
   </div>;
 }
 
-export function MarkupCalculation({ input, output, settings }) {
+export function MarkupCalculation({ input, output, settings, packageNames = {} }) {
   if (!output) return null;
+  if(input.packages?.some(p=>p.packageBuyPrice!=null&&p.packageBuyPrice!=='')) return <div className="enterprise-markup-calculation" role="status">
+    {output.packages.map((pkg,index)=><div key={pkg.packageId}><strong>{packageNames[pkg.packageId] || `Package ${index+1}`}</strong>: Buy {money(pkg.packageBuyPriceCents ?? Math.round(output.buyFromTenThousandths/100*(pkg.quantity||1)))} + {percentLabel(output.appliedMarkupBp)} markup → {input.squareEnabled?<>Square {money(pkg.squareVariationCents)} → </>:null}FF {money(pkg.localLineRegularCents)} per package</div>)}
+    {(output.csaOverrideActive||output.squareOverrideActive)&&<small>A fixed retail override takes precedence over the markup calculation.</small>}
+  </div>;
   const fixed = input.squareEnabled ? input.squareOverride != null && input.squareOverride !== "" : input.csaOverride != null && input.csaOverride !== "";
   return <div className="enterprise-markup-calculation" role="status">
     <div><span>Buy {money(output.buyFromTenThousandths / 100)}</span><span> + {percentLabel(output.appliedMarkupBp)} markup</span><strong> → {money(output.calculatedRetailCents)} target / {input.pricingUnit}</strong></div>
     <div>{input.squareEnabled ? <><strong>Square {money(output.squareUnitCents)}</strong> {fixed ? "(fixed override)" : `(rounded to ${money(settings.squareIncrementCents)})`} → CSA {money(output.csaUnitCents)} (−{percentLabel(settings.localLineDiscountBp)})</> : <strong>CSA {money(output.csaUnitCents)} / {input.pricingUnit}{fixed ? " (fixed override)" : ""}</strong>}</div>
     {fixed && <small>The selling price is fixed. Change or remove its price override in product details to follow markup.</small>}
     {output.effectiveMarkupBp !== output.appliedMarkupBp && <small>Effective selling markup: {percentLabel(output.effectiveMarkupBp)}</small>}
-    <small>{output.packages.map(pkg => `LL package ${money(pkg.localLineRegularCents)}`).join(" · ")} · Same price in all four baskets</small>
+    <small>{output.packages.map(pkg => `LL package ${money(pkg.localLineRegularCents)}`).join(" · ")} · Same price in all three active baskets</small>
   </div>;
 }
 

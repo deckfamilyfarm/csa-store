@@ -26,11 +26,11 @@ export function EnterpriseBundles({ token, roles = [], active = true, review = f
     <div className="admin-actions bundle-filters">
       <input className="input" aria-label="Search bundles" placeholder="Search bundles" value={search} onChange={e => setSearch(e.target.value)} />
       <select className="input" aria-label="Bundle visibility" value={visibility} onChange={e => setVisibility(e.target.value)}><option value="all">All bundles</option><option value="visible">Visible</option><option value="hidden">Hidden</option></select>
-      <span>{rows.length} bundles</span><button className="button alt" onClick={() => setRefresh(v => v + 1)}>Refresh prices</button>
+      <span>{rows.length} bundles</span>{!review && canEdit && <button className="button alt" disabled={!data} onClick={() => setSelected("new")}>+ Add bundle</button>}<button className="button alt" onClick={() => setRefresh(v => v + 1)}>Refresh prices</button>
     </div>
     {error && <p role="alert">{error}</p>}
     {!data && !error && <p role="status">Loading bundles…</p>}
-    {data && !data.rows.length && <p>No bundle definitions have been imported.</p>}
+    {data && !data.rows.length && <p>No bundles yet. Add a bundle to choose its contents and discount.</p>}
     <div className="table-wrap bundle-table-scroll" ref={scroll} role="region" aria-label="Bundle pricing" tabIndex={0}>
       <table className="admin-table"><thead><tr><th>Bundle</th><th>Buy Price</th><th>Contents</th><th>Discount</th><th>FF Bundle Price</th><th>Visibility</th><th>{review ? 'Channel price' : 'Availability'}</th><th>Sync</th></tr></thead>
       <tbody>{rows.map(row => <tr key={row.id}>
@@ -43,7 +43,7 @@ export function EnterpriseBundles({ token, roles = [], active = true, review = f
     </div>
     {review && <p className="small">Bundle changes are saved locally. Check Local Line and approve publication from the bundle’s Sync section.</p>}
     {selected && data && <BundleEditor key={selected} id={selected} token={token} canEdit={canEdit} roles={roles} localOnly={data.localOnly} catalog={data.catalog} vendors={data.vendors}
-      onClose={() => setSelected(null)} onSaved={() => setRefresh(v => v + 1)} />}
+      onClose={() => setSelected(null)} onCreated={id => { setSelected(id); setRefresh(v => v + 1); }} onSaved={() => setRefresh(v => v + 1)} />}
   </section>;
 }
 
@@ -54,20 +54,28 @@ function Description({ value, resetKey, disabled, onChange }) {
     contentEditable={!disabled} suppressContentEditableWarning onInput={e => onChange(safeDescription(e.currentTarget.innerHTML))} />;
 }
 
-function BundleEditor({ id, token, catalog, vendors, canEdit, roles, localOnly, onClose, onSaved }) {
+function BundleEditor({ id, token, catalog, vendors, canEdit, roles, localOnly, onClose, onSaved, onCreated }) {
   const [detail, setDetail] = useState(null), [draft, setDraft] = useState(null), [baseline, setBaseline] = useState(null);
   const [preview, setPreview] = useState(null), [busy, setBusy] = useState(false), [message, setMessage] = useState('');
   const [reload, setReload] = useState(0), [refreshPreview, setRefreshPreview] = useState(0), [componentSearch, setComponentSearch] = useState('');
   const [adding, setAdding] = useState(false), [imageUrl, setImageUrl] = useState('');
-  const dirty = draft && JSON.stringify(draft) !== JSON.stringify(baseline);
+  const [creationKey] = useState(() => crypto.randomUUID());
+  const isNew = id === "new";
+  const dirty = draft && (isNew || JSON.stringify(draft) !== JSON.stringify(baseline));
   useEffect(() => {
+    if (isNew) {
+      const input = { name: '', description: '', vendorId: '', buyPrice: '', discountPercent: 5,
+        visible: false, inventoryMode: 'untracked', stock: null, images: [], components: [] };
+      setDraft(input); setBaseline(input); setDetail({ input, remoteBoxId: null, remotePrices: [] });
+      return;
+    }
     let cancelled = false;
     adminGet(`enterprise-pricing/bundles/${id}`, token).then(value => { if (!cancelled) { setDetail(value); setDraft(value.input); setBaseline(value.input); setMessage(''); } })
       .catch(e => { if (!cancelled) setMessage(e.message); });
     return () => { cancelled = true; };
   }, [id, token, reload]);
   useEffect(() => {
-    if (!draft || !canEdit) return undefined;
+    if (!draft || !canEdit || (isNew && (!draft.name.trim() || !draft.vendorId || draft.buyPrice === '' || !draft.components.length))) return undefined;
     let cancelled = false;
     const timer = setTimeout(() => adminPost('enterprise-pricing/bundles/preview', token, { input: draft })
       .then(value => { if (!cancelled) setPreview(value); })
@@ -80,7 +88,8 @@ function BundleEditor({ id, token, catalog, vendors, canEdit, roles, localOnly, 
     if (!preview || busy) return;
     setBusy(true); setMessage('');
     try {
-      const saved = await adminPost(`enterprise-pricing/bundles/${id}`, token, { input: draft, expectedRevision: detail.revision, pricingHash: preview.pricingHash });
+      const saved = await adminPost(isNew ? "enterprise-pricing/bundles" : `enterprise-pricing/bundles/${id}`, token, { input: draft, expectedRevision: detail.revision, pricingHash: preview.pricingHash, ...(isNew ? { creationKey } : {}) });
+      if (isNew) { onCreated(saved.id); if (goBack) onClose(); return; }
       setDetail(old => ({ ...old, revision: saved.revision, input: saved.input, output: saved.output }));
       setDraft(saved.input); setBaseline(saved.input); setPreview(saved); setMessage('Saved locally.'); onSaved();
       if (goBack) onClose();
@@ -91,15 +100,15 @@ function BundleEditor({ id, token, catalog, vendors, canEdit, roles, localOnly, 
   const available = catalog.filter(p => !p.blocker && !draft?.components.some(c => c.packageId === p.packageId) &&
     `${p.name} ${p.packageName} ${p.vendorName}`.toLowerCase().includes(componentSearch.toLowerCase()));
   const editComponent = (index, patch) => update({ components: draft.components.map((c,i) => i===index ? {...c,...patch} : c) });
-  return <ProductEditorDialog name={draft?.name || 'bundle'} backLabel="Back to bundles" showNeighbors={false} busy={busy} dirty={dirty} message={message}
+  return <ProductEditorDialog name={draft?.name || 'new bundle'} title={isNew ? 'Add bundle' : undefined} backLabel="Back to bundles" showNeighbors={false} busy={busy} dirty={dirty} message={message}
     onClose={close} sections={[["bundle-info","Bundle info"],["bundle-inventory","Inventory"],["bundle-contents","Contents & price"],["bundle-sync","Sync"]]}
     footer={<><button className="button alt" disabled={busy} onClick={close}>Cancel</button>{canEdit && <>
-      <button className="button alt" disabled={busy || !dirty || !preview} onClick={() => save(false)}>Save</button>
-      <button className="button" disabled={busy || !dirty || !preview} onClick={() => save(true)}>Save and go back</button></>}</>}>
+      <button className="button alt" disabled={busy || !dirty || !preview || !!preview?.output?.blockers?.length} onClick={() => save(false)}>{isNew ? 'Create bundle' : 'Save'}</button>
+      <button className="button" disabled={busy || !dirty || !preview || !!preview?.output?.blockers?.length} onClick={() => save(true)}>{isNew ? 'Create and go back' : 'Save and go back'}</button></>}</>}>
     {!draft ? <p role="status">{message || 'Loading bundle…'}</p> : <>
     <section className="product-editor-section bundle-form" id="bundle-info"><h3>Bundle info</h3>
       <fieldset disabled={!canEdit || busy}><label>Bundle name<input className="input" value={draft.name} onChange={e=>update({name:e.target.value})} /></label>
-      <label>Vendor<select className="input" value={draft.vendorId} onChange={e=>update({vendorId:Number(e.target.value)})}>{vendors.map(v=><option key={v.id} value={v.id}>{v.name}</option>)}</select></label>
+      <label>Vendor<select aria-label="Bundle vendor" className="input" value={draft.vendorId} onChange={e=>update({vendorId:Number(e.target.value)})}><option value="">Choose vendor</option>{vendors.map(v=><option key={v.id} value={v.id}>{v.name}</option>)}</select></label>
       <label className="bundle-check"><input type="checkbox" checked={draft.visible} onChange={e=>update({visible:e.target.checked})} /> Visible in Local Line after publication</label>
       <span>Description</span><Description resetKey={`${id}:${reload}:${detail.revision}`} value={draft.description} disabled={!canEdit || busy} onChange={description=>update({description})} />
       <span>Images</span><div className="bundle-images">{draft.images.map((url,i)=><div key={`${i}:${url}`}><img src={url} alt={`${draft.name} ${i+1}`} /><button className="button alt" aria-label={`Remove image ${i+1}`} onClick={()=>update({images:draft.images.filter((_,n)=>n!==i)})}>Remove</button></div>)}</div>
@@ -122,13 +131,13 @@ function BundleEditor({ id, token, catalog, vendors, canEdit, roles, localOnly, 
         <div role="region" aria-label="Available component packages">{available.slice(0,40).map(p=><button key={p.packageId} disabled={busy} onClick={()=>{update({components:[...draft.components,{packageId:p.packageId,quantity:1}]});setComponentSearch('');}}>{p.name} · {p.packageName}<small>{p.vendorName} · {money(p.priceCents)}</small></button>)}{!available.length && <p>No priced packages match.</p>}</div></div>}
       <fieldset disabled={!canEdit||busy} className="bundle-pricing-inputs"><label>Bundle Buy Price<input className="input" type="number" min="0" step="0.01" value={draft.buyPrice} onChange={e=>update({buyPrice:e.target.value})} /></label>
       <label>Bundle discount %<input className="input" type="number" min="0" max="99.99" step="0.01" value={draft.discountPercent} onChange={e=>update({discountPercent:e.target.value})} /></label></fieldset>
-      <p className="small">Component FF package prices × quantities, less {draft.discountPercent}%. All four FF baskets use this price. The discount does not change the Buy Price.</p>
+      <p className="small">Component FF package prices × quantities, less {draft.discountPercent}%. All three active FF baskets use this price. The discount does not change the Buy Price.</p>
       {output?.blockers.map((text,i)=><p role="alert" key={i}>{text}</p>)}
     </section>
-    <section className="product-editor-section" id="bundle-sync"><h3>Sync</h3><p>Local Line box #{detail.remoteBoxId} · {draft.visible?'Visible':'Hidden'}</p>
+    <section className="product-editor-section" id="bundle-sync"><h3>Sync</h3><p>{detail.remoteBoxId ? `Local Line box #${detail.remoteBoxId}` : "Saved locally; Local Line listing not linked"} · {draft.visible?'Visible':'Hidden'}</p>
       <table className="admin-table"><thead><tr><th>Basket</th><th>Channel price</th><th>Local bundle price</th></tr></thead><tbody>{detail.remotePrices.map(p=><tr key={p.listId}><td>{p.name}</td><td>{money(p.priceCents)}</td><td>{money(output?.priceCents)}</td></tr>)}</tbody></table>
-      <BundleSync id={id} token={token} roles={roles} localOnly={localOnly} dirty={dirty} publicationId={detail.latestPublicationId} onPublished={()=>{setReload(v=>v+1);onSaved();}} />
-      <button className="button alt" disabled={busy} onClick={()=>{if(!dirty||window.confirm('Discard your draft and reload the saved bundle?')){setPreview(null);setReload(v=>v+1);}}}>Reload saved bundle</button>
+      {detail.remoteBoxId ? <BundleSync id={id} token={token} roles={roles} localOnly={localOnly} dirty={dirty} publicationId={detail.latestPublicationId} onPublished={()=>{setReload(v=>v+1);onSaved();}} /> : <p>Create and link the Local Line bundle before publishing. Saving here does not create a channel listing.</p>}
+      {!isNew && <button className="button alt" disabled={busy} onClick={()=>{if(!dirty||window.confirm('Discard your draft and reload the saved bundle?')){setPreview(null);setReload(v=>v+1);}}}>Reload saved bundle</button>}
     </section></>}
   </ProductEditorDialog>;
 }

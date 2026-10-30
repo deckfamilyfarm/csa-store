@@ -1,3 +1,4 @@
+import { activeLocalLinePriceListIds } from "../../apps/api/lib/localLinePricingLists.js";
 // Standalone read-only channel capture. No application bootstrap or database client.
 import fs from 'node:fs';import path from 'node:path';import dotenv from '../../apps/api/node_modules/dotenv/lib/main.js';
 const arg=n=>process.argv.find(a=>a.startsWith(`--${n}=`))?.slice(n.length+3);
@@ -20,5 +21,5 @@ const ids=[...productIds].map(id=>{const links=local.local_line_product_meta.fil
 const products=[];let next=0;await Promise.all(Array.from({length:3},async()=>{while(next<ids.length){const id=ids[next++];products.push(await request(new URL(`products/${id}/?expand=packages,product_price_list_entries`,ll),{headers}));}}));
 const boxes=[];for(const b of local.enterprise_bundles)boxes.push(await request(new URL(`boxes/${b.remote_box_id}/`,ll),{headers}));
 const objects=[];let cursor;do{const url=new URL('/v2/catalog/list',sq);if(cursor)url.searchParams.set('cursor',cursor);const response=await request(url,{headers:{Authorization:`Bearer ${env.SQUARE_ACCESS_TOKEN}`,'Square-Version':env.SQUARE_API_VERSION||'2026-08-19'}});objects.push(...response.objects||[]);cursor=response.cursor;}while(cursor);
-write('channels.json',{capturedAt:new Date().toISOString(),readOnly:true,saleProductIds:saleIds,products,boxes,square:objects,basketIds:['LL_PRICE_LIST_GUEST_ID','LL_PRICE_LIST_CSA_MEMBERS_ID','LL_PRICE_LIST_HERDSHARE_ID','LL_PRICE_LIST_SNAP_ID'].map(k=>Number(env[k]))});
+write('channels.json',{capturedAt:new Date().toISOString(),readOnly:true,saleProductIds:saleIds,products,boxes,square:objects,basketIds:activeLocalLinePriceListIds(env)});
 console.log(JSON.stringify({products:products.length,saleProducts:saleIds.length,boxes:boxes.length,squareObjects:objects.length,remoteWrites:0}));

@@ -115,11 +115,6 @@ function buildConfiguredPriceListChecks() {
       localLinePriceListId: parsePriceListId(process.env.LL_PRICE_LIST_GUEST_ID)
     },
     {
-      envKey: "LL_PRICE_LIST_CSA_MEMBERS_ID",
-      label: "CSA Members",
-      localLinePriceListId: parsePriceListId(process.env.LL_PRICE_LIST_CSA_MEMBERS_ID)
-    },
-    {
       envKey: "LL_PRICE_LIST_HERDSHARE_ID",
       label: "Herd Share Members",
       localLinePriceListId: parsePriceListId(process.env.LL_PRICE_LIST_HERDSHARE_ID)

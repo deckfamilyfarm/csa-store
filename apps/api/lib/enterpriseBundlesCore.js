@@ -1,3 +1,4 @@
+import { isRetiredLocalLineList } from "./localLinePricingLists.js";
 import { roundRatio, scaledInteger } from './enterprisePricingEngine.js';
 
 const fail = message => { throw Object.assign(new Error(message), { status: 400 }); };
@@ -65,7 +66,7 @@ export function calculateBundle(input, catalog) {
 }
 
 export function observedBundlePrices(source) {
-  return (source?.product_price_list_entries || []).map(row => {
+  return (source?.product_price_list_entries || []).filter(row => !isRetiredLocalLineList(row.price_list, row.price_list_name)).map(row => {
     const entry = row.box_package_entry || {}, base = Number(source.price), value = Number(entry.adjustment_value);
     let price = base;
     if (entry.adjustment) price = Number(entry.adjustment_type) === 1 ? base + value : Number(entry.adjustment_type) === 2 ? base * (1 + value / 100) : Number(entry.adjustment_type) === 3 ? value : NaN;

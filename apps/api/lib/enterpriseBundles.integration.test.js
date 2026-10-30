@@ -13,7 +13,7 @@ test('bundle import, local editing, dependent pricing, history and permission bo
   process.env.CSA_LOCAL_ONLY='true';
   t.after(()=>pool.end());
   for(const sql of [
-    'CREATE TABLE vendors(id INT PRIMARY KEY,name VARCHAR(255))',
+    'CREATE TABLE product_sales(product_id INT PRIMARY KEY,on_sale INT,sale_discount DECIMAL(10,4))','CREATE TABLE product_pricing_profiles(product_id INT PRIMARY KEY,on_sale INT,sale_discount DECIMAL(10,4))','CREATE TABLE vendors(id INT PRIMARY KEY,name VARCHAR(255))',
     'CREATE TABLE categories(id INT PRIMARY KEY,name VARCHAR(255))',
     'CREATE TABLE products(id INT PRIMARY KEY,name VARCHAR(255),vendor_id INT,category_id INT,is_deleted INT,track_inventory INT,inventory INT)',
     'CREATE TABLE packages(id INT PRIMARY KEY,product_id INT,name VARCHAR(255),track_inventory INT,inventory INT,num_of_items INT,track_type VARCHAR(30))',
@@ -61,6 +61,20 @@ test('bundle import, local editing, dependent pricing, history and permission bo
   response=await fetch(`${url}/bundles/preview`,{method:'POST',headers:{'Content-Type':'application/json','x-test-role':'pricing_editor'},body:JSON.stringify({input:changed})});assert.equal(response.status,200);
   response=await fetch(`${url}/bundles/${id}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({})});assert.equal(response.status,403);
   response=await fetch(`${url}/bundles/${id}/publish`,{method:'POST'});assert.equal(response.status,404,'There is no accidental remote publish endpoint');
+  const createInput={...changed,name:'New local bundle'};
+  const createPreview=await service.previewBundle(createInput);
+  const body={input:createInput,pricingHash:createPreview.pricingHash,creationKey:'test-local-bundle-creation'};
+  response=await fetch(`${url}/bundles`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  assert.equal(response.status,403,'Publish-only users cannot create');
+  response=await fetch(`${url}/bundles`,{method:'POST',headers:{'Content-Type':'application/json','x-test-role':'pricing_editor'},body:JSON.stringify(body)});
+  assert.equal(response.status,200);const created=await response.json();assert.equal(created.remoteBoxId,null);
+  assert.equal(created.output.priceCents,createPreview.output.priceCents);
+  const resumed=await service.createBundle(body,{userId:1});assert.equal(resumed.id,created.id,'lost-response retry reuses local bundle');
+  assert.equal((await pool.query('SELECT COUNT(*) n FROM enterprise_bundle_revisions WHERE bundle_id=?',[created.id]))[0][0].n,1);
+  await assert.rejects(()=>service.createBundle({...body,creationKey:'test-stale-bundle-create',pricingHash:'old'},{userId:1}),e=>e.status===409);
+  await assert.rejects(()=>service.createBundle({...body,creationKey:'test-missing-vendor-create',input:{...createInput,vendorId:999}},{userId:1}),/named vendor/);
+  const publications=await import('./enterpriseBundlePublications.js');
+  await assert.rejects(()=>publications.reviewBundlePublication(created.id,{userId:1}),/Create and link/);
   current=await service.getBundle(id);assert.equal(current.input.buyPrice,'26.73');assert.equal(current.revision,2);
   const {assertLegacyPricingPublicationAllowed}=await import('./enterprisePricingService.js');
   await assert.rejects(()=>assertLegacyPricingPublicationAllowed([3]),e=>e.status===409&&/Bundles use native/.test(e.message));

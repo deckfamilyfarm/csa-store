@@ -678,7 +678,7 @@ export function AdminProductsSection({
           >
             Columns
           </button>}
-          {capabilities.edit && !compactInventory ? (
+          {capabilities.edit && view === "pricing" ? (
             <button
               className="button alt"
               disabled={saving || busy}
@@ -834,7 +834,6 @@ export function AdminProductsSection({
             {mobileFiltersOpen ? "Fewer filters" : "Filters & sort"}
           </button>
           <span>{filters.vendorId === DECK_ENTERPRISES ? "Deck Enterprises" : vendors.find(v => String(v.id) === String(filters.vendorId))?.name || "All vendors"}</span>
-          {capabilities.edit && <button type="button" className="products-text-button" disabled={saving || busy} onClick={onAddProduct}>Add product</button>}
         </div>
       </>}
       <div className="products-toolbar">

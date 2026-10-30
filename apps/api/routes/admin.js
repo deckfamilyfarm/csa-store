@@ -1,3 +1,5 @@
+import { copyEnterprisePricing } from "../lib/duplicateEnterprisePricing.js";
+import { ensureEnterprisePricingSchema } from "../lib/enterprisePricingSchema.js";
 import { requireProductPricingUnit } from '../lib/productPricingUnitInput.js';
 import productSyncRouter from "./productSync.js";
 import enterprisePricingRouter from "./enterprisePricing.js";
@@ -211,8 +213,10 @@ router.put("/products/:id/farm-stock", requireAdminPermission(["inventory_admin"
 });
 
 router.post("/products/:id/inventory", requireAdminPermission(["inventory_admin", "pricing_admin", "local_pricelist_admin"]), async (req, res) => {
-  try { res.json(await saveInventoryToLocalLine(req.params.id, req.body?.changes, req.admin)); }
-  catch (error) { res.status(error.status || 400).json({ error: error.message }); }
+  try {
+    if(Object.hasOwn(req.body?.changes||{},'inventory') && !req.body?.expectedInventory) return res.status(428).json({error:'Refresh FF inventory before editing its quantity.'});
+    res.json(await saveInventoryToLocalLine(req.params.id, req.body?.changes, req.admin, req.body?.expectedInventory)); }
+  catch (error) { res.status(error.status || 400).json({ error: error.message, ...(error.inventoryConflict ? {inventoryConflict:error.inventoryConflict} : {}) }); }
 });
 
 let spacesClient = null;
@@ -3335,7 +3339,7 @@ async function markProductRemoteSyncPending(connection, productId, message) {
   );
 }
 
-async function duplicateLocalProductRecord(connection, sourceProductId) {
+async function duplicateLocalProductRecord(connection, sourceProductId, { forPricing = false, user } = {}) {
   const [productRows] = await connection.query(
     "SELECT * FROM products WHERE id = ? LIMIT 1",
     [sourceProductId]
@@ -3393,26 +3397,26 @@ async function duplicateLocalProductRecord(connection, sourceProductId) {
     pricingProfile: { unitOfMeasure: profileRows[0]?.unit_of_measure || (isSourcePricingVendor(sourceVendor) ? null : 'each') },
     name: `${sourceProduct.name} Copy`,
     description: sourceProduct.description || "",
-    visible: Boolean(sourceProduct.visible),
+    visible: forPricing ? false : Boolean(sourceProduct.visible),
     trackInventory: Boolean(sourceProduct.track_inventory),
-    inventory: Number(sourceProduct.inventory || 0),
+    inventory: forPricing ? 0 : Number(sourceProduct.inventory || 0),
     categoryId: sourceProduct.category_id,
     vendorId: sourceProduct.vendor_id,
     thumbnailUrl: sourceProduct.thumbnail_url,
-    onSale: Boolean(saleRows[0]?.on_sale),
-    saleDiscount:
+    onSale: forPricing ? false : Boolean(saleRows[0]?.on_sale),
+    saleDiscount: forPricing ? 0 :
       saleRows[0]?.sale_discount === null || typeof saleRows[0]?.sale_discount === "undefined"
         ? 0
         : Number(saleRows[0].sale_discount),
     packages: packageRows.map((pkg) => ({
       name: pkg.name,
       price: Number(pkg.price),
-      packageCode: pkg.package_code,
+      packageCode: forPricing ? "" : pkg.package_code,
       unit: pkg.unit,
       numOfItems: pkg.num_of_items,
-      visible: pkg.visible,
+      visible: forPricing ? false : pkg.visible,
       trackInventory: pkg.track_inventory,
-      inventory: pkg.inventory,
+      inventory: forPricing ? 0 : pkg.inventory,
       trackType: pkg.track_type,
       chargeType: pkg.charge_type
     }))
@@ -3465,8 +3469,8 @@ async function duplicateLocalProductRecord(connection, sourceProductId) {
       defaultCsaMarkup,
       defaultCsaMarkup,
       defaultCsaMarkup,
-      profile ? profile.on_sale : (saleRows[0]?.on_sale ? 1 : 0),
-      defaultSaleDiscount,
+      forPricing ? 0 : profile ? profile.on_sale : (saleRows[0]?.on_sale ? 1 : 0),
+      forPricing ? 0 : defaultSaleDiscount,
       now,
       "pending",
       "Duplicate created with default CSA markup applied to all price lists. Apply to remote store pending.",
@@ -3522,6 +3526,7 @@ async function duplicateLocalProductRecord(connection, sourceProductId) {
     );
   }
 
+  if (forPricing) await copyEnterprisePricing(connection, sourceProductId, created, packageRows, user);
   return created;
 }
 
@@ -10581,7 +10586,7 @@ router.put("/reviews/:id", requireAdminPermission("member_admin"), async (req, r
   res.json({ ok: true });
 });
 
-router.post("/products", requireAdminPermission(["inventory_admin", "pricing_admin", "membership_admin", "local_pricelist_admin"]), async (req, res) => {
+router.post("/products", requireAdminPermission(["inventory_admin", "pricing_admin", "pricing_editor", "membership_admin", "local_pricelist_admin"]), async (req, res) => {
   const pool = getPool();
   const payload = req.body || {};
   const connection = await pool.getConnection();
@@ -10627,7 +10632,7 @@ router.post("/products", requireAdminPermission(["inventory_admin", "pricing_adm
   }
 });
 
-router.post("/products/:id/duplicate", requireAdminPermission(["inventory_admin", "pricing_admin", "membership_admin", "local_pricelist_admin"]), async (req, res) => {
+router.post("/products/:id/duplicate", requireAdminPermission(["inventory_admin", "pricing_admin", "pricing_editor", "membership_admin", "local_pricelist_admin"]), async (req, res) => {
   const pool = getPool();
   const db = getDb();
   const sourceProductId = Number(req.params.id);
@@ -10642,8 +10647,9 @@ router.post("/products/:id/duplicate", requireAdminPermission(["inventory_admin"
       console.warn("Local Line schema bootstrap skipped for /admin/products/:id/duplicate:", error.message);
     });
 
+    if (req.body?.forPricing === true) await ensureEnterprisePricingSchema();
     await connection.beginTransaction();
-    const created = await duplicateLocalProductRecord(connection, sourceProductId);
+    const created = await duplicateLocalProductRecord(connection, sourceProductId, { forPricing: req.body?.forPricing === true, user: req.admin });
     await connection.commit();
 
     await upsertLocalOnlyProductMeta(db, created.productId, created.productRecord);
@@ -10704,7 +10710,7 @@ router.delete("/products/:id", requireAdminPermission(["inventory_admin", "prici
   }
 });
 
-router.put("/products/:id", requireAdminPermission(["inventory_admin", "pricing_admin", "membership_admin", "local_pricelist_admin"]), async (req, res) => {
+router.put("/products/:id", requireAdminPermission(["inventory_admin", "pricing_admin", "pricing_editor", "membership_admin", "local_pricelist_admin"]), async (req, res) => {
   const db = getDb();
   const pool = getPool();
   const id = Number(req.params.id);
@@ -11107,7 +11113,7 @@ router.put("/packages/:id", requireAdminPermission(["pricing_admin", "membership
   res.json({ ok: true });
 });
 
-router.post("/products/:id/images", requireAdminPermission(["inventory_admin", "pricing_admin", "local_pricelist_admin"]), upload.single("image"), async (req, res) => {
+router.post("/products/:id/images", requireAdminPermission(["inventory_admin", "pricing_admin", "pricing_editor", "local_pricelist_admin"]), upload.single("image"), async (req, res) => {
   const db = getDb();
   const productId = Number(req.params.id);
   if (!req.file) {
@@ -11234,7 +11240,7 @@ router.post("/products/:id/images", requireAdminPermission(["inventory_admin", "
   }
 });
 
-router.post("/products/:id/images/delete", requireAdminPermission(["inventory_admin", "pricing_admin", "local_pricelist_admin"]), async (req, res) => {
+router.post("/products/:id/images/delete", requireAdminPermission(["inventory_admin", "pricing_admin", "pricing_editor", "local_pricelist_admin"]), async (req, res) => {
   const db = getDb();
   const productId = Number(req.params.id);
   const url = toNullableString(req.body?.url);

@@ -1,3 +1,4 @@
+import { isRetiredLocalLineList } from "../lib/localLinePricingLists.js";
 import { catalogIsLocallyManaged } from "../lib/catalogAuthority.js";
 import fs from "fs";
 import os from "os";
@@ -248,11 +249,6 @@ function buildConfiguredPriceListsFromEnv() {
       markup: parseNumber(process.env.LL_PRICE_LIST_GUEST_MARKUP, defaultGuest)
     },
     {
-      key: "CSA Members",
-      id: parseNumber(process.env.LL_PRICE_LIST_CSA_MEMBERS_ID),
-      markup: parseNumber(process.env.LL_PRICE_LIST_CSA_MEMBERS_MARKUP, defaultMember)
-    },
-    {
       key: "Herd Share Members",
       id: parseNumber(process.env.LL_PRICE_LIST_HERDSHARE_ID),
       markup: parseNumber(process.env.LL_PRICE_LIST_HERDSHARE_MARKUP, defaultMember)
@@ -463,7 +459,7 @@ function collectPriceListDefinitions(liveDetails) {
         definitions.set(id, {
           localLinePriceListId: id,
           name: getEntryPriceListName(entry) || `Price List ${id}`,
-          active: 1,
+          active: isRetiredLocalLineList(id, getEntryPriceListName(entry)) ? 0 : 1,
           source: "localline"
         });
       } else if (!definitions.get(id).name && getEntryPriceListName(entry)) {
@@ -1136,7 +1132,7 @@ async function upsertPriceLists(connection, rows) {
       [
         row.localLinePriceListId,
         row.name,
-        row.active,
+        isRetiredLocalLineList(row.localLinePriceListId, row.name) ? 0 : row.active,
         row.source,
         row.createdAt || new Date(),
         row.updatedAt || new Date(),

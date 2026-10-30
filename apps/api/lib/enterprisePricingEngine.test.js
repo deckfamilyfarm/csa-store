@@ -12,7 +12,7 @@ test("Square per-pound price drives one discounted Local Line package price for 
   assert.equal(result.csaUnitCents, 900);
   assert.equal(result.packages[0].localLineRegularCents, 3600);
   assert.equal(result.packages[0].localLineSaleCents, 2880);
-  assert.deepEqual(Object.values(result.packages[0].localLineBasketCents), [2880, 2880, 2880, 2880]);
+  assert.deepEqual(Object.values(result.packages[0].localLineBasketCents), [2880, 2880, 2880]);
   assert.equal(result.packages[0].weightSource, "midpoint");
 });
 
@@ -64,4 +64,19 @@ test("fixed Square and CSA overrides stay fixed as purchase costs change", () =>
   const csaB = calculateEnterprisePricing({ ...base, buyFromPrice: "4.0000", squareEnabled: false, csaOverride: "6.25" });
   assert.equal(csaA.csaUnitCents, 625);
   assert.equal(csaB.csaUnitCents, 625);
+});
+
+test('package costs preserve distinct sizes, remain fixed across default cost edits, and follow markup',()=>{
+  const base={pricingUnit:'each',buyFromPrice:'3.00',markupCategory:'shelfStable',squareEnabled:false,
+    packages:[{packageId:1,quantity:1,packageBuyPrice:'3.00'},{packageId:2,quantity:5,packageBuyPrice:'5.00'}]};
+  assert.deepEqual(calculateEnterprisePricing(base).packages.map(p=>p.localLineRegularCents),[450,750]);
+  assert.deepEqual(calculateEnterprisePricing({...base,buyFromPrice:'7.00'}).packages.map(p=>p.localLineRegularCents),[450,750]);
+  assert.deepEqual(calculateEnterprisePricing({...base,customMarkupBp:10000}).packages.map(p=>p.localLineRegularCents),[600,1000]);
+  assert.deepEqual(calculateEnterprisePricing({...base,saleBp:2000}).packages.map(p=>p.localLineSaleCents),[360,600]);
+  assert.deepEqual(calculateEnterprisePricing({...base,csaOverride:'4.00'}).packages.map(p=>p.localLineRegularCents),[400,2000]);
+  const square=calculateEnterprisePricing({...base,squareEnabled:true});
+  assert.deepEqual(square.packages.map(p=>[p.squareVariationCents,p.localLineRegularCents]),[[450,405],[750,675]]);
+  assert.equal(calculateEnterprisePricing({...base,packages:[{packageId:1,quantity:2}]}).packages[0].localLineRegularCents,900);
+  assert.throws(()=>calculateEnterprisePricing({...base,packages:[{packageId:1,packageBuyPrice:'0'}]}),/greater than zero/);
+  assert.throws(()=>calculateEnterprisePricing({...base,pricingUnit:'lb',packages:[{packageId:1,minWeight:1,maxWeight:2,packageBuyPrice:'5'}]}),/per-pound|Per-pound/);
 });

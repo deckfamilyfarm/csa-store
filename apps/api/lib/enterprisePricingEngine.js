@@ -89,16 +89,29 @@ export function calculateEnterprisePricing(input, settings = DEFAULT_PRICING_SET
     const quantity = unit === "each" ? whole(pkg.quantity ?? 1, "Package quantity", 1, 100000) : null;
     const factor = unit === "lb" ? weight.milliPounds : quantity;
     const divisor = unit === "lb" ? 1000 : 1;
-    const localLineRegularCents = factor === null ? null : roundRatio(BigInt(csaUnitCents) * BigInt(factor), BigInt(divisor));
-    const localLineSaleCents = localLineRegularCents === null ? null : roundRatio(BigInt(localLineRegularCents) * BigInt(10000 - saleBp), 10000n);
-    const squareVariationCents = squareEnabled
+    let localLineRegularCents = factor === null ? null : roundRatio(BigInt(csaUnitCents) * BigInt(factor), BigInt(divisor));
+    let squareVariationCents = squareEnabled
       ? unit === "lb" ? squareUnitCents : roundRatio(BigInt(squareUnitCents) * BigInt(quantity), BigInt(increment)) * increment
       : null;
+    const explicitPackageCost=pkg.packageBuyPrice!==null && pkg.packageBuyPrice!==undefined && pkg.packageBuyPrice!=='';
+    let packageBuyPriceCents=null;
+    if(explicitPackageCost) {
+      if(unit!=='each') fail('Package Buy Price applies to each/package pricing. Per-pound products use their unit Buy Price.');
+      packageBuyPriceCents=scaledInteger(pkg.packageBuyPrice,2,'Package Buy Price');
+      if(packageBuyPriceCents<=0) fail('Package Buy Price must be greater than zero.');
+      const target=roundRatio(BigInt(packageBuyPriceCents)*BigInt(10000+appliedMarkupBp),10000n);
+      if(squareEnabled) {
+        if(input.squareOverride==null||input.squareOverride==='') squareVariationCents=roundRatio(BigInt(packageBuyPriceCents)*BigInt(10000+appliedMarkupBp),BigInt(10000*increment))*increment;
+        localLineRegularCents=roundRatio(BigInt(squareVariationCents)*BigInt(10000-discountBp),10000n);
+      } else if(input.csaOverride==null||input.csaOverride==='') localLineRegularCents=target;
+    }
+    const localLineSaleCents = localLineRegularCents === null ? null : roundRatio(BigInt(localLineRegularCents) * BigInt(10000 - saleBp), 10000n);
     return {
+      ...(explicitPackageCost?{packageBuyPriceCents}:{}),
       packageId, quantity, averageWeightMilliPounds: weight?.milliPounds ?? null,
       weightSource: weight?.source ?? null, squareVariationCents,
       localLineRegularCents, localLineSaleCents,
-      localLineBasketCents: Object.fromEntries(["guest", "member", "herdShare", "snap"].map(key => [key, localLineSaleCents]))
+      localLineBasketCents: Object.fromEntries(["guest", "herdShare", "snap"].map(key => [key, localLineSaleCents]))
     };
   });
   const retailCents = squareEnabled ? squareUnitCents : csaUnitCents;

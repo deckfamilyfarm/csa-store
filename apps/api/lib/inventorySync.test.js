@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { inventoryChanges, saveInventoryToLocalLine } from "./inventorySync.js";
+import { inventoryConflict, inventoryChanges, saveInventoryToLocalLine } from "./inventorySync.js";
 import { canPublishInventory, hasAdminPermission } from "./adminRoles.js";
 
 test("inventory publishing permits inventory admins and retains existing editor/push grants", () => {
@@ -33,4 +33,13 @@ test("direct inventory updates reject all other product fields and invalid stock
     {inventory:-1}, {inventory:1.5}, {inventory:true}, {inventory:null}, {inventory:"2"}, {trackInventory:2}]) {
     assert.throws(()=>inventoryChanges(changes));
   }
+});
+
+
+test('stock edits reject diminished remote quantities and changed tracking baselines',()=>{
+  const remote={inventory:3,track_inventory:true};
+  assert.equal(inventoryConflict(remote,{inventory:3,trackInventory:true}),null);
+  assert.equal(inventoryConflict(remote,{inventory:5,trackInventory:true}).inventory,3);
+  assert.equal(inventoryConflict({...remote,track_inventory:false},{inventory:3,trackInventory:true}).trackInventory,false);
+  for(const baseline of [null,{}, {inventory:'3',trackInventory:true}]) assert.throws(()=>inventoryConflict(remote,baseline),{status:428});
 });

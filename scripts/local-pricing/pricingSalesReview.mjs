@@ -11,7 +11,7 @@ export function inspectSale(pkg, listIds) {
       crossedOutCents: entry.strikethrough_display_value == null ? null : scaledInteger(entry.strikethrough_display_value, 2) };
   });
   const first = baskets[0];
-  const consistent = baskets.length === 4 && new Set(listIds).size === 4 && baskets.every(b => !b.missing && Number.isSafeInteger(b.priceCents) && b.priceCents === first.priceCents && b.sale === first.sale && b.crossedOutCents === first.crossedOutCents);
+  const consistent = baskets.length === 3 && new Set(listIds).size === 3 && baskets.every(b => !b.missing && Number.isSafeInteger(b.priceCents) && b.priceCents === first.priceCents && b.sale === first.sale && b.crossedOutCents === first.crossedOutCents);
   if (!consistent) return { baskets, discountPercent: null, issue: 'Basket prices or sale displays differ; choose the intended sale explicitly.' };
   if (!first.sale) return { baskets, discountPercent: null, issue: 'No current channel sale; do not carry the old local flag forward.' };
   if (!(first.crossedOutCents > first.priceCents)) return { baskets, discountPercent: null, issue: 'Crossed-out price is not greater than the selling price.' };

@@ -95,7 +95,6 @@ function parsePriceListId(value) {
 function getStorefrontLocalLinePriceListIds() {
   return [
     parsePriceListId(process.env.LL_PRICE_LIST_GUEST_ID),
-    parsePriceListId(process.env.LL_PRICE_LIST_CSA_MEMBERS_ID),
     parsePriceListId(process.env.LL_PRICE_LIST_HERDSHARE_ID),
     parsePriceListId(process.env.LL_PRICE_LIST_SNAP_ID)
   ].filter((value, index, values) => Number.isFinite(value) && values.indexOf(value) === index);
@@ -1630,7 +1629,6 @@ router.get("/catalog", async (_req, res) => {
 
     const guestPriceListId = parsePriceListId(process.env.LL_PRICE_LIST_GUEST_ID);
     const memberPriceListIds = [
-      parsePriceListId(process.env.LL_PRICE_LIST_CSA_MEMBERS_ID),
       parsePriceListId(process.env.LL_PRICE_LIST_HERDSHARE_ID),
       parsePriceListId(process.env.LL_PRICE_LIST_SNAP_ID)
     ].filter((value, index, values) => Number.isFinite(value) && values.indexOf(value) === index);

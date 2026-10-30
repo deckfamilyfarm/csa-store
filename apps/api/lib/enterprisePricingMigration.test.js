@@ -17,7 +17,7 @@ test("migration calibrates the new markup from inferred cost and current Square 
   assert.equal(plan.input.pricingUnit, "each");
   assert.equal(plan.output.squareUnitCents, 1950);
   assert.equal(plan.output.csaUnitCents, 1755);
-  assert.deepEqual(Object.values(plan.output.packages[0].localLineBasketCents), [1755, 1755, 1755, 1755]);
+  assert.deepEqual(Object.values(plan.output.packages[0].localLineBasketCents), [1755, 1755, 1755]);
   assert.equal(plan.approvedForMigration, false);
 });
 
@@ -56,4 +56,14 @@ test("missing explicit Square units and special products remain held or preserve
   assert.equal(plan.summary.held, 1);
   assert.equal(plan.summary.preservedSpecial, 1);
   assert.equal(plan.rows[0].input, null);
+});
+
+test('migration preserves distinct package buy prices instead of flattening variants',()=>{
+  const record=sample({product:{id:2,name:'Coasters',vendorName:'Wood shop'},vendor:{name:'Wood shop'},profile:null,squarePrices:[],
+    packages:[{id:10,name:'2 pack',price:'3.00',numOfItems:1},{id:20,name:'5 pack',price:'5.00',numOfItems:null}],
+    localLinePrices:[{packageId:10,listName:'Guest Basket',finalPrice:'4.35'},{packageId:20,listName:'Guest Basket',finalPrice:'7.25'}]});
+  const plan=planProductMigration(record);
+  assert.equal(plan.action,'ready');
+  assert.deepEqual(plan.input.packages.map(p=>p.packageBuyPrice),['3.00','5.00']);
+  assert.deepEqual(plan.output.packages.map(p=>p.localLineRegularCents),[435,725]);
 });

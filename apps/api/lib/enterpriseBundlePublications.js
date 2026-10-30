@@ -1,3 +1,4 @@
+import { activeLocalLinePriceListIds } from "./localLinePricingLists.js";
 import {getPool} from '../db.js';
 import {getLocalLineBaseUrl,getLocalLineAccessToken} from '../localLineAuth.js';
 import {getBundle} from './enterpriseBundles.js';
@@ -7,7 +8,7 @@ import {bundleRemoteState,prepareBundlePatch,componentPriceCents,assertBundlePil
 import {digest} from './pricingCutover.js';
 const fail=(message,status=409)=>{throw Object.assign(new Error(message),{status});};
 const actor=user=>Number(user?.userId??user?.id);
-const lists=()=>['LL_PRICE_LIST_GUEST_ID','LL_PRICE_LIST_CSA_MEMBERS_ID','LL_PRICE_LIST_HERDSHARE_ID','LL_PRICE_LIST_SNAP_ID'].map(k=>Number(process.env[k]));
+const lists=()=>activeLocalLinePriceListIds();
 async function request(path,body){
   if(process.env.CSA_LOCAL_ONLY==='true')fail('Channel access is disabled in isolated local mode.',403);
   const base=new URL(getLocalLineBaseUrl()),url=new URL(path,base);
@@ -20,6 +21,7 @@ async function request(path,body){
 async function remoteVendors(){const result=[];let page='vendors/';while(page){const data=await request(page);result.push(...(Array.isArray(data)?data:data.results||[]));page=Array.isArray(data)?null:data.next;}return result;}
 async function inspect(id){
  const bundle=await getBundle(id),db=getPool();
+ if(!bundle.remoteBoxId)fail("Create and link this bundle in Local Line before checking publication.");
  const [[vendor]]=await db.query('SELECT id,name FROM vendors WHERE id=?',[bundle.input.vendorId]);
  const remoteVendor=matchLocalLineVendor({vendorId:bundle.input.vendorId},vendor,await remoteVendors());
  const components=[];
@@ -42,7 +44,7 @@ async function checkComponents(components){
   if(!pkg)fail('A bundle component package is missing from Local Line.');
   for(const id of lists()){
    const entries=(pkg.price_list_entries||[]).filter(e=>Number(e.price_list_id??e.price_list)===id);
-   if(entries.length!==1||componentPriceCents(pkg,entries[0],c.promotion)!==c.priceCents)fail('Sync individual component prices to all four Local Line baskets before publishing the bundle discount.');
+   if(entries.length!==1||componentPriceCents(pkg,entries[0],c.promotion)!==c.priceCents)fail('Sync individual component prices to all three active Local Line baskets before publishing the bundle discount.');
   }
  }
 }

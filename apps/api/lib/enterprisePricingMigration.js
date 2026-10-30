@@ -1,3 +1,4 @@
+import { ACTIVE_LOCAL_LINE_BASKETS } from "./localLinePricingLists.js";
 import crypto from "node:crypto";
 import { calculateEnterprisePricing, averagePackageWeight, DEFAULT_PRICING_SETTINGS, roundRatio, scaledInteger } from "./enterprisePricingEngine.js";
 import { deriveLegacyPricingEvidence } from "./legacyPricingEvidence.js";
@@ -13,7 +14,7 @@ const group = (rows, key) => {
 };
 const positive = value => Number(value) > 0 ? Number(value) : null;
 const cents = value => value == null ? null : Math.round(Number(value) * 100);
-const baskets = ["Guest Basket", "CSA Members", "Herd Share Members", "SNAP"];
+const baskets = ACTIVE_LOCAL_LINE_BASKETS.map(list => list.name);
 export const migrationFingerprint = record => crypto.createHash("sha256").update(JSON.stringify(record)).digest("hex");
 
 // A caller-supplied read-only connection lets preview run without schema writes.
@@ -101,7 +102,13 @@ export function planProductMigration(record, { settings = DEFAULT_PRICING_SETTIN
   if (!(buyCents > 0)) return hold("Positive Buy Price could not be inferred from stored package prices");
   result.buyPrice = { cents: buyCents, basis: `Stored package ${reference.id} price divided by ${factors[refIndex]} ${unit}`,
     inferred: true, pricingUnit: unit };
-  if (new Set(packageCostCents).size > 1) result.reviewReasons.push("Package Buy Prices differ; the first visible package is the reference.");
+  if (new Set(packageCostCents).size > 1) {
+    if(unit==='each') {
+      if(record.packages.some(pkg=>!(Number(pkg.price)>0))) return hold('Every package needs a validated positive Buy Price.');
+      packages.forEach((pkg,index)=>{pkg.packageBuyPrice=(cents(record.packages[index].price)/100).toFixed(2);});
+      result.reviewReasons.push('Distinct package Buy Prices preserved; review each package price.');
+    } else result.reviewReasons.push('Package Buy Prices differ; review per-pound purchase cost.');
+  }
   const evidence = deriveLegacyPricingEvidence(record);
   const onSale = evidence.sale.activeInProduct || evidence.sale.activeInProfile;
   const saleBp = onSale && positive(evidence.sale.discountPercent) ? Math.round(evidence.sale.discountPercent * 100) : 0;
@@ -154,6 +161,7 @@ export function planProductMigration(record, { settings = DEFAULT_PRICING_SETTIN
   // Calibrated markup normally reproduces the target. An explicit override
   // handles integer percentage precision at unusually large prices.
   if ((squareEnabled ? output.squareUnitCents : output.csaUnitCents) !== target) {
+    if(packages.some(pkg=>pkg.packageBuyPrice!=null)) return hold('Package prices require review: a shared retail override would discard their distinct costs.');
     input[squareEnabled ? "squareOverride" : "csaOverride"] = (target / 100).toFixed(2);
     input.overrideNote = "Preserve migration reference price after markup precision rounding";
     output = calculateEnterprisePricing({ ...input, buyFromPrice: input.purchaseCosts[0].cost }, settings);
@@ -166,7 +174,7 @@ export function planProductMigration(record, { settings = DEFAULT_PRICING_SETTIN
     if (new Set(prices.map(row => cents(row.finalPrice))).size > 1 && !result.reviewReasons.includes("Existing basket prices differ.")) {
       result.reviewReasons.push("Existing basket prices differ.");
     }
-    if (new Set(prices.map(row => row.listName)).size !== 4 && !result.reviewReasons.includes("One or more Local Line basket prices are missing.")) {
+    if (new Set(prices.map(row => row.listName)).size !== baskets.length && !result.reviewReasons.includes("One or more Local Line basket prices are missing.")) {
       result.reviewReasons.push("One or more Local Line basket prices are missing.");
     }
     const regular = output.packages[index].localLineRegularCents;

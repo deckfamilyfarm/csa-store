@@ -1,3 +1,4 @@
+import { LOCAL_LINE_PRICING_POLICY } from "./localLinePricingLists.js";
 import crypto from "node:crypto";
 import { getDb, getPool } from "../db.js";
 import { getLocalLineAccessToken } from "../localLineAuth.js";
@@ -44,6 +45,7 @@ export function localLineInputs(context, includeInventory = true, includeVisibil
       return { packageId: Number(pkg.id), avgPackageWeight: number(meta?.avgPackageWeight), numOfItems: number(meta?.numOfItems) };
     }),
     imageUrls: context.imageUrls,
+    pricingListPolicy: LOCAL_LINE_PRICING_POLICY,
     config: Object.fromEntries(Object.entries(process.env).filter(([key]) => /^LL_(PRICE_LIST_|MARKUP_|DAIRY_)/.test(key)).sort())
   };
 }

@@ -1,3 +1,4 @@
+import { getPool } from "../db.js";
 import { getLocalLineAccessToken } from "../localLineAuth.js";
 import { isLocalLineEnabled, patchLocalLineProduct, fetchLocalLineProduct, resolveLocalLineVendor } from "../localLine.js";
 import { validateSavedProductVendor, confirmLocalLineVendor } from "./productVendor.js";
@@ -20,7 +21,7 @@ export function inventoryChanges(changes = {}) {
   return result;
 }
 
-export async function saveInventoryToLocalLine(productId, input, user) {
+export async function saveInventoryToLocalLine(productId, input, user, expected = null) {
   const [id] = normalizeIds([productId]);
   const changes = inventoryChanges(input);
   const roles = user.adminRoles || [];
@@ -31,7 +32,7 @@ export async function saveInventoryToLocalLine(productId, input, user) {
   return withSyncLock("csa-store:scheduled-pricelist-releases", async connection => {
     await connection.beginTransaction();
     try {
-      const [[product]] = await connection.query(`SELECT p.id, p.is_deleted, c.name AS categoryName, lm.local_line_product_id AS remoteId
+      const [[product]] = await connection.query(`SELECT p.id, p.inventory, p.track_inventory, p.is_deleted, c.name AS categoryName, lm.local_line_product_id AS remoteId
         FROM products p LEFT JOIN categories c ON c.id=p.category_id LEFT JOIN local_line_product_meta lm ON lm.product_id=p.id
         WHERE p.id=? FOR UPDATE`, [id]);
       if (!product || product.is_deleted || product.categoryName?.trim().toLowerCase() === "membership") fail("This product is not available in Inventory.");
@@ -44,7 +45,18 @@ export async function saveInventoryToLocalLine(productId, input, user) {
       const token = await getLocalLineAccessToken();
       const vendorId = await resolveLocalLineVendor({ product: { vendorId: vendor.id }, vendor }, token);
       // Inventory never changes vendors; repair a mismatch through a reviewed Product Sync action.
-      confirmLocalLineVendor(await fetchLocalLineProduct(Number(product.remoteId), token), vendorId);
+      const before=await fetchLocalLineProduct(Number(product.remoteId), token);
+      confirmLocalLineVendor(before, vendorId);
+      if(Object.hasOwn(changes,'inventory')) {
+        const baseline=expected || {inventory:product.inventory,trackInventory:Boolean(product.track_inventory)};
+        const conflict=inventoryConflict(before,baseline);
+        if(conflict) {
+          await connection.query('UPDATE products SET inventory=?,track_inventory=? WHERE id=?',[conflict.inventory,Number(conflict.trackInventory),id]);
+          await connection.commit();
+          throw Object.assign(new Error(`FF inventory changed in Local Line from ${baseline.inventory ?? 'unknown'} to ${conflict.inventory ?? 'unknown'}. No update was sent. Review the current stock before trying again.`),{status:409,inventoryConflict:conflict});
+        }
+        if(!before.track_inventory && changes.trackInventory!==1) fail('Full Farm inventory tracking is off. Refresh before editing stock.',409);
+      }
       await patchLocalLineProduct(Number(product.remoteId), token, payload);
       const remote = await fetchLocalLineProduct(Number(product.remoteId), token);
       confirmLocalLineVendor(remote, vendorId);
@@ -58,7 +70,46 @@ export async function saveInventoryToLocalLine(productId, input, user) {
       // Pricing profiles, sales, images, and their pending flags are deliberately untouched.
       await connection.query(`UPDATE local_line_product_meta SET product_inventory=?, track_inventory=?, visible=?, raw_json=?, last_synced_at=UTC_TIMESTAMP() WHERE product_id=?`, [remote.inventory ?? null, Number(Boolean(remote.track_inventory)), Number(Boolean(remote.visible)), JSON.stringify(remote), id]);
       await connection.commit();
-      return { ok: true, productId: id, localLineUpdate: true, savedFields: Object.keys(changes) };
+      return { ok: true, productId: id, localLineUpdate: true, savedFields: Object.keys(changes), currentInventory: remoteInventory(remote) };
     } catch (error) { await connection.rollback(); throw error; }
   });
+}
+
+
+export function remoteInventory(remote) {
+  const quantity=remote?.inventory;
+  if(quantity!==null && quantity!==undefined && (!Number.isSafeInteger(Number(quantity))||Number(quantity)<0)) fail('Local Line returned an invalid inventory count.');
+  if(typeof remote?.track_inventory!=='boolean') fail('Local Line did not return inventory tracking status.');
+  return {inventory:quantity==null?null:Number(quantity),trackInventory:remote.track_inventory,checkedAt:new Date().toISOString()};
+}
+export function inventoryConflict(remote,expected) {
+  const current=remoteInventory(remote);
+  if(!expected || !Object.hasOwn(expected,'inventory') || typeof expected.trackInventory!=='boolean' ||
+    (expected.inventory!==null&&(!Number.isSafeInteger(expected.inventory)||expected.inventory<0))) fail('Refresh FF inventory before editing its quantity.',428);
+  return current.inventory!==expected.inventory||current.trackInventory!==expected.trackInventory ? current : null;
+}
+export async function refreshFullFarmInventory(productIds) {
+  const ids=normalizeIds(productIds);
+  if(!ids.length||ids.length>100) fail('Select between 1 and 100 products.');
+  if(process.env.CSA_LOCAL_ONLY==='true'||!isLocalLineEnabled()||process.env.LOCALLINE_TEST==='true') fail('Local Line inventory checks are not enabled.');
+  const token=await getLocalLineAccessToken();
+  const rows=[];let cursor=0;
+  await Promise.all(Array.from({length:3},async()=>{
+    while(cursor<ids.length) {
+      const id=ids[cursor++], db=await getPool().getConnection();
+      try {
+        await db.beginTransaction();
+        const [[p]]=await db.query(`SELECT p.id,p.is_deleted,c.name AS categoryName,m.local_line_product_id AS remoteId
+          FROM products p LEFT JOIN categories c ON c.id=p.category_id LEFT JOIN local_line_product_meta m ON m.product_id=p.id WHERE p.id=? FOR UPDATE`,[id]);
+        if(!p||p.is_deleted||p.categoryName?.toLowerCase()==='membership'||!p.remoteId) fail('Link this product to Local Line before checking inventory.');
+        const vendor=await validateSavedProductVendor(db,id);
+        const vendorId=await resolveLocalLineVendor({product:{vendorId:vendor.id},vendor},token);
+        const remote=await fetchLocalLineProduct(Number(p.remoteId),token);confirmLocalLineVendor(remote,vendorId);
+        const current=remoteInventory(remote);
+        await db.query('UPDATE products SET inventory=?,track_inventory=? WHERE id=?',[current.inventory,Number(current.trackInventory),id]);
+        await db.commit();rows.push({productId:id,...current});
+      }catch(e){await db.rollback();rows.push({productId:id,error:e.message});}finally{db.release();}
+    }
+  }));
+  return {rows};
 }

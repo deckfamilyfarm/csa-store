@@ -1,5 +1,6 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { adminGet, adminPut } from "../adminApi.js";
+import { ProductImages } from "./ProductImages.jsx";
 import { productCapabilities } from "./productWorkspace.js";
 
 // Retain simple storefront formatting without executing imported HTML.
@@ -19,14 +20,13 @@ export function safeDescription(html) {
 const fields = product => ({ name: product.name || "", vendorId: String(product.vendorId || ""),
   categoryId: String(product.categoryId || ""), description: safeDescription(product.description) });
 
-export const ProductEditorInfo = forwardRef(function ProductEditorInfo({ productId, token, roles, vendors, busy, onDirty, onSaved }, ref) {
+export const ProductEditorInfo = forwardRef(function ProductEditorInfo({ productId, token, roles, vendors, busy, onDirty, onSaved, onImageBusy }, ref) {
   const [product, setProduct] = useState(null);
   const [draft, setDraft] = useState(null);
   const [baseline, setBaseline] = useState(null);
   const [categories, setCategories] = useState([]);
   const [error, setError] = useState("");
   const [retry, setRetry] = useState(0);
-  const description = useRef(null);
   const canEdit = productCapabilities(roles).edit;
   useEffect(() => {
     let cancelled = false;
@@ -37,7 +37,6 @@ export const ProductEditorInfo = forwardRef(function ProductEditorInfo({ product
     }).catch(error => { if (!cancelled) setError(error.message); });
     return () => { cancelled = true; };
   }, [productId, token, retry]);
-  useEffect(() => { if (description.current && baseline) description.current.innerHTML = baseline.description; }, [baseline]);
   const dirty = !!draft && JSON.stringify(draft) !== JSON.stringify(baseline);
   useEffect(() => { onDirty(dirty); }, [dirty, onDirty]);
   useImperativeHandle(ref, () => ({
@@ -62,20 +61,9 @@ export const ProductEditorInfo = forwardRef(function ProductEditorInfo({ product
       {draft && <div className="product-editor-info-fields">
         {!vendors.some(vendor => String(vendor.id) === draft.vendorId && vendor.name?.trim()) &&
           <p role="alert">This product needs a vendor. Choose one below and save before changing pricing, inventory, or synchronizing.</p>}
-        <label>Name<input className="input" disabled={!canEdit || busy} value={draft.name} onChange={event => update({ name: event.target.value })} /></label>
-        <label>Vendor<select className="input" disabled={!canEdit || busy} value={draft.vendorId} onChange={event => update({ vendorId: event.target.value })}>
-          <option value="">Select vendor</option>{vendors.map(vendor => <option key={vendor.id} value={vendor.id}>{vendor.name}</option>)}
-        </select></label>
-        <label>Category<select className="input" disabled={!canEdit || busy} value={draft.categoryId} onChange={event => update({ categoryId: event.target.value })}>
-          <option value="">Uncategorized</option>{categories.filter(category => category.name?.toLowerCase() !== "membership").map(category => <option key={category.id} value={category.id}>{category.name}</option>)}
-        </select></label>
-        <div><span id="editor-description-label">Description</span>
-          <div className="product-editor-description" ref={description} role="textbox" aria-labelledby="editor-description-label" aria-multiline="true"
-            contentEditable={canEdit && !busy} suppressContentEditableWarning onInput={event => update({ description: safeDescription(event.currentTarget.innerHTML) })}
-            onPaste={event => { event.preventDefault(); document.execCommand("insertText", false, event.clipboardData.getData("text/plain")); }} />
-        </div>
-        {!!product.images?.length && <div><p>Images</p><div className="product-editor-images">{product.images.map((image, i) =>
-          <img key={i} src={typeof image === "string" ? image : image.thumbnailUrl || image.url} alt={draft.name} loading="lazy" />)}</div></div>}
+        <ProductInfoFields draft={draft} baseline={baseline} vendors={vendors} categories={categories} disabled={!canEdit || busy} update={update} />
+        <ProductImages productId={productId} token={token} images={product.images || []} name={draft.name} disabled={!canEdit || busy}
+          onBusy={onImageBusy} onImages={images => setProduct(value => ({ ...value, images }))} />
       </div>}
     </section>
     <section id="editor-inventory" className="product-editor-section"><h3>Inventory</h3>
@@ -86,3 +74,22 @@ export const ProductEditorInfo = forwardRef(function ProductEditorInfo({ product
     </section>
   </>;
 });
+
+export function ProductInfoFields({ draft, baseline, vendors, categories, disabled, update }) {
+  const description = useRef(null);
+  useEffect(() => { if (description.current) description.current.innerHTML = baseline?.description || ""; }, [baseline?.description]);
+  return <>
+        <label>Name<input className="input" disabled={disabled} value={draft.name} onChange={event => update({ name: event.target.value })} /></label>
+        <label>Vendor<select className="input" disabled={disabled} value={draft.vendorId} onChange={event => update({ vendorId: event.target.value })}>
+          <option value="">Select vendor</option>{vendors.map(vendor => <option key={vendor.id} value={vendor.id}>{vendor.name}</option>)}
+        </select></label>
+        <label>Category<select className="input" disabled={disabled} value={draft.categoryId} onChange={event => update({ categoryId: event.target.value })}>
+          <option value="">Uncategorized</option>{categories.filter(category => category.name?.toLowerCase() !== "membership").map(category => <option key={category.id} value={category.id}>{category.name}</option>)}
+        </select></label>
+        <div><span id="editor-description-label">Description</span>
+          <div className="product-editor-description" ref={description} role="textbox" aria-labelledby="editor-description-label" aria-multiline="true"
+            contentEditable={!disabled} suppressContentEditableWarning onInput={event => update({ description: safeDescription(event.currentTarget.innerHTML) })}
+            onPaste={event => { event.preventDefault(); document.execCommand("insertText", false, event.clipboardData.getData("text/plain")); }} />
+        </div>
+  </>;
+}
