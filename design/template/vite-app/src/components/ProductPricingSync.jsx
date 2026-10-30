@@ -3,7 +3,6 @@ import { adminGet, adminPost } from "../adminApi.js";
 import { canSyncLocalLine, publicationRunning, publicationMessage, syncProductLocalLine } from "./productPricingSyncFlow.js";
 import "./EnterpriseReviewSection.css";
 
-const money = cents => cents == null ? "—" : `$${(Number(cents) / 100).toFixed(2)}`;
 export function ProductPricingSync({ productId, token, roles, dirty, onChanged, onRequestBusy }) {
   const [data, setData] = useState(null), [error, setError] = useState("");
   const [request, setRequest] = useState(""), [release, setRelease] = useState(null);
@@ -104,11 +103,9 @@ export function ProductPricingSync({ productId, token, roles, dirty, onChanged, 
     } catch (e) { if (mounted.current) setError(e.message); }
     finally { if (mounted.current) { setRequest(""); callbacks.current.onRequestBusy?.(false); } }
   }
-  const rows = (data?.comparison || []).filter(row => row.destination === 'Local Line');
   const active = !!request || running;
   return <div className="product-pricing-sync">
-    <p>Sync sends your saved prices and sale to Local Line, then checks that they arrived.</p>
-    <div className="admin-actions">
+    <div className="admin-actions product-sync-actions">
       <button type="button" className="button" onClick={sync}
         disabled={loading || active || dirty || data?.localOnly || !data || !canSyncLocalLine(roles)}>
         {active ? 'Syncing Local Line…' : job ? 'Resume sync' : 'Sync Local Line'}
@@ -123,7 +120,7 @@ export function ProductPricingSync({ productId, token, roles, dirty, onChanged, 
     {(request || release) && <div className="product-connection-progress">
       <strong role="status" aria-live="polite">{request || publicationMessage(release)}</strong>
       {active && <progress aria-label="Syncing Local Line" />}
-      {request ? <p>Keep this window open while we check prices and send the update.</p>
+      {request ? <p>Keep this window open until we confirm the server has received your update.</p>
         : running ? <p>You can close this window. The server will finish the update. Reopen Sync to see the result.</p>
         : <p>You can close this window.{release?.finishedAt && ` Last sync: ${new Date(release.finishedAt).toLocaleString()}.`}</p>}
       {lastContact && active && <p className="small">Last server response {Math.max(0, Math.floor((now - lastContact) / 1000))} seconds ago.</p>}
@@ -132,11 +129,5 @@ export function ProductPricingSync({ productId, token, roles, dirty, onChanged, 
     {error && <p role="alert">Sync could not finish: {error}</p>}
     {connectionError && <p role="alert">Connection interrupted; retrying the status check. The update may still be running. {connectionError}</p>}
     {data?.input?.squareEnabled && <p className="small">Square is separate. Use Review &amp; Publish when you are ready to update Square.</p>}
-    {!!rows.length && <details><summary>Local Line price details</summary>
-      <p className="small">Last stored channel prices; Sync fetches fresh prices before updating.</p>
-      <div className="table-wrap"><table className="admin-table"><thead><tr><th>Package / basket</th><th>Last channel price</th><th>Saved price to send</th></tr></thead><tbody>
-        {rows.map((row, index) => <tr key={index}><td>{row.label}</td><td>{money(row.currentCents)}</td><td>{money(row.localCents)}</td></tr>)}
-      </tbody></table></div>
-    </details>}
   </div>;
 }

@@ -30,8 +30,15 @@ test('live comparison preserves unknown prices, matches basket IDs, and refreshe
   assert.deepEqual(rows.map(row=>row.currentCents),[3600,0,null,null]);
   assert.deepEqual(rows.map(row=>row.localCents),[4000,4000,4000,4000]);
   const calls=[];
-  await refreshEnterprisePriceCache({query:async(sql,args)=>calls.push({sql,args})},10,remote,payload);
-  assert.equal(calls.length,4);
-  assert(calls.every(call=>call.sql.startsWith('UPDATE local_line_price_list_entries SET') && call.args[4]===10 && call.args[5]===80));
-  assert.deepEqual(calls.map(call=>call.args[0]),[36,0,null,null]);
+  const db={beginTransaction:async()=>{},commit:async()=>{},rollback:async()=>{},release:()=>{},
+    query:async(sql,args)=>{calls.push({sql,args});return [sql.includes('FROM packages')?[{id:7,remoteId:80}]:sql.includes('FROM price_lists')?[1,2,3,4].map(id=>({id,remoteId:id,name:`List ${id}`})):[]];}};
+  await refreshEnterprisePriceCache({getConnection:async()=>db},10,remote,payload);
+  const updates=calls.filter(c=>c.sql.startsWith('UPDATE'));
+  assert.equal(updates.length,4);
+  assert(updates.every(call=>call.sql.startsWith('UPDATE local_line_price_list_entries SET') && call.args[4]===10 && call.args[5]===80));
+  assert.deepEqual(updates.map(call=>call.args[0]),[36,0,null,null]);
+  const inserts=calls.filter(c=>c.sql.startsWith('INSERT'));
+  assert.equal(inserts.length,3,'Only existing remote entries with established local mappings can be cached');
+  assert(inserts.every(c=>c.sql.includes('WHERE NOT EXISTS') && c.args[2]===7));
+  assert.deepEqual(inserts.map(c=>c.args[8]),[36,0,null],'Cache observed values, never the proposed $40');
 });

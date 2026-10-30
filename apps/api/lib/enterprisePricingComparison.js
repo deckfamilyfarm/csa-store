@@ -22,15 +22,41 @@ export function liveLocalLinePriceComparison(remote, payload) {
 }
 
 export async function refreshEnterprisePriceCache(pool, productId, remote, payload) {
-  // Cache observed remote prices only. Do not write products, packages, pricing inputs, or mappings.
-  for (const row of liveLocalLinePriceComparison(remote, payload)) {
-    const pkg = remote?.packages?.find(pkg => Number(pkg.id) === row.remotePackageId);
-    const entry = pkg?.price_list_entries?.find(entry => Number(entry.price_list_id ?? entry.price_list) === row.remoteListId);
-    await pool.query(`UPDATE local_line_price_list_entries SET final_price_cache=?,calculated_value=?,adjustment_type=?,adjustment_value=?,last_synced_at=UTC_TIMESTAMP()
-      WHERE product_id=? AND local_line_package_id=? AND local_line_price_list_id=? AND package_id IS NOT NULL`,
-      [row.currentCents == null ? null : row.currentCents / 100, entry?.calculated_value ?? null, entry?.adjustment_type ?? null, entry?.adjustment_value ?? null,
-        productId, row.remotePackageId, row.remoteListId]);
-  }
+  // Store observed channel prices, including missing cache rows. Never alter local
+  // pricing inputs, package mappings, basket enrollment, or inventory.
+  const db = await pool.getConnection();
+  try {
+    await db.beginTransaction();
+    // Serialize cache repairs for this product; retries cannot insert duplicates.
+    await db.query('SELECT id FROM products WHERE id=? FOR UPDATE', [productId]);
+    const [mappings] = await db.query(`SELECT p.id,m.local_line_package_id AS remoteId
+      FROM packages p JOIN local_line_package_meta m ON m.package_id=p.id WHERE p.product_id=?`, [productId]);
+    const [lists] = await db.query('SELECT id,local_line_price_list_id AS remoteId,name FROM price_lists');
+    for (const row of liveLocalLinePriceComparison(remote, payload)) {
+      const pkg = remote?.packages?.find(pkg => Number(pkg.id) === row.remotePackageId);
+      const entries = (pkg?.price_list_entries || []).filter(entry => Number(entry.price_list_id ?? entry.price_list) === row.remoteListId);
+      const entry = entries.length === 1 ? entries[0] : null;
+      const observed = [row.currentCents == null ? null : row.currentCents / 100, entry?.calculated_value ?? null,
+        entry?.adjustment_type ?? null, entry?.adjustment_value ?? null];
+      await db.query(`UPDATE local_line_price_list_entries SET final_price_cache=?,calculated_value=?,adjustment_type=?,adjustment_value=?,last_synced_at=UTC_TIMESTAMP()
+        WHERE product_id=? AND local_line_package_id=? AND local_line_price_list_id=? AND package_id IS NOT NULL`,
+        [...observed, productId, row.remotePackageId, row.remoteListId]);
+      const mapped = mappings.filter(m => Number(m.remoteId) === row.remotePackageId);
+      const list = lists.find(l => Number(l.remoteId) === row.remoteListId);
+      if (!entry || mapped.length !== 1 || !list) continue;
+      await db.query(`INSERT INTO local_line_price_list_entries
+        (product_id,local_line_product_id,package_id,local_line_package_id,price_list_id,local_line_price_list_id,
+         entry_scope,price_list_name,package_name,final_price_cache,calculated_value,adjustment_type,adjustment_value,
+         created_at,updated_at,last_synced_at)
+        SELECT ?,?,?,?,?,?,'package',?,?,?,?,?,?,UTC_TIMESTAMP(),UTC_TIMESTAMP(),UTC_TIMESTAMP()
+        WHERE NOT EXISTS (SELECT 1 FROM local_line_price_list_entries WHERE product_id=?
+          AND local_line_package_id=? AND local_line_price_list_id=? AND package_id IS NOT NULL)`,
+        [productId, remote.id ?? null, mapped[0].id, row.remotePackageId, list.id, row.remoteListId,
+          row.listName || list.name, pkg.name || null, ...observed, productId, row.remotePackageId, row.remoteListId]);
+    }
+    await db.commit();
+  } catch (error) { await db.rollback(); throw error; }
+  finally { db.release(); }
 }
 export function compareLocalChannelPrices(revision, record) {
   const rows = [];

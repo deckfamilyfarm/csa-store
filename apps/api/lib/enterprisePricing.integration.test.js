@@ -24,7 +24,7 @@ test("saved prices activate locally before independently approved channel public
   t.after(() => pool.end());
   for (const table of [schema.products, schema.packages, schema.vendors, schema.categories, schema.productPricingProfiles,
     schema.productSales, schema.productTags, schema.productImages, schema.productMedia, schema.localLineProductMeta,
-    schema.localLinePackageMeta, schema.localLinePriceListEntries, schema.users]) {
+    schema.localLinePackageMeta, schema.localLinePriceListEntries, schema.priceLists, schema.users]) {
     const config = getTableConfig(table);
     const columns = config.columns.map(col => `\`${col.name}\` ${col.getSQLType()}${col.notNull ? " NOT NULL" : ""}${col.autoIncrement ? " AUTO_INCREMENT" : ""}${col.primary ? " PRIMARY KEY" : ""}${col.default !== undefined && (typeof col.default !== "object" || col.default === null) ? ` DEFAULT ${pool.escape(col.default)}` : ""}`);
     for (const index of config.indexes.filter(index => index.config.unique)) columns.push(`UNIQUE KEY \`${index.config.name}\` (${index.config.columns.map(col => `\`${col.name}\``).join(",")})`);
@@ -395,6 +395,8 @@ test("saved prices activate locally before independently approved channel public
   });
 
   await t.test('Local Line-only prices include sales, preserve inventory, freeze sale edits, and never publish Square', async () => {
+    await pool.query("INSERT INTO price_lists (local_line_price_list_id,name) VALUES (1,'Guest Basket'),(3,'Herd Share Members'),(4,'SNAP')");
+    await pool.query('DELETE FROM local_line_price_list_entries WHERE product_id=1');
     await pool.query("UPDATE enterprise_promotions SET status='cancelled'");
     await pool.query("UPDATE product_sync_release_actions SET status='cancelled' WHERE status IN ('pending','working','failed','held')");
     const current = await pricing.getEnterprisePricingProduct(1);
@@ -452,6 +454,11 @@ test("saved prices activate locally before independently approved channel public
     const done=await sync.runProductSyncRelease(r.id,{user,allowFuture:true});
     assert.equal(done.status,'completed',JSON.stringify(done.actions.map(a=>a.message)));
     assert.equal(Number((await pricing.getEnterprisePricingSync(1)).latestLocalLineReleaseId), r.id, 'popup can recover a durable receipt after closing');
+    const [[cached]] = await pool.query('SELECT COUNT(*) AS count FROM local_line_price_list_entries WHERE product_id=1');
+    assert.equal(cached.count,3,'Repeated checks create missing cache rows once per active basket');
+    const table = await pricing.listEnterprisePricingProducts({search:'Sausage 12 oz'});
+    const product = table.rows.find(row=>row.id===1);
+    assert.equal(product.sync.channels.find(c=>c.platform==='localline').state,'matched','Table shows Local Line success after cache repair');
     assert.ok(writes.slice(before).every(w=>w.platform==='localline'));
     assert.equal(remote.inventory,7);assert.equal(remote.visible,false);assert.equal(remote.description,'Remote description');
     const [[publication]]=await pool.query("SELECT status FROM enterprise_pricing_publications WHERE revision_id=? AND platform='square'",[draft.revisionId]);

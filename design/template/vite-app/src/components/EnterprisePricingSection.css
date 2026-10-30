@@ -265,6 +265,7 @@
 
 .enterprise-pricing-page .pricing-sync-status { display: inline-flex; align-items: center; gap: 5px; padding: 2px; border: 0; background: transparent; cursor: pointer; }
 .pricing-sync-badge { min-width: 27px; padding: 3px 6px; border-radius: 5px; background: #fff0d5; border: 1px solid #dfa650; color: #94500b; font-size: 12px; font-weight: 700; text-align: center; }
+.pricing-sync-badge.is-matched { background: #e5f2e8; border-color: #b9cdbc; color: #216438; }
 .pricing-sync-check { display: grid; place-items: center; width: 25px; height: 25px; border-radius: 50%; background: #e5f2e8; color: #216438; font-size: 18px; font-weight: 700; }
 .pricing-sync-status:focus-visible { outline: 2px solid #325b45; outline-offset: 3px; border-radius: 5px; }
 

@@ -240,6 +240,7 @@ function EnterpriseProductsSection({ token, roles = [], createdProductId }) {
   const canLeaveEditor = () => !saveBusy.current && !saleBusy && !syncRequestBusy && (!editorDirty || window.confirm("Discard unsaved changes to this product?"));
   function selectProduct(id, force = false, section = null) {
     if (!force && !canLeaveEditor()) return;
+    if (!id && selectedId) setMarkupRefresh(value => value + 1);
     setEditorSection(section);
     const url = new URL(window.location.href);
     if (id) url.searchParams.set("pricingProduct", String(id)); else url.searchParams.delete("pricingProduct");
