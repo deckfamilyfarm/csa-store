@@ -1,57 +1,142 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { adminGet } from "../adminApi.js";
-import { EnterpriseReviewSection } from "./EnterpriseReviewSection.jsx";
+import React, { useEffect, useRef, useState } from "react";
+import { adminGet, adminPost } from "../adminApi.js";
+import { canSyncLocalLine, publicationRunning, publicationMessage, syncProductLocalLine } from "./productPricingSyncFlow.js";
+import "./EnterpriseReviewSection.css";
 
 const money = cents => cents == null ? "—" : `$${(Number(cents) / 100).toFixed(2)}`;
-const percent = bp => bp == null ? "—" : `${Number(bp) / 100}%`;
-
 export function ProductPricingSync({ productId, token, roles, dirty, onChanged, onRequestBusy }) {
-  const [data, setData] = useState(null);
-  const [error, setError] = useState("");
-  const [refresh, setRefresh] = useState(0);
-  const [live, setLive] = useState(null);
+  const [data, setData] = useState(null), [error, setError] = useState("");
+  const [request, setRequest] = useState(""), [release, setRelease] = useState(null);
+  const [connectionError, setConnectionError] = useState(""), [lastContact, setLastContact] = useState(null);
+  const [now, setNow] = useState(Date.now()), [loading, setLoading] = useState(true);
+  const [job, setJob] = useState(null);
+  const mounted = useRef(false), callbacks = useRef({ onChanged, onRequestBusy });
+  callbacks.current = { onChanged, onRequestBusy };
+  const storageKey = `product-localline-sync:${productId}`;
+  const saveJob = value => {
+    setJob(value);
+    try { value ? localStorage.setItem(storageKey, JSON.stringify(value)) : localStorage.removeItem(storageKey); } catch { /* Server receipts remain available. */ }
+  };
+  const get = async path => { const result = await adminGet(path, token); if (mounted.current) setLastContact(Date.now()); return result; };
+  const post = (path, body) => {
+    if (!mounted.current) throw new Error("Reopen Sync to continue.");
+    return adminPost(path, token, body);
+  };
   useEffect(() => {
+    mounted.current = true;
     let cancelled = false;
-    adminGet(`enterprise-pricing/products/${productId}/sync`, token).then(result => {
-      if (!cancelled) { setData(result); setError(""); }
-    }).catch(error => { if (!cancelled) setError(error.message); });
-    return () => { cancelled = true; };
-  }, [productId, token, refresh]);
-  const checked = useCallback(actions => {
-    const rows = actions.flatMap(action => {
-      if (action.platform === "localline") return action.display?.pricingComparison || [];
-      const current = action.display?.current?.price, proposed = action.display?.proposed?.price;
-      return [{ destination: "Square", label: `${action.packageName || "Variation"} · per ${action.display?.proposed?.sellingUnit || "unit"}`,
-        currentCents: current == null ? null : Math.round(Number(current) * 100), localCents: proposed == null ? null : Math.round(Number(proposed) * 100),
-        status: current == null || proposed == null ? "needs-check" : Number(current) === Number(proposed) ? "matches" : "different" }];
-    });
-    setLive(rows); onChanged?.();
-  }, [onChanged]);
-  const published = useCallback(() => { setLive(null); setRefresh(value => value + 1); onChanged?.(); }, [onChanged]);
-  const rows = live ?? data?.comparison ?? [];
-  const differences = rows.filter(row => row.status === "different").length;
+    (async () => {
+      try {
+        const result = await get(`enterprise-pricing/products/${productId}/sync`);
+        if (cancelled) return;
+        setData(result);
+        let saved;
+        try { saved = JSON.parse(localStorage.getItem(storageKey) || 'null'); } catch { saved = null; }
+        setJob(saved);
+        const releaseId = saved?.releaseId || (!saved && result.latestLocalLineReleaseId);
+        if (releaseId) {
+          // Retain this receipt even if the progress connection fails. A retry
+          // must recover the existing update before starting another one.
+          if (!saved) saveJob({ releaseId });
+          const receipt = await get(`product-sync/releases/${releaseId}/progress`);
+          if (!cancelled) { setRelease(receipt); if (['completed', 'cancelled'].includes(receipt.status)) saveJob(null); }
+        }
+      } catch (e) { if (!cancelled) setError(e.message); }
+      finally { if (!cancelled) setLoading(false); }
+    })();
+    return () => { cancelled = true; mounted.current = false; callbacks.current.onRequestBusy?.(false); };
+  }, [productId, token]);
+  const running = publicationRunning(release);
+  useEffect(() => {
+    if (!running) return;
+    let cancelled = false, timer;
+    const poll = async () => {
+      try {
+        const next = await get(`product-sync/releases/${release.id}/progress`);
+        if (cancelled) return;
+        setRelease(next); setConnectionError("");
+        if (!publicationRunning(next)) {
+          if (next.status === 'completed') saveJob(null);
+          callbacks.current.onChanged?.();
+          const updated = await get(`enterprise-pricing/products/${productId}/sync`);
+          if (!cancelled) setData(updated);
+          return;
+        }
+      } catch (e) { if (!cancelled) setConnectionError(e.message); }
+      if (!cancelled) timer = setTimeout(poll, 1500);
+    };
+    timer = setTimeout(poll, 500);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [release?.id, running, productId, token]);
+  useEffect(() => {
+    if (!request && !running) return;
+    const timer = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, [Boolean(request), running]);
+
+  async function sync() {
+    if (request || running || dirty || !canSyncLocalLine(roles)) return;
+    setError(""); setConnectionError(""); setRequest("Connecting to the server…");
+    callbacks.current.onRequestBusy?.(true);
+    try {
+      // Refresh local state before approving; the server freezes and revalidates it.
+      const current = await get(`enterprise-pricing/products/${productId}/sync`);
+      setData(current);
+      let next;
+      if (release && ['failed', 'partial', 'held'].includes(release.status)) {
+        if (release.actions?.some(a => a.status === 'held')) {
+          setRequest('Rechecking the issue against your saved prices…');
+          const audit = await post(`product-sync/releases/${release.id}/review`, {});
+          const resumed = { auditId: audit.id, revisionId: current.revisionId };
+          saveJob(resumed);
+          next = await syncProductLocalLine({ productId, data: current, resume: resumed, get, post, saveJob, progress: setRequest });
+        } else {
+          setRequest('Retrying the saved Local Line update…');
+          next = await post(`product-sync/releases/${release.id}/retry`, { background: true });
+        }
+      } else {
+        setRelease(null);
+        next = await syncProductLocalLine({ productId, data: current, resume: job, get, post, saveJob, progress: setRequest });
+      }
+      if (!mounted.current) return;
+      setRelease(next);
+      if (next.status === 'completed') { saveJob(null); callbacks.current.onChanged?.(); }
+    } catch (e) { if (mounted.current) setError(e.message); }
+    finally { if (mounted.current) { setRequest(""); callbacks.current.onRequestBusy?.(false); } }
+  }
+  const rows = (data?.comparison || []).filter(row => row.destination === 'Local Line');
+  const active = !!request || running;
   return <div className="product-pricing-sync">
-    {error && <p role="alert">{error} <button type="button" className="button alt" onClick={() => setRefresh(value => value + 1)}>Retry</button></p>}
-    {!data && !error && <p role="status">Loading channel prices…</p>}
-    {data && <>
-      {dirty && <p role="status">Save your product changes before checking or updating channel prices.</p>}
-      <div className="table-wrap"><table className="admin-table"><thead><tr><th>Pricing inputs</th><th>Buy Price</th><th>Markup</th></tr></thead><tbody>
-        {data.previous.map(previous => <tr key={previous.platform}><td>Last published to {previous.platform === "square" ? "Square" : "Local Line"}</td>
-          <td>{money(previous.output?.buyFromTenThousandths == null ? null : previous.output.buyFromTenThousandths / 100)} / {previous.input?.pricingUnit}</td><td>{percent(previous.output?.appliedMarkupBp)}</td></tr>)}
-        <tr><td>Saved local pricing</td><td>{money(data.output?.buyFromTenThousandths == null ? null : data.output.buyFromTenThousandths / 100)}{data.input?.pricingUnit ? ` / ${data.input.pricingUnit}` : ""}</td><td>{percent(data.output?.appliedMarkupBp)}</td></tr>
+    <p>Sync sends your saved prices and sale to Local Line, then checks that they arrived.</p>
+    <div className="admin-actions">
+      <button type="button" className="button" onClick={sync}
+        disabled={loading || active || dirty || data?.localOnly || !data || !canSyncLocalLine(roles)}>
+        {active ? 'Syncing Local Line…' : job ? 'Resume sync' : 'Sync Local Line'}
+      </button>
+      {data?.sale?.discountBp > 0 && <span>{data.sale.discountBp / 100}% sale included</span>}
+    </div>
+    {loading && <p role="status">Loading sync status…</p>}
+    {dirty && <p>Save your changes before syncing.</p>}
+    {!canSyncLocalLine(roles) && <p>A Pricing Publisher with Local Line Push permission can sync this product.</p>}
+    {data?.localOnly && <p>Local test mode: remote updates are disabled.</p>}
+    {!active && data?.syncBlocker && <p role="alert">{data.syncBlocker}</p>}
+    {(request || release) && <div className="product-connection-progress">
+      <strong role="status" aria-live="polite">{request || publicationMessage(release)}</strong>
+      {active && <progress aria-label="Syncing Local Line" />}
+      {request ? <p>Keep this window open while we check prices and send the update.</p>
+        : running ? <p>You can close this window. The server will finish the update. Reopen Sync to see the result.</p>
+        : <p>You can close this window.{release?.finishedAt && ` Last sync: ${new Date(release.finishedAt).toLocaleString()}.`}</p>}
+      {lastContact && active && <p className="small">Last server response {Math.max(0, Math.floor((now - lastContact) / 1000))} seconds ago.</p>}
+      {release?.status === 'completed' && !request && <p className="small">This confirms the saved sync above. If you have edited prices or sales since then, sync again.</p>}
+    </div>}
+    {error && <p role="alert">Sync could not finish: {error}</p>}
+    {connectionError && <p role="alert">Connection interrupted; retrying the status check. The update may still be running. {connectionError}</p>}
+    {data?.input?.squareEnabled && <p className="small">Square is separate. Use Review &amp; Publish when you are ready to update Square.</p>}
+    {!!rows.length && <details><summary>Local Line price details</summary>
+      <p className="small">Last stored channel prices; Sync fetches fresh prices before updating.</p>
+      <div className="table-wrap"><table className="admin-table"><thead><tr><th>Package / basket</th><th>Last channel price</th><th>Saved price to send</th></tr></thead><tbody>
+        {rows.map((row, index) => <tr key={index}><td>{row.label}</td><td>{money(row.currentCents)}</td><td>{money(row.localCents)}</td></tr>)}
       </tbody></table></div>
-      <p className="small">Buy Price and markup are local inputs. {!data.previous.length && "No previously published input history is available."}</p>
-      <h4>{live ? "Server price check" : data.localOnly ? "Imported channel prices" : "Last stored channel prices"}</h4>
-      {!rows.length ? <p>Complete the pricing inputs and package mappings to compare prices.</p> : <div className="table-wrap"><table className="admin-table"><thead><tr><th>Channel / package</th><th>{live ? "Server price" : "Channel price"}</th><th>Local price to send</th><th>Difference</th></tr></thead><tbody>
-        {rows.map((row, index) => <tr key={index}><td>{row.destination} · {row.label}</td><td>{money(row.currentCents)}</td><td>{money(row.localCents)}</td>
-          <td>{row.status === "needs-check" ? "Needs checking" : row.status === "matches" ? "✓ Matches" : money(row.localCents - row.currentCents)}</td></tr>)}
-      </tbody></table></div>}
-      {!!differences && <p>Suggested update: send the saved local selling prices to the channels with differences.</p>}
-      {data.localOnly ? <>
-        <p className="small">Local test mode: server checks and remote updates are disabled.</p>
-        <div className="admin-actions"><button className="button alt" type="button" disabled={dirty} onClick={() => { setRefresh(value => value + 1); onChanged?.(); }}>Recheck imported prices</button>
-          <button className="button" type="button" disabled>Update remote prices</button></div>
-      </> : <fieldset disabled={dirty}><EnterpriseReviewSection token={token} roles={roles} productId={productId} embedded onRequestBusy={onRequestBusy} onChecked={checked} onPublished={published} /></fieldset>}
-    </>}
+    </details>}
   </div>;
 }

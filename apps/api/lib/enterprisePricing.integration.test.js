@@ -406,7 +406,29 @@ test("saved prices activate locally before independently approved channel public
     // Historical disabled sale discounts must not fabricate staged local drift.
     await pool.query('UPDATE product_sales SET sale_discount=NULL,on_sale=0 WHERE product_id=1');
     await pool.query('UPDATE product_pricing_profiles SET sale_discount=0.1,on_sale=0 WHERE product_id=1');
-    await pricing.approveEnterprisePricingRevision(draft.revisionId, user, {localLinePricesOnly:true});
+    const express = (await import('express')).default;
+    const router = (await import('../routes/enterprisePricing.js')).default;
+    const app = express(); app.use(express.json());
+    app.use((req, res, next) => { req.admin = {userId:Number(req.headers['x-test-user'] || 2),
+      adminRoles: String(req.headers['x-test-roles'] || '').split(',')}; next(); });
+    app.use(router);
+    const server = app.listen(0, '127.0.0.1'); await new Promise(resolve => server.once('listening', resolve));
+    try {
+      const approve = (roles, actor=2) => nativeFetch(`http://127.0.0.1:${server.address().port}/revisions/${draft.revisionId}/approve-localline`,
+        {method:'POST',headers:{'x-test-roles':roles,'x-test-user':String(actor)}});
+      assert.equal((await approve('pricing_editor,localline_push')).status,403);
+      assert.equal((await approve('pricing_publisher')).status,403);
+      assert.equal((await approve('pricing_publisher,localline_push',1)).status,403, 'separation of duties still applies');
+      assert.equal((await approve('pricing_publisher,localline_push')).status,200);
+    } finally { await new Promise(resolve => server.close(resolve)); }
+    const popup = await pricing.getEnterprisePricingSync(1);
+    assert.equal(popup.sale.discountBp, 1000);
+    assert.equal(popup.revisionStatus, 'approved');
+    assert.equal(popup.syncBlocker, null);
+    assert.ok(popup.comparison.filter(row => row.destination === 'Local Line').every(row =>
+      row.localCents === Math.round(popup.output.packages[0].localLineRegularCents * 0.9)), 'popup includes the saved sale');
+    assert.ok(popup.comparison.filter(row => row.destination === 'Square').every(row =>
+      row.localCents === popup.output.squareUnitCents), 'Local Line sync does not discount Square catalog prices');
     const opts = {platforms:['localline'], productIds:[1], productScope:'selected', vendorGroup:'all',
       enterpriseRevisionId:draft.revisionId, publicationScope:'localline-prices-and-sales'};
     await assert.rejects(sync.createProductSyncAudit({...opts,platforms:['square']},user), /Local Line only/);
@@ -429,6 +451,7 @@ test("saved prices activate locally before independently approved channel public
     assert.match((await sync.getProductSyncRelease(r.id)).scheduledAt,/^9999/);
     const done=await sync.runProductSyncRelease(r.id,{user,allowFuture:true});
     assert.equal(done.status,'completed',JSON.stringify(done.actions.map(a=>a.message)));
+    assert.equal(Number((await pricing.getEnterprisePricingSync(1)).latestLocalLineReleaseId), r.id, 'popup can recover a durable receipt after closing');
     assert.ok(writes.slice(before).every(w=>w.platform==='localline'));
     assert.equal(remote.inventory,7);assert.equal(remote.visible,false);assert.equal(remote.description,'Remote description');
     const [[publication]]=await pool.query("SELECT status FROM enterprise_pricing_publications WHERE revision_id=? AND platform='square'",[draft.revisionId]);

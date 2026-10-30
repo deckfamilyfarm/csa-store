@@ -1,4 +1,4 @@
-import { readProductSales, effectiveProductSale, applySaleOutput } from "./enterpriseProductSales.js";
+import { readProductSales, effectiveProductSale, applySaleOutput, salePrice } from "./enterpriseProductSales.js";
 import { isRetiredLocalLineList } from "./localLinePricingLists.js";
 import { readEnterpriseReviewChecks } from "./enterprisePricingReview.js";
 import { ensureProductSyncSchema } from "./productSyncSchema.js";
@@ -11,6 +11,7 @@ import { pricingUtcDate as validDate } from "./enterprisePricingDates.js";
 import { readMigrationCatalog } from "./enterprisePricingMigration.js";
 import { matchesPricingSyncFilter, pricingSyncStatus, readPricingChannelRecords } from "./enterprisePricingSyncStatus.js";
 import { compareLocalChannelPrices } from "./enterprisePricingComparison.js";
+import { localLineSaleSnapshot } from "./localLinePricePublication.js";
 
 const parse = (value) => typeof value === "string" ? JSON.parse(value) : value;
 const id = (value, label = "ID") => {
@@ -736,9 +737,23 @@ export async function getEnterprisePricingSync(productId) {
   const previous = [];
   for (const row of published) if (!previous.some(item => item.platform === row.platform)) previous.push({ platform: row.platform,
     verifiedAt: row.verifiedAt, input: parse(row.inputJson), output: parse(row.outputJson) });
+  let sale = null, syncBlocker = null;
+  try { sale = await localLineSaleSnapshot(getPool(), Number(detail.product.id), revision?.output.packages || []); }
+  catch (error) { syncBlocker = error.message; }
+  const comparisonRevision = revision && sale ? { ...revision, output: { ...revision.output,
+    packages: revision.output.packages.map(pkg => ({ ...pkg,
+      localLineRegularCents: salePrice(pkg.localLineRegularCents, sale.discountBp) })) } } : revision;
+  await ensureProductSyncSchema();
+  const [recent] = await getPool().query(`SELECT r.id FROM product_sync_releases r
+    JOIN product_sync_release_actions ra ON ra.release_id=r.id
+    JOIN product_sync_actions a ON a.id=ra.action_id
+    JOIN product_sync_audits au ON au.id=a.audit_id
+    WHERE a.product_id=? AND JSON_UNQUOTE(JSON_EXTRACT(au.options_json,'$.publicationScope'))='localline-prices-and-sales'
+    ORDER BY r.id DESC LIMIT 1`, [detail.product.id]);
   return { localOnly: process.env.CSA_LOCAL_ONLY === "true", revisionId: detail.latest?.id || null,
+    revisionStatus: detail.latest?.status || null, sale, syncBlocker, latestLocalLineReleaseId: recent[0]?.id || null,
     input: revision?.input || null, output: revision?.output || null, previous,
-    comparison: revision ? compareLocalChannelPrices(revision, record) : [],
+    comparison: comparisonRevision ? compareLocalChannelPrices(comparisonRevision, record) : [],
     publications: detail.publications };
 }
 

@@ -52,6 +52,10 @@ router.post("/products/:id/preview", edit, route(req => previewEnterprisePricing
 router.post("/products/:id/revisions", edit, route(req => saveEnterprisePricingDraft(req.params.id, req.body?.input, req.body?.expectedLatestRevisionId, req.admin, req.body?.expectedBuyPriceRevision)));
 router.get("/review", route(req => listEnterprisePricingReview({ productId: req.query.productId })));
 router.post("/revisions/:id/approve", approve, route(req => approveEnterprisePricingRevision(req.params.id, req.admin)));
+// The product popup approves only the Local Line price/sale workflow. Publication
+// still requires a frozen audit and the existing release authorization checks.
+router.post("/revisions/:id/approve-localline", approve, requireAdminPermission("localline_push"),
+  route(req => approveEnterprisePricingRevision(req.params.id, req.admin, { localLinePricesOnly: true })));
 router.post("/revisions/:id/activate-local", approve, route(req => activateEnterprisePricingLocally(req.params.id, req.admin)));
 router.post("/revisions/:id/reject", approve, route(req => rejectEnterprisePricingRevision(req.params.id, req.body?.reason, req.admin)));
 router.get("/migration-report", route(req => enterprisePricingMigrationReport(req.query)));

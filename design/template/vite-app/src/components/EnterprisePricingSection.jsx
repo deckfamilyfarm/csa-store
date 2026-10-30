@@ -366,7 +366,7 @@ function EnterpriseProductsSection({ token, roles = [], createdProductId }) {
         </>}</>}>
       {!detail && <section className="product-editor-section"><p role="status">{detailError || "Loading product…"}</p>
         {detailError && <button type="button" className="button alt" onClick={() => setDetailRefresh(value => value + 1)}>Retry</button>}</section>}
-      {detail && draft && <fieldset id="pricing-product-detail" className="enterprise-pricing-editor" disabled={loading || saleBusy}>
+      {detail && draft && <fieldset id="pricing-product-detail" className="enterprise-pricing-editor" disabled={loading || saleBusy || syncRequestBusy}>
       <ProductEditorInfo ref={productInfoRef} productId={selectedId} token={token} roles={roles} vendors={vendors} busy={loading || saleBusy}
         onDirty={setInfoDirty} onImageBusy={setSaleBusy} onSaved={updates => {
           setDetail(value => ({ ...value, product: { ...value.product, ...updates,
