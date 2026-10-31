@@ -35,4 +35,16 @@ test('cost plan persistence, snapshots, refresh and isolation',{skip:!socket},as
  assert.equal(Number((await db.query('SELECT price FROM enterprise_pricing_buy_price_drafts'))[0][0].price),14);
  assert.equal((await db.query('SELECT COUNT(*) n FROM enterprise_pricing_revisions'))[0][0].n,1);
  assert.equal((await db.query('SELECT COUNT(*) n FROM enterprise_cost_plan_revisions WHERE plan_id=?',[first.id]))[0][0].n,3);
+ // Package measurements are captured with Costs and only change on reviewed refresh.
+ await db.query('UPDATE enterprise_pricing_revisions SET input_json=?',[JSON.stringify({pricingUnit:'each',retailEnterpriseId:1,packages:[]})]);
+ const packaged=await api.saveCostPlan(null,{input:{...input,name:'Packaged test',model:'simple-average'}},{userId:1});
+ assert.equal(packaged.output.comparison.average,14);assert.equal(packaged.input.groups[0].rows[0].baseline.packageWeightLb,'1.0000');
+ await db.query("UPDATE packages SET name='2 lb'");
+ const frozen=await api.prepareCostPlan(packaged.input,packaged.input);
+ assert.equal(frozen.output.comparison.average,14);
+ const measurementRefresh=await api.prepareCostPlan(packaged.input,packaged.input,true);
+ assert.equal(measurementRefresh.changes.length,1);assert.equal(measurementRefresh.output.comparison.average,7);
+ await db.query("UPDATE packages SET name='3 lb'");
+ await assert.rejects(api.saveCostPlan(packaged.id,{input:measurementRefresh.input,expectedRevision:1,refresh:true},{userId:1}),e=>e.status===409);
+
 });

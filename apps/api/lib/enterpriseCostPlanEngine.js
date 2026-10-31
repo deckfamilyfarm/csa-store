@@ -8,7 +8,7 @@ export function decimal(value, scale = 4) {
 }
 const round = (a,b) => (a + b/2n)/b;
 const dollars = n => Number(n)/10000;
-export function calculateCostPlan(plan) {
+function calculateCostPlanRaw(plan) {
   const issues=[]; const qty=decimal(plan.quantity,3), base=decimal(plan.cogs), target=decimal(plan.targetMargin,2);
   if (!qty || qty<=0n) issues.push('Enter total packaged quantity.');
   if (base===null) issues.push('Enter production COGS.');
@@ -31,7 +31,7 @@ export function calculateCostPlan(plan) {
     const rows=(g.rows||[]).map(r=>{
       const key=`${r.productId}:${r.packageId}`;
       if(seen.has(key)) issues.push('A package can only appear once in a plan.');seen.add(key);
-      const part=simple?10000n:decimal(r.share,2), conversion=decimal(r.conversion,3);
+      const part=simple?10000n:decimal(r.share,2), conversion=decimal(costPlanConversion(r,plan.unit));
       if(part===null||part>10000n) issues.push(`${r.name}: enter a product percentage from 0 to 100.`);
       rowTotal+=part||0n;
       const charge=decimal(r.baseline?.cost), next=decimal(r.proposed==null||r.proposed===''?r.baseline?.cost:r.proposed);
@@ -39,12 +39,13 @@ export function calculateCostPlan(plan) {
       if(charge===null||next===null) issues.push(`${r.name}: Cost is missing or invalid.`);
       const direct=r.baseline?.basis===plan.unit;
       if(!direct&&!conversion) issues.push(`${r.name}: enter ${plan.unit} per ${r.baseline?.basis||'package'}.`);
-      const divisor=direct?1000n:conversion||1000n;
+      const divisor=direct?10000n:conversion||10000n;
       const units=simple?round(amount,rowCount):round(amount*(part||0n),10000n);
-      const normalized=round((charge||0n)*1000n,divisor), normalizedNext=round((next||0n)*1000n,divisor);
+      const normalized=round((charge||0n)*10000n,divisor), normalizedNext=round((next||0n)*10000n,divisor);
       const rev=round(units*normalized,1000n), prop=round(units*normalizedNext,1000n);
       revenue+=rev;scenario+=prop;unitSum+=normalized;proposedSum+=normalizedNext;
-      return {...r,quantity:Number(units)/1000,currentUnit:dollars(normalized),proposedUnit:dollars(normalizedNext),revenue:dollars(rev),proposedRevenue:dollars(prop)};
+      const usable=charge!==null&&!r.baseline?.issue&&(direct||Boolean(conversion));
+      return {...r,quantity:Number(units)/1000,currentUnit:usable?dollars(normalized):null,proposedUnit:dollars(normalizedNext),revenue:dollars(rev),proposedRevenue:dollars(prop)};
     });
     if(simple&&g.proposedAverage!=null&&g.proposedAverage!==''){const override=decimal(g.proposedAverage);if(override===null)issues.push(`${g.name}: enter a valid proposed average Cost.`);else proposedSum=override*rowCount;}
     if(simple){if(!g.rows?.length)issues.push(`${g.name}: select at least one product.`);revenue=round(amount*unitSum,1000n*rowCount);scenario=round(amount*proposedSum,1000n*rowCount);}
@@ -64,4 +65,43 @@ export function calculateCostPlan(plan) {
     return difference<=0n?0:dollars(round(difference,5600n));
   };
   return {requiredOtherUnit:beef?requiredOther(groundCurrent):null,proposedRequiredOtherUnit:beef?requiredOther(groundProposed):null,complete:issues.length===0,issues:[...new Set(issues)],groups,groupPercent:Number(groupTotal)/100,cost:dollars(cost),requiredRevenue:required===null?null:dollars(required),requiredUnit:required!==null&&qty?dollars(round(required*1000n,qty)):null,current:summary(current),proposed:summary(proposed)};
+}
+
+// Only explicit, fixed package weights are usable automatically. Never infer a
+// selling unit, a range midpoint, or a processed-product yield from these labels.
+export function fixedPackagePounds(name){
+ const match=String(name||'').trim().match(/^(\d+(?:\.\d+)?|\.\d+)\s*(lbs?|pounds?|oz|ounces?)(?:\s*(?:ea|each))?$/i);
+ if(!match)return null;
+ const amount=decimal(match[1].startsWith('.')?`0${match[1]}`:match[1]);
+ if(!amount)return null;
+ return dollars(/^(oz|ounce)/i.test(match[2])?round(amount,16n):amount).toFixed(4);
+}
+export function costPlanConversion(row,unit){
+ return row.conversion!=null&&row.conversion!==''?row.conversion:
+  unit==='lb'&&row.baseline?.basis==='package'?row.baseline.packageWeightLb:null;
+}
+
+export function calculateCostPlan(plan){
+ const result=calculateCostPlanRaw(plan);
+ const simple=['simple-beef','simple-average'].includes(plan.model);
+ const omitted=[];
+ const groups=(plan.groups||[]).map(g=>({...g,proposedAverage:'',rows:(g.rows||[]).filter(r=>{
+  const reason=r.baseline?.issue||(decimal(r.baseline?.cost)===null?'Cost is missing or invalid.':
+   r.baseline?.basis!==plan.unit&&!decimal(costPlanConversion(r,plan.unit))?`Package ${plan.unit} is missing.`:null);
+  if(simple&&reason){omitted.push({productId:r.productId,name:r.name,reason});return false;}
+  return true;
+ }).map(r=>({...r,proposed:''}))}));
+ const current=calculateCostPlanRaw({...plan,proposedAverage:'',groups});
+ const total=(plan.groups||[]).reduce((sum,g)=>sum+(g.rows||[]).length,0);
+ // For the simple model, missing products are omitted from the estimate, never
+ // assigned zero Cost. Both beef groups must still contain usable products.
+ const comparison={available:current.complete,estimated:omitted.length>0,omitted,included:total-omitted.length,total,
+  average:current.complete?current.current.unitCharge:null,
+  margin:current.complete?current.current.margin:null,
+  groups:current.groups.map(g=>({averageUnit:g.rows.length?g.averageUnit:null})),
+  requiredUnit:decimal(plan.cogs)!==null&&decimal(plan.targetMargin,2)!==null&&Number(plan.targetMargin)<100?
+   (simple?dollars(round(decimal(plan.cogs)*10000n,10000n-decimal(plan.targetMargin,2))):current.complete?current.requiredUnit:null):null,
+  gapPerUnit:current.complete?Number((current.current.unitCharge-current.requiredUnit).toFixed(4)):null,
+  marginGap:current.complete&&current.current.margin!=null?current.current.margin-Number(plan.targetMargin):null};
+ return {...result,comparison};
 }

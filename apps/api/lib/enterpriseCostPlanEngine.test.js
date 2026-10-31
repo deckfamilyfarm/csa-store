@@ -59,3 +59,26 @@ test('category selection stays within the exact producer and category',async()=>
  const result=simpleCategoryCostPlan({...plan(),producer:'creamy-cow',category:'Dairy'},catalog);assert.equal(result.model,'simple-average');assert.equal(result.groups.length,1);assert.deepEqual(result.groups[0].rows.map(r=>r.productId).sort(),[1,2]);
  const empty=simpleCategoryCostPlan({...plan(),producer:'hyland',category:'Missing'},catalog);assert.equal(calculateCostPlan(empty).complete,false);
 });
+
+test('fixed package weights convert pounds and ounces without guessing ambiguous labels',async()=>{
+ const {fixedPackagePounds}=await import('./enterpriseCostPlanEngine.js');
+ for(const [label,pounds] of [['1 lbs','1.0000'],['3 oz','0.1875'],['12 oz ea','0.7500'],['.5 lb','0.5000']])assert.equal(fixedPackagePounds(label),pounds);
+ for(const label of ['2-3 lbs','2 Pack','16 fl oz','1 lb each x 2','about 1 lb','0 lb'])assert.equal(fixedPackagePounds(label),null);
+ const p={...plan(),model:'simple-average'};p.groups[0].rows=[{...row(1,'3'),baseline:{cost:'3',basis:'package',packageWeightLb:'0.1875'}}];
+ const r=calculateCostPlan(p);assert.equal(r.complete,true);assert.equal(r.comparison.average,16);
+ p.groups[0].rows[0].conversion='0.5';assert.equal(calculateCostPlan(p).comparison.average,6);
+});
+test('comparison uses actual Costs, preserves the beef mix and labels incomplete estimates',()=>{
+ const p={...plan(),producer:'deck',model:'simple-beef',proposedAverage:'99',groups:[{name:'Ground',rows:[{...row(1,'6.49'),baseline:{cost:'6.49',basis:'package',packageWeightLb:'1.0000'}},row(2,'7.58')]},{name:'Other',rows:[row(3,'12'),row(4,null)]}]};
+ const c=calculateCostPlan(p).comparison;
+ assert.equal(c.average,9.8154);assert.equal(c.requiredUnit,11.0519);assert.equal(c.available,true);assert.equal(c.estimated,true);assert.equal(c.included,3);assert.equal(c.total,4);assert.equal(c.omitted[0].productId,4);
+ assert.equal(c.gapPerUnit,-1.2365);assert.ok(Math.abs(c.margin-(9.8154-8.51)/9.8154*100)<1e-8);
+ p.groups[0].rows=[];const missing=calculateCostPlan(p).comparison;assert.equal(missing.available,false);assert.equal(missing.average,null);assert.equal(missing.requiredUnit,11.0519);
+});
+test('target remains available with no product Costs; zero and losses remain valid',()=>{
+ const p={...plan(),model:'simple-average'};p.groups[0].rows=[];let c=calculateCostPlan(p).comparison;assert.equal(c.requiredUnit,11.0519);assert.equal(c.average,null);
+ p.groups[0].rows=[row(1,'0')];c=calculateCostPlan(p).comparison;assert.equal(c.available,true);assert.equal(c.average,0);assert.equal(c.margin,null);
+ p.groups[0].rows=[row(1,'5')];c=calculateCostPlan(p).comparison;assert.ok(c.margin<0);
+ p.cogs='';assert.equal(calculateCostPlan(p).comparison.requiredUnit,null);
+ p.cogs='8.51';p.targetMargin='100';assert.equal(calculateCostPlan(p).comparison.requiredUnit,null);
+});

@@ -1,7 +1,7 @@
 import { simpleCategoryCostPlan } from './simpleCategoryCostPlan.js';
 import { simpleBeefCostPlan } from './simpleBeefCostPlan.js';
 import { getPool } from '../db.js';
-import { calculateCostPlan } from './enterpriseCostPlanEngine.js';
+import { calculateCostPlan, fixedPackagePounds } from './enterpriseCostPlanEngine.js';
 const parse=v=>typeof v==='string'?JSON.parse(v):v;
 const fail=(message,status=400)=>{throw Object.assign(new Error(message),{status});};
 export const producerFor=name=>/creamy cow/i.test(name)?'creamy-cow':/hyland/i.test(name)?'hyland':/deck family farm/i.test(name)?'deck':null;
@@ -11,7 +11,7 @@ export function ensureCostPlans(){return schema??=(async()=>{
  await db.query(`CREATE TABLE IF NOT EXISTS enterprise_cost_plans (id INT AUTO_INCREMENT PRIMARY KEY, seed_key VARCHAR(40) UNIQUE, name VARCHAR(255) NOT NULL, producer VARCHAR(32) NOT NULL, revision INT NOT NULL DEFAULT 1, input_json LONGTEXT NOT NULL, output_json LONGTEXT NOT NULL, edited_by INT NULL, updated_at DATETIME NOT NULL) ENGINE=InnoDB`);
  await db.query(`CREATE TABLE IF NOT EXISTS enterprise_cost_plan_revisions (id INT AUTO_INCREMENT PRIMARY KEY, plan_id INT NOT NULL, revision INT NOT NULL, input_json LONGTEXT NOT NULL, output_json LONGTEXT NOT NULL, edited_by INT NULL, created_at DATETIME NOT NULL, UNIQUE KEY plan_revision(plan_id,revision)) ENGINE=InnoDB`);
  for(const [program,cogs] of [['Beef','8.51'],['Lamb','10.79'],['Pork','5.22']]){
-  const input={name:`Deck ${program}`,producer:'deck',program,unit:'lb',quantity:'',cogs,targetMargin:'23',notes:'',model:program==='Beef'?'simple-beef':'simple-average',quantity:'100',groups:program==='Beef'?[{name:'Ground beef',share:'44',rows:[]},{name:'Other beef products',share:'56',rows:[]}]:[{name:program,share:'100',rows:[]}]};
+  const input={name:`Deck ${program}`,producer:'deck',program,unit:'lb',cogs,targetMargin:'23',notes:'',model:program==='Beef'?'simple-beef':'simple-average',quantity:'100',groups:program==='Beef'?[{name:'Ground beef',share:'44',rows:[]},{name:'Other beef products',share:'56',rows:[]}]:[{name:program,share:'100',rows:[]}]};
   await db.query(`INSERT IGNORE INTO enterprise_cost_plans(seed_key,name,producer,input_json,output_json,updated_at) VALUES(?,?,?,?,?,UTC_TIMESTAMP())`,[program,input.name,input.producer,JSON.stringify(input),JSON.stringify(calculateCostPlan(input))]);
  }
  await db.query(`INSERT IGNORE INTO enterprise_cost_plan_revisions(plan_id,revision,input_json,output_json,edited_by,created_at) SELECT id,revision,input_json,output_json,edited_by,updated_at FROM enterprise_cost_plans`);
@@ -27,7 +27,7 @@ export async function costPlanCatalog(){
    const explicit=!perLb&&pkg?.packageBuyPrice!=null;
    const cost=explicit?Number(pkg.packageBuyPrice):unitCost==null?null:Number(unitCost)*(perLb?1:Number(pkg?.quantity??k.num_of_items??1));
    const mismatch=p.price!=null&&Number(p.costEnterprise)!==Number(input.retailEnterpriseId);
-   return {productId:p.id,packageId:k.id,name:p.name,packageName:k.name,category:p.category,producer:producerFor(p.vendor),baseline:{cost:Number.isFinite(cost)&&cost!==null?cost.toFixed(4):null,basis:perLb?'lb':'package',enterpriseId:input.retailEnterpriseId,capturedAt:new Date().toISOString(),issue:mismatch?'Purchasing enterprise needs review.':!['lb','each'].includes(input.pricingUnit)?'Pricing unit is missing.':cost==null?'Cost is missing.':null}};
+   return {productId:p.id,packageId:k.id,name:p.name,packageName:k.name,category:p.category,producer:producerFor(p.vendor),baseline:{cost:Number.isFinite(cost)&&cost!==null?cost.toFixed(4):null,basis:perLb?'lb':'package',packageWeightLb:perLb?null:fixedPackagePounds(k.name),enterpriseId:input.retailEnterpriseId,capturedAt:new Date().toISOString(),issue:mismatch?'Purchasing enterprise needs review.':!['lb','each'].includes(input.pricingUnit)?'Pricing unit is missing.':cost==null?'Cost is missing.':null}};
   });
  });
 }
@@ -57,7 +57,7 @@ export async function prepareCostPlan(input,base=null,refresh=false){
    if(previous&&base.producer!==input.producer)fail('Remove product rows before changing producer.');
    if(!current&&!previous)fail('Product/package is not available for this plan.');
    const baseline=(!refresh&&previous?previous.baseline:current?.baseline)||{...previous.baseline,issue:'Product/package is no longer available.'};
-   if(refresh&&previous&&JSON.stringify([baseline.cost,baseline.basis,baseline.issue])!==JSON.stringify([previous.baseline.cost,previous.baseline.basis,previous.baseline.issue]))changes.push({name:current?.name||r.name,before:previous.baseline,after:baseline});
+   if(refresh&&previous&&JSON.stringify([baseline.cost,baseline.basis,baseline.issue,baseline.packageWeightLb])!==JSON.stringify([previous.baseline.cost,previous.baseline.basis,previous.baseline.issue,previous.baseline.packageWeightLb]))changes.push({name:current?.name||r.name,before:previous.baseline,after:baseline});
    return {...r,name:current?.name||previous.name,packageName:current?.packageName||previous.packageName,baseline,proposed:refresh&&previous&&previous.baseline?.basis!==baseline.basis?'':r.proposed,conversion:refresh&&previous&&previous.baseline?.basis!==baseline.basis?'':r.conversion};
   })};
  })};
@@ -70,7 +70,7 @@ export async function saveCostPlan(id,body,user,source=null){
  const incoming=body.input.groups.flatMap(g=>g.rows);
  for(const r of prepared.input.groups.flatMap(g=>g.rows)){
   const seen=incoming.find(x=>Number(x.productId)===Number(r.productId)&&Number(x.packageId)===Number(r.packageId));
-  if(JSON.stringify([seen?.baseline?.cost,seen?.baseline?.basis,seen?.baseline?.issue])!==JSON.stringify([r.baseline?.cost,r.baseline?.basis,r.baseline?.issue]))fail('Pricing Costs changed since the refresh preview. Refresh and review again.',409);
+  if(JSON.stringify([seen?.baseline?.cost,seen?.baseline?.basis,seen?.baseline?.issue,seen?.baseline?.packageWeightLb])!==JSON.stringify([r.baseline?.cost,r.baseline?.basis,r.baseline?.issue,r.baseline?.packageWeightLb]))fail('Pricing Costs changed since the refresh preview. Refresh and review again.',409);
  }
  }
  const db=await getPool().getConnection();try{await db.beginTransaction();let revision=1;
