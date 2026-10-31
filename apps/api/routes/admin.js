@@ -1,4 +1,3 @@
-import enterpriseCostPlansRouter from "./enterpriseCostPlans.js";
 import { productBasketFlags, BASKET_FLAG_KEYS } from '../lib/productBasketEligibility.js';
 import { copyEnterprisePricing } from "../lib/duplicateEnterprisePricing.js";
 import { ensureEnterprisePricingSchema } from "../lib/enterprisePricingSchema.js";
@@ -208,7 +207,6 @@ router.use(async (_req, _res, next) => {
 
 router.use("/product-sync", productSyncRouter);
 router.use("/enterprise-pricing", enterprisePricingRouter);
-router.use("/enterprise-cost-plans", enterpriseCostPlansRouter);
 router.use("/enterprise-promotions", enterprisePromotionsRouter);
 router.put("/products/:id/farm-stock", requireAdminPermission(["inventory_admin", "pricing_admin", "local_pricelist_admin"]), async (req, res) => {
   try { res.json(await saveProductFarmStock(req.params.id, req.body, req.admin)); }

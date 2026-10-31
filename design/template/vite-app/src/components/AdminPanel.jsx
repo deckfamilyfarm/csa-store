@@ -1,4 +1,3 @@
-import { EnterpriseCostPlans } from "./EnterpriseCostPlans.jsx";
 import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AdminContentSection } from "./AdminContentSection.jsx";
@@ -68,7 +67,6 @@ function canAccessAdminSection(roleKeys, section) {
     case "inventory":
       return productCapabilities(roleKeys).view;
     case "migrationComparison":
-    case "deckProductCosts":
     case "enterprisePricing":
     case "reviewPublish":
       return roleKeys.some(role => ["pricing_editor", "pricing_publisher", "pricing_admin", "local_pricelist_admin"].includes(role));
@@ -142,7 +140,6 @@ const ADMIN_NAV_GROUPS = [
     items: [
       { section: "enterprisePricing", label: "Pricing" },
       { section: "inventory", label: "Inventory" },
-      { section: "deckProductCosts", label: "Deck Product Costs" },
       { section: "reviewPublish", label: "Review & Publish" },
       { section: "migrationComparison", label: "Migration comparison" },
       { section: "storefront", label: "Storefront" },
@@ -4530,7 +4527,6 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh, sessionTarg
             <EnterprisePricingSection token={token} roles={currentAdminRoles} />
           )}
 
-          {activeSection === "deckProductCosts" && canAccessAdminSection(currentAdminRoles, "deckProductCosts") && <EnterpriseCostPlans token={token} roles={currentAdminRoles} />}
 
           {activeSection === "migrationComparison" && canAccessAdminSection(currentAdminRoles, "migrationComparison") && (
             <EnterpriseMigrationSection token={token} />
