@@ -7,7 +7,7 @@ import productSyncRouter from "./productSync.js";
 import enterprisePricingRouter from "./enterprisePricing.js";
 import enterprisePromotionsRouter from "./enterprisePromotions.js";
 import { assertLegacyPricingPublicationAllowed, assertNoMigratedLegacySquarePublication } from "../lib/enterprisePricingService.js";
-import { saveInventoryToLocalLine } from "../lib/inventorySync.js";
+import { saveInventoryToLocalLine, refreshFullFarmInventory } from "../lib/inventorySync.js";
 import { saveProductFarmStock } from "../lib/productFarmStock.js";
 import { farmInventorySnapshot } from "../lib/farmInventory.js";
 import { validateVendorAssignment, validateSavedProductVendor } from "../lib/productVendor.js";
@@ -215,9 +215,12 @@ router.put("/products/:id/farm-stock", requireAdminPermission(["inventory_admin"
   catch (error) { res.status(error.status || 400).json({ error: error.message, ...(error.farmStockConflict ? { farmStockConflict: error.farmStockConflict } : {}) }); }
 });
 
+router.post('/products/inventory/refresh', requireAdminPermission(['inventory_admin','pricing_admin','pricing_editor','pricing_publisher','local_pricelist_admin','localline_pull','localline_push']), async(req,res)=>{
+ try{res.json(await refreshFullFarmInventory(req.body?.productIds));}catch(e){res.status(e.status||400).json({error:e.message});}
+});
 router.post("/products/:id/inventory", requireAdminPermission(["inventory_admin", "pricing_admin", "local_pricelist_admin"]), async (req, res) => {
   try {
-    if(Object.hasOwn(req.body?.changes||{},'inventory') && !req.body?.expectedInventory) return res.status(428).json({error:'Refresh FF inventory before editing its quantity.'});
+    if((Object.hasOwn(req.body?.changes||{},'inventory')||req.body?.changes?.packageInventory) && !req.body?.expectedInventory) return res.status(428).json({error:'Refresh FF inventory before editing its quantity.'});
     res.json(await saveInventoryToLocalLine(req.params.id, req.body?.changes, req.admin, req.body?.expectedInventory)); }
   catch (error) { res.status(error.status || 400).json({ error: error.message, ...(error.inventoryConflict ? {inventoryConflict:error.inventoryConflict} : {}) }); }
 });
@@ -6417,6 +6420,8 @@ function buildPricelistRows(productRows, supportingRows) {
       visible: toBooleanFlag(visibleSource, true),
       trackInventory: toBooleanFlag(trackInventorySource, false),
       inventory: toInventoryValue(inventorySource, 0),
+      inventoryType: productMeta?.inventoryType || 'product',
+      packageInventory: (packagesByProductId.get(productId)||[]).map(pkg=>({packageId:Number(pkg.id),remoteId:Number(packageMetaByPackageId.get(Number(pkg.id))?.localLinePackageId||0),name:pkg.name,inventory:pkg.inventory==null?null:Number(pkg.inventory)})),
       ...farmInventorySnapshot(product),
       usesSourcePricing,
       usesNoMarkupPricing: snapshot.profile.usesNoMarkupPricing,

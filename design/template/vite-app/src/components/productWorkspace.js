@@ -19,7 +19,7 @@ export const SCHEDULE_FIELDS = [
   "saleDiscount",
 ];
 const METADATA_FIELDS = ["name", "description", "vendorId", "categoryId"];
-export const FULL_FARM_INVENTORY_FIELDS = ["inventory", "trackInventory", "visible"];
+export const FULL_FARM_INVENTORY_FIELDS = ["inventory", "packageInventory", "trackInventory", "visible"];
 export const INVENTORY_FIELDS = [...FULL_FARM_INVENTORY_FIELDS, ...FARM_INVENTORY_FIELDS];
 
 async function saveFarmStock(entry, api) {
@@ -68,12 +68,14 @@ export async function saveInventoryDraft(entry, capabilities, api) {
   if (fields.length) {
     try {
       if (!capabilities.inventoryPush) throw new Error("Inventory Admin, or product editing and Local Line Push permissions, are required.");
-      const changes = Object.fromEntries(fields.map(key => [key, Number(entry.values[key])]));
+      const changes = Object.fromEntries(fields.map(key => [key, key==='packageInventory'?entry.values.packageInventory.filter(p=>p.inventory!==entry.defaults.packageInventory.find(old=>old.packageId===p.packageId)?.inventory).map(p=>({packageId:p.packageId,inventory:p.inventory===''?NaN:Number(p.inventory)})):Number(entry.values[key])]));
       if (Object.hasOwn(changes, "inventory") && (!Number.isInteger(changes.inventory) || changes.inventory < 0)) throw new Error("Full Farm Stock must be a nonnegative whole number.");
-      const response = await api.post(`products/${entry.meta.productId}/inventory`, { changes, ...(Object.hasOwn(changes,"inventory") ? {expectedInventory:{inventory:Number(entry.defaults.inventory),trackInventory:Boolean(entry.defaults.trackInventory)}} : {}) });
+      if(entry.meta.inventoryConflict)throw new Error('Review current Full Farm stock before retrying.');
+      const response = await api.post(`products/${entry.meta.productId}/inventory`, { changes, ...((Object.hasOwn(changes,"inventory")||changes.packageInventory) ? {expectedInventory:entry.meta.inventorySnapshot||{inventory:Number(entry.defaults.inventory),trackInventory:Boolean(entry.defaults.trackInventory)}} : {}) });
       if (!response?.ok || !response?.localLineUpdate) throw new Error(response?.message || "Local Line inventory was not confirmed.");
+      result.currentInventory=response.currentInventory;
       result.savedFields.push(...fields);
-    } catch (error) { result.errors.push(`Full Farm: ${error.message || "Inventory update failed."}`); }
+    } catch (error) { if(error.inventoryConflict)result.inventoryConflict=error.inventoryConflict; result.errors.push(`Full Farm: ${error.message || "Inventory update failed."}`); }
   }
   result.ok = result.errors.length === 0;
   result.partial = !result.ok && result.savedFields.length > 0;
@@ -131,7 +133,8 @@ export function buildProductDraftFromProduct(
     categoryId: product.categoryId == null ? "" : String(product.categoryId),
     visible: Boolean(product.visible),
     trackInventory: Boolean(product.trackInventory),
-    inventory: Number(product.inventory) || 0,
+    inventory: product.inventory == null ? 0 : Number(product.inventory),
+    packageInventory: product.inventoryType==='package' ? (product.packageInventory||[]) : [],
     stockOnFarm: product.stockOnFarm == null ? null : Boolean(Number(product.stockOnFarm)),
     stockOnFarmLbs: product.stockOnFarmLbs == null ? "" : String(Number(product.stockOnFarmLbs)),
     unitOfMeasure: field("unitOfMeasure", "each") === "lbs" ? "lbs" : "each",
@@ -183,6 +186,9 @@ export function hydrateProductDraft(existing, product, sanitize) {
     values,
     meta: {
       ...existing?.meta,
+      inventoryConflict: existing?.meta?.inventoryConflict || (dirtyFields(existing).some(k=>['inventory','packageInventory'].includes(k))&&product.inventorySnapshot&&(existing.meta.inventoryType||'product')!==(product.inventoryType||'product')?product.inventorySnapshot:null),
+      inventorySnapshot: dirtyFields(existing).some(k=>['inventory','packageInventory','trackInventory'].includes(k)) ? existing.meta.inventorySnapshot : product.inventorySnapshot,
+      inventoryType: product.inventoryType||'product',
       productId: Number(product.productId ?? product.id),
       productName: product.name,
       farmStockRevision: farmDirty || existing?.meta.farmStockConflict ? existing.meta.farmStockRevision : Number(product.farmStockRevision || 0),
@@ -247,6 +253,8 @@ export function acknowledgeSave(
     meta.farmStockRevision = result.farmStock.farmStockRevision;
     delete meta.farmStockConflict;
   }
+  if(result.currentInventory){meta.inventorySnapshot=result.currentInventory;meta.inventoryType=result.currentInventory.inventoryType||'product';delete meta.inventoryConflict;}
+  if(result.inventoryConflict)meta.inventoryConflict=result.inventoryConflict;
   if (result.farmStockConflict) meta.farmStockConflict = result.farmStockConflict;
   return { ...current, defaults, values, meta };
 }

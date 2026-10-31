@@ -593,3 +593,14 @@ test('invalid pounds stay visible for correction without blocking Full Farm save
   assert.deepEqual(result.savedFields, ['inventory']);
   assert.equal(acknowledgeSave(draft, draft, result.savedFields).values.stockOnFarmLbs, '2.1234');
 });
+
+test('package inventory saves only dirty packages with frozen remote mappings',async()=>{
+ const snapshot={inventoryType:'package',inventory:null,trackInventory:true,packages:[{packageId:1,remoteId:11,name:'ea',inventory:9},{packageId:2,remoteId:12,name:'box',inventory:7}]};
+ const product={id:30,name:'Napa',vendorId:1,inventoryType:'package',inventorySnapshot:snapshot,packageInventory:snapshot.packages,trackInventory:true};
+ const entry=hydrateProductDraft(null,product);entry.values.packageInventory=entry.values.packageInventory.map(p=>p.packageId===1?{...p,inventory:5}:p);
+ const calls=[];const result=await saveInventoryDraft(entry,{edit:true,inventoryPush:true},{post:async(path,body)=>{calls.push(body);return {ok:true,localLineUpdate:true,currentInventory:{...snapshot,packages:entry.values.packageInventory}};}});
+ assert.equal(result.ok,true);assert.deepEqual(calls[0],{changes:{packageInventory:[{packageId:1,inventory:5}]},expectedInventory:snapshot});
+ assert.deepEqual(result.savedFields,['packageInventory']);
+ const refreshed=hydrateProductDraft(entry,{...product,packageInventory:snapshot.packages.map(p=>({...p,inventory:1})),inventorySnapshot:{...snapshot,packages:[]}});
+ assert.equal(refreshed.values.packageInventory[0].inventory,5);assert.equal(refreshed.meta.inventorySnapshot.packages[0].inventory,9);
+});

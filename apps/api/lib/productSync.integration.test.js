@@ -61,7 +61,10 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
       if (method === "GET" && id > 99000 && failCreateReads > 0) { failCreateReads -= 1; throw new Error("Interrupted after confirmed creation"); }
       if (method === "PATCH") {
         if (pausePublication?.id === id) { pausePublication.entered(); await pausePublication.wait; }
-        Object.assign(remote, body); if (Object.hasOwn(body, "set_inventory")) remote.inventory = body.set_inventory;
+        const packageInventoryPatch=body.packages?.some(p=>Object.hasOwn(p,'set_inventory'));
+        const mergedPackages=packageInventoryPatch?body.packages.map(p=>({...remote.packages.find(old=>old.id===p.id),...p,...(Object.hasOwn(p,'set_inventory')?{current_inventory:p.set_inventory}:{})})):body.packages;
+        Object.assign(remote, body);if(mergedPackages)remote.packages=mergedPackages;
+        if (Object.hasOwn(body, "set_inventory")) remote.inventory = body.set_inventory;
         if (dropVendor && Object.hasOwn(body, "vendor")) remote.vendor = null;
       }
       return json(remote);
@@ -372,6 +375,23 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
   await assert.rejects(saveInventoryToLocalLine(130,{inventory:1},user),/GET failed/);
   const [[unchangedInventory]]=await pool.query("SELECT inventory FROM products WHERE id=130");
   assert.equal(unchangedInventory.inventory,6,"A failed remote update preserves the previously confirmed local inventory");
+
+  await product(132);
+  const packageRemote=remoteProducts.get(1132);packageRemote.inventory_type='package';packageRemote.inventory=0;packageRemote.track_inventory=true;packageRemote.packages[0].current_inventory=9;
+  packageRemote.packages.push({id:99932,name:'Second package',current_inventory:7,unit_price:23});
+  const pkgLocal=(await pool.query('SELECT package_id AS id FROM local_line_package_meta WHERE product_id=132'))[0][0].id;
+  const refreshedPackage=(await refreshFullFarmInventory([132])).rows[0];
+  assert.equal(refreshedPackage.inventory,null);assert.equal(refreshedPackage.packages[0].inventory,9);
+  assert.equal((await pool.query('SELECT inventory FROM packages WHERE id=?',[pkgLocal]))[0][0].inventory,9);
+  const beforePackageRequests=requests.length;
+  const packageSave=await saveInventoryToLocalLine(132,{packageInventory:[{packageId:pkgLocal,inventory:5}]},inventoryUser,refreshedPackage);
+  assert.equal(packageSave.currentInventory.packages[0].inventory,5);assert.equal(packageRemote.inventory,0);assert.equal(packageRemote.packages[1].current_inventory,7);assert.equal(packageRemote.packages[1].unit_price,23);
+  const sent=requests.slice(beforePackageRequests).find(r=>r.method==='PATCH').body;
+  assert.deepEqual(sent,{packages:[{id:packageRemote.packages[0].id,set_inventory:5},{id:99932}]});
+  const writesBefore=requests.filter(r=>r.method==='PATCH').length;
+  await assert.rejects(saveInventoryToLocalLine(132,{packageInventory:[{packageId:pkgLocal,inventory:4}]},inventoryUser,refreshedPackage),e=>e.status===409&&e.inventoryConflict.packages[0].inventory===5);
+  assert.equal(requests.filter(r=>r.method==='PATCH').length,writesBefore);
+  await assert.rejects(saveInventoryToLocalLine(132,{inventory:4},inventoryUser,{inventory:0,trackInventory:true}),e=>e.status===409&&e.inventoryConflict.inventoryType==='package');
 
   await product(140);
   remoteProducts.get(1140).vendor = null;

@@ -43,3 +43,18 @@ test('stock edits reject diminished remote quantities and changed tracking basel
   assert.equal(inventoryConflict({...remote,track_inventory:false},{inventory:3,trackInventory:true}).trackInventory,false);
   for(const baseline of [null,{}, {inventory:'3',trackInventory:true}]) assert.throws(()=>inventoryConflict(remote,baseline),{status:428});
 });
+
+test('package stock targets exact mapped packages and keeps product totals separate', async()=>{
+ const {remoteInventory,stockPayload}=await import('./inventorySnapshot.js');
+ const remote={inventory_type:'package',inventory:0,track_inventory:true,packages:[{id:8,name:'ea',current_inventory:9},{id:9,name:'Box',current_inventory:2}]};
+ const mappings=[{packageId:80,remoteId:8},{packageId:90,remoteId:9}];
+ const before=remoteInventory(remote,mappings);assert.equal(before.inventory,null);assert.equal(before.packages[0].inventory,9);
+ assert.deepEqual(stockPayload(remote,{packageInventory:[{packageId:80,inventory:5}]},before,mappings).payload,{packages:[{id:8,set_inventory:5},{id:9}]});
+ remote.packages[1].current_inventory=1;
+ assert.equal(stockPayload(remote,{packageInventory:[{packageId:80,inventory:5}]},before,mappings).conflict,undefined,'unmodified sibling sales do not block or get overwritten');
+ remote.packages[0].current_inventory=3;
+ assert.equal(stockPayload(remote,{packageInventory:[{packageId:80,inventory:5}]},before,mappings).conflict.packages[0].inventory,3);
+ assert.throws(()=>stockPayload(remote,{inventory:5},before,mappings),/by package/);
+ assert.equal(inventoryConflict({...remote,inventory_type:'product'},before,mappings).inventoryType,'product');
+ assert.equal(inventoryConflict(remote,before,[{packageId:80,remoteId:9}], [{packageId:80}]).packages[0].packageId,null);
+});

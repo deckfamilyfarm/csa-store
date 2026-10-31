@@ -147,9 +147,9 @@ function EnterpriseProductsSection({ token, roles = [], createdProductId }) {
     inventoryRefreshBusy.current=true;setInventoryRefreshing(true);
     const ids=rows.map(r=>r.id);
     try {
-      const result=await adminPost('enterprise-pricing/inventory/refresh',token,{productIds:ids});
+      const result=await adminPost('products/inventory/refresh',token,{productIds:ids});
       const results=new Map(result.rows.map(r=>[Number(r.productId),r]));
-      setRows(current=>current.map(row=>{const stock=results.get(row.id);return !stock?row:stock.error?{...row,ffInventoryError:stock.error}:{...row,ffInventory:stock.inventory,ffTrackInventory:stock.trackInventory,ffInventoryCheckedAt:stock.checkedAt,ffInventoryError:null};}));
+      setRows(current=>current.map(row=>{const stock=results.get(row.id);return !stock?row:stock.error?{...row,ffInventoryError:stock.error}:{...row,ffInventorySnapshot:stock,ffInventory:stock.inventory,ffTrackInventory:stock.trackInventory,ffInventoryCheckedAt:stock.checkedAt,ffInventoryError:null};}));
     }catch(e){setRows(current=>current.map(row=>ids.includes(row.id)?{...row,ffInventoryError:e.message}:row));}
     finally{inventoryRefreshBusy.current=false;setInventoryRefreshing(false);}
   }
@@ -329,7 +329,7 @@ function EnterpriseProductsSection({ token, roles = [], createdProductId }) {
           setMessage(`${row.name} is now ${visible?'visible':'hidden'} in Full Farm. Confirmed in Local Line.`);
         }} /></td>
         <td><EnterpriseInventoryCell row={row} token={token} roles={roles} localOnly={summary?.localOnly !== false} onSaved={(quantity,snapshot)=>{
-          setRows(current=>current.map(item=>item.id===row.id?{...item,ffInventory:quantity,ffTrackInventory:snapshot?.trackInventory??item.ffTrackInventory,ffInventoryCheckedAt:new Date().toISOString(),ffInventoryError:null}:item));
+          setRows(current=>current.map(item=>item.id===row.id?{...item,ffInventorySnapshot:snapshot,ffInventory:quantity,ffTrackInventory:snapshot?.trackInventory??item.ffTrackInventory,ffInventoryCheckedAt:new Date().toISOString(),ffInventoryError:null}:item));
           setMessage(`${row.name}: FF inventory updated to ${quantity}. Confirmed in Local Line.`);
         }} /></td>
         <td><PricingSyncStatus row={row} onReview={() => selectProduct(row.id, false, "editor-sync")} /></td>

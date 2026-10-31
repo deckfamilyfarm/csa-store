@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { adminGet } from "../adminApi.js";
+import { adminGet, adminPost } from "../adminApi.js";
 import { categoryLabel } from "../categoryLabel.js";
 import { ProductActionsMenu } from "./ProductActionsMenu.jsx";
 import { InventoryFieldInfo, INVENTORY_FIELD_HELP } from "./InventoryFieldInfo.jsx";
@@ -328,7 +328,7 @@ export function AdminProductsSection({
       }, () => cancelled)
       : adminGet(`pricelist?${params}`, token);
     request
-      .then((response) => {
+      .then(async (response) => {
         if (!response || cancelled || requestId.current !== id) return;
         for (const row of response.rows || [])
           rowCache.current.set(row.productId, row);
@@ -336,6 +336,24 @@ export function AdminProductsSection({
         if (compactInventory) setMobileLoaded(true);
         if (!compactInventory && response.pagination?.page && response.pagination.page !== page)
           setPage(response.pagination.page);
+        if(view==='inventory'){
+          const ids=(response.rows||[]).map(r=>r.productId);
+          for(let offset=0;offset<ids.length;offset+=100){
+            if(cancelled||requestId.current!==id)break;
+            const batch=ids.slice(offset,offset+100);let stocks;
+            try{stocks=(await adminPost('products/inventory/refresh',token,{productIds:batch})).rows;}
+            catch(e){stocks=batch.map(productId=>({productId,error:e.message}));}
+            if(cancelled||requestId.current!==id)break;
+            const map=new Map(stocks.map(s=>[s.productId,s]));
+            const refreshed=response.rows.map(row=>{
+              const stock=map.get(row.productId);if(!stock)return row;
+              const next=stock.error?{...row,inventoryError:stock.error}:{...row,inventory:stock.inventory,trackInventory:stock.trackInventory,inventoryType:stock.inventoryType||'product',packageInventory:stock.packages||[],inventorySnapshot:stock,inventoryError:null};
+              rowCache.current.set(next.productId,next);return next;
+            });
+            response={...response,rows:refreshed};setData(response);
+            setDrafts(existing=>Object.fromEntries(Object.entries(existing).map(([key,value])=>{const row=refreshed.find(r=>r.productId===Number(key));return [key,row?hydrateProductDraft(value,row):value];})));
+          }
+        }
       })
       .catch((error) => {
         if (!cancelled) setMessage(error.message || "Unable to load products.");
@@ -527,7 +545,15 @@ export function AdminProductsSection({
           />
         );
         return view === "inventory" ? <label className="products-inventory-checkbox">{checkbox}</label> : checkbox;
-      case "inventory":
+      case "inventory": {
+        if(view==='inventory'&&!row.inventorySnapshot)return <small role="status">{row.inventoryError||'Checking current stock…'}</small>;
+        const conflict=drafts[row.productId]?.meta.inventoryConflict;
+        if(conflict)return <div role="alert">Stock changed in Local Line.<button type="button" onClick={()=>{
+          setDrafts(old=>{const entry=old[row.productId],snapshot=conflict;const changes={inventory:snapshot.inventory??0,packageInventory:snapshot.packages||[],trackInventory:snapshot.trackInventory};return {...old,[row.productId]:{...entry,defaults:{...entry.defaults,...changes},values:{...entry.values,...changes},meta:{...entry.meta,inventoryConflict:null,inventorySnapshot:snapshot,inventoryType:snapshot.inventoryType||'product'}}};});
+        }}>Review current stock</button></div>;
+        if(row.inventoryType==='package')return <div>{values.packageInventory.map(pkg=><label key={pkg.remoteId||pkg.packageId} className="small">{pkg.name}<input className="input products-number" type="number" min="0" step="1" aria-label={`Full Farm Stock: ${row.name} ${pkg.name}`} value={pkg.inventory??''} disabled={disabled||!capabilities.edit||!values.trackInventory||!pkg.packageId||!row.inventorySnapshot||Boolean(row.inventoryError)} onChange={e=>patch(row,{packageInventory:values.packageInventory.map(p=>p.packageId===pkg.packageId?{...p,inventory:e.target.value===''?'':Number(e.target.value)}:p)})}/>{!pkg.packageId&&<small>Package mapping required</small>}</label>)}{row.inventoryError&&<small role="alert">{row.inventoryError}</small>}</div>;
+        return numericInput(column.key);
+      }
       case "saleDiscount":
         if (column.key === 'saleDiscount' && values.customerPriceOverrides?.length) return <span className="small">By group</span>;
         return numericInput(column.key);

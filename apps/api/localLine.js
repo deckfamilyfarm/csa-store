@@ -689,6 +689,10 @@ async function updateLocalLineInventory(db, productId, changes) {
     return { ok: null, payload };
   }
   const token = await getLocalLineAccessToken();
+  if(Object.hasOwn(payload,'set_inventory')){
+    const before=await fetchLocalLineProduct(remoteProductId,token);
+    if(before.inventory_type==='package')throw new Error('This product tracks inventory by package. Use Store → Inventory to refresh and edit its package quantities.');
+  }
   await patchLocalLineProduct(remoteProductId, token, payload);
   const remoteProduct = await fetchLocalLineProduct(remoteProductId, token);
   const localPackageRows = await db
@@ -721,7 +725,7 @@ async function updateLocalLineInventory(db, productId, changes) {
     !Object.prototype.hasOwnProperty.call(payload, "track_inventory") ||
     remoteProduct?.track_inventory === payload.track_inventory;
 
-  return { ok: visibleMatches && trackInventoryMatches };
+  return { ok: visibleMatches && trackInventoryMatches && (!Object.hasOwn(payload,'set_inventory') || Number(remoteProduct?.inventory)===payload.set_inventory) };
 }
 
 async function updateLocalLinePrices(db, productId, changes, context) {
