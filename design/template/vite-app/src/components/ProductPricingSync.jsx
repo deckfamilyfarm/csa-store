@@ -39,7 +39,7 @@ export function ProductPricingSync({ productId, token, roles, dirty, onChanged, 
           // must recover the existing update before starting another one.
           if (!saved) saveJob({ releaseId, platforms:result.latestPricingReleasePlatforms?.length ? result.latestPricingReleasePlatforms : ['localline'] });
           const receipt = await get(`product-sync/releases/${releaseId}/progress`);
-          if (!cancelled) { setRelease(receipt);
+          if (!cancelled) { setRelease(receipt); setSelectedPlatforms(releasePlatforms(receipt));
             if (['completed', 'cancelled'].includes(receipt.status)) saveJob(null);
             else saveJob({...saved, releaseId, platforms:releasePlatforms(receipt)});
           }
