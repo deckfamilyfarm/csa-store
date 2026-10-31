@@ -1,0 +1,17 @@
+import express from 'express';
+import { requireAdminPermission } from '../middleware/auth.js';
+import { previewSimpleCategory,previewSimpleBeef,listCostPlans,readCostPlan,costPlanCatalog,prepareCostPlan,saveCostPlan } from '../lib/enterpriseCostPlans.js';
+const router=express.Router();
+const edit=requireAdminPermission(['pricing_editor','pricing_admin','local_pricelist_admin']);
+router.use(requireAdminPermission(['pricing_editor','pricing_publisher','pricing_admin','local_pricelist_admin']));
+const route=fn=>async(req,res)=>{try{res.json(await fn(req));}catch(e){res.status(e.status||400).json({error:e.message});}};
+router.get('/',route(()=>listCostPlans()));
+router.get('/catalog',route(()=>costPlanCatalog()));
+router.post('/simple-category',edit,route(async req=>previewSimpleCategory(req.body.input,req.body.id?(await readCostPlan(req.body.id)).input:null)));
+router.post('/simple-beef',edit,route(async req=>previewSimpleBeef(req.body.input,req.body.id?(await readCostPlan(req.body.id)).input:null)));
+router.post('/preview',route(async req=>prepareCostPlan(req.body.input,req.body.id?(await readCostPlan(req.body.id)).input:null,req.body.refresh===true)));
+router.post('/',edit,route(req=>saveCostPlan(null,req.body,req.admin)));
+router.get('/:id',route(req=>readCostPlan(req.params.id)));
+router.post('/:id',edit,route(req=>saveCostPlan(req.params.id,req.body,req.admin)));
+router.post('/:id/duplicate',edit,route(async req=>{const source=await readCostPlan(req.params.id);return saveCostPlan(null,{input:{...source.input,name:source.input.name+' copy'}},req.admin,source.input);}));
+export default router;
