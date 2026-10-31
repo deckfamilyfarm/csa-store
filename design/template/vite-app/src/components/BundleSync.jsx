@@ -15,7 +15,7 @@ export function BundleSync({id,token,roles,localOnly,dirty,publicationId,onPubli
   {snap&&<><p>Review #{receipt.id} · {receipt.status}</p><table className="admin-table"><thead><tr><th>Field</th><th>Channel</th><th>Saved bundle</th></tr></thead><tbody>
    <tr><td>Name</td><td>{snap.before.name}</td><td>{snap.expected.name}</td></tr>
    <tr><td>Visibility</td><td>{snap.before.visible?'Visible':'Hidden'}</td><td>{snap.expected.visible?'Visible':'Hidden'}</td></tr>
-   <tr><td>Buy Price</td><td>{money(snap.before.price)}</td><td>{money(snap.expected.price)}</td></tr>
+   <tr><td>Cost</td><td>{money(snap.before.price)}</td><td>{money(snap.expected.price)}</td></tr>
    <tr><td>Vendor ID</td><td>{snap.before.vendor}</td><td>{snap.expected.vendor}</td></tr>
    <tr><td>Description</td><td>{snap.before.description.replace(/<[^>]*>/g,' ')}</td><td>{snap.expected.description.replace(/<[^>]*>/g,' ')}</td></tr>
    <tr><td>Component packages</td><td>{snap.before.contents.flatMap(g=>g.packages).map(p=>`${p.quantity} × #${p.packageId}`).join(', ')}</td><td>{snap.components.map(p=>`${p.quantity} × ${p.name||`#${p.remotePackageId}`}`).join(', ')}</td></tr>

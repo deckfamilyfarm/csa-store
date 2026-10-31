@@ -1,3 +1,4 @@
+import { CostFieldInfo } from "./CostFieldInfo.jsx";
 import { EnterpriseInventoryCell } from "./EnterpriseInventoryCell.jsx";
 import { EnterpriseVisibilityCell } from "./EnterpriseVisibilityCell.jsx";
 import { EnterpriseSaleCell, SalePrice } from "./EnterpriseSaleCell.jsx";
@@ -28,7 +29,7 @@ const productHref = id => {
   return `${url.pathname}${url.search}${url.hash}`;
 };
 const columns = [
-  ["name", "Product"], ["buyFrom", "Buy Price"],
+  ["name", "Product"], ["buyFrom", "Cost"],
   ["markup", "Markup"], ["csa", "FF Unit Price"],
   ["sale", "Sale"], ["llPackage", "FF Package Price"], ["square", "Square"], ["wholesale", "Wholesale"], ["visibility", "FF Visible"], ["inventory", "FF Inventory"], ["sync", "Sync"]
 ];
@@ -223,7 +224,7 @@ function EnterpriseProductsSection({ token, roles = [], createdProductId }) {
       } : current);
     }
     setMarkupRefresh(value => value + 1);
-    setMessage(saved.pricing ? "Buy Price saved. Updated selling prices are now in use locally." : "Buy Price saved. Complete the product’s pricing inputs to calculate selling prices.");
+    setMessage(saved.pricing ? "Cost saved. Updated selling prices are now in use locally." : "Cost saved. Complete the product’s pricing inputs to calculate selling prices.");
   }
 
   const pricingDirty = !!draft && !isDepositPricing(detail?.product) && JSON.stringify(draft) !== pricingBaseline;
@@ -281,6 +282,7 @@ function EnterpriseProductsSection({ token, roles = [], createdProductId }) {
     <div className="table-wrap enterprise-pricing-table-wrap" ref={tableScrollRef} role="region" aria-label="Pricing table" tabIndex={0}><table className="admin-table enterprise-pricing-table"><thead><tr>{columns.map(([key, label]) =>
       <th key={key} scope="col" aria-sort={key === "sync" ? undefined : sort.key === key ? sort.direction === "asc" ? "ascending" : "descending" : "none"}>
         {key === "sync" ? label : <button type="button" className="enterprise-pricing-sort" onClick={() => changeSort(key)}>{label}<span aria-hidden="true">{sort.key === key ? sort.direction === "asc" ? " ▲" : " ▼" : " ↕"}</span></button>}
+        {key === "buyFrom" && <CostFieldInfo />}
       </th>)}</tr></thead>
       <tbody>{visible.map(row => {
         const source = row.sourceEvidence;
@@ -300,7 +302,7 @@ function EnterpriseProductsSection({ token, roles = [], createdProductId }) {
           }} />
           {productWarnings(row).length > 0 && <button type="button" className="enterprise-pricing-warning" aria-label={`Show warnings for ${row.name}`} onClick={() => setWarningRow(row)}>⚠</button>}
         </div></td>
-        <td>{packageCosts ? row.output?.packages.map(p=><div key={p.packageId}><button type="button" className="enterprise-pricing-edit-value" onClick={()=>selectProduct(row.id,false,'editor-packages')}>{money(p.packageBuyPriceCents ?? Math.round(row.output.buyFromTenThousandths/100*(p.quantity||1)))}</button><small>{packageName(p.packageId)}</small></div>) : deposit ? <span title="Fixed deposit package amount; no markup">{money(depositBaseCents(row))}</span> : <InlinePricingValue label={`Buy Price for ${row.name}`} canEdit={canEdit} min={0.01}
+        <td>{packageCosts ? row.output?.packages.map(p=><div key={p.packageId}><button type="button" className="enterprise-pricing-edit-value" onClick={()=>selectProduct(row.id,false,'editor-packages')}>{money(p.packageBuyPriceCents ?? Math.round(row.output.buyFromTenThousandths/100*(p.quantity||1)))}</button><small>{packageName(p.packageId)}</small></div>) : deposit ? <span title="Fixed deposit package amount; no markup">{money(depositBaseCents(row))}</span> : <InlinePricingValue label={`Cost for ${row.name}`} canEdit={canEdit} min={0.01}
           display={row.buyPrice ? money(row.buyPrice.cents) : row.output?.buyFromTenThousandths != null ? dollars(row.output.buyFromTenThousandths / 10000) : "—"}
           value={row.buyPrice ? (row.buyPrice.cents / 100).toFixed(2) : row.output?.buyFromTenThousandths != null ? (row.output.buyFromTenThousandths / 10000).toFixed(2) : ""}
           onSave={value => saveBuyPrice(row, value)} />}</td>

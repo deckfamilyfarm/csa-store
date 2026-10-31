@@ -1,0 +1,19 @@
+.inventory-field-info { display: inline-flex; flex-shrink: 0; }
+.inventory-field-info-button {
+  display: inline-flex; justify-content: center; align-items: center;
+  width: 24px; height: 24px; padding: 0; border: 0;
+  background: transparent; color: var(--navy); cursor: pointer;
+}
+.inventory-field-info-button > span {
+  display: inline-flex; justify-content: center; align-items: center;
+  width: 20px; height: 20px; border: 1px solid var(--line);
+  border-radius: 50%; background: white; font-size: 12px; font-weight: 600;
+}
+.inventory-field-info-button:focus-visible { outline: 2px solid var(--barn); outline-offset: 2px; }
+.inventory-field-tooltip {
+  position: fixed; z-index: 1000; width: min(280px, calc(100vw - 16px));
+  box-sizing: border-box; padding: 10px; background: white; color: var(--ink);
+  border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow);
+  font-size: 12px; line-height: 1.5;
+}
+

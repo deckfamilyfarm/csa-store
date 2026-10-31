@@ -1,3 +1,4 @@
+import { CostFieldInfo } from "./CostFieldInfo.jsx";
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { adminGet, adminPost } from '../adminApi.js';
 import { ProductIdentity } from './ProductIdentity.jsx';
@@ -135,7 +136,7 @@ export function EnterpriseReviewTable({ token, roles, salesContent }) {
         <div className="review-table-scroll" ref={scroll} role="region" aria-label="Product publication table" tabIndex={0}>
           <table className="admin-table review-product-table"><thead><tr>
             <th><input ref={selectAll} type="checkbox" aria-label="Select all matching products" disabled={busy || !filtered.length} checked={filtered.length > 0 && chosen.length === filtered.length} onChange={e => setSelected(e.target.checked ? filtered.map(row => row.id) : [])} /></th>
-            <th>Product</th><th>Buy Price</th><th>Markup</th><th>LL channel → local package</th><th>Square channel → local</th><th>Sync / review</th>
+            <th>Product</th><th>Cost <CostFieldInfo /></th><th>Markup</th><th>LL channel → local package</th><th>Square channel → local</th><th>Sync / review</th>
           </tr></thead><tbody>{filtered.map(row => {
             const state = reviewState(row), warnings = [errors[row.id], ...reviewWarnings(row)].filter(Boolean);
             const releases = [...new Map((row.check?.actions || []).filter(a => a.releaseId && ['partial', 'failed', 'held', 'scheduled'].includes(a.publicationStatus)).map(a => [a.releaseId, a])).values()];

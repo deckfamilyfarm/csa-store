@@ -1,3 +1,4 @@
+import { CostFieldInfo } from "./CostFieldInfo.jsx";
 import {BundleSync} from './BundleSync.jsx';
 import React, { useEffect, useRef, useState } from 'react';
 import { adminGet, adminPost } from '../adminApi.js';
@@ -32,7 +33,7 @@ export function EnterpriseBundles({ token, roles = [], active = true, review = f
     {!data && !error && <p role="status">Loading bundles…</p>}
     {data && !data.rows.length && <p>No bundles yet. Add a bundle to choose its contents and discount.</p>}
     <div className="table-wrap bundle-table-scroll" ref={scroll} role="region" aria-label="Bundle pricing" tabIndex={0}>
-      <table className="admin-table"><thead><tr><th>Bundle</th><th>Buy Price</th><th>Contents</th><th>Discount</th><th>FF Bundle Price</th><th>Visibility</th><th>{review ? 'Channel price' : 'Availability'}</th><th>Sync</th></tr></thead>
+      <table className="admin-table"><thead><tr><th>Bundle</th><th>Cost <CostFieldInfo /></th><th>Contents</th><th>Discount</th><th>FF Bundle Price</th><th>Visibility</th><th>{review ? 'Channel price' : 'Availability'}</th><th>Sync</th></tr></thead>
       <tbody>{rows.map(row => <tr key={row.id}>
         <td><button className="bundle-name" onClick={() => setSelected(row.id)}>{row.input.name}</button><small>{row.vendorName} · bundle</small></td>
         <td>{money(row.output.buyPriceCents)}<small>per bundle</small></td><td>{money(row.output.subtotalCents)}<small>{row.input.components.reduce((n,c)=>n+c.quantity,0)} packages</small></td>
@@ -129,9 +130,9 @@ function BundleEditor({ id, token, catalog, vendors, canEdit, roles, localOnly, 
       {canEdit && <button className="button alt" disabled={busy} onClick={()=>setAdding(v=>!v)}>{adding?'Close product search':'Add contents'}</button>}
       {adding && <div className="bundle-add-contents"><input autoFocus className="input" aria-label="Search component packages" placeholder="Search product, package or vendor" value={componentSearch} onChange={e=>setComponentSearch(e.target.value)} />
         <div role="region" aria-label="Available component packages">{available.slice(0,40).map(p=><button key={p.packageId} disabled={busy} onClick={()=>{update({components:[...draft.components,{packageId:p.packageId,quantity:1}]});setComponentSearch('');}}>{p.name} · {p.packageName}<small>{p.vendorName} · {money(p.priceCents)}</small></button>)}{!available.length && <p>No priced packages match.</p>}</div></div>}
-      <fieldset disabled={!canEdit||busy} className="bundle-pricing-inputs"><label>Bundle Buy Price<input className="input" type="number" min="0" step="0.01" value={draft.buyPrice} onChange={e=>update({buyPrice:e.target.value})} /></label>
+      <fieldset disabled={!canEdit||busy} className="bundle-pricing-inputs"><label>Bundle Cost<input className="input" type="number" min="0" step="0.01" value={draft.buyPrice} onChange={e=>update({buyPrice:e.target.value})} /></label>
       <label>Bundle discount %<input className="input" type="number" min="0" max="99.99" step="0.01" value={draft.discountPercent} onChange={e=>update({discountPercent:e.target.value})} /></label></fieldset>
-      <p className="small">Component FF package prices × quantities, less {draft.discountPercent}%. All three active FF baskets use this price. The discount does not change the Buy Price.</p>
+      <p className="small">Component FF package prices × quantities, less {draft.discountPercent}%. All three active FF baskets use this price. The discount does not change the Cost.</p>
       {output?.blockers.map((text,i)=><p role="alert" key={i}>{text}</p>)}
     </section>
     <section className="product-editor-section" id="bundle-sync"><h3>Sync</h3><p>{detail.remoteBoxId ? `Local Line box #${detail.remoteBoxId}` : "Saved locally; Local Line listing not linked"} · {draft.visible?'Visible':'Hidden'}</p>

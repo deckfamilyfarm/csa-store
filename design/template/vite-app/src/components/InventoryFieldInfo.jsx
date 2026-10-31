@@ -1,5 +1,6 @@
 import React, { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import "./FieldInfo.css";
 
 export const INVENTORY_FIELD_HELP = {
   stockOnFarm: "Yes means some stock is available in a freezer or fridge anywhere on the farm. No means none and sets on-farm pounds to zero. Yes can be used when the weight is unknown. Not checked means farm availability has not been reviewed. Full Farm Stock is independent.",
@@ -10,6 +11,10 @@ export const INVENTORY_FIELD_HELP = {
 };
 
 export function InventoryFieldInfo({ field, label }) {
+  return <FieldInfo label={label}>{INVENTORY_FIELD_HELP[field]}</FieldInfo>;
+}
+
+export function FieldInfo({ label, children }) {
   const id = useId();
   const button = useRef(null);
   const tooltip = useRef(null);
@@ -54,7 +59,7 @@ export function InventoryFieldInfo({ field, label }) {
       <span aria-hidden="true">i</span>
     </button>
     {open && createPortal(<span ref={tooltip} id={id} role="tooltip" className="inventory-field-tooltip" style={position}>
-      {INVENTORY_FIELD_HELP[field]}
+      {children}
     </span>, document.body)}
   </span>;
 }

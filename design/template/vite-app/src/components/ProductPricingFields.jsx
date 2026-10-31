@@ -1,3 +1,4 @@
+import { CostFieldInfo } from "./CostFieldInfo.jsx";
 import React from "react";
 import { MarkupControls, MarkupCalculation } from "./EnterpriseMarkup.jsx";
 const textValue = value => value ?? "";
@@ -27,15 +28,15 @@ export function ProductPricingFields({ draft, detail, preview, canEdit = true, l
         <label>CSA-only override<input className="input" type="number" step="0.01" disabled={!canEdit || loading || draft.squareEnabled} value={textValue(draft.csaOverride)} onChange={event => update({ csaOverride: event.target.value || null })} /></label>
         <label>Override note<input className="input" disabled={!canEdit || loading} value={draft.overrideNote || ""} onChange={event => update({ overrideNote: event.target.value })} /></label>
       </div>
-      <h4>Buy Prices</h4><p className="small">Set the price paid by each purchasing enterprise. Cost-plus wholesale prices use that enterprise’s Buy Price. Packages can have their own Buy Price below; those costs stay fixed when the default changes.</p>
+      <h4>Costs <CostFieldInfo /></h4><p className="small">Set the price paid by each purchasing enterprise. Cost-plus wholesale prices use that enterprise’s Cost. Packages can have their own Cost below; those costs stay fixed when the default changes.</p>
       {draft.purchaseCosts.map((cost, index) => <div className="admin-grid enterprise-pricing-repeat-grid" key={index}>
         <select className="input" disabled={!canEdit || loading} aria-label="Purchasing enterprise" value={cost.enterpriseId} onChange={event => updateCost(index, { enterpriseId: Number(event.target.value) })}>{detail.enterprises.map(enterprise => <option value={enterprise.id} key={enterprise.id}>{enterprise.name}</option>)}</select>
-        <input className="input" aria-label="Buy Price" type="number" step="0.01" min="0.01" disabled={!canEdit || loading} value={textValue(cost.cost)} onChange={event => updateCost(index, { cost: event.target.value })} />
+        <input className="input" aria-label="Cost" type="number" step="0.01" min="0.01" disabled={!canEdit || loading} value={textValue(cost.cost)} onChange={event => updateCost(index, { cost: event.target.value })} />
         <input className="input" aria-label="Cost effective date" type="date" disabled={!canEdit || loading} value={String(cost.effectiveAt || "").slice(0, 10)} onChange={event => updateCost(index, { effectiveAt: event.target.value })} />
         <input className="input" aria-label="Documentation reference" disabled={!canEdit || loading} placeholder="Document reference" value={cost.documentationRef || ""} onChange={event => updateCost(index, { documentationRef: event.target.value })} />
         {canEdit && <button className="button alt" type="button" onClick={() => update({ purchaseCosts: draft.purchaseCosts.filter((_, i) => i !== index) })}>Remove</button>}
       </div>)}
-      {canEdit && <button className="button alt" type="button" onClick={() => update({ purchaseCosts: [...draft.purchaseCosts, { enterpriseId: detail.enterprises[0]?.id, cost: "", effectiveAt: new Date().toISOString().slice(0, 10), documentationRef: "" }] })}>Add Buy Price</button>}
+      {canEdit && <button className="button alt" type="button" onClick={() => update({ purchaseCosts: [...draft.purchaseCosts, { enterpriseId: detail.enterprises[0]?.id, cost: "", effectiveAt: new Date().toISOString().slice(0, 10), documentationRef: "" }] })}>Add Cost</button>}
       <MarkupCalculation input={draft} output={preview?.output} settings={detail.settings} packageNames={Object.fromEntries(detail.packages.map(p=>[p.packageId,p.name]))} />
       </section>
       <section id="editor-packages" className="product-editor-section"><h3>Packages</h3>
@@ -46,10 +47,10 @@ export function ProductPricingFields({ draft, detail, preview, canEdit = true, l
           <label>Maximum lb<input className="input" type="number" step="0.001" disabled={!canEdit || loading} value={textValue(pkg.maxWeight)} onChange={event => updatePackage(index, { maxWeight: event.target.value })} /></label>
           <label>Average override lb<input className="input" type="number" step="0.001" disabled={!canEdit || loading} value={textValue(pkg.avgWeightOverride)} onChange={event => updatePackage(index, { avgWeightOverride: event.target.value })} /></label>
         </> : <label>Units in package<input className="input" type="number" min="1" step="1" disabled={!canEdit || loading} value={textValue(pkg.quantity)} onChange={event => updatePackage(index, { quantity: event.target.value })} /></label>}
-        {draft.pricingUnit === "each" && <label>Package Buy Price<input className="input" type="number" min="0.01" step="0.01" disabled={!canEdit || loading}
-          aria-label={`Package Buy Price for ${pkg.name || detail.packages.find(row=>Number(row.packageId)===Number(pkg.packageId))?.name || 'package'}`}
+        {draft.pricingUnit === "each" && <label>Package Cost<input className="input" type="number" min="0.01" step="0.01" disabled={!canEdit || loading}
+          aria-label={`Package Cost for ${pkg.name || detail.packages.find(row=>Number(row.packageId)===Number(pkg.packageId))?.name || 'package'}`}
           placeholder="Use default × quantity" value={textValue(pkg.packageBuyPrice)} onChange={event=>updatePackage(index,{packageBuyPrice:event.target.value || null,packageBuyPriceEnterpriseId:Number(draft.retailEnterpriseId)})} />
-          <small>Total cost of this package. Blank uses the default Buy Price × quantity.</small></label>}
+          <small>Total cost of this package. Blank uses the default Cost × quantity.</small></label>}
         <span>FF Package Price {money(preview?.output?.packages?.find(row => row.packageId === Number(pkg.packageId))?.localLineRegularCents)}</span>
         {creating && draft.packages.length > 1 && <button type="button" className="button alt" onClick={() => update({ packages: draft.packages.filter((_, i) => i !== index) })}>Remove package</button>}
       </div>)}
