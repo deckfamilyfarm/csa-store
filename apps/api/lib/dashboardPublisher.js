@@ -1048,8 +1048,8 @@ export function buildDashboardRows(
     {
       section: "GIVENS",
       rows: [
-        { label: "Positive responses/week", entry: "MANUAL", source: "Manual QA", rowLabel: "Positive responses/week" },
-        { label: "Errors/week", entry: "MANUAL", source: "Manual QA", rowLabel: "Errors/week" },
+        { label: "Positive responses/week", entry: "MANUAL", source: "Manual QA", valueType: "int", rowLabel: "Positive responses/week" },
+        { label: "Errors/week", entry: "MANUAL", source: "Manual QA", valueType: "int", rowLabel: "Errors/week" },
         { label: "Num Orders", entry: "AUTO", source: "Local DB", valueType: "int", summary: "sum", auto: (w) => Number(weeklyKpiMap[w.start]?.numOrders) },
         {
           label: FULFILLMENT_EFFICIENCY_LABEL,
@@ -1300,6 +1300,7 @@ export function buildDashboardRows(
         {
           label: "Average % product markup",
           entry: "AUTO",
+          note: "Realized markup = (Retail Sales − Purchase Cost) ÷ Purchase Cost. Uses historical order costs, including reviewed corrections, rather than averaging current product markup presets. Custom side-sale entries without recorded supplier costs can inflate this percentage.",
           source: "Local DB reporting cache",
           valueType: "percent",
           auto: (w) => {
