@@ -8,6 +8,7 @@ const nativeFetch = globalThis.fetch;
 const socket = process.env.PRODUCT_SYNC_TEST_SOCKET;
 test("saved prices activate locally before independently approved channel publication", { skip: !socket }, async t => {
   assert.ok(socket.startsWith("/tmp/csa-product-sync-") || socket.startsWith("/private/tmp/csa-product-sync-"));
+  t.mock.timers.enable({ apis: ["Date"], now: new Date("2026-10-31T12:00:00Z") });
   const database = `csa_enterprise_test_${process.pid}_${Date.now()}`;
   const root = await mysql.createConnection({ socketPath: socket, user: "root" });
   await root.query(`CREATE DATABASE \`${database}\``);
@@ -140,6 +141,7 @@ test("saved prices activate locally before independently approved channel public
   const release = await sync.createProductSyncRelease({ auditId: audit.id, actionIds: actions.map(row => row.id) }, user);
   const finished = await sync.runProductSyncRelease(release.id, { user, allowFuture: true });
   assert.equal(finished.status, "completed");
+  assert.equal(remote.packages[0].unit_price,5,"vendor Cost survives full publication");
   const restoredRelease = (await readEnterpriseReviewChecks(pool, [draft.revisionId])).get(draft.revisionId);
   assert.ok(restoredRelease.actions.every(action => action.releaseId === release.id && action.releaseStatus === "completed" && action.publicationStatus === "completed"));
   const [interruptedAudit] = await pool.query("INSERT INTO product_sync_audits (status,options_json,created_at,error_message) VALUES ('failed',?,UTC_TIMESTAMP(),'Check interrupted')", [JSON.stringify({ enterpriseRevisionId: draft.revisionId })]);
@@ -219,6 +221,7 @@ test("saved prices activate locally before independently approved channel public
   assert.equal(square.get("V1").item_variation_data.price_money.amount, 1200, "regular Square price stays unchanged");
   const activated = await promotions.publishEnterpriseLocalLinePromotion(sale.id, { userId: 2 }, new Date("2026-11-01T17:00:00Z"));
   assert.equal(activated.status, "active");
+  assert.equal(remote.packages[0].unit_price,5,"sale does not replace vendor Cost with regular retail");
   assert.equal(await pricing.enterpriseRevisionMarker(1, draft.revisionId), null, "approved sale freezes regular-price publication");
   assert.equal((await pricing.listEnterprisePricingProducts({ limit: 10 })).rows.find(row => row.id === 1)?.saleStatus, "active");
   assert.deepEqual(remote.packages[0].price_list_entries.map(row => row.adjustment_value), [8.64, 8.64, 8.64]);
@@ -226,6 +229,7 @@ test("saved prices activate locally before independently approved channel public
   await assert.rejects(pricing.saveEnterprisePricingDraft(1, { ...active.suggestedInput, priceEffectiveAt: "2026-10-21T12:00:00Z", overrideNote: "cost changed during sale" }, active.latest.id, { userId: 1 }), /Finish or cancel the sale/);
   const expired = await promotions.publishEnterpriseLocalLinePromotion(sale.id, { userId: 2 }, new Date("2026-11-02T17:00:00Z"));
   assert.equal(expired.status, "expired");
+  assert.equal(remote.packages[0].unit_price,5,"sale expiry preserves vendor Cost");
   assert.deepEqual(remote.packages[0].price_list_entries.map(row => row.adjustment_value), [10.8, 10.8, 10.8]);
   const secondSale = await promotions.saveEnterprisePromotionDraft({ ...saleInput, name: "Until turned off", startAt: "2026-11-03T16:00:00Z", endAt: null }, { userId: 1 });
   await promotions.approveEnterprisePromotion(secondSale.id, { userId: 2 });

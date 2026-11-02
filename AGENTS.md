@@ -33,6 +33,8 @@ Unit regressions: `node --test apps/api/lib/squarePricingUnits.test.js apps/api/
 
 ## Local Line API
 
+Local Line base package `unit_price` is vendor Cost, because orders snapshot it as `package_unit_price` for vendor settlement reports. Enterprise retail and sale prices belong only in eligible basket adjustments (type 3); sale strikethrough is regular retail. Never put retail in the base field. Use `enterprisePackageCostCents` for explicit package costs, per-each quantities, or per-lb costs multiplied by approved package weight. Hold remote weight-charged products for unit review before publishing package prices. Enterprise approvals predating `vendor-cost-base-v1` must be checked and approved again. Regular, price-only and promotion publications must verify vendor Cost separately from basket prices. Regression: `node --test apps/api/lib/enterpriseLocalLineCost.test.js apps/api/lib/enterprisePricingPublication.test.js apps/api/lib/localLinePricePublication.test.js apps/api/lib/enterprisePromotionsCore.test.js` plus the disposable enterprise pricing integration suite.
+
 The integration targets the Local Line Backoffice v2 API:
 
 - Base URL: `https://localline.ca/api/backoffice/v2/` unless `LL_BASEURL` overrides it.

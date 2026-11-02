@@ -62,8 +62,11 @@ export function priceOnlyLocalLinePayload(regularPayload, remote, sale, listIds 
   // Reuse the sale builder for regular and discounted prices. It preserves live
   // list limits. Names are taken from the channel; no catalog/inventory edits.
   const selected = regularPayload.packages.map(p => {
-    const regularCents = Math.round(Number(p.unit_price) * 100);
-    return { localLinePackageId: Number(p.id), regularCents, saleCents: salePrice(regularCents, sale.discountBp) };
+    const prices = (p.price_list_entries || []).map(e => e.adjustment && Number(e.adjustment_type) === 3 ? Math.round(Number(e.adjustment_value) * 100) : NaN);
+    if (!prices.length || prices.some(n => !Number.isSafeInteger(n) || n < 0 || n !== prices[0])) throw new Error('Reviewed basket retail prices are missing or inconsistent. Check prices again.');
+    const regularCents = prices[0];
+    const vendorCostCents = p.unit_price == null ? NaN : Math.round(Number(p.unit_price) * 100);
+    return { localLinePackageId: Number(p.id), vendorCostCents, regularCents, saleCents: salePrice(regularCents, sale.discountBp) };
   });
   if (remote.packages.length !== selected.length || remote.packages.some(p => !selected.some(s => s.localLinePackageId === Number(p.id)))) {
     throw new Error('Local Line package definitions differ. Review package mappings before publishing prices.');

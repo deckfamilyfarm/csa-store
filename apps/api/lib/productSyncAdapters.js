@@ -17,6 +17,7 @@ import {
 } from "./squareStoreSync.js";
 import { squareUnitSnapshot, unitChangeIssue, planSquareUnit } from './squarePricingUnits.js';
 import { applyEnterpriseLocalLinePrices } from './enterprisePricingPublication.js';
+import { ENTERPRISE_LOCAL_LINE_COST_POLICY, requireEnterpriseCostPolicy, requireLocalLinePackageCharging } from './enterpriseLocalLineCost.js';
 import { enterpriseRevisionMarker } from './enterprisePricingService.js';
 import { liveLocalLinePriceComparison, refreshEnterprisePriceCache } from './enterprisePricingComparison.js';
 import { same, preflight } from "./productSyncCore.js";
@@ -199,7 +200,7 @@ export async function prepareLocalLineAction(product, staged = {}, { onRefresh, 
   let payload, createPayload = null;
   if (remote) {
     const prices = buildLocalLinePricePayload(next, remote, next.sale);
-    payload = { ...(enterpriseRevision ? applyEnterpriseLocalLinePrices(prices, next, enterpriseRevision) : prices), ...buildInventoryPayload({
+    payload = { ...(enterpriseRevision ? applyEnterpriseLocalLinePrices(prices, next, enterpriseRevision, undefined, remote) : prices), ...buildInventoryPayload({
       ...(includeInventory ? { inventory: next.product.inventory, trackInventory: next.product.trackInventory } : {}),
       ...(includeVisibility ? { visible: next.product.visible } : {})
     }) };
@@ -216,7 +217,7 @@ export async function prepareLocalLineAction(product, staged = {}, { onRefresh, 
   const action = {
     direction: "outgoing", platform: "localline", kind: remote ? "update" : "create", productId: Number(product.id), productName: product.name,
     vendorName: product.vendorName, staged, includeInventory, includeVisibility, ...(localLinePricesOnly ? { localLinePricesOnly: true } : {}), mapping: localLineMapping(context),
-    ...(enterpriseRevision ? { enterpriseRevisionId: enterpriseRevision.id } : {}),
+    ...(enterpriseRevision ? { enterpriseRevisionId: enterpriseRevision.id, enterpriseCostPolicy: ENTERPRISE_LOCAL_LINE_COST_POLICY } : {}),
     localBefore: localLineInputs(context, includeInventory, includeVisibility), localAfter: localLineInputs(next, includeInventory, includeVisibility),
     payload, createPayload, imageSources: imagesMatch ? [] : imageSources,
     remoteBefore: remote ? { ...(basketEligibility ? { basketEligibility } : {}), fields: localLineProjection(remote, payload), images: imageSources.length && !imagesMatch ? imagesOf(remote) : null } : null,
@@ -230,6 +231,7 @@ export async function prepareLocalLineAction(product, staged = {}, { onRefresh, 
   return action;
 }
 export async function inspectAction(action, saveCheckpoint = async () => {}) {
+  requireEnterpriseCostPolicy(action);
   const checkpoint = action.checkpoint || {};
   if (action.platform === "square") {
     if (!action.payload?.sellingUnit) throw Object.assign(new Error('This approval predates selling-unit checks. Run a new audit and review the unit before publishing.'), { hold: true });
@@ -274,6 +276,7 @@ export async function inspectAction(action, saveCheckpoint = async () => {}) {
   }
   const remoteId = checkpoint.remoteId || context.remoteId;
   const remote = remoteId ? await fetchLocalLineProduct(remoteId, await getLocalLineAccessToken()) : null;
+  if (action.enterpriseRevisionId) requireLocalLinePackageCharging(remote);
   if (remote?.is_deleted) throw Object.assign(new Error("The Local Line product was deleted. Review its link first."), { hold: true });
   const payload = checkpoint.payload || action.payload;
   if (action.enterpriseRevisionId && remote) await refreshEnterprisePriceCache(getPool(), action.productId, remote, payload);
@@ -336,6 +339,7 @@ async function finishCreatedLink(action, checkpoint, token, saveCheckpoint) {
   await saveCheckpoint(checkpoint);
 }
 export async function executeAction(action, current, saveCheckpoint) {
+  requireEnterpriseCostPolicy(action);
   if (action.platform === "square") {
     const checkpoint = action.checkpoint || {};
     // Preserve the exact request body and key across uncertain responses.

@@ -1,5 +1,6 @@
 import { validateActiveLocalLinePriceListIds, isRetiredLocalLineList, enrolledLocalLineLists } from "./localLinePricingLists.js";
 import { roundRatio } from "./enterprisePricingEngine.js";
+import { requireLocalLinePackageCharging } from './enterpriseLocalLineCost.js';
 
 const fail = message => { throw new Error(message); };
 // A null end is intentional: only an explicit cancellation ends this sale.
@@ -47,10 +48,10 @@ export function promotionsOverlap(left, right) {
     left.channels.some(value => right.channels.includes(value));
 }
 
-// A sale changes the three active basket entries for a reviewed package. Keep
-// the regular unit price so the Local Line sale display can cross it out.
+// Keep vendor Cost separate from the regular retail strikethrough and sale.
 export function localLineSalePatch(remote, selectedPackages, priceListIds, saleActive) {
   if (!remote || !Array.isArray(remote.packages)) fail("Refresh the Local Line product before publishing a sale.");
+  requireLocalLinePackageCharging(remote);
   const lists = [...new Set(priceListIds.map(Number))];
   validateActiveLocalLinePriceListIds(priceListIds.map(Number));
   const wanted = new Map(selectedPackages.map(pkg => [Number(pkg.localLinePackageId), pkg]));
@@ -83,6 +84,7 @@ export function localLineSalePatch(remote, selectedPackages, priceListIds, saleA
       };
     }
     const selected = wanted.get(Number(pkg.id));
+    if (!Number.isSafeInteger(selected.vendorCostCents) || selected.vendorCostCents <= 0) fail('The approved vendor Cost is missing. Review this sale again before publishing.');
     const entries = enrolledLocalLineLists(pkg, lists).map(listId => {
       const row = (pkg.price_list_entries || []).find(entry => Number(entry.price_list_id ?? entry.price_list) === listId);
       const entryId = Number(row?.product_price_list_entry ?? row?.id);
@@ -93,7 +95,7 @@ export function localLineSalePatch(remote, selectedPackages, priceListIds, saleA
         on_sale_toggle: Boolean(saleActive), strikethrough_display_value: saleActive ? selected.regularCents / 100 : null,
         max_units_per_order: row?.max_units_per_order ?? null };
     });
-    return { id: Number(pkg.id), name: pkg.name, unit_price: selected.regularCents / 100,
+    return { id: Number(pkg.id), name: pkg.name, unit_price: selected.vendorCostCents / 100,
       price_list_entries: entries };
   });
   if (remote.packages.filter(pkg => wanted.has(Number(pkg.id))).length !== wanted.size) fail("A Local Line package mapping changed. Review the sale again.");
@@ -105,7 +107,7 @@ export function localLineSaleMatches(remote, selectedPackages, priceListIds, sal
   const selectedIds = new Set(selectedPackages.map(pkg => Number(pkg.localLinePackageId)));
   return desired.packages.filter(pkg => selectedIds.has(pkg.id)).every(pkg => {
     const current = remote.packages.find(row => Number(row.id) === pkg.id);
-    return pkg.price_list_entries.every(entry => {
+    return current.unit_price != null && Math.round(Number(current.unit_price) * 100) === Math.round(pkg.unit_price * 100) && pkg.price_list_entries.every(entry => {
       const live = current.price_list_entries.find(row => Number(row.price_list_id ?? row.price_list) === entry.price_list);
       return Number(live.adjustment_type) === 3 &&
         Math.round(Number(live.adjustment_value) * 100) === Math.round(entry.adjustment_value * 100) &&

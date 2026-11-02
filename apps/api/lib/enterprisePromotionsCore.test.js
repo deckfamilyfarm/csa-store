@@ -44,14 +44,14 @@ test("overlap detection is scoped to package and channel", () => {
   assert.equal(promotionsOverlap(a, { ...b, packageIds: [2] }), false);
 });
 
-test("Local Line sale patch preserves regular unit price and creates three active crossed-out sale entries", () => {
+test("Local Line sale patch preserves vendor Cost and creates three active crossed-out sale entries", () => {
   const remote = { vendor: 9, packages: [
-    { id: 20, name: "Chuck Roast", price_list_entries: [1, 2, 3, 4].map(id => ({ id: id + 100, price_list: id, adjustment_type: 3, adjustment_value: 36, on_sale_toggle: false })) },
+    { id: 20, name: "Chuck Roast", unit_price:20, price_list_entries: [1, 2, 3, 4].map(id => ({ id: id + 100, price_list: id, adjustment_type: 3, adjustment_value: 36, on_sale_toggle: false })) },
     { id: 21, name: "Other package", unit_price: 5, price_list_entries: [{ id: 201, price_list: 1, adjustment: true, adjustment_type: 2, adjustment_value: 10 }] }
   ] };
-  const selected = [{ localLinePackageId: 20, regularCents: 3600, saleCents: 2880 }];
+  const selected = [{ localLinePackageId: 20, vendorCostCents:2000, regularCents: 3600, saleCents: 2880 }];
   const patch = localLineSalePatch(remote, selected, [1, 3, 4], true);
-  assert.equal(patch.packages[0].unit_price, 36);
+  assert.equal(patch.packages[0].unit_price, 20);
   assert.deepEqual(patch.packages[0].price_list_entries.map(row => [row.adjustment_value, row.strikethrough_display_value]), [[28.8, 36], [28.8, 36], [28.8, 36]]);
   assert.deepEqual(patch.packages[1].price_list_entries.map(row => [row.adjustment_type, row.adjustment_value]), [[2, 10]], "unselected package remains in the patch with its current pricing");
   assert.equal(localLineSaleMatches(remote, selected, [1, 3, 4], false), true);
@@ -59,4 +59,7 @@ test("Local Line sale patch preserves regular unit price and creates three activ
   const live = structuredClone(remote);
   live.packages[0].price_list_entries.forEach(row => { row.adjustment_value = 28.8; row.on_sale_toggle = true; });
   assert.equal(localLineSaleMatches(live, selected, [1, 3, 4], true), true);
+  live.packages[0].unit_price=36;
+  assert.equal(localLineSaleMatches(live,selected,[1,3,4],true),false);
+  assert.throws(()=>localLineSalePatch(remote,[{localLinePackageId:20,regularCents:3600,saleCents:2880}],[1,3,4],true),/vendor Cost/);
 });

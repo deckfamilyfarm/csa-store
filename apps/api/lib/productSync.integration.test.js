@@ -556,7 +556,7 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
     const remote = remoteProducts.get(1960);
     remote.packages[0].price_list_entries = [1,2,3,4].map(price_list => ({...remote.packages[0].price_list_entries[0],price_list,product_price_list_entry:4000+price_list}));
     const input={squareEnabled:true,pricingUnit:'each',packages:[{packageId:9600,quantity:1}]};
-    const output={squareUnitCents:1000,csaUnitCents:900,packages:[{packageId:9600,localLineRegularCents:900,squareVariationCents:1000}]};
+    const output={pricingUnit:"each",buyFromTenThousandths:50000,squareUnitCents:1000,csaUnitCents:900,packages:[{packageId:9600,quantity:1,localLineRegularCents:900,squareVariationCents:1000}]};
     const [inserted]=await pool.query(`INSERT INTO enterprise_pricing_revisions (product_id,settings_version_id,status,input_json,output_json,editor_id,approver_id,created_at,approved_at)
       VALUES (960,1,'active',?,?,1,2,UTC_TIMESTAMP(),UTC_TIMESTAMP())`,[JSON.stringify(input),JSON.stringify(output)]);
     const revisionId=inserted.insertId;

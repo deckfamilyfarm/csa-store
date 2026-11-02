@@ -10,6 +10,7 @@ import { fetchLocalLineProduct, patchLocalLineProduct, loadLocalLineSyncContext,
 import { getLocalLineAccessToken } from "../localLineAuth.js";
 import { getDb } from "../db.js";
 import { requireProductVendor } from "./productVendor.js";
+import { enterprisePackageCostCents } from './enterpriseLocalLineCost.js';
 
 const parse = value => typeof value === "string" ? JSON.parse(value) : value;
 const fail = (message, status = 400) => { throw Object.assign(new Error(message), { status }); };
@@ -62,6 +63,7 @@ async function frozenPromotion(promotion, connection = getPool()) {
       activeRevisionId: Number(pkg.activeRevisionId), localLinePackageId: pkg.localLinePackageId,
       localLineProductId: pkg.localLineProductId, squareVariationId: pkg.squareVariationId,
       localLineRegularCents: regular.localLineRegularCents, squareRegularCents: regular.squareVariationCents,
+      vendorCostCents: enterprisePackageCostCents(output, pkg.packageId),
       pricingUnit: input.pricingUnit, excludeFromSnap:Boolean(pkg.excludeFromSnap),excludeFromGuest:Boolean(pkg.excludeFromGuest) };
   });
   return { packages: frozen, localLinePrices: promotionPrices(frozen, promotion.endSale ? 0 : promotion.discountBp) };
