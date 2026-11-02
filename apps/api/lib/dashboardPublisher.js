@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { rebuildDashboardVendorCosts } from "./dashboardVendorCosts.js";
 import dotenv from "dotenv";
 import fs from "fs";
 import mysql from "mysql2/promise";
@@ -1318,7 +1319,8 @@ export function buildDashboardRows(
         {
           label: "Purchase Cost",
           entry: "AUTO",
-          source: "Local DB reporting cache",
+          source: "Saved order vendor costs + reviewed corrections",
+          note: "Uses each saved order’s supplier cost and charge quantity, including reviewed corrections for the October 2026 pricing incident. Current catalog prices never revalue earlier sales. Custom manual charges without catalog products retain their existing recorded cost; no supplier cost is inferred.",
           valueType: "currency",
           bold: true,
           summary: "sum",
@@ -1718,6 +1720,15 @@ export function buildDashboardRows(
     }
   ];
 
+  // Move the existing metrics, preserving their calculations and one unique label
+  // for every formula reference. Monthly layout remains unchanged.
+  const kpiLabels = ["Total Subscribers", "Net Profit", FULFILLMENT_EFFICIENCY_LABEL];
+  const kpiRows = kpiLabels.map((label) => {
+    const group = layout.find((section) => section.rows.some((row) => row.label === label));
+    const index = group.rows.findIndex((row) => row.label === label);
+    return { ...group.rows.splice(index, 1)[0], bold: true };
+  });
+  layout.unshift({ section: "KPIs", rows: kpiRows });
   const resolvedLayout = addCustomManualRowsToLayout(layout, customManualRows);
   const totalExpenseMetricLabels = getExpenseTotalMetricLabels(resolvedLayout);
   const values = [];
@@ -8236,6 +8247,12 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
       message: "Building weekly dashboard metrics"
     });
 
+    const vendorCostRepair = await rebuildDashboardVendorCosts(connection, {
+      apply: true,
+      skipVerified: true,
+      reportProgress: message => reportProgress({ phaseKey: "compute", status: "running", message })
+    });
+
     const [weeklyKpiMap, vendorWeeklyMap, subscriberWeeklyMap, timesheetResult, storeCreditMonthlyMap] = await Promise.all([
       loadWeeklyOrderMetrics(weeks),
       loadVendorWeeklyMap(weeks),
@@ -8428,6 +8445,7 @@ export async function publishLocalLineDashboard({ reportProgress = () => {} } = 
         end: week.end
       })),
       warnings: dashboardWarnings,
+      vendorCosts: { pricingBasis: vendorCostRepair.pricingBasis, checkedRows: vendorCostRepair.checkedRows, repairedRows: vendorCostRepair.changes.length, incidentCorrectedEntries: vendorCostRepair.correctedEntries, customRowsRetained: vendorCostRepair.customRows.length },
       availability,
       missingSubscriberWeeks,
       timesheetStatus: timesheetResult.status

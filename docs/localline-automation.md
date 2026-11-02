@@ -103,3 +103,13 @@ Optional automation tuning:
 - `LOCAL_LINE_AUTOMATION_JOB_TIMEOUT_MS`, default 3 hours.
 - `LOCAL_LINE_AUTOMATION_DASHBOARD_MAX_PULL_AGE_HOURS`, default 26 hours.
 - `LOCAL_LINE_JOB_STALE_SECONDS`, default 1800 seconds before an old queued/running job is marked stale.
+
+### Dashboard supplier costs and KPI summary
+
+The weekly dashboard begins with Total Subscribers, Net Profit, and Pack / Delivery / Pickup (min/order). These are the existing metrics moved above Givens; all formulas use label-based references, including weighted labor minutes per order. Monthly layout and manually maintained inputs are preserved.
+
+Dashboard vendor costs use saved order `package_unit_price` and `quantity_to_charge`, not the current product export. `dashboardVendorCosts.js` shares the historical pricing resolver and reviewed private correction ledger with `../ffcsa_scripts/localline/order_pricing.js`. Deploy that reporting repository and its private ledger alongside CSA Store; `DASHBOARD_ORDER_PRICING_MODULE` can override the module path. Missing pricing rules block publishing rather than silently omitting corrections.
+
+Order-cache refreshes reconcile export retail totals with saved order details before calculating supplier costs. Missing/stale details are refreshed read-only from Local Line. Verified pricing snapshots are stored under `_dashboardVendorCost` in each reporting row's JSON; the underlying Local Line order and local order snapshot are unchanged. Dashboard publication also repairs older reporting rows transactionally and rejects concurrent cache changes. Custom charges without catalog product IDs retain their previous recorded cost and appear as `customRowsRetained` in the publication receipt. Membership rows remain outside vendor COGS.
+
+Regression checks: `node --test apps/api/lib/dashboardPublisher.test.js apps/api/lib/dashboardVendorCosts.test.js apps/api/lib/dashboardFulfillmentEfficiency.test.js`.

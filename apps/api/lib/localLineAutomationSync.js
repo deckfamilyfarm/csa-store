@@ -1,4 +1,5 @@
 import xlsx from "xlsx";
+import { resolveDashboardVendorCosts, dashboardCostRawJson } from "./dashboardVendorCosts.js";
 import { getPool } from "../db.js";
 import {
   fetchAllLocalLineFulfillmentStrategies,
@@ -552,11 +553,7 @@ async function syncLocalLineOrderReportingCache({
     };
   }
   const accessToken = await getLocalLineAccessToken();
-  const productWorkbookBuffer = await downloadBinaryFile(
-    `${getLocalLineBaseUrl()}products/export/?direct=true`,
-    accessToken
-  );
-  const packagePriceMap = buildPackagePriceMapFromWorkbookBuffer(productWorkbookBuffer);
+
   let totalRows = 0;
 
   reportProgress({
@@ -599,7 +596,7 @@ async function syncLocalLineOrderReportingCache({
         const retailAmount = parseCurrencyCell(
           getTrimmedRowValue(row, ["Product Subtotal", "Line Subtotal", "Subtotal", "Line Item Total", "Amount"])
         );
-        const purchaseUnitPrice = packageId ? Number(packagePriceMap.get(packageId) || 0) : 0;
+        const purchaseUnitPrice = 0; // Filled from verified saved order pricing before storing.
         const purchaseTotal = Number((purchaseUnitPrice * quantity).toFixed(2));
         return [
           range.monthKey,
@@ -630,6 +627,36 @@ async function syncLocalLineOrderReportingCache({
         ];
       })
       .filter((values) => Boolean(values[14]) || Boolean(values[11]));
+
+    const [previousRows] = await connection.query(
+      "SELECT local_line_order_id,product_id,product_name,package_name,quantity,retail_amount,purchase_unit_price,purchase_total,raw_json FROM local_line_order_reporting_entries WHERE fulfillment_month = ?", [range.monthKey]
+    );
+    const rowKey = row => JSON.stringify([Number(row.local_line_order_id), Number(row.product_id) || row.product_name, row.package_name || ""]);
+    const previousByKey = new Map(previousRows.map(row => [rowKey(row), row]));
+    const previousCosts = new Map(previousRows.map(row => [rowKey(row),
+      JSON.parse(row.raw_json || "{}")._dashboardVendorCost]));
+    const pricingRows = preparedRows.map((values, id) => {
+      const row = { id, fulfillment_month: values[0], local_line_order_id: values[3], product_id: values[13],
+        product_name: values[14], package_name: values[16], category_name: values[12], quantity: values[17],
+        retail_amount: values[18], purchase_unit_price: values[19], purchase_total: values[20] };
+      const previous = previousByKey.get(rowKey(row));
+      if (!(Number(row.product_id) > 0) && previous && Number(previous.quantity) === row.quantity && Number(previous.retail_amount) === row.retail_amount) {
+        values[19] = Number(previous.purchase_unit_price);
+        values[20] = Number(previous.purchase_total);
+      }
+      row.raw_json = JSON.stringify({ ...JSON.parse(values[21]), _dashboardVendorCost: previousCosts.get(rowKey(row)) });
+      return row;
+    });
+    const costPlan = await resolveDashboardVendorCosts(connection, pricingRows, {
+      reportProgress: message => reportProgress({ phaseKey: "reporting", status: "running", message })
+    });
+    if (costPlan.issues.length) throw new Error(`Reporting prices need review: ${JSON.stringify(costPlan.issues.slice(0, 5))}`);
+    for (const priced of costPlan.pricedRows) {
+      const values = preparedRows[priced.id];
+      values[19] = priced.unit;
+      values[20] = priced.total;
+      values[21] = dashboardCostRawJson(values[21], priced, costPlan.pricingBasis);
+    }
 
     await connection.beginTransaction();
     await connection.query(

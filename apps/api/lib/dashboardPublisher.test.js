@@ -25,12 +25,12 @@ function rowByLabel(values, label) {
   return row;
 }
 
-function assertGivensOrder(values) {
+function assertGivensOrder(values, expected = expectedSubscriberRows) {
   const givensIndex = values.findIndex((row) => row[0] === "GIVENS");
   const nextSectionIndex = values.findIndex((row, index) => index > givensIndex && row[0]);
   const labels = values.slice(givensIndex + 1, nextSectionIndex).map((row) => row[1]);
   const requested = labels.filter((label) => expectedSubscriberRows.includes(label));
-  assert.deepEqual(requested, expectedSubscriberRows);
+  assert.deepEqual(requested, expected);
 }
 
 test("weekly and monthly subscriber summaries share the requested GIVENS order", () => {
@@ -56,7 +56,11 @@ test("weekly and monthly subscriber summaries share the requested GIVENS order",
     monthlySubscriberMap: { "2026-10-01": subscribers }
   });
 
-  assertGivensOrder(weekly.values);
+  assertGivensOrder(weekly.values, expectedSubscriberRows.filter(label => label !== "Total Subscribers"));
+  assert.deepEqual(weekly.values.slice(2, 7).map(row => row[0] || row[1]), ["KPIs", "Total Subscribers", "Net Profit", "Pack / Delivery / Pickup (min/order)", "GIVENS"]);
+  const profit = rowByLabel(weekly.values, "Net Profit");
+  const ref = label => `J${weekly.values.findIndex(row => row[1] === label) + 1}`;
+  assert.equal(profit.at(-1), `=${ref("Retail Sales")}-${ref("Purchase Cost")}-${ref("Total Expenses")}`);
   assertGivensOrder(monthly.values);
   assert.equal(rowByLabel(weekly.values, "Regular subscribers").at(-1), 306);
   assert.equal(rowByLabel(monthly.values, "Employee subscribers").at(-1), 14);
@@ -112,7 +116,7 @@ test("monthly sales use the same-year monthly baseline and order averages are we
   assert.deepEqual(rowByLabel(dashboard.values, "Sales compared to yearly average").slice(4), ["", -0.5, 0.5]);
 });
 
-test("weekly fulfillment time follows Num Orders, uses hours independently of wages, and weights period totals", () => {
+test("weekly fulfillment KPI precedes Givens, uses hours independently of wages, and weights period totals", () => {
   const weeks = ["2026-01-05", "2026-04-06", "2026-04-13", "2026-04-20", "2026-04-27"]
     .map((start) => ({ start, end: new Date(Date.parse(start) + 6 * 86400000).toISOString().slice(0, 10), label: start, year: 2026 }));
   const kpi = Object.fromEntries(weeks.map((week, index) => [week.start, { numOrders: [10, 30, 50, 0, 100][index] }]));
@@ -131,21 +135,21 @@ test("weekly fulfillment time follows Num Orders, uses hours independently of wa
   ];
   const report = buildDashboardRows(weeks, new Map(), kpi, {}, labor, [], {}, new Set(weeks.slice(0, 4).map((w) => w.start)), periods);
   const ordersIndex = report.values.findIndex((row) => row[1] === "Num Orders");
-  assert.equal(ordersIndex, 5);
-  const row = report.values[ordersIndex + 1];
+  assert.equal(ordersIndex, 9);
+  const row = rowByLabel(report.values, "Pack / Delivery / Pickup (min/order)");
   assert.equal(row[1], "Pack / Delivery / Pickup (min/order)");
   assert.equal(row[2], "AUTO");
   assert.deepEqual(row.slice(4, 9), [
-    '=IF(OR(COUNT(J6,K6)<>2,MIN(J6,K6)<=0),"",600/SUM(J6,K6))',
-    '=IF(OR(COUNT(J6)<>1,MIN(J6)<=0),"",240/SUM(J6))',
-    '=IF(OR(COUNT(K6)<>1,MIN(K6)<=0),"",360/SUM(K6))', "", ""
+    '=IF(OR(COUNT(J10,K10)<>2,MIN(J10,K10)<=0),"",600/SUM(J10,K10))',
+    '=IF(OR(COUNT(J10)<>1,MIN(J10)<=0),"",240/SUM(J10))',
+    '=IF(OR(COUNT(K10)<>1,MIN(K10)<=0),"",360/SUM(K10))', "", ""
   ]);
   assert.deepEqual(row.slice(9), [
-    '=IF(OR(COUNT(J6)<>1,MIN(J6)<=0),"",240/SUM(J6))',
-    '=IF(OR(COUNT(K6)<>1,MIN(K6)<=0),"",360/SUM(K6))', "", "", ""
+    '=IF(OR(COUNT(J10)<>1,MIN(J10)<=0),"",240/SUM(J10))',
+    '=IF(OR(COUNT(K10)<>1,MIN(K10)<=0),"",360/SUM(K10))', "", "", ""
   ]);
-  const metadata = report.metricRows.find((metric) => metric.rowIndex === ordersIndex + 1);
+  const metadata = report.metricRows.find((metric) => metric.rowIndex === 5);
   assert.equal(metadata.valueType, "minutes");
   assert.match(metadata.note, /eligible completed weeks only/);
-  assert.match(rowByLabel(report.values, "Num Subscriber Orders")[4], /E6-E9/);
+  assert.match(rowByLabel(report.values, "Num Subscriber Orders")[4], /E10-E12/);
 });
