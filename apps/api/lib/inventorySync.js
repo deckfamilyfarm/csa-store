@@ -104,6 +104,7 @@ export async function refreshFullFarmInventory(productIds) {
   if(process.env.CSA_LOCAL_ONLY==='true'||!isLocalLineEnabled()||process.env.LOCALLINE_TEST==='true') fail('Local Line inventory checks are not enabled.');
   const token=await getLocalLineAccessToken();
   const rows=[];let cursor=0;
+  const vendorChecks=new Map();
   await Promise.all(Array.from({length:3},async()=>{
     while(cursor<ids.length) {
       const id=ids[cursor++], db=await getPool().getConnection();
@@ -113,7 +114,9 @@ export async function refreshFullFarmInventory(productIds) {
           FROM products p LEFT JOIN categories c ON c.id=p.category_id LEFT JOIN local_line_product_meta m ON m.product_id=p.id WHERE p.id=? FOR UPDATE`,[id]);
         if(!p||p.is_deleted||p.categoryName?.toLowerCase()==='membership'||!p.remoteId) fail('Link this product to Local Line before checking inventory.');
         const vendor=await validateSavedProductVendor(db,id);
-        const vendorId=await resolveLocalLineVendor({product:{vendorId:vendor.id},vendor},token);
+        const vendorKey=JSON.stringify([vendor.id,vendor.name]);
+        if(!vendorChecks.has(vendorKey)) vendorChecks.set(vendorKey,resolveLocalLineVendor({product:{vendorId:vendor.id},vendor},token));
+        const vendorId=await vendorChecks.get(vendorKey);
         const remote=await fetchLocalLineProduct(Number(p.remoteId),token);confirmLocalLineVendor(remote,vendorId);
         const [mappings]=await db.query('SELECT package_id AS packageId,local_line_package_id AS remoteId FROM local_line_package_meta WHERE product_id=?',[id]);
         const current=await cacheInventory(db,id,remote,mappings);

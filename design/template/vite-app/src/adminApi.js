@@ -1,3 +1,4 @@
+import { adminResponseError } from "./adminErrors.js";
 const base = import.meta.env.VITE_API_BASE || "/api";
 const inflightGetRequests = new Map();
 
@@ -6,25 +7,7 @@ function getRequestKey(url, token = "") {
 }
 
 async function throwForError(response, fallbackMessage) {
-  let detail = "";
-  let farmStockConflict, inventoryConflict;
-  try {
-    const payload = await response.json();
-    detail = payload?.detail || payload?.error || "";
-    if (response.status === 409) { farmStockConflict = payload?.farmStockConflict; inventoryConflict=payload?.inventoryConflict; }
-  } catch (error) {
-    try {
-      detail = (await response.text()) || "";
-    } catch (textError) {
-      detail = "";
-    }
-  }
-
-  const error = new Error(detail || fallbackMessage);
-  error.status = response.status;
-  if (farmStockConflict) error.farmStockConflict = farmStockConflict;
-  if (inventoryConflict) error.inventoryConflict = inventoryConflict;
-  throw error;
+  throw await adminResponseError(response, fallbackMessage);
 }
 
 async function fetchJsonGet(url, token, fallbackMessage) {

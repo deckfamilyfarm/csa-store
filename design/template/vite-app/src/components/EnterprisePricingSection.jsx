@@ -1,3 +1,4 @@
+import { refreshInventoryBatches } from "./inventoryRefresh.js";
 import { CostFieldInfo } from "./CostFieldInfo.jsx";
 import { EnterpriseInventoryCell } from "./EnterpriseInventoryCell.jsx";
 import { EnterpriseVisibilityCell } from "./EnterpriseVisibilityCell.jsx";
@@ -69,6 +70,8 @@ function EnterpriseProductsSection({ token, roles = [], createdProductId }) {
   const [rows, setRows] = useState([]);
   const [inventoryPageVersion,setInventoryPageVersion]=useState(0);
   const [inventoryRefreshing,setInventoryRefreshing]=useState(false);
+  const [inventoryProgress,setInventoryProgress]=useState(0);
+  const inventoryScope=useRef(0);
   const inventoryRefreshBusy=useRef(false);
   const [vendors, setVendors] = useState([]);
   const [enterprises, setEnterprises] = useState([]);
@@ -140,16 +143,21 @@ function EnterpriseProductsSection({ token, roles = [], createdProductId }) {
         .then(data => { if (!cancelled) { setRows(data.rows); setInventoryPageVersion(v=>v+1); setVendors(data.vendors); setEnterprises(data.enterprises); setTotal(data.total); } })
         .catch(error => { if (!cancelled) setMessage(error.message); });
     }, 200);
-    return () => { cancelled = true; clearTimeout(timer); };
+    return () => { cancelled = true; inventoryScope.current+=1; clearTimeout(timer); };
   }, [token, search, status, vendorFilter, unitFilter, categoryFilter, squareFilter, saleFilter, visibilityFilter, snapEligibility, guestEligibility, sort, page, loading, markupRefresh]);
   async function refreshInventory() {
     if(inventoryRefreshBusy.current||summary?.localOnly!==false||!rows.length)return;
-    inventoryRefreshBusy.current=true;setInventoryRefreshing(true);
+    inventoryRefreshBusy.current=true;setInventoryRefreshing(true);setInventoryProgress(0);
+    const scope=inventoryScope.current;
     const ids=rows.map(r=>r.id);
     try {
-      const result=await adminPost('products/inventory/refresh',token,{productIds:ids});
-      const results=new Map(result.rows.map(r=>[Number(r.productId),r]));
-      setRows(current=>current.map(row=>{const stock=results.get(row.id);return !stock?row:stock.error?{...row,ffInventoryError:stock.error}:{...row,ffInventorySnapshot:stock,ffInventory:stock.inventory,ffTrackInventory:stock.trackInventory,ffInventoryCheckedAt:stock.checkedAt,ffInventoryError:null};}));
+      await refreshInventoryBatches(ids,
+        productIds=>adminPost('products/inventory/refresh',token,{productIds}),
+        (stocks,completed)=>{
+          const results=new Map(stocks.map(r=>[Number(r.productId),r]));
+          setRows(current=>current.map(row=>{const stock=results.get(row.id);return !stock?row:stock.error?{...row,ffInventoryError:stock.error}:{...row,ffInventorySnapshot:stock,ffInventory:stock.inventory,ffTrackInventory:stock.trackInventory,ffInventoryCheckedAt:stock.checkedAt,ffInventoryError:null};}));
+          setInventoryProgress(completed);
+        },()=>scope!==inventoryScope.current);
     }catch(e){setRows(current=>current.map(row=>ids.includes(row.id)?{...row,ffInventoryError:e.message}:row));}
     finally{inventoryRefreshBusy.current=false;setInventoryRefreshing(false);}
   }
@@ -272,7 +280,7 @@ function EnterpriseProductsSection({ token, roles = [], createdProductId }) {
       <label>Markup category<select className="input" value={categoryFilter} onChange={event => { setCategoryFilter(event.target.value); setPage(0); }}><option value="">All categories</option><option value="highlyPerishable">Highly perishable</option><option value="perishable">Perishable</option><option value="shelfStable">Shelf stable</option><option value="deckHyland">DFF markup</option><option value="creamyCow">Creamy Cow Markup</option><option value="custom">Custom</option></select></label>
       <label>Square<select className="input" value={squareFilter} onChange={event => { setSquareFilter(event.target.value); setPage(0); }}><option value="">All</option><option value="enabled">Enabled</option><option value="disabled">Not sold</option></select></label>
       <label>Sale<select className="input" value={saleFilter} onChange={e=>{setSaleFilter(e.target.value);setPage(0);}}><option value="">All</option><option value="on">On sale</option><option value="off">Not on sale</option></select></label>
-      <button className="button alt" type="button" disabled={inventoryRefreshing||summary?.localOnly!==false} onClick={refreshInventory}>{inventoryRefreshing?'Checking FF inventory…':'Refresh FF inventory'}</button>
+      <button className="button alt" type="button" disabled={inventoryRefreshing||summary?.localOnly!==false} onClick={refreshInventory}>{inventoryRefreshing?`Checking FF inventory ${inventoryProgress}/${rows.length}…`:'Refresh FF inventory'}</button>
       <label>SNAP<select className="input" value={snapEligibility} onChange={e=>{setSnapEligibility(e.target.value);setPage(0);}}><option value="">All</option><option value="excluded">Excluded</option><option value="included">Not excluded</option></select></label>
       <label>Guest<select className="input" value={guestEligibility} onChange={e=>{setGuestEligibility(e.target.value);setPage(0);}}><option value="">All</option><option value="excluded">Excluded</option><option value="included">Not excluded</option></select></label>
       <label>FF visibility<select className="input" value={visibilityFilter} onChange={e=>{setVisibilityFilter(e.target.value);setPage(0);}}><option value="">All</option><option value="visible">Visible</option><option value="hidden">Hidden</option></select></label>

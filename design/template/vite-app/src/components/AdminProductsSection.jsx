@@ -1,3 +1,4 @@
+import { INVENTORY_REFRESH_BATCH_SIZE } from "./inventoryRefresh.js";
 import React, { useEffect, useRef, useState } from "react";
 import { adminGet, adminPost } from "../adminApi.js";
 import { categoryLabel } from "../categoryLabel.js";
@@ -338,9 +339,9 @@ export function AdminProductsSection({
           setPage(response.pagination.page);
         if(view==='inventory'){
           const ids=(response.rows||[]).map(r=>r.productId);
-          for(let offset=0;offset<ids.length;offset+=100){
+          for(let offset=0;offset<ids.length;offset+=INVENTORY_REFRESH_BATCH_SIZE){
             if(cancelled||requestId.current!==id)break;
-            const batch=ids.slice(offset,offset+100);let stocks;
+            const batch=ids.slice(offset,offset+INVENTORY_REFRESH_BATCH_SIZE);let stocks;
             try{stocks=(await adminPost('products/inventory/refresh',token,{productIds:batch})).rows;}
             catch(e){stocks=batch.map(productId=>({productId,error:e.message}));}
             if(cancelled||requestId.current!==id)break;
