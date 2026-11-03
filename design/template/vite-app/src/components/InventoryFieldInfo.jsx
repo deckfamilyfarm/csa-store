@@ -5,8 +5,8 @@ import "./FieldInfo.css";
 export const INVENTORY_FIELD_HELP = {
   stockOnFarm: "Yes means some stock is available in a freezer or fridge anywhere on the farm. No means none and sets on-farm pounds to zero. Yes can be used when the weight is unknown. Not checked means farm availability has not been reviewed. Full Farm Stock is independent.",
   stockOnFarmLbs: "Total pounds currently in all farm freezers and fridges, regardless of selling unit or package size. Enter the total, not an amount to add. Blank means weight unknown; 0 means none. Positive pounds set Yes; 0 sets No. Saved locally only; sales do not yet deduct from this count. Full Farm Stock is independent.",
-  inventory: "The quantity available through Full Farm. Enable Full Farm Track Inventory to edit this number. Saving sends the quantity to Local Line. This is separate from physical availability recorded by Stock on Farm.",
-  trackInventory: "When enabled, Full Farm uses the stock quantity to limit how much can be ordered. Enable this to edit Full Farm Stock. Saving updates Local Line; it does not change Stock on Farm.",
+  inventory: "The quantity currently reported by Local Line. Make quantity corrections in Local Line, then refresh here. Quantity pushes are paused until atomic stock updates are verified. On-farm counts remain separate.",
+  trackInventory: "When enabled, Full Farm uses the stock quantity to limit how much can be ordered. Saving updates Local Line; it does not change Stock on Farm.",
   visible: "Controls whether the product is visible in the Full Farm storefront. Hiding a product does not change its stock quantity or Stock on Farm. Saving updates visibility in Local Line.",
 };
 

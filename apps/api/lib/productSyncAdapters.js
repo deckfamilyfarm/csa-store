@@ -17,6 +17,8 @@ import {
 } from "./squareStoreSync.js";
 import { squareUnitSnapshot, unitChangeIssue, planSquareUnit } from './squarePricingUnits.js';
 import { applyEnterpriseLocalLinePrices } from './enterprisePricingPublication.js';
+import { enterpriseLocalLineCreation } from './enterpriseLocalLineCreation.js';
+import { assertNoUnsafeLocalLineStock } from './localLineInventorySafety.js';
 import { ENTERPRISE_LOCAL_LINE_COST_POLICY, requireEnterpriseCostPolicy, requireLocalLinePackageCharging } from './enterpriseLocalLineCost.js';
 import { enterpriseRevisionMarker } from './enterprisePricingService.js';
 import { liveLocalLinePriceComparison, refreshEnterprisePriceCache } from './enterprisePricingComparison.js';
@@ -189,7 +191,7 @@ export async function prepareLocalLineAction(product, staged = {}, { onRefresh, 
   const token = await getLocalLineAccessToken();
   next.localLineVendorId = await resolveLocalLineVendor(next, token);
   const remote = context.remoteId ? await fetchLocalLineProduct(context.remoteId, token) : null;
-  if (enterpriseRevision && !remote) throw new Error("Enterprise pricing needs an approved Local Line product and package mapping before publication.");
+  if (remote && context.packages.some(pkg=>!context.packageMeta.some(meta=>Number(meta.packageId)===Number(pkg.id)&&Number(meta.localLinePackageId)>0))) throw new Error('Every Local Line package needs an explicit mapping. Review package links before publishing.');
   // A pricing/image approval should not freeze visibility when no visibility change was reviewed.
   const includeVisibility = !localLinePricesOnly && (!remote || Object.hasOwn(staged, "visible") || Boolean(remote.visible) !== Boolean(next.product.visible));
   if (remote?.is_deleted) throw new Error("The Local Line product was deleted. Review its link first.");
@@ -204,12 +206,15 @@ export async function prepareLocalLineAction(product, staged = {}, { onRefresh, 
       ...(includeInventory ? { inventory: next.product.inventory, trackInventory: next.product.trackInventory } : {}),
       ...(includeVisibility ? { visible: next.product.visible } : {})
     }) };
+  } else if (enterpriseRevision) {
+    ({createPayload,payload} = enterpriseLocalLineCreation(next,enterpriseRevision,await fetchLocalLineProductUnits(token)));
   } else {
     createPayload = buildLocalLineCreatePayload(next, await fetchLocalLineProductUnits(token));
     const fake = { packages: next.packages.map(pkg => ({ id: Number(pkg.id), price_list_entries: createPayload.product_price_list_entries.map(entry => ({ price_list: entry.price_list, product_price_list_entry: -entry.price_list, adjustment_type: 2 })) })) };
-    payload = { ...buildLocalLinePricePayload({ ...next, packageMeta: [] }, fake, next.sale), ...buildInventoryPayload(next.product) };
+    payload = { ...buildLocalLinePricePayload({ ...next, packageMeta: [] }, fake, next.sale), visible:Boolean(next.product.visible) };
   }
   if (localLinePricesOnly) payload = priceOnlyLocalLinePayload(payload, remote, context.localLineSale);
+  assertNoUnsafeLocalLineStock(payload);
   const [receipts] = await getPool().query("SELECT * FROM product_sync_image_receipts WHERE product_id = ?", [product.id]);
   const receipt = receipts[0];
   const imageSources = localLinePricesOnly ? [] : next.imageUrls;
@@ -232,6 +237,7 @@ export async function prepareLocalLineAction(product, staged = {}, { onRefresh, 
 }
 export async function inspectAction(action, saveCheckpoint = async () => {}) {
   requireEnterpriseCostPolicy(action);
+  if(action.platform==='localline')assertNoUnsafeLocalLineStock(action.checkpoint?.payload || action.payload || {});
   const checkpoint = action.checkpoint || {};
   if (action.platform === "square") {
     if (!action.payload?.sellingUnit) throw Object.assign(new Error('This approval predates selling-unit checks. Run a new audit and review the unit before publishing.'), { hold: true });

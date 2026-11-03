@@ -19,7 +19,7 @@ test('farm availability migration, persistence, defaults, permissions and indepe
   t.mock.method(globalThis, 'fetch', () => assert.fail('Local farm availability must not call remote services'));
   for (const table of [schema.products, schema.vendors, schema.categories]) {
     const config = getTableConfig(table);
-    const columns = config.columns.filter(col => !['stock_on_farm', 'stock_on_farm_lbs', 'farm_stock_revision'].includes(col.name)).map(col => `\`${col.name}\` ${col.getSQLType()}${col.notNull ? ' NOT NULL' : ''}${col.autoIncrement ? ' AUTO_INCREMENT' : ''}${col.primary ? ' PRIMARY KEY' : ''}`);
+    const columns = config.columns.filter(col => !['stock_on_farm', 'stock_on_farm_lbs', 'farm_stock_revision'].includes(col.name)).map(col => `\`${col.name}\` ${col.getSQLType()}${col.notNull ? ' NOT NULL' : ''}${col.autoIncrement ? ' AUTO_INCREMENT' : ''}${col.primary ? ' PRIMARY KEY' : ''}${col.default !== undefined && (typeof col.default !== 'object' || col.default === null) ? ` DEFAULT ${pool.escape(col.default)}` : ''}`);
     await pool.query(`CREATE TABLE \`${config.name}\` (${columns.join(',')}) ENGINE=InnoDB`);
   }
   await pool.query("INSERT INTO vendors (id,name) VALUES (1,'Deck Family Farm'),(2,'')");

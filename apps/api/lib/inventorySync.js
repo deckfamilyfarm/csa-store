@@ -1,4 +1,4 @@
-import { remoteInventory, inventoryConflict, stockPayload } from "./inventorySnapshot.js";
+import { remoteInventory } from "./inventorySnapshot.js";
 export { remoteInventory, inventoryConflict } from "./inventorySnapshot.js";
 import { getPool } from "../db.js";
 import { getLocalLineAccessToken } from "../localLineAuth.js";
@@ -7,6 +7,10 @@ import { validateSavedProductVendor, confirmLocalLineVendor } from "./productVen
 import { ensureProductSyncSchema, withSyncLock } from "./productSyncSchema.js";
 import { fail, normalizeIds } from "./productSyncCore.js";
 import { canPublishInventory } from "./adminRoles.js";
+import { INVENTORY_READ_ONLY_MESSAGE } from './localLineInventorySafety.js';
+import { randomUUID } from 'node:crypto';
+import { hash } from './memberFinancialOperations.js';
+import { assertFinancialSchema } from './memberFinancialSchema.js';
 
 export function inventoryChanges(changes = {}) {
   const keys = Object.keys(changes);
@@ -34,10 +38,12 @@ export async function saveInventoryToLocalLine(productId, input, user, expected 
   const changes = inventoryChanges(input);
   const roles = user.adminRoles || [];
   if (!canPublishInventory(roles)) fail("Saving inventory requires Inventory Admin, or product editing and Local Line Push permissions.", 403);
+  if (Object.hasOwn(changes,'inventory') || changes.packageInventory) throw Object.assign(new Error(INVENTORY_READ_ONLY_MESSAGE), {status:409,code:'LOCAL_LINE_STOCK_READ_ONLY'});
   if (!isLocalLineEnabled() || process.env.LOCALLINE_TEST === "true") fail("Local Line inventory publishing is not enabled.");
   await ensureProductSyncSchema();
   // Serialize with product publications, preserving their existing frozen approvals.
   return withSyncLock("csa-store:scheduled-pricelist-releases", async connection => {
+    await assertFinancialSchema(connection);
     await connection.beginTransaction();
     try {
       const [[product]] = await connection.query(`SELECT p.id, p.inventory, p.track_inventory, p.is_deleted, c.name AS categoryName, lm.local_line_product_id AS remoteId
@@ -56,30 +62,34 @@ export async function saveInventoryToLocalLine(productId, input, user, expected 
       const before=await fetchLocalLineProduct(Number(product.remoteId), token);
       confirmLocalLineVendor(before, vendorId);
       const [mappings]=await connection.query('SELECT package_id AS packageId,local_line_package_id AS remoteId FROM local_line_package_meta WHERE product_id=?',[id]);
-      if(Object.hasOwn(changes,'inventory')||changes.packageInventory) {
-        const baseline=expected || {inventory:product.inventory,trackInventory:Boolean(product.track_inventory)};
-        const {payload:stock,conflict}=stockPayload(before,changes,baseline,mappings);
-        if(conflict){
-          await cacheInventory(connection,id,before,mappings);await connection.commit();
-          throw Object.assign(new Error('FF inventory or package mapping changed in Local Line. No update was sent. Review current stock before trying again.'),{status:409,inventoryConflict:conflict});
-        }
-        Object.assign(payload,stock);
+      const requestHash=hash({remoteId:Number(product.remoteId),payload});
+      const [[pending]]=await connection.query("SELECT * FROM local_line_inventory_operations WHERE product_id=? AND status='attempted' ORDER BY created_at LIMIT 1",[id]);
+      const alreadyApplied=Object.entries(payload).every(([key,value])=>before[key]===value);
+      if(pending && (pending.request_hash!==requestHash || Number(pending.remote_id)!==Number(product.remoteId))) fail('An earlier inventory publication needs reconciliation. Refresh and confirm its original request before sending another.',409);
+      if(pending && !alreadyApplied) fail('An earlier Local Line inventory request has an uncertain outcome. No repeat was sent. Review its receipt and current Local Line settings.',409);
+      const operationId=pending?.id || randomUUID();
+      if(!alreadyApplied) {
+        await connection.query(`INSERT INTO local_line_inventory_operations (id,product_id,user_id,remote_id,request_hash,payload_json,status,created_at,updated_at)
+          VALUES (?,?,?,?,?,?,'attempted',UTC_TIMESTAMP(3),UTC_TIMESTAMP(3))`,[operationId,id,user.userId || user.adminId,Number(product.remoteId),requestHash,JSON.stringify(payload)]);
+        // The publication receipt must survive a process crash or lost response.
+        await connection.commit();
+        await patchLocalLineProduct(Number(product.remoteId), token, payload);
+        await connection.beginTransaction();
       }
-      await patchLocalLineProduct(Number(product.remoteId), token, payload);
       const remote = await fetchLocalLineProduct(Number(product.remoteId), token);
       confirmLocalLineVendor(remote, vendorId);
-      if ((Object.hasOwn(changes, "inventory") && (remote.inventory == null || Number(remote.inventory) !== changes.inventory)) ||
-        (Object.hasOwn(changes, "trackInventory") && remote.track_inventory !== Boolean(changes.trackInventory)) ||
+      if ((Object.hasOwn(changes, "trackInventory") && remote.track_inventory !== Boolean(changes.trackInventory)) ||
         (Object.hasOwn(changes, "visible") && remote.visible !== Boolean(changes.visible))) {
         fail("Local Line did not confirm the requested inventory. Check its stock before retrying; local inventory was not changed.");
       }
       const current=remoteInventory(remote,mappings);
       if((before.inventory_type||'product')!==(remote.inventory_type||'product') || changes.packageInventory?.some(target=>!current.packages?.some(p=>p.packageId===target.packageId&&p.inventory===target.inventory)) ||
         changes.packageInventory&&before.packages.some(p=>!remote.packages?.some(after=>after.id===p.id)))fail('Local Line did not confirm the requested package inventory. Refresh before retrying.');
-      const columns = { inventory: "inventory", trackInventory: "track_inventory", visible: "visible" };
+      const columns = { trackInventory: "track_inventory", visible: "visible" };
       const fields=Object.keys(changes).filter(key=>key!=='packageInventory');
       if(fields.length)await connection.query(`UPDATE products SET ${fields.map(key=>`${columns[key]}=?`).join(', ')}, updated_at=UTC_TIMESTAMP() WHERE id=?`,[...fields.map(k=>changes[k]),id]);
       await cacheInventory(connection,id,remote,mappings);
+      if(pending || !alreadyApplied)await connection.query("UPDATE local_line_inventory_operations SET status='confirmed',receipt_json=?,updated_at=UTC_TIMESTAMP(3) WHERE id=?",[JSON.stringify({visible:remote.visible,track_inventory:remote.track_inventory}),operationId]);
       await connection.commit();
       return { ok: true, productId: id, localLineUpdate: true, savedFields: Object.keys(changes), currentInventory: current };
     } catch (error) { await connection.rollback(); throw error; }
