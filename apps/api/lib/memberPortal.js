@@ -1,6 +1,7 @@
 import Stripe from "stripe";
 import { desc, eq } from "drizzle-orm";
 import { getDb, getPool } from "../db.js";
+import {requireVerifiedLocalLineLink} from './memberExternalLinks.js';
 import {
   memberCreditMirrors,
   memberExternalAccountLinks,
@@ -32,12 +33,14 @@ export const MEMBER_PLAN_DEFINITIONS = {
 };
 
 let stripeClient;
+let stripeClientKey;
 
 export function getStripeClient() {
   const stripeSecret = String(process.env.STRIPE_SECRET_KEY || "").trim();
   if (!stripeSecret) return null;
-  if (!stripeClient) {
-    stripeClient = new Stripe(stripeSecret);
+  if (!stripeClient || stripeClientKey !== stripeSecret) {
+    stripeClient = new Stripe(stripeSecret, {timeout:20000,maxNetworkRetries:0});
+    stripeClientKey = stripeSecret;
   }
   return stripeClient;
 }
@@ -177,8 +180,8 @@ export async function createLedgerEntry({
   referenceId = null,
   description = null,
   metadata = null
-}) {
-  const db = getDb();
+}, db = getDb()) {
+  if (!Number.isSafeInteger(amountCents)) throw new Error('Ledger amounts must be integer cents.');
   const now = new Date();
   await db.insert(memberLedgerEntries).values({
     accountId: Number(accountId),
@@ -309,11 +312,17 @@ export async function buildMemberPortalSummary(userId) {
       sumByEntryType(userId, ["purchase_debit", "herdshare_charge"])
     ]);
 
-  const creditMirror = locallineLink
+  let verifiedLink=false;
+  if(locallineLink) {
+    try {await requireVerifiedLocalLineLink(locallineLink,userId);verifiedLink=true;}
+    catch(error){if(error.status!==403)throw error;}
+  }
+  const creditMirror = verifiedLink
     ? await getCreditMirrorForLink(locallineLink.id, db)
     : null;
 
-  const decoratedEntries = decorateLedgerEntries(dedupeLedgerEntries(entries), {
+  const visibleEntries=verifiedLink?entries:entries.filter(row=>row.accountType!=='external_activity' && !String(row.referenceType || '').startsWith('localline'));
+  const decoratedEntries = decorateLedgerEntries(dedupeLedgerEntries(visibleEntries), {
     walletBalanceCents,
     dividendAccruedCents,
     externalActivityBalanceCents: Number.isFinite(Number(creditMirror?.lastLedgerImportedBalanceCents))
@@ -322,9 +331,9 @@ export async function buildMemberPortalSummary(userId) {
   });
 
   const localLineSetupStatus =
-    locallineLink?.externalCustomerId
+    verifiedLink
       ? "connected"
-      : profile?.localLineSetupStatus || "not_connected";
+      : locallineLink ? 'needs_verification' : profile?.localLineSetupStatus || "not_connected";
 
   return {
     user: user
@@ -349,6 +358,8 @@ export async function buildMemberPortalSummary(userId) {
     },
     wallet: {
       availableBalanceCents: walletBalanceCents,
+      balanceAuthority: 'localline',
+      localLedgerBalanceCents: walletBalanceCents,
       totalReceivedCents: totalDepositedCents,
       totalSpentCents: Math.abs(totalSpentCents)
     },
@@ -357,7 +368,7 @@ export async function buildMemberPortalSummary(userId) {
       ratePercent: Number(settings.dividendRatePercent || 3)
     },
     localline: {
-      link: locallineLink,
+      link: verifiedLink ? locallineLink : locallineLink ? {id:locallineLink.id,verificationStatus:'needs_verification'} : null,
       mirror: creditMirror,
       importStatus: creditMirror
         ? {

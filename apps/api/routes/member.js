@@ -4,17 +4,11 @@ import { ensureSubscriptionPortalSchema, getDb } from "../db.js";
 import { requireUser } from "../middleware/auth.js";
 import { getLocalLineAccessToken, getLocalLineBaseUrl, isLocalLineAuthConfigured } from "../localLineAuth.js";
 import {
-  memberCreditMirrors,
-  memberExternalAccountLinks,
-  memberHerdshareStatuses,
-  memberProfiles,
-  memberSubscriptions
+  memberProfiles
 } from "../schema.js";
 import {
   buildMemberPortalSummary,
-  computeNextBillingDate,
   computeStripeBillingAnchor,
-  createLedgerEntry,
   ensureLocalLineMirror,
   ensureMemberLedgerAccounts,
   getMemberProfileByUserId,
@@ -24,13 +18,16 @@ import {
   getStripeClient,
   getStripePriceIdForPlan,
   getUserById,
-  ledgerReferenceExists,
   loadSubscriptionSettings,
   normalizeBillingDay,
   normalizePlanKey
 } from "../lib/memberPortal.js";
 import { importMemberLocalLineLedgerActivity } from "../lib/memberPortalSync.js";
 
+import { runMemberBilling } from '../lib/memberBilling.js';
+import { getMemberOperation } from '../lib/memberFinancialOperations.js';
+import { processMemberStripeEvent } from '../lib/memberStripeEvents.js';
+import { requireVerifiedLocalLineLink, saveVerifiedLocalLineLink } from '../lib/memberExternalLinks.js';
 const router = express.Router();
 
 function getLocalLineStorefrontBaseUrl() {
@@ -39,24 +36,6 @@ function getLocalLineStorefrontBaseUrl() {
       process.env.PUBLIC_STORE_URL ||
       "https://fullfarmcsa.deckfamilyfarm.com"
   ).replace(/\/+$/, "");
-}
-
-function parseMetadataJson(value) {
-  if (!value) return {};
-  try {
-    const parsed = JSON.parse(value);
-    return parsed && typeof parsed === "object" ? parsed : {};
-  } catch (_error) {
-    return {};
-  }
-}
-
-function stringifyMetadata(value) {
-  try {
-    return JSON.stringify(value || {});
-  } catch (_error) {
-    return "{}";
-  }
 }
 
 async function setLocalLineSetupState(userId, {
@@ -75,175 +54,6 @@ async function setLocalLineSetupState(userId, {
     .where(eq(memberProfiles.userId, Number(userId)));
 }
 
-async function saveLocalLineLinkRecord({
-  userId,
-  externalCustomerId,
-  externalEmail = null,
-  metadata = {},
-  mode = "manual"
-}, db = getDb()) {
-  const existing = await getPrimaryExternalLink(userId, "localline", db);
-  const now = new Date();
-  let linkId = existing?.id || null;
-  if (existing) {
-    const existingMetadata = parseMetadataJson(existing.metadataJson);
-    await db
-      .update(memberExternalAccountLinks)
-      .set({
-        externalCustomerId,
-        externalEmail: externalEmail || null,
-        metadataJson: stringifyMetadata({
-          ...existingMetadata,
-          ...metadata,
-          connectionMode: mode,
-          connectionStatus: "connected"
-        }),
-        linkedAt: existing.linkedAt || now,
-        lastSyncedAt: existing.lastSyncedAt || null,
-        updatedAt: now
-      })
-      .where(eq(memberExternalAccountLinks.id, existing.id));
-    linkId = existing.id;
-  } else {
-    const result = await db.insert(memberExternalAccountLinks).values({
-      userId,
-      provider: "localline",
-      externalCustomerId,
-      externalEmail: externalEmail || null,
-      metadataJson: stringifyMetadata({
-        ...metadata,
-        connectionMode: mode,
-        connectionStatus: "connected"
-      }),
-      linkedAt: now,
-      createdAt: now,
-      updatedAt: now
-    });
-    linkId = Number(result[0]?.insertId);
-  }
-
-  await setLocalLineSetupState(
-    userId,
-    {
-      status: "connected",
-      mode,
-      note: null
-    },
-    db
-  );
-
-  const mirror = await ensureLocalLineMirror(userId, linkId, "localline", db);
-  return { linkId, mirror };
-}
-
-async function applyPaidInvoiceToMemberPortal({
-  subscription,
-  invoice,
-  db
-}) {
-  if (!subscription) return;
-
-  const settings = await loadSubscriptionSettings(db);
-  const { wallet } = await ensureMemberLedgerAccounts(subscription.userId, db);
-  const now = new Date();
-  const referenceBase = String(invoice?.id || invoice?.subscription || subscription.stripeSubscriptionId || "").trim();
-  if (!referenceBase) return;
-
-  const depositReferenceId = referenceBase;
-  const herdshareReferenceId = `${referenceBase}:herdshare`;
-  const creditIssuedCents =
-    Number(subscription.planAmountCents || 0) || Number(invoice?.amount_paid || 0);
-  const cashReceivedCents =
-    Number.isFinite(Number(invoice?.amount_paid)) && Number(invoice?.amount_paid) > 0
-      ? Number(invoice.amount_paid)
-      : creditIssuedCents;
-  const bonusCreditCents = Math.max(0, creditIssuedCents - cashReceivedCents);
-  const herdshareFeeCents = Number(settings.herdshareMonthlyFeeCents || 500);
-
-  let createdDeposit = false;
-  let createdHerdshareCharge = false;
-
-  if (
-    creditIssuedCents > 0 &&
-    !(await ledgerReferenceExists(subscription.userId, "stripe_invoice", depositReferenceId))
-  ) {
-    await createLedgerEntry({
-      accountId: wallet.id,
-      userId: subscription.userId,
-      entryType: "subscription_deposit",
-      amountCents: creditIssuedCents,
-      effectiveDate: now,
-      referenceType: "stripe_invoice",
-      referenceId: depositReferenceId,
-      description: `Subscription deposit for ${subscription.planKey}`,
-      metadata: {
-        source: "stripe_invoice",
-        stripeInvoiceId: invoice?.id || null,
-        stripeSubscriptionId: invoice?.subscription || subscription.stripeSubscriptionId || null,
-        planKey: subscription.planKey,
-        cashReceivedCents,
-        creditIssuedCents,
-        bonusCreditCents
-      }
-    });
-    createdDeposit = true;
-  }
-
-  if (
-    herdshareFeeCents > 0 &&
-    !(await ledgerReferenceExists(subscription.userId, "stripe_invoice", herdshareReferenceId))
-  ) {
-    await createLedgerEntry({
-      accountId: wallet.id,
-      userId: subscription.userId,
-      entryType: "herdshare_charge",
-      amountCents: -Math.abs(herdshareFeeCents),
-      effectiveDate: now,
-      referenceType: "stripe_invoice",
-      referenceId: herdshareReferenceId,
-      description: "Monthly herdshare charge"
-    });
-    createdHerdshareCharge = true;
-  }
-
-  const nextBillingDate =
-    subscription.billingDayOfMonth
-      ? computeNextBillingDate(subscription.billingDayOfMonth, now)
-      : subscription.nextBillingDate || null;
-
-  await db
-    .update(memberSubscriptions)
-    .set({
-      status: "active",
-      lastDepositAt: createdDeposit ? now : subscription.lastDepositAt || now,
-      nextBillingDate,
-      updatedAt: now
-    })
-    .where(eq(memberSubscriptions.id, subscription.id));
-
-  if (createdDeposit || createdHerdshareCharge) {
-    const link = await getPrimaryExternalLink(subscription.userId, "localline", db);
-    if (link) {
-      const mirror = await ensureLocalLineMirror(subscription.userId, link.id, "localline", db);
-      const netCreditCents = Math.max(
-        0,
-        (createdDeposit ? depositAmountCents : 0) -
-          (createdHerdshareCharge ? herdshareFeeCents : 0)
-      );
-      if (netCreditCents > 0) {
-        await db
-          .update(memberCreditMirrors)
-          .set({
-            lastKnownBalanceCents: Number(mirror.lastKnownBalanceCents || 0) + netCreditCents,
-            lastMirroredAt: now,
-            updatedAt: now
-          })
-          .where(eq(memberCreditMirrors.id, mirror.id));
-      }
-    }
-  }
-}
-
 async function ensurePortalContext(userId) {
   const db = getDb();
   await ensureSubscriptionPortalSchema();
@@ -258,28 +68,10 @@ async function ensurePortalContext(userId) {
   return { db, user, profile, subscription, settings, accounts };
 }
 
-async function ensureStripeCustomer({ stripe, userId, profile, subscription }) {
-  let stripeCustomerId = subscription?.stripeCustomerId || null;
-  if (stripeCustomerId) return stripeCustomerId;
-
-  const customer = await stripe.customers.create({
-    email: profile.userEmail || undefined,
-    name: `${profile.firstName || ""} ${profile.lastName || ""}`.trim() || undefined,
-    phone: profile.phone || undefined,
-    metadata: {
-      userId: String(userId),
-      source: "csa-store"
-    }
-  });
-  stripeCustomerId = customer.id;
-  await getDb()
-    .update(memberSubscriptions)
-    .set({
-      stripeCustomerId,
-      updatedAt: new Date()
-    })
-    .where(eq(memberSubscriptions.userId, Number(userId)));
-  return stripeCustomerId;
+async function ensureStripeCustomer({ stripe, userId, subscription }) {
+  if (subscription?.stripeCustomerId) return subscription.stripeCustomerId;
+  const result = await runMemberBilling({userId,kind:'customer',requestKey:'stripe-customer-v1',stripe});
+  return result.stripeCustomerId;
 }
 
 async function fetchStripeOverview(subscriptionRow) {
@@ -337,38 +129,13 @@ router.get("/portal", requireUser, async (req, res) => {
   }
 });
 
-router.post("/setup-intent", requireUser, async (req, res) => {
+router.post('/setup-intent', requireUser, async (req,res) => {
   try {
     const stripe = getStripeClient();
-    if (!stripe) return res.status(400).json({ error: "Stripe is not configured." });
-
-    const userId = Number(req.user.userId);
-    const context = await ensurePortalContext(userId);
-    if (context.error) {
-      return res.status(context.status || 400).json({ error: context.error });
-    }
-    const { user, profile, subscription } = context;
-    const stripeCustomerId = await ensureStripeCustomer({
-      stripe,
-      userId,
-      profile: {
-        ...profile,
-        userEmail: user?.email
-      },
-      subscription
-    });
-
-    const intent = await stripe.setupIntents.create({
-      customer: stripeCustomerId,
-      usage: "off_session",
-      payment_method_types: ["card"]
-    });
-
-    res.json({ clientSecret: intent.client_secret, stripeCustomerId });
-  } catch (error) {
-    console.error("Member setup intent failed:", error);
-    res.status(400).json({ error: error?.message || "Unable to create setup intent." });
-  }
+    if (!stripe) return res.status(503).json({error:'Stripe is not configured.'});
+    await ensureSubscriptionPortalSchema();
+    res.json(await runMemberBilling({userId:Number(req.user.userId),kind:'setup',requestKey:req.headers['idempotency-key'],stripe}));
+  } catch(error) { res.status(error.status || 503).json({error:error.message,operationId:error.operationId}); }
 });
 
 router.post("/payment-method/default", requireUser, async (req, res) => {
@@ -462,242 +229,25 @@ router.post("/payment-method/delete", requireUser, async (req, res) => {
   }
 });
 
-router.post("/subscription", requireUser, async (req, res) => {
-  try {
-    const stripe = getStripeClient();
-    if (!stripe) return res.status(400).json({ error: "Stripe is not configured." });
-
-    const userId = Number(req.user.userId);
-    const planKey = normalizePlanKey(req.body?.planKey || req.body?.selectedPlan);
-    const billingDayOfMonth = normalizeBillingDay(req.body?.billingDayOfMonth, 1);
-    const plan = getPlanDefinition(planKey);
-    if (!plan) {
-      return res.status(400).json({ error: "Choose a valid subscription plan." });
-    }
-    const priceId = getStripePriceIdForPlan(plan.key);
-    if (!priceId) {
-      return res.status(400).json({ error: "Stripe price is not configured for that plan." });
-    }
-
-    const db = getDb();
-    const context = await ensurePortalContext(userId);
-    if (context.error) {
-      return res.status(context.status || 400).json({ error: context.error });
-    }
-    const { user, profile, subscription, settings } = context;
-    const stripeCustomerId = await ensureStripeCustomer({
-      stripe,
-      userId,
-      profile: {
-        ...profile,
-        userEmail: user?.email
-      },
-      subscription
-    });
-    const customer = await stripe.customers.retrieve(stripeCustomerId);
-    const defaultPaymentMethodId =
-      customer && !customer.deleted ? customer.invoice_settings?.default_payment_method : null;
-    if (!defaultPaymentMethodId) {
-      return res.status(400).json({
-        error: "Add and set a default payment method before activating your subscription."
-      });
-    }
-
-    const shouldCollectImmediateCharge =
-      !subscription?.stripeSubscriptionId ||
-      subscription?.status === "pending_payment_method" ||
-      subscription?.status === "canceled";
-    if (subscription?.stripeSubscriptionId) {
-      try {
-        await stripe.subscriptions.cancel(subscription.stripeSubscriptionId, {
-          invoice_now: false,
-          prorate: false
-        });
-      } catch (_error) {
-        // Ignore stale remote subscription ids and continue with recreation.
-      }
-    }
-
-    const stripeSubscription = await stripe.subscriptions.create({
-      customer: stripeCustomerId,
-      items: [{ price: priceId }],
-      default_payment_method: defaultPaymentMethodId,
-      billing_cycle_anchor: computeStripeBillingAnchor(billingDayOfMonth),
-      proration_behavior: "none",
-      collection_method: "charge_automatically",
-      payment_behavior: "allow_incomplete",
-      metadata: {
-        userId: String(userId),
-        planKey: plan.key
-      }
-    });
-
-    if (shouldCollectImmediateCharge) {
-      await stripe.invoiceItems.create({
-        customer: stripeCustomerId,
-        amount: plan.amountCents,
-        currency: "usd",
-        description: `Initial ${plan.label} subscription charge`,
-        metadata: {
-          userId: String(userId),
-          planKey: plan.key,
-          billingKind: "initial_subscription_charge"
-        }
-      });
-
-      const immediateInvoice = await stripe.invoices.create({
-        customer: stripeCustomerId,
-        auto_advance: true,
-        collection_method: "charge_automatically",
-        metadata: {
-          userId: String(userId),
-          planKey: plan.key,
-          billingKind: "initial_subscription_charge"
-        }
-      });
-
-      await stripe.invoices.pay(immediateInvoice.id);
-    }
-
-    const now = new Date();
-    const nextBillingDate =
-      stripeSubscription.current_period_end
-        ? new Date(stripeSubscription.current_period_end * 1000)
-        : computeNextBillingDate(billingDayOfMonth, now);
-
-    await db
-      .update(memberSubscriptions)
-      .set({
-        planKey: plan.key,
-        planAmountCents: plan.amountCents,
-        billingDayOfMonth,
-        stripeCustomerId,
-        stripeSubscriptionId: stripeSubscription.id,
-        status: stripeSubscription.pause_collection ? "paused" : stripeSubscription.status || "active",
-        nextBillingDate,
-        currentPeriodStart: stripeSubscription.current_period_start
-          ? new Date(stripeSubscription.current_period_start * 1000)
-          : now,
-        currentPeriodEnd: stripeSubscription.current_period_end
-          ? new Date(stripeSubscription.current_period_end * 1000)
-          : nextBillingDate,
-        pausedAt: null,
-        canceledAt: null,
-        updatedAt: now
-      })
-      .where(eq(memberSubscriptions.userId, userId));
-
-    await db
-      .update(memberHerdshareStatuses)
-      .set({
-        monthlyFeeCents: Number(settings.herdshareMonthlyFeeCents || 500),
-        status: "active",
-        nextBillingDate,
-        updatedAt: now
-      })
-      .where(eq(memberHerdshareStatuses.userId, userId));
-
-    const summary = await buildMemberPortalSummary(userId);
-    const stripeData = await fetchStripeOverview(summary.subscription);
-    res.json({ ...summary, stripe: stripeData });
-  } catch (error) {
-    console.error("Create/update subscription failed:", error);
-    res.status(400).json({ error: error?.message || "Unable to update your subscription." });
-  }
-});
-
-router.post("/subscription/pause", requireUser, async (req, res) => {
-  try {
-    const stripe = getStripeClient();
-    if (!stripe) return res.status(400).json({ error: "Stripe is not configured." });
-    const userId = Number(req.user.userId);
-    const subscription = await getMemberSubscriptionByUserId(userId);
-    if (!subscription?.stripeSubscriptionId) {
-      return res.status(404).json({ error: "Subscription not found." });
-    }
-
-    await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
-      pause_collection: { behavior: "mark_uncollectible" }
-    });
-
-    await getDb()
-      .update(memberSubscriptions)
-      .set({
-        status: "paused",
-        pausedAt: new Date(),
-        updatedAt: new Date()
-      })
-      .where(eq(memberSubscriptions.userId, userId));
-
-    const summary = await buildMemberPortalSummary(userId);
-    res.json(summary);
-  } catch (error) {
-    console.error("Pause subscription failed:", error);
-    res.status(400).json({ error: error?.message || "Unable to pause subscription." });
-  }
-});
-
-router.post("/subscription/resume", requireUser, async (req, res) => {
-  try {
-    const stripe = getStripeClient();
-    if (!stripe) return res.status(400).json({ error: "Stripe is not configured." });
-    const userId = Number(req.user.userId);
-    const subscription = await getMemberSubscriptionByUserId(userId);
-    if (!subscription?.stripeSubscriptionId) {
-      return res.status(404).json({ error: "Subscription not found." });
-    }
-
-    await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
-      pause_collection: null
-    });
-
-    await getDb()
-      .update(memberSubscriptions)
-      .set({
-        status: "active",
-        pausedAt: null,
-        updatedAt: new Date()
-      })
-      .where(eq(memberSubscriptions.userId, userId));
-
-    const summary = await buildMemberPortalSummary(userId);
-    res.json(summary);
-  } catch (error) {
-    console.error("Resume subscription failed:", error);
-    res.status(400).json({ error: error?.message || "Unable to resume subscription." });
-  }
-});
-
-router.post("/subscription/cancel", requireUser, async (req, res) => {
-  try {
-    const stripe = getStripeClient();
-    if (!stripe) return res.status(400).json({ error: "Stripe is not configured." });
-    const userId = Number(req.user.userId);
-    const subscription = await getMemberSubscriptionByUserId(userId);
-    if (!subscription?.stripeSubscriptionId) {
-      return res.status(404).json({ error: "Subscription not found." });
-    }
-
-    await stripe.subscriptions.cancel(subscription.stripeSubscriptionId, {
-      invoice_now: false,
-      prorate: false
-    });
-
-    await getDb()
-      .update(memberSubscriptions)
-      .set({
-        status: "canceled",
-        canceledAt: new Date(),
-        updatedAt: new Date()
-      })
-      .where(eq(memberSubscriptions.userId, userId));
-
-    const summary = await buildMemberPortalSummary(userId);
-    res.json(summary);
-  } catch (error) {
-    console.error("Cancel subscription failed:", error);
-    res.status(400).json({ error: error?.message || "Unable to cancel subscription." });
-  }
+for (const [path,kind] of [['/subscription','subscription'],['/subscription/pause','pause'],['/subscription/resume','resume'],['/subscription/cancel','cancel']]) {
+  router.post(path, requireUser, async (req,res) => {
+    try {
+      const stripe = getStripeClient();
+      if (!stripe) return res.status(503).json({error:'Stripe is not configured.'});
+      await ensureSubscriptionPortalSchema();
+      const input = kind==='subscription' ? {planKey:normalizePlanKey(req.body?.planKey || req.body?.selectedPlan),billingDayOfMonth:normalizeBillingDay(req.body?.billingDayOfMonth,1)} : {};
+      const plan = kind==='subscription' ? getPlanDefinition(input.planKey) : null;
+      if(kind==='subscription' && !plan) return res.status(400).json({error:'Choose a valid subscription plan.'});
+      const result = await runMemberBilling({userId:Number(req.user.userId),kind,requestKey:req.headers['idempotency-key'],input,stripe,plan,
+        priceId:plan ? getStripePriceIdForPlan(plan.key) : null,anchor:plan ? computeStripeBillingAnchor(input.billingDayOfMonth) : null});
+      const summary = await buildMemberPortalSummary(Number(req.user.userId));
+      res.json({...summary,operation:result});
+    } catch(error) { res.status(error.status || 503).json({error:error.message,operationId:error.operationId}); }
+  });
+}
+router.get('/operations/:id',requireUser,async(req,res)=>{
+  try { res.json(await getMemberOperation(req.params.id,Number(req.user.userId))); }
+  catch(e){res.status(e.status || 500).json({error:e.message});}
 });
 
 router.get("/localline-link", requireUser, async (req, res) => {
@@ -705,42 +255,17 @@ router.get("/localline-link", requireUser, async (req, res) => {
     await ensureSubscriptionPortalSchema();
     const userId = Number(req.user.userId);
     const link = await getPrimaryExternalLink(userId, "localline");
+    if(link)await requireVerifiedLocalLineLink(link,userId);
     const mirror = link ? await ensureLocalLineMirror(userId, link.id) : null;
     res.json({ link, mirror });
   } catch (error) {
     console.error("Load Local Line link failed:", error);
-    res.status(500).json({ error: "Unable to load Local Line link." });
+    res.status(error.status || 500).json({ error: error.status ? error.message : "Unable to load Local Line link." });
   }
 });
 
-router.post("/localline-link", requireUser, async (req, res) => {
-  try {
-    await ensureSubscriptionPortalSchema();
-    const db = getDb();
-    const userId = Number(req.user.userId);
-    const externalCustomerId = String(req.body?.externalCustomerId || "").trim();
-    const externalEmail = String(req.body?.externalEmail || req.body?.email || "").trim();
-    if (!externalCustomerId) {
-      return res.status(400).json({ error: "External customer id is required." });
-    }
-
-    const { linkId, mirror } = await saveLocalLineLinkRecord(
-      {
-        userId,
-        externalCustomerId,
-        externalEmail,
-        metadata: {
-          linkedBy: "manual_entry"
-        },
-        mode: "manual"
-      },
-      db
-    );
-    res.json({ ok: true, linkId, mirror });
-  } catch (error) {
-    console.error("Save Local Line link failed:", error);
-    res.status(500).json({ error: "Unable to save Local Line link." });
-  }
+router.post("/localline-link", requireUser, (_req, res) => {
+  res.status(410).json({ error: 'Manual customer IDs are no longer accepted. Sign in to Local Line to verify account ownership.' });
 });
 
 router.post("/localline/login", requireUser, async (req, res) => {
@@ -876,23 +401,13 @@ router.post("/localline/login", requireUser, async (req, res) => {
       });
     }
 
-    const { linkId, mirror } = await saveLocalLineLinkRecord(
-      {
-        userId,
-        externalCustomerId: String(customer.id),
-        externalEmail: String(customer.email || normalizedEmail || "").trim() || null,
-        metadata: {
-          linkedBy: "storefront_login",
-          lastCustomer: {
-            id: customer.id,
-            email: customer.email || normalizedEmail,
-            name: customer.name || customer.business_name || null
-          }
-        },
-        mode: "find_existing"
-      },
-      db
-    );
+    const { linkId } = await saveVerifiedLocalLineLink({
+      userId, externalCustomerId: String(customer.id),
+      externalEmail: String(customer.email || normalizedEmail || '').trim() || null,
+      method: 'storefront_login', actorUserId: userId,
+      evidence: { endpoint: 'customers/current', customerId: String(customer.id) }
+    });
+    const mirror = await ensureLocalLineMirror(userId, linkId);
 
     const importResult = await importMemberLocalLineLedgerActivity({ userId });
     const summary = await buildMemberPortalSummary(userId);
@@ -921,6 +436,7 @@ router.post("/localline/import-ledger", requireUser, async (req, res) => {
     if (!link?.externalCustomerId) {
       return res.status(404).json({ error: "Local Line account is not connected yet." });
     }
+    await requireVerifiedLocalLineLink(link, userId);
 
     const importResult = await importMemberLocalLineLedgerActivity({ userId });
     const summary = await buildMemberPortalSummary(userId);
@@ -975,10 +491,12 @@ router.get("/localline/customer", requireUser, async (req, res) => {
     if (!link?.externalCustomerId) {
       return res.status(404).json({ error: "Local Line account is not connected yet." });
     }
+    await requireVerifiedLocalLineLink(link, userId);
 
     const token = await getLocalLineAccessToken();
     const url = `${getLocalLineBaseUrl()}customers/${encodeURIComponent(link.externalCustomerId)}/`;
     const response = await fetch(url, {
+      signal: AbortSignal.timeout(15000),
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json"
@@ -1000,7 +518,7 @@ router.get("/localline/customer", requireUser, async (req, res) => {
     res.json({ customer });
   } catch (error) {
     console.error("Local Line customer fetch failed:", error);
-    res.status(500).json({ error: "Unable to load Local Line customer details." });
+    res.status(error.status || 500).json({ error: error.status ? error.message : "Unable to load Local Line customer details." });
   }
 });
 
@@ -1015,6 +533,7 @@ router.get("/localline/credit", requireUser, async (req, res) => {
     if (!link?.externalCustomerId) {
       return res.status(404).json({ error: "Local Line account is not connected yet." });
     }
+    await requireVerifiedLocalLineLink(link, userId);
 
     const page = Number.parseInt(String(req.query?.page || "1"), 10) || 1;
     const pageSize = Number.parseInt(String(req.query?.page_size || "25"), 10) || 25;
@@ -1023,6 +542,7 @@ router.get("/localline/credit", requireUser, async (req, res) => {
       link.externalCustomerId
     )}/store-credit-transaction/?page=${page}&page_size=${pageSize}`;
     const response = await fetch(url, {
+      signal: AbortSignal.timeout(15000),
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json"
@@ -1044,7 +564,7 @@ router.get("/localline/credit", requireUser, async (req, res) => {
     res.json({ credit });
   } catch (error) {
     console.error("Local Line credit fetch failed:", error);
-    res.status(500).json({ error: "Unable to load Local Line credit." });
+    res.status(error.status || 500).json({ error: error.status ? error.message : "Unable to load Local Line credit." });
   }
 });
 
@@ -1069,42 +589,7 @@ export async function stripeWebhookHandler(req, res) {
   }
 
   try {
-    if (event.type === "invoice.paid") {
-      const invoice = event.data.object;
-      const stripeSubscriptionId = String(invoice.subscription || "").trim();
-      const stripeCustomerId = String(invoice.customer || "").trim();
-      const db = getDb();
-      await ensureSubscriptionPortalSchema();
-
-      let subscription = null;
-      if (stripeSubscriptionId) {
-        const rows = await db
-          .select()
-          .from(memberSubscriptions)
-          .where(eq(memberSubscriptions.stripeSubscriptionId, stripeSubscriptionId))
-          .limit(1);
-        subscription = rows[0] || null;
-      }
-
-      if (!subscription && stripeCustomerId) {
-        const rows = await db
-          .select()
-          .from(memberSubscriptions)
-          .where(eq(memberSubscriptions.stripeCustomerId, stripeCustomerId))
-          .limit(1);
-        subscription = rows[0] || null;
-      }
-
-      if (subscription) {
-        await applyPaidInvoiceToMemberPortal({
-          subscription,
-          invoice,
-          db
-        });
-      }
-    }
-
-    res.json({ received: true });
+    res.json(await processMemberStripeEvent(event,{stripe}));
   } catch (error) {
     console.error("Stripe webhook processing failed:", error);
     res.status(500).json({ error: "Webhook processing failed." });

@@ -170,6 +170,7 @@ export function AdminMemberCreditsSection({ token }) {
   const [opsResult, setOpsResult] = useState(null);
   const [creditStatusLoading, setCreditStatusLoading] = useState(true);
   const [creditStatusRows, setCreditStatusRows] = useState([]);
+  const [financialReview,setFinancialReview] = useState(null);
   const [creditStatusMeta, setCreditStatusMeta] = useState({
     count: 0,
     includeRemote: true,
@@ -181,6 +182,7 @@ export function AdminMemberCreditsSection({ token }) {
     try {
       const response = await adminGet("subscription-ops/localline-credit-status", token);
       setCreditStatusRows(Array.isArray(response?.rows) ? response.rows : []);
+      setFinancialReview(await adminGet("subscription-ops/financial-review",token));
       setCreditStatusMeta({
         count: Number(response?.count || 0),
         includeRemote: response?.includeRemote !== false,
@@ -227,10 +229,19 @@ export function AdminMemberCreditsSection({ token }) {
       <div className="small">
         Preview and run member credit sync jobs, purchase debit sync, and related Local Line balance checks.
       </div>
+      {financialReview && <div className="response-card"><div className="title">Financial review</div>
+        <p className="small">Local Line owns spendable credit. Transfers use recorded funding or refund events; differences between total balances are review information.</p>
+        <table><thead><tr><th>Member / operation</th><th>Amount</th><th>Status</th><th>Review</th></tr></thead><tbody>
+          {financialReview.transfers.map(row=><tr key={row.operationId}><td>{row.userId} · {row.operationId}</td><td>${(row.amountCents/100).toFixed(2)}</td><td>{row.status}</td><td>{row.error || 'Recorded financial event'}</td></tr>)}
+          {financialReview.operations.map(row=><tr key={row.id}><td>{row.user_id} · {row.kind}</td><td>—</td><td>{row.status}</td><td>{row.error_message}</td></tr>)}
+          {financialReview.events.map(row=><tr key={row.event_id}><td>{row.event_type} · {row.event_id}</td><td>—</td><td>{row.status}</td><td>{row.error_message}</td></tr>)}
+        </tbody></table>
+        <button className="button" disabled={Boolean(opsBusy)} onClick={()=>runSubscriptionOp('recovery','subscription-ops/reconcile-finances',false)}>Reconcile existing payments</button>
+      </div>}
       <div className="response-card" style={{ marginTop: 16, marginBottom: 16 }}>
         <div className="title">Subscription Operations</div>
         <div className="small">
-          Preview or run Local Line credit sync, Local Line purchase debit sync, and paused-member
+          Review identified Local Line credit transfers, reconcile purchase debits, and run paused-member
           herdshare billing from here.
         </div>
         <div className="button-row" style={{ marginTop: 12, flexWrap: "wrap" }}>
@@ -240,7 +251,7 @@ export function AdminMemberCreditsSection({ token }) {
             onClick={() => runSubscriptionOp("credits-preview", "subscription-ops/localline-credits-sync", true)}
             disabled={Boolean(opsBusy)}
           >
-            {opsBusy === "credits-preview" ? "Running..." : "Preview Credit Sync"}
+            {opsBusy === "credits-preview" ? "Running..." : "Preview Event Transfers"}
           </button>
           <button
             className="button"
@@ -248,7 +259,7 @@ export function AdminMemberCreditsSection({ token }) {
             onClick={() => runSubscriptionOp("credits-run", "subscription-ops/localline-credits-sync", false)}
             disabled={Boolean(opsBusy)}
           >
-            {opsBusy === "credits-run" ? "Running..." : "Run Credit Sync"}
+            {opsBusy === "credits-run" ? "Running..." : "Send Event Transfers"}
           </button>
           <button
             className="button alt"
@@ -303,7 +314,7 @@ export function AdminMemberCreditsSection({ token }) {
             <div className="title">Local Line Credit Status</div>
             <div className="small">
               Inspect linked members, wallet balance, mirrored balance, remote Local Line balance,
-              and sync deltas before running credit sync.
+              and differences for review. Balance differences never generate transfers.
             </div>
             <div className="small" style={{ marginTop: 4 }}>
               Linked members: {creditStatusMeta.count} · Remote balance checks:{" "}
