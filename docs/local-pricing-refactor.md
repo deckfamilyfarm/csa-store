@@ -58,7 +58,7 @@ The opt-in Product Sync integration suites require their own disposable MySQL so
 
 ### Local markup presets
 
-The preset defaults are Highly perishable 100%, Perishable 65%, Shelf stable 50%, and Deck/Hyland Markup 85%. Product-specific percentages remain available through Custom. Existing settings versions keep their recorded rates; changing code defaults alone does not reprice previously saved revisions.
+The preset defaults are Highly perishable 75%, Perishable 55%, Shelf stable 50%, and Deck/Hyland Markup 85%. Product-specific percentages remain available through Custom. Existing settings versions keep their recorded rates; changing code defaults alone does not reprice previously saved revisions.
 
 `node scripts/local-pricing/applyMarkupPresets.mjs` previews the requested local assignments. Add `--apply` to activate a new local settings version and save local pricing revisions. The script uses only the selected Docker database, blocks external connections, and records before/after values and results under `.local-pricing/markup-presets-*.json`. It assigns eligible Deck/Hyland products first, then products whose configured markup is 43–48% inclusive to Shelf stable. Deposits and membership products are excluded and verified unchanged. Fixed retail overrides remain intact.
 

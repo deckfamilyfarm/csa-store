@@ -21,18 +21,18 @@ test("fixed 12 oz sausage sold each remains one package and multipacks multiply 
     pricingUnit: "each", buyFromPrice: "3.0000", markupCategory: "perishable", squareEnabled: true,
     packages: [{ packageId: 1, quantity: 1, cachedWeight: "0.750" }, { packageId: 2, quantity: 6 }]
   });
-  assert.equal(result.squareUnitCents, 500);
-  assert.equal(result.csaUnitCents, 450);
-  assert.equal(result.packages[0].localLineRegularCents, 450);
+  assert.equal(result.squareUnitCents, 450);
+  assert.equal(result.csaUnitCents, 405);
+  assert.equal(result.packages[0].localLineRegularCents, 405);
   assert.equal(result.packages[0].averageWeightMilliPounds, null);
-  assert.equal(result.packages[1].squareVariationCents, 3000);
-  assert.equal(result.packages[1].localLineRegularCents, 2700);
+  assert.equal(result.packages[1].squareVariationCents, 2700);
+  assert.equal(result.packages[1].localLineRegularCents, 2430);
 });
 
 test("category markups, override, and global discount use deterministic rounding", () => {
   const base = { pricingUnit: "each", squareEnabled: false, packages: [{ packageId: 1, quantity: 1 }] };
   for (const [markupCategory, buyFromPrice, expected] of [
-    ["highlyPerishable", "2.0000", 400], ["perishable", "3.5000", 578], ["shelfStable", "6.0000", 900], ["deckHyland", "10.0000", 1850], ["creamyCow", "15.0000", 2100]
+    ["highlyPerishable", "2.0000", 350], ["perishable", "3.5000", 543], ["shelfStable", "6.0000", 900], ["deckHyland", "10.0000", 1850], ["creamyCow", "15.0000", 2100]
   ]) assert.equal(calculateEnterprisePricing({ ...base, markupCategory, buyFromPrice }).csaUnitCents, expected);
   const custom = calculateEnterprisePricing({ ...base, markupCategory: "shelfStable", customMarkupBp: 5000, buyFromPrice: "2.0000", csaOverride: "3.25" });
   assert.equal(custom.calculatedRetailCents, 300);

@@ -3,7 +3,7 @@
 export const DEFAULT_PRICING_SETTINGS = Object.freeze({
   localLineDiscountBp: 1000,
   squareIncrementCents: 50,
-  markupBp: Object.freeze({ highlyPerishable: 10000, perishable: 6500, shelfStable: 5000, deckHyland: 8500, creamyCow: 4000 }),
+  markupBp: Object.freeze({ highlyPerishable: 7500, perishable: 5500, shelfStable: 5000, deckHyland: 8500, creamyCow: 4000 }),
   squareDefaults: Object.freeze({ deck: true, hyland: true, creamyCow: false, other: false }),
   requireDifferentApprover: true
 });
