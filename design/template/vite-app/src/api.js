@@ -1,3 +1,4 @@
+import { memberCommandKey } from './memberCommands.js';
 const base = import.meta.env.VITE_API_BASE || "/api";
 const inflightGetRequests = new Map();
 const DEFAULT_POST_TIMEOUT_MS = 20000;
@@ -329,17 +330,25 @@ export async function fetchMemberPortal(token) {
   return fetchJsonGet(`${base}/member/portal`, token, "Unable to load member portal");
 }
 
+async function memberCommand(token,path,input,errorMessage) {
+  let userId;
+  try { userId = JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).userId; }
+  catch { throw new Error('Sign in again before changing billing.'); }
+  const command = memberCommandKey(window.localStorage,userId,path,input);
+  const response = await fetch(`${base}/member/${path}`, {method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json','Idempotency-Key':command.key},body:JSON.stringify(input)});
+  if(!response.ok) {
+    const problem=await response.clone().json().catch(()=>null);
+    // An input rejection without a committed operation can be corrected. Lost
+    // responses, provider failures and durable operations retain their key.
+    if(response.status===400 && problem && !problem.operationId)command.complete();
+    await throwForError(response,errorMessage);
+  }
+  const result = await response.json();
+  command.complete();
+  return result;
+}
 export async function createMemberSetupIntent(token) {
-  const response = await fetch(`${base}/member/setup-intent`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({})
-  });
-  if (!response.ok) await throwForError(response, "Unable to create payment setup intent");
-  return response.json();
+  return memberCommand(token,'setup-intent',{},'Unable to create payment setup intent');
 }
 
 export async function setMemberPaymentMethodDefault(token, paymentMethodId) {
@@ -368,57 +377,10 @@ export async function deleteMemberPaymentMethod(token, paymentMethodId) {
   return response.json();
 }
 
-export async function updateMemberSubscription(token, payload) {
-  const response = await fetch(`${base}/member/subscription`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(payload || {})
-  });
-  if (!response.ok) await throwForError(response, "Unable to update subscription");
-  return response.json();
-}
-
-export async function pauseMemberSubscription(token) {
-  const response = await fetch(`${base}/member/subscription/pause`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({})
-  });
-  if (!response.ok) await throwForError(response, "Unable to pause subscription");
-  return response.json();
-}
-
-export async function resumeMemberSubscription(token) {
-  const response = await fetch(`${base}/member/subscription/resume`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({})
-  });
-  if (!response.ok) await throwForError(response, "Unable to resume subscription");
-  return response.json();
-}
-
-export async function cancelMemberSubscription(token) {
-  const response = await fetch(`${base}/member/subscription/cancel`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({})
-  });
-  if (!response.ok) await throwForError(response, "Unable to cancel subscription");
-  return response.json();
-}
+export async function updateMemberSubscription(token,payload) { return memberCommand(token,'subscription',payload || {},'Unable to update subscription'); }
+export async function pauseMemberSubscription(token) { return memberCommand(token,'subscription/pause',{},'Unable to pause subscription'); }
+export async function resumeMemberSubscription(token) { return memberCommand(token,'subscription/resume',{},'Unable to resume subscription'); }
+export async function cancelMemberSubscription(token) { return memberCommand(token,'subscription/cancel',{},'Unable to cancel subscription'); }
 
 export async function fetchMemberLocalLineLink(token) {
   return fetchJsonGet(`${base}/member/localline-link`, token, "Unable to load Local Line link");

@@ -1,3 +1,4 @@
+import { orderSnapshotDecision } from './localLineOrderSnapshots.js';
 import xlsx from "xlsx";
 import { resolveDashboardVendorCosts, dashboardCostRawJson } from "./dashboardVendorCosts.js";
 import { getPool } from "../db.js";
@@ -212,57 +213,6 @@ async function upsertLocalLineSyncCursor(connection, syncKey, values = {}) {
       values.updatedAt ?? now
     ]
   );
-}
-
-async function backfillLocalLineOrderFulfillmentFields(connection) {
-  const [result] = await connection.query(
-    `
-      UPDATE local_line_orders
-      SET
-        fulfillment_strategy_id = COALESCE(
-          fulfillment_strategy_id,
-          CAST(NULLIF(NULLIF(TRIM(JSON_UNQUOTE(JSON_EXTRACT(raw_json, '$.fulfillment.fulfillment_strategy'))), ''), 'null') AS UNSIGNED)
-        ),
-        fulfillment_strategy_name = COALESCE(
-          NULLIF(TRIM(fulfillment_strategy_name), ''),
-          NULLIF(NULLIF(TRIM(JSON_UNQUOTE(JSON_EXTRACT(raw_json, '$.fulfillment.fulfillment_strategy_name'))), ''), 'null')
-        ),
-        fulfillment_type = COALESCE(
-          NULLIF(TRIM(fulfillment_type), ''),
-          NULLIF(NULLIF(TRIM(JSON_UNQUOTE(JSON_EXTRACT(raw_json, '$.fulfillment.type_display'))), ''), 'null'),
-          NULLIF(NULLIF(TRIM(JSON_UNQUOTE(JSON_EXTRACT(raw_json, '$.fulfillment.fulfillment_strategy_type'))), ''), 'null')
-        ),
-        fulfillment_status = COALESCE(
-          NULLIF(TRIM(fulfillment_status), ''),
-          NULLIF(NULLIF(TRIM(JSON_UNQUOTE(JSON_EXTRACT(raw_json, '$.fulfillment.status'))), ''), 'null')
-        ),
-        fulfillment_date = COALESCE(
-          fulfillment_date,
-          STR_TO_DATE(NULLIF(NULLIF(TRIM(JSON_UNQUOTE(JSON_EXTRACT(raw_json, '$.fulfillment.fulfillment_date'))), ''), 'null'), '%Y-%m-%d')
-        ),
-        pickup_start_time = COALESCE(
-          NULLIF(TRIM(pickup_start_time), ''),
-          NULLIF(NULLIF(TRIM(JSON_UNQUOTE(JSON_EXTRACT(raw_json, '$.fulfillment.pickup_start_time'))), ''), 'null')
-        ),
-        pickup_end_time = COALESCE(
-          NULLIF(TRIM(pickup_end_time), ''),
-          NULLIF(NULLIF(TRIM(JSON_UNQUOTE(JSON_EXTRACT(raw_json, '$.fulfillment.pickup_end_time'))), ''), 'null')
-        ),
-        updated_at = ?
-      WHERE raw_json IS NOT NULL
-        AND (
-          fulfillment_strategy_id IS NULL OR
-          fulfillment_strategy_name IS NULL OR TRIM(fulfillment_strategy_name) = '' OR
-          fulfillment_type IS NULL OR TRIM(fulfillment_type) = '' OR
-          fulfillment_status IS NULL OR TRIM(fulfillment_status) = '' OR
-          fulfillment_date IS NULL OR
-          pickup_start_time IS NULL OR
-          pickup_end_time IS NULL
-        )
-    `,
-    [new Date()]
-  );
-  return Number(result?.affectedRows || 0);
 }
 
 function formatYmd(date) {
@@ -1022,9 +972,8 @@ export async function syncLocalLineOrdersToStore({
   reportProgress = () => {},
   cutoffDate,
   includeSubscriberSnapshot = true
-} = {}) {
-  const effectiveCutoffDate = toDateOrNull(cutoffDate) || new Date("2026-01-01T00:00:00.000Z");
-  const pool = getPool();
+} = {}, { pool = getPool(), fetchOrders = fetchLocalLineOrdersPage, syncReporting = syncLocalLineOrderReportingCache } = {}) {
+  const effectiveCutoffDate = toDateOrNull(cutoffDate) || new Date("2000-01-01T00:00:00.000Z");
   const connection = await pool.getConnection();
   const startedAt = new Date();
 
@@ -1042,7 +991,9 @@ export async function syncLocalLineOrdersToStore({
       createdAt: existingCursor?.createdAt || startedAt,
       updatedAt: startedAt
     });
-    const backfilledOrderRows = await backfillLocalLineOrderFulfillmentFields(connection);
+    // Full scans now ingest current snapshots. Do not rewrite every incomplete
+    // historical row on every pull merely to advance its local updated_at.
+    const backfilledOrderRows = 0;
     await connection.commit();
 
     let page = 1;
@@ -1054,10 +1005,9 @@ export async function syncLocalLineOrdersToStore({
     let reachedCutoff = false;
     let totalAvailable = null;
     const touchedReportingMonths = new Set();
-    const incrementalSync = Number(existingCursor?.cursorValue || 0) > 0;
-    const syncLabel = incrementalSync
-      ? `Fetching new orders since ${String(existingCursor?.syncedThroughAt || "").slice(0, 10) || "last sync"}`
-      : `Fetching orders since ${effectiveCutoffDate.toISOString().slice(0, 10)}`;
+    const incrementalSync = true; // Revisit existing orders; IDs do not identify updates.
+    const heldOrders = [];
+    const syncLabel = 'Checking all order pages for new and changed orders';
 
     reportProgress({
       phaseKey: "fetch",
@@ -1070,7 +1020,7 @@ export async function syncLocalLineOrdersToStore({
     });
 
     while (!reachedCursor && !reachedCutoff) {
-      const payload = await fetchLocalLineOrdersPage({ page, pageSize: 100, ordering: "-id" });
+      const payload = await fetchOrders({ page, pageSize: 100, ordering: "-id" });
       const orders = Array.isArray(payload?.results) ? payload.results : [];
       totalAvailable = Number(payload?.count || totalAvailable || 0);
 
@@ -1087,7 +1037,7 @@ export async function syncLocalLineOrdersToStore({
           : (totalAvailable ? Math.min(95, Math.round((totalFetched / totalAvailable) * 100)) : 0),
         current: totalFetched,
         total: incrementalSync ? null : totalAvailable,
-        message: incrementalSync ? `Scanned ${totalFetched} new orders` : `Fetched page ${page}`
+        message: incrementalSync ? `Scanned ${totalFetched} orders` : `Fetched page ${page}`
       });
 
       await connection.beginTransaction();
@@ -1099,16 +1049,18 @@ export async function syncLocalLineOrdersToStore({
         if (!Number.isFinite(remoteOrderId)) continue;
 
         const createdAtRemote = toDateOrNull(order?.created_at);
-        if (createdAtRemote && createdAtRemote < effectiveCutoffDate) {
-          reachedCutoff = true;
-          break;
-        }
-        if (Number(existingCursor?.cursorValue || 0) > 0 && remoteOrderId <= Number(existingCursor.cursorValue)) {
-          reachedCursor = true;
-          break;
-        }
-
         totalFetched += 1;
+        if (createdAtRemote && createdAtRemote < effectiveCutoffDate) continue;
+        const [[previous]] = await connection.query('SELECT raw_json,updated_at_remote,fulfillment_date,created_at_remote FROM local_line_orders WHERE local_line_order_id=? FOR UPDATE',[remoteOrderId]);
+        const decision = orderSnapshotDecision(order,previous);
+        if (decision !== 'changed') {
+          if (decision === 'review') heldOrders.push({orderId:remoteOrderId,reason:'Different order snapshots have no unambiguous newer revision.'});
+          continue;
+        }
+        if (previous) {
+          const oldDate=toDateOrNull(previous.fulfillment_date || previous.created_at_remote);
+          if (oldDate) touchedReportingMonths.add(formatMonthKeyFromDate(oldDate));
+        }
         const customer = order?.customer || {};
         const fulfillment = order?.fulfillment || {};
         const payment = order?.payment || {};
@@ -1331,7 +1283,7 @@ export async function syncLocalLineOrdersToStore({
             current: totalFetched,
             total: incrementalSync ? null : totalAvailable,
             message: incrementalSync
-              ? `Scanned ${totalFetched} new orders (${scannedThisPage}/${totalOrdersThisPage} on current page)`
+              ? `Scanned ${totalFetched} orders (${scannedThisPage}/${totalOrdersThisPage} on current page)`
               : `Fetched page ${page} (${scannedThisPage}/${totalOrdersThisPage} processed)`
           });
         }
@@ -1367,6 +1319,8 @@ export async function syncLocalLineOrdersToStore({
       backfilledOrderRows,
       newestOrderId: newestOrderId || null,
       newestCreatedAt: newestCreatedAt ? newestCreatedAt.toISOString() : null,
+      heldOrders,
+      financialReconciliation: "separate",
       reachedCursor,
       reachedCutoff
     };
@@ -1393,7 +1347,7 @@ export async function syncLocalLineOrdersToStore({
         )
       : null;
 
-    const reportingSummary = await syncLocalLineOrderReportingCache({
+    const reportingSummary = await syncReporting({
       connection,
       reportProgress,
       startDate: effectiveCutoffDate,
@@ -1424,7 +1378,7 @@ export async function syncLocalLineOrdersToStore({
       percent: 100,
       current: totalFetched,
       total: incrementalSync ? null : totalAvailable,
-      message: `Fetched ${totalFetched} new orders`
+      message: `Checked ${totalFetched} orders`
     });
     reportProgress({
       phaseKey: "store",

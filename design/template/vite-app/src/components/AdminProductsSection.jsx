@@ -548,13 +548,10 @@ export function AdminProductsSection({
         return view === "inventory" ? <label className="products-inventory-checkbox">{checkbox}</label> : checkbox;
       case "inventory": {
         if(view==='inventory'&&!row.inventorySnapshot)return <small role="status">{row.inventoryError||'Checking current stock…'}</small>;
-        const conflict=drafts[row.productId]?.meta.inventoryConflict;
-        if(conflict)return <div role="alert">Stock changed in Local Line.<button type="button" onClick={()=>{
-          setDrafts(old=>{const entry=old[row.productId],snapshot=conflict;const changes={inventory:snapshot.inventory??0,packageInventory:snapshot.packages||[],trackInventory:snapshot.trackInventory};return {...old,[row.productId]:{...entry,defaults:{...entry.defaults,...changes},values:{...entry.values,...changes},meta:{...entry.meta,inventoryConflict:null,inventorySnapshot:snapshot,inventoryType:snapshot.inventoryType||'product'}}};});
-        }}>Review current stock</button></div>;
-        if(row.inventoryType==='package')return <div>{values.packageInventory.map(pkg=><label key={pkg.remoteId||pkg.packageId} className="small">{pkg.name}<input className="input products-number" type="number" min="0" step="1" aria-label={`Full Farm Stock: ${row.name} ${pkg.name}`} value={pkg.inventory??''} disabled={disabled||!capabilities.edit||!values.trackInventory||!pkg.packageId||!row.inventorySnapshot||Boolean(row.inventoryError)} onChange={e=>patch(row,{packageInventory:values.packageInventory.map(p=>p.packageId===pkg.packageId?{...p,inventory:e.target.value===''?'':Number(e.target.value)}:p)})}/>{!pkg.packageId&&<small>Package mapping required</small>}</label>)}{row.inventoryError&&<small role="alert">{row.inventoryError}</small>}</div>;
-        return numericInput(column.key);
+        const snapshot=row.inventorySnapshot;
+        return <span title="Manage quantities in Local Line, then refresh here.">{snapshot?.inventoryType==='package'?(snapshot.packages || []).map(pkg=><span key={pkg.remoteId}>{pkg.name}: {pkg.inventory ?? '—'} </span>):values.inventory ?? '—'}</span>;
       }
+
       case "saleDiscount":
         if (column.key === 'saleDiscount' && values.customerPriceOverrides?.length) return <span className="small">By group</span>;
         return numericInput(column.key);

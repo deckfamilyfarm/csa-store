@@ -46,7 +46,7 @@ async function fetchLocalLineWithRetry(url, options, label) {
   let lastError = null;
   for (let attempt = 1; attempt <= LOCAL_LINE_RETRY_ATTEMPTS; attempt += 1) {
     try {
-      return await fetch(url, options);
+      return await fetch(url, { ...options, signal: AbortSignal.timeout(15000) });
     } catch (error) {
       lastError = error;
       if (attempt >= LOCAL_LINE_RETRY_ATTEMPTS) {

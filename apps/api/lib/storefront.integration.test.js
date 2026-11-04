@@ -8,7 +8,7 @@ import { DEFAULT_HERITAGE_DESCRIPTION, DEFAULT_BROAD_BREASTED_DESCRIPTION } from
 // Never load .env. This suite only accepts a disposable socket under /tmp.
 const socket = process.env.STOREFRONT_TEST_SOCKET;
 test('turkey checkout, inventory, fulfillment and refunds on isolated MySQL', { skip: !socket }, async t => {
-  assert.match(socket, /^\/(?:private\/)?tmp\/csa-storefront-test[^/]*\//);
+  assert.match(socket, /^\/(?:private\/)?tmp\/(?:csa-storefront-test[^/]*|csa-product-sync-[^/]*)\//);
   const database = `storefront_test_${process.pid}_${Date.now()}`;
   const root = await mysql.createConnection({ socketPath: socket, user: 'root' });
   await root.query(`CREATE DATABASE \`${database}\``);

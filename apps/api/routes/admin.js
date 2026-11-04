@@ -131,7 +131,8 @@ import {
   listMemberLocalLineCreditStatus,
   processPausedMemberHerdshareBilling,
   syncMemberLocalLineCredits,
-  syncMemberLocalLinePurchaseDebits
+  syncMemberLocalLinePurchaseDebits,
+  reconcileMemberLocalLineOrderRefund
 } from "../lib/memberPortalSync.js";
 import {
   commitLegacyImport,
@@ -163,6 +164,10 @@ import {
 } from "../lib/squareStoreSync.js";
 import { previewSquareProductCreation, applySquareProductCreation } from "../lib/squareProductCreation.js";
 
+import { listLocalLineEventTransfers } from '../lib/memberCreditTransfers.js';
+import { runMemberFinancialMaintenance } from '../lib/memberFinancialMaintenance.js';
+import { stripeMode, cents } from '../lib/memberFinancialOperations.js';
+import { saveVerifiedLocalLineLink, approveLocalLineCreditStartingPoint } from '../lib/memberExternalLinks.js';
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 const CONTENT_EDITOR_ROLES = ["content_editor", "marketing_admin"];
@@ -4107,6 +4112,47 @@ router.put(
     }
   }
 );
+
+router.post('/members/:id/localline-verification', requireAdminPermission('member_admin'), async (req,res) => {
+  try {
+    if (!String(req.body?.evidence || '').trim()) return res.status(400).json({error:'Record evidence of customer ownership.'});
+    res.json(await saveVerifiedLocalLineLink({userId:Number(req.params.id),externalCustomerId:String(req.body.externalCustomerId),
+      method:'staff_review',actorUserId:req.admin.userId || req.admin.adminId,evidence:{note:req.body.evidence}}));
+  } catch(e) { res.status(e.status || 500).json({error:e.message}); }
+});
+router.post('/members/:id/localline-credit-starting-point', requireAdminPermission('member_admin'), async (req,res) => {
+  try { res.json(await approveLocalLineCreditStartingPoint({userId:Number(req.params.id),actorUserId:req.admin.userId || req.admin.adminId,evidence:req.body?.evidence})); }
+  catch(e) { res.status(e.status || 500).json({error:e.message}); }
+});
+
+router.post('/members/:id/localline-order-refund',requireAdminPermission('member_admin'),async(req,res)=>{
+  try {await ensureSubscriptionPortalSchema();res.json(await reconcileMemberLocalLineOrderRefund({userId:Number(req.params.id),orderId:Number(req.body?.orderId),transactionIds:req.body?.transactionIds,dryRun:req.body?.dryRun!==false}));}
+  catch(e){res.status(e.status || 500).json({error:e.message});}
+});
+router.get('/subscription-ops/financial-review',requireAdminPermission('member_admin'),async(req,res)=>{
+  try {
+    await ensureSubscriptionPortalSchema();
+    const [events]=await getPool().query("SELECT event_id,event_type,status,error_message,updated_at FROM member_stripe_inbox WHERE status<>'completed' ORDER BY created_at LIMIT 200");
+    const [operations]=await getPool().query("SELECT id,user_id,kind,status,error_message,updated_at FROM member_financial_operations WHERE provider='stripe' AND status<>'completed' ORDER BY created_at LIMIT 200");
+    res.json({events,operations,transfers:await listLocalLineEventTransfers()});
+  }catch(e){res.status(e.status || 500).json({error:e.message});}
+});
+router.post('/subscription-ops/reconcile-finances',requireAdminPermission('member_admin'),async(req,res)=>{
+  try {res.json(await runMemberFinancialMaintenance());}catch(e){res.status(e.status || 500).json({error:e.message});}
+});
+router.post('/members/:id/funding-policy',requireAdminPermission('member_admin'),async(req,res)=>{
+  try {
+    await ensureSubscriptionPortalSchema();
+    const creditCents=cents(req.body?.creditCents),feeCents=cents(req.body?.feeCents),effectiveAt=Number(req.body?.effectiveAt),priceId=String(req.body?.priceId || '');
+    if(creditCents<=0 || feeCents<0 || feeCents>creditCents || !Number.isSafeInteger(effectiveAt) || effectiveAt<0 || !priceId.startsWith('price_') || !String(req.body?.evidence || '').trim())return res.status(400).json({error:'Record a reviewed credit amount, fee, effective timestamp, Stripe price ID and supporting evidence.'});
+    const [[subscription]]=await getPool().query('SELECT stripe_subscription_id FROM member_subscriptions WHERE user_id=?',[req.params.id]);
+    if(!subscription?.stripe_subscription_id)return res.status(404).json({error:'Subscription not found.'});
+    const policy={creditCents,feeCents,priceId,reviewedBy:req.admin.userId || req.admin.adminId,evidence:req.body.evidence};
+    const [result]=await getPool().query(`INSERT IGNORE INTO member_subscription_policies (stripe_subscription_id,effective_at,user_id,provider_mode,policy_json) VALUES (?,?,?,?,?)`,[subscription.stripe_subscription_id,effectiveAt,Number(req.params.id),stripeMode(),JSON.stringify(policy)]);
+    if(!result.affectedRows)return res.status(409).json({error:'A policy already exists at that timestamp. Historical policies cannot be overwritten.'});
+    res.json({ok:true});
+  }catch(e){res.status(e.status || 500).json({error:e.message});}
+});
 
 router.post(
   "/subscription-ops/localline-credits-sync",
@@ -10885,7 +10931,10 @@ router.post("/products/bulk-update", requireAdminPermission(["inventory_admin", 
   const db = getDb();
   const updates = Array.isArray(req.body?.updates) ? req.body.updates : [];
   const syncPricingProfileSale = Boolean(req.body?.syncPricingProfileSale);
-  const applyRemote = req.body?.applyRemote !== false;
+  // This endpoint is a local editor, never a publication authority.
+  if (req.body?.applyRemote === true || updates.some(update => Object.hasOwn(update.changes || {}, 'forcePriceSync'))) {
+    return res.status(400).json({ error: 'Save locally, then review and publish through Product Sync. Use Inventory for Full Farm stock changes.' });
+  }
   const queueRemoteSync = Boolean(req.body?.queueRemoteSync);
   const results = [];
 
@@ -11030,17 +11079,7 @@ router.post("/products/bulk-update", requireAdminPermission(["inventory_admin", 
 
       let localLineUpdate = null;
       let localLinePriceUpdate = null;
-      if (applyRemote && isLocalLineEnabled()) {
-        try {
-          const result = await updateLocalLineForProduct(db, productId, changes);
-          localLineUpdate = result.inventoryOk;
-          localLinePriceUpdate = result.priceOk;
-        } catch (err) {
-          console.error("LocalLine update failed:", err.message);
-          localLineUpdate = false;
-          localLinePriceUpdate = false;
-        }
-      }
+
 
       results.push({
         productId,

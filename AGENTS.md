@@ -1,5 +1,17 @@
 # CSA Store Agent Notes
 
+## Financial and publication stabilization (2026-11-03)
+
+These rules supersede older quantity-editing and implicit-publication descriptions below.
+
+- Member financial schema changes run only through `migrate:member-finances` (`--check`, then `--apply`); startup/request readiness must never perform financial DDL or delete ledger entries. See `docs/financial-stabilization-rollout.md`.
+- Manual Local Line customer-ID linking is retired. Privileged member reads, imports and transfers require separately verified ownership, with one financial owner per external customer. Old metadata is not proof.
+- Local Line owns spendable member credit. Never publish a difference between wallet/mirror/remote totals. Transfer only identified financial events through durable receipts and a reviewed starting point. Unknown outcomes must not generate replacement POSTs.
+- Member billing uses frozen operations, provider mode, per-step keys, verified invoice attribution, atomic event/posting/transfer-intent transactions and a webhook inbox. New billing and new credit transfers default paused until reconciliation. Preserve receipts on rollback.
+- `/products/bulk-update` is local-only; remote/forced requests are rejected. Enterprise prices cannot use legacy publishing services or Killdeer imports. Existing-product remote IDs and package links must be explicit.
+- Full Farm quantities are read-only until a verified atomic/conditional Local Line stock primitive exists. Reject absolute quantity PATCHes at transport, including old approved payloads. Continue refresh, separately verified tracking/visibility publication, local farm counts, and independent turkey reservations.
+- Required regression runner: `python3 scripts/test-stabilization.py --docker` (cached MySQL 8.4, disposable tmpfs, mocked providers, no `.env`). Do not count skipped integration suites as validation.
+
 ## Intended Sync Model
 
 This application sits between three sources:

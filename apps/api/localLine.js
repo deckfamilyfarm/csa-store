@@ -1,5 +1,6 @@
 import { assertNoRetiredLocalLinePrices, expectedLocalLineLists, validateProductBasketMappings } from "./lib/localLinePricingLists.js";
 import { eq } from "drizzle-orm";
+import { assertNoUnsafeLocalLineStock } from './lib/localLineInventorySafety.js';
 import { requireProductVendor, requireVendorId, matchLocalLineVendor, confirmLocalLineVendor } from "./lib/productVendor.js";
 import { findCustomerPriceOverride, customerOverridePrice, assertProductWideSaleAllowed } from './lib/customerPriceOverrides.js';
 import {
@@ -114,12 +115,14 @@ export function isLocalLineEnabled() {
 
 async function fetchLocalLineWithRetry(url, options, label) {
   let lastError = null;
-  for (let attempt = 1; attempt <= LOCAL_LINE_RETRY_ATTEMPTS; attempt += 1) {
+  // A lost POST/PATCH response is uncertain, not permission to send it again.
+  const attempts = !options.method || options.method === 'GET' ? LOCAL_LINE_RETRY_ATTEMPTS : 1;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
     try {
-      return await fetch(url, options);
+      return await fetch(url, { ...options, signal: AbortSignal.timeout(15000) });
     } catch (error) {
       lastError = error;
-      if (attempt >= LOCAL_LINE_RETRY_ATTEMPTS) {
+      if (attempt >= attempts) {
         break;
       }
     }
@@ -172,6 +175,7 @@ async function fetchLocalLineProduct(productId, accessToken) {
 
 async function patchLocalLineProduct(productId, accessToken, payload) {
   assertNoRetiredLocalLinePrices(payload);
+  assertNoUnsafeLocalLineStock(payload);
   const url = `${LL_BASEURL}products/${productId}/`;
   const companyBaseUrl = process.env.LL_COMPANY_BASEURL || "";
   const response = await fetchLocalLineWithRetry(url, {
@@ -438,7 +442,7 @@ function pickUnitByNames(units, names) {
   );
 }
 
-function resolveLocalLineUnitIds(productUnits, resolvedProfile, packageRows = []) {
+export function resolveLocalLineUnitIds(productUnits, resolvedProfile, packageRows = []) {
   const itemUnits = productUnits.filter((unit) => unit?.unit_type === "item");
   const weightUnits = productUnits.filter((unit) => unit?.unit_type === "weight");
   const packageUnitNames = packageRows
@@ -481,7 +485,8 @@ function resolveRemoteProductId(metaRow, productId) {
   if (Number.isFinite(mappedId) && mappedId > 0) {
     return mappedId;
   }
-  return metaRow ? null : productId;
+  // Local IDs are not remote IDs. Creation/linking must save an explicit mapping.
+  return null;
 }
 
 async function upsertLocalLineProductMeta(db, productId, localLineProductId, payload = {}) {
@@ -743,6 +748,9 @@ async function updateLocalLinePrices(db, productId, changes, context) {
   if (!saleFieldsProvided) {
     return { ok: null };
   }
+
+  const { assertLegacyPricingPublicationAllowed } = await import('./lib/enterprisePricingService.js');
+  await assertLegacyPricingPublicationAllowed([productId]);
 
   const token = await getLocalLineAccessToken();
   const metaRow = await getLocalLineMetaRow(db, productId);
@@ -1051,6 +1059,8 @@ export function buildLocalLineCreatePayload(context, productUnits) {
 }
 
 export async function createLocalLineProductFromStoreProduct(db, productId) {
+  const { assertLegacyPricingPublicationAllowed } = await import('./lib/enterprisePricingService.js');
+  await assertLegacyPricingPublicationAllowed([productId]);
   if (!isLocalLineEnabled()) {
     throw new Error("Local Line authentication is not configured");
   }
@@ -1143,6 +1153,8 @@ export async function createLocalLineProductFromStoreProduct(db, productId) {
 }
 
 export async function updateLocalLineForProduct(db, productId, changes = {}) {
+  const { assertLegacyPricingPublicationAllowed } = await import('./lib/enterprisePricingService.js');
+  await assertLegacyPricingPublicationAllowed([productId]);
   if (!isLocalLineEnabled()) {
     throw new Error("Local Line authentication is not configured");
   }

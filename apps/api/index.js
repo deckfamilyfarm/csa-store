@@ -21,6 +21,8 @@ import { ensureSeedUser } from "./scripts/seedUser.js";
 import authRoutes from "./routes/auth.js";
 import memberRoutes, { stripeWebhookHandler } from "./routes/member.js";
 import { storefrontRouter, storefrontAdminRouter, storefrontStripeWebhook } from "./routes/storefront.js";
+import { assertFinancialSchema } from './lib/memberFinancialSchema.js';
+import { getPool } from './db.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -63,7 +65,7 @@ ensureLocalLineSyncSchema().catch((err) => {
   console.error("Local Line schema bootstrap failed:", err.message);
 });
 ensureSubscriptionPortalSchema().catch((err) => {
-  console.error("Subscription portal schema bootstrap failed:", err.message);
+  console.error("Member financial readiness check failed:", err.message);
 });
 ensureLiabilityReleaseSchema().catch((err) => {
   console.error("Liability release schema bootstrap failed:", err.message);
@@ -86,6 +88,10 @@ if (process.env.AUTO_SEED_USER === "true") {
 
 app.get("/api/health", (_req, res) => {
   res.json({ ok: true });
+});
+app.get('/api/ready', async (_req,res) => {
+  try { await assertFinancialSchema(getPool()); res.json({ok:true,memberFinances:'ready'}); }
+  catch(e) {res.status(503).json({ok:false,memberFinances:'migration_required',error:e.message});}
 });
 
 app.use("/api", catalogRoutes);

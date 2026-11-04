@@ -164,6 +164,7 @@ export function AdminMembershipSection({
 
       if (pendingMembershipEditEntries.length) {
         await adminPost("products/bulk-update", token, {
+          applyRemote: false,
           updates: pendingMembershipEditEntries.map(([id, changes]) => {
             const productId = Number(id);
             const safeDiscount = Math.min(Math.max(Number(changes.saleDiscount) || 0, 0), 100);

@@ -1,5 +1,10 @@
+import { requireVerifiedLocalLineLink } from './memberExternalLinks.js';
+import { reconcileMemberOrder } from './memberOrderReconciliation.js';
+import { runMemberBilling } from './memberBilling.js';
+import { processLocalLineEventTransfers } from './memberCreditTransfers.js';
+import { financialError } from './memberFinancialSchema.js';
 import { and, desc, eq, lte } from "drizzle-orm";
-import { getDb } from "../db.js";
+import { getDb, getPool } from "../db.js";
 import { getLocalLineAccessToken, getLocalLineBaseUrl, isLocalLineAuthConfigured } from "../localLineAuth.js";
 import {
   localLineOrders,
@@ -39,30 +44,6 @@ function parseJsonObject(value) {
   } catch (_error) {
     return null;
   }
-}
-
-function getOrderStoreCreditCents(order) {
-  const directValue = order?.paymentStoreCreditAmount;
-  if (directValue !== null && typeof directValue !== "undefined" && directValue !== "") {
-    return Math.max(0, toCents(directValue));
-  }
-
-  const raw = parseJsonObject(order?.rawJson);
-  const rawValue =
-    raw?.payment?.store_credit_amount ??
-    raw?.payment?.storeCreditAmount ??
-    null;
-  if (rawValue !== null && typeof rawValue !== "undefined" && rawValue !== "") {
-    return Math.max(0, toCents(rawValue));
-  }
-
-  return null;
-}
-
-function getOrderCreditDebitCents(order) {
-  const storeCreditCents = getOrderStoreCreditCents(order);
-  if (storeCreditCents !== null) return storeCreditCents;
-  return toCents(order?.total);
 }
 
 function normalizeRemoteTransactionId(transaction) {
@@ -153,13 +134,6 @@ function shouldSkipImportedRemoteTransaction(transaction) {
   return false;
 }
 
-function nextMonthDate(currentValue) {
-  const current = new Date(currentValue || new Date());
-  const next = new Date(current);
-  next.setMonth(next.getMonth() + 1);
-  return next;
-}
-
 function shouldSyncOrder(order) {
   const status = String(order?.status || "").trim().toUpperCase();
   const paymentStatus = String(order?.paymentStatus || "").trim().toUpperCase();
@@ -176,6 +150,7 @@ async function fetchRemoteStoreCreditTransactions(externalCustomerId, page = 1, 
   const base = getLocalLineBaseUrl();
   const url = `${base}customers/${externalCustomerId}/store-credit-transaction/?page=${page}&page_size=${pageSize}`;
   const response = await fetch(url, {
+    signal: AbortSignal.timeout(15000),
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json"
@@ -240,6 +215,7 @@ async function fetchAllRemoteStoreCreditTransactions(externalCustomerId, {
     keepGoing = false;
   }
 
+  if (keepGoing && safety >= 100) throw new Error('Local Line credit history was truncated; no transfer is authorized.');
   return collected;
 }
 
@@ -264,6 +240,7 @@ export async function importMemberLocalLineLedgerActivity({ userId = null, dryRu
   for (const link of links) {
     const mirror = await ensureLocalLineMirror(link.userId, link.id, "localline", db);
     try {
+      await requireVerifiedLocalLineLink(link,link.userId);
       const accounts = await ensureMemberLedgerAccounts(link.userId, db);
       const fullHistory = !Boolean(mirror.ledgerBackfillCompleted);
       const remoteTransactions = await fetchAllRemoteStoreCreditTransactions(link.externalCustomerId, {
@@ -446,6 +423,7 @@ async function postLocalLineStoreCreditTransaction({
   const url = `${base}customers/${externalCustomerId}/store-credit-transaction/`;
   const response = await fetch(url, {
     method: "POST",
+    signal: AbortSignal.timeout(15000),
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json"
@@ -530,6 +508,7 @@ export async function listMemberLocalLineCreditStatus({
 
     if (includeRemote) {
       try {
+        await requireVerifiedLocalLineLink(link,link.userId);
         const remoteTransactions = await fetchRemoteStoreCreditTransactions(externalCustomerId, 1, 1);
         const remoteBalance =
           Number(
@@ -563,347 +542,60 @@ export async function listMemberLocalLineCreditStatus({
   };
 }
 
-export async function syncMemberLocalLineCredits({ userId = null, dryRun = false } = {}) {
-  const db = getDb();
-  const linkRows = userId
-    ? await db
-        .select()
-        .from(memberExternalAccountLinks)
-        .where(
-          and(
-            eq(memberExternalAccountLinks.provider, "localline"),
-            eq(memberExternalAccountLinks.userId, Number(userId))
-          )
-        )
-    : await db
-        .select()
-        .from(memberExternalAccountLinks)
-        .where(eq(memberExternalAccountLinks.provider, "localline"));
-
-  const results = [];
-  for (const link of linkRows) {
-    const walletAccount = await ensureMemberLedgerAccounts(link.userId, db);
-    const desiredBalanceCents = await sumAccountBalance(link.userId, walletAccount.wallet.accountType);
-    const mirror = await ensureLocalLineMirror(link.userId, link.id, "localline", db);
-    const externalCustomerId = normalizeExternalCustomerId(link.externalCustomerId);
-    const result = {
-      userId: link.userId,
-      externalCustomerId,
-      desiredBalanceCents,
-      mirroredBalanceCents: Number(mirror.lastKnownBalanceCents || 0),
-      remoteBalanceCents: null,
-      deltaCents: 0,
-      action: "noop",
-      ok: true
-    };
-
-    try {
-      const remoteTransactions = await fetchRemoteStoreCreditTransactions(externalCustomerId, 1, 1);
-      const remoteBalance =
-        Number(remoteTransactions?.results?.[0]?.store_credit_balance ?? remoteTransactions?.results?.[0]?.storeCreditBalance);
-      if (Number.isFinite(remoteBalance)) {
-        result.remoteBalanceCents = Math.round(remoteBalance * 100);
-      }
-    } catch (error) {
-      result.remoteError = error?.message || "Unable to fetch remote Local Line balance.";
-    }
-
-    const currentBalanceCents =
-      typeof result.remoteBalanceCents === "number" ? result.remoteBalanceCents : result.mirroredBalanceCents;
-    const deltaCents = desiredBalanceCents - currentBalanceCents;
-    result.deltaCents = deltaCents;
-
-    if (deltaCents !== 0) {
-      result.action = deltaCents > 0 ? "credit" : "debit";
-      if (!dryRun) {
-        await postLocalLineStoreCreditTransaction({
-          externalCustomerId,
-          amountCents: deltaCents,
-          transactionType: deltaCents > 0 ? "MANUAL_CREDIT" : "MANUAL_DEBIT",
-          note:
-            deltaCents > 0
-              ? "CSA Store member credit sync"
-              : "CSA Store purchase debit sync reconciliation"
-        });
-        await db
-          .update(memberCreditMirrors)
-          .set({
-            lastKnownBalanceCents: desiredBalanceCents,
-            lastMirroredAt: new Date(),
-            updatedAt: new Date()
-          })
-          .where(eq(memberCreditMirrors.id, mirror.id));
-      }
-    } else if (!dryRun && currentBalanceCents !== result.mirroredBalanceCents) {
-      await db
-        .update(memberCreditMirrors)
-        .set({
-          lastKnownBalanceCents: currentBalanceCents,
-          lastMirroredAt: new Date(),
-          updatedAt: new Date()
-        })
-        .where(eq(memberCreditMirrors.id, mirror.id));
-    }
-
-    results.push(result);
-  }
-
-  return {
-    ok: true,
-    dryRun,
-    count: results.length,
-    creditedCount: results.filter((row) => row.action === "credit").length,
-    debitedCount: results.filter((row) => row.action === "debit").length,
-    results
-  };
+// Compatibility name: event transfers only. Never align total balances.
+export async function syncMemberLocalLineCredits(options = {}) {
+  return processLocalLineEventTransfers({...options,fetchTransactions:fetchAllRemoteStoreCreditTransactions,postTransaction:postLocalLineStoreCreditTransaction});
 }
 
-export async function syncMemberLocalLinePurchaseDebits({ userId = null, dryRun = false } = {}) {
-  const db = getDb();
-  const settings = await loadSubscriptionSettings(db);
-  const dividendRate = Number(settings.dividendRatePercent || 3);
-  const links = userId
-    ? await db
-        .select()
-        .from(memberExternalAccountLinks)
-        .where(
-          and(
-            eq(memberExternalAccountLinks.provider, "localline"),
-            eq(memberExternalAccountLinks.userId, Number(userId))
-          )
-        )
-    : await db
-        .select()
-        .from(memberExternalAccountLinks)
-        .where(eq(memberExternalAccountLinks.provider, "localline"));
-
-  const results = [];
-  for (const link of links) {
-    const externalCustomerId = normalizeExternalCustomerId(link.externalCustomerId);
-    const orders = await db
-      .select()
-      .from(localLineOrders)
-      .where(eq(localLineOrders.customerId, Number(externalCustomerId)))
-      .orderBy(desc(localLineOrders.fulfillmentDate), desc(localLineOrders.id));
-    const syncableOrders = orders.filter((order) => shouldSyncOrder(order));
-
-    const accounts = await ensureMemberLedgerAccounts(link.userId, db);
-    let createdDebits = 0;
-    let createdDividendAccruals = 0;
-    let totalDebitedCents = 0;
-
-    for (const order of syncableOrders) {
-      const orderReferenceId = `order:${order.localLineOrderId}`;
-      const alreadyExists = await ledgerReferenceExists(link.userId, "localline_order", orderReferenceId);
-      if (alreadyExists) continue;
-
-      const orderTotalCents = getOrderCreditDebitCents(order);
-      if (orderTotalCents <= 0) continue;
-
-      const effectiveDate = order.fulfillmentDate || order.updatedAtRemote || order.createdAtRemote || new Date();
-      const dividendAccrualCents = Math.round(orderTotalCents * (dividendRate / 100));
-
-      if (!dryRun) {
-        await createLedgerEntry({
-          accountId: accounts.wallet.id,
-          userId: link.userId,
-          entryType: "purchase_debit",
-          amountCents: -Math.abs(orderTotalCents),
-          effectiveDate,
-          referenceType: "localline_order",
-          referenceId: orderReferenceId,
-          description: `Local Line order ${order.localLineOrderId} at ${order.fulfillmentStrategyName || order.priceListName || "pickup"}`
-        });
-
-        if (dividendAccrualCents > 0) {
-          await createLedgerEntry({
-            accountId: accounts.dividendReserve.id,
-            userId: link.userId,
-            entryType: "dividend_accrual",
-            amountCents: dividendAccrualCents,
-            effectiveDate,
-            referenceType: "localline_order",
-            referenceId: `${orderReferenceId}:dividend`,
-            description: `Dividend accrual for Local Line order ${order.localLineOrderId}`
-          });
-        }
+export async function syncMemberLocalLinePurchaseDebits({userId=null,dryRun=false}={}) {
+  const db=getDb(),settings=await loadSubscriptionSettings(db);
+  const links=await db.select().from(memberExternalAccountLinks).where(eq(memberExternalAccountLinks.provider,'localline'));
+  const results=[];
+  for(const link of links.filter(row=>!userId || Number(row.userId)===Number(userId))) {
+    try {
+      await requireVerifiedLocalLineLink(link,link.userId);
+      const orders=await db.select().from(localLineOrders).where(eq(localLineOrders.customerId,Number(link.externalCustomerId)));
+      for(const order of orders) {
+        try {results.push({userId:link.userId,...await reconcileMemberOrder({link,order,dividendRateBp:Math.round(Number(settings.dividendRatePercent ?? 3)*100),dryRun})});}
+        catch(e){results.push({userId:link.userId,orderId:order.localLineOrderId,held:true,error:e.message});}
       }
-
-      createdDebits += 1;
-      totalDebitedCents += orderTotalCents;
-      if (dividendAccrualCents > 0) {
-        createdDividendAccruals += 1;
-      }
-    }
-
-    const mirror = await ensureLocalLineMirror(link.userId, link.id, "localline", db);
-    if (!dryRun && createdDebits > 0) {
-      const walletBalance = await sumAccountBalance(link.userId, "wallet");
-      await db
-        .update(memberCreditMirrors)
-        .set({
-          lastKnownBalanceCents: walletBalance,
-          lastOrderSyncedAt: new Date(),
-          updatedAt: new Date()
-        })
-        .where(eq(memberCreditMirrors.id, mirror.id));
-    }
-
-    results.push({
-      userId: link.userId,
-      externalCustomerId,
-      scannedOrders: syncableOrders.length,
-      createdDebits,
-      createdDividendAccruals,
-      totalDebitedCents
-    });
+    }catch(e){results.push({userId:link.userId,held:true,error:e.message});}
   }
-
-  return {
-    ok: true,
-    dryRun,
-    count: results.length,
-    results
-  };
+  return {ok:!results.some(row=>row.held),dryRun,count:results.length,results};
 }
 
-export async function processPausedMemberHerdshareBilling({ userId = null, dryRun = false } = {}) {
-  const db = getDb();
-  const now = new Date();
-  const { getStripeClient } = await import("./memberPortal.js");
-  const stripeClient = getStripeClient();
-  if (!stripeClient && !dryRun) {
-    throw new Error("Stripe is not configured.");
-  }
+// Refunds with an ambiguous order snapshot require an explicit staff review of
+// actual provider transactions. Never infer money returned from cancellation.
+export async function reconcileMemberLocalLineOrderRefund({userId,orderId,transactionIds,dryRun=true}) {
+  if(!Array.isArray(transactionIds) || !transactionIds.length || new Set(transactionIds.map(String)).size!==transactionIds.length)throw financialError('Choose distinct Local Line refund transaction IDs.',400);
+  const db=getDb();
+  const links=await db.select().from(memberExternalAccountLinks).where(eq(memberExternalAccountLinks.userId,Number(userId)));
+  const link=links.find(row=>row.provider==='localline');
+  await requireVerifiedLocalLineLink(link,userId);
+  const orders=await db.select().from(localLineOrders).where(eq(localLineOrders.localLineOrderId,Number(orderId)));
+  const order=orders[0];
+  if(!order || String(order.customerId)!==String(link.externalCustomerId))throw financialError('Order does not belong to the verified Local Line customer.',403);
+  const history=await fetchAllRemoteStoreCreditTransactions(link.externalCustomerId,{fullHistory:true});
+  const selected=transactionIds.map(id=>history.find(row=>String(row.id)===String(id)));
+  if(selected.some(row=>!row || String(row.order_id ?? row.order?.id ?? row.order)!==String(orderId) ||
+    !['ORDER_CREDIT','ORDER_REFUND','MANUAL_CREDIT'].includes(String(row.transaction_type || '')) || !(Number(row.amount)>0)))throw financialError('Each refund needs a positive credit transaction explicitly linked to this order. Unsupported or missing provider evidence is held.');
+  const cumulativeRefundCents=selected.reduce((total,row)=>total+Math.round(Number(row.amount)*100),0);
+  const settings=await loadSubscriptionSettings(db);
+  return reconcileMemberOrder({link,order,dividendRateBp:Math.round(Number(settings.dividendRatePercent ?? 3)*100),dryRun,
+    refundEvidence:{transactionIds:transactionIds.map(String).sort(),cumulativeRefundCents}},getPool());
+}
 
-  const rows = userId
-    ? await db
-        .select({
-          subscription: memberSubscriptions,
-          herdshare: memberHerdshareStatuses
-        })
-        .from(memberSubscriptions)
-        .innerJoin(memberHerdshareStatuses, eq(memberHerdshareStatuses.userId, memberSubscriptions.userId))
-        .where(
-          and(
-            eq(memberSubscriptions.status, "paused"),
-            lte(memberHerdshareStatuses.nextBillingDate, now),
-            eq(memberSubscriptions.userId, Number(userId)),
-            eq(memberHerdshareStatuses.status, "active")
-          )
-        )
-    : await db
-        .select({
-          subscription: memberSubscriptions,
-          herdshare: memberHerdshareStatuses
-        })
-        .from(memberSubscriptions)
-        .innerJoin(memberHerdshareStatuses, eq(memberHerdshareStatuses.userId, memberSubscriptions.userId))
-        .where(
-          and(
-            eq(memberSubscriptions.status, "paused"),
-            lte(memberHerdshareStatuses.nextBillingDate, now),
-            eq(memberHerdshareStatuses.status, "active")
-          )
-        );
-
-  const results = [];
-  for (const row of rows) {
-    const subscription = row.subscription;
-    const herdshare = row.herdshare;
-    const user = await getUserById(subscription.userId, db);
-    const accountIds = await ensureMemberLedgerAccounts(subscription.userId, db);
-    const nextBillingDate = nextMonthDate(herdshare.nextBillingDate || now);
-    const feeCents = Number(herdshare.monthlyFeeCents || 500);
-    const referenceId = `paused-herdshare:${subscription.userId}:${new Date(
-      herdshare.nextBillingDate || now
-    )
-      .toISOString()
-      .slice(0, 10)}`;
-
-    const result = {
-      userId: subscription.userId,
-      stripeCustomerId: subscription.stripeCustomerId,
-      chargedCents: feeCents,
-      dryRun,
-      ok: true
-    };
-
-    if (await ledgerReferenceExists(subscription.userId, "stripe_payment", referenceId)) {
-      result.skipped = "already_processed";
-      results.push(result);
-      continue;
-    }
-
-    if (!subscription.stripeCustomerId) {
-      result.ok = false;
-      result.error = "Missing Stripe customer id.";
-      results.push(result);
-      continue;
-    }
-
+export async function processPausedMemberHerdshareBilling({userId=null,dryRun=false}={}) {
+  const db=getDb(),{getStripeClient}=await import('./memberPortal.js'),stripe=getStripeClient();
+  const rows=await db.select({subscription:memberSubscriptions,herdshare:memberHerdshareStatuses}).from(memberSubscriptions)
+    .innerJoin(memberHerdshareStatuses,eq(memberHerdshareStatuses.userId,memberSubscriptions.userId))
+    .where(and(eq(memberSubscriptions.status,'paused'),lte(memberHerdshareStatuses.nextBillingDate,new Date()),eq(memberHerdshareStatuses.status,'active')));
+  const results=[];
+  for(const {subscription,herdshare} of rows.filter(row=>!userId || Number(row.subscription.userId)===Number(userId))) {
+    const period=new Date(herdshare.nextBillingDate).toISOString().slice(0,10);
     try {
-      if (!dryRun) {
-        const customer = await stripeClient.customers.retrieve(subscription.stripeCustomerId);
-        const defaultPaymentMethod =
-          customer && !customer.deleted ? customer.invoice_settings?.default_payment_method : null;
-        if (!defaultPaymentMethod) {
-          throw new Error("No default payment method is available for herdshare billing.");
-        }
-
-        const intent = await stripeClient.paymentIntents.create({
-          amount: feeCents,
-          currency: "usd",
-          customer: subscription.stripeCustomerId,
-          payment_method: String(defaultPaymentMethod),
-          off_session: true,
-          confirm: true,
-          metadata: {
-            userId: String(subscription.userId),
-            billingType: "paused_herdshare"
-          },
-          description: "Paused subscription herdshare charge"
-        });
-
-        await createLedgerEntry({
-          accountId: accountIds.wallet.id,
-          userId: subscription.userId,
-          entryType: "herdshare_charge",
-          amountCents: -Math.abs(feeCents),
-          effectiveDate: now,
-          referenceType: "stripe_payment",
-          referenceId,
-          description: "Monthly herdshare charge while subscription is paused",
-          metadata: {
-            paymentIntentId: intent.id
-          }
-        });
-
-        await db
-          .update(memberHerdshareStatuses)
-          .set({
-            nextBillingDate,
-            updatedAt: now
-          })
-          .where(eq(memberHerdshareStatuses.id, herdshare.id));
-      }
-
-      result.nextBillingDate = nextBillingDate;
-      result.email = user?.email || null;
-    } catch (error) {
-      result.ok = false;
-      result.error = error?.message || "Unable to process paused herdshare charge.";
-    }
-
-    results.push(result);
+      results.push(dryRun?{userId:subscription.userId,period,feeCents:herdshare.monthlyFeeCents,dryRun}:await runMemberBilling({userId:subscription.userId,kind:'paused_fee',requestKey:`paused-fee:${period}`,input:{period},stripe}));
+    }catch(e){results.push({userId:subscription.userId,held:true,error:e.message,operationId:e.operationId});}
   }
-
-  return {
-    ok: true,
-    dryRun,
-    count: results.length,
-    processedCount: results.filter((row) => row.ok && !row.skipped).length,
-    failedCount: results.filter((row) => !row.ok).length,
-    results
-  };
+  return {ok:!results.some(row=>row.held),dryRun,count:results.length,results};
 }

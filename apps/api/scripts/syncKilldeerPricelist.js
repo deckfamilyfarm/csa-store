@@ -370,6 +370,12 @@ async function loadStoreRows(connection, productIds) {
 
 async function applyUpdates(connection, updates) {
   if (!updates.length) return;
+  const [[table]] = await connection.query("SELECT COUNT(*) AS n FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='enterprise_pricing_product_state'");
+  if (Number(table.n)) {
+    const [managed] = await connection.query('SELECT product_id FROM enterprise_pricing_product_state WHERE product_id IN (?) AND (active_revision_id IS NOT NULL OR latest_revision_id IS NOT NULL) LIMIT 1',[updates.map(row=>row.productId)]);
+    if (managed.length) throw new Error('Killdeer imports cannot overwrite enterprise pricing. Review Cost changes in Pricing instead.');
+  }
+
 
   await connection.beginTransaction();
 

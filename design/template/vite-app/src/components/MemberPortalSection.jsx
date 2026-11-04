@@ -716,10 +716,10 @@ export function MemberPortalSection({
           {!localLineConnected ? localLineSection : null}
           {accountSection}
           <div className="card pad">
-            <div className="eyebrow">CSA wallet</div>
+            <div className="eyebrow">CSA ledger balance</div>
             <h3 className="member-portal-money">{formatMoney(portal?.wallet?.availableBalanceCents)}</h3>
             <div className="small">
-              CSA Store account credit available for your membership ledger.
+              Local accounting balance. Local Line maintains the credit available to spend; pending transfers may make these balances differ.
             </div>
             <div className="member-portal-stat-grid">
               <div>

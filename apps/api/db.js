@@ -17,7 +17,6 @@ let basketEligibilitySchemaPromise;
 let subscriberCaptureSchemaPromise;
 let siteContentSchemaPromise;
 let marketingSchemaPromise;
-let subscriptionPortalSchemaPromise;
 let liabilityReleaseSchemaPromise;
 let scheduledPricelistSchemaPromise;
 let squareSchemaPromise;
@@ -3109,7 +3108,7 @@ async function runMarketingSchemaBootstrap(connection) {
   }
 }
 
-async function runSubscriptionPortalSchemaBootstrap(connection) {
+export async function migrateLegacySubscriptionPortalSchema(connection) {
   for (const statement of SUBSCRIPTION_PORTAL_TABLE_STATEMENTS) {
     await connection.query(statement);
   }
@@ -3175,17 +3174,6 @@ async function runSubscriptionPortalSchemaBootstrap(connection) {
     );
   }
 
-  await connection.query(`
-    DELETE duplicate_entries
-    FROM member_ledger_entries AS duplicate_entries
-    INNER JOIN member_ledger_entries AS canonical_entries
-      ON duplicate_entries.user_id = canonical_entries.user_id
-      AND duplicate_entries.reference_type = canonical_entries.reference_type
-      AND duplicate_entries.reference_id = canonical_entries.reference_id
-      AND duplicate_entries.id < canonical_entries.id
-    WHERE duplicate_entries.reference_type = 'localline_credit_transaction'
-      AND duplicate_entries.reference_id IS NOT NULL
-  `);
 
   for (const indexDefinition of SUBSCRIPTION_PORTAL_INDEX_STATEMENTS) {
     const exists = await indexExists(
@@ -3454,20 +3442,10 @@ export async function ensureMarketingSchema(connection = getPool()) {
   return runMarketingSchemaBootstrap(connection);
 }
 
+// Financial DDL is explicit deployment work, never a request/startup side effect.
 export async function ensureSubscriptionPortalSchema(connection = getPool()) {
-  if (connection === getPool()) {
-    if (!subscriptionPortalSchemaPromise) {
-      subscriptionPortalSchemaPromise = runSubscriptionPortalSchemaBootstrap(connection).catch(
-        (error) => {
-          subscriptionPortalSchemaPromise = null;
-          throw error;
-        }
-      );
-    }
-    return subscriptionPortalSchemaPromise;
-  }
-
-  return runSubscriptionPortalSchemaBootstrap(connection);
+  const { assertFinancialSchema } = await import('./lib/memberFinancialSchema.js');
+  await assertFinancialSchema(connection);
 }
 
 export async function ensureLiabilityReleaseSchema(connection = getPool()) {

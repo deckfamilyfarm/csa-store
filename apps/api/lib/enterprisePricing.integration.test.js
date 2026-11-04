@@ -52,14 +52,28 @@ test("saved prices activate locally before independently approved channel public
   const item = { id: "I1", type: "ITEM", version: 1, item_data: { name: "Sausage 12 oz", variations: [variation] } };
   const square = new Map([["I1", item], ["V1", variation]]);
   const writes = [];
-  let failNextSaleRestore = false;
+  let failNextSaleRestore = false, loseEnterpriseCreateResponse=false;
+  const createdProducts=new Map();
   t.mock.method(globalThis, "fetch", async (url, options = {}) => {
     const parsed = new URL(url), method = options.method || "GET", body = options.body ? JSON.parse(options.body) : null;
     assert.ok(["localline.test", "square.test"].includes(parsed.hostname));
     const json = value => new Response(JSON.stringify(value), { status: 200 });
     if (parsed.pathname.endsWith("/token/")) return json({ access: "test" });
-    if (parsed.pathname.endsWith("/vendors/")) return json({ results: [{ id: 101, name: "Deck Family Farm" }] });
+    if (parsed.pathname.endsWith("/vendors/")) return json({ results: [{ id: 101, name: "Deck Family Farm" },{id:202,name:"Test Produce Vendor"}] });
     if (parsed.pathname.endsWith("/vendors/101/")) return json({ id: 101, name: "Deck Family Farm" });
+    if(parsed.pathname.endsWith('/vendors/202/'))return json({id:202,name:'Test Produce Vendor'});
+    if(parsed.pathname.endsWith('/product-units/'))return json({results:[{id:1,unit_type:'item',name:'each'},{id:2,unit_type:'weight',name:'pound'}]});
+    if(method==='POST'&&parsed.pathname.endsWith('/products/')) {
+      writes.push({platform:'localline-create',body});
+      const id=10000+createdProducts.size;
+      const created={...structuredClone(body),id,inventory:body.set_inventory,packages:body.packages.map((pkg,index)=>({...pkg,id:id*10+index,
+        price_list_entries:pkg.price_list_entries.map(entry=>({...entry,id:id*100+entry.price_list,product_price_list_entry:id*100+entry.price_list}))}))};
+      createdProducts.set(id,created);
+      if(loseEnterpriseCreateResponse){loseEnterpriseCreateResponse=false;throw new Error('lost enterprise create response');}
+      return json(created);
+    }
+    const createdMatch=parsed.pathname.match(/\/products\/(\d+)\/$/),createdRemote=createdProducts.get(Number(createdMatch?.[1]));
+    if(createdRemote){if(method==='PATCH'){writes.push({platform:'localline',body});Object.assign(createdRemote,structuredClone(body));}return json(createdRemote);}
     if (parsed.pathname.endsWith("/products/1001/")) {
       if (method === 'PATCH' && failNextSaleRestore && body.packages?.[0]?.price_list_entries?.every(e => e.on_sale_toggle === false)) {
         throw new Error('Restore connection interrupted');
@@ -396,6 +410,43 @@ test("saved prices activate locally before independently approved channel public
       assert.equal(writes.length,writesBefore,'Editing basket exclusions never publishes');
 
     } finally { await new Promise(resolve => server.close(resolve)); }
+  });
+
+  await t.test('new enterprise product publication creates once with vendor Cost, eligible retail baskets and durable mappings',async()=>{
+    const creation=await import('./enterpriseProductCreation.js');
+    const enterpriseId=(await pricing.listPricingEnterprises())[0].id;
+    const body={product:{name:'New weighted test product',vendorId:2,categoryId:1,excludeFromGuest:true,excludeFromSnap:false},creationKey:'enterprise-publish-create',input:{
+      retailEnterpriseId:enterpriseId,priceEffectiveAt:'2026-10-01',pricingUnit:'lb',markupCategory:'perishable',customMarkupBp:null,squareEnabled:false,saleBp:0,
+      purchaseCosts:[{enterpriseId,cost:'2.00',effectiveAt:'2026-01-01'}],packages:[{packageId:1,name:'1–2 lb bag',minWeight:1,maxWeight:2},{packageId:2,name:'3 lb bag',avgWeightOverride:3}],wholesale:[]}};
+    body.previewHash=(await creation.previewEnterpriseProductCreation(body)).previewHash;
+    const created=await creation.createEnterpriseProduct(body,{userId:1});
+    await pricing.approveEnterprisePricingRevision(created.revisionId,{userId:2});
+    const review=async revision=>{
+      const audit=await sync.createProductSyncAudit({platforms:['localline'],productIds:[revision.productId],productScope:'selected',vendorGroup:'all',enterpriseRevisionId:revision.revisionId},user);
+      let result;for(let n=0;n<100;n++){result=await sync.getProductSyncAudit(audit.id);if(result.status!=='running')break;await new Promise(resolve=>setTimeout(resolve,10));}
+      const actions=(await sync.listProductSyncActions(audit.id,{status:'all'})).rows;
+      assert.equal(actions[0].status,'changed',JSON.stringify(actions.map(row=>({status:row.status,message:row.message}))));
+      return sync.createProductSyncRelease({auditId:audit.id,actionIds:actions.map(row=>row.id)},user);
+    };
+    const release=await review(created),finished=await sync.runProductSyncRelease(release.id,{user,allowFuture:true});
+    assert.equal(finished.status,'completed',JSON.stringify(finished.actions.map(row=>row.message)));
+    const remoteId=(await pool.query('SELECT local_line_product_id AS id FROM local_line_product_meta WHERE product_id=?',[created.productId]))[0][0].id;
+    const remote=createdProducts.get(remoteId);
+    assert.deepEqual(remote.packages.map(pkg=>pkg.unit_price),[3,6]);
+    assert.deepEqual(remote.packages.map(pkg=>pkg.price_list_entries.map(entry=>[entry.price_list,entry.adjustment_value])),[[[3,4.95],[4,4.95]],[[3,9.9],[4,9.9]]]);
+    assert.equal((await pool.query('SELECT COUNT(*) n FROM local_line_package_meta WHERE product_id=? AND local_line_package_id>0',[created.productId]))[0][0].n,2);
+    const createCount=writes.filter(row=>row.platform==='localline-create').length;
+    await sync.runProductSyncRelease(release.id,{user,allowFuture:true});
+    assert.equal(writes.filter(row=>row.platform==='localline-create').length,createCount);
+    const uncertainBody={...body,creationKey:'enterprise-publish-lost',product:{...body.product,name:'Lost create test'}};
+    uncertainBody.previewHash=(await creation.previewEnterpriseProductCreation(uncertainBody)).previewHash;
+    const uncertain=await creation.createEnterpriseProduct(uncertainBody,{userId:1});await pricing.approveEnterprisePricingRevision(uncertain.revisionId,{userId:2});
+    const uncertainRelease=await review(uncertain);loseEnterpriseCreateResponse=true;
+    const held=await sync.runProductSyncRelease(uncertainRelease.id,{user,allowFuture:true});
+    assert.equal(held.status,'held');
+    const attempts=writes.filter(row=>row.platform==='localline-create').length;
+    await sync.runProductSyncRelease(uncertainRelease.id,{user,allowFuture:true});
+    assert.equal(writes.filter(row=>row.platform==='localline-create').length,attempts,'Lost create responses are never resent, including inside transport retries');
   });
 
   await t.test('Local Line-only prices include sales, preserve inventory, freeze sale edits, and never publish Square', async () => {
