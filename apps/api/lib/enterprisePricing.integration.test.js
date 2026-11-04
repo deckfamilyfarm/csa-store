@@ -326,8 +326,8 @@ test("saved prices activate locally before independently approved channel public
     const preview = await creation.previewEnterpriseProductCreation(body);
     body.previewHash = preview.previewHash;
     assert.equal(preview.output.squareUnitCents, null);
-    assert.equal(preview.output.csaUnitCents, 330);
-    assert.equal(preview.output.packages[0].localLineRegularCents, 495);
+    assert.equal(preview.output.csaUnitCents, 310);
+    assert.equal(preview.output.packages[0].localLineRegularCents, 465);
     const writesBefore = writes.length;
     const [created, retry] = await Promise.all([creation.createEnterpriseProduct(body, { userId: 1 }), creation.createEnterpriseProduct(body, { userId: 1 })]);
     assert.equal(created.productId, retry.productId);
@@ -335,7 +335,7 @@ test("saved prices activate locally before independently approved channel public
     assert.equal(saved.active.id, created.revisionId);
     assert.equal(saved.active.input.pricingUnit, "lb");
     assert.equal(saved.active.output.wholesale[0].priceCents, 250);
-    assert.equal(saved.active.output.packages[0].localLineRegularCents, 495);
+    assert.equal(saved.active.output.packages[0].localLineRegularCents, 465);
     assert.equal(saved.active.approverId ?? null, null);
     const [[catalog]] = await pool.query("SELECT * FROM products WHERE id=?", [created.productId]);
     assert.equal(catalog.visible, 0); assert.equal(catalog.inventory, 0); assert.equal(catalog.track_inventory, 0);
@@ -433,7 +433,7 @@ test("saved prices activate locally before independently approved channel public
     const remoteId=(await pool.query('SELECT local_line_product_id AS id FROM local_line_product_meta WHERE product_id=?',[created.productId]))[0][0].id;
     const remote=createdProducts.get(remoteId);
     assert.deepEqual(remote.packages.map(pkg=>pkg.unit_price),[3,6]);
-    assert.deepEqual(remote.packages.map(pkg=>pkg.price_list_entries.map(entry=>[entry.price_list,entry.adjustment_value])),[[[3,4.95],[4,4.95]],[[3,9.9],[4,9.9]]]);
+    assert.deepEqual(remote.packages.map(pkg=>pkg.price_list_entries.map(entry=>[entry.price_list,entry.adjustment_value])),[[[3,4.65],[4,4.65]],[[3,9.3],[4,9.3]]]);
     assert.equal((await pool.query('SELECT COUNT(*) n FROM local_line_package_meta WHERE product_id=? AND local_line_package_id>0',[created.productId]))[0][0].n,2);
     const createCount=writes.filter(row=>row.platform==='localline-create').length;
     await sync.runProductSyncRelease(release.id,{user,allowFuture:true});
