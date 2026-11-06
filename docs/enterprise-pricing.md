@@ -35,6 +35,8 @@ The pricing engine uses integer amounts: purchase costs have four decimal places
 
 Square eligibility is explicit and distinct from an approved variation mapping. Disabling eligibility does not remove a Square listing. Products without Square eligibility produce no Square price action. Wholesale prices stay local. Deposits, Membership, and unresolved basket-specific overrides stay in the legacy workflow pending reconciliation.
 
+The Store → Pricing product popup includes Square setup in its Sync section. Review the saved Square price and existing link for each package, search the cached Square catalog, and explicitly approve a match there. Link approval saves the mapping; Sync Square or Sync Both then checks and publishes the saved enterprise revision. Products with no Square links can preview Create in Square and explicitly approve creation and linking without leaving the popup. The preview freezes regular prices and selling units. Reopening an interrupted creation recovers its original request and remote receipt before considering newer pricing. Partly linked products must match their remaining packages to the existing item; the popup does not create a second item for them. Square Pull still authorizes matching, and both Square Pull and Square Push are required for creation. Pricing approval and each destination’s publication permissions remain separate.
+
 The Migration comparison menu item uses cached remote data and does not publish or change prices. Treat missing costs, conflicting basket prices, and uncertain mappings as review items.
 
 ## Sales

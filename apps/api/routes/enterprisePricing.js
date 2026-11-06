@@ -5,6 +5,8 @@ import express from "express";
 import { hasAdminPermission } from '../lib/adminRoles.js';
 import { SELECTED_PRICE_SCOPE, validateSelectedPriceScope } from '../lib/localLinePricePublication.js';
 import { requireAdminPermission } from "../middleware/auth.js";
+import { buildSquareMatchReview, isSquareEnabled } from '../lib/squareStoreSync.js';
+import { getSquareProductCreation } from '../lib/squareProductCreation.js';
 import { listBundles, getBundle, previewBundle, saveBundle, createBundle } from '../lib/enterpriseBundles.js';
 import {
   approveEnterprisePricingRevision, enterprisePricingMigrationReport, enterprisePricingSummary, getEnterprisePricingProduct,
@@ -48,6 +50,16 @@ router.get("/summary", route(() => enterprisePricingSummary()));
 router.get("/products/:id", route(req => getEnterprisePricingProduct(req.params.id)));
 router.post("/products/:id/sale", edit, route(req => saveProductSale(req.params.id, req.body, req.admin)));
 router.get("/products/:id/sync", route(req => getEnterprisePricingSync(req.params.id)));
+router.get('/products/:id/square-setup', requireAdminPermission(['square_pull', 'square_push', 'pricing_admin']), route(async req => {
+  const productId = Number(req.params.id);
+  if (!Number.isSafeInteger(productId) || productId <= 0) throw Object.assign(new Error('A valid product is required.'), { status: 400 });
+  const search = String(req.query.search || '').trim().slice(0, 120);
+  const [matches, creation] = await Promise.all([
+    buildSquareMatchReview({ includeAllProducts: true, productIds: [productId], limitCandidates: search ? 30 : 10, search }),
+    getSquareProductCreation(productId)
+  ]);
+  return { productId, enabled: isSquareEnabled(), rows: matches.rows, summary: matches.summary, creation };
+}));
 router.post("/products/:id/buy-price", edit, route(req => saveEnterpriseBuyPrice(
   req.params.id, req.body?.price, req.body?.expectedRevision, req.admin)));
 router.post("/products/:id/preview", edit, route(req => previewEnterprisePricing(req.params.id, req.body?.input)));

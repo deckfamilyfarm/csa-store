@@ -376,7 +376,7 @@ function EnterpriseProductsSection({ token, roles = [], createdProductId }) {
             vendorRequired: updates.vendorId ? false : value.product.vendorRequired } }));
           setRows(value => value.map(row => Number(row.id) === Number(selectedId) ? { ...row, ...updates } : row));
         }} />
-      {isDepositPricing(detail.product) ? <p className="small">Fixed deposit amount, with no markup. Managed through the existing deposit workflow.</p> : <p className="small">{summary?.localOnly ? "Saving updates local prices immediately. Review & Publish compares channel prices." : "Saving updates our prices immediately. Review & Publish approves channel synchronization."} {detail.product.approvedSquareLinks ? `${detail.product.approvedSquareLinks} Square variation link(s).` : "Square mapping required if enabled."}</p>}
+      {isDepositPricing(detail.product) ? <p className="small">Fixed deposit amount, with no markup. Managed through the existing deposit workflow.</p> : <p className="small">Saving updates our prices immediately. Use Sync below to review Square links, create a missing Square item, and publish this product to either channel.{summary?.localOnly && ' Remote updates are disabled in local test mode.'}</p>}
       {!isDepositPricing(detail.product) && <>
       <ProductPricingFields draft={draft} detail={detail} preview={preview} canEdit={canEdit} loading={loading} update={update} />
       <section id="editor-sales" className="product-editor-section"><h3>Sales</h3>

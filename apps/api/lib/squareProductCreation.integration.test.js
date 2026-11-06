@@ -25,7 +25,7 @@ test("Square creation previews, explicit approval, durable recovery, and guarded
   }
   await pool.query("INSERT INTO categories (id,name) VALUES (1,'Meat'),(2,'Membership')");
   await pool.query("INSERT INTO vendors (id,name) VALUES (1,'Hyland')");
-  const { previewSquareProductCreation: preview, applySquareProductCreation: apply } = await import("./squareProductCreation.js");
+  const { previewSquareProductCreation: preview, applySquareProductCreation: apply, getSquareProductCreation } = await import("./squareProductCreation.js");
   const receipts = new Map(), objects = new Map(), requests = [];
   let loseResponse = false, failRead = false, rejectNext = false, pauseCreate = null;
   t.mock.method(globalThis, "fetch", async (url, options = {}) => {
@@ -75,6 +75,10 @@ test("Square creation previews, explicit approval, durable recovery, and guarded
   await t.test("lost responses resume frozen request across previews, drift, and rejected retries", async () => {
     await product(2); const draft = await preview(2, 7); loseResponse = true;
     await assert.rejects(apply(draft.id, 7), /Connection lost/);
+    const readsBefore = requests.length;
+    assert.equal((await getSquareProductCreation(2)).id, draft.id);
+    assert.equal((await getSquareProductCreation(2)).status, 'sending');
+    assert.equal(requests.length, readsBefore, 'Reading a creation receipt must not call Square.');
     await pool.query("UPDATE product_pricing_profiles SET source_unit_price=99 WHERE product_id=2");
     assert.equal((await preview(2, 8)).id, draft.id);
     rejectNext = true; await assert.rejects(apply(draft.id, 7), /Unauthorized/);
@@ -228,6 +232,50 @@ test("Square creation previews, explicit approval, durable recovery, and guarded
         assert.equal(reachedHandler, allowed, `${path}: ${roles}`);
         assert.equal(status, allowed ? 200 : 403);
       }
+    }
+  });
+  await t.test('pricing popup setup is scoped, searchable, read-only and recovers the durable creation receipt', async () => {
+    const { default: router } = await import('../routes/enterprisePricing.js');
+    const { upsertReturnedSquareObjects } = await import('./squareStoreSync.js');
+    const route = router.stack.find(layer => layer.route?.path === '/products/:id/square-setup').route;
+    const handlers = route.stack.map(layer => layer.handle);
+    await product(15);
+    await pool.query("INSERT INTO vendors(id,name) VALUES(2,'Other supplier')");
+    await pool.query('UPDATE products SET vendor_id=2 WHERE id=15');
+    const manual = { type: 'ITEM', id: 'manual-item', item_data: { name: 'Unrelated catalog item', variations: [
+      { type: 'ITEM_VARIATION', id: 'manual-variation', version: 1, item_variation_data: { item_id: 'manual-item', name: 'Distinct option', sku: 'EXACT-MANUAL', pricing_type: 'FIXED_PRICING', price_money: { amount: 500, currency: 'USD' } } }
+    ] } };
+    await upsertReturnedSquareObjects(pool, [manual], new Date());
+    const before = requests.length;
+    async function read(id, search = '') {
+      let status = 200, result;
+      await handlers.at(-1)({ params: { id: String(id) }, query: { search } }, {
+        status(code) { status = code; return this; }, json(value) { result = value; }
+      });
+      return { status, result };
+    }
+    const setup = await read(15);
+    assert.equal(setup.status, 200);
+    assert.equal(setup.result.enabled, true);
+    assert.equal(setup.result.productId, 15);
+    assert.equal(setup.result.rows.length, 2);
+    assert.ok(setup.result.rows.every(row => row.productId === 15));
+    assert.equal(setup.result.creation, null);
+    assert.equal((await links(15)).length, 0);
+    const searched = await read(15, 'EXACT-MANUAL');
+    assert.ok(searched.result.rows.every(row => row.candidates.length === 1 && row.candidates[0].squareVariationId === 'manual-variation'));
+    const absent = await read(15, 'nothing-matches-this-query');
+    assert.ok(absent.result.rows.every(row => row.candidates.length === 0));
+    const completed = await read(14);
+    assert.equal(completed.result.creation.status, 'completed');
+    assert.equal(completed.result.creation.enterpriseRevisionId > 0, true);
+    assert.equal((await read('15,1')).status, 400);
+    assert.equal(requests.length, before, 'Setup reads must not fetch or publish remote objects.');
+    for (const roles of [['pricing_editor'], ['square_pull'], ['square_push'], ['pricing_admin'], ['admin']]) {
+      let allowed = false, status = 200;
+      await handlers[0]({ admin: { adminRoles: roles } }, { status(code) { status = code; return this; }, json() {} }, () => { allowed = true; });
+      assert.equal(allowed, roles[0] !== 'pricing_editor');
+      assert.equal(status, allowed ? 200 : 403);
     }
   });
 });

@@ -709,7 +709,7 @@ async function loadSquareLinks() {
   return rows;
 }
 
-export async function buildSquareMatchReview({ limitCandidates = 5, includeAllProducts = false, productIds = null } = {}) {
+export async function buildSquareMatchReview({ limitCandidates = 5, includeAllProducts = false, productIds = null, search = '' } = {}) {
   await ensureSquareSyncSchema();
   const [localPackages, squareVariations, links] = await Promise.all([
     loadLocalPackagesForSquare({ includeAllProducts }),
@@ -719,6 +719,7 @@ export async function buildSquareMatchReview({ limitCandidates = 5, includeAllPr
   const linkByPackageId = new Map(links.map((link) => [Number(link.packageId), link]));
   const linkByVariationId = new Map(links.map((link) => [String(link.squareVariationId), link]));
   const variationById = new Map(squareVariations.map((variation) => [variation.squareVariationId, variation]));
+  const searchTerms = String(search).toLowerCase().trim().split(/\s+/).filter(Boolean);
 
   const scopedIds = productIds === null ? null : new Set(productIds.map(Number));
   const scopedPackages = localPackages.filter(row => scopedIds === null || scopedIds.has(Number(row.productId)));
@@ -729,7 +730,9 @@ export async function buildSquareMatchReview({ limitCandidates = 5, includeAllPr
     const candidates = squareVariations
       .filter((variation) => {
         const variationLink = linkByVariationId.get(String(variation.squareVariationId));
-        return !variationLink || Number(variationLink.packageId) === Number(localPackage.packageId);
+        const label = `${variation.itemName || ''} ${variation.name || ''} ${variation.sku || ''}`.toLowerCase();
+        return (!variationLink || Number(variationLink.packageId) === Number(localPackage.packageId))
+          && searchTerms.every(term => label.includes(term));
       })
       .map((variation) => ({
         squareItemId: variation.squareItemId,
@@ -742,7 +745,7 @@ export async function buildSquareMatchReview({ limitCandidates = 5, includeAllPr
         pricingType: variation.pricingType || "",
         score: scoreSquareCandidate(localPackage, variation)
       }))
-      .filter((candidate) => candidate.score >= 0.18)
+      .filter((candidate) => searchTerms.length || candidate.score >= 0.18)
       .sort((left, right) => right.score - left.score)
       .slice(0, limitCandidates);
     const localRetailPrice = buildSquareMatchRetailPrice(localPackage, packagesByProductId, metaByPackageId);

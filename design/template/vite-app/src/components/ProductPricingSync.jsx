@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { adminGet, adminPost } from "../adminApi.js";
 import { canSyncPlatforms, publicationRunning, publicationMessage, syncProductChannels, samePlatforms, releasePlatforms, channelNames } from "./productPricingSyncFlow.js";
+import { ProductSquareSetup } from './ProductSquareSetup.jsx';
+import { squareSetupReady } from './productSquareSetupFlow.js';
 import "./EnterpriseReviewSection.css";
 
 export function ProductPricingSync({ productId, token, roles, dirty, onChanged, onRequestBusy }) {
@@ -9,6 +11,8 @@ export function ProductPricingSync({ productId, token, roles, dirty, onChanged, 
   const [connectionError, setConnectionError] = useState(""), [lastContact, setLastContact] = useState(null);
   const [now, setNow] = useState(Date.now()), [loading, setLoading] = useState(true);
   const [job, setJob] = useState(null);
+  const [squareSetup, setSquareSetup] = useState(null), [squareBusy, setSquareBusy] = useState(false);
+  const [setupRefresh, setSetupRefresh] = useState(0);
   const [selectedPlatforms, setSelectedPlatforms] = useState(['localline']);
   const mounted = useRef(false), callbacks = useRef({ onChanged, onRequestBusy });
   callbacks.current = { onChanged, onRequestBusy };
@@ -63,6 +67,7 @@ export function ProductPricingSync({ productId, token, roles, dirty, onChanged, 
           callbacks.current.onChanged?.();
           const updated = await get(`enterprise-pricing/products/${productId}/sync`);
           if (!cancelled) setData(updated);
+          if (!cancelled) setSetupRefresh(value => value + 1);
           return;
         }
       } catch (e) { if (!cancelled) setConnectionError(e.message); }
@@ -78,7 +83,11 @@ export function ProductPricingSync({ productId, token, roles, dirty, onChanged, 
   }, [Boolean(request), running]);
 
   async function sync(platforms) {
-    if (request || running || dirty || !canSyncPlatforms(roles, platforms)) return;
+    if (request || running || squareBusy || dirty || !canSyncPlatforms(roles, platforms)) return;
+    if (platforms.includes('square') && !job && !squareSetupReady(squareSetup)) {
+      setError('Finish the Square links and creation above before syncing Square.');
+      return;
+    }
     setSelectedPlatforms(platforms);
     setError(""); setConnectionError(""); setRequest("Connecting to the server…");
     callbacks.current.onRequestBusy?.(true);
@@ -110,19 +119,32 @@ export function ProductPricingSync({ productId, token, roles, dirty, onChanged, 
       if (!mounted.current) return;
       setRelease(next);
       if (next.status === 'completed') { saveJob(null); callbacks.current.onChanged?.(); }
+      setSetupRefresh(value => value + 1);
     } catch (e) { if (mounted.current) { setError(e.message); callbacks.current.onChanged?.(); } }
     finally { if (mounted.current) { setRequest(""); callbacks.current.onRequestBusy?.(false); } }
   }
-  const active = !!request || running;
+  async function squareChanged() {
+    const updated = await get(`enterprise-pricing/products/${productId}/sync`);
+    if (mounted.current) { setData(updated); setError(''); callbacks.current.onChanged?.(); }
+  }
+  const active = !!request || running || squareBusy;
   return <div className="product-pricing-sync">
+    <div className="product-localline-setup"><h4>Local Line</h4>
+      <p>{data?.syncBlocker || 'Sync checks and publishes this product’s saved Local Line prices and sale.'}</p>
+    </div>
+    {data?.input?.squareEnabled && <ProductSquareSetup productId={productId} token={token} roles={roles} data={data} dirty={dirty}
+      busy={!!request || running} refreshVersion={setupRefresh} onSetup={setSquareSetup}
+      onBusy={value => { setSquareBusy(value); callbacks.current.onRequestBusy?.(value); }} onChanged={squareChanged} />}
+    {data && !data.input?.squareEnabled && <p>Square is disabled for this product. Enable Square in Pricing and save to set up its links here.</p>}
     <div className="admin-actions product-sync-actions">
       {[
         {label:'Sync Local Line',platforms:['localline']},
         ...(data?.input?.squareEnabled ? [{label:'Sync Square',platforms:['square']},{label:'Sync Both',platforms:['localline','square']}] : [])
       ].map(choice => <button key={choice.label} type="button" className="button" onClick={() => sync(choice.platforms)}
         disabled={loading || active || dirty || data?.localOnly || !data || !canSyncPlatforms(roles,choice.platforms)
+          || Boolean(choice.platforms.includes('square') && !job && !squareSetupReady(squareSetup))
           || Boolean(job && !samePlatforms(job.platforms || ['localline'],choice.platforms))}>
-        {active && samePlatforms(selectedPlatforms,choice.platforms) ? 'Syncing…' : job && samePlatforms(job.platforms || ['localline'],choice.platforms) ? `Resume ${channelNames(choice.platforms)} sync` : choice.label}
+        {(!!request || running) && samePlatforms(selectedPlatforms,choice.platforms) ? 'Syncing…' : job && samePlatforms(job.platforms || ['localline'],choice.platforms) ? `Resume ${channelNames(choice.platforms)} sync` : choice.label}
       </button>)}
       {data?.sale?.discountBp > 0 && <span>{data.sale.discountBp / 100}% Local Line sale</span>}
     </div>

@@ -120,6 +120,15 @@ function view(row) {
     squareItemId: result?.catalog_object?.id || null, resuming: ["sending", "created"].includes(row.status) };
 }
 
+// Read the durable receipt without rebuilding a preview or contacting Square.
+// Product editors use this to recover an uncertain creation after reopening.
+export async function getSquareProductCreation(productId) {
+  if (!Number.isSafeInteger(productId) || productId <= 0) throw fail('A valid product is required.', 400);
+  await ensureSchema();
+  const [[saved]] = await getPool().query('SELECT * FROM square_product_creations WHERE product_id=?', [productId]);
+  return saved ? view(saved) : null;
+}
+
 export async function previewSquareProductCreation(productId, userId) {
   if (!Number.isSafeInteger(productId) || productId <= 0) throw fail("A valid product is required.", 400);
   await ensureSchema();
