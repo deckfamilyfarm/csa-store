@@ -1,0 +1,127 @@
+{
+  "status": "completed",
+  "deletedVariations": 23,
+  "parentItemsPreserved": 23,
+  "organicGroundBeefKept": true,
+  "mediumBrisketLinkCleared": true,
+  "localMediumBrisketPreserved": true,
+  "otherVariationsAndSettingsPreserved": true,
+  "deleted": [
+    {
+      "item": "Bavette Steak",
+      "variation": "Organic Bavette",
+      "id": "DYP6DXPVCN6V6DHZZKSJ7QTL"
+    },
+    {
+      "item": "Beef Back Ribs",
+      "variation": "Organic",
+      "id": "MEJE6DYSAFEJZ54RY4ZMNE2C"
+    },
+    {
+      "item": "Beef Bones",
+      "variation": "Organic Beef Bones",
+      "id": "ZHGFAUOQGPWL3S76V57VP6YG"
+    },
+    {
+      "item": "Beef Flat Iron Steak",
+      "variation": "Organic Flat Iron",
+      "id": "WPUMNRELJSOPPXTKRNA7X3RN"
+    },
+    {
+      "item": "Beef Heart",
+      "variation": "Organic Beef Heart",
+      "id": "XX2GOM6JZVROK3NWECBULBJW"
+    },
+    {
+      "item": "Beef Kidney",
+      "variation": "Organic Beef Kidney",
+      "id": "BRF6UIFAUU7LW5TVDJAKDTF2"
+    },
+    {
+      "item": "Beef Liver",
+      "variation": "Organic Beef Liver",
+      "id": "VYPGEK3JDDJV3E5NB2K73BBO"
+    },
+    {
+      "item": "Beef Marrow Bones",
+      "variation": "Organic Beef Marrow Bones",
+      "id": "5A5PVRRHF7ZJEYJ2WEYNV4RL"
+    },
+    {
+      "item": "Beef Oxtail",
+      "variation": "Organic Beef Oxtail",
+      "id": "HHCG6HK22MSBWEIH3NZOYMOL"
+    },
+    {
+      "item": "Beef Shank Osso Buco",
+      "variation": "Organic",
+      "id": "MS4AWNAS64EEDWGEVGXRW2T3"
+    },
+    {
+      "item": "Beef Stew Meat",
+      "variation": "Organic Beef Stew",
+      "id": "O2KR5VTETZ5GDNH4DWS73O56"
+    },
+    {
+      "item": "Beef Tenderloin",
+      "variation": "Organic Tenderloin",
+      "id": "6MJVQW23QTLYSHPHKFDPJSWN"
+    },
+    {
+      "item": "Beef Tongue",
+      "variation": "Organic Tongue",
+      "id": "E42RKU2L3DA3RPV34NFC4V6D"
+    },
+    {
+      "item": "Beef Tri-Tip",
+      "variation": "Organic Tri Tip",
+      "id": "HV7HA5JOUAPPDQXQEE7PIVBG"
+    },
+    {
+      "item": "Brisket",
+      "variation": "Organic Brisket",
+      "id": "SLLB3I6MS6L2ENNMOZZ3X3QK"
+    },
+    {
+      "item": "Chuck roast",
+      "variation": "Organic Chuck Roast",
+      "id": "CIGT4OMRIMASB4AXNPG4A53P"
+    },
+    {
+      "item": "Flank Steak",
+      "variation": "Organic Flank Steak",
+      "id": "7DZB7ATMWI4SYBNIP5ZBAZU5"
+    },
+    {
+      "item": "Hamburger Patties",
+      "variation": "Organic Hamburger",
+      "id": "SKWNIOW3LB2OZUC74EFOOY5Z"
+    },
+    {
+      "item": "Hanger Steak",
+      "variation": "Organic Hanger Steak",
+      "id": "JAFJ4WOYPJ7JGC2XTW7DAJCI"
+    },
+    {
+      "item": "Ribeye Steak",
+      "variation": "Organic Ribeye",
+      "id": "2K6CKF7DSFQKL6LKQHY7OEGK"
+    },
+    {
+      "item": "Skirt Steak, Large",
+      "variation": "Organic Skirt Steak",
+      "id": "5Q2H2KTZNM6K5RKSWGEBSF5L"
+    },
+    {
+      "item": "Teres Major Steak",
+      "variation": "Organic Teres Major Steak",
+      "id": "WSVLYC2P465ES2AB4C5CNHOA"
+    },
+    {
+      "item": "Top Sirloin Steak",
+      "variation": "Organic Top Sirloin",
+      "id": "ZT5OVMGGGVFCN32WWKUBTX43"
+    }
+  ],
+  "confirmedAt": "2026-11-06T19:23:06.072Z"
+}

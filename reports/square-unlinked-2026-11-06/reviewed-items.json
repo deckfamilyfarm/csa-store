@@ -1,0 +1,2822 @@
+{
+  "checkedAt": "2026-11-06T19:10:15.721Z",
+  "summary": {
+    "squareItems": 173,
+    "activeLocalProducts": 832,
+    "unlinkedActive": 64,
+    "unlinkedArchived": 3,
+    "noExactLocalMatchActive": 62,
+    "exactMatchButUnlinkedActive": 2,
+    "exactLocalMatches": 2,
+    "possibleLocalCounterparts": 32,
+    "noClearLocalCounterpart": 30
+  },
+  "rows": [
+    {
+      "squareItemId": "EOKB7LQZ2PRLZNFKBF2BCSIG",
+      "name": "1/4 Pint Honey",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [
+        {
+          "id": 806161,
+          "name": "Raw Honey, 1 pint",
+          "vendor": "Deck Family Farm",
+          "score": 0.75
+        },
+        {
+          "id": 940998,
+          "name": "Raw Honey, 1/2 pint",
+          "vendor": "Deck Family Farm",
+          "score": 0.6666666666666666
+        },
+        {
+          "id": 941000,
+          "name": "Raw Honey, 1 quart",
+          "vendor": "Deck Family Farm",
+          "score": 0.5
+        }
+      ],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "2MHMXWEP2SQVOGVKSVTVPZEJ",
+          "name": "Regular",
+          "sku": "",
+          "amount": 900,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": "No local quarter-pint package found; other honey sizes exist."
+    },
+    {
+      "squareItemId": "BXQW4BTHEQLRG4A5ZA5A2AHT",
+      "name": "16oz. Pork Back Fat",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "HQSDLCQ254D73TUTDUILQIU4",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1500,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "TI2L6EBKBXBDX52LPJVVDJ7V",
+      "name": "8oz. Pork Back Fat",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "WJNNFOM3NDDK2FT7MI3NKVPM",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1000,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "X5UX2PTIWGXDQ3S5U3MORXZT",
+      "name": "BNF Kombucha",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "GIXC63SXBXRHERVGAUP4OLQV",
+          "name": "Regular",
+          "sku": "",
+          "amount": 450,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 806020,
+          "name": "Blackberry Herbalism Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 821597,
+          "name": "Chai Cider",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806023,
+          "name": "Ginger Turmeric Jun",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806027,
+          "name": "Ginger Zen Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806031,
+          "name": "Grape Lavender Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806034,
+          "name": "Hibiscus Mint Yerbe Mate Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806036,
+          "name": "Mango Marigold Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806040,
+          "name": "Moonfruit Yerbe Mate Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806042,
+          "name": "Oregon Blueberry Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806045,
+          "name": "Peach Rose Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806049,
+          "name": "Pear Jun",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806052,
+          "name": "Pomegranate Cardamom Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806056,
+          "name": "Raspberry Reishi Jun",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806059,
+          "name": "Skullcap Lemon Yerbe Mate Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 976879,
+          "name": "Strawberry Mint Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 1038295,
+          "name": "Sugar Plum Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        }
+      ],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "VGQP22CRRBUOGZDMILJRVADG",
+      "name": "British  Bangers",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "HKIOOO57ASSC7D3XEFVUCPJH",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1800,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 840822,
+          "name": "English Banger Sausage Links",
+          "isDeleted": 0,
+          "vendor": "Deck Family Farm's Hyland Artisinal Meats",
+          "category": "Sausages & Cured Meats🥓"
+        }
+      ],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "6WRAOOSLV3PZMGQZAF737G73",
+      "name": "Bulk Hot Italian Sausage",
+      "archived": false,
+      "status": "Unlinked; exact local name or SKU match",
+      "exactNames": [
+        {
+          "id": 1163729,
+          "name": "Bulk Hot Italian Sausage",
+          "isDeleted": 0,
+          "vendor": "Deck Family Farm's Hyland Artisinal Meats",
+          "category": "Sausages & Cured Meats🥓"
+        }
+      ],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [
+        {
+          "id": 1163729,
+          "name": "Bulk Hot Italian Sausage",
+          "vendor": "Deck Family Farm's Hyland Artisinal Meats",
+          "score": 1
+        },
+        {
+          "id": 871143,
+          "name": "Hot Italian Sausage Links",
+          "vendor": "Deck Family Farm's Hyland Artisinal Meats",
+          "score": 0.75
+        },
+        {
+          "id": 813086,
+          "name": "Country Sausage, Bulk",
+          "vendor": "Deck Family Farm",
+          "score": 0.5714285714285714
+        },
+        {
+          "id": 840823,
+          "name": "Bulk English Breakfast Sausage",
+          "vendor": "Deck Family Farm's Hyland Artisinal Meats",
+          "score": 0.5
+        }
+      ],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "YHJJOW32FDVHQ4QIY4622POB",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1650,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "Exists locally; unlinked",
+      "reviewedCandidates": [],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "TZTWZVQKHLSUBLIJQYIZ6VVI",
+      "name": "Cabbage",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [
+        {
+          "id": 1131919,
+          "name": "Cone Cabbage",
+          "vendor": "Camas Swale Farm",
+          "score": 0.6666666666666666
+        },
+        {
+          "id": 805882,
+          "name": "Green Cabbage",
+          "vendor": "Red Tail Growers",
+          "score": 0.6666666666666666
+        },
+        {
+          "id": 1146326,
+          "name": "Green Cabbage",
+          "vendor": "Red Tail Growers",
+          "score": 0.6666666666666666
+        },
+        {
+          "id": 975957,
+          "name": "Napa Cabbage",
+          "vendor": "Winter Green Farm",
+          "score": 0.6666666666666666
+        }
+      ],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "JOC4LBUWF425ZWRTBQAAAGKB",
+          "name": "Regular",
+          "sku": "",
+          "amount": 500,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 1131919,
+          "name": "Cone Cabbage",
+          "isDeleted": 0,
+          "vendor": "Camas Swale Farm",
+          "category": "Organic Cruciferous Vegetables🥦"
+        },
+        {
+          "id": 805882,
+          "name": "Green Cabbage",
+          "isDeleted": 0,
+          "vendor": "Red Tail Growers",
+          "category": "Organic Cruciferous Vegetables🥦"
+        },
+        {
+          "id": 1146326,
+          "name": "Green Cabbage",
+          "isDeleted": 0,
+          "vendor": "Red Tail Growers",
+          "category": "Organic Cruciferous Vegetables🥦"
+        },
+        {
+          "id": 975957,
+          "name": "Napa Cabbage",
+          "isDeleted": 0,
+          "vendor": "Winter Green Farm",
+          "category": "Organic Vegetables - Leafy Greens 🥬"
+        },
+        {
+          "id": 912736,
+          "name": "Red Cabbage",
+          "isDeleted": 0,
+          "vendor": "Organically Grown Company",
+          "category": "Organic Vegetables - Leafy Greens 🥬"
+        },
+        {
+          "id": 805981,
+          "name": "Savoy Cabbage",
+          "isDeleted": 0,
+          "vendor": "Organically Grown Company",
+          "category": "Organic Vegetables - Leafy Greens 🥬"
+        }
+      ],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "NFDRACMUDDUMITKMQJQABZXE",
+      "name": "Cardamom Bun",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "NTPLGAA7SE6CTY6CRGWSDGH2",
+          "name": "Regular",
+          "sku": "",
+          "amount": 600,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "IZNB2IMWSQDX4THJ6TZF6PCW",
+      "name": "Case eggs",
+      "archived": true,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "XVGY376CTQZGT3L3HMKKQ7CJ",
+          "name": "Regular",
+          "sku": "",
+          "amount": 6750,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "BUENXTWWPCTTFJ7RYVH672GY",
+      "name": "Chaurice (Bulk)",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [
+        {
+          "id": 1017975,
+          "name": "Bulk Carrots",
+          "vendor": "Grazier's Garden",
+          "score": 0.5
+        }
+      ],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "6KFXTGSNGESMBP7OSJMQMXBJ",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1650,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 816905,
+          "name": "Cajun Chaurice Sausage Links",
+          "isDeleted": 0,
+          "vendor": "Deck Family Farm's Hyland Artisinal Meats",
+          "category": "Sausages & Cured Meats🥓"
+        }
+      ],
+      "reviewNote": "Local Chaurice is links; bulk package is not confirmed."
+    },
+    {
+      "squareItemId": "ZRFFTAWFWKM23F7VVZDGRD66",
+      "name": "Chops (Pork)",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [
+        {
+          "id": 805724,
+          "name": "Bacon, Pork",
+          "vendor": "Deck Family Farm",
+          "score": 0.5
+        },
+        {
+          "id": 805691,
+          "name": "Ground Pork",
+          "vendor": "Deck Family Farm",
+          "score": 0.5
+        },
+        {
+          "id": 813078,
+          "name": "Pork Bones",
+          "vendor": "Deck Family Farm",
+          "score": 0.5
+        },
+        {
+          "id": 861798,
+          "name": "Pork Shank",
+          "vendor": "Deck Family Farm",
+          "score": 0.5
+        }
+      ],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "SUGYE4ITQHHLEDGFSFMJ2ACY",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1950,
+          "currency": "USD",
+          "unit": "lb"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 805652,
+          "name": "Pork Chop, Bone-in",
+          "isDeleted": 0,
+          "vendor": "Deck Family Farm",
+          "category": "Pasture-raised Pork 🐖"
+        },
+        {
+          "id": 832792,
+          "name": "Pork Chop, Boneless",
+          "isDeleted": 0,
+          "vendor": "Deck Family Farm",
+          "category": "Pasture-raised Pork 🐖"
+        }
+      ],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "7ZUJFWHWSBQ4SRK3TEJJLNWG",
+      "name": "Chorizo (Bulk)",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [
+        {
+          "id": 913652,
+          "name": "Bulk Farm Made Chorizo Sausage",
+          "vendor": "Deck Family Farm's Hyland Artisinal Meats",
+          "score": 0.5714285714285714
+        },
+        {
+          "id": 1017975,
+          "name": "Bulk Carrots",
+          "vendor": "Grazier's Garden",
+          "score": 0.5
+        },
+        {
+          "id": 932132,
+          "name": "Chorizo Verde",
+          "vendor": "Deck Family Farm's Hyland Artisinal Meats",
+          "score": 0.5
+        }
+      ],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "R2K3KQ3STAD3D7XKKSKL5KBX",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1650,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 913652,
+          "name": "Bulk Farm Made Chorizo Sausage",
+          "isDeleted": 0,
+          "vendor": "Deck Family Farm's Hyland Artisinal Meats",
+          "category": "Sausages & Cured Meats🥓"
+        }
+      ],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "5GGLVFITJESYSGTJDBIP7IRC",
+      "name": "Coca Cola",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "RAESP6VD5W5ARGPC7BD4TVYR",
+          "name": "Regular",
+          "sku": "",
+          "amount": 400,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "F5A5OF46G7E5JRXGLH65XHOD",
+      "name": "Coke",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "3LHPP6IW6EZTYPYXMSNKD6DU",
+          "name": "Regular",
+          "sku": "",
+          "amount": 400,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "Z3YFYZUSJEFDID2ULPGK25CJ",
+      "name": "Combo ",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "7R2KSNFLHAYGL6TJBIWQO23G",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1300,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "JC2T5KZH3TVIIXDDJA2EYVQS",
+      "name": "CRX Drumsticks",
+      "archived": false,
+      "status": "Unlinked; exact local name or SKU match",
+      "exactNames": [
+        {
+          "id": 1163732,
+          "name": "CRX Drumsticks",
+          "isDeleted": 0,
+          "vendor": "Deck Family Farm",
+          "category": "Pasture-raised Poultry🐔"
+        }
+      ],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [
+        {
+          "id": 1163732,
+          "name": "CRX Drumsticks",
+          "vendor": "Deck Family Farm",
+          "score": 1
+        },
+        {
+          "id": 1163731,
+          "name": "CRX Thighs",
+          "vendor": "Deck Family Farm",
+          "score": 0.5
+        }
+      ],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "ZO43VQG6PHP7LWKPZXZP2P44",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1200,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "Exists locally; unlinked",
+      "reviewedCandidates": [],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "Y2PVWBPZ7DHNBNIX5ARR7MAG",
+      "name": "CRX Feet",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [
+        {
+          "id": 1163732,
+          "name": "CRX Drumsticks",
+          "vendor": "Deck Family Farm",
+          "score": 0.5
+        },
+        {
+          "id": 1163731,
+          "name": "CRX Thighs",
+          "vendor": "Deck Family Farm",
+          "score": 0.5
+        },
+        {
+          "id": 814849,
+          "name": "Turkey Feet",
+          "vendor": "Deck Family Farm",
+          "score": 0.5
+        }
+      ],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "XMIVORSH742SXBF3RIIZWWM4",
+          "name": "Regular",
+          "sku": "",
+          "amount": 950,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 813079,
+          "name": "Chicken Feet, 1lb bag",
+          "isDeleted": 0,
+          "vendor": "Deck Family Farm",
+          "category": "Pasture-raised Poultry🐔"
+        }
+      ],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "YFEXZYORRBLWM4GLIBVZ6DVR",
+      "name": "CRX Hearts",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [
+        {
+          "id": 818957,
+          "name": "Chicken Hearts",
+          "vendor": "Deck Family Farm",
+          "score": 0.5
+        },
+        {
+          "id": 1163732,
+          "name": "CRX Drumsticks",
+          "vendor": "Deck Family Farm",
+          "score": 0.5
+        },
+        {
+          "id": 1163731,
+          "name": "CRX Thighs",
+          "vendor": "Deck Family Farm",
+          "score": 0.5
+        }
+      ],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "KSHNRUR5RP3APBNE5ZA3NFOJ",
+          "name": "Regular",
+          "sku": "",
+          "amount": 950,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 818957,
+          "name": "Chicken Hearts",
+          "isDeleted": 0,
+          "vendor": "Deck Family Farm",
+          "category": "Pasture-raised Poultry🐔"
+        }
+      ],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "VPT2HXYYYWXSK2VCZTTI7JGL",
+      "name": "CRX Hindquarters",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [
+        {
+          "id": 1163732,
+          "name": "CRX Drumsticks",
+          "vendor": "Deck Family Farm",
+          "score": 0.5
+        },
+        {
+          "id": 1163731,
+          "name": "CRX Thighs",
+          "vendor": "Deck Family Farm",
+          "score": 0.5
+        }
+      ],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "ALBBJSQDXTEHY2ICGAX62AEJ",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1200,
+          "currency": "USD",
+          "unit": "lb"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 805676,
+          "name": "Chicken Part, Hindquarter",
+          "isDeleted": 0,
+          "vendor": "Deck Family Farm",
+          "category": "Pasture-raised Poultry🐔"
+        }
+      ],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "H44FXVNEJLWUBUJSH6KJ3I6N",
+      "name": "CRX Liver",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [
+        {
+          "id": 841579,
+          "name": "Beef Liver",
+          "vendor": "Deck Family Farm",
+          "score": 0.5
+        },
+        {
+          "id": 805677,
+          "name": "Chicken Liver",
+          "vendor": "Deck Family Farm",
+          "score": 0.5
+        },
+        {
+          "id": 1163732,
+          "name": "CRX Drumsticks",
+          "vendor": "Deck Family Farm",
+          "score": 0.5
+        },
+        {
+          "id": 1163731,
+          "name": "CRX Thighs",
+          "vendor": "Deck Family Farm",
+          "score": 0.5
+        }
+      ],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "73RVVYB5OR6HIWVLV5PD2TAG",
+          "name": "Regular",
+          "sku": "",
+          "amount": 950,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 805677,
+          "name": "Chicken Liver",
+          "isDeleted": 0,
+          "vendor": "Deck Family Farm",
+          "category": "Pasture-raised Poultry🐔"
+        }
+      ],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "AL5UGDCUIRSMFYGSHY6I3JCG",
+      "name": "CRX Wings",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [
+        {
+          "id": 1163732,
+          "name": "CRX Drumsticks",
+          "vendor": "Deck Family Farm",
+          "score": 0.5
+        },
+        {
+          "id": 1163731,
+          "name": "CRX Thighs",
+          "vendor": "Deck Family Farm",
+          "score": 0.5
+        }
+      ],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "YNI5TRGXHPXMEY3RJI34NLXK",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1200,
+          "currency": "USD",
+          "unit": "lb"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 805679,
+          "name": "Chicken Part, Wings",
+          "isDeleted": 0,
+          "vendor": "Deck Family Farm",
+          "category": "Pasture-raised Poultry🐔"
+        }
+      ],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "USSJN64CH5BMDEVDB3XAJQSR",
+      "name": "Cucumber Salad",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [
+        {
+          "id": 994208,
+          "name": "Muncher Cucumber",
+          "vendor": "Little Wings",
+          "score": 0.5
+        },
+        {
+          "id": 883821,
+          "name": "Persian Cucumber",
+          "vendor": null,
+          "score": 0.5
+        },
+        {
+          "id": 805892,
+          "name": "Pickling Cucumber",
+          "vendor": "Camas Swale Farm",
+          "score": 0.5
+        },
+        {
+          "id": 805977,
+          "name": "Salad Mix",
+          "vendor": "Little Wings",
+          "score": 0.5
+        }
+      ],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "NEMISXQUJ6ZLW7TPWGKSCBHB",
+          "name": "Regular",
+          "sku": "",
+          "amount": 300,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "YCNO3E43XR323MAEXZT7HOWB",
+      "name": "EE 7 layer bar",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "LQSUGB37OXEPGZUVTVXRSZH5",
+          "name": "Regular",
+          "sku": "",
+          "amount": 350,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 806065,
+          "name": "Gluten Free Seven Layer Cookie",
+          "isDeleted": 0,
+          "vendor": "Elegant Elephant Baking Co.",
+          "category": "Baked Goods 🍞 🥖"
+        }
+      ],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "ZMAGPONYIBYXHJUJLIOY6UUI",
+      "name": "EE 7 Layer Bar",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "34SOAZEOF73DE54ISCNYXPCN",
+          "name": "Regular",
+          "sku": "",
+          "amount": 350,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 806065,
+          "name": "Gluten Free Seven Layer Cookie",
+          "isDeleted": 0,
+          "vendor": "Elegant Elephant Baking Co.",
+          "category": "Baked Goods 🍞 🥖"
+        }
+      ],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "HUTKUVNSXER2SE5R5PAHIEKZ",
+      "name": "EE Blackberry Handpie",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "CDKAZ3OTICKDV2BYYAHYYDWR",
+          "name": "Regular",
+          "sku": "",
+          "amount": 420,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 806022,
+          "name": "Gluten Free Blackberry Hand Pie",
+          "isDeleted": 0,
+          "vendor": "Elegant Elephant Baking Co.",
+          "category": "Baked Goods 🍞 🥖"
+        }
+      ],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "MOJ4L5ZDPWNRWJKLGNHKGTW5",
+      "name": "EE Chocolat Chip Brownie",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "2OVGD362LFNAQXBO6G6OWOR3",
+          "name": "Regular",
+          "sku": "",
+          "amount": 350,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 806030,
+          "name": "Gluten Free Brownie Bite with Chocolate Chips",
+          "isDeleted": 0,
+          "vendor": "Elegant Elephant Baking Co.",
+          "category": "Baked Goods 🍞 🥖"
+        }
+      ],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "5BVR3AIT4637XBCBJGQLDNZQ",
+      "name": "EE chocolate donut",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [
+        {
+          "id": 806038,
+          "name": "Gluten Free Chocolate Donut",
+          "vendor": "Elegant Elephant Baking Co.",
+          "score": 0.5714285714285714
+        }
+      ],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "JIQGIEDPU6QGXHHH7YHY7MBQ",
+          "name": "Regular",
+          "sku": "",
+          "amount": 330,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 806038,
+          "name": "Gluten Free Chocolate Donut",
+          "isDeleted": 0,
+          "vendor": "Elegant Elephant Baking Co.",
+          "category": "Baked Goods 🍞 🥖"
+        }
+      ],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "377CBX75ZJJR6DEH5XE6DL4Y",
+      "name": "Free Eggs $40 min",
+      "archived": true,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "73PXGICEEG6FNYKS23O5RLFJ",
+          "name": "Regular",
+          "sku": "",
+          "amount": 0,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "EVUJYHLMQAKKN4NSYLQAJ7VI",
+      "name": "Garlic (Pork)",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [
+        {
+          "id": 805724,
+          "name": "Bacon, Pork",
+          "vendor": "Deck Family Farm",
+          "score": 0.5
+        },
+        {
+          "id": 1122274,
+          "name": "Garlic Scapes",
+          "vendor": "Grazier's Garden",
+          "score": 0.5
+        },
+        {
+          "id": 805909,
+          "name": "Garlic Scapes",
+          "vendor": "Camas Swale Farm",
+          "score": 0.5
+        },
+        {
+          "id": 882263,
+          "name": "Green garlic",
+          "vendor": "Camas Swale Farm",
+          "score": 0.5
+        }
+      ],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "3KGYHKQW52EDX4S6VRSHKPMD",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1950,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 805686,
+          "name": "Fresh Garlic Sausage Links",
+          "isDeleted": 0,
+          "vendor": "Deck Family Farm",
+          "category": "Sausages & Cured Meats🥓"
+        }
+      ],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "3VY2J7UPRQNJU34HGEGCPT7T",
+      "name": "GH Chocolate Chip Cookie",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [
+        {
+          "id": 1168793,
+          "name": "Sourdough Chocolate Chip Cookies",
+          "vendor": "Cook-Book's Bakin'",
+          "score": 0.5
+        }
+      ],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "2BL3U3HW63YAYAFBEJI576JZ",
+          "name": "Regular",
+          "sku": "",
+          "amount": 300,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "JJS2ET5QQFUI4ULRF573QLBF",
+      "name": "GH Danish",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "RKGBL7MUE43I7TUIZL3AUGHJ",
+          "name": "Regular",
+          "sku": "",
+          "amount": 600,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "GJ7FCM4Y6OIDZX5OCBHHPUBJ",
+      "name": "GH Turnover",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "BWKNJ5EOELORMBZHHFSSZ55Z",
+          "name": "Regular",
+          "sku": "",
+          "amount": 600,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "6L4LHXKZLZ5QHLPPSHK3NVOV",
+      "name": "GH Yogurt Fruit Cup",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "BPODA7EEZ5NJXXVE3SY7ETGF",
+          "name": "Regular",
+          "sku": "",
+          "amount": 600,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "AE5HB5I5KBLWYKBTDZWHMJ2X",
+      "name": "Glass house cookie",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "2GM27RKQHC5SNCRANDUUPOR7",
+          "name": "Regular",
+          "sku": "",
+          "amount": 300,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "KKXEXNKQJ6ZRPDCUTDUABAI7",
+      "name": "Glass house spinach feta turnover",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "SICQ6PWV53WKJCOLTD4BDZLW",
+          "name": "Regular",
+          "sku": "",
+          "amount": 600,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "TQCYFY7PJSSIFPJ57QWV2COL",
+      "name": "Half Dozen Eggs",
+      "archived": true,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "XJ6AIN2KAEA3CYUTBDSAVLOM",
+          "name": "Regular",
+          "sku": "",
+          "amount": 700,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "3QXI3INIUXQOJQ2SDU4QBIF3",
+      "name": "Ham",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "2XVTYG4RHL3NBICYZ5VUXRSW",
+          "name": "Regular",
+          "sku": "",
+          "amount": 2000,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 921372,
+          "name": "Honey Maple Ham, Ends & Pieces",
+          "isDeleted": 0,
+          "vendor": "Deck Family Farm",
+          "category": "Sausages & Cured Meats🥓"
+        },
+        {
+          "id": 805693,
+          "name": "Honey Maple Ham, Sliced",
+          "isDeleted": 0,
+          "vendor": "Deck Family Farm",
+          "category": "Sausages & Cured Meats🥓"
+        }
+      ],
+      "reviewNote": "Local sliced ham and ends/pieces exist; Square package is unspecified."
+    },
+    {
+      "squareItemId": "ICKLKGWCJDPGBEXWSGG4TTAM",
+      "name": "Honey 1/2 pint",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [
+        {
+          "id": 940998,
+          "name": "Raw Honey, 1/2 pint",
+          "vendor": "Deck Family Farm",
+          "score": 0.8888888888888888
+        },
+        {
+          "id": 806161,
+          "name": "Raw Honey, 1 pint",
+          "vendor": "Deck Family Farm",
+          "score": 0.75
+        },
+        {
+          "id": 958464,
+          "name": "Spinach  1/2 Lb.",
+          "vendor": "Little Wings",
+          "score": 0.5714285714285714
+        },
+        {
+          "id": 805832,
+          "name": "Spinach  1/2 Lb.",
+          "vendor": "Small is Beautiful Farm",
+          "score": 0.5714285714285714
+        }
+      ],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "G4GC5T2AQXKINQL4FSFIIKSI",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1700,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 940998,
+          "name": "Raw Honey, 1/2 pint",
+          "isDeleted": 0,
+          "vendor": "Deck Family Farm",
+          "category": "Canned Goods 🥫"
+        }
+      ],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "Q55MUZPKDZURIE5RXNZPCKXK",
+      "name": "Honey 1/4 pint",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [
+        {
+          "id": 806161,
+          "name": "Raw Honey, 1 pint",
+          "vendor": "Deck Family Farm",
+          "score": 0.75
+        },
+        {
+          "id": 940998,
+          "name": "Raw Honey, 1/2 pint",
+          "vendor": "Deck Family Farm",
+          "score": 0.6666666666666666
+        },
+        {
+          "id": 941000,
+          "name": "Raw Honey, 1 quart",
+          "vendor": "Deck Family Farm",
+          "score": 0.5
+        }
+      ],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "VSS4AQL4DLS5OYYSF2PRFLGC",
+          "name": "Regular",
+          "sku": "",
+          "amount": 900,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": "No local quarter-pint package found; other honey sizes exist."
+    },
+    {
+      "squareItemId": "L5TENQNPPCD7U7SFT7MRCFVA",
+      "name": "Hotdogs Beef&Pork",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [
+        {
+          "id": 1160556,
+          "name": "Ground Beef & Pork Bundle",
+          "vendor": "Full Farm CSA",
+          "score": 0.5714285714285714
+        }
+      ],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "LVMAPHC27CSY42WPCUFNCN2P",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1950,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 1131922,
+          "name": "Old World Style Hot Dogs",
+          "isDeleted": 0,
+          "vendor": "Deck Family Farm",
+          "category": "Sausages & Cured Meats🥓"
+        }
+      ],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "NUAYVKIQK6LY3I4WM3Z3F6IZ",
+      "name": "Kombucha",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [
+        {
+          "id": 806020,
+          "name": "Blackberry Herbalism Kombucha",
+          "vendor": "BNF Kombucha and Jun",
+          "score": 0.5
+        },
+        {
+          "id": 806027,
+          "name": "Ginger Zen Kombucha",
+          "vendor": "BNF Kombucha and Jun",
+          "score": 0.5
+        },
+        {
+          "id": 806031,
+          "name": "Grape Lavender Kombucha",
+          "vendor": "BNF Kombucha and Jun",
+          "score": 0.5
+        },
+        {
+          "id": 806036,
+          "name": "Mango Marigold Kombucha",
+          "vendor": "BNF Kombucha and Jun",
+          "score": 0.5
+        }
+      ],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "JVOGXOXO5K5HXHJ7BPSL55CP",
+          "name": "Regular",
+          "sku": "",
+          "amount": 450,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 806020,
+          "name": "Blackberry Herbalism Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 821597,
+          "name": "Chai Cider",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806023,
+          "name": "Ginger Turmeric Jun",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806027,
+          "name": "Ginger Zen Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806031,
+          "name": "Grape Lavender Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806034,
+          "name": "Hibiscus Mint Yerbe Mate Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806036,
+          "name": "Mango Marigold Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806040,
+          "name": "Moonfruit Yerbe Mate Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806042,
+          "name": "Oregon Blueberry Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806045,
+          "name": "Peach Rose Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806049,
+          "name": "Pear Jun",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806052,
+          "name": "Pomegranate Cardamom Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806056,
+          "name": "Raspberry Reishi Jun",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806059,
+          "name": "Skullcap Lemon Yerbe Mate Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 976879,
+          "name": "Strawberry Mint Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 1038295,
+          "name": "Sugar Plum Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        }
+      ],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "JLKTUM5MXH7F3JTHB7K4VBJC",
+      "name": "Kroppkakkor",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "T2DFZBY27YQPN2TMWDV5DYKY",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1000,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 1011872,
+          "name": "Swedish Sausage Potato Dumplings",
+          "isDeleted": 0,
+          "vendor": "Deck Family Farm's Hyland Artisinal Meats",
+          "category": "Prepared Foods"
+        }
+      ],
+      "reviewNote": "Possible Swedish dumpling counterpart; serving/package needs review."
+    },
+    {
+      "squareItemId": "NRHOVYAY6UIJS27DWAQEOXZM",
+      "name": "Lonesome whistle popcorn",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "NKKENZA5K27X2J476OTLUSBX",
+          "name": "Regular",
+          "sku": "",
+          "amount": 600,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 806082,
+          "name": "Dakota Black Heirloom Popcorn",
+          "isDeleted": 0,
+          "vendor": "Lonesome Whistle",
+          "category": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+        },
+        {
+          "id": 806090,
+          "name": "Garlic Dill Popcorn",
+          "isDeleted": 0,
+          "vendor": "Lonesome Whistle",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806093,
+          "name": "Jalapeno Cheddar Popcorn",
+          "isDeleted": 0,
+          "vendor": "Lonesome Whistle",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806096,
+          "name": "Lemon Lavender Popcorn",
+          "isDeleted": 0,
+          "vendor": "Lonesome Whistle",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806097,
+          "name": "Nutritional Yeast Popcorn",
+          "isDeleted": 0,
+          "vendor": "Lonesome Whistle",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        }
+      ],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "C44VX4IKA7YX3EVRZ6TTL456",
+      "name": "LW Popcorn",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "GPMTZZLKAHRC2VGFPPMNFTAW",
+          "name": "Regular",
+          "sku": "",
+          "amount": 560,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 806082,
+          "name": "Dakota Black Heirloom Popcorn",
+          "isDeleted": 0,
+          "vendor": "Lonesome Whistle",
+          "category": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+        },
+        {
+          "id": 806090,
+          "name": "Garlic Dill Popcorn",
+          "isDeleted": 0,
+          "vendor": "Lonesome Whistle",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806093,
+          "name": "Jalapeno Cheddar Popcorn",
+          "isDeleted": 0,
+          "vendor": "Lonesome Whistle",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806096,
+          "name": "Lemon Lavender Popcorn",
+          "isDeleted": 0,
+          "vendor": "Lonesome Whistle",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806097,
+          "name": "Nutritional Yeast Popcorn",
+          "isDeleted": 0,
+          "vendor": "Lonesome Whistle",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        }
+      ],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "7NOGPYESRU2QAO32SYQEMAZI",
+      "name": "Pepperoni stick, individual",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [
+        {
+          "id": 805721,
+          "name": "Pepperoni stick",
+          "vendor": "Deck Family Farm",
+          "score": 0.8
+        }
+      ],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "LK7DSTHQABMBBZZDHZ374SV4",
+          "name": "Individual stick",
+          "sku": "",
+          "amount": 300,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": "Intentionally Square-only individual stick; local product is a 6 oz package."
+    },
+    {
+      "squareItemId": "CWIK4ATO4PTO2UBGMXWOZOVA",
+      "name": "Pick 3 for 30",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "JYHEERVEYI5MFETTQGOEXAM6",
+          "name": "Regular",
+          "sku": "",
+          "amount": null,
+          "currency": null,
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "7CBV5JB5OQIB62SHILP2GJPE",
+      "name": "Pick 3 for 50",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "UCJPU7DRL53L6YHKEHH26TVA",
+          "name": "Regular",
+          "sku": "",
+          "amount": null,
+          "currency": null,
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "E42WKZNTTUZOFWJ3BBV6G6FA",
+      "name": "Picnic Beef Sausage",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "WYADNXCPEEOMCRZC3ZTWWSPW",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1950,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "EJTUO45BLYB5I74RVSPRRNOM",
+      "name": "Pint Honey",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [
+        {
+          "id": 806161,
+          "name": "Raw Honey, 1 pint",
+          "vendor": "Deck Family Farm",
+          "score": 0.6666666666666666
+        },
+        {
+          "id": 940998,
+          "name": "Raw Honey, 1/2 pint",
+          "vendor": "Deck Family Farm",
+          "score": 0.5714285714285714
+        },
+        {
+          "id": 991384,
+          "name": "Honey Plum",
+          "vendor": "Small is Beautiful Farm",
+          "score": 0.5
+        }
+      ],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "AJDOYXU4YINBCM6W4AXZATY2",
+          "name": "Regular",
+          "sku": "",
+          "amount": 2600,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 806161,
+          "name": "Raw Honey, 1 pint",
+          "isDeleted": 0,
+          "vendor": "Deck Family Farm",
+          "category": "Canned Goods 🥫"
+        }
+      ],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "PCGER3JHKMWG3NC4NWAE7PXM",
+      "name": "Pork Chops",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [
+        {
+          "id": 805724,
+          "name": "Bacon, Pork",
+          "vendor": "Deck Family Farm",
+          "score": 0.5
+        },
+        {
+          "id": 805691,
+          "name": "Ground Pork",
+          "vendor": "Deck Family Farm",
+          "score": 0.5
+        },
+        {
+          "id": 813078,
+          "name": "Pork Bones",
+          "vendor": "Deck Family Farm",
+          "score": 0.5
+        },
+        {
+          "id": 861798,
+          "name": "Pork Shank",
+          "vendor": "Deck Family Farm",
+          "score": 0.5
+        }
+      ],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "HE3CDAY5PTKGQSLNASLM5SUC",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1950,
+          "currency": "USD",
+          "unit": "lb"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 805652,
+          "name": "Pork Chop, Bone-in",
+          "isDeleted": 0,
+          "vendor": "Deck Family Farm",
+          "category": "Pasture-raised Pork 🐖"
+        },
+        {
+          "id": 832792,
+          "name": "Pork Chop, Boneless",
+          "isDeleted": 0,
+          "vendor": "Deck Family Farm",
+          "category": "Pasture-raised Pork 🐖"
+        }
+      ],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "IGGJTNXQOJGO2CQWSLOEOBJK",
+      "name": "Potato Salad",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [
+        {
+          "id": 805977,
+          "name": "Salad Mix",
+          "vendor": "Little Wings",
+          "score": 0.5
+        }
+      ],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "D2I3TQN7V3M2R5GE72SGUOLE",
+          "name": "Regular",
+          "sku": "",
+          "amount": 500,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "XOOZEELF4A5M2XA2MF2QY7PQ",
+      "name": "Pretzel ",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "VQJMAWTJC7T5SV6GXEGIDKL2",
+          "name": "Regular",
+          "sku": "",
+          "amount": 600,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "K36JLIEGZO6T4UEWCGEKIDYB",
+      "name": "Pullet Dz",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "OFJIHPLGZ43KQUYQ7UPI7ANR",
+          "name": "Regular",
+          "sku": "",
+          "amount": 500,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 995135,
+          "name": "Small Organic Pasture Raised Chicken Eggs",
+          "isDeleted": 0,
+          "vendor": "Deck Family Farm",
+          "category": "Organic Eggs 🍳 🥚"
+        }
+      ],
+      "reviewNote": "Possible small-egg product; pullet equivalence is unverified."
+    },
+    {
+      "squareItemId": "IEQ5XOFLC5AFPNJI5WZEEFKN",
+      "name": "Quart Honey",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [
+        {
+          "id": 941000,
+          "name": "Raw Honey, 1 quart",
+          "vendor": "Deck Family Farm",
+          "score": 0.6666666666666666
+        },
+        {
+          "id": 991384,
+          "name": "Honey Plum",
+          "vendor": "Small is Beautiful Farm",
+          "score": 0.5
+        }
+      ],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "EBGFWL37CWOWFIQXHEWWDRMJ",
+          "name": "Regular",
+          "sku": "",
+          "amount": 4750,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 941000,
+          "name": "Raw Honey, 1 quart",
+          "isDeleted": 0,
+          "vendor": "Deck Family Farm",
+          "category": "Canned Goods 🥫"
+        }
+      ],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "4PGLUI2SYEMKDEIPVUZYLD2J",
+      "name": "Ribs (Lamb)",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [
+        {
+          "id": 813092,
+          "name": "Ground Lamb",
+          "vendor": "Deck Family Farm",
+          "score": 0.5
+        },
+        {
+          "id": 825835,
+          "name": "Lamb Bones",
+          "vendor": "Deck Family Farm",
+          "score": 0.5
+        },
+        {
+          "id": 939774,
+          "name": "Lamb Heart",
+          "vendor": "Deck Family Farm",
+          "score": 0.5
+        },
+        {
+          "id": 825839,
+          "name": "Lamb Kabob",
+          "vendor": "Deck Family Farm",
+          "score": 0.5
+        }
+      ],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "5A7E4QX6LFB2QA34UJGNXJ3Q",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1850,
+          "currency": "USD",
+          "unit": "lb"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "5TIN23QNVSMIKAUOTUMIJ5EY",
+      "name": "Sausage+Roll",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [
+        {
+          "id": 805687,
+          "name": "Summer Sausage",
+          "vendor": "Deck Family Farm",
+          "score": 0.5
+        }
+      ],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "WEESNTVT3ANQWN7LKQBDQ2WF",
+          "name": "Regular",
+          "sku": "",
+          "amount": 900,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "N26E5BMPK2DXQGFVN5K7N232",
+      "name": "Scandi Dumpling",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "XMHYEWTIZ5LEHKZYBULFAPFV",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1200,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 1011872,
+          "name": "Swedish Sausage Potato Dumplings",
+          "isDeleted": 0,
+          "vendor": "Deck Family Farm's Hyland Artisinal Meats",
+          "category": "Prepared Foods"
+        }
+      ],
+      "reviewNote": "Possible Swedish dumpling counterpart; serving/package needs review."
+    },
+    {
+      "squareItemId": "NE42LNRBOWKK2F4OE6DFZHP6",
+      "name": "Scandi Kombucha",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "BHSMSHWHVSMJSYZNRVQ7UTIX",
+          "name": "Regular",
+          "sku": "",
+          "amount": 500,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 806020,
+          "name": "Blackberry Herbalism Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 821597,
+          "name": "Chai Cider",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806023,
+          "name": "Ginger Turmeric Jun",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806027,
+          "name": "Ginger Zen Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806031,
+          "name": "Grape Lavender Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806034,
+          "name": "Hibiscus Mint Yerbe Mate Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806036,
+          "name": "Mango Marigold Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806040,
+          "name": "Moonfruit Yerbe Mate Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806042,
+          "name": "Oregon Blueberry Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806045,
+          "name": "Peach Rose Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806049,
+          "name": "Pear Jun",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806052,
+          "name": "Pomegranate Cardamom Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806056,
+          "name": "Raspberry Reishi Jun",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 806059,
+          "name": "Skullcap Lemon Yerbe Mate Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 976879,
+          "name": "Strawberry Mint Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        },
+        {
+          "id": 1038295,
+          "name": "Sugar Plum Kombucha",
+          "isDeleted": 0,
+          "vendor": "BNF Kombucha and Jun",
+          "category": "Beverages 🍶🥤  and Snacks 🍿"
+        }
+      ],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "Y6C5J7WSMBVK4WV4KFFAVK2W",
+      "name": "Skewer",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "ZDTKDO2UOISVNNG2FBCZ54ML",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1200,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "QBB27NAALKK6LCUIZPSX46KU",
+      "name": "Snack pack",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "UX5MX4NUME2INYRZY7PR4LRL",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1000,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "JHQHDMNTN753EJEJR6OOU43I",
+      "name": "Tamari 10oz",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "7XWUOVUJL7M26SGV74XY5BPE",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1000,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": "Local Tamari packages are 3 oz and 12 oz; no local 10 oz package found."
+    },
+    {
+      "squareItemId": "RLO7SAZXQA6V6MMRXBDSSIFL",
+      "name": "Tamari Pressed Beef Strips 10 oz",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [
+        {
+          "id": 805694,
+          "name": "Tamari Pressed Beef Jerky",
+          "vendor": "Deck Family Farm",
+          "score": 0.6666666666666666
+        },
+        {
+          "id": 1107078,
+          "name": "Tamari Pressed Beef Jerky - 12 oz",
+          "vendor": "Deck Family Farm",
+          "score": 0.6
+        }
+      ],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "3GYXW4KEDWCMDKF2IB5WGUFW",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1000,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": "Local Tamari packages are 3 oz and 12 oz; no local 10 oz package found."
+    },
+    {
+      "squareItemId": "WSTQI7M5RC3ZFFKIDQ7G4PQM",
+      "name": "Uncured Smoked Picnic Beef Sausage",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "XGL3PNOOD7TKZXSUAWJYA25X",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1950,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "7DEDXYV4AKC5ODQTCMLSUNL5",
+      "name": "Walnuts (1lb.)",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "WMAHDOAPQPUVEJUO76GHES6Q",
+          "name": "Regular",
+          "sku": "",
+          "amount": 2500,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 806159,
+          "name": "Raw Walnuts, 1 lb",
+          "isDeleted": 0,
+          "vendor": "Deck Family Farm",
+          "category": "Grains/Pasta/Nuts  🫘 🍝 🥣"
+        }
+      ],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "7EJRCALF6DDFWQNVONCQU6EK",
+      "name": "Water",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "ZGGA5U646CRMR642QOEN2E3C",
+          "name": "Regular",
+          "sku": "",
+          "amount": 150,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "Q6A3NATO2GTVW2NSNIPBVZOM",
+      "name": "Water",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "MPM4MFMSZYX57TYNOKVGP2BY",
+          "name": "Regular",
+          "sku": "",
+          "amount": 200,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "reviewCategory": "No clear local counterpart found",
+      "reviewedCandidates": [],
+      "reviewNote": ""
+    },
+    {
+      "squareItemId": "H6XJOPIQKDYIX54KKCOSFAUN",
+      "name": "Whole CRX (POP)",
+      "archived": false,
+      "status": "No active local link or exact name/SKU match",
+      "exactNames": [],
+      "skuMatches": [],
+      "deletedNameMatches": [],
+      "suggestions": [],
+      "existingLinks": [],
+      "variations": [
+        {
+          "id": "XS44NNISRWTQP4HYFGEMORRR",
+          "name": "Regular",
+          "sku": "",
+          "amount": 810,
+          "currency": "USD",
+          "unit": "lb"
+        }
+      ],
+      "reviewCategory": "Possible local counterpart; unlinked",
+      "reviewedCandidates": [
+        {
+          "id": 805673,
+          "name": "Cornish Roasting Chicken, Extra Large",
+          "isDeleted": 0,
+          "vendor": "Deck Family Farm",
+          "category": "Pasture-raised Poultry🐔"
+        },
+        {
+          "id": 953035,
+          "name": "Cornish Roasting Chicken, Large",
+          "isDeleted": 0,
+          "vendor": "Deck Family Farm",
+          "category": "Pasture-raised Poultry🐔"
+        },
+        {
+          "id": 953036,
+          "name": "Cornish Roasting Chicken, Medium",
+          "isDeleted": 0,
+          "vendor": "Deck Family Farm",
+          "category": "Pasture-raised Poultry🐔"
+        },
+        {
+          "id": 953039,
+          "name": "Cornish Roasting Chicken, Small",
+          "isDeleted": 0,
+          "vendor": "Deck Family Farm",
+          "category": "Pasture-raised Poultry🐔"
+        }
+      ],
+      "reviewNote": "Local Cornish roasting chickens are split into sizes."
+    }
+  ]
+}

@@ -1,0 +1,1478 @@
+{
+  "status": "completed",
+  "completedItems": 95,
+  "itemNamesUpdated": 80,
+  "variationNamesUpdated": 93,
+  "heldItems": [
+    {
+      "item": "Brisket",
+      "squareItemId": "BB4BQ436YGC4LUSOU4HLL27D",
+      "localProducts": [
+        "Brisket, Large",
+        "Brisket, Medium"
+      ],
+      "reasons": [
+        "Square item linked to multiple local products"
+      ]
+    },
+    {
+      "item": "Broth",
+      "squareItemId": "STOLBNKXICC2JBBIP4575AQW",
+      "localProducts": [
+        "Classic Beef Broth",
+        "Classic Chicken Broth",
+        "Classic Pork Broth"
+      ],
+      "reasons": [
+        "Square item linked to multiple local products",
+        "Proposed variation names are ambiguous within the Square item"
+      ]
+    },
+    {
+      "item": "Ground Beef",
+      "squareItemId": "XJV3K7ISGJYS3ERSUYR3I32H",
+      "localProducts": [
+        "Natural Ground Beef",
+        "Organic Ground Beef"
+      ],
+      "reasons": [
+        "Square item linked to multiple local products",
+        "Proposed variation names are ambiguous within the Square item"
+      ]
+    },
+    {
+      "item": "Tamari Pressed Jerky",
+      "squareItemId": "OUU6M6GFFCZ2DPE455MXY3SB",
+      "localProducts": [
+        "Tamari Pressed Beef Jerky",
+        "Tamari Pressed Beef Jerky - 12 oz"
+      ],
+      "reasons": [
+        "Square item linked to multiple local products"
+      ]
+    }
+  ],
+  "heldVariations": [
+    {
+      "product": "Beef Back Ribs",
+      "squareItemId": "ANOBF7MHTR5DKMLRW3KEJ52P",
+      "type": "variation",
+      "variationId": "ESFETJY6J3E3YNPYEUT3P4BJ",
+      "packageId": 535102,
+      "before": "Natural",
+      "after": "2.00 - 3.00 lbs",
+      "reason": "Square generates this name from shared Natural/Organic item options; option removal requires review."
+    },
+    {
+      "product": "Beef Shank Osso Buco",
+      "squareItemId": "YO6NZ2ZRLEGTFOWDKE4EC6E5",
+      "type": "variation",
+      "variationId": "36KI54KEJJZP76I7I2AAQASZ",
+      "packageId": 535101,
+      "before": "Natural",
+      "after": "2.10 - 2.40 lbs",
+      "reason": "Square generates this name from shared Natural/Organic item options; option removal requires review."
+    }
+  ],
+  "verification": "Every renamed item was read back from Square; non-name fields match the frozen live object, allowing Square to discard empty location override rows and update catalog metadata.",
+  "confirmedAt": "2026-11-06T19:01:33.849Z",
+  "changes": [
+    {
+      "product": "Baby Back Ribs",
+      "squareItemId": "5UOYFMPA22EZ4IBLF2NH4KMT",
+      "type": "item",
+      "before": "Baby Back Ribs (Pork)",
+      "after": "Baby Back Ribs"
+    },
+    {
+      "product": "Baby Back Ribs",
+      "squareItemId": "5UOYFMPA22EZ4IBLF2NH4KMT",
+      "type": "variation",
+      "variationId": "LISW32VK23KXNB33ENFT477O",
+      "packageId": 538686,
+      "before": "Regular",
+      "after": "0.90 - 1.50 lbs"
+    },
+    {
+      "product": "Bacon Ends & Pieces, Pork",
+      "squareItemId": "624YSUGQGVL4Q6N6XTRJI3W5",
+      "type": "item",
+      "before": "Bacon Ends",
+      "after": "Bacon Ends & Pieces, Pork"
+    },
+    {
+      "product": "Bacon Ends & Pieces, Pork",
+      "squareItemId": "624YSUGQGVL4Q6N6XTRJI3W5",
+      "type": "variation",
+      "variationId": "S3VRZSN4RMWEZYGOJPBD7E7A",
+      "packageId": 526706,
+      "before": "Regular",
+      "after": "8 oz"
+    },
+    {
+      "product": "Bacon, Pork",
+      "squareItemId": "IE234OJWSW3XBJVMLNNWHKPW",
+      "type": "item",
+      "before": "Bacon",
+      "after": "Bacon, Pork"
+    },
+    {
+      "product": "Bacon, Pork",
+      "squareItemId": "IE234OJWSW3XBJVMLNNWHKPW",
+      "type": "variation",
+      "variationId": "LLQPAZZFUS4TG46PVVOW4P6T",
+      "packageId": 526778,
+      "before": "Regular",
+      "after": "8 oz"
+    },
+    {
+      "product": "Bavarian Style Grazier's Sausage",
+      "squareItemId": "IS5M2UVFIMSFPBAGYZZ7T22C",
+      "type": "item",
+      "before": "Bavarian Sausage",
+      "after": "Bavarian Style Grazier's Sausage"
+    },
+    {
+      "product": "Bavarian Style Grazier's Sausage",
+      "squareItemId": "IS5M2UVFIMSFPBAGYZZ7T22C",
+      "type": "variation",
+      "variationId": "7NG2FP6SV5D3EJVLG4FEN34Q",
+      "packageId": 1011354,
+      "before": "Regular",
+      "after": "ea"
+    },
+    {
+      "product": "Bavette Steak",
+      "squareItemId": "CDWO26QVN3QAPSU3RFO46A7R",
+      "type": "variation",
+      "variationId": "HY4IZXY6GM4AI6EC66ESAZK4",
+      "packageId": 720358,
+      "before": "Natural Bavette",
+      "after": "0.9 - 1.6 lbs"
+    },
+    {
+      "product": "Beef Back Ribs",
+      "squareItemId": "ANOBF7MHTR5DKMLRW3KEJ52P",
+      "type": "item",
+      "before": "Back Ribs (Beef)",
+      "after": "Beef Back Ribs"
+    },
+    {
+      "product": "Beef Bones",
+      "squareItemId": "EKVB7B3EUDOEUW4YKY4WKAH6",
+      "type": "item",
+      "before": "Bones (Beef)",
+      "after": "Beef Bones"
+    },
+    {
+      "product": "Beef Bones",
+      "squareItemId": "EKVB7B3EUDOEUW4YKY4WKAH6",
+      "type": "variation",
+      "variationId": "FO4U2WMBU6CNP3M4TJVGSCXJ",
+      "packageId": 669030,
+      "before": "Natural Beef Bones",
+      "after": "3.00 - 5.00 lbs"
+    },
+    {
+      "product": "Beef Flat Iron Steak",
+      "squareItemId": "RTUI22MY5EU7CX6ALHETPMBO",
+      "type": "item",
+      "before": "Flat Iron Steak",
+      "after": "Beef Flat Iron Steak"
+    },
+    {
+      "product": "Beef Flat Iron Steak",
+      "squareItemId": "RTUI22MY5EU7CX6ALHETPMBO",
+      "type": "variation",
+      "variationId": "B6UDTUDPUQKV2THQ5PFPC6SZ",
+      "packageId": 535105,
+      "before": "Natural Flat Iron",
+      "after": "0.70 - 1.10 lbs"
+    },
+    {
+      "product": "Beef Heart",
+      "squareItemId": "IL4HKH32KJU43QZF2WTE57CM",
+      "type": "item",
+      "before": "Heart (Beef)",
+      "after": "Beef Heart"
+    },
+    {
+      "product": "Beef Heart",
+      "squareItemId": "IL4HKH32KJU43QZF2WTE57CM",
+      "type": "variation",
+      "variationId": "VMS35LF22K4ZIIQLENRZ562Y",
+      "packageId": 526713,
+      "before": "Natural Beef Heart",
+      "after": "2.50 - 3.5 lbs"
+    },
+    {
+      "product": "Beef Kidney",
+      "squareItemId": "E7BTUWHFLBSEQADC5HY3J2NP",
+      "type": "item",
+      "before": "Kidney (Beef)",
+      "after": "Beef Kidney"
+    },
+    {
+      "product": "Beef Kidney",
+      "squareItemId": "E7BTUWHFLBSEQADC5HY3J2NP",
+      "type": "variation",
+      "variationId": "YZD2KCNWUJOWGWKFT7DCG42C",
+      "packageId": 549811,
+      "before": "Natural Beef Kidney",
+      "after": "0.80 - 1.00 lbs"
+    },
+    {
+      "product": "Beef Liver",
+      "squareItemId": "PLQR3XP6GQOWX6GLDFJQZI6D",
+      "type": "item",
+      "before": "Liver (Beef)",
+      "after": "Beef Liver"
+    },
+    {
+      "product": "Beef Liver",
+      "squareItemId": "PLQR3XP6GQOWX6GLDFJQZI6D",
+      "type": "variation",
+      "variationId": "DPHMZXG5A3S4YOMA3V3FICUI",
+      "packageId": 569100,
+      "before": "Natural Beef Liver",
+      "after": "0.90 - 1.30 lbs"
+    },
+    {
+      "product": "Beef Marrow Bones",
+      "squareItemId": "SHZS54JA7XZFU4WNB3O4CLSO",
+      "type": "item",
+      "before": "Marrow Bones (Beef)",
+      "after": "Beef Marrow Bones"
+    },
+    {
+      "product": "Beef Marrow Bones",
+      "squareItemId": "SHZS54JA7XZFU4WNB3O4CLSO",
+      "type": "variation",
+      "variationId": "PJUREPBRNPEO4OGFFYYA7Q7Z",
+      "packageId": 549813,
+      "before": "Natural Beef Marrow Bones",
+      "after": "3.00 - 5.00 lbs"
+    },
+    {
+      "product": "Beef Oxtail",
+      "squareItemId": "AY5RVFQFLHXRD5USE52DU5BD",
+      "type": "item",
+      "before": "Oxtail",
+      "after": "Beef Oxtail"
+    },
+    {
+      "product": "Beef Oxtail",
+      "squareItemId": "AY5RVFQFLHXRD5USE52DU5BD",
+      "type": "variation",
+      "variationId": "HKHJAL5T7IGLNBNP2SHGWFET",
+      "packageId": 535106,
+      "before": "Natural Beef Oxtail",
+      "after": "1.40 - 1.90 lbs"
+    },
+    {
+      "product": "Beef Shank Osso Buco",
+      "squareItemId": "YO6NZ2ZRLEGTFOWDKE4EC6E5",
+      "type": "item",
+      "before": "Osso Buco (Beef)",
+      "after": "Beef Shank Osso Buco"
+    },
+    {
+      "product": "Beef Short Rib",
+      "squareItemId": "IYPQ3PXHDAX25MEP2EFYMKTH",
+      "type": "item",
+      "before": "Short Rib (Beef)",
+      "after": "Beef Short Rib"
+    },
+    {
+      "product": "Beef Short Rib",
+      "squareItemId": "IYPQ3PXHDAX25MEP2EFYMKTH",
+      "type": "variation",
+      "variationId": "73CWJJUMSGTLRLWKCHTYZNCV",
+      "packageId": 634544,
+      "before": "Natural Beef Short Rib",
+      "after": "1.30 - 2.10 lbs"
+    },
+    {
+      "product": "Beef Stew Meat",
+      "squareItemId": "NJRMSC2BLHXCJCDR5ULCPPXX",
+      "type": "item",
+      "before": "Stew (Beef)",
+      "after": "Beef Stew Meat"
+    },
+    {
+      "product": "Beef Stew Meat",
+      "squareItemId": "NJRMSC2BLHXCJCDR5ULCPPXX",
+      "type": "variation",
+      "variationId": "VINTQXAU46GLF3MVILEBL2GN",
+      "packageId": 526720,
+      "before": "Natural Beef Stew",
+      "after": "1.1 - 1.3 lbs"
+    },
+    {
+      "product": "Beef Tenderloin",
+      "squareItemId": "QZ6L4PORGVUVAZSDTH6XIC76",
+      "type": "item",
+      "before": "Tenderloin (Beef)",
+      "after": "Beef Tenderloin"
+    },
+    {
+      "product": "Beef Tenderloin",
+      "squareItemId": "QZ6L4PORGVUVAZSDTH6XIC76",
+      "type": "variation",
+      "variationId": "QGDFUX4RZYYUBRYCXCW2ZW4O",
+      "packageId": 535097,
+      "before": "Natural Tenderloin",
+      "after": "0.40 - 0.70 lbs"
+    },
+    {
+      "product": "Beef Tongue",
+      "squareItemId": "CTUQPFQYSCASKP4QBTONH255",
+      "type": "item",
+      "before": "Tongue (Beef)",
+      "after": "Beef Tongue"
+    },
+    {
+      "product": "Beef Tongue",
+      "squareItemId": "CTUQPFQYSCASKP4QBTONH255",
+      "type": "variation",
+      "variationId": "XLUIITLT42YYIEAIIQMM43SU",
+      "packageId": 549812,
+      "before": "Natural Tongue",
+      "after": "2.50 - 3.00 lbs"
+    },
+    {
+      "product": "Beef Tri-Tip",
+      "squareItemId": "VO7YEQD5FKOYVWGHGFI3ISA3",
+      "type": "item",
+      "before": "Tri-Tip",
+      "after": "Beef Tri-Tip"
+    },
+    {
+      "product": "Beef Tri-Tip",
+      "squareItemId": "VO7YEQD5FKOYVWGHGFI3ISA3",
+      "type": "variation",
+      "variationId": "MG34WSHAPYGTK5C2F7WJY7HH",
+      "packageId": 600217,
+      "before": "Natural Tri Tip",
+      "after": "1.90 - 2.20 lbs"
+    },
+    {
+      "product": "Bratwurst",
+      "squareItemId": "6V7DQMGSLUABL7JI3GMVXULZ",
+      "type": "variation",
+      "variationId": "JL4WOYSE5LX75MYTNGRJEU24",
+      "packageId": 535115,
+      "before": "Regular",
+      "after": "12 oz"
+    },
+    {
+      "product": "Broad Breasted White Thanksgiving Turkeys, Medium",
+      "squareItemId": "WXM5MVVZNSSOZIQHHDQMWAK6",
+      "type": "item",
+      "before": "Thanksgiving Turkey",
+      "after": "Broad Breasted White Thanksgiving Turkeys, Medium"
+    },
+    {
+      "product": "Broad Breasted White Thanksgiving Turkeys, Medium",
+      "squareItemId": "WXM5MVVZNSSOZIQHHDQMWAK6",
+      "type": "variation",
+      "variationId": "ACSBCUQ54CQ6XNUJQYH6VREQ",
+      "packageId": 655862,
+      "before": "White Medium 18-25 lbs",
+      "after": "12.01 - 14.00  lbs"
+    },
+    {
+      "product": "Bulk English Breakfast Sausage",
+      "squareItemId": "DSKZWD2Z6KSSTTADHICAXC5G",
+      "type": "item",
+      "before": "English Breakfast (Bulk)",
+      "after": "Bulk English Breakfast Sausage"
+    },
+    {
+      "product": "Bulk English Breakfast Sausage",
+      "squareItemId": "DSKZWD2Z6KSSTTADHICAXC5G",
+      "type": "variation",
+      "variationId": "GVDPMOIBYDM7FPJUH6PKQPT2",
+      "packageId": 568237,
+      "before": "Regular",
+      "after": "12 oz"
+    },
+    {
+      "product": "Bulk Farm Made Chorizo Sausage",
+      "squareItemId": "DFUN7N54SAZMPXVCNTW3EPBP",
+      "type": "item",
+      "before": "Chorizo",
+      "after": "Bulk Farm Made Chorizo Sausage"
+    },
+    {
+      "product": "Bulk Farm Made Chorizo Sausage",
+      "squareItemId": "DFUN7N54SAZMPXVCNTW3EPBP",
+      "type": "variation",
+      "variationId": "C6SVDIWSCNJKRFIFD6XM2RQF",
+      "packageId": 659188,
+      "before": "Regular",
+      "after": "12 oz"
+    },
+    {
+      "product": "Bulk Thai Curry Sausage",
+      "squareItemId": "56JW4CHELXLEOPRF7E4K4B4Z",
+      "type": "item",
+      "before": "Thai (Bulk)",
+      "after": "Bulk Thai Curry Sausage"
+    },
+    {
+      "product": "Bulk Thai Curry Sausage",
+      "squareItemId": "56JW4CHELXLEOPRF7E4K4B4Z",
+      "type": "variation",
+      "variationId": "LF5N3PXAP6GF6SPZA5R3RC2Z",
+      "packageId": 659187,
+      "before": "Regular",
+      "after": "12 oz"
+    },
+    {
+      "product": "Cajun Chaurice Sausage Links",
+      "squareItemId": "BKII4YYPR7FUPZVKDYUHUXVD",
+      "type": "item",
+      "before": "Cajun Chaurice Links",
+      "after": "Cajun Chaurice Sausage Links"
+    },
+    {
+      "product": "Cajun Chaurice Sausage Links",
+      "squareItemId": "BKII4YYPR7FUPZVKDYUHUXVD",
+      "type": "variation",
+      "variationId": "WBDNBYBMRDK55JR6NCQG6FGD",
+      "packageId": 539546,
+      "before": "Regular",
+      "after": "4 links/ pack 14 oz pack"
+    },
+    {
+      "product": "Chicken Part, Breast, Bone-In",
+      "squareItemId": "7PRNL7OITHV4F5PMM3IDACU3",
+      "type": "item",
+      "before": "CRX Bone In Breast",
+      "after": "Chicken Part, Breast, Bone-In"
+    },
+    {
+      "product": "Chicken Part, Breast, Bone-In",
+      "squareItemId": "7PRNL7OITHV4F5PMM3IDACU3",
+      "type": "variation",
+      "variationId": "GWUVAKYUHDRBOBPDJH3UHMYW",
+      "packageId": 526722,
+      "before": "Regular",
+      "after": "1.30 - 1.70 lbs"
+    },
+    {
+      "product": "Chorizo Verde",
+      "squareItemId": "CB5RBKV2UCS7T6K2GNRHHMTX",
+      "type": "variation",
+      "variationId": "TKXIYOEX25R4SBDAH2QHNCXK",
+      "packageId": 684511,
+      "before": "Regular",
+      "after": "4 links/ pack 14 oz pack"
+    },
+    {
+      "product": "Chuck roast",
+      "squareItemId": "RTQ6INIYGMMDJ3RKTT64KVFN",
+      "type": "item",
+      "before": "Chuck Roast",
+      "after": "Chuck roast"
+    },
+    {
+      "product": "Chuck roast",
+      "squareItemId": "RTQ6INIYGMMDJ3RKTT64KVFN",
+      "type": "variation",
+      "variationId": "7JHSSGCRX4A6VQ5CHHLSB7J5",
+      "packageId": 526711,
+      "before": "Natural Chuck Roast",
+      "after": "2.30 - 2.90 lbs"
+    },
+    {
+      "product": "Country Sausage, Bulk",
+      "squareItemId": "ZOZ27GYI6FO3XADQSKYEVETK",
+      "type": "item",
+      "before": "Country Sausage (Bulk)",
+      "after": "Country Sausage, Bulk"
+    },
+    {
+      "product": "Country Sausage, Bulk",
+      "squareItemId": "ZOZ27GYI6FO3XADQSKYEVETK",
+      "type": "variation",
+      "variationId": "SM7UBX6YKK2EZJJFACUYR5P6",
+      "packageId": 535117,
+      "before": "Regular",
+      "after": "12 oz"
+    },
+    {
+      "product": "Deck Family Farm Insulated Bag",
+      "squareItemId": "SQ6ANRDASE5UMIAPXJDLXK7R",
+      "type": "item",
+      "before": "Insulated Bag Blue Color",
+      "after": "Deck Family Farm Insulated Bag"
+    },
+    {
+      "product": "Deck Family Farm Insulated Bag",
+      "squareItemId": "SQ6ANRDASE5UMIAPXJDLXK7R",
+      "type": "variation",
+      "variationId": "QQ6O2UWSJ7VAGMT3XHTRSLVF",
+      "packageId": 793235,
+      "before": "Regular",
+      "after": "Blue Bag"
+    },
+    {
+      "product": "Deck Family Farm Insulated Bag",
+      "squareItemId": "R7R5YLMIBYYUXAQH5I55WE5N",
+      "type": "item",
+      "before": "Insulated Bag Green Color",
+      "after": "Deck Family Farm Insulated Bag"
+    },
+    {
+      "product": "Deck Family Farm Insulated Bag",
+      "squareItemId": "R7R5YLMIBYYUXAQH5I55WE5N",
+      "type": "variation",
+      "variationId": "USUT3WAE46WL2TOQAIY4SCKL",
+      "packageId": 793236,
+      "before": "Regular",
+      "after": "Green Bag"
+    },
+    {
+      "product": "Flank Steak",
+      "squareItemId": "CQAVFLDGU4BEMOZ4TH6FI3SG",
+      "type": "variation",
+      "variationId": "CH2P36B35NEX5GQB24N6TQ6Y",
+      "packageId": 535104,
+      "before": "Natural Flank Steak",
+      "after": "1.10 - 1.40 lbs"
+    },
+    {
+      "product": "Gluten Free Blueberry Scone",
+      "squareItemId": "52GV4CMWOZSDWW7VC3Z6573X",
+      "type": "item",
+      "before": "EE Blueberry Scone",
+      "after": "Gluten Free Blueberry Scone"
+    },
+    {
+      "product": "Gluten Free Blueberry Scone",
+      "squareItemId": "52GV4CMWOZSDWW7VC3Z6573X",
+      "type": "variation",
+      "variationId": "ZKKXZXF5WODVW6XOHCDKC32A",
+      "packageId": 527087,
+      "before": "Regular",
+      "after": "each"
+    },
+    {
+      "product": "Gluten Free Brownie Bite with Chocolate Chips",
+      "squareItemId": "FXULFLYHKH2IXRWNOWOT4N5Z",
+      "type": "item",
+      "before": "EE brownie",
+      "after": "Gluten Free Brownie Bite with Chocolate Chips"
+    },
+    {
+      "product": "Gluten Free Brownie Bite with Chocolate Chips",
+      "squareItemId": "FXULFLYHKH2IXRWNOWOT4N5Z",
+      "type": "variation",
+      "variationId": "FJB4PYJB5DS7JH23BC3NIDRK",
+      "packageId": 527092,
+      "before": "Regular",
+      "after": "each"
+    },
+    {
+      "product": "Gluten Free Chocolate Donut",
+      "squareItemId": "XHEH6EXU5CSKY4V3FLUWA4PN",
+      "type": "item",
+      "before": "EE Chocolate Donut",
+      "after": "Gluten Free Chocolate Donut"
+    },
+    {
+      "product": "Gluten Free Chocolate Donut",
+      "squareItemId": "XHEH6EXU5CSKY4V3FLUWA4PN",
+      "type": "variation",
+      "variationId": "OP7GVICC4NK4QADUYGVKJFVP",
+      "packageId": 527100,
+      "before": "Regular",
+      "after": "each"
+    },
+    {
+      "product": "Grass-Fed Organ Blend",
+      "squareItemId": "X5ZOGUSJ5AABXRHEGRAJQNQU",
+      "type": "item",
+      "before": "Grass fed organ blend",
+      "after": "Grass-Fed Organ Blend"
+    },
+    {
+      "product": "Grass-Fed Organ Blend",
+      "squareItemId": "X5ZOGUSJ5AABXRHEGRAJQNQU",
+      "type": "variation",
+      "variationId": "DVO2SXTU7A5IQIHBUJ5AWUZ2",
+      "packageId": 659189,
+      "before": "Regular",
+      "after": "1 lb pack"
+    },
+    {
+      "product": "Greek Loukaniko Sausage Links",
+      "squareItemId": "5VM3KJOZZW3Q3I3ITPZVOTX2",
+      "type": "item",
+      "before": "Loukaniko",
+      "after": "Greek Loukaniko Sausage Links"
+    },
+    {
+      "product": "Greek Loukaniko Sausage Links",
+      "squareItemId": "5VM3KJOZZW3Q3I3ITPZVOTX2",
+      "type": "variation",
+      "variationId": "BEPUBK767D7WACNDBXCJH3L4",
+      "packageId": 541754,
+      "before": "Regular",
+      "after": "4 links/ pack 14 oz pack"
+    },
+    {
+      "product": "Ground Lamb",
+      "squareItemId": "W6TLTOS5DEHZUYMO47WBSGOE",
+      "type": "variation",
+      "variationId": "I4326UJUHXDELAFK7M2BZ4Z6",
+      "packageId": 535123,
+      "before": "Regular",
+      "after": "1.00 lbs"
+    },
+    {
+      "product": "Ground Pork",
+      "squareItemId": "ZWYKIFSJHXRJAMUTBROCLXDV",
+      "type": "variation",
+      "variationId": "ATTBVR3RYMNJXCOHHWZ7LUE7",
+      "packageId": 526744,
+      "before": "Regular",
+      "after": "1.00 lbs"
+    },
+    {
+      "product": "Hamburger Patties",
+      "squareItemId": "ZWZUCQRCDOB2CJF4KCGQJYI5",
+      "type": "item",
+      "before": "Patties (Beef)",
+      "after": "Hamburger Patties"
+    },
+    {
+      "product": "Hamburger Patties",
+      "squareItemId": "ZWZUCQRCDOB2CJF4KCGQJYI5",
+      "type": "variation",
+      "variationId": "T5CTPJKL4O3BTPFAD4IEBOYY",
+      "packageId": 526717,
+      "before": "Natural Hamburger",
+      "after": "1.00 lbs"
+    },
+    {
+      "product": "Hanger Steak",
+      "squareItemId": "WSEWP54CB6EZWHXJTDFT5M6W",
+      "type": "variation",
+      "variationId": "U2RS4TBUI2S7DJ6NO2O665TI",
+      "packageId": 568280,
+      "before": "Natural Hanger Steak",
+      "after": "0.40 - 0.70 lbs"
+    },
+    {
+      "product": "Hot Italian Sausage Links",
+      "squareItemId": "6GZJ5FIDENXSI2UBMEER2SQC",
+      "type": "item",
+      "before": "Hot Italian",
+      "after": "Hot Italian Sausage Links"
+    },
+    {
+      "product": "Hot Italian Sausage Links",
+      "squareItemId": "6GZJ5FIDENXSI2UBMEER2SQC",
+      "type": "variation",
+      "variationId": "IZC4B3HYKVYJGWP2ZFFWZLMB",
+      "packageId": 604158,
+      "before": "Regular",
+      "after": "4 links/ pack 14 oz pack"
+    },
+    {
+      "product": "Korean Style Beef Ribs",
+      "squareItemId": "Q6RDEMHLOLEZNQZO2RDBFYEC",
+      "type": "item",
+      "before": "Korean Style Ribs (Beef)",
+      "after": "Korean Style Beef Ribs"
+    },
+    {
+      "product": "Korean Style Beef Ribs",
+      "squareItemId": "Q6RDEMHLOLEZNQZO2RDBFYEC",
+      "type": "variation",
+      "variationId": "MVFD66GNBFVK6CV4WF46J4JY",
+      "packageId": 526754,
+      "before": "Natural Korean Style Short Ribs",
+      "after": "1.20 - 1.40 lbs"
+    },
+    {
+      "product": "Lamb Bones",
+      "squareItemId": "X5JEUWVLEY7Q32PNRSNNUUKG",
+      "type": "item",
+      "before": "Bones (Lamb)",
+      "after": "Lamb Bones"
+    },
+    {
+      "product": "Lamb Bones",
+      "squareItemId": "X5JEUWVLEY7Q32PNRSNNUUKG",
+      "type": "variation",
+      "variationId": "GLJBCAFOB4EJTMLFCS5WRPTN",
+      "packageId": 549814,
+      "before": "Regular",
+      "after": "3.00 - 5.00 lbs"
+    },
+    {
+      "product": "Lamb Chops, 2 pack",
+      "squareItemId": "Z4DXDFPKC6EH7VGLBH27Y4UO",
+      "type": "item",
+      "before": "Chops (Lamb)",
+      "after": "Lamb Chops, 2 pack"
+    },
+    {
+      "product": "Lamb Chops, 2 pack",
+      "squareItemId": "Z4DXDFPKC6EH7VGLBH27Y4UO",
+      "type": "variation",
+      "variationId": "SBF426S4VJ72E7QUX6ORWUAU",
+      "packageId": 669028,
+      "before": "Regular",
+      "after": "2 pack, 0.70 - 1.10 lbs"
+    },
+    {
+      "product": "Lamb Heart",
+      "squareItemId": "UO24DZZIVNHSYSA3GTKKWCTV",
+      "type": "item",
+      "before": "Heart (Lamb)",
+      "after": "Lamb Heart"
+    },
+    {
+      "product": "Lamb Heart",
+      "squareItemId": "UO24DZZIVNHSYSA3GTKKWCTV",
+      "type": "variation",
+      "variationId": "RKGYVDNZTZAFRMSTU24YL4KU",
+      "packageId": 693441,
+      "before": "Regular",
+      "after": "2 pack, 0.8 - 1.1 lbs"
+    },
+    {
+      "product": "Lamb Kabob",
+      "squareItemId": "C2RZ7V6MHLDDVGQOX6UPNR66",
+      "type": "item",
+      "before": "Kabob (Lamb)",
+      "after": "Lamb Kabob"
+    },
+    {
+      "product": "Lamb Kabob",
+      "squareItemId": "C2RZ7V6MHLDDVGQOX6UPNR66",
+      "type": "variation",
+      "variationId": "3XPZAKU4J3TIKCYIMUP43TWZ",
+      "packageId": 549818,
+      "before": "Regular",
+      "after": "1.1 - 1.35"
+    },
+    {
+      "product": "Lamb Merguez Sausage Links",
+      "squareItemId": "N7X3GEGY2OGLMSPQ4KCM4OGO",
+      "type": "item",
+      "before": "Lamb Merguez",
+      "after": "Lamb Merguez Sausage Links"
+    },
+    {
+      "product": "Lamb Merguez Sausage Links",
+      "squareItemId": "N7X3GEGY2OGLMSPQ4KCM4OGO",
+      "type": "variation",
+      "variationId": "U37CHXXOQNKCISKGN4INWKO3",
+      "packageId": 659184,
+      "before": "Regular",
+      "after": "4 links/pack 14 oz pack"
+    },
+    {
+      "product": "Lamb Neck Slices",
+      "squareItemId": "Z7QJDOALKFNWSUBRGSAGVRDO",
+      "type": "item",
+      "before": "Neck Slices (Lamb)",
+      "after": "Lamb Neck Slices"
+    },
+    {
+      "product": "Lamb Neck Slices",
+      "squareItemId": "Z7QJDOALKFNWSUBRGSAGVRDO",
+      "type": "variation",
+      "variationId": "TZTMDSMJTAGOJCQF46SKBXMR",
+      "packageId": 526756,
+      "before": "Regular",
+      "after": "1.10 - 1.50 lbs"
+    },
+    {
+      "product": "Lamb Shank Osso Buco",
+      "squareItemId": "WUIXU3UL54OQLCEZKXCHA5AT",
+      "type": "item",
+      "before": "Osso Bucco Lamb",
+      "after": "Lamb Shank Osso Buco"
+    },
+    {
+      "product": "Lamb Shank Osso Buco",
+      "squareItemId": "WUIXU3UL54OQLCEZKXCHA5AT",
+      "type": "variation",
+      "variationId": "HKPTHCXRUEDJY6C2VGFXW3GJ",
+      "packageId": 549819,
+      "before": "Regular",
+      "after": "1.10 - 1.40 lbs"
+    },
+    {
+      "product": "Lamb Shank, Whole",
+      "squareItemId": "DPVXXTQWQAB5FDSY37Q6FAXK",
+      "type": "item",
+      "before": "Shank (Lamb)",
+      "after": "Lamb Shank, Whole"
+    },
+    {
+      "product": "Lamb Shank, Whole",
+      "squareItemId": "DPVXXTQWQAB5FDSY37Q6FAXK",
+      "type": "variation",
+      "variationId": "B3RFRXZ5A7OE2QMW7HARI2KP",
+      "packageId": 526763,
+      "before": "Regular",
+      "after": "2.00 - 2.50 lbs"
+    },
+    {
+      "product": "Lamb Shoulder Roast",
+      "squareItemId": "HXKKRP3BEDWFO3JXC6T6ICIT",
+      "type": "item",
+      "before": "Shoulder (Lamb)",
+      "after": "Lamb Shoulder Roast"
+    },
+    {
+      "product": "Lamb Shoulder Roast",
+      "squareItemId": "HXKKRP3BEDWFO3JXC6T6ICIT",
+      "type": "variation",
+      "variationId": "7GPYF465GTEEMVHTQLHJIN2Q",
+      "packageId": 526764,
+      "before": "Regular",
+      "after": "2.30 - 2.70 lbs"
+    },
+    {
+      "product": "Lamb Stew",
+      "squareItemId": "MCJCI6NPYSTJWMOKY3AK4EUV",
+      "type": "item",
+      "before": "Stew (Lamb)",
+      "after": "Lamb Stew"
+    },
+    {
+      "product": "Lamb Stew",
+      "squareItemId": "MCJCI6NPYSTJWMOKY3AK4EUV",
+      "type": "variation",
+      "variationId": "UXP7TNX3XOY2T2HG5MWDTU5A",
+      "packageId": 526765,
+      "before": "Regular",
+      "after": "0.90 - 1.10 lbs"
+    },
+    {
+      "product": "Lamb Sundried Tomato Basil Sausage",
+      "squareItemId": "OKA5MQIK5LAZKH6OZKLBA47E",
+      "type": "item",
+      "before": "Sundried Tomato Basil Lamb",
+      "after": "Lamb Sundried Tomato Basil Sausage"
+    },
+    {
+      "product": "Lamb Sundried Tomato Basil Sausage",
+      "squareItemId": "OKA5MQIK5LAZKH6OZKLBA47E",
+      "type": "variation",
+      "variationId": "PCIAN5L2GXDTCDITJYCQPL3S",
+      "packageId": 724882,
+      "before": "Regular",
+      "after": "12 oz"
+    },
+    {
+      "product": "Landjaeger Jerky, 3 pack",
+      "squareItemId": "2HWBBERFI42SO727UETRX3LC",
+      "type": "item",
+      "before": "Landjaeger",
+      "after": "Landjaeger Jerky, 3 pack"
+    },
+    {
+      "product": "Landjaeger Jerky, 3 pack",
+      "squareItemId": "2HWBBERFI42SO727UETRX3LC",
+      "type": "variation",
+      "variationId": "TEZ2TYOGPELCZV5Z76SLIUQO",
+      "packageId": 526766,
+      "before": "Regular",
+      "after": "3 oz"
+    },
+    {
+      "product": "New York Steak",
+      "squareItemId": "3BVXZIN53VTEAN7WKAN5H5IT",
+      "type": "variation",
+      "variationId": "DR6FL7HZECDHPLKVARMFC5ZP",
+      "packageId": 526769,
+      "before": "Natural New York",
+      "after": "0.50 - 0.90 lbs"
+    },
+    {
+      "product": "Olympia Provisions Frankfurter",
+      "squareItemId": "M2EUZHR6CW3FIKE46TVJRZKS",
+      "type": "item",
+      "before": "Frankfurter",
+      "after": "Olympia Provisions Frankfurter"
+    },
+    {
+      "product": "Olympia Provisions Frankfurter",
+      "squareItemId": "M2EUZHR6CW3FIKE46TVJRZKS",
+      "type": "variation",
+      "variationId": "VMFVU6NDPXNNERM3NDFILLLQ",
+      "packageId": 551690,
+      "before": "Regular",
+      "after": "12 oz"
+    },
+    {
+      "product": "Olympia Provisions Saucisson D'Arles Salami",
+      "squareItemId": "NCRK2CIGU3RWNKQZ5DSPEJHD",
+      "type": "item",
+      "before": "D'Arles Salami",
+      "after": "Olympia Provisions Saucisson D'Arles Salami"
+    },
+    {
+      "product": "Olympia Provisions Saucisson D'Arles Salami",
+      "squareItemId": "NCRK2CIGU3RWNKQZ5DSPEJHD",
+      "type": "variation",
+      "variationId": "JRXWL5BZVA7NYHYPW3CF7KDE",
+      "packageId": 644080,
+      "before": "Regular",
+      "after": "4.5 oz"
+    },
+    {
+      "product": "Olympia Provisions, Dog Treats",
+      "squareItemId": "WWWJVCE57A35KUIF5UDYVR4Z",
+      "type": "item",
+      "before": "OP Dog Treats",
+      "after": "Olympia Provisions, Dog Treats"
+    },
+    {
+      "product": "Olympia Provisions, Dog Treats",
+      "squareItemId": "WWWJVCE57A35KUIF5UDYVR4Z",
+      "type": "variation",
+      "variationId": "7ONA7WTZJVR2U67PQAQ3GHDS",
+      "packageId": 588612,
+      "before": "Regular",
+      "after": "5 oz"
+    },
+    {
+      "product": "Olympia Provisions, Rosette D'Oregon Salami",
+      "squareItemId": "5OHLTPGX3CFC65MUI72NMXJH",
+      "type": "item",
+      "before": "Rosette d'Oregon",
+      "after": "Olympia Provisions, Rosette D'Oregon Salami"
+    },
+    {
+      "product": "Olympia Provisions, Rosette D'Oregon Salami",
+      "squareItemId": "5OHLTPGX3CFC65MUI72NMXJH",
+      "type": "variation",
+      "variationId": "TFCA4G67CDKQ7QANG6E2EUYG",
+      "packageId": 526728,
+      "before": "Regular",
+      "after": "4.5 oz"
+    },
+    {
+      "product": "Organic Pasture Raised Chicken Eggs, 1 dozen",
+      "squareItemId": "W3RENYXRDGQYXHKYBTHAEGAA",
+      "type": "item",
+      "before": "Dozen Eggs",
+      "after": "Organic Pasture Raised Chicken Eggs, 1 dozen"
+    },
+    {
+      "product": "Organic Pasture Raised Chicken Eggs, 1 dozen",
+      "squareItemId": "W3RENYXRDGQYXHKYBTHAEGAA",
+      "type": "variation",
+      "variationId": "C4BHMDGUH33BFC5C7DTOMRN2",
+      "packageId": 695001,
+      "before": "Regular",
+      "after": "1 dozen"
+    },
+    {
+      "product": "Organic Pasture Raised Chicken Eggs, 1/2 dozen",
+      "squareItemId": "WCJEJEUJB6IDKOGHDNB7FTCV",
+      "type": "item",
+      "before": "1/2 Doz eggs",
+      "after": "Organic Pasture Raised Chicken Eggs, 1/2 dozen"
+    },
+    {
+      "product": "Organic Pasture Raised Chicken Eggs, 1/2 dozen",
+      "squareItemId": "WCJEJEUJB6IDKOGHDNB7FTCV",
+      "type": "variation",
+      "variationId": "WMQYKADWBE26JTN7VMEISO5L",
+      "packageId": 600222,
+      "before": "Regular",
+      "after": "1/2 dozen"
+    },
+    {
+      "product": "Pastrami, Sliced",
+      "squareItemId": "MKVN3BV4B3OC3TBFSOH6ZFRW",
+      "type": "item",
+      "before": "Pastrami",
+      "after": "Pastrami, Sliced"
+    },
+    {
+      "product": "Pastrami, Sliced",
+      "squareItemId": "MKVN3BV4B3OC3TBFSOH6ZFRW",
+      "type": "variation",
+      "variationId": "HGB7UEJ7Z7FWXTD33M6L3J2Z",
+      "packageId": 526772,
+      "before": "Regular",
+      "after": "8 oz"
+    },
+    {
+      "product": "Peppered Knife Cut Beef Jerky",
+      "squareItemId": "2DADSQP2PYSGJRZ7KUERQELH",
+      "type": "item",
+      "before": "Peppered Jerky",
+      "after": "Peppered Knife Cut Beef Jerky"
+    },
+    {
+      "product": "Peppered Knife Cut Beef Jerky",
+      "squareItemId": "2DADSQP2PYSGJRZ7KUERQELH",
+      "type": "variation",
+      "variationId": "567FGAI43XNCIV55IV2AJWSD",
+      "packageId": 526773,
+      "before": "Regular",
+      "after": "3 oz"
+    },
+    {
+      "product": "Pepperoni stick",
+      "squareItemId": "WRXBRMIVAISDWMBWEFPPHIW2",
+      "type": "item",
+      "before": "Pepperoni Sticks",
+      "after": "Pepperoni stick"
+    },
+    {
+      "product": "Pepperoni stick",
+      "squareItemId": "WRXBRMIVAISDWMBWEFPPHIW2",
+      "type": "variation",
+      "variationId": "DMFXNHXS7V5RTGKNKITJ67OM",
+      "packageId": 526775,
+      "before": "Regular",
+      "after": "6 oz"
+    },
+    {
+      "product": "Pet Food, Organ Blend",
+      "squareItemId": "KMIWMJLL7C73ADSABAGDF4KO",
+      "type": "item",
+      "before": "Pet Food Organ Blend",
+      "after": "Pet Food, Organ Blend"
+    },
+    {
+      "product": "Pet Food, Organ Blend",
+      "squareItemId": "KMIWMJLL7C73ADSABAGDF4KO",
+      "type": "variation",
+      "variationId": "U3KGBMTUXU63EPJN6A2CITXP",
+      "packageId": 535111,
+      "before": "Regular",
+      "after": "1.00 lbs"
+    },
+    {
+      "product": "Polish Kielbasa",
+      "squareItemId": "3QTLT4QV3NIQQBA3765JDEF4",
+      "type": "variation",
+      "variationId": "HHOQSQYLPYEQC43R7E77SDNR",
+      "packageId": 526735,
+      "before": "Regular",
+      "after": "12 oz"
+    },
+    {
+      "product": "Pork Bones",
+      "squareItemId": "HIBUHRVFDXAGQIDKI3N5UNVM",
+      "type": "item",
+      "before": "Bones (Pork)",
+      "after": "Pork Bones"
+    },
+    {
+      "product": "Pork Bones",
+      "squareItemId": "HIBUHRVFDXAGQIDKI3N5UNVM",
+      "type": "variation",
+      "variationId": "4Q3SG46WA27GRXGSATR4ZWCY",
+      "packageId": 535108,
+      "before": "Regular",
+      "after": "3.00 - 5.00 lbs"
+    },
+    {
+      "product": "Pork Shank",
+      "squareItemId": "K4HL4E6PATADGVGUS35GACMG",
+      "type": "item",
+      "before": "Shank (Pork)",
+      "after": "Pork Shank"
+    },
+    {
+      "product": "Pork Shank",
+      "squareItemId": "K4HL4E6PATADGVGUS35GACMG",
+      "type": "variation",
+      "variationId": "U6KFVHFNWEC2MTLAJWRHOVMW",
+      "packageId": 591682,
+      "before": "Regular",
+      "after": "2.40 - 3.10 lbs"
+    },
+    {
+      "product": "Pork Shoulder Roast, Large",
+      "squareItemId": "H52IIMV53U3SVJDSLMCPJB6Y",
+      "type": "item",
+      "before": "Shoulder (Pork)",
+      "after": "Pork Shoulder Roast, Large"
+    },
+    {
+      "product": "Pork Shoulder Roast, Large",
+      "squareItemId": "H52IIMV53U3SVJDSLMCPJB6Y",
+      "type": "variation",
+      "variationId": "NCEKYJ2A7WLQT7NM6CQLV6SV",
+      "packageId": 694991,
+      "before": "Regular",
+      "after": "Large, 2.80 - 3.50 lbs"
+    },
+    {
+      "product": "Pork Spare Ribs",
+      "squareItemId": "CEBZQ67NEX43LADVLREWJ5RU",
+      "type": "item",
+      "before": "Spare Ribs (Pork)",
+      "after": "Pork Spare Ribs"
+    },
+    {
+      "product": "Pork Spare Ribs",
+      "squareItemId": "CEBZQ67NEX43LADVLREWJ5RU",
+      "type": "variation",
+      "variationId": "CA2YUN42QQ223DUUVGBVMR3G",
+      "packageId": 538685,
+      "before": "Regular",
+      "after": "2.00 - 3.00 lbs"
+    },
+    {
+      "product": "Pork Tenderloin",
+      "squareItemId": "7ZJBLPBIRJ553NT6K35NCQH4",
+      "type": "item",
+      "before": "Tenderloin (Pork)",
+      "after": "Pork Tenderloin"
+    },
+    {
+      "product": "Pork Tenderloin",
+      "squareItemId": "7ZJBLPBIRJ553NT6K35NCQH4",
+      "type": "variation",
+      "variationId": "UH3V2ZZSJBNSILFQ3OSCEFPU",
+      "packageId": 590546,
+      "before": "Regular",
+      "after": "0.80 - 1.30 lbs"
+    },
+    {
+      "product": "Rack of Lamb",
+      "squareItemId": "KGXWEJBOL6XYYP6WDIGY7XKS",
+      "type": "variation",
+      "variationId": "LBER4XSN4A4IEU5ERQNX6ZUE",
+      "packageId": 526712,
+      "before": "Regular",
+      "after": "2.50 - 3.10 lbs"
+    },
+    {
+      "product": "Raw Honey, 1 pint",
+      "squareItemId": "IRMSDE3RXXZRQ5RGXN5MAUFY",
+      "type": "item",
+      "before": "Honey Pint",
+      "after": "Raw Honey, 1 pint"
+    },
+    {
+      "product": "Raw Honey, 1 pint",
+      "squareItemId": "IRMSDE3RXXZRQ5RGXN5MAUFY",
+      "type": "variation",
+      "variationId": "VBA7QNBQN4DAJEBMIWY5BZ4I",
+      "packageId": 527228,
+      "before": "Regular",
+      "after": "1 pint"
+    },
+    {
+      "product": "Raw Honey, 1 quart",
+      "squareItemId": "7NILSMS7L35D2AIXMEWLSOAJ",
+      "type": "item",
+      "before": "Honey Quart",
+      "after": "Raw Honey, 1 quart"
+    },
+    {
+      "product": "Raw Honey, 1 quart",
+      "squareItemId": "7NILSMS7L35D2AIXMEWLSOAJ",
+      "type": "variation",
+      "variationId": "WJG7GD5EUZ67ATJWK7QEQCAV",
+      "packageId": 694996,
+      "before": "Regular",
+      "after": "1 quart"
+    },
+    {
+      "product": "Raw Honey, 1/2 pint",
+      "squareItemId": "UDZUFDD4BZQV4OKACAQ55ZGA",
+      "type": "item",
+      "before": "1/2 Pint Honey",
+      "after": "Raw Honey, 1/2 pint"
+    },
+    {
+      "product": "Raw Honey, 1/2 pint",
+      "squareItemId": "UDZUFDD4BZQV4OKACAQ55ZGA",
+      "type": "variation",
+      "variationId": "5L6WZFWO6HESVITXZYJELIQJ",
+      "packageId": 694994,
+      "before": "Regular",
+      "after": "1/2 pint"
+    },
+    {
+      "product": "Raw Walnuts, 1/2 lb",
+      "squareItemId": "EYHJG4R7QXDA3RKAAGCCKO2N",
+      "type": "item",
+      "before": "Walnuts (1/2lb.)",
+      "after": "Raw Walnuts, 1/2 lb"
+    },
+    {
+      "product": "Raw Walnuts, 1/2 lb",
+      "squareItemId": "EYHJG4R7QXDA3RKAAGCCKO2N",
+      "type": "variation",
+      "variationId": "ISXY3B7BIMVUUMYLEDGMEOX5",
+      "packageId": 694990,
+      "before": "Regular",
+      "after": "1/2 lb"
+    },
+    {
+      "product": "Red Ranger Roasting Chicken, Large",
+      "squareItemId": "C7SLODSFPL74WVKTHCG47MY2",
+      "type": "item",
+      "before": "Whole Red Ranger",
+      "after": "Red Ranger Roasting Chicken, Large"
+    },
+    {
+      "product": "Red Ranger Roasting Chicken, Large",
+      "squareItemId": "C7SLODSFPL74WVKTHCG47MY2",
+      "type": "variation",
+      "variationId": "4BSDTHCNQU27C42FET6ITBH2",
+      "packageId": 784656,
+      "before": "Regular",
+      "after": "Large, 5.01 - 5.70 lbs"
+    },
+    {
+      "product": "Rendered Beef Tallow, 16 oz",
+      "squareItemId": "RKGG5ZUGZUOVIXY2KHABI5N7",
+      "type": "item",
+      "before": "Tallow 16oz (Beef)",
+      "after": "Rendered Beef Tallow, 16 oz"
+    },
+    {
+      "product": "Rendered Beef Tallow, 16 oz",
+      "squareItemId": "RKGG5ZUGZUOVIXY2KHABI5N7",
+      "type": "variation",
+      "variationId": "3Y2UCCDHYT3VY5O63IAHKH6Z",
+      "packageId": 547722,
+      "before": "Regular",
+      "after": "16 oz"
+    },
+    {
+      "product": "Rendered Beef Tallow, 8 oz",
+      "squareItemId": "HVG4VFTHE3RMCAWBXDGPTBKG",
+      "type": "item",
+      "before": "Tallow 8oz (Beef)",
+      "after": "Rendered Beef Tallow, 8 oz"
+    },
+    {
+      "product": "Rendered Beef Tallow, 8 oz",
+      "squareItemId": "HVG4VFTHE3RMCAWBXDGPTBKG",
+      "type": "variation",
+      "variationId": "4HFME7B2JIQDOLKVUVLVS6F7",
+      "packageId": 695051,
+      "before": "Regular",
+      "after": "8 oz"
+    },
+    {
+      "product": "Rendered Pork Leaf Lard, 16 oz",
+      "squareItemId": "WCUGXGC3XZNNDGNQLI6VQRCR",
+      "type": "item",
+      "before": "16oz. Leaf Lard (Pork)",
+      "after": "Rendered Pork Leaf Lard, 16 oz"
+    },
+    {
+      "product": "Rendered Pork Leaf Lard, 16 oz",
+      "squareItemId": "WCUGXGC3XZNNDGNQLI6VQRCR",
+      "type": "variation",
+      "variationId": "ZEJEZMPCSE323KHSR7HIV3CE",
+      "packageId": 677954,
+      "before": "Regular",
+      "after": "16 oz"
+    },
+    {
+      "product": "Rendered Pork Leaf Lard, 8 oz",
+      "squareItemId": "SA4JK56BISQNLCQQWMRTR3UL",
+      "type": "item",
+      "before": "8oz. Leaf Lard (Pork)",
+      "after": "Rendered Pork Leaf Lard, 8 oz"
+    },
+    {
+      "product": "Rendered Pork Leaf Lard, 8 oz",
+      "squareItemId": "SA4JK56BISQNLCQQWMRTR3UL",
+      "type": "variation",
+      "variationId": "FSUAAXZ62XGTPFHUOBYNVTOI",
+      "packageId": 595381,
+      "before": "Regular",
+      "after": "8 oz"
+    },
+    {
+      "product": "Ribeye Steak",
+      "squareItemId": "SRKRCQW6FG5XOUPKH2TAGASK",
+      "type": "variation",
+      "variationId": "XNUP7RT3X5TIKGXT6Z76HU2H",
+      "packageId": 526721,
+      "before": "Natural Ribeye",
+      "after": "0.80 - 1.10 lbs"
+    },
+    {
+      "product": "Roast Beef, Sliced",
+      "squareItemId": "HQLROZH2OWSLSF3QZBETCFUU",
+      "type": "item",
+      "before": "Roast Beef",
+      "after": "Roast Beef, Sliced"
+    },
+    {
+      "product": "Roast Beef, Sliced",
+      "squareItemId": "HQLROZH2OWSLSF3QZBETCFUU",
+      "type": "variation",
+      "variationId": "NXIETAVWPT7OOSV3NRW2P5N2",
+      "packageId": 526723,
+      "before": "Regular",
+      "after": "8 oz"
+    },
+    {
+      "product": "Sage & Sea Salt Sausage",
+      "squareItemId": "OL5XFDPFV7YXP5O4AHK6R464",
+      "type": "item",
+      "before": "Sage & Sea Salt (POP)",
+      "after": "Sage & Sea Salt Sausage"
+    },
+    {
+      "product": "Sage & Sea Salt Sausage",
+      "squareItemId": "OL5XFDPFV7YXP5O4AHK6R464",
+      "type": "variation",
+      "variationId": "22VTXVWPWRUOGSAMRP3FBFSD",
+      "packageId": 526731,
+      "before": "Regular",
+      "after": "8 oz"
+    },
+    {
+      "product": "Skirt Steak, Large",
+      "squareItemId": "77WYOWU6KBIMIGE2NPMLNPFH",
+      "type": "item",
+      "before": "Skirt Steak",
+      "after": "Skirt Steak, Large"
+    },
+    {
+      "product": "Skirt Steak, Large",
+      "squareItemId": "77WYOWU6KBIMIGE2NPMLNPFH",
+      "type": "variation",
+      "variationId": "TVIOJDKULJFKZ7DC75ADRLML",
+      "packageId": 677939,
+      "before": "Natural Skirt Steak",
+      "after": "Large, .80 - 1.20 lbs"
+    },
+    {
+      "product": "Smoked Pork Shanks - Skin-on and Smoked",
+      "squareItemId": "4MJHJVJYDZNCHSKIFKWF553J",
+      "type": "item",
+      "before": "Smoke Pork Shanks",
+      "after": "Smoked Pork Shanks - Skin-on and Smoked"
+    },
+    {
+      "product": "Smoked Pork Shanks - Skin-on and Smoked",
+      "squareItemId": "4MJHJVJYDZNCHSKIFKWF553J",
+      "type": "variation",
+      "variationId": "HSN75FILHGFLQGROEUIIC2XC",
+      "packageId": 798012,
+      "before": "Hock",
+      "after": "2 - 2.5 lbs"
+    },
+    {
+      "product": "Stewing Hen",
+      "squareItemId": "SWAAL32DIRG2YSI7CY4652MD",
+      "type": "variation",
+      "variationId": "42F457CBYE46V4266HXQBCFB",
+      "packageId": 526738,
+      "before": "Regular",
+      "after": "2 - 3 lbs"
+    },
+    {
+      "product": "Summer Sausage",
+      "squareItemId": "IGVW5XO7MRUVRIPCIM7VWN2Y",
+      "type": "variation",
+      "variationId": "634VPLABW35HBLQMFSCMU6HA",
+      "packageId": 526740,
+      "before": "Regular",
+      "after": "8 oz"
+    },
+    {
+      "product": "Swedish Sausage Potato Dumplings",
+      "squareItemId": "BZSBJ76772CXFNCQVKRT7DTT",
+      "type": "item",
+      "before": "DUMPLINGS",
+      "after": "Swedish Sausage Potato Dumplings"
+    },
+    {
+      "product": "Swedish Sausage Potato Dumplings",
+      "squareItemId": "BZSBJ76772CXFNCQVKRT7DTT",
+      "type": "variation",
+      "variationId": "KF6PWHPNK4MJPTDJBLLYH3Z5",
+      "packageId": 795004,
+      "before": "Regular",
+      "after": "13oz/ 10 Dumplings/Pack"
+    },
+    {
+      "product": "Sweet Italian Sausage Links",
+      "squareItemId": "4LJ2ZOMW2M7ZVJ6KA5VXFCY3",
+      "type": "item",
+      "before": "Sweet Italian",
+      "after": "Sweet Italian Sausage Links"
+    },
+    {
+      "product": "Sweet Italian Sausage Links",
+      "squareItemId": "4LJ2ZOMW2M7ZVJ6KA5VXFCY3",
+      "type": "variation",
+      "variationId": "GG3UTPG3X2GJ2J2RCRGYBMMQ",
+      "packageId": 526745,
+      "before": "Regular",
+      "after": "12 oz"
+    },
+    {
+      "product": "Teres Major Steak",
+      "squareItemId": "IEAP53MPU6KHNAAHK55UTMDH",
+      "type": "variation",
+      "variationId": "QGGOCDMYYFFICWGSUMGZUQNP",
+      "packageId": 535099,
+      "before": "Natural Teres Major Steak",
+      "after": "0.40 - 0.70 lbs"
+    },
+    {
+      "product": "Thai Curry Sausage Links",
+      "squareItemId": "YV5NJYNQTUZQY7FEXCLEU5VU",
+      "type": "item",
+      "before": "Thai (Links)",
+      "after": "Thai Curry Sausage Links"
+    },
+    {
+      "product": "Thai Curry Sausage Links",
+      "squareItemId": "YV5NJYNQTUZQY7FEXCLEU5VU",
+      "type": "variation",
+      "variationId": "26M5W4W6YJGAXVNWVIOUSNUU",
+      "packageId": 659186,
+      "before": "Regular",
+      "after": "4 links/ pack 14 oz pack"
+    },
+    {
+      "product": "Top Sirloin Steak",
+      "squareItemId": "XRZSVBUMXIX6WN46EJWZP3NW",
+      "type": "variation",
+      "variationId": "JZ7GSDAEMS6X7ENYGAG3MO2Z",
+      "packageId": 536948,
+      "before": "Natural Top Sirloin",
+      "after": "1.30 - 1.60 lbs"
+    },
+    {
+      "product": "Turkey Apple Sage Sausage Links",
+      "squareItemId": "EMLOI6VDW2L4CQCOJWU2BDGO",
+      "type": "item",
+      "before": "Turkey Apple Sage Links",
+      "after": "Turkey Apple Sage Sausage Links"
+    },
+    {
+      "product": "Turkey Apple Sage Sausage Links",
+      "squareItemId": "EMLOI6VDW2L4CQCOJWU2BDGO",
+      "type": "variation",
+      "variationId": "PNCJYNXMQKMJD64ANYNXGGQC",
+      "packageId": 966336,
+      "before": "Regular",
+      "after": "ea"
+    }
+  ]
+}

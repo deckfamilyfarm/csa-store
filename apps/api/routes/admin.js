@@ -8566,7 +8566,6 @@ router.get("/square/matches", requireAdminPermission(["square_pull", "square_pus
 
 router.post("/square/products/preview", requireAdminPermission("square_push"), requireAdminPermission("square_pull"), async (req, res) => {
   try {
-    await assertLegacyPricingPublicationAllowed([Number(req.body?.productId)]);
     return res.json(await previewSquareProductCreation(Number(req.body?.productId), req.admin?.userId || req.admin?.adminId || null));
   } catch (error) {
     return res.status(error.status || 400).json({ error: error.message || "Unable to preview Square creation." });
@@ -8575,7 +8574,6 @@ router.post("/square/products/preview", requireAdminPermission("square_push"), r
 
 router.post("/square/products/:id/create", requireAdminPermission("square_push"), requireAdminPermission("square_pull"), async (req, res) => {
   try {
-    await assertLegacyPricingPublicationAllowed([Number(req.params.id)]);
     return res.json(await applySquareProductCreation(req.params.id, req.admin?.userId || req.admin?.adminId || null));
   } catch (error) {
     return res.status(error.status || 400).json({ error: error.message || "Unable to finish Square creation. Retry the same request." });

@@ -1,0 +1,12 @@
+Product,Before price (USD),Before selling unit / listing,Current regular (USD),Current checkout (USD),Current unit,Update,Verified live,Notes
+Beef Marrow Bones,15,each/package,2.5,2.5,lb,Price and selling-unit update,Yes,Confirmed live pound measurement unit; original $15 package basis replaced by $2.50/lb.
+Ground Pork,9.6,package,12,12,package,Sale ended; regular price restored,Yes,Sale flags off locally; Square discount/rule/product set deleted. $12 at every Square location. Full Farm remains regular $10.80.
+"Red Ranger Roasting Chicken, Small",,New Square item,10,9,lb,"Created, linked, and automatic sale activated",Yes,New Square listing; local Full Farm visibility preserved.
+"Cornish Roasting Chicken, Extra Large",,New Square item,8,7.2,lb,"Created, linked, and automatic sale activated",Yes,New Square listing; local Full Farm visibility preserved.
+Bulk English Breakfast Sausage,16.5,package,16.5,14.85,package,Automatic 10% sale activated,Yes,Regular catalog price retained; discount applies automatically at the tested POS location.
+Beef Liver,15,lb,15,13.5,lb,Automatic 10% sale activated,Yes,Regular catalog price retained; discount applies automatically at the tested POS location.
+"Cornish Roasting Chicken, Large",,New Square item,8.5,7.65,lb,"Created, linked, and automatic sale activated",Yes,New Square listing; local Full Farm visibility preserved.
+"Cornish Roasting Chicken, Medium",,New Square item,9,8.1,lb,"Created, linked, and automatic sale activated",Yes,New Square listing; local Full Farm visibility preserved.
+"Red Ranger Roasting Chicken, Medium",,New Square item,10,9,lb,"Created, linked, and automatic sale activated",Yes,New Square listing; local Full Farm visibility preserved.
+"Red Ranger Roasting Chicken, Large",9,lb,10,9,lb,Automatic 10% sale activated,Yes,Checkout price remains $9/lb; now shows $10/lb regular with one 10% automatic discount.
+"Pepperoni stick, individual",,New Square item,3,3,each,New separate individual item,Yes,Separate $3 individual item. Does not reprice or repair the older $2 Single Stick link to the local 6 oz package.

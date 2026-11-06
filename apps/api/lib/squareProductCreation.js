@@ -6,6 +6,7 @@ import { computeSquareRetailPackagePrice, fetchSquare, getSquareConfig, listSqua
   loadPackagesByProduct, upsertReturnedSquareObjects, loadSquareMeasurementUnits } from "./squareStoreSync.js";
 import { expectedSquareUnit, planSquareUnit, squareUnitSnapshot } from './squarePricingUnits.js';
 import { same } from './productSyncCore.js';
+import { ensureEnterprisePricingSchema } from './enterprisePricingSchema.js';
 
 const parse = value => typeof value === "string" ? JSON.parse(value) : value;
 const fail = (message, status = 409) => Object.assign(new Error(message), { status });
@@ -14,6 +15,7 @@ let schemaPromise;
 async function ensureSchema() {
   if (!schemaPromise) schemaPromise = (async () => {
     await ensureSquareSyncSchema();
+    await ensureEnterprisePricingSchema();
     await getPool().query(`CREATE TABLE IF NOT EXISTS square_product_creations (
       product_id INT PRIMARY KEY, id CHAR(36) NOT NULL UNIQUE, status VARCHAR(24) NOT NULL,
       preview_json LONGTEXT NOT NULL, request_json LONGTEXT NOT NULL, target_hash CHAR(64) NOT NULL,
@@ -34,24 +36,34 @@ export function buildSquareCreationPreview(source, packages, metaByPackageId = n
   if (!source || source.isDeleted || normalize(source.categoryName) === "membership") throw fail("This product is not eligible for Square creation.", 400);
   if (!source.vendorId || !source.vendorName?.trim()) throw fail("Choose a valid vendor before creating the Square item.", 400);
   if (!source.productName?.trim() || !packages.length) throw fail("A product name and at least one package are required.", 400);
-  const profile = resolvePricingProfile({
+  const revision = source.enterpriseRevision;
+  if (revision && (!revision.id || !['approved', 'partial', 'active'].includes(revision.status))) throw fail('Review and approve the current enterprise pricing revision before creating it in Square.');
+  if (revision && (!revision.input?.squareEnabled || !['lb', 'each'].includes(revision.input.pricingUnit))) throw fail('Enable Square and review its selling unit in the current pricing revision.');
+  if (revision && (Number(revision.output?.saleBp || 0) || !Array.isArray(revision.output?.packages)
+    || revision.output.packages.length !== packages.length
+    || new Set(revision.output.packages.map(row => Number(row.packageId))).size !== packages.length)) throw fail('Review regular enterprise prices for every current package before creating it in Square.');
+  const profile = revision ? null : resolvePricingProfile({
     profile: source.profile, product: { id: source.productId, name: source.productName }, packages,
     packageMetaByPackageId: metaByPackageId, vendor: source.vendor
   });
-  if (profile.usesSourcePricing && (source.profile?.sourceUnitPrice == null || source.profile.sourceUnitPrice === "")) throw fail("Set the product’s Retail Price before creating it in Square.", 400);
+  if (profile?.usesSourcePricing && (source.profile?.sourceUnitPrice == null || source.profile.sourceUnitPrice === "")) throw fail("Set the product’s Retail Price before creating it in Square.", 400);
   const variations = [...packages].sort((a, b) => a.id - b.id).map(pkg => {
-    const price = computeSquareRetailPackagePrice({ ...profile, saleDiscount: getCustomerFacingSaleDiscount(profile) }, pkg);
-    const amount = price.price == null ? null : Math.round(price.price * 100);
+    // Enterprise creations use regular approved rates. Managed Square sales
+    // are published separately after the new variations have been linked.
+    const price = revision ? null : computeSquareRetailPackagePrice({ ...profile, saleDiscount: getCustomerFacingSaleDiscount(profile) }, pkg);
+    const amount = revision ? revision.output.packages.find(row => Number(row.packageId) === Number(pkg.id))?.squareVariationCents
+      : price.price == null ? null : Math.round(price.price * 100);
     if (!Number.isSafeInteger(amount) || amount < 0) throw fail(`A valid retail price is required for ${pkg.name || "this package"}.`, 400);
-    const unitPlan = planSquareUnit(expectedSquareUnit(profile.usesSourcePricing, source.profile?.unitOfMeasure), null, measurementUnits);
+    const unitPlan = planSquareUnit(revision ? revision.input.pricingUnit : expectedSquareUnit(profile.usesSourcePricing, source.profile?.unitOfMeasure), null, measurementUnits);
     if (unitPlan.issues.length) throw fail(unitPlan.issues.join(' '), 400);
     return { packageId: Number(pkg.id), name: String(pkg.name || "Regular").trim() || "Regular",
-      sku: String(pkg.packageCode || "").trim(), amount, currency: getSquareConfig().currency, priceBasis: price.basis,
+      sku: String(pkg.packageCode || "").trim(), amount, currency: getSquareConfig().currency, priceBasis: revision ? 'enterprise-pricing' : price.basis,
       unit: unitPlan.expectedUnit, sellingUnit: unitPlan.proposed };
   });
   if (new Set(variations.map(row => normalize(row.name))).size !== variations.length) throw fail("Give each package a distinct name before creating Square variations.", 400);
   return { productId: Number(source.productId), productName: source.productName.trim(), vendorName: source.vendorName,
-    environment: getSquareConfig().environment, presentAtAllLocations: true, variations };
+    environment: getSquareConfig().environment, presentAtAllLocations: true,
+    ...(revision ? { enterpriseRevisionId: Number(revision.id) } : {}), variations };
 }
 
 export function squareCreationRequest(preview, id) {
@@ -79,9 +91,15 @@ async function loadPreview(productId) {
     FROM products p LEFT JOIN vendors v ON v.id=p.vendor_id LEFT JOIN categories c ON c.id=p.category_id
     LEFT JOIN product_pricing_profiles pp ON pp.product_id=p.id LEFT JOIN product_sales ps ON ps.product_id=p.id WHERE p.id=?`, [productId]);
   if (!row) throw fail("Product not found.", 404);
+  const [[bundle]] = await getPool().query('SELECT product_id FROM enterprise_bundle_legacy_products WHERE product_id=?', [productId]);
+  if (bundle) throw fail('Bundles use native Local Line box records. Review them under Pricing → Bundles; product publication is blocked.');
+  const [[state]] = await getPool().query(`SELECT s.latest_revision_id AS id, r.status, r.input_json AS inputJson, r.output_json AS outputJson
+    FROM enterprise_pricing_product_state s LEFT JOIN enterprise_pricing_revisions r ON r.id=s.latest_revision_id
+    WHERE s.product_id=? AND (s.latest_revision_id IS NOT NULL OR s.active_revision_id IS NOT NULL)`, [productId]);
+  const enterpriseRevision = state ? { id: state.id, status: state.status, input: parse(state.inputJson), output: parse(state.outputJson) } : null;
   const { packagesByProductId, metaByPackageId } = await loadPackagesByProduct([productId]);
   const units = await loadSquareMeasurementUnits();
-  return buildSquareCreationPreview({ ...row, profile: row, vendor: { id: row.vendorId, name: row.vendorName,
+  return buildSquareCreationPreview({ ...row, enterpriseRevision, profile: row, vendor: { id: row.vendorId, name: row.vendorName,
     priceListMarkup: row.vendorPriceListMarkup, sourceMultiplier: row.vendorSourceMultiplier,
     guestMarkup: row.vendorGuestMarkup, memberMarkup: row.vendorMemberMarkup } }, packagesByProductId.get(productId) || [], metaByPackageId, units);
 }

@@ -1,0 +1,6 @@
+Test,Expected total before tax,Automatic discount,Server preview result
+One Ground Pork package,9.6,2.4,Passed
+Two Ground Pork packages,19.2,4.8,Passed
+Ground Pork plus individual pepperoni,12.6,2.4,Passed
+Individual pepperoni alone,3,0,Passed
+Other location retains original Ground Pork price,9.6,0,Passed

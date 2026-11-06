@@ -160,6 +160,61 @@ test("Square creation previews, explicit approval, durable recovery, and guarded
     await assert.rejects(apply(stale.id, 7), /changed/);
     assert.equal(writes().length, count);
   });
+  await t.test('enterprise creation routes use approved revision rates and units, hold drift, and recover frozen requests', async () => {
+    const { default: router } = await import('../routes/admin.js');
+    async function route(path, { body = {}, params = {} } = {}) {
+      const handler = router.stack.find(layer => layer.route?.path === path).route.stack.at(-1).handle;
+      let status = 200, result;
+      await handler({ body, params, admin: { userId: 7, adminRoles: ['admin'] } }, {
+        status(code) { status = code; return this; }, json(value) { result = value; }
+      });
+      return { status, result };
+    }
+    await product(14);
+    // Deliberately stale legacy price, unit and sale must not set creation prices.
+    await pool.query("UPDATE product_pricing_profiles SET source_unit_price=99,unit_of_measure='each',on_sale=1,sale_discount=.5 WHERE product_id=14");
+    const input = { squareEnabled: true, pricingUnit: 'lb' };
+    const output = { saleBp: 0, packages: [140,141].map(packageId => ({ packageId, squareVariationCents: 1200 })) };
+    const [insert] = await pool.query(`INSERT INTO enterprise_pricing_revisions(product_id,settings_version_id,status,input_json,output_json,editor_id,created_at)
+      VALUES(14,1,'partial',?,?,7,UTC_TIMESTAMP())`, [JSON.stringify(input), JSON.stringify(output)]);
+    const revisionId = insert.insertId;
+    await pool.query('INSERT INTO enterprise_pricing_product_state(product_id,latest_revision_id,active_revision_id,updated_at) VALUES(14,?,?,UTC_TIMESTAMP())', [revisionId, revisionId]);
+    const draft = await route('/square/products/preview', { body: { productId: 14 } });
+    assert.equal(draft.status, 200);
+    assert.equal(draft.result.enterpriseRevisionId, revisionId);
+    assert.ok(draft.result.variations.every(row => row.amount === 1200 && row.sellingUnit.id === 'LB'));
+    const count = writes().length;
+    await pool.query("UPDATE enterprise_pricing_revisions SET status='pending' WHERE id=?", [revisionId]);
+    const held = await route('/square/products/:id/create', { params: { id: draft.result.id } });
+    assert.equal(held.status, 409);
+    assert.match(held.result.error, /approve the current enterprise/);
+    assert.equal(writes().length, count);
+    await pool.query("UPDATE enterprise_pricing_revisions SET status='partial' WHERE id=?", [revisionId]);
+    // A different revision with identical prices must still invalidate approval.
+    const [newRevision] = await pool.query(`INSERT INTO enterprise_pricing_revisions(product_id,settings_version_id,status,input_json,output_json,editor_id,created_at)
+      VALUES(14,1,'approved',?,?,7,UTC_TIMESTAMP())`, [JSON.stringify(input), JSON.stringify(output)]);
+    await pool.query('UPDATE enterprise_pricing_product_state SET latest_revision_id=?,active_revision_id=? WHERE product_id=14', [newRevision.insertId, newRevision.insertId]);
+    assert.equal((await route('/square/products/:id/create', { params: { id: draft.result.id } })).status, 409);
+    assert.equal(writes().length, count);
+    const refreshed = await route('/square/products/preview', { body: { productId: 14 } });
+    assert.equal(refreshed.status, 200);
+    assert.notEqual(refreshed.result.id, draft.result.id);
+    loseResponse = true;
+    const lost = await route('/square/products/:id/create', { params: { id: refreshed.result.id } });
+    assert.equal(lost.status, 400);
+    await pool.query("UPDATE enterprise_pricing_revisions SET status='pending' WHERE id=?", [newRevision.insertId]);
+    const resumed = await route('/square/products/preview', { body: { productId: 14 } });
+    assert.equal(resumed.result.id, refreshed.result.id);
+    const done = await route('/square/products/:id/create', { params: { id: resumed.result.id } });
+    assert.equal(done.status, 200);
+    assert.equal(done.result.status, 'completed');
+    assert.equal((await links(14)).length, 2);
+    const attempts = writes().filter(row => row.body.idempotency_key === resumed.result.id);
+    assert.equal(attempts.length, 2);
+    assert.deepEqual(attempts[0].body, attempts[1].body);
+    assert.equal(attempts[0].body.object.item_data.variations[0].item_variation_data.price_money.amount, 1200);
+    assert.equal(attempts[0].body.object.item_data.variations[0].item_variation_data.measurement_unit_id, 'LB');
+  });
   await t.test("both preview and create routes enforce both Square grants", async () => {
     const { default: router } = await import("../routes/admin.js");
     for (const path of ["/square/products/preview", "/square/products/:id/create"]) {

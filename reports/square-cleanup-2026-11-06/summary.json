@@ -1,0 +1,66 @@
+{
+  "status": "completed",
+  "deletedItems": 29,
+  "deletedNames": [
+    "1/4 Pint Honey",
+    "16oz. Pork Back Fat",
+    "8oz. Pork Back Fat",
+    "Cardamom Bun",
+    "Coca Cola",
+    "Coke",
+    "Combo ",
+    "Cucumber Salad",
+    "GH Chocolate Chip Cookie",
+    "GH Danish",
+    "GH Turnover",
+    "GH Yogurt Fruit Cup",
+    "Glass house cookie",
+    "Glass house spinach feta turnover",
+    "Honey 1/4 pint",
+    "Pick 3 for 30",
+    "Pick 3 for 50",
+    "Picnic Beef Sausage",
+    "Potato Salad",
+    "Pretzel ",
+    "Ribs (Lamb)",
+    "Sausage+Roll",
+    "Skewer",
+    "Snack pack",
+    "Tamari 10oz",
+    "Tamari Pressed Beef Strips 10 oz",
+    "Uncured Smoked Picnic Beef Sausage",
+    "Water",
+    "Water"
+  ],
+  "pepperoniKept": true,
+  "lard": [
+    {
+      "productId": 929464,
+      "packageId": 677954,
+      "name": "Rendered Pork Leaf Lard, 16 oz",
+      "packageName": "16 oz",
+      "itemId": "WCUGXGC3XZNNDGNQLI6VQRCR",
+      "variationId": "ZEJEZMPCSE323KHSR7HIV3CE",
+      "status": "already linked; live Square link verified",
+      "squarePrice": {
+        "amount": 1600,
+        "currency": "USD"
+      }
+    },
+    {
+      "productId": 805665,
+      "packageId": 595381,
+      "name": "Rendered Pork Leaf Lard, 8 oz",
+      "packageName": "8 oz",
+      "itemId": "SA4JK56BISQNLCQQWMRTR3UL",
+      "variationId": "FSUAAXZ62XGTPFHUOBYNVTOI",
+      "status": "already linked; live Square link verified",
+      "squarePrice": {
+        "amount": 1000,
+        "currency": "USD"
+      }
+    }
+  ],
+  "localLinksUnchanged": true,
+  "confirmedAt": "2026-11-06T19:16:23.250Z"
+}

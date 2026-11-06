@@ -81,3 +81,30 @@ test("per-pound creation cannot omit a verified unit; per-each creations do not 
   const each = buildSquareCreationPreview({ ...product, profile: { ...product.profile, unitOfMeasure: "each" } }, packages);
   assert.equal(squareCreationRequest(each, "each-key").object.item_data.variations[0].item_variation_data.measurement_unit_id, undefined);
 });
+
+const enterpriseRevision = { id: 17, status: 'partial', input: { squareEnabled: true, pricingUnit: 'lb' },
+  output: { saleBp: 0, packages: packages.map(pkg => ({ packageId: pkg.id, squareVariationCents: 1200 })) } };
+
+test('enterprise creation freezes the current revision, regular Square rates and units independently of legacy pricing and sales', () => {
+  const source = { ...product, profile: { sourceUnitPrice: 99, unitOfMeasure: 'each', onSale: 1, saleDiscount: 0.5 }, enterpriseRevision };
+  const preview = previewFor(source, packages);
+  assert.equal(preview.enterpriseRevisionId, 17);
+  assert.deepEqual(preview.variations.map(row => row.amount), [1200, 1200]);
+  assert.ok(preview.variations.every(row => row.priceBasis === 'enterprise-pricing' && row.sellingUnit.id === 'LB'));
+  assert.throws(() => buildSquareCreationPreview(source, packages), /pound unit/);
+  const each = previewFor({ ...source, enterpriseRevision: { ...enterpriseRevision, input: { squareEnabled: true, pricingUnit: 'each' } } }, packages);
+  assert.ok(each.variations.every(row => row.sellingUnit.id === null));
+});
+
+test('enterprise creation holds unapproved, disabled, missing or changed package pricing without falling back to legacy fields', () => {
+  for (const revision of [
+    { ...enterpriseRevision, status: 'pending' },
+    { ...enterpriseRevision, input: { squareEnabled: false, pricingUnit: 'lb' } },
+    { ...enterpriseRevision, input: { squareEnabled: true } },
+    { ...enterpriseRevision, output: { saleBp: 1000, packages: enterpriseRevision.output.packages } },
+    { ...enterpriseRevision, output: { packages: enterpriseRevision.output.packages.slice(1) } },
+    { ...enterpriseRevision, output: { packages: [enterpriseRevision.output.packages[0], enterpriseRevision.output.packages[0]] } },
+    { ...enterpriseRevision, output: { packages: enterpriseRevision.output.packages.map(row => ({ ...row, packageId: row.packageId + 10 })) } },
+    ...[null, -1, 12.5].map(amount => ({ ...enterpriseRevision, output: { packages: enterpriseRevision.output.packages.map(row => ({ ...row, squareVariationCents: amount })) } }))
+  ]) assert.throws(() => previewFor({ ...product, enterpriseRevision: revision }, packages));
+});

@@ -1,0 +1,4736 @@
+{
+  "checkedAt": "2026-11-06T19:20:44.351Z",
+  "readOnly": true,
+  "candidates": [
+    {
+      "itemId": "CDWO26QVN3QAPSU3RFO46A7R",
+      "itemName": "Bavette Steak",
+      "variationId": "DYP6DXPVCN6V6DHZZKSJ7QTL",
+      "variationName": "Organic Bavette",
+      "price": 26,
+      "currency": "USD",
+      "unitId": "IC5AI62JDKMVPS4K7EJN2RAJ",
+      "optionValues": [],
+      "localLinks": [],
+      "keep": false,
+      "archived": false
+    },
+    {
+      "itemId": "ANOBF7MHTR5DKMLRW3KEJ52P",
+      "itemName": "Beef Back Ribs",
+      "variationId": "MEJE6DYSAFEJZ54RY4ZMNE2C",
+      "variationName": "Organic",
+      "price": 16.5,
+      "currency": "USD",
+      "unitId": "IC5AI62JDKMVPS4K7EJN2RAJ",
+      "optionValues": [
+        {
+          "item_option_id": "3GGEHJOH6RZHI3DJHQB6FHGY",
+          "item_option_value_id": "64XREWLX6FULOQSXZA4CRXTI"
+        }
+      ],
+      "localLinks": [],
+      "keep": false,
+      "archived": false
+    },
+    {
+      "itemId": "EKVB7B3EUDOEUW4YKY4WKAH6",
+      "itemName": "Beef Bones",
+      "variationId": "ZHGFAUOQGPWL3S76V57VP6YG",
+      "variationName": "Organic Beef Bones",
+      "price": 2.5,
+      "currency": "USD",
+      "unitId": "IC5AI62JDKMVPS4K7EJN2RAJ",
+      "optionValues": [],
+      "localLinks": [],
+      "keep": false,
+      "archived": false
+    },
+    {
+      "itemId": "RTUI22MY5EU7CX6ALHETPMBO",
+      "itemName": "Beef Flat Iron Steak",
+      "variationId": "WPUMNRELJSOPPXTKRNA7X3RN",
+      "variationName": "Organic Flat Iron",
+      "price": 26,
+      "currency": "USD",
+      "unitId": "IC5AI62JDKMVPS4K7EJN2RAJ",
+      "optionValues": [],
+      "localLinks": [],
+      "keep": false,
+      "archived": false
+    },
+    {
+      "itemId": "IL4HKH32KJU43QZF2WTE57CM",
+      "itemName": "Beef Heart",
+      "variationId": "XX2GOM6JZVROK3NWECBULBJW",
+      "variationName": "Organic Beef Heart",
+      "price": 9.5,
+      "currency": "USD",
+      "unitId": "IC5AI62JDKMVPS4K7EJN2RAJ",
+      "optionValues": [],
+      "localLinks": [],
+      "keep": false,
+      "archived": false
+    },
+    {
+      "itemId": "E7BTUWHFLBSEQADC5HY3J2NP",
+      "itemName": "Beef Kidney",
+      "variationId": "BRF6UIFAUU7LW5TVDJAKDTF2",
+      "variationName": "Organic Beef Kidney",
+      "price": 15,
+      "currency": "USD",
+      "unitId": "IC5AI62JDKMVPS4K7EJN2RAJ",
+      "optionValues": [],
+      "localLinks": [],
+      "keep": false,
+      "archived": false
+    },
+    {
+      "itemId": "PLQR3XP6GQOWX6GLDFJQZI6D",
+      "itemName": "Beef Liver",
+      "variationId": "VYPGEK3JDDJV3E5NB2K73BBO",
+      "variationName": "Organic Beef Liver",
+      "price": 15,
+      "currency": "USD",
+      "unitId": null,
+      "optionValues": [],
+      "localLinks": [],
+      "keep": false,
+      "archived": false
+    },
+    {
+      "itemId": "SHZS54JA7XZFU4WNB3O4CLSO",
+      "itemName": "Beef Marrow Bones",
+      "variationId": "5A5PVRRHF7ZJEYJ2WEYNV4RL",
+      "variationName": "Organic Beef Marrow Bones",
+      "price": 12,
+      "currency": "USD",
+      "unitId": null,
+      "optionValues": [],
+      "localLinks": [],
+      "keep": false,
+      "archived": false
+    },
+    {
+      "itemId": "AY5RVFQFLHXRD5USE52DU5BD",
+      "itemName": "Beef Oxtail",
+      "variationId": "HHCG6HK22MSBWEIH3NZOYMOL",
+      "variationName": "Organic Beef Oxtail",
+      "price": 13,
+      "currency": "USD",
+      "unitId": "IC5AI62JDKMVPS4K7EJN2RAJ",
+      "optionValues": [],
+      "localLinks": [],
+      "keep": false,
+      "archived": false
+    },
+    {
+      "itemId": "YO6NZ2ZRLEGTFOWDKE4EC6E5",
+      "itemName": "Beef Shank Osso Buco",
+      "variationId": "MS4AWNAS64EEDWGEVGXRW2T3",
+      "variationName": "Organic",
+      "price": 19.5,
+      "currency": "USD",
+      "unitId": "IC5AI62JDKMVPS4K7EJN2RAJ",
+      "optionValues": [
+        {
+          "item_option_id": "3GGEHJOH6RZHI3DJHQB6FHGY",
+          "item_option_value_id": "64XREWLX6FULOQSXZA4CRXTI"
+        }
+      ],
+      "localLinks": [],
+      "keep": false,
+      "archived": false
+    },
+    {
+      "itemId": "NJRMSC2BLHXCJCDR5ULCPPXX",
+      "itemName": "Beef Stew Meat",
+      "variationId": "O2KR5VTETZ5GDNH4DWS73O56",
+      "variationName": "Organic Beef Stew",
+      "price": 18.5,
+      "currency": "USD",
+      "unitId": "IC5AI62JDKMVPS4K7EJN2RAJ",
+      "optionValues": [],
+      "localLinks": [],
+      "keep": false,
+      "archived": false
+    },
+    {
+      "itemId": "QZ6L4PORGVUVAZSDTH6XIC76",
+      "itemName": "Beef Tenderloin",
+      "variationId": "6MJVQW23QTLYSHPHKFDPJSWN",
+      "variationName": "Organic Tenderloin",
+      "price": 42,
+      "currency": "USD",
+      "unitId": "IC5AI62JDKMVPS4K7EJN2RAJ",
+      "optionValues": [],
+      "localLinks": [],
+      "keep": false,
+      "archived": false
+    },
+    {
+      "itemId": "CTUQPFQYSCASKP4QBTONH255",
+      "itemName": "Beef Tongue",
+      "variationId": "E42RKU2L3DA3RPV34NFC4V6D",
+      "variationName": "Organic Tongue",
+      "price": 9.5,
+      "currency": "USD",
+      "unitId": "IC5AI62JDKMVPS4K7EJN2RAJ",
+      "optionValues": [],
+      "localLinks": [],
+      "keep": false,
+      "archived": false
+    },
+    {
+      "itemId": "VO7YEQD5FKOYVWGHGFI3ISA3",
+      "itemName": "Beef Tri-Tip",
+      "variationId": "HV7HA5JOUAPPDQXQEE7PIVBG",
+      "variationName": "Organic Tri Tip",
+      "price": 21,
+      "currency": "USD",
+      "unitId": "IC5AI62JDKMVPS4K7EJN2RAJ",
+      "optionValues": [],
+      "localLinks": [],
+      "keep": false,
+      "archived": false
+    },
+    {
+      "itemId": "BB4BQ436YGC4LUSOU4HLL27D",
+      "itemName": "Brisket",
+      "variationId": "SLLB3I6MS6L2ENNMOZZ3X3QK",
+      "variationName": "Organic Brisket",
+      "price": 17,
+      "currency": "USD",
+      "unitId": "IC5AI62JDKMVPS4K7EJN2RAJ",
+      "optionValues": [],
+      "localLinks": [
+        {
+          "productId": 941001,
+          "packageId": 694997,
+          "itemId": "BB4BQ436YGC4LUSOU4HLL27D",
+          "variationId": "SLLB3I6MS6L2ENNMOZZ3X3QK",
+          "productName": "Brisket, Medium",
+          "packageName": "Medium, 3.00 - 3.99 lbs"
+        }
+      ],
+      "keep": false,
+      "archived": false
+    },
+    {
+      "itemId": "RTQ6INIYGMMDJ3RKTT64KVFN",
+      "itemName": "Chuck roast",
+      "variationId": "CIGT4OMRIMASB4AXNPG4A53P",
+      "variationName": "Organic Chuck Roast",
+      "price": 16,
+      "currency": "USD",
+      "unitId": "IC5AI62JDKMVPS4K7EJN2RAJ",
+      "optionValues": [],
+      "localLinks": [],
+      "keep": false,
+      "archived": false
+    },
+    {
+      "itemId": "CQAVFLDGU4BEMOZ4TH6FI3SG",
+      "itemName": "Flank Steak",
+      "variationId": "7DZB7ATMWI4SYBNIP5ZBAZU5",
+      "variationName": "Organic Flank Steak",
+      "price": 26,
+      "currency": "USD",
+      "unitId": "IC5AI62JDKMVPS4K7EJN2RAJ",
+      "optionValues": [],
+      "localLinks": [],
+      "keep": false,
+      "archived": false
+    },
+    {
+      "itemId": "ZWZUCQRCDOB2CJF4KCGQJYI5",
+      "itemName": "Hamburger Patties",
+      "variationId": "SKWNIOW3LB2OZUC74EFOOY5Z",
+      "variationName": "Organic Hamburger",
+      "price": 15.5,
+      "currency": "USD",
+      "unitId": null,
+      "optionValues": [],
+      "localLinks": [],
+      "keep": false,
+      "archived": false
+    },
+    {
+      "itemId": "WSEWP54CB6EZWHXJTDFT5M6W",
+      "itemName": "Hanger Steak",
+      "variationId": "JAFJ4WOYPJ7JGC2XTW7DAJCI",
+      "variationName": "Organic Hanger Steak",
+      "price": 26,
+      "currency": "USD",
+      "unitId": "IC5AI62JDKMVPS4K7EJN2RAJ",
+      "optionValues": [],
+      "localLinks": [],
+      "keep": false,
+      "archived": false
+    },
+    {
+      "itemId": "SRKRCQW6FG5XOUPKH2TAGASK",
+      "itemName": "Ribeye Steak",
+      "variationId": "2K6CKF7DSFQKL6LKQHY7OEGK",
+      "variationName": "Organic Ribeye",
+      "price": 40.5,
+      "currency": "USD",
+      "unitId": "IC5AI62JDKMVPS4K7EJN2RAJ",
+      "optionValues": [],
+      "localLinks": [],
+      "keep": false,
+      "archived": false
+    },
+    {
+      "itemId": "77WYOWU6KBIMIGE2NPMLNPFH",
+      "itemName": "Skirt Steak, Large",
+      "variationId": "5Q2H2KTZNM6K5RKSWGEBSF5L",
+      "variationName": "Organic Skirt Steak",
+      "price": 26,
+      "currency": "USD",
+      "unitId": "IC5AI62JDKMVPS4K7EJN2RAJ",
+      "optionValues": [],
+      "localLinks": [],
+      "keep": false,
+      "archived": false
+    },
+    {
+      "itemId": "IEAP53MPU6KHNAAHK55UTMDH",
+      "itemName": "Teres Major Steak",
+      "variationId": "WSVLYC2P465ES2AB4C5CNHOA",
+      "variationName": "Organic Teres Major Steak",
+      "price": 26,
+      "currency": "USD",
+      "unitId": "IC5AI62JDKMVPS4K7EJN2RAJ",
+      "optionValues": [],
+      "localLinks": [],
+      "keep": false,
+      "archived": false
+    },
+    {
+      "itemId": "XRZSVBUMXIX6WN46EJWZP3NW",
+      "itemName": "Top Sirloin Steak",
+      "variationId": "ZT5OVMGGGVFCN32WWKUBTX43",
+      "variationName": "Organic Top Sirloin",
+      "price": 26,
+      "currency": "USD",
+      "unitId": "IC5AI62JDKMVPS4K7EJN2RAJ",
+      "optionValues": [],
+      "localLinks": [],
+      "keep": false,
+      "archived": false
+    }
+  ],
+  "keep": [
+    {
+      "itemId": "XJV3K7ISGJYS3ERSUYR3I32H",
+      "itemName": "Ground Beef",
+      "variationId": "6DJNVCZ3SEZG7PYWKJED3HZJ",
+      "variationName": "Organic Ground Beef",
+      "price": 14,
+      "currency": "USD",
+      "unitId": null,
+      "optionValues": [],
+      "localLinks": [
+        {
+          "productId": 805689,
+          "packageId": 526742,
+          "itemId": "XJV3K7ISGJYS3ERSUYR3I32H",
+          "variationId": "6DJNVCZ3SEZG7PYWKJED3HZJ",
+          "productName": "Organic Ground Beef",
+          "packageName": "1 lbs"
+        }
+      ],
+      "keep": true,
+      "archived": false
+    }
+  ],
+  "snapshots": [
+    {
+      "type": "ITEM",
+      "id": "RTQ6INIYGMMDJ3RKTT64KVFN",
+      "updated_at": "2026-11-06T19:01:10.094Z",
+      "created_at": "2019-10-10T17:07:40.214Z",
+      "version": 1793991670094,
+      "is_deleted": false,
+      "catalog_v1_ids": [
+        {
+          "catalog_v1_id": "32A7A3D9-1074-4592-9FE4-B5D3DF967B1F",
+          "location_id": "C0T7DVZY5XVG5"
+        }
+      ],
+      "present_at_all_locations": false,
+      "present_at_location_ids": [
+        "C0T7DVZY5XVG5",
+        "L1MHNE83A8XPY",
+        "L307W0S4THZP3",
+        "L373VS1QADC37",
+        "LJGEXCF3N7XJ4",
+        "LJS8Z7FW504J5",
+        "LKX3NDPZ68H74",
+        "LP5542Q9WCHX2",
+        "LP8AY4081PK5E",
+        "LVKCGC3H1QMYX",
+        "LWREC814AB8A4"
+      ],
+      "item_data": {
+        "name": "Chuck roast",
+        "label_color": "4AB200",
+        "is_taxable": true,
+        "variations": [
+          {
+            "type": "ITEM_VARIATION",
+            "id": "7JHSSGCRX4A6VQ5CHHLSB7J5",
+            "updated_at": "2026-11-06T19:01:10.094Z",
+            "created_at": "2019-10-10T17:07:40.214Z",
+            "version": 1793991670094,
+            "is_deleted": false,
+            "catalog_v1_ids": [
+              {
+                "catalog_v1_id": "5C714B5F-6D2B-40CD-806C-8EA1C171074A",
+                "location_id": "C0T7DVZY5XVG5"
+              }
+            ],
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "RTQ6INIYGMMDJ3RKTT64KVFN",
+              "name": "2.30 - 2.90 lbs",
+              "ordinal": 1,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 1600,
+                "currency": "USD"
+              },
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "service_duration": 0,
+              "available_for_booking": false,
+              "transition_time": 0,
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          },
+          {
+            "type": "ITEM_VARIATION",
+            "id": "CIGT4OMRIMASB4AXNPG4A53P",
+            "updated_at": "2026-09-13T13:47:53.506Z",
+            "created_at": "2022-10-14T22:50:12.464Z",
+            "version": 1789307273506,
+            "is_deleted": false,
+            "catalog_v1_ids": [
+              {
+                "catalog_v1_id": "16BFAF59-0877-4E8F-BCCF-D1EB909A2EA6",
+                "location_id": "C0T7DVZY5XVG5"
+              }
+            ],
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "RTQ6INIYGMMDJ3RKTT64KVFN",
+              "name": "Organic Chuck Roast",
+              "ordinal": 2,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 1600,
+                "currency": "USD"
+              },
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          }
+        ],
+        "product_type": "REGULAR",
+        "skip_modifier_screen": false,
+        "categories": [
+          {
+            "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+            "ordinal": 1030792151040
+          }
+        ],
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ],
+        "is_archived": false,
+        "reporting_category": {
+          "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+          "ordinal": 1030792151040
+        },
+        "is_alcoholic": false
+      }
+    },
+    {
+      "type": "ITEM",
+      "id": "XJV3K7ISGJYS3ERSUYR3I32H",
+      "updated_at": "2026-10-11T20:19:37.045Z",
+      "created_at": "2019-10-10T17:08:41.828Z",
+      "version": 1791749977045,
+      "is_deleted": false,
+      "catalog_v1_ids": [
+        {
+          "catalog_v1_id": "62503CE7-1411-4C2D-9566-4C98CC6D54EA",
+          "location_id": "C0T7DVZY5XVG5"
+        }
+      ],
+      "present_at_all_locations": false,
+      "present_at_location_ids": [
+        "C0T7DVZY5XVG5",
+        "L1MHNE83A8XPY",
+        "L307W0S4THZP3",
+        "L373VS1QADC37",
+        "LJGEXCF3N7XJ4",
+        "LJS8Z7FW504J5",
+        "LKX3NDPZ68H74",
+        "LP5542Q9WCHX2",
+        "LP8AY4081PK5E",
+        "LVKCGC3H1QMYX",
+        "LWREC814AB8A4"
+      ],
+      "item_data": {
+        "name": "Ground Beef",
+        "label_color": "4AB200",
+        "is_taxable": true,
+        "variations": [
+          {
+            "type": "ITEM_VARIATION",
+            "id": "ZJ5C7CRZQNREBLA2VWZU733H",
+            "updated_at": "2026-10-11T20:19:32.856Z",
+            "created_at": "2021-03-05T22:00:03.266Z",
+            "version": 1791749972856,
+            "is_deleted": false,
+            "catalog_v1_ids": [
+              {
+                "catalog_v1_id": "07E97511-0C0A-4CAD-8846-A7BBFA35681F",
+                "location_id": "C0T7DVZY5XVG5"
+              }
+            ],
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "XJV3K7ISGJYS3ERSUYR3I32H",
+              "name": "Natural Ground Beef",
+              "ordinal": 0,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 1200,
+                "currency": "USD"
+              },
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "service_duration": 0,
+              "sellable": true,
+              "stockable": true,
+              "kitchen_name": "",
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          },
+          {
+            "type": "ITEM_VARIATION",
+            "id": "6DJNVCZ3SEZG7PYWKJED3HZJ",
+            "updated_at": "2026-10-11T20:19:37.045Z",
+            "created_at": "2022-10-14T22:38:37.934Z",
+            "version": 1791749977045,
+            "is_deleted": false,
+            "catalog_v1_ids": [
+              {
+                "catalog_v1_id": "C3B7746C-1041-40B0-815C-A910EA7529E7",
+                "location_id": "C0T7DVZY5XVG5"
+              }
+            ],
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "XJV3K7ISGJYS3ERSUYR3I32H",
+              "name": "Organic Ground Beef",
+              "ordinal": 1,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 1400,
+                "currency": "USD"
+              },
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "service_duration": 0,
+              "sellable": true,
+              "stockable": true,
+              "kitchen_name": "",
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          }
+        ],
+        "product_type": "REGULAR",
+        "skip_modifier_screen": false,
+        "categories": [
+          {
+            "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+            "ordinal": 68719476736
+          }
+        ],
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ],
+        "is_archived": false,
+        "reporting_category": {
+          "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+          "ordinal": 68719476736
+        },
+        "is_alcoholic": false
+      }
+    },
+    {
+      "type": "ITEM",
+      "id": "NJRMSC2BLHXCJCDR5ULCPPXX",
+      "updated_at": "2026-11-06T19:00:52.347Z",
+      "created_at": "2019-10-10T17:09:29.889Z",
+      "version": 1793991652347,
+      "is_deleted": false,
+      "catalog_v1_ids": [
+        {
+          "catalog_v1_id": "43C80325-5DB7-44FC-977E-A0E8D0B7E70F",
+          "location_id": "C0T7DVZY5XVG5"
+        }
+      ],
+      "present_at_all_locations": false,
+      "present_at_location_ids": [
+        "C0T7DVZY5XVG5",
+        "L1MHNE83A8XPY",
+        "L307W0S4THZP3",
+        "L373VS1QADC37",
+        "LJGEXCF3N7XJ4",
+        "LJS8Z7FW504J5",
+        "LKX3NDPZ68H74",
+        "LP5542Q9WCHX2",
+        "LP8AY4081PK5E",
+        "LVKCGC3H1QMYX",
+        "LWREC814AB8A4"
+      ],
+      "item_data": {
+        "name": "Beef Stew Meat",
+        "label_color": "4AB200",
+        "is_taxable": true,
+        "variations": [
+          {
+            "type": "ITEM_VARIATION",
+            "id": "VINTQXAU46GLF3MVILEBL2GN",
+            "updated_at": "2026-11-06T19:00:52.347Z",
+            "created_at": "2019-10-10T17:09:29.889Z",
+            "version": 1793991652347,
+            "is_deleted": false,
+            "catalog_v1_ids": [
+              {
+                "catalog_v1_id": "5C521A65-706E-4A27-8643-DD2A36782357",
+                "location_id": "C0T7DVZY5XVG5"
+              }
+            ],
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "NJRMSC2BLHXCJCDR5ULCPPXX",
+              "name": "1.1 - 1.3 lbs",
+              "ordinal": 1,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 1850,
+                "currency": "USD"
+              },
+              "location_overrides": [
+                {
+                  "location_id": "C0T7DVZY5XVG5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L1MHNE83A8XPY",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L373VS1QADC37",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJGEXCF3N7XJ4",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJS8Z7FW504J5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LKX3NDPZ68H74",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP5542Q9WCHX2",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP8AY4081PK5E",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LVKCGC3H1QMYX",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LWREC814AB8A4",
+                  "track_inventory": false
+                }
+              ],
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "service_duration": 0,
+              "available_for_booking": false,
+              "transition_time": 0,
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          },
+          {
+            "type": "ITEM_VARIATION",
+            "id": "O2KR5VTETZ5GDNH4DWS73O56",
+            "updated_at": "2026-09-13T13:47:53.506Z",
+            "created_at": "2022-10-14T22:50:07.373Z",
+            "version": 1789307273506,
+            "is_deleted": false,
+            "catalog_v1_ids": [
+              {
+                "catalog_v1_id": "7540F4F4-20A7-4990-9999-0E985C1287C0",
+                "location_id": "C0T7DVZY5XVG5"
+              }
+            ],
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "NJRMSC2BLHXCJCDR5ULCPPXX",
+              "name": "Organic Beef Stew",
+              "ordinal": 2,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 1850,
+                "currency": "USD"
+              },
+              "location_overrides": [
+                {
+                  "location_id": "C0T7DVZY5XVG5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L1MHNE83A8XPY",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L373VS1QADC37",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJGEXCF3N7XJ4",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJS8Z7FW504J5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LKX3NDPZ68H74",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP5542Q9WCHX2",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP8AY4081PK5E",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LVKCGC3H1QMYX",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LWREC814AB8A4",
+                  "track_inventory": false
+                }
+              ],
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          }
+        ],
+        "product_type": "REGULAR",
+        "skip_modifier_screen": false,
+        "categories": [
+          {
+            "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+            "ordinal": 1099511627776
+          }
+        ],
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ],
+        "is_archived": false,
+        "reporting_category": {
+          "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+          "ordinal": 1099511627776
+        },
+        "is_alcoholic": false
+      }
+    },
+    {
+      "type": "ITEM",
+      "id": "ZWZUCQRCDOB2CJF4KCGQJYI5",
+      "updated_at": "2026-11-06T19:01:10.094Z",
+      "created_at": "2019-10-10T17:21:28.452Z",
+      "version": 1793991670094,
+      "is_deleted": false,
+      "catalog_v1_ids": [
+        {
+          "catalog_v1_id": "91D1C8F6-F7D2-46E0-9B3D-11ACA144C7E7",
+          "location_id": "C0T7DVZY5XVG5"
+        }
+      ],
+      "present_at_all_locations": false,
+      "present_at_location_ids": [
+        "C0T7DVZY5XVG5",
+        "L1MHNE83A8XPY",
+        "L307W0S4THZP3",
+        "L373VS1QADC37",
+        "LJGEXCF3N7XJ4",
+        "LJS8Z7FW504J5",
+        "LKX3NDPZ68H74",
+        "LP5542Q9WCHX2",
+        "LP8AY4081PK5E",
+        "LVKCGC3H1QMYX",
+        "LWREC814AB8A4"
+      ],
+      "item_data": {
+        "name": "Hamburger Patties",
+        "label_color": "4AB200",
+        "is_taxable": true,
+        "variations": [
+          {
+            "type": "ITEM_VARIATION",
+            "id": "T5CTPJKL4O3BTPFAD4IEBOYY",
+            "updated_at": "2026-11-06T19:01:10.094Z",
+            "created_at": "2019-10-10T17:21:28.452Z",
+            "version": 1793991670094,
+            "is_deleted": false,
+            "catalog_v1_ids": [
+              {
+                "catalog_v1_id": "B4CEBE6F-3EAA-4B9A-99E2-46696D3909CD",
+                "location_id": "C0T7DVZY5XVG5"
+              }
+            ],
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "ZWZUCQRCDOB2CJF4KCGQJYI5",
+              "name": "1.00 lbs",
+              "ordinal": 1,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 1550,
+                "currency": "USD"
+              },
+              "location_overrides": [
+                {
+                  "location_id": "C0T7DVZY5XVG5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L1MHNE83A8XPY",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L373VS1QADC37",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJGEXCF3N7XJ4",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJS8Z7FW504J5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LKX3NDPZ68H74",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP5542Q9WCHX2",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP8AY4081PK5E",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LVKCGC3H1QMYX",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LWREC814AB8A4",
+                  "track_inventory": false
+                }
+              ],
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "service_duration": 0,
+              "available_for_booking": false,
+              "transition_time": 0,
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          },
+          {
+            "type": "ITEM_VARIATION",
+            "id": "SKWNIOW3LB2OZUC74EFOOY5Z",
+            "updated_at": "2026-09-13T13:47:53.506Z",
+            "created_at": "2025-03-13T18:15:53.114Z",
+            "version": 1789307273506,
+            "is_deleted": false,
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "ZWZUCQRCDOB2CJF4KCGQJYI5",
+              "name": "Organic Hamburger",
+              "ordinal": 2,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 1550,
+                "currency": "USD"
+              },
+              "location_overrides": [
+                {
+                  "location_id": "C0T7DVZY5XVG5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L1MHNE83A8XPY",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L373VS1QADC37",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJGEXCF3N7XJ4",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJS8Z7FW504J5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LKX3NDPZ68H74",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP5542Q9WCHX2",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP8AY4081PK5E",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LVKCGC3H1QMYX",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LWREC814AB8A4",
+                  "track_inventory": false
+                }
+              ],
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          }
+        ],
+        "product_type": "REGULAR",
+        "skip_modifier_screen": false,
+        "categories": [
+          {
+            "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+            "ordinal": 274877906944
+          }
+        ],
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ],
+        "is_archived": false,
+        "reporting_category": {
+          "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+          "ordinal": 274877906944
+        },
+        "is_alcoholic": false
+      }
+    },
+    {
+      "type": "ITEM",
+      "id": "SRKRCQW6FG5XOUPKH2TAGASK",
+      "updated_at": "2026-11-06T19:01:29.335Z",
+      "created_at": "2019-10-10T17:40:06.691Z",
+      "version": 1793991689335,
+      "is_deleted": false,
+      "catalog_v1_ids": [
+        {
+          "catalog_v1_id": "620744D6-6322-46B1-AFCC-4DB64AD700D5",
+          "location_id": "C0T7DVZY5XVG5"
+        }
+      ],
+      "present_at_all_locations": false,
+      "present_at_location_ids": [
+        "C0T7DVZY5XVG5",
+        "L1MHNE83A8XPY",
+        "L307W0S4THZP3",
+        "L373VS1QADC37",
+        "LJGEXCF3N7XJ4",
+        "LJS8Z7FW504J5",
+        "LKX3NDPZ68H74",
+        "LP5542Q9WCHX2",
+        "LP8AY4081PK5E",
+        "LVKCGC3H1QMYX",
+        "LWREC814AB8A4"
+      ],
+      "item_data": {
+        "name": "Ribeye Steak",
+        "label_color": "4AB200",
+        "is_taxable": true,
+        "variations": [
+          {
+            "type": "ITEM_VARIATION",
+            "id": "XNUP7RT3X5TIKGXT6Z76HU2H",
+            "updated_at": "2026-11-06T19:01:29.335Z",
+            "created_at": "2022-10-14T22:49:32.912Z",
+            "version": 1793991689335,
+            "is_deleted": false,
+            "catalog_v1_ids": [
+              {
+                "catalog_v1_id": "LGMFETF6PXZ66TLC4R5YNC7N",
+                "location_id": "C0T7DVZY5XVG5"
+              }
+            ],
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "SRKRCQW6FG5XOUPKH2TAGASK",
+              "name": "0.80 - 1.10 lbs",
+              "ordinal": 1,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 4050,
+                "currency": "USD"
+              },
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          },
+          {
+            "type": "ITEM_VARIATION",
+            "id": "2K6CKF7DSFQKL6LKQHY7OEGK",
+            "updated_at": "2026-09-13T13:47:53.506Z",
+            "created_at": "2022-10-14T22:49:38.117Z",
+            "version": 1789307273506,
+            "is_deleted": false,
+            "catalog_v1_ids": [
+              {
+                "catalog_v1_id": "0F36CCB0-3FC7-433E-A4F1-AC5C612E35B6",
+                "location_id": "C0T7DVZY5XVG5"
+              }
+            ],
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "SRKRCQW6FG5XOUPKH2TAGASK",
+              "name": "Organic Ribeye",
+              "ordinal": 2,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 4050,
+                "currency": "USD"
+              },
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          }
+        ],
+        "product_type": "REGULAR",
+        "skip_modifier_screen": false,
+        "categories": [
+          {
+            "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+            "ordinal": 549755813888
+          }
+        ],
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ],
+        "is_archived": false,
+        "reporting_category": {
+          "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+          "ordinal": 549755813888
+        },
+        "is_alcoholic": false
+      }
+    },
+    {
+      "type": "ITEM",
+      "id": "XRZSVBUMXIX6WN46EJWZP3NW",
+      "updated_at": "2026-11-06T19:01:29.335Z",
+      "created_at": "2019-10-10T17:40:06.91Z",
+      "version": 1793991689335,
+      "is_deleted": false,
+      "catalog_v1_ids": [
+        {
+          "catalog_v1_id": "8BC96C0C-6504-48B9-9965-E9013A261161",
+          "location_id": "C0T7DVZY5XVG5"
+        }
+      ],
+      "present_at_all_locations": false,
+      "present_at_location_ids": [
+        "C0T7DVZY5XVG5",
+        "L1MHNE83A8XPY",
+        "L307W0S4THZP3",
+        "L373VS1QADC37",
+        "LJGEXCF3N7XJ4",
+        "LJS8Z7FW504J5",
+        "LKX3NDPZ68H74",
+        "LP5542Q9WCHX2",
+        "LP8AY4081PK5E",
+        "LVKCGC3H1QMYX",
+        "LWREC814AB8A4"
+      ],
+      "item_data": {
+        "name": "Top Sirloin Steak",
+        "abbreviation": "To",
+        "label_color": "4AB200",
+        "is_taxable": true,
+        "variations": [
+          {
+            "type": "ITEM_VARIATION",
+            "id": "JZ7GSDAEMS6X7ENYGAG3MO2Z",
+            "updated_at": "2026-11-06T19:01:29.335Z",
+            "created_at": "2019-10-10T17:40:06.91Z",
+            "version": 1793991689335,
+            "is_deleted": false,
+            "catalog_v1_ids": [
+              {
+                "catalog_v1_id": "C4C0B0CE-1D52-404A-9ED0-31B7702D9BAC",
+                "location_id": "C0T7DVZY5XVG5"
+              }
+            ],
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "XRZSVBUMXIX6WN46EJWZP3NW",
+              "name": "1.30 - 1.60 lbs",
+              "ordinal": 1,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 2500,
+                "currency": "USD"
+              },
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "service_duration": 0,
+              "available_for_booking": false,
+              "transition_time": 0,
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          },
+          {
+            "type": "ITEM_VARIATION",
+            "id": "ZT5OVMGGGVFCN32WWKUBTX43",
+            "updated_at": "2026-09-19T01:05:29.54Z",
+            "created_at": "2022-10-14T22:49:49.903Z",
+            "version": 1789779929540,
+            "is_deleted": false,
+            "catalog_v1_ids": [
+              {
+                "catalog_v1_id": "6CE2937D-373D-4A1D-B5DF-13995C3438A8",
+                "location_id": "C0T7DVZY5XVG5"
+              }
+            ],
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "XRZSVBUMXIX6WN46EJWZP3NW",
+              "name": "Organic Top Sirloin",
+              "ordinal": 2,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 2600,
+                "currency": "USD"
+              },
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          }
+        ],
+        "product_type": "REGULAR",
+        "skip_modifier_screen": false,
+        "ecom_visibility": "VISIBLE",
+        "categories": [
+          {
+            "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+            "ordinal": 687194767360
+          }
+        ],
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ],
+        "is_archived": false,
+        "reporting_category": {
+          "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+          "ordinal": 687194767360
+        },
+        "is_alcoholic": false
+      }
+    },
+    {
+      "type": "ITEM",
+      "id": "PLQR3XP6GQOWX6GLDFJQZI6D",
+      "updated_at": "2026-11-06T19:00:52.347Z",
+      "created_at": "2019-10-10T17:51:00.939Z",
+      "version": 1793991652347,
+      "is_deleted": false,
+      "catalog_v1_ids": [
+        {
+          "catalog_v1_id": "DF007D85-61AE-46D0-9036-DD4D0BA1A7D8",
+          "location_id": "C0T7DVZY5XVG5"
+        }
+      ],
+      "present_at_all_locations": false,
+      "present_at_location_ids": [
+        "C0T7DVZY5XVG5",
+        "L1MHNE83A8XPY",
+        "L307W0S4THZP3",
+        "L373VS1QADC37",
+        "LJGEXCF3N7XJ4",
+        "LJS8Z7FW504J5",
+        "LKX3NDPZ68H74",
+        "LP5542Q9WCHX2",
+        "LP8AY4081PK5E",
+        "LVKCGC3H1QMYX",
+        "LWREC814AB8A4"
+      ],
+      "item_data": {
+        "name": "Beef Liver",
+        "label_color": "B21212",
+        "is_taxable": true,
+        "variations": [
+          {
+            "type": "ITEM_VARIATION",
+            "id": "DPHMZXG5A3S4YOMA3V3FICUI",
+            "updated_at": "2026-11-06T19:00:52.347Z",
+            "created_at": "2019-10-10T17:51:00.939Z",
+            "version": 1793991652347,
+            "is_deleted": false,
+            "catalog_v1_ids": [
+              {
+                "catalog_v1_id": "00E97744-35F4-40A6-9456-43968018F20C",
+                "location_id": "C0T7DVZY5XVG5"
+              }
+            ],
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "PLQR3XP6GQOWX6GLDFJQZI6D",
+              "name": "0.90 - 1.30 lbs",
+              "ordinal": 0,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 1500,
+                "currency": "USD"
+              },
+              "location_overrides": [
+                {
+                  "location_id": "C0T7DVZY5XVG5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L1MHNE83A8XPY",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L373VS1QADC37",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJGEXCF3N7XJ4",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJS8Z7FW504J5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LKX3NDPZ68H74",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP5542Q9WCHX2",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP8AY4081PK5E",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LVKCGC3H1QMYX",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LWREC814AB8A4",
+                  "track_inventory": false
+                }
+              ],
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "service_duration": 0,
+              "available_for_booking": false,
+              "transition_time": 0,
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          },
+          {
+            "type": "ITEM_VARIATION",
+            "id": "VYPGEK3JDDJV3E5NB2K73BBO",
+            "updated_at": "2026-09-13T13:47:53.506Z",
+            "created_at": "2025-03-13T18:19:58.423Z",
+            "version": 1789307273506,
+            "is_deleted": false,
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "PLQR3XP6GQOWX6GLDFJQZI6D",
+              "name": "Organic Beef Liver",
+              "ordinal": 1,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 1500,
+                "currency": "USD"
+              },
+              "location_overrides": [
+                {
+                  "location_id": "C0T7DVZY5XVG5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L1MHNE83A8XPY",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L373VS1QADC37",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJGEXCF3N7XJ4",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJS8Z7FW504J5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LKX3NDPZ68H74",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP5542Q9WCHX2",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP8AY4081PK5E",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LVKCGC3H1QMYX",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LWREC814AB8A4",
+                  "track_inventory": false
+                }
+              ],
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "service_duration": 0,
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          }
+        ],
+        "product_type": "REGULAR",
+        "skip_modifier_screen": false,
+        "categories": [
+          {
+            "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+            "ordinal": 2405181685760
+          }
+        ],
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ],
+        "is_archived": false,
+        "reporting_category": {
+          "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+          "ordinal": 2405181685760
+        },
+        "is_alcoholic": false
+      }
+    },
+    {
+      "type": "ITEM",
+      "id": "IL4HKH32KJU43QZF2WTE57CM",
+      "updated_at": "2026-11-06T19:00:52.347Z",
+      "created_at": "2019-10-10T17:51:03.905Z",
+      "version": 1793991652347,
+      "is_deleted": false,
+      "catalog_v1_ids": [
+        {
+          "catalog_v1_id": "B698E1DF-63E7-4D84-B5DF-2FF3F95FC386",
+          "location_id": "C0T7DVZY5XVG5"
+        }
+      ],
+      "present_at_all_locations": false,
+      "present_at_location_ids": [
+        "C0T7DVZY5XVG5",
+        "L1MHNE83A8XPY",
+        "L307W0S4THZP3",
+        "L373VS1QADC37",
+        "LJGEXCF3N7XJ4",
+        "LJS8Z7FW504J5",
+        "LKX3NDPZ68H74",
+        "LP5542Q9WCHX2",
+        "LP8AY4081PK5E",
+        "LVKCGC3H1QMYX",
+        "LWREC814AB8A4"
+      ],
+      "item_data": {
+        "name": "Beef Heart",
+        "label_color": "4AB200",
+        "is_taxable": true,
+        "variations": [
+          {
+            "type": "ITEM_VARIATION",
+            "id": "VMS35LF22K4ZIIQLENRZ562Y",
+            "updated_at": "2026-11-06T19:00:52.347Z",
+            "created_at": "2019-10-10T17:51:03.905Z",
+            "version": 1793991652347,
+            "is_deleted": false,
+            "catalog_v1_ids": [
+              {
+                "catalog_v1_id": "E24ECEFB-CDE0-4809-BD38-5632B5E07489",
+                "location_id": "C0T7DVZY5XVG5"
+              }
+            ],
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "IL4HKH32KJU43QZF2WTE57CM",
+              "name": "2.50 - 3.5 lbs",
+              "ordinal": 1,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 950,
+                "currency": "USD"
+              },
+              "location_overrides": [
+                {
+                  "location_id": "C0T7DVZY5XVG5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L1MHNE83A8XPY",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L373VS1QADC37",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJGEXCF3N7XJ4",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJS8Z7FW504J5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LKX3NDPZ68H74",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP5542Q9WCHX2",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP8AY4081PK5E",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LVKCGC3H1QMYX",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LWREC814AB8A4",
+                  "track_inventory": false
+                }
+              ],
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "service_duration": 0,
+              "available_for_booking": false,
+              "transition_time": 0,
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          },
+          {
+            "type": "ITEM_VARIATION",
+            "id": "XX2GOM6JZVROK3NWECBULBJW",
+            "updated_at": "2026-09-13T13:47:53.506Z",
+            "created_at": "2025-03-13T18:21:02.735Z",
+            "version": 1789307273506,
+            "is_deleted": false,
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "IL4HKH32KJU43QZF2WTE57CM",
+              "name": "Organic Beef Heart",
+              "ordinal": 2,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 950,
+                "currency": "USD"
+              },
+              "location_overrides": [
+                {
+                  "location_id": "C0T7DVZY5XVG5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L1MHNE83A8XPY",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L373VS1QADC37",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJGEXCF3N7XJ4",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJS8Z7FW504J5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LKX3NDPZ68H74",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP5542Q9WCHX2",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP8AY4081PK5E",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LVKCGC3H1QMYX",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LWREC814AB8A4",
+                  "track_inventory": false
+                }
+              ],
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          }
+        ],
+        "product_type": "REGULAR",
+        "skip_modifier_screen": false,
+        "categories": [
+          {
+            "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+            "ordinal": 2336462209024
+          }
+        ],
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ],
+        "is_archived": false,
+        "reporting_category": {
+          "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+          "ordinal": 2336462209024
+        },
+        "is_alcoholic": false
+      }
+    },
+    {
+      "type": "ITEM",
+      "id": "CTUQPFQYSCASKP4QBTONH255",
+      "updated_at": "2026-11-06T19:00:52.347Z",
+      "created_at": "2019-10-10T17:51:04.057Z",
+      "version": 1793991652347,
+      "is_deleted": false,
+      "catalog_v1_ids": [
+        {
+          "catalog_v1_id": "3D28A02A-4BD8-400A-ABCC-A0540FB50B00",
+          "location_id": "C0T7DVZY5XVG5"
+        }
+      ],
+      "present_at_all_locations": false,
+      "present_at_location_ids": [
+        "C0T7DVZY5XVG5",
+        "L1MHNE83A8XPY",
+        "L307W0S4THZP3",
+        "L373VS1QADC37",
+        "LJGEXCF3N7XJ4",
+        "LJS8Z7FW504J5",
+        "LKX3NDPZ68H74",
+        "LP5542Q9WCHX2",
+        "LP8AY4081PK5E",
+        "LVKCGC3H1QMYX",
+        "LWREC814AB8A4"
+      ],
+      "item_data": {
+        "name": "Beef Tongue",
+        "label_color": "4AB200",
+        "is_taxable": true,
+        "variations": [
+          {
+            "type": "ITEM_VARIATION",
+            "id": "E42RKU2L3DA3RPV34NFC4V6D",
+            "updated_at": "2026-09-13T13:47:53.506Z",
+            "created_at": "2025-03-13T18:11:56.929Z",
+            "version": 1789307273506,
+            "is_deleted": false,
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "CTUQPFQYSCASKP4QBTONH255",
+              "name": "Organic Tongue",
+              "ordinal": 1,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 950,
+                "currency": "USD"
+              },
+              "location_overrides": [
+                {
+                  "location_id": "C0T7DVZY5XVG5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L1MHNE83A8XPY",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L373VS1QADC37",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJGEXCF3N7XJ4",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJS8Z7FW504J5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LKX3NDPZ68H74",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP5542Q9WCHX2",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP8AY4081PK5E",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LVKCGC3H1QMYX",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LWREC814AB8A4",
+                  "track_inventory": false
+                }
+              ],
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          },
+          {
+            "type": "ITEM_VARIATION",
+            "id": "XLUIITLT42YYIEAIIQMM43SU",
+            "updated_at": "2026-11-06T19:00:52.347Z",
+            "created_at": "2025-03-13T18:11:56.929Z",
+            "version": 1793991652347,
+            "is_deleted": false,
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "CTUQPFQYSCASKP4QBTONH255",
+              "name": "2.50 - 3.00 lbs",
+              "ordinal": 2,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 950,
+                "currency": "USD"
+              },
+              "location_overrides": [
+                {
+                  "location_id": "C0T7DVZY5XVG5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L1MHNE83A8XPY",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L373VS1QADC37",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJGEXCF3N7XJ4",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJS8Z7FW504J5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LKX3NDPZ68H74",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP5542Q9WCHX2",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP8AY4081PK5E",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LVKCGC3H1QMYX",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LWREC814AB8A4",
+                  "track_inventory": false
+                }
+              ],
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          }
+        ],
+        "product_type": "REGULAR",
+        "skip_modifier_screen": false,
+        "categories": [
+          {
+            "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+            "ordinal": 2542620639232
+          }
+        ],
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ],
+        "is_archived": false,
+        "reporting_category": {
+          "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+          "ordinal": 2542620639232
+        },
+        "is_alcoholic": false
+      }
+    },
+    {
+      "type": "ITEM",
+      "id": "EKVB7B3EUDOEUW4YKY4WKAH6",
+      "updated_at": "2026-11-06T19:00:52.347Z",
+      "created_at": "2019-10-10T17:51:04.227Z",
+      "version": 1793991652347,
+      "is_deleted": false,
+      "catalog_v1_ids": [
+        {
+          "catalog_v1_id": "13E63183-AE36-4A60-A8DF-BFBAD75A9BF8",
+          "location_id": "C0T7DVZY5XVG5"
+        }
+      ],
+      "present_at_all_locations": false,
+      "present_at_location_ids": [
+        "C0T7DVZY5XVG5",
+        "L1MHNE83A8XPY",
+        "L307W0S4THZP3",
+        "L373VS1QADC37",
+        "LJGEXCF3N7XJ4",
+        "LJS8Z7FW504J5",
+        "LKX3NDPZ68H74",
+        "LP5542Q9WCHX2",
+        "LP8AY4081PK5E",
+        "LVKCGC3H1QMYX",
+        "LWREC814AB8A4"
+      ],
+      "item_data": {
+        "name": "Beef Bones",
+        "label_color": "4AB200",
+        "is_taxable": true,
+        "variations": [
+          {
+            "type": "ITEM_VARIATION",
+            "id": "FO4U2WMBU6CNP3M4TJVGSCXJ",
+            "updated_at": "2026-11-06T19:00:52.347Z",
+            "created_at": "2019-10-10T17:51:04.227Z",
+            "version": 1793991652347,
+            "is_deleted": false,
+            "catalog_v1_ids": [
+              {
+                "catalog_v1_id": "13DA04C8-E075-4769-B7B3-47355169B803",
+                "location_id": "C0T7DVZY5XVG5"
+              }
+            ],
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "EKVB7B3EUDOEUW4YKY4WKAH6",
+              "name": "3.00 - 5.00 lbs",
+              "ordinal": 0,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 250,
+                "currency": "USD"
+              },
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "service_duration": 0,
+              "available_for_booking": false,
+              "transition_time": 0,
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          },
+          {
+            "type": "ITEM_VARIATION",
+            "id": "ZHGFAUOQGPWL3S76V57VP6YG",
+            "updated_at": "2026-11-06T19:00:52.347Z",
+            "created_at": "2022-10-15T16:06:24.929Z",
+            "version": 1793991652347,
+            "is_deleted": false,
+            "catalog_v1_ids": [
+              {
+                "catalog_v1_id": "BC8B0D6E-C1E0-41E0-B26C-31C2864B04F2",
+                "location_id": "C0T7DVZY5XVG5"
+              }
+            ],
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "EKVB7B3EUDOEUW4YKY4WKAH6",
+              "name": "Organic Beef Bones",
+              "ordinal": 1,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 250,
+                "currency": "USD"
+              },
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          }
+        ],
+        "product_type": "REGULAR",
+        "skip_modifier_screen": false,
+        "ecom_visibility": "VISIBLE",
+        "categories": [
+          {
+            "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+            "ordinal": 2267742732288
+          }
+        ],
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ],
+        "is_archived": false,
+        "reporting_category": {
+          "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+          "ordinal": 2267742732288
+        },
+        "is_alcoholic": false
+      }
+    },
+    {
+      "type": "ITEM",
+      "id": "SHZS54JA7XZFU4WNB3O4CLSO",
+      "updated_at": "2026-11-06T19:00:52.347Z",
+      "created_at": "2019-10-10T17:51:04.318Z",
+      "version": 1793991652347,
+      "is_deleted": false,
+      "catalog_v1_ids": [
+        {
+          "catalog_v1_id": "3FF348AE-5063-428C-AF48-3A9CE4B66C60",
+          "location_id": "C0T7DVZY5XVG5"
+        }
+      ],
+      "present_at_all_locations": false,
+      "present_at_location_ids": [
+        "C0T7DVZY5XVG5",
+        "L1MHNE83A8XPY",
+        "L307W0S4THZP3",
+        "L373VS1QADC37",
+        "LJGEXCF3N7XJ4",
+        "LJS8Z7FW504J5",
+        "LKX3NDPZ68H74",
+        "LP5542Q9WCHX2",
+        "LP8AY4081PK5E",
+        "LVKCGC3H1QMYX",
+        "LWREC814AB8A4"
+      ],
+      "item_data": {
+        "name": "Beef Marrow Bones",
+        "label_color": "4AB200",
+        "is_taxable": true,
+        "variations": [
+          {
+            "type": "ITEM_VARIATION",
+            "id": "PJUREPBRNPEO4OGFFYYA7Q7Z",
+            "updated_at": "2026-11-06T19:00:52.347Z",
+            "created_at": "2019-10-10T17:51:04.318Z",
+            "version": 1793991652347,
+            "is_deleted": false,
+            "catalog_v1_ids": [
+              {
+                "catalog_v1_id": "8DD4D256-8547-43DC-A0AB-97D86B5A116B",
+                "location_id": "C0T7DVZY5XVG5"
+              }
+            ],
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "SHZS54JA7XZFU4WNB3O4CLSO",
+              "name": "3.00 - 5.00 lbs",
+              "ordinal": 1,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 250,
+                "currency": "USD"
+              },
+              "location_overrides": [
+                {
+                  "location_id": "C0T7DVZY5XVG5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L1MHNE83A8XPY",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L373VS1QADC37",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJGEXCF3N7XJ4",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJS8Z7FW504J5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LKX3NDPZ68H74",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP5542Q9WCHX2",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP8AY4081PK5E",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LVKCGC3H1QMYX",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LWREC814AB8A4",
+                  "track_inventory": false
+                }
+              ],
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "service_duration": 0,
+              "available_for_booking": false,
+              "transition_time": 0,
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          },
+          {
+            "type": "ITEM_VARIATION",
+            "id": "5A5PVRRHF7ZJEYJ2WEYNV4RL",
+            "updated_at": "2026-09-13T13:47:53.506Z",
+            "created_at": "2025-03-13T18:19:27.927Z",
+            "version": 1789307273506,
+            "is_deleted": false,
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "SHZS54JA7XZFU4WNB3O4CLSO",
+              "name": "Organic Beef Marrow Bones",
+              "ordinal": 2,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 1200,
+                "currency": "USD"
+              },
+              "location_overrides": [
+                {
+                  "location_id": "C0T7DVZY5XVG5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L1MHNE83A8XPY",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L373VS1QADC37",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJGEXCF3N7XJ4",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJS8Z7FW504J5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LKX3NDPZ68H74",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP5542Q9WCHX2",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP8AY4081PK5E",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LVKCGC3H1QMYX",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LWREC814AB8A4",
+                  "track_inventory": false
+                }
+              ],
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          }
+        ],
+        "product_type": "REGULAR",
+        "skip_modifier_screen": false,
+        "categories": [
+          {
+            "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+            "ordinal": 2473901162496
+          }
+        ],
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ],
+        "is_archived": false,
+        "reporting_category": {
+          "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+          "ordinal": 2473901162496
+        },
+        "is_alcoholic": false
+      }
+    },
+    {
+      "type": "ITEM",
+      "id": "BB4BQ436YGC4LUSOU4HLL27D",
+      "updated_at": "2026-10-10T14:39:37.527Z",
+      "created_at": "2020-03-21T17:20:37.068Z",
+      "version": 1791643177527,
+      "is_deleted": false,
+      "catalog_v1_ids": [
+        {
+          "catalog_v1_id": "65E54BB6-0A77-4038-B75F-3A8A01F11516",
+          "location_id": "C0T7DVZY5XVG5"
+        }
+      ],
+      "present_at_all_locations": false,
+      "present_at_location_ids": [
+        "C0T7DVZY5XVG5",
+        "L1MHNE83A8XPY",
+        "L307W0S4THZP3",
+        "L373VS1QADC37",
+        "LJGEXCF3N7XJ4",
+        "LJS8Z7FW504J5",
+        "LKX3NDPZ68H74",
+        "LP5542Q9WCHX2",
+        "LP8AY4081PK5E",
+        "LVKCGC3H1QMYX",
+        "LWREC814AB8A4"
+      ],
+      "item_data": {
+        "name": "Brisket",
+        "label_color": "4AB200",
+        "is_taxable": true,
+        "variations": [
+          {
+            "type": "ITEM_VARIATION",
+            "id": "25JLU7YR4FTI4NFNKZXTZKY6",
+            "updated_at": "2026-09-17T14:19:12.256Z",
+            "created_at": "2020-03-21T17:20:37.068Z",
+            "version": 1789654752256,
+            "is_deleted": false,
+            "catalog_v1_ids": [
+              {
+                "catalog_v1_id": "780C7CB0-DC46-4B9F-9396-EA3B78E5BAED",
+                "location_id": "C0T7DVZY5XVG5"
+              }
+            ],
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "BB4BQ436YGC4LUSOU4HLL27D",
+              "name": "Natural Brisket",
+              "ordinal": 1,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 1600,
+                "currency": "USD"
+              },
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          },
+          {
+            "type": "ITEM_VARIATION",
+            "id": "SLLB3I6MS6L2ENNMOZZ3X3QK",
+            "updated_at": "2026-09-13T13:47:53.506Z",
+            "created_at": "2022-10-14T22:50:18.357Z",
+            "version": 1789307273506,
+            "is_deleted": false,
+            "catalog_v1_ids": [
+              {
+                "catalog_v1_id": "1453F2C3-2948-4EE9-8B4E-340BC2E9AA8F",
+                "location_id": "C0T7DVZY5XVG5"
+              }
+            ],
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "BB4BQ436YGC4LUSOU4HLL27D",
+              "name": "Organic Brisket",
+              "ordinal": 2,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 1700,
+                "currency": "USD"
+              },
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          }
+        ],
+        "product_type": "REGULAR",
+        "skip_modifier_screen": false,
+        "categories": [
+          {
+            "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+            "ordinal": 1168231104512
+          }
+        ],
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ],
+        "is_archived": false,
+        "reporting_category": {
+          "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+          "ordinal": 1168231104512
+        },
+        "is_alcoholic": false
+      }
+    },
+    {
+      "type": "ITEM",
+      "id": "CQAVFLDGU4BEMOZ4TH6FI3SG",
+      "updated_at": "2026-11-06T19:01:10.094Z",
+      "created_at": "2020-03-21T17:26:43.066Z",
+      "version": 1793991670094,
+      "is_deleted": false,
+      "catalog_v1_ids": [
+        {
+          "catalog_v1_id": "55ABEEE9-C1EB-45E7-B795-2F013000ABA1",
+          "location_id": "C0T7DVZY5XVG5"
+        }
+      ],
+      "present_at_all_locations": false,
+      "present_at_location_ids": [
+        "C0T7DVZY5XVG5",
+        "L1MHNE83A8XPY",
+        "L307W0S4THZP3",
+        "L373VS1QADC37",
+        "LJGEXCF3N7XJ4",
+        "LJS8Z7FW504J5",
+        "LKX3NDPZ68H74",
+        "LP5542Q9WCHX2",
+        "LP8AY4081PK5E",
+        "LVKCGC3H1QMYX",
+        "LWREC814AB8A4"
+      ],
+      "item_data": {
+        "name": "Flank Steak",
+        "label_color": "4AB200",
+        "is_taxable": true,
+        "ordinal": 0,
+        "variations": [
+          {
+            "type": "ITEM_VARIATION",
+            "id": "CH2P36B35NEX5GQB24N6TQ6Y",
+            "updated_at": "2026-11-06T19:01:10.094Z",
+            "created_at": "2020-03-21T17:26:43.066Z",
+            "version": 1793991670094,
+            "is_deleted": false,
+            "catalog_v1_ids": [
+              {
+                "catalog_v1_id": "DBDCA46B-877A-46A8-9E7A-09897ECB281A",
+                "location_id": "C0T7DVZY5XVG5"
+              }
+            ],
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "CQAVFLDGU4BEMOZ4TH6FI3SG",
+              "name": "1.10 - 1.40 lbs",
+              "ordinal": 1,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 2600,
+                "currency": "USD"
+              },
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          },
+          {
+            "type": "ITEM_VARIATION",
+            "id": "7DZB7ATMWI4SYBNIP5ZBAZU5",
+            "updated_at": "2026-09-13T13:47:53.506Z",
+            "created_at": "2023-07-18T22:51:03.498Z",
+            "version": 1789307273506,
+            "is_deleted": false,
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "CQAVFLDGU4BEMOZ4TH6FI3SG",
+              "name": "Organic Flank Steak",
+              "ordinal": 2,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 2600,
+                "currency": "USD"
+              },
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          }
+        ],
+        "product_type": "REGULAR",
+        "skip_modifier_screen": false,
+        "categories": [
+          {
+            "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+            "ordinal": 1649267441664
+          }
+        ],
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ],
+        "is_archived": false,
+        "reporting_category": {
+          "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+          "ordinal": 1649267441664
+        },
+        "is_alcoholic": false
+      }
+    },
+    {
+      "type": "ITEM",
+      "id": "77WYOWU6KBIMIGE2NPMLNPFH",
+      "updated_at": "2026-11-06T19:01:29.335Z",
+      "created_at": "2020-03-21T17:27:01.436Z",
+      "version": 1793991689335,
+      "is_deleted": false,
+      "catalog_v1_ids": [
+        {
+          "catalog_v1_id": "65DBAA56-653A-4C73-80D7-33A3A8C29CC7",
+          "location_id": "C0T7DVZY5XVG5"
+        }
+      ],
+      "present_at_all_locations": false,
+      "present_at_location_ids": [
+        "C0T7DVZY5XVG5",
+        "L1MHNE83A8XPY",
+        "L307W0S4THZP3",
+        "L373VS1QADC37",
+        "LJGEXCF3N7XJ4",
+        "LJS8Z7FW504J5",
+        "LKX3NDPZ68H74",
+        "LP5542Q9WCHX2",
+        "LP8AY4081PK5E",
+        "LVKCGC3H1QMYX",
+        "LWREC814AB8A4"
+      ],
+      "item_data": {
+        "name": "Skirt Steak, Large",
+        "label_color": "4AB200",
+        "is_taxable": true,
+        "ordinal": 0,
+        "variations": [
+          {
+            "type": "ITEM_VARIATION",
+            "id": "TVIOJDKULJFKZ7DC75ADRLML",
+            "updated_at": "2026-11-06T19:01:29.335Z",
+            "created_at": "2020-03-21T17:27:01.436Z",
+            "version": 1793991689335,
+            "is_deleted": false,
+            "catalog_v1_ids": [
+              {
+                "catalog_v1_id": "145FAB07-338C-4DD2-B511-EA4A9A590102",
+                "location_id": "C0T7DVZY5XVG5"
+              }
+            ],
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "77WYOWU6KBIMIGE2NPMLNPFH",
+              "name": "Large, .80 - 1.20 lbs",
+              "ordinal": 1,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 2600,
+                "currency": "USD"
+              },
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          },
+          {
+            "type": "ITEM_VARIATION",
+            "id": "5Q2H2KTZNM6K5RKSWGEBSF5L",
+            "updated_at": "2026-09-13T13:47:53.506Z",
+            "created_at": "2025-03-13T18:17:17.797Z",
+            "version": 1789307273506,
+            "is_deleted": false,
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "77WYOWU6KBIMIGE2NPMLNPFH",
+              "name": "Organic Skirt Steak",
+              "ordinal": 2,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 2600,
+                "currency": "USD"
+              },
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          }
+        ],
+        "product_type": "REGULAR",
+        "skip_modifier_screen": false,
+        "categories": [
+          {
+            "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+            "ordinal": 1443109011456
+          }
+        ],
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ],
+        "is_archived": false,
+        "reporting_category": {
+          "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+          "ordinal": 1443109011456
+        },
+        "is_alcoholic": false
+      }
+    },
+    {
+      "type": "ITEM",
+      "id": "RTUI22MY5EU7CX6ALHETPMBO",
+      "updated_at": "2026-11-06T19:00:52.347Z",
+      "created_at": "2020-03-21T17:27:10.703Z",
+      "version": 1793991652347,
+      "is_deleted": false,
+      "catalog_v1_ids": [
+        {
+          "catalog_v1_id": "829E33B1-3079-4EE4-8F19-FC021FDAE631",
+          "location_id": "C0T7DVZY5XVG5"
+        }
+      ],
+      "present_at_all_locations": false,
+      "present_at_location_ids": [
+        "C0T7DVZY5XVG5",
+        "L1MHNE83A8XPY",
+        "L307W0S4THZP3",
+        "L373VS1QADC37",
+        "LJGEXCF3N7XJ4",
+        "LJS8Z7FW504J5",
+        "LKX3NDPZ68H74",
+        "LP5542Q9WCHX2",
+        "LP8AY4081PK5E",
+        "LVKCGC3H1QMYX",
+        "LWREC814AB8A4"
+      ],
+      "item_data": {
+        "name": "Beef Flat Iron Steak",
+        "label_color": "4AB200",
+        "is_taxable": true,
+        "variations": [
+          {
+            "type": "ITEM_VARIATION",
+            "id": "B6UDTUDPUQKV2THQ5PFPC6SZ",
+            "updated_at": "2026-11-06T19:00:52.347Z",
+            "created_at": "2020-03-21T17:27:10.703Z",
+            "version": 1793991652347,
+            "is_deleted": false,
+            "catalog_v1_ids": [
+              {
+                "catalog_v1_id": "0398A003-6CA6-4046-98C5-DCC61947BAF9",
+                "location_id": "C0T7DVZY5XVG5"
+              }
+            ],
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "RTUI22MY5EU7CX6ALHETPMBO",
+              "name": "0.70 - 1.10 lbs",
+              "ordinal": 1,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 2600,
+                "currency": "USD"
+              },
+              "location_overrides": [
+                {
+                  "location_id": "C0T7DVZY5XVG5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L1MHNE83A8XPY",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L373VS1QADC37",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJGEXCF3N7XJ4",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJS8Z7FW504J5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LKX3NDPZ68H74",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP5542Q9WCHX2",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP8AY4081PK5E",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LVKCGC3H1QMYX",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LWREC814AB8A4",
+                  "track_inventory": false
+                }
+              ],
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          },
+          {
+            "type": "ITEM_VARIATION",
+            "id": "WPUMNRELJSOPPXTKRNA7X3RN",
+            "updated_at": "2026-09-13T13:47:53.506Z",
+            "created_at": "2022-10-14T22:50:00.691Z",
+            "version": 1789307273506,
+            "is_deleted": false,
+            "catalog_v1_ids": [
+              {
+                "catalog_v1_id": "83CC05D8-95E4-4731-B4F1-B4891ECCED08",
+                "location_id": "C0T7DVZY5XVG5"
+              }
+            ],
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "RTUI22MY5EU7CX6ALHETPMBO",
+              "name": "Organic Flat Iron",
+              "ordinal": 2,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 2600,
+                "currency": "USD"
+              },
+              "location_overrides": [
+                {
+                  "location_id": "C0T7DVZY5XVG5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L1MHNE83A8XPY",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L373VS1QADC37",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJGEXCF3N7XJ4",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJS8Z7FW504J5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LKX3NDPZ68H74",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP5542Q9WCHX2",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP8AY4081PK5E",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LVKCGC3H1QMYX",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LWREC814AB8A4",
+                  "track_inventory": false
+                }
+              ],
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          }
+        ],
+        "product_type": "REGULAR",
+        "skip_modifier_screen": false,
+        "categories": [
+          {
+            "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+            "ordinal": 1580547964928
+          }
+        ],
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ],
+        "is_archived": false,
+        "reporting_category": {
+          "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+          "ordinal": 1580547964928
+        },
+        "is_alcoholic": false
+      }
+    },
+    {
+      "type": "ITEM",
+      "id": "QZ6L4PORGVUVAZSDTH6XIC76",
+      "updated_at": "2026-11-06T19:00:52.347Z",
+      "created_at": "2020-03-21T17:55:34.984Z",
+      "version": 1793991652347,
+      "is_deleted": false,
+      "catalog_v1_ids": [
+        {
+          "catalog_v1_id": "01D76088-432E-468C-8D47-A84E2F00568E",
+          "location_id": "C0T7DVZY5XVG5"
+        }
+      ],
+      "present_at_all_locations": false,
+      "present_at_location_ids": [
+        "C0T7DVZY5XVG5",
+        "L1MHNE83A8XPY",
+        "L307W0S4THZP3",
+        "L373VS1QADC37",
+        "LJGEXCF3N7XJ4",
+        "LJS8Z7FW504J5",
+        "LKX3NDPZ68H74",
+        "LP5542Q9WCHX2",
+        "LP8AY4081PK5E",
+        "LVKCGC3H1QMYX",
+        "LWREC814AB8A4"
+      ],
+      "item_data": {
+        "name": "Beef Tenderloin",
+        "label_color": "4AB200",
+        "is_taxable": true,
+        "variations": [
+          {
+            "type": "ITEM_VARIATION",
+            "id": "QGDFUX4RZYYUBRYCXCW2ZW4O",
+            "updated_at": "2026-11-06T19:00:52.347Z",
+            "created_at": "2020-03-21T17:55:34.984Z",
+            "version": 1793991652347,
+            "is_deleted": false,
+            "catalog_v1_ids": [
+              {
+                "catalog_v1_id": "04448660-47E9-4F4D-B3FF-8EE45D2ECB6B",
+                "location_id": "C0T7DVZY5XVG5"
+              }
+            ],
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "QZ6L4PORGVUVAZSDTH6XIC76",
+              "name": "0.40 - 0.70 lbs",
+              "ordinal": 1,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 4300,
+                "currency": "USD"
+              },
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          },
+          {
+            "type": "ITEM_VARIATION",
+            "id": "6MJVQW23QTLYSHPHKFDPJSWN",
+            "updated_at": "2026-11-06T19:00:52.347Z",
+            "created_at": "2025-03-13T18:14:28.443Z",
+            "version": 1793991652347,
+            "is_deleted": false,
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "QZ6L4PORGVUVAZSDTH6XIC76",
+              "name": "Organic Tenderloin",
+              "ordinal": 2,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 4200,
+                "currency": "USD"
+              },
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          }
+        ],
+        "product_type": "REGULAR",
+        "skip_modifier_screen": false,
+        "ecom_visibility": "VISIBLE",
+        "categories": [
+          {
+            "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+            "ordinal": 1717986918400
+          }
+        ],
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ],
+        "is_archived": false,
+        "reporting_category": {
+          "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+          "ordinal": 1717986918400
+        },
+        "is_alcoholic": false
+      }
+    },
+    {
+      "type": "ITEM",
+      "id": "VO7YEQD5FKOYVWGHGFI3ISA3",
+      "updated_at": "2026-11-06T19:00:52.347Z",
+      "created_at": "2020-08-02T18:29:48.251Z",
+      "version": 1793991652347,
+      "is_deleted": false,
+      "catalog_v1_ids": [
+        {
+          "catalog_v1_id": "7079a3db-c91d-4f5b-83d1-284b1c229c64",
+          "location_id": "C0T7DVZY5XVG5"
+        }
+      ],
+      "present_at_all_locations": false,
+      "present_at_location_ids": [
+        "C0T7DVZY5XVG5",
+        "L1MHNE83A8XPY",
+        "L307W0S4THZP3",
+        "L373VS1QADC37",
+        "LJGEXCF3N7XJ4",
+        "LJS8Z7FW504J5",
+        "LKX3NDPZ68H74",
+        "LP5542Q9WCHX2",
+        "LP8AY4081PK5E",
+        "LVKCGC3H1QMYX",
+        "LWREC814AB8A4"
+      ],
+      "item_data": {
+        "name": "Beef Tri-Tip",
+        "abbreviation": "Tr",
+        "label_color": "4AB200",
+        "is_taxable": true,
+        "variations": [
+          {
+            "type": "ITEM_VARIATION",
+            "id": "MG34WSHAPYGTK5C2F7WJY7HH",
+            "updated_at": "2026-11-06T19:00:52.347Z",
+            "created_at": "2020-08-02T18:29:48.251Z",
+            "version": 1793991652347,
+            "is_deleted": false,
+            "catalog_v1_ids": [
+              {
+                "catalog_v1_id": "a90237ed-9a5e-426d-a22a-629e08d54047",
+                "location_id": "C0T7DVZY5XVG5"
+              }
+            ],
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "VO7YEQD5FKOYVWGHGFI3ISA3",
+              "name": "1.90 - 2.20 lbs",
+              "ordinal": 1,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 2100,
+                "currency": "USD"
+              },
+              "location_overrides": [
+                {
+                  "location_id": "C0T7DVZY5XVG5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L1MHNE83A8XPY",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L373VS1QADC37",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJGEXCF3N7XJ4",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJS8Z7FW504J5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LKX3NDPZ68H74",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP5542Q9WCHX2",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP8AY4081PK5E",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LVKCGC3H1QMYX",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LWREC814AB8A4",
+                  "track_inventory": false
+                }
+              ],
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          },
+          {
+            "type": "ITEM_VARIATION",
+            "id": "HV7HA5JOUAPPDQXQEE7PIVBG",
+            "updated_at": "2026-09-13T13:47:53.506Z",
+            "created_at": "2022-10-14T22:50:23.454Z",
+            "version": 1789307273506,
+            "is_deleted": false,
+            "catalog_v1_ids": [
+              {
+                "catalog_v1_id": "03BA7234-4187-4D7C-9E64-766337617FB8",
+                "location_id": "C0T7DVZY5XVG5"
+              }
+            ],
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "VO7YEQD5FKOYVWGHGFI3ISA3",
+              "name": "Organic Tri Tip",
+              "ordinal": 2,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 2100,
+                "currency": "USD"
+              },
+              "location_overrides": [
+                {
+                  "location_id": "C0T7DVZY5XVG5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L1MHNE83A8XPY",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L373VS1QADC37",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJGEXCF3N7XJ4",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJS8Z7FW504J5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LKX3NDPZ68H74",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP5542Q9WCHX2",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP8AY4081PK5E",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LVKCGC3H1QMYX",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LWREC814AB8A4",
+                  "track_inventory": false
+                }
+              ],
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          }
+        ],
+        "product_type": "REGULAR",
+        "skip_modifier_screen": false,
+        "categories": [
+          {
+            "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+            "ordinal": 1305670057984
+          }
+        ],
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ],
+        "is_archived": false,
+        "reporting_category": {
+          "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+          "ordinal": 1305670057984
+        },
+        "is_alcoholic": false
+      }
+    },
+    {
+      "type": "ITEM",
+      "id": "IEAP53MPU6KHNAAHK55UTMDH",
+      "updated_at": "2026-11-06T19:01:29.335Z",
+      "created_at": "2020-08-14T19:24:34.705Z",
+      "version": 1793991689335,
+      "is_deleted": false,
+      "catalog_v1_ids": [
+        {
+          "catalog_v1_id": "B47C4A88-DC35-428C-A062-A4012A1CBE5E",
+          "location_id": "C0T7DVZY5XVG5"
+        }
+      ],
+      "present_at_all_locations": false,
+      "present_at_location_ids": [
+        "C0T7DVZY5XVG5",
+        "L1MHNE83A8XPY",
+        "L307W0S4THZP3",
+        "L373VS1QADC37",
+        "LJGEXCF3N7XJ4",
+        "LJS8Z7FW504J5",
+        "LKX3NDPZ68H74",
+        "LP5542Q9WCHX2",
+        "LP8AY4081PK5E",
+        "LVKCGC3H1QMYX",
+        "LWREC814AB8A4"
+      ],
+      "item_data": {
+        "name": "Teres Major Steak",
+        "label_color": "4AB200",
+        "is_taxable": true,
+        "variations": [
+          {
+            "type": "ITEM_VARIATION",
+            "id": "QGGOCDMYYFFICWGSUMGZUQNP",
+            "updated_at": "2026-11-06T19:01:29.335Z",
+            "created_at": "2025-03-13T16:45:49.105Z",
+            "version": 1793991689335,
+            "is_deleted": false,
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "IEAP53MPU6KHNAAHK55UTMDH",
+              "name": "0.40 - 0.70 lbs",
+              "ordinal": 1,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 2600,
+                "currency": "USD"
+              },
+              "location_overrides": [
+                {
+                  "location_id": "C0T7DVZY5XVG5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L1MHNE83A8XPY",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L373VS1QADC37",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJGEXCF3N7XJ4",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJS8Z7FW504J5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LKX3NDPZ68H74",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP5542Q9WCHX2",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP8AY4081PK5E",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LVKCGC3H1QMYX",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LWREC814AB8A4",
+                  "track_inventory": false
+                }
+              ],
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          },
+          {
+            "type": "ITEM_VARIATION",
+            "id": "WSVLYC2P465ES2AB4C5CNHOA",
+            "updated_at": "2026-09-13T13:47:53.506Z",
+            "created_at": "2025-03-13T18:17:54.329Z",
+            "version": 1789307273506,
+            "is_deleted": false,
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "IEAP53MPU6KHNAAHK55UTMDH",
+              "name": "Organic Teres Major Steak",
+              "ordinal": 2,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 2600,
+                "currency": "USD"
+              },
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          }
+        ],
+        "product_type": "REGULAR",
+        "skip_modifier_screen": false,
+        "categories": [
+          {
+            "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+            "ordinal": 1374389534720
+          }
+        ],
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ],
+        "is_archived": false,
+        "reporting_category": {
+          "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+          "ordinal": 1374389534720
+        },
+        "is_alcoholic": false
+      }
+    },
+    {
+      "type": "ITEM",
+      "id": "WSEWP54CB6EZWHXJTDFT5M6W",
+      "updated_at": "2026-11-06T19:01:10.094Z",
+      "created_at": "2021-08-04T15:00:47.644Z",
+      "version": 1793991670094,
+      "is_deleted": false,
+      "catalog_v1_ids": [
+        {
+          "catalog_v1_id": "788A507C-BB3E-48EA-8C9A-51FD9D6F3A4A",
+          "location_id": "C0T7DVZY5XVG5"
+        }
+      ],
+      "present_at_all_locations": false,
+      "present_at_location_ids": [
+        "C0T7DVZY5XVG5",
+        "L1MHNE83A8XPY",
+        "L307W0S4THZP3",
+        "L373VS1QADC37",
+        "LJGEXCF3N7XJ4",
+        "LJS8Z7FW504J5",
+        "LKX3NDPZ68H74",
+        "LP5542Q9WCHX2",
+        "LP8AY4081PK5E",
+        "LVKCGC3H1QMYX",
+        "LWREC814AB8A4"
+      ],
+      "item_data": {
+        "name": "Hanger Steak",
+        "label_color": "4AB200",
+        "is_taxable": true,
+        "variations": [
+          {
+            "type": "ITEM_VARIATION",
+            "id": "U2RS4TBUI2S7DJ6NO2O665TI",
+            "updated_at": "2026-11-06T19:01:10.094Z",
+            "created_at": "2021-08-04T15:00:47.644Z",
+            "version": 1793991670094,
+            "is_deleted": false,
+            "catalog_v1_ids": [
+              {
+                "catalog_v1_id": "226634B7-E660-429C-B4CF-453BB6EF7A41",
+                "location_id": "C0T7DVZY5XVG5"
+              }
+            ],
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "WSEWP54CB6EZWHXJTDFT5M6W",
+              "name": "0.40 - 0.70 lbs",
+              "ordinal": 1,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 2600,
+                "currency": "USD"
+              },
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          },
+          {
+            "type": "ITEM_VARIATION",
+            "id": "JAFJ4WOYPJ7JGC2XTW7DAJCI",
+            "updated_at": "2026-09-13T13:47:53.506Z",
+            "created_at": "2023-07-18T22:50:16.829Z",
+            "version": 1789307273506,
+            "is_deleted": false,
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "WSEWP54CB6EZWHXJTDFT5M6W",
+              "name": "Organic Hanger Steak",
+              "ordinal": 2,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 2600,
+                "currency": "USD"
+              },
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          }
+        ],
+        "product_type": "REGULAR",
+        "skip_modifier_screen": false,
+        "categories": [
+          {
+            "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+            "ordinal": 1511828488192
+          }
+        ],
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ],
+        "is_archived": false,
+        "reporting_category": {
+          "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+          "ordinal": 1511828488192
+        },
+        "is_alcoholic": false
+      }
+    },
+    {
+      "type": "ITEM",
+      "id": "ANOBF7MHTR5DKMLRW3KEJ52P",
+      "updated_at": "2026-11-06T19:00:52.347Z",
+      "created_at": "2022-10-15T16:10:27.594Z",
+      "version": 1793991652347,
+      "is_deleted": false,
+      "catalog_v1_ids": [
+        {
+          "catalog_v1_id": "5YCYC2BO4LBFZGG4YG42PCO2",
+          "location_id": "C0T7DVZY5XVG5"
+        }
+      ],
+      "present_at_all_locations": false,
+      "present_at_location_ids": [
+        "C0T7DVZY5XVG5",
+        "L1MHNE83A8XPY",
+        "L307W0S4THZP3",
+        "L373VS1QADC37",
+        "LJGEXCF3N7XJ4",
+        "LJS8Z7FW504J5",
+        "LKX3NDPZ68H74",
+        "LP5542Q9WCHX2",
+        "LP8AY4081PK5E",
+        "LVKCGC3H1QMYX",
+        "LWREC814AB8A4"
+      ],
+      "item_data": {
+        "name": "Beef Back Ribs",
+        "label_color": "4AB200",
+        "is_taxable": true,
+        "variations": [
+          {
+            "type": "ITEM_VARIATION",
+            "id": "MEJE6DYSAFEJZ54RY4ZMNE2C",
+            "updated_at": "2026-11-06T19:00:52.347Z",
+            "created_at": "2022-10-15T16:10:27.594Z",
+            "version": 1793991652347,
+            "is_deleted": false,
+            "catalog_v1_ids": [
+              {
+                "catalog_v1_id": "5WKUNGWCIL4UV74GDO6WCXUU",
+                "location_id": "C0T7DVZY5XVG5"
+              }
+            ],
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "ANOBF7MHTR5DKMLRW3KEJ52P",
+              "name": "Organic",
+              "ordinal": 0,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 1650,
+                "currency": "USD"
+              },
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "item_option_values": [
+                {
+                  "item_option_id": "3GGEHJOH6RZHI3DJHQB6FHGY",
+                  "item_option_value_id": "64XREWLX6FULOQSXZA4CRXTI"
+                }
+              ],
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          },
+          {
+            "type": "ITEM_VARIATION",
+            "id": "ESFETJY6J3E3YNPYEUT3P4BJ",
+            "updated_at": "2026-11-06T15:40:10.361Z",
+            "created_at": "2025-01-24T23:27:13.526Z",
+            "version": 1793979610361,
+            "is_deleted": false,
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "ANOBF7MHTR5DKMLRW3KEJ52P",
+              "name": "Natural",
+              "ordinal": 2,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 1600,
+                "currency": "USD"
+              },
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "item_option_values": [
+                {
+                  "item_option_id": "3GGEHJOH6RZHI3DJHQB6FHGY",
+                  "item_option_value_id": "QFJFSQT4AYHCTK6R2VNWXD6J"
+                }
+              ],
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          }
+        ],
+        "product_type": "FOOD_AND_BEV",
+        "skip_modifier_screen": false,
+        "item_options": [
+          {
+            "item_option_id": "3GGEHJOH6RZHI3DJHQB6FHGY"
+          }
+        ],
+        "ecom_visibility": "VISIBLE",
+        "categories": [
+          {
+            "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+            "ordinal": 1236950581248
+          }
+        ],
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ],
+        "is_archived": false,
+        "reporting_category": {
+          "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+          "ordinal": 1236950581248
+        },
+        "is_alcoholic": false
+      }
+    },
+    {
+      "type": "ITEM",
+      "id": "YO6NZ2ZRLEGTFOWDKE4EC6E5",
+      "updated_at": "2026-11-06T19:00:52.347Z",
+      "created_at": "2023-09-30T15:41:51.857Z",
+      "version": 1793991652347,
+      "is_deleted": false,
+      "catalog_v1_ids": [
+        {
+          "catalog_v1_id": "K7NTBWSRCSQNCO2RYMFSA4BG",
+          "location_id": "C0T7DVZY5XVG5"
+        }
+      ],
+      "present_at_all_locations": false,
+      "present_at_location_ids": [
+        "C0T7DVZY5XVG5",
+        "L1MHNE83A8XPY",
+        "L307W0S4THZP3",
+        "L373VS1QADC37",
+        "LJGEXCF3N7XJ4",
+        "LJS8Z7FW504J5",
+        "LKX3NDPZ68H74",
+        "LP5542Q9WCHX2",
+        "LP8AY4081PK5E",
+        "LVKCGC3H1QMYX",
+        "LWREC814AB8A4"
+      ],
+      "item_data": {
+        "name": "Beef Shank Osso Buco",
+        "label_color": "4AB200",
+        "is_taxable": true,
+        "variations": [
+          {
+            "type": "ITEM_VARIATION",
+            "id": "MS4AWNAS64EEDWGEVGXRW2T3",
+            "updated_at": "2026-09-13T13:47:53.506Z",
+            "created_at": "2023-09-30T15:41:51.857Z",
+            "version": 1789307273506,
+            "is_deleted": false,
+            "catalog_v1_ids": [
+              {
+                "catalog_v1_id": "NVJWRK26VLXU6AHBJUKKVO5R",
+                "location_id": "C0T7DVZY5XVG5"
+              }
+            ],
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "YO6NZ2ZRLEGTFOWDKE4EC6E5",
+              "name": "Organic",
+              "ordinal": 0,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 1950,
+                "currency": "USD"
+              },
+              "location_overrides": [
+                {
+                  "location_id": "C0T7DVZY5XVG5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L1MHNE83A8XPY",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L373VS1QADC37",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJGEXCF3N7XJ4",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJS8Z7FW504J5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LKX3NDPZ68H74",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP5542Q9WCHX2",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP8AY4081PK5E",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LVKCGC3H1QMYX",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LWREC814AB8A4",
+                  "track_inventory": false
+                }
+              ],
+              "inventory_alert_type": "NONE",
+              "item_option_values": [
+                {
+                  "item_option_id": "3GGEHJOH6RZHI3DJHQB6FHGY",
+                  "item_option_value_id": "64XREWLX6FULOQSXZA4CRXTI"
+                }
+              ],
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          },
+          {
+            "type": "ITEM_VARIATION",
+            "id": "36KI54KEJJZP76I7I2AAQASZ",
+            "updated_at": "2026-09-13T13:47:53.506Z",
+            "created_at": "2024-06-09T16:43:42.652Z",
+            "version": 1789307273506,
+            "is_deleted": false,
+            "catalog_v1_ids": [
+              {
+                "catalog_v1_id": "BBCC3234-A406-4ADC-BEE8-BC371C8B2161",
+                "location_id": "C0T7DVZY5XVG5"
+              }
+            ],
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "YO6NZ2ZRLEGTFOWDKE4EC6E5",
+              "name": "Natural",
+              "ordinal": 1,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 1950,
+                "currency": "USD"
+              },
+              "location_overrides": [
+                {
+                  "location_id": "C0T7DVZY5XVG5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L1MHNE83A8XPY",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L373VS1QADC37",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJGEXCF3N7XJ4",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJS8Z7FW504J5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LKX3NDPZ68H74",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP5542Q9WCHX2",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP8AY4081PK5E",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LVKCGC3H1QMYX",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LWREC814AB8A4",
+                  "track_inventory": false
+                }
+              ],
+              "inventory_alert_type": "NONE",
+              "item_option_values": [
+                {
+                  "item_option_id": "3GGEHJOH6RZHI3DJHQB6FHGY",
+                  "item_option_value_id": "QFJFSQT4AYHCTK6R2VNWXD6J"
+                }
+              ],
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          }
+        ],
+        "product_type": "FOOD_AND_BEV",
+        "skip_modifier_screen": false,
+        "item_options": [
+          {
+            "item_option_id": "3GGEHJOH6RZHI3DJHQB6FHGY"
+          }
+        ],
+        "categories": [
+          {
+            "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+            "ordinal": 2199023255552
+          }
+        ],
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ],
+        "is_archived": false,
+        "reporting_category": {
+          "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+          "ordinal": 2199023255552
+        },
+        "is_alcoholic": false
+      }
+    },
+    {
+      "type": "ITEM",
+      "id": "E7BTUWHFLBSEQADC5HY3J2NP",
+      "updated_at": "2026-11-06T19:00:52.347Z",
+      "created_at": "2024-07-20T05:59:30.312Z",
+      "version": 1793991652347,
+      "is_deleted": false,
+      "catalog_v1_ids": [
+        {
+          "catalog_v1_id": "B6APYMCNHEHJUMWGPKUVX5TZ",
+          "location_id": "C0T7DVZY5XVG5"
+        }
+      ],
+      "present_at_all_locations": false,
+      "present_at_location_ids": [
+        "C0T7DVZY5XVG5",
+        "L1MHNE83A8XPY",
+        "L307W0S4THZP3",
+        "L373VS1QADC37",
+        "LJGEXCF3N7XJ4",
+        "LJS8Z7FW504J5",
+        "LKX3NDPZ68H74",
+        "LP5542Q9WCHX2",
+        "LP8AY4081PK5E",
+        "LVKCGC3H1QMYX",
+        "LWREC814AB8A4"
+      ],
+      "item_data": {
+        "name": "Beef Kidney",
+        "label_color": "4AB200",
+        "is_taxable": true,
+        "variations": [
+          {
+            "type": "ITEM_VARIATION",
+            "id": "YZD2KCNWUJOWGWKFT7DCG42C",
+            "updated_at": "2026-11-06T19:00:52.347Z",
+            "created_at": "2024-07-20T05:59:30.312Z",
+            "version": 1793991652347,
+            "is_deleted": false,
+            "catalog_v1_ids": [
+              {
+                "catalog_v1_id": "6O2II45B4VPBTUSXELWGLZW4",
+                "location_id": "C0T7DVZY5XVG5"
+              }
+            ],
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "E7BTUWHFLBSEQADC5HY3J2NP",
+              "name": "0.80 - 1.00 lbs",
+              "ordinal": 1,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 1500,
+                "currency": "USD"
+              },
+              "location_overrides": [
+                {
+                  "location_id": "C0T7DVZY5XVG5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L1MHNE83A8XPY",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L373VS1QADC37",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJGEXCF3N7XJ4",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJS8Z7FW504J5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LKX3NDPZ68H74",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP5542Q9WCHX2",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP8AY4081PK5E",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LVKCGC3H1QMYX",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LWREC814AB8A4",
+                  "track_inventory": false
+                }
+              ],
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          },
+          {
+            "type": "ITEM_VARIATION",
+            "id": "BRF6UIFAUU7LW5TVDJAKDTF2",
+            "updated_at": "2026-08-18T18:04:03.395Z",
+            "created_at": "2025-03-13T18:20:35.498Z",
+            "version": 1787076243395,
+            "is_deleted": false,
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "E7BTUWHFLBSEQADC5HY3J2NP",
+              "name": "Organic Beef Kidney",
+              "ordinal": 2,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 1500,
+                "currency": "USD"
+              },
+              "location_overrides": [
+                {
+                  "location_id": "C0T7DVZY5XVG5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L1MHNE83A8XPY",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L373VS1QADC37",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJGEXCF3N7XJ4",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJS8Z7FW504J5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LKX3NDPZ68H74",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP5542Q9WCHX2",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP8AY4081PK5E",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LVKCGC3H1QMYX",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LWREC814AB8A4",
+                  "track_inventory": false
+                }
+              ],
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          }
+        ],
+        "product_type": "FOOD_AND_BEV",
+        "skip_modifier_screen": false,
+        "ecom_visibility": "VISIBLE",
+        "categories": [
+          {
+            "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+            "ordinal": 2817498546176
+          }
+        ],
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o",
+          "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC"
+        ],
+        "is_archived": false,
+        "reporting_category": {
+          "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+          "ordinal": 2817498546176
+        },
+        "is_alcoholic": false
+      }
+    },
+    {
+      "type": "ITEM",
+      "id": "AY5RVFQFLHXRD5USE52DU5BD",
+      "updated_at": "2026-11-06T19:00:52.347Z",
+      "created_at": "2025-02-21T03:38:40.868Z",
+      "version": 1793991652347,
+      "is_deleted": false,
+      "present_at_all_locations": false,
+      "present_at_location_ids": [
+        "C0T7DVZY5XVG5",
+        "L1MHNE83A8XPY",
+        "L307W0S4THZP3",
+        "L373VS1QADC37",
+        "LJGEXCF3N7XJ4",
+        "LJS8Z7FW504J5",
+        "LKX3NDPZ68H74",
+        "LP5542Q9WCHX2",
+        "LP8AY4081PK5E",
+        "LVKCGC3H1QMYX",
+        "LWREC814AB8A4"
+      ],
+      "item_data": {
+        "name": "Beef Oxtail",
+        "label_color": "4AB200",
+        "is_taxable": true,
+        "variations": [
+          {
+            "type": "ITEM_VARIATION",
+            "id": "HKHJAL5T7IGLNBNP2SHGWFET",
+            "updated_at": "2026-11-06T19:00:52.347Z",
+            "created_at": "2025-02-21T03:38:40.868Z",
+            "version": 1793991652347,
+            "is_deleted": false,
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "AY5RVFQFLHXRD5USE52DU5BD",
+              "name": "1.40 - 1.90 lbs",
+              "ordinal": 1,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 1300,
+                "currency": "USD"
+              },
+              "location_overrides": [
+                {
+                  "location_id": "C0T7DVZY5XVG5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L1MHNE83A8XPY",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L373VS1QADC37",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJGEXCF3N7XJ4",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJS8Z7FW504J5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LKX3NDPZ68H74",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP5542Q9WCHX2",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP8AY4081PK5E",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LVKCGC3H1QMYX",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LWREC814AB8A4",
+                  "track_inventory": false
+                }
+              ],
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          },
+          {
+            "type": "ITEM_VARIATION",
+            "id": "HHCG6HK22MSBWEIH3NZOYMOL",
+            "updated_at": "2026-08-18T18:04:03.708Z",
+            "created_at": "2025-03-13T18:18:54.488Z",
+            "version": 1787076243708,
+            "is_deleted": false,
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "AY5RVFQFLHXRD5USE52DU5BD",
+              "name": "Organic Beef Oxtail",
+              "ordinal": 2,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 1300,
+                "currency": "USD"
+              },
+              "location_overrides": [
+                {
+                  "location_id": "C0T7DVZY5XVG5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L1MHNE83A8XPY",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "L373VS1QADC37",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJGEXCF3N7XJ4",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LJS8Z7FW504J5",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LKX3NDPZ68H74",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP5542Q9WCHX2",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LP8AY4081PK5E",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LVKCGC3H1QMYX",
+                  "track_inventory": false
+                },
+                {
+                  "location_id": "LWREC814AB8A4",
+                  "track_inventory": false
+                }
+              ],
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          }
+        ],
+        "product_type": "FOOD_AND_BEV",
+        "skip_modifier_screen": false,
+        "ecom_visibility": "VISIBLE",
+        "categories": [
+          {
+            "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+            "ordinal": 2954937499648
+          }
+        ],
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o",
+          "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC"
+        ],
+        "is_archived": false,
+        "reporting_category": {
+          "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+          "ordinal": 2954937499648
+        },
+        "is_alcoholic": false
+      }
+    },
+    {
+      "type": "ITEM",
+      "id": "CDWO26QVN3QAPSU3RFO46A7R",
+      "updated_at": "2026-11-06T19:00:52.347Z",
+      "created_at": "2025-04-01T03:30:04.379Z",
+      "version": 1793991652347,
+      "is_deleted": false,
+      "catalog_v1_ids": [
+        {
+          "catalog_v1_id": "RKEQRCTW6U3F3ZHIDQGZP4J6",
+          "location_id": "C0T7DVZY5XVG5"
+        }
+      ],
+      "present_at_all_locations": false,
+      "present_at_location_ids": [
+        "C0T7DVZY5XVG5",
+        "L1MHNE83A8XPY",
+        "L307W0S4THZP3",
+        "L373VS1QADC37",
+        "LJGEXCF3N7XJ4",
+        "LJS8Z7FW504J5",
+        "LKX3NDPZ68H74",
+        "LP5542Q9WCHX2",
+        "LP8AY4081PK5E",
+        "LVKCGC3H1QMYX",
+        "LWREC814AB8A4"
+      ],
+      "item_data": {
+        "name": "Bavette Steak",
+        "label_color": "4AB200",
+        "is_taxable": true,
+        "variations": [
+          {
+            "type": "ITEM_VARIATION",
+            "id": "HY4IZXY6GM4AI6EC66ESAZK4",
+            "updated_at": "2026-11-06T19:00:52.347Z",
+            "created_at": "2025-04-01T03:30:04.379Z",
+            "version": 1793991652347,
+            "is_deleted": false,
+            "catalog_v1_ids": [
+              {
+                "catalog_v1_id": "TM4U22X2WEUIYOMLCFXGJ22R",
+                "location_id": "C0T7DVZY5XVG5"
+              }
+            ],
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "CDWO26QVN3QAPSU3RFO46A7R",
+              "name": "0.9 - 1.6 lbs",
+              "ordinal": 1,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 2600,
+                "currency": "USD"
+              },
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          },
+          {
+            "type": "ITEM_VARIATION",
+            "id": "DYP6DXPVCN6V6DHZZKSJ7QTL",
+            "updated_at": "2026-08-18T18:03:57.878Z",
+            "created_at": "2025-04-10T18:49:44.75Z",
+            "version": 1787076237878,
+            "is_deleted": false,
+            "present_at_all_locations": false,
+            "present_at_location_ids": [
+              "C0T7DVZY5XVG5",
+              "L1MHNE83A8XPY",
+              "L307W0S4THZP3",
+              "L373VS1QADC37",
+              "LJGEXCF3N7XJ4",
+              "LJS8Z7FW504J5",
+              "LKX3NDPZ68H74",
+              "LP5542Q9WCHX2",
+              "LP8AY4081PK5E",
+              "LVKCGC3H1QMYX",
+              "LWREC814AB8A4"
+            ],
+            "item_variation_data": {
+              "item_id": "CDWO26QVN3QAPSU3RFO46A7R",
+              "name": "Organic Bavette",
+              "ordinal": 2,
+              "pricing_type": "FIXED_PRICING",
+              "price_money": {
+                "amount": 2600,
+                "currency": "USD"
+              },
+              "track_inventory": false,
+              "inventory_alert_type": "NONE",
+              "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+              "sellable": true,
+              "stockable": true,
+              "channels": [
+                "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+              ]
+            }
+          }
+        ],
+        "product_type": "FOOD_AND_BEV",
+        "skip_modifier_screen": false,
+        "ecom_visibility": "VISIBLE",
+        "categories": [
+          {
+            "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+            "ordinal": 3023656976384
+          }
+        ],
+        "channels": [
+          "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+        ],
+        "is_archived": false,
+        "reporting_category": {
+          "id": "IBKKIX6FY3BJBIYLGXHQ42OT",
+          "ordinal": 3023656976384
+        },
+        "is_alcoholic": false
+      }
+    }
+  ]
+}

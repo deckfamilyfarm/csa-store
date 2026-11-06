@@ -1,0 +1,6 @@
+Test,Expected total (USD),Discount (USD),Result
+Ground Pork at market POS,12,0,Passed
+Two Ground Pork packages,24,0,Passed
+Ground Pork plus individual pepperoni,15,0,Passed
+Ground Pork at another Square location,12,0,Passed
+All other sale items plus Ground Pork and pepperoni,93.3,8.7,Passed
