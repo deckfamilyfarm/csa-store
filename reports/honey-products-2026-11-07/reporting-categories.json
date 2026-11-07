@@ -1,0 +1,28 @@
+{
+  "status": "completed",
+  "category": "Fruits/Nuts Honey",
+  "updated": [
+    "Raw Honey, 1 pint",
+    "Raw Honey, 1 quart"
+  ],
+  "verified": [
+    {
+      "name": "Raw Honey, 1/2 pint",
+      "reportingCategory": "Fruits/Nuts Honey"
+    },
+    {
+      "name": "Raw Honey, 1 pint",
+      "reportingCategory": "Fruits/Nuts Honey"
+    },
+    {
+      "name": "Raw Honey, 1 quart",
+      "reportingCategory": "Fruits/Nuts Honey"
+    },
+    {
+      "name": "Raw Honey, 1/4 pint",
+      "reportingCategory": "Fruits/Nuts Honey"
+    }
+  ],
+  "pricesUnitsLocationsAndLocalProductsUnchanged": true,
+  "confirmedAt": "2026-11-07T18:10:44.638Z"
+}

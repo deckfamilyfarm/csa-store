@@ -1,0 +1,51 @@
+{
+  "status": "completed",
+  "quarterPintEstimatedCost": 4.6,
+  "rows": [
+    {
+      "productId": 1173489,
+      "name": "Raw Honey, 1/4 pint",
+      "packageId": 1025816,
+      "squareItemId": "335SYARADAHLDFMQHOE7LFHI",
+      "squareVariationId": "CXMJRCYFJFBSM454XILPP2RJ",
+      "price": 9,
+      "allSquareLocations": true,
+      "unit": "each/jar"
+    },
+    {
+      "productId": 940998,
+      "name": "Raw Honey, 1/2 pint",
+      "packageId": 694994,
+      "squareItemId": "UDZUFDD4BZQV4OKACAQ55ZGA",
+      "squareVariationId": "5L6WZFWO6HESVITXZYJELIQJ",
+      "price": 17,
+      "allSquareLocations": true,
+      "unit": "each/jar"
+    },
+    {
+      "productId": 806161,
+      "name": "Raw Honey, 1 pint",
+      "packageId": 527228,
+      "squareItemId": "IRMSDE3RXXZRQ5RGXN5MAUFY",
+      "squareVariationId": "VBA7QNBQN4DAJEBMIWY5BZ4I",
+      "price": 26,
+      "allSquareLocations": true,
+      "unit": "each/jar"
+    },
+    {
+      "productId": 941000,
+      "name": "Raw Honey, 1 quart",
+      "packageId": 694996,
+      "squareItemId": "7NILSMS7L35D2AIXMEWLSOAJ",
+      "squareVariationId": "WJG7GD5EUZ67ATJWK7QEQCAV",
+      "price": 47.5,
+      "allSquareLocations": true,
+      "unit": "each/jar"
+    }
+  ],
+  "activeSquareLocationsVerified": 12,
+  "squareBadgesVerified": 4,
+  "noDuplicateSquareItemsCreated": true,
+  "localLinePublished": false,
+  "verifiedAt": "2026-11-07T18:00:25.864Z"
+}

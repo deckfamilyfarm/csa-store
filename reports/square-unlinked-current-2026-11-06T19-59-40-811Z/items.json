@@ -1,0 +1,1181 @@
+{
+  "summary": {
+    "checkedAt": "2026-11-06T19:59:40.811Z",
+    "liveSquareItems": 147,
+    "unlinkedItems": 35,
+    "unlinkedArchivedItems": 3,
+    "linkedItemsWithExtraVariations": 2,
+    "extraUnlinkedVariations": 4
+  },
+  "unlinked": [
+    {
+      "itemId": "X5UX2PTIWGXDQ3S5U3MORXZT",
+      "name": "BNF Kombucha",
+      "variants": [
+        {
+          "variationId": "GIXC63SXBXRHERVGAUP4OLQV",
+          "name": "Regular",
+          "sku": "",
+          "amount": 450,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [
+        {
+          "productId": 806020,
+          "name": "Blackberry Herbalism Kombucha"
+        },
+        {
+          "productId": 821597,
+          "name": "Chai Cider"
+        },
+        {
+          "productId": 806023,
+          "name": "Ginger Turmeric Jun"
+        },
+        {
+          "productId": 806027,
+          "name": "Ginger Zen Kombucha"
+        },
+        {
+          "productId": 806031,
+          "name": "Grape Lavender Kombucha"
+        },
+        {
+          "productId": 806034,
+          "name": "Hibiscus Mint Yerbe Mate Kombucha"
+        },
+        {
+          "productId": 806036,
+          "name": "Mango Marigold Kombucha"
+        },
+        {
+          "productId": 806040,
+          "name": "Moonfruit Yerbe Mate Kombucha"
+        },
+        {
+          "productId": 806042,
+          "name": "Oregon Blueberry Kombucha"
+        },
+        {
+          "productId": 806045,
+          "name": "Peach Rose Kombucha"
+        },
+        {
+          "productId": 806049,
+          "name": "Pear Jun"
+        },
+        {
+          "productId": 806052,
+          "name": "Pomegranate Cardamom Kombucha"
+        },
+        {
+          "productId": 806056,
+          "name": "Raspberry Reishi Jun"
+        },
+        {
+          "productId": 806059,
+          "name": "Skullcap Lemon Yerbe Mate Kombucha"
+        },
+        {
+          "productId": 976879,
+          "name": "Strawberry Mint Kombucha"
+        },
+        {
+          "productId": 1038295,
+          "name": "Sugar Plum Kombucha"
+        }
+      ],
+      "note": "",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "VGQP22CRRBUOGZDMILJRVADG",
+      "name": "British  Bangers",
+      "variants": [
+        {
+          "variationId": "HKIOOO57ASSC7D3XEFVUCPJH",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1800,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [
+        {
+          "productId": 840822,
+          "name": "English Banger Sausage Links"
+        }
+      ],
+      "note": "",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "6WRAOOSLV3PZMGQZAF737G73",
+      "name": "Bulk Hot Italian Sausage",
+      "variants": [
+        {
+          "variationId": "YHJJOW32FDVHQ4QIY4622POB",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1650,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [
+        {
+          "productId": 1163729,
+          "name": "Bulk Hot Italian Sausage"
+        }
+      ],
+      "possibleLocalMatches": [],
+      "note": "",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "TZTWZVQKHLSUBLIJQYIZ6VVI",
+      "name": "Cabbage",
+      "variants": [
+        {
+          "variationId": "JOC4LBUWF425ZWRTBQAAAGKB",
+          "name": "Regular",
+          "sku": "",
+          "amount": 500,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [
+        {
+          "productId": 1131919,
+          "name": "Cone Cabbage"
+        },
+        {
+          "productId": 805882,
+          "name": "Green Cabbage"
+        },
+        {
+          "productId": 1146326,
+          "name": "Green Cabbage"
+        },
+        {
+          "productId": 975957,
+          "name": "Napa Cabbage"
+        },
+        {
+          "productId": 912736,
+          "name": "Red Cabbage"
+        },
+        {
+          "productId": 805981,
+          "name": "Savoy Cabbage"
+        }
+      ],
+      "note": "",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "BUENXTWWPCTTFJ7RYVH672GY",
+      "name": "Chaurice (Bulk)",
+      "variants": [
+        {
+          "variationId": "6KFXTGSNGESMBP7OSJMQMXBJ",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1650,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [
+        {
+          "productId": 816905,
+          "name": "Cajun Chaurice Sausage Links"
+        }
+      ],
+      "note": "Local Chaurice is links; bulk package is not confirmed.",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "ZRFFTAWFWKM23F7VVZDGRD66",
+      "name": "Chops (Pork)",
+      "variants": [
+        {
+          "variationId": "SUGYE4ITQHHLEDGFSFMJ2ACY",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1950,
+          "currency": "USD",
+          "unit": "lb"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [
+        {
+          "productId": 805652,
+          "name": "Pork Chop, Bone-in"
+        },
+        {
+          "productId": 832792,
+          "name": "Pork Chop, Boneless"
+        }
+      ],
+      "note": "",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "7ZUJFWHWSBQ4SRK3TEJJLNWG",
+      "name": "Chorizo (Bulk)",
+      "variants": [
+        {
+          "variationId": "R2K3KQ3STAD3D7XKKSKL5KBX",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1650,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [
+        {
+          "productId": 913652,
+          "name": "Bulk Farm Made Chorizo Rojo Sausage"
+        }
+      ],
+      "note": "",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "JC2T5KZH3TVIIXDDJA2EYVQS",
+      "name": "CRX Drumsticks",
+      "variants": [
+        {
+          "variationId": "ZO43VQG6PHP7LWKPZXZP2P44",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1200,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [
+        {
+          "productId": 1163732,
+          "name": "CRX Drumsticks"
+        }
+      ],
+      "possibleLocalMatches": [],
+      "note": "",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "Y2PVWBPZ7DHNBNIX5ARR7MAG",
+      "name": "CRX Feet",
+      "variants": [
+        {
+          "variationId": "XMIVORSH742SXBF3RIIZWWM4",
+          "name": "Regular",
+          "sku": "",
+          "amount": 950,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [
+        {
+          "productId": 813079,
+          "name": "Chicken Feet, 1lb bag"
+        }
+      ],
+      "note": "",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "YFEXZYORRBLWM4GLIBVZ6DVR",
+      "name": "CRX Hearts",
+      "variants": [
+        {
+          "variationId": "KSHNRUR5RP3APBNE5ZA3NFOJ",
+          "name": "Regular",
+          "sku": "",
+          "amount": 950,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [
+        {
+          "productId": 818957,
+          "name": "Chicken Hearts"
+        }
+      ],
+      "note": "",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "VPT2HXYYYWXSK2VCZTTI7JGL",
+      "name": "CRX Hindquarters",
+      "variants": [
+        {
+          "variationId": "ALBBJSQDXTEHY2ICGAX62AEJ",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1200,
+          "currency": "USD",
+          "unit": "lb"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [
+        {
+          "productId": 805676,
+          "name": "Chicken Part, Hindquarter"
+        }
+      ],
+      "note": "",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "H44FXVNEJLWUBUJSH6KJ3I6N",
+      "name": "CRX Liver",
+      "variants": [
+        {
+          "variationId": "73RVVYB5OR6HIWVLV5PD2TAG",
+          "name": "Regular",
+          "sku": "",
+          "amount": 950,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [
+        {
+          "productId": 805677,
+          "name": "Chicken Liver"
+        }
+      ],
+      "note": "",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "AL5UGDCUIRSMFYGSHY6I3JCG",
+      "name": "CRX Wings",
+      "variants": [
+        {
+          "variationId": "YNI5TRGXHPXMEY3RJI34NLXK",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1200,
+          "currency": "USD",
+          "unit": "lb"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [
+        {
+          "productId": 805679,
+          "name": "Chicken Part, Wings"
+        }
+      ],
+      "note": "",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "YCNO3E43XR323MAEXZT7HOWB",
+      "name": "EE 7 layer bar",
+      "variants": [
+        {
+          "variationId": "LQSUGB37OXEPGZUVTVXRSZH5",
+          "name": "Regular",
+          "sku": "",
+          "amount": 350,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [
+        {
+          "productId": 806065,
+          "name": "Gluten Free Seven Layer Cookie"
+        }
+      ],
+      "note": "",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "ZMAGPONYIBYXHJUJLIOY6UUI",
+      "name": "EE 7 Layer Bar",
+      "variants": [
+        {
+          "variationId": "34SOAZEOF73DE54ISCNYXPCN",
+          "name": "Regular",
+          "sku": "",
+          "amount": 350,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [
+        {
+          "productId": 806065,
+          "name": "Gluten Free Seven Layer Cookie"
+        }
+      ],
+      "note": "",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "HUTKUVNSXER2SE5R5PAHIEKZ",
+      "name": "EE Blackberry Handpie",
+      "variants": [
+        {
+          "variationId": "CDKAZ3OTICKDV2BYYAHYYDWR",
+          "name": "Regular",
+          "sku": "",
+          "amount": 420,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [
+        {
+          "productId": 806022,
+          "name": "Gluten Free Blackberry Hand Pie"
+        }
+      ],
+      "note": "",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "MOJ4L5ZDPWNRWJKLGNHKGTW5",
+      "name": "EE Chocolat Chip Brownie",
+      "variants": [
+        {
+          "variationId": "2OVGD362LFNAQXBO6G6OWOR3",
+          "name": "Regular",
+          "sku": "",
+          "amount": 350,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [
+        {
+          "productId": 806030,
+          "name": "Gluten Free Brownie Bite with Chocolate Chips"
+        }
+      ],
+      "note": "",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "5BVR3AIT4637XBCBJGQLDNZQ",
+      "name": "EE chocolate donut",
+      "variants": [
+        {
+          "variationId": "JIQGIEDPU6QGXHHH7YHY7MBQ",
+          "name": "Regular",
+          "sku": "",
+          "amount": 330,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [
+        {
+          "productId": 806038,
+          "name": "Gluten Free Chocolate Donut"
+        }
+      ],
+      "note": "",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "EVUJYHLMQAKKN4NSYLQAJ7VI",
+      "name": "Fresh Garlic Sausage Links",
+      "variants": [
+        {
+          "variationId": "3KGYHKQW52EDX4S6VRSHKPMD",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1950,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [
+        {
+          "productId": 805686,
+          "name": "Fresh Garlic Sausage Links"
+        }
+      ],
+      "possibleLocalMatches": [
+        {
+          "productId": 805686,
+          "name": "Fresh Garlic Sausage Links"
+        }
+      ],
+      "note": "",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "3QXI3INIUXQOJQ2SDU4QBIF3",
+      "name": "Ham",
+      "variants": [
+        {
+          "variationId": "2XVTYG4RHL3NBICYZ5VUXRSW",
+          "name": "Regular",
+          "sku": "",
+          "amount": 2000,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [
+        {
+          "productId": 921372,
+          "name": "Honey Maple Ham, Ends & Pieces"
+        },
+        {
+          "productId": 805693,
+          "name": "Honey Maple Ham, Sliced"
+        }
+      ],
+      "note": "Local sliced ham and ends/pieces exist; Square package is unspecified.",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "ICKLKGWCJDPGBEXWSGG4TTAM",
+      "name": "Honey 1/2 pint",
+      "variants": [
+        {
+          "variationId": "G4GC5T2AQXKINQL4FSFIIKSI",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1700,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [
+        {
+          "productId": 940998,
+          "name": "Raw Honey, 1/2 pint"
+        }
+      ],
+      "note": "",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "L5TENQNPPCD7U7SFT7MRCFVA",
+      "name": "Hotdogs Beef&Pork",
+      "variants": [
+        {
+          "variationId": "LVMAPHC27CSY42WPCUFNCN2P",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1950,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [
+        {
+          "productId": 1131922,
+          "name": "Old World Style Hot Dogs"
+        }
+      ],
+      "note": "",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "NUAYVKIQK6LY3I4WM3Z3F6IZ",
+      "name": "Kombucha",
+      "variants": [
+        {
+          "variationId": "JVOGXOXO5K5HXHJ7BPSL55CP",
+          "name": "Regular",
+          "sku": "",
+          "amount": 450,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [
+        {
+          "productId": 806020,
+          "name": "Blackberry Herbalism Kombucha"
+        },
+        {
+          "productId": 821597,
+          "name": "Chai Cider"
+        },
+        {
+          "productId": 806023,
+          "name": "Ginger Turmeric Jun"
+        },
+        {
+          "productId": 806027,
+          "name": "Ginger Zen Kombucha"
+        },
+        {
+          "productId": 806031,
+          "name": "Grape Lavender Kombucha"
+        },
+        {
+          "productId": 806034,
+          "name": "Hibiscus Mint Yerbe Mate Kombucha"
+        },
+        {
+          "productId": 806036,
+          "name": "Mango Marigold Kombucha"
+        },
+        {
+          "productId": 806040,
+          "name": "Moonfruit Yerbe Mate Kombucha"
+        },
+        {
+          "productId": 806042,
+          "name": "Oregon Blueberry Kombucha"
+        },
+        {
+          "productId": 806045,
+          "name": "Peach Rose Kombucha"
+        },
+        {
+          "productId": 806049,
+          "name": "Pear Jun"
+        },
+        {
+          "productId": 806052,
+          "name": "Pomegranate Cardamom Kombucha"
+        },
+        {
+          "productId": 806056,
+          "name": "Raspberry Reishi Jun"
+        },
+        {
+          "productId": 806059,
+          "name": "Skullcap Lemon Yerbe Mate Kombucha"
+        },
+        {
+          "productId": 976879,
+          "name": "Strawberry Mint Kombucha"
+        },
+        {
+          "productId": 1038295,
+          "name": "Sugar Plum Kombucha"
+        }
+      ],
+      "note": "",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "JLKTUM5MXH7F3JTHB7K4VBJC",
+      "name": "Kroppkakkor",
+      "variants": [
+        {
+          "variationId": "T2DFZBY27YQPN2TMWDV5DYKY",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1000,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [
+        {
+          "productId": 1011872,
+          "name": "Swedish Sausage Potato Dumplings"
+        }
+      ],
+      "note": "Possible Swedish dumpling counterpart; serving/package needs review.",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "NRHOVYAY6UIJS27DWAQEOXZM",
+      "name": "Lonesome whistle popcorn",
+      "variants": [
+        {
+          "variationId": "NKKENZA5K27X2J476OTLUSBX",
+          "name": "Regular",
+          "sku": "",
+          "amount": 600,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [
+        {
+          "productId": 806082,
+          "name": "Dakota Black Heirloom Popcorn"
+        },
+        {
+          "productId": 806090,
+          "name": "Garlic Dill Popcorn"
+        },
+        {
+          "productId": 806093,
+          "name": "Jalapeno Cheddar Popcorn"
+        },
+        {
+          "productId": 806096,
+          "name": "Lemon Lavender Popcorn"
+        },
+        {
+          "productId": 806097,
+          "name": "Nutritional Yeast Popcorn"
+        }
+      ],
+      "note": "",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "C44VX4IKA7YX3EVRZ6TTL456",
+      "name": "LW Popcorn",
+      "variants": [
+        {
+          "variationId": "GPMTZZLKAHRC2VGFPPMNFTAW",
+          "name": "Regular",
+          "sku": "",
+          "amount": 560,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [
+        {
+          "productId": 806082,
+          "name": "Dakota Black Heirloom Popcorn"
+        },
+        {
+          "productId": 806090,
+          "name": "Garlic Dill Popcorn"
+        },
+        {
+          "productId": 806093,
+          "name": "Jalapeno Cheddar Popcorn"
+        },
+        {
+          "productId": 806096,
+          "name": "Lemon Lavender Popcorn"
+        },
+        {
+          "productId": 806097,
+          "name": "Nutritional Yeast Popcorn"
+        }
+      ],
+      "note": "",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "7NOGPYESRU2QAO32SYQEMAZI",
+      "name": "Pepperoni stick, individual",
+      "variants": [
+        {
+          "variationId": "LK7DSTHQABMBBZZDHZ374SV4",
+          "name": "Individual stick",
+          "sku": "",
+          "amount": 300,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [],
+      "note": "Intentionally Square-only individual stick; local product is a 6 oz package.",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "EJTUO45BLYB5I74RVSPRRNOM",
+      "name": "Pint Honey",
+      "variants": [
+        {
+          "variationId": "AJDOYXU4YINBCM6W4AXZATY2",
+          "name": "Regular",
+          "sku": "",
+          "amount": 2600,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [
+        {
+          "productId": 806161,
+          "name": "Raw Honey, 1 pint"
+        }
+      ],
+      "note": "",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "PCGER3JHKMWG3NC4NWAE7PXM",
+      "name": "Pork Chops",
+      "variants": [
+        {
+          "variationId": "HE3CDAY5PTKGQSLNASLM5SUC",
+          "name": "Regular",
+          "sku": "",
+          "amount": 1950,
+          "currency": "USD",
+          "unit": "lb"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [
+        {
+          "productId": 805652,
+          "name": "Pork Chop, Bone-in"
+        },
+        {
+          "productId": 832792,
+          "name": "Pork Chop, Boneless"
+        }
+      ],
+      "note": "",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "K36JLIEGZO6T4UEWCGEKIDYB",
+      "name": "Pullet Dz",
+      "variants": [
+        {
+          "variationId": "OFJIHPLGZ43KQUYQ7UPI7ANR",
+          "name": "Regular",
+          "sku": "",
+          "amount": 500,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [
+        {
+          "productId": 995135,
+          "name": "Small Organic Pasture Raised Chicken Eggs"
+        }
+      ],
+      "note": "Possible small-egg product; pullet equivalence is unverified.",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "IEQ5XOFLC5AFPNJI5WZEEFKN",
+      "name": "Quart Honey",
+      "variants": [
+        {
+          "variationId": "EBGFWL37CWOWFIQXHEWWDRMJ",
+          "name": "Regular",
+          "sku": "",
+          "amount": 4750,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [
+        {
+          "productId": 941000,
+          "name": "Raw Honey, 1 quart"
+        }
+      ],
+      "note": "",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "NE42LNRBOWKK2F4OE6DFZHP6",
+      "name": "Scandi Kombucha",
+      "variants": [
+        {
+          "variationId": "BHSMSHWHVSMJSYZNRVQ7UTIX",
+          "name": "Regular",
+          "sku": "",
+          "amount": 500,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [
+        {
+          "productId": 806020,
+          "name": "Blackberry Herbalism Kombucha"
+        },
+        {
+          "productId": 821597,
+          "name": "Chai Cider"
+        },
+        {
+          "productId": 806023,
+          "name": "Ginger Turmeric Jun"
+        },
+        {
+          "productId": 806027,
+          "name": "Ginger Zen Kombucha"
+        },
+        {
+          "productId": 806031,
+          "name": "Grape Lavender Kombucha"
+        },
+        {
+          "productId": 806034,
+          "name": "Hibiscus Mint Yerbe Mate Kombucha"
+        },
+        {
+          "productId": 806036,
+          "name": "Mango Marigold Kombucha"
+        },
+        {
+          "productId": 806040,
+          "name": "Moonfruit Yerbe Mate Kombucha"
+        },
+        {
+          "productId": 806042,
+          "name": "Oregon Blueberry Kombucha"
+        },
+        {
+          "productId": 806045,
+          "name": "Peach Rose Kombucha"
+        },
+        {
+          "productId": 806049,
+          "name": "Pear Jun"
+        },
+        {
+          "productId": 806052,
+          "name": "Pomegranate Cardamom Kombucha"
+        },
+        {
+          "productId": 806056,
+          "name": "Raspberry Reishi Jun"
+        },
+        {
+          "productId": 806059,
+          "name": "Skullcap Lemon Yerbe Mate Kombucha"
+        },
+        {
+          "productId": 976879,
+          "name": "Strawberry Mint Kombucha"
+        },
+        {
+          "productId": 1038295,
+          "name": "Sugar Plum Kombucha"
+        }
+      ],
+      "note": "",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "4MJHJVJYDZNCHSKIFKWF553J",
+      "name": "Smoked Pork Shanks - Skin-on and Smoked",
+      "variants": [
+        {
+          "variationId": "HSJOOTEOZJRIWVHGSEEDWSH6",
+          "name": "Shank",
+          "sku": "",
+          "amount": 1650,
+          "currency": "USD",
+          "unit": "lb"
+        }
+      ],
+      "exactLocalMatches": [
+        {
+          "productId": 1013988,
+          "name": "Smoked Pork Shanks - Skin-on and Smoked"
+        }
+      ],
+      "possibleLocalMatches": [],
+      "note": "",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "7DEDXYV4AKC5ODQTCMLSUNL5",
+      "name": "Walnuts (1lb.)",
+      "variants": [
+        {
+          "variationId": "WMAHDOAPQPUVEJUO76GHES6Q",
+          "name": "Regular",
+          "sku": "",
+          "amount": 2500,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [
+        {
+          "productId": 806159,
+          "name": "Raw Walnuts, 1 lb"
+        }
+      ],
+      "note": "",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "H6XJOPIQKDYIX54KKCOSFAUN",
+      "name": "Whole CRX (POP)",
+      "variants": [
+        {
+          "variationId": "XS44NNISRWTQP4HYFGEMORRR",
+          "name": "Regular",
+          "sku": "",
+          "amount": 810,
+          "currency": "USD",
+          "unit": "lb"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [
+        {
+          "productId": 805673,
+          "name": "Cornish Roasting Chicken, Extra Large"
+        },
+        {
+          "productId": 953035,
+          "name": "Cornish Roasting Chicken, Large"
+        },
+        {
+          "productId": 953036,
+          "name": "Cornish Roasting Chicken, Medium"
+        },
+        {
+          "productId": 953039,
+          "name": "Cornish Roasting Chicken, Small"
+        }
+      ],
+      "note": "Local Cornish roasting chickens are split into sizes.",
+      "creationReceipt": null
+    }
+  ],
+  "partial": [
+    {
+      "itemId": "WXM5MVVZNSSOZIQHHDQMWAK6",
+      "name": "Broad Breasted White Thanksgiving Turkeys, Medium",
+      "linkedProducts": [
+        "Broad Breasted White Thanksgiving Turkeys, Medium"
+      ],
+      "unlinkedVariations": [
+        {
+          "variationId": "42LRBQYMLK7NRFRLU3AZV262",
+          "name": "Heritage Large 18-25 lbs",
+          "sku": "",
+          "amount": 14000,
+          "currency": "USD",
+          "unit": "each/package"
+        },
+        {
+          "variationId": "KLWMVQQZER4MT7TLQCPNYQXX",
+          "name": "White Large 25+ lbs",
+          "sku": "",
+          "amount": 15000,
+          "currency": "USD",
+          "unit": "each/package"
+        },
+        {
+          "variationId": "FDWAASU5AXRHVPD4KGJ7VJYA",
+          "name": "Heritage Large 25+ lbs",
+          "sku": "",
+          "amount": 15000,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ]
+    },
+    {
+      "itemId": "WRXBRMIVAISDWMBWEFPPHIW2",
+      "name": "Pepperoni stick",
+      "linkedProducts": [
+        "Pepperoni stick"
+      ],
+      "unlinkedVariations": [
+        {
+          "variationId": "YZYUYQR4AIXIY3KRKGCSBKBA",
+          "name": "Single Stick",
+          "sku": "",
+          "amount": 200,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ]
+    }
+  ],
+  "archived": [
+    {
+      "itemId": "IZNB2IMWSQDX4THJ6TZF6PCW",
+      "name": "Case eggs",
+      "variants": [
+        {
+          "variationId": "XVGY376CTQZGT3L3HMKKQ7CJ",
+          "name": "Regular",
+          "sku": "",
+          "amount": 6750,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [],
+      "note": "",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "377CBX75ZJJR6DEH5XE6DL4Y",
+      "name": "Free Eggs $40 min",
+      "variants": [
+        {
+          "variationId": "73PXGICEEG6FNYKS23O5RLFJ",
+          "name": "Regular",
+          "sku": "",
+          "amount": 0,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [],
+      "note": "",
+      "creationReceipt": null
+    },
+    {
+      "itemId": "TQCYFY7PJSSIFPJ57QWV2COL",
+      "name": "Half Dozen Eggs",
+      "variants": [
+        {
+          "variationId": "XJ6AIN2KAEA3CYUTBDSAVLOM",
+          "name": "Regular",
+          "sku": "",
+          "amount": 700,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "exactLocalMatches": [],
+      "possibleLocalMatches": [],
+      "note": "",
+      "creationReceipt": null
+    }
+  ]
+}

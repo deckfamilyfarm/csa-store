@@ -1,0 +1,271 @@
+{
+  "status": "checked",
+  "verifiedProducts": 98,
+  "eligibleProducts": 106,
+  "published": [
+    {
+      "name": "Chicken Feet",
+      "releaseId": 1052,
+      "status": "verified"
+    }
+  ],
+  "heldDuringSync": [],
+  "heldBeforeSync": [
+    {
+      "productId": 856878,
+      "name": "Brisket, Large",
+      "reasons": [
+        "Square item name differs from local product; mapping review needed"
+      ]
+    },
+    {
+      "productId": 941001,
+      "name": "Brisket, Medium",
+      "reasons": [
+        "No approved Square links",
+        "Not every local package has one approved link",
+        "A linked Square variation is missing"
+      ]
+    },
+    {
+      "productId": 941002,
+      "name": "Brisket, Small",
+      "reasons": [
+        "No approved Square links",
+        "Not every local package has one approved link",
+        "A linked Square variation is missing"
+      ]
+    },
+    {
+      "productId": 910775,
+      "name": "Broad Breasted White Turkeys, Large",
+      "reasons": [
+        "No approved Square links",
+        "Not every local package has one approved link",
+        "A linked Square variation is missing"
+      ]
+    },
+    {
+      "productId": 1008413,
+      "name": "Broad Breasted White Turkeys, Small",
+      "reasons": [
+        "No approved Square links",
+        "Not every local package has one approved link",
+        "A linked Square variation is missing"
+      ]
+    },
+    {
+      "productId": 818957,
+      "name": "Chicken Hearts",
+      "reasons": [
+        "Complete saved enterprise pricing is missing",
+        "Saved Square package price is missing or invalid",
+        "Set the local Retail Price unit (lb or each) in Products before syncing Square."
+      ]
+    },
+    {
+      "productId": 1011877,
+      "name": "Classic Beef Broth",
+      "reasons": [
+        "Square item name differs from local product; mapping review needed",
+        "Square item is shared by multiple local products"
+      ]
+    },
+    {
+      "productId": 1131920,
+      "name": "Classic Chicken Broth",
+      "reasons": [
+        "Square item name differs from local product; mapping review needed",
+        "Square item is shared by multiple local products"
+      ]
+    },
+    {
+      "productId": 1061161,
+      "name": "Classic Pork Broth",
+      "reasons": [
+        "Square item name differs from local product; mapping review needed",
+        "Square item is shared by multiple local products"
+      ]
+    },
+    {
+      "productId": 1011876,
+      "name": "Classic Pork Broth",
+      "reasons": [
+        "Square item name differs from local product; mapping review needed",
+        "Square item is shared by multiple local products"
+      ]
+    },
+    {
+      "productId": 953039,
+      "name": "Cornish Roasting Chicken, Small",
+      "reasons": [
+        "No approved Square links",
+        "Not every local package has one approved link",
+        "A linked Square variation is missing"
+      ]
+    },
+    {
+      "productId": 1010693,
+      "name": "Deck Family Farm Insulated Bag",
+      "reasons": [
+        "Square is disabled in saved pricing",
+        "Not every local package has one approved link",
+        "Saved Square package price is missing or invalid",
+        "A linked Square variation is missing"
+      ]
+    },
+    {
+      "productId": 806025,
+      "name": "Gluten Free Blueberry Scone",
+      "reasons": [
+        "Square is disabled in saved pricing",
+        "Saved Square package price is missing or invalid"
+      ]
+    },
+    {
+      "productId": 806030,
+      "name": "Gluten Free Brownie Bite with Chocolate Chips",
+      "reasons": [
+        "Square is disabled in saved pricing",
+        "Saved Square package price is missing or invalid"
+      ]
+    },
+    {
+      "productId": 806038,
+      "name": "Gluten Free Chocolate Donut",
+      "reasons": [
+        "Square is disabled in saved pricing",
+        "Saved Square package price is missing or invalid"
+      ]
+    },
+    {
+      "productId": 1008414,
+      "name": "Heritage Thanksgiving Turkey, Small",
+      "reasons": [
+        "No approved Square links",
+        "Not every local package has one approved link",
+        "A linked Square variation is missing"
+      ]
+    },
+    {
+      "productId": 816472,
+      "name": "Heritage Turkeys, Large",
+      "reasons": [
+        "No approved Square links",
+        "Not every local package has one approved link",
+        "A linked Square variation is missing"
+      ]
+    },
+    {
+      "productId": 910776,
+      "name": "Heritage Turkeys, Medium",
+      "reasons": [
+        "No approved Square links",
+        "Not every local package has one approved link",
+        "A linked Square variation is missing"
+      ]
+    },
+    {
+      "productId": 913064,
+      "name": "Lamb Chops, 4 pack",
+      "reasons": [
+        "No approved Square links",
+        "Not every local package has one approved link",
+        "A linked Square variation is missing"
+      ]
+    },
+    {
+      "productId": 805688,
+      "name": "Natural Ground Beef",
+      "reasons": [
+        "Square item name differs from local product; mapping review needed",
+        "Square item is shared by multiple local products"
+      ]
+    },
+    {
+      "productId": 805689,
+      "name": "Organic Ground Beef",
+      "reasons": [
+        "Square item name differs from local product; mapping review needed",
+        "Square item is shared by multiple local products"
+      ]
+    },
+    {
+      "productId": 805654,
+      "name": "Pork Shoulder Roast, Small",
+      "reasons": [
+        "No approved Square links",
+        "Not every local package has one approved link",
+        "A linked Square variation is missing"
+      ]
+    },
+    {
+      "productId": 806159,
+      "name": "Raw Walnuts, 1 lb",
+      "reasons": [
+        "No approved Square links",
+        "Not every local package has one approved link",
+        "A linked Square variation is missing"
+      ]
+    },
+    {
+      "productId": 1004600,
+      "name": "Red Ranger Roasting Chicken, Large",
+      "reasons": [
+        "Square location C0T7DVZY5XVG5 has a separate price (USD 10.00). Review that location price in Square before publishing; CSA Store updates the base variation price."
+      ]
+    },
+    {
+      "productId": 894282,
+      "name": "Skirt Steak, Small",
+      "reasons": [
+        "No approved Square links",
+        "Not every local package has one approved link",
+        "A linked Square variation is missing"
+      ]
+    },
+    {
+      "productId": 1013988,
+      "name": "Smoked Pork Shanks - Skin-on and Smoked",
+      "reasons": [
+        "A linked Square variation is missing"
+      ]
+    },
+    {
+      "productId": 805694,
+      "name": "Tamari Pressed Beef Jerky",
+      "reasons": [
+        "Square item name differs from local product; mapping review needed",
+        "Square item is shared by multiple local products"
+      ]
+    },
+    {
+      "productId": 1107078,
+      "name": "Tamari Pressed Beef Jerky - 12 oz",
+      "reasons": [
+        "Square item name differs from local product; mapping review needed",
+        "Square item is shared by multiple local products"
+      ]
+    },
+    {
+      "productId": 805699,
+      "name": "Turkey Liver",
+      "reasons": [
+        "No approved Square links",
+        "Not every local package has one approved link",
+        "A linked Square variation is missing"
+      ]
+    },
+    {
+      "productId": 883799,
+      "name": "Unrendered Beef Tallow",
+      "reasons": [
+        "No approved Square links",
+        "Not every local package has one approved link",
+        "A linked Square variation is missing"
+      ]
+    }
+  ],
+  "localLineWrites": 0,
+  "finishedAt": "2026-11-06T20:51:52.597Z"
+}

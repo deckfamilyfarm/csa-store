@@ -1,0 +1,26 @@
+{
+  "status": "completed",
+  "linksSaved": 7,
+  "names": [
+    "Chicken Liver",
+    "Chicken Feet",
+    "Chicken Hearts",
+    "Chicken Hindquarters",
+    "Chicken Wings",
+    "Chicken Drumsticks",
+    "Bulk Hot Italian Sausage"
+  ],
+  "squareCatalogUnchanged": true,
+  "pricingUnchanged": true,
+  "pricingReview": [
+    {
+      "name": "Chicken Feet",
+      "reason": "Square selling unit needs separate approval before publication."
+    },
+    {
+      "name": "Chicken Hearts",
+      "reason": "Complete local pricing before publishing."
+    }
+  ],
+  "completedAt": "2026-11-06T20:37:12.186Z"
+}

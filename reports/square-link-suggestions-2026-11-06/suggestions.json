@@ -1,0 +1,1637 @@
+{
+  "summary": {
+    "checkedAt": "2026-11-06T20:02:42.482Z",
+    "readOnly": true,
+    "unlinkedSquareItemsReviewed": 35,
+    "suggestedLinks": 6,
+    "sellingUnitReviews": 2,
+    "existingLinksToKeep": 9,
+    "additionalUnlinkedVariations": 4
+  },
+  "rows": [
+    {
+      "squareItemId": "X5UX2PTIWGXDQ3S5U3MORXZT",
+      "squareItemName": "BNF Kombucha",
+      "squareVariations": [
+        {
+          "id": "GIXC63SXBXRHERVGAUP4OLQV",
+          "name": "Regular",
+          "amount": 450,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Hold: identify flavor and size",
+      "reason": "Local products are specific kombucha/Jun/cider flavors. Square provides no flavor, size or SKU; do not assign a generic listing to an arbitrary flavor.",
+      "localCandidates": []
+    },
+    {
+      "squareItemId": "VGQP22CRRBUOGZDMILJRVADG",
+      "squareItemName": "British  Bangers",
+      "squareVariations": [
+        {
+          "id": "HKIOOO57ASSC7D3XEFVUCPJH",
+          "name": "Regular",
+          "amount": 1800,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Confirm package and complete pricing",
+      "reason": "Likely English Banger Sausage Links, 4 links/14 oz. Square has no size or SKU; local pricing revision and explicit selling unit are missing.",
+      "localCandidates": [
+        {
+          "id": 840822,
+          "name": "English Banger Sausage Links",
+          "vendor": "Deck Family Farm's Hyland Artisinal Meats",
+          "description": "Our English Banger Linked Sausage is a UK pub classic with a rich history, named for the wartime era when sausages often burst in the pan. These links feature a soft, fatty texture with a satisfying snappy bite, packed with warming savory spices like nutmeg, white pepper, and thyme. Perfect for a traditional British breakfast, they’re also ideal for any meal—especially the famous \"Bangers and Mash!\" Made with pork, oats, onion, and a blend of fresh herbs and spices, these sausages are a flavorful addition to your table.Contains wheat.  Our prod",
+          "visible": 0,
+          "revisionId": null,
+          "revisionStatus": null,
+          "pricingUnit": null,
+          "packages": [
+            {
+              "id": 568236,
+              "productId": 840822,
+              "name": "4 links/ pack 14 oz pack",
+              "price": "9.74",
+              "sku": "999999000106",
+              "unit": "pk",
+              "quantity": 1,
+              "squareItemId": null,
+              "squareVariationId": null,
+              "currentLink": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "squareItemId": "6WRAOOSLV3PZMGQZAF737G73",
+      "squareItemName": "Bulk Hot Italian Sausage",
+      "squareVariations": [
+        {
+          "id": "YHJJOW32FDVHQ4QIY4622POB",
+          "name": "Regular",
+          "amount": 1650,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Suggest link",
+      "reason": "Same product name and $16.50 each saved Square price; local package is not linked.",
+      "localCandidates": [
+        {
+          "id": 1163729,
+          "name": "Bulk Hot Italian Sausage",
+          "vendor": "Deck Family Farm's Hyland Artisinal Meats",
+          "description": "<span style=\"color: rgb(34, 34, 34); font-family: Arial, Helvetica, sans-serif; font-size: small;\">Our Bulk Hot Italian Sausage is a bold, flavorful classic, packed with lightly crushed fennel, smoky paprika, and a nice spicy kick. This versatile sausage can elevate nearly any meal - add it to pasta, lasagna, top a pizza, or use in soups. With a spiciness level of 6/10, it delivers a balanced heat that enhances every bite. Ingredients: Pork, white wine, sea salt, fresh garlic, fennel, fresh parsley, fresh oregano, sugar, pepper, paprika, cayenn",
+          "visible": 1,
+          "revisionId": 1710,
+          "revisionStatus": "partial",
+          "pricingUnit": "each",
+          "squareEnabled": true,
+          "regularSquareUnitCents": 1650,
+          "packages": [
+            {
+              "id": 1011355,
+              "productId": 1163729,
+              "name": "ea",
+              "price": "8.93",
+              "sku": null,
+              "unit": null,
+              "quantity": 1,
+              "squareItemId": null,
+              "squareVariationId": null,
+              "regularSquareCents": 1650,
+              "currentLink": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "squareItemId": "TZTWZVQKHLSUBLIJQYIZ6VVI",
+      "squareItemName": "Cabbage",
+      "squareVariations": [
+        {
+          "id": "JOC4LBUWF425ZWRTBQAAAGKB",
+          "name": "Regular",
+          "amount": 500,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Hold: identify variety and supplier",
+      "reason": "Multiple local cabbage varieties and suppliers exist; Square gives no variety or supplier.",
+      "localCandidates": []
+    },
+    {
+      "squareItemId": "BUENXTWWPCTTFJ7RYVH672GY",
+      "squareItemName": "Chaurice (Bulk)",
+      "squareVariations": [
+        {
+          "id": "6KFXTGSNGESMBP7OSJMQMXBJ",
+          "name": "Regular",
+          "amount": 1650,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "No equivalent local bulk package",
+      "reason": "The local Cajun Chaurice product is links, already mapped. Bulk sausage should not be linked to a linked-sausage package.",
+      "localCandidates": []
+    },
+    {
+      "squareItemId": "ZRFFTAWFWKM23F7VVZDGRD66",
+      "squareItemName": "Chops (Pork)",
+      "squareVariations": [
+        {
+          "id": "SUGYE4ITQHHLEDGFSFMJ2ACY",
+          "name": "Regular",
+          "amount": 1950,
+          "currency": "USD",
+          "unit": "lb"
+        }
+      ],
+      "action": "Keep existing links; identify old listing",
+      "reason": "Both Pork Chop, Bone-in and Pork Chop, Boneless already have valid separate Square links. This generic $19.50/lb listing does not identify bone-in versus boneless.",
+      "localCandidates": [
+        {
+          "id": 805652,
+          "name": "Pork Chop, Bone-in",
+          "vendor": "Deck Family Farm",
+          "description": "Our Heritage Pork Chops are the king of pork cuts – tender, juicy, and packed with flavor that’s perfect for any occasion. Whether it’s a dinner for two or a personal treat, these chops deliver a satisfying, melt-in-your-mouth experience. Raised on open pastures and oak woodlands, our heritage hogs enjoy a natural diet of dairy, hazelnuts, and custom-milled grains, producing high-quality, flavorful meat that’s consistently praised throughout the Willamette Valley. For a foolproof cooking method, check out our blog for the perfect pork chop reci",
+          "visible": 0,
+          "revisionId": 1015,
+          "revisionStatus": "partial",
+          "pricingUnit": "lb",
+          "squareEnabled": true,
+          "regularSquareUnitCents": 1600,
+          "packages": [
+            {
+              "id": 526705,
+              "productId": 805652,
+              "name": "1.20 - 1.50 lbs",
+              "price": "11.69",
+              "sku": "999999000000",
+              "unit": "ea",
+              "quantity": 1,
+              "squareItemId": "ILHEC25TNXQ4LPPDALYQPVZH",
+              "squareVariationId": "4DJSRX4DMOZJFDETAVUDZDHN",
+              "regularSquareCents": 1600,
+              "currentLink": {
+                "valid": true,
+                "itemName": "Pork Chop, Bone-in",
+                "variationName": "1.20 - 1.50 lbs",
+                "amount": 1600,
+                "unitId": "IC5AI62JDKMVPS4K7EJN2RAJ"
+              }
+            }
+          ]
+        },
+        {
+          "id": 832792,
+          "name": "Pork Chop, Boneless",
+          "vendor": "Deck Family Farm",
+          "description": "Our Heritage Pork Chops are the king of pork cuts – tender, juicy, and packed with flavor that’s perfect for any occasion. Whether it’s a dinner for two or a personal treat, these chops deliver a satisfying, melt-in-your-mouth experience. Raised on open pastures and oak woodlands, our heritage hogs enjoy a natural diet of dairy, hazelnuts, and custom-milled grains, producing high-quality, flavorful meat that’s consistently praised throughout the Willamette Valley. For a foolproof cooking method, check out our blog for the perfect pork chop reci",
+          "visible": 0,
+          "revisionId": 1317,
+          "revisionStatus": "partial",
+          "pricingUnit": "lb",
+          "squareEnabled": true,
+          "regularSquareUnitCents": 1800,
+          "packages": [
+            {
+              "id": 558509,
+              "productId": 832792,
+              "name": "1.20 - 1.50 lbs",
+              "price": "13.15",
+              "sku": "999999000041",
+              "unit": "pk",
+              "quantity": 1,
+              "squareItemId": "7TZ2PHV5WBRXETZIWZWGIHBA",
+              "squareVariationId": "AR35EOVCDNFZ4AVG3BN6K445",
+              "regularSquareCents": 1800,
+              "currentLink": {
+                "valid": true,
+                "itemName": "Pork Chop, Boneless",
+                "variationName": "1.20 - 1.50 lbs",
+                "amount": 1800,
+                "unitId": "IC5AI62JDKMVPS4K7EJN2RAJ"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "squareItemId": "7ZUJFWHWSBQ4SRK3TEJJLNWG",
+      "squareItemName": "Chorizo (Bulk)",
+      "squareVariations": [
+        {
+          "id": "R2K3KQ3STAD3D7XKKSKL5KBX",
+          "name": "Regular",
+          "amount": 1650,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Keep existing local link",
+      "reason": "Bulk Farm Made Chorizo Rojo Sausage, 12 oz already has a valid link to another Square item. Treat this $16.50 listing as a possible old duplicate; current saved/linked price is $18.",
+      "localCandidates": [
+        {
+          "id": 913652,
+          "name": "Bulk Farm Made Chorizo Rojo Sausage",
+          "vendor": "Deck Family Farm's Hyland Artisinal Meats",
+          "description": "Our Farm Made Chorizo Sausage is a vibrant, Mexican-style chorizo made with a rich blend of four different chili peppers, giving it a deep red color and a lively flavor. Floral paprika, pleasant smokiness, and fresh oregano from our garden elevate this sausage to new heights. Chorizo and eggs is a classic, but this versatile sausage can be served in tacos, on salads, with rice or potatoes, or added to soups. With a spiciness level of 4/10, it offers a balanced heat perfect for any dish. Ingredients: Pork, red wine vinegar, onion, sea salt, chil",
+          "visible": 1,
+          "revisionId": 1416,
+          "revisionStatus": "active",
+          "pricingUnit": "each",
+          "squareEnabled": true,
+          "regularSquareUnitCents": 1800,
+          "packages": [
+            {
+              "id": 659188,
+              "productId": 913652,
+              "name": "12 oz",
+              "price": "9.74",
+              "sku": "999999000113",
+              "unit": "pk",
+              "quantity": 1,
+              "squareItemId": "DFUN7N54SAZMPXVCNTW3EPBP",
+              "squareVariationId": "C6SVDIWSCNJKRFIFD6XM2RQF",
+              "regularSquareCents": 1800,
+              "currentLink": {
+                "valid": true,
+                "itemName": "Bulk Farm Made Chorizo Rojo Sausage",
+                "variationName": "12 oz",
+                "amount": 1800,
+                "unitId": null
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "squareItemId": "JC2T5KZH3TVIIXDDJA2EYVQS",
+      "squareItemName": "CRX Drumsticks",
+      "squareVariations": [
+        {
+          "id": "ZO43VQG6PHP7LWKPZXZP2P44",
+          "name": "Regular",
+          "amount": 1200,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Review selling unit",
+      "reason": "Exact product identity, but local Square price is $12/lb and the existing Square variation is $12 each. Review and approve the unit before price publication.",
+      "localCandidates": [
+        {
+          "id": 1163732,
+          "name": "CRX Drumsticks",
+          "vendor": "Deck Family Farm",
+          "description": "<span style=\"color: rgb(34, 34, 34); font-family: &quot;Google Sans&quot;, Roboto, Arial, sans-serif; font-size: small; white-space: pre-wrap; background-color: transparent;\">Our Bone-In, Skin-On, Chicken Drumsticks, are a delicious and hearty cut. Perfect for roasting, baking, or grilling, these </span><span style=\"color: rgb(34, 34, 34); font-family: &quot;Google Sans&quot;, Roboto, Arial, sans-serif; font-size: small;\">&nbsp;d</span><span style=\"color: rgb(34, 34, 34); font-family: &quot;Google Sans&quot;, Roboto, Arial, sans-serif; font-siz",
+          "visible": 1,
+          "revisionId": 1713,
+          "revisionStatus": "partial",
+          "pricingUnit": "lb",
+          "squareEnabled": true,
+          "regularSquareUnitCents": 1200,
+          "packages": [
+            {
+              "id": 1011358,
+              "productId": 1163732,
+              "name": "ea",
+              "price": "8.12",
+              "sku": null,
+              "unit": null,
+              "quantity": 1,
+              "squareItemId": null,
+              "squareVariationId": null,
+              "regularSquareCents": 1200,
+              "currentLink": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "squareItemId": "Y2PVWBPZ7DHNBNIX5ARR7MAG",
+      "squareItemName": "CRX Feet",
+      "squareVariations": [
+        {
+          "id": "XMIVORSH742SXBF3RIIZWWM4",
+          "name": "Regular",
+          "amount": 950,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Confirm package and complete pricing",
+      "reason": "Likely Chicken Feet, 1lb bag. Confirm Square Regular is the 1 lb bag, then save complete pricing and its selling unit.",
+      "localCandidates": [
+        {
+          "id": 813079,
+          "name": "Chicken Feet, 1lb bag",
+          "vendor": "Deck Family Farm",
+          "description": "Our Pasture-Raised Chicken Feet from Deck Family Farm are a nutrient-rich ingredient perfect for making gelatinous, flavorful broths and stocks. Raised on open pastures, our chickens roam freely, ensuring exceptional quality and a clean, natural taste. Chicken feet are packed with collagen, making them an ideal addition to your kitchen for both health benefits and rich culinary flavor.  Our products come from pasture‑raised animals and are tended on pastures and forests with care. Because they are not factory‑farmed, natural variation in size, ",
+          "visible": 1,
+          "revisionId": null,
+          "revisionStatus": null,
+          "pricingUnit": null,
+          "packages": [
+            {
+              "id": 642344,
+              "productId": 813079,
+              "name": "1 lb bag",
+              "price": "5.14",
+              "sku": "999999000049",
+              "unit": "ea",
+              "quantity": 1,
+              "squareItemId": null,
+              "squareVariationId": null,
+              "currentLink": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "squareItemId": "YFEXZYORRBLWM4GLIBVZ6DVR",
+      "squareItemName": "CRX Hearts",
+      "squareVariations": [
+        {
+          "id": "KSHNRUR5RP3APBNE5ZA3NFOJ",
+          "name": "Regular",
+          "amount": 950,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Confirm package and complete pricing",
+      "reason": "Likely Chicken Hearts, 1/2 lb bag. Confirm package size; saved enterprise pricing and explicit selling unit are missing.",
+      "localCandidates": [
+        {
+          "id": 818957,
+          "name": "Chicken Hearts",
+          "vendor": "Deck Family Farm",
+          "description": "Chicken hearts are a versatile, nutritious, and flavorful cut of meat that are bite-sized and chewy with a slightly metallic, gamey flavor and a taste similar to dark meat  Our products come from pasture‑raised animals and are tended on pastures and forests with care. Because they are not factory‑farmed, natural variation in size, shape, weight, and flavor is expected. These differences are a hallmark of truly humane, artisanal farming.",
+          "visible": 1,
+          "revisionId": null,
+          "revisionStatus": null,
+          "pricingUnit": null,
+          "packages": [
+            {
+              "id": 541747,
+              "productId": 818957,
+              "name": "1/2 lb bag",
+              "price": "5.14",
+              "sku": "999999000051",
+              "unit": "pk",
+              "quantity": 1,
+              "squareItemId": null,
+              "squareVariationId": null,
+              "currentLink": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "squareItemId": "VPT2HXYYYWXSK2VCZTTI7JGL",
+      "squareItemName": "CRX Hindquarters",
+      "squareVariations": [
+        {
+          "id": "ALBBJSQDXTEHY2ICGAX62AEJ",
+          "name": "Regular",
+          "amount": 1200,
+          "currency": "USD",
+          "unit": "lb"
+        }
+      ],
+      "action": "Suggest link",
+      "reason": "Chicken Part, Hindquarter is unlinked; both saved local Square rate and live Square rate are $12/lb.",
+      "localCandidates": [
+        {
+          "id": 805676,
+          "name": "Chicken Part, Hindquarter",
+          "vendor": "Deck Family Farm",
+          "description": "Our Chicken Hindquarters, also known as chicken leg quarters, are a delicious and hearty cut that includes both the thigh and drumstick. Perfect for roasting, baking, or grilling, these hindquarters offer tender, flavorful meat with a crispy skin when cooked. Raised on fresh pasture where up to 20% of their diet includes grass, herbs, and clover, our pasture-raised broilers are well-fed and happy, ensuring high-quality, flavorful chicken. Whether you're preparing a simple family dinner or a savory feast, our chicken hindquarters provide a satis",
+          "visible": 1,
+          "revisionId": 1031,
+          "revisionStatus": "partial",
+          "pricingUnit": "lb",
+          "squareEnabled": true,
+          "regularSquareUnitCents": 1200,
+          "packages": [
+            {
+              "id": 526729,
+              "productId": 805676,
+              "name": "1.00 - 1.50 lbs",
+              "price": "8.12",
+              "sku": "999999000056",
+              "unit": "ea",
+              "quantity": 1,
+              "squareItemId": null,
+              "squareVariationId": null,
+              "regularSquareCents": 1200,
+              "currentLink": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "squareItemId": "H44FXVNEJLWUBUJSH6KJ3I6N",
+      "squareItemName": "CRX Liver",
+      "squareVariations": [
+        {
+          "id": "73RVVYB5OR6HIWVLV5PD2TAG",
+          "name": "Regular",
+          "amount": 950,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Suggest link",
+      "reason": "Chicken Liver is unlinked and both prices are $9.50 per package; confirm Square Regular is the local 1/2 lb bag.",
+      "localCandidates": [
+        {
+          "id": 805677,
+          "name": "Chicken Liver",
+          "vendor": "Deck Family Farm",
+          "description": "Our Chicken Liver is a flavorful and nutritious option for creating delicious, healthy meals. Perfect for sautéing in butter, making pâté, or adding to spaghetti sauce alongside ground meat, chicken liver is a versatile ingredient. For a simple yet elegant dish, sauté the livers with garlic, onion, salt, pepper, and a splash of red wine or chicken broth, then serve with mixed greens, sliced apples, or red onions. Sourced from our pasture-raised broilers, who enjoy a diet of grass, herbs, and clover, our chicken livers offer both exceptional fla",
+          "visible": 1,
+          "revisionId": 1032,
+          "revisionStatus": "partial",
+          "pricingUnit": "each",
+          "squareEnabled": true,
+          "regularSquareUnitCents": 950,
+          "packages": [
+            {
+              "id": 526730,
+              "productId": 805677,
+              "name": "1/2 lb bag",
+              "price": "5.14",
+              "sku": "999999000052",
+              "unit": "ea",
+              "quantity": 1,
+              "squareItemId": null,
+              "squareVariationId": null,
+              "regularSquareCents": 950,
+              "currentLink": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "squareItemId": "AL5UGDCUIRSMFYGSHY6I3JCG",
+      "squareItemName": "CRX Wings",
+      "squareVariations": [
+        {
+          "id": "YNI5TRGXHPXMEY3RJI34NLXK",
+          "name": "Regular",
+          "amount": 1200,
+          "currency": "USD",
+          "unit": "lb"
+        }
+      ],
+      "action": "Suggest link",
+      "reason": "Chicken Part, Wings is unlinked; both saved local Square rate and live Square rate are $12/lb.",
+      "localCandidates": [
+        {
+          "id": 805679,
+          "name": "Chicken Part, Wings",
+          "vendor": "Deck Family Farm",
+          "description": "Our Chicken Wings are a flavorful, juicy cut of white meat with a rich, concentrated poultry flavor, often enjoyed for their versatility in dishes like classic Buffalo wings. Whether you're frying, grilling, or baking, these wings deliver a delicious bite every time. Sourced from our pasture-raised broilers, who enjoy a diet of grass, herbs, and clover, our chickens are well-fed, happy, and healthy, ensuring high-quality meat with exceptional taste. Perfect for your next family gathering or game day, our chicken wings offer a satisfying and who",
+          "visible": 1,
+          "revisionId": 1034,
+          "revisionStatus": "partial",
+          "pricingUnit": "lb",
+          "squareEnabled": true,
+          "regularSquareUnitCents": 1200,
+          "packages": [
+            {
+              "id": 526732,
+              "productId": 805679,
+              "name": "1.50 - 2.00",
+              "price": "11.37",
+              "sku": "999999000057",
+              "unit": "ea",
+              "quantity": 1,
+              "squareItemId": null,
+              "squareVariationId": null,
+              "regularSquareCents": 1200,
+              "currentLink": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "squareItemId": "YCNO3E43XR323MAEXZT7HOWB",
+      "squareItemName": "EE 7 layer bar",
+      "squareVariations": [
+        {
+          "id": "LQSUGB37OXEPGZUVTVXRSZH5",
+          "name": "Regular",
+          "amount": 350,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Choose one Square listing; enable Square",
+      "reason": "Local Gluten Free Seven Layer Cookie description explicitly identifies Elegant Elephant 7-layer bars. Two unlinked Square listings exist; choose one for this package. Square eligibility is disabled locally.",
+      "localCandidates": [
+        {
+          "id": 806065,
+          "name": "Gluten Free Seven Layer Cookie",
+          "vendor": "Elegant Elephant Baking Co.",
+          "description": "Elegant Elephants 7-layer bars are a fan favorite featuring a combination of peanut butter chips, walnuts, chocolate, and coconut. These are commonly prepared with a graham cracker base, butter, and sweetened condensed milk to create a rich,, chewy, and, in some cases, gluten-free treat.",
+          "visible": 1,
+          "revisionId": 1212,
+          "revisionStatus": "active",
+          "pricingUnit": "each",
+          "squareEnabled": false,
+          "regularSquareUnitCents": null,
+          "packages": [
+            {
+              "id": 527128,
+              "productId": 806065,
+              "name": "each",
+              "price": "2.50",
+              "sku": null,
+              "unit": "ea",
+              "quantity": 1,
+              "squareItemId": null,
+              "squareVariationId": null,
+              "regularSquareCents": null,
+              "currentLink": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "squareItemId": "ZMAGPONYIBYXHJUJLIOY6UUI",
+      "squareItemName": "EE 7 Layer Bar",
+      "squareVariations": [
+        {
+          "id": "34SOAZEOF73DE54ISCNYXPCN",
+          "name": "Regular",
+          "amount": 350,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Choose one Square listing; enable Square",
+      "reason": "Local Gluten Free Seven Layer Cookie description explicitly identifies Elegant Elephant 7-layer bars. Two unlinked Square listings exist; choose one for this package. Square eligibility is disabled locally.",
+      "localCandidates": [
+        {
+          "id": 806065,
+          "name": "Gluten Free Seven Layer Cookie",
+          "vendor": "Elegant Elephant Baking Co.",
+          "description": "Elegant Elephants 7-layer bars are a fan favorite featuring a combination of peanut butter chips, walnuts, chocolate, and coconut. These are commonly prepared with a graham cracker base, butter, and sweetened condensed milk to create a rich,, chewy, and, in some cases, gluten-free treat.",
+          "visible": 1,
+          "revisionId": 1212,
+          "revisionStatus": "active",
+          "pricingUnit": "each",
+          "squareEnabled": false,
+          "regularSquareUnitCents": null,
+          "packages": [
+            {
+              "id": 527128,
+              "productId": 806065,
+              "name": "each",
+              "price": "2.50",
+              "sku": null,
+              "unit": "ea",
+              "quantity": 1,
+              "squareItemId": null,
+              "squareVariationId": null,
+              "regularSquareCents": null,
+              "currentLink": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "squareItemId": "HUTKUVNSXER2SE5R5PAHIEKZ",
+      "squareItemName": "EE Blackberry Handpie",
+      "squareVariations": [
+        {
+          "id": "CDKAZ3OTICKDV2BYYAHYYDWR",
+          "name": "Regular",
+          "amount": 420,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Suggest identity; enable Square for publication",
+      "reason": "Likely Gluten Free Blackberry Hand Pie, each, from Elegant Elephant. Local package is unlinked, but Square eligibility is currently disabled.",
+      "localCandidates": [
+        {
+          "id": 806022,
+          "name": "Gluten Free Blackberry Hand Pie",
+          "vendor": "Elegant Elephant Baking Co.",
+          "description": "<p>Ingredients</p>\n<p>Dough: Gluten Free Flour Blend (almond Meal, Sweet Rice Flour, Corn Starch, Scone, White Rice Flour, Potato Starch, Sorghum Flour, Brown Rice Flour, Tapioca Starch, Buttermilk Powder, Baking Powder, Baking Soda, Xanthan Gum,cream Of Tartar Sea Salt), Cream Cheese, Butter, Whole Milk, Cane Sugar, Baking Powder, Baking Soda, Yeast. Filling: Blackberries, Lemon Juice. Icing: Yogurt, Powdered Sugar, Lemon Juice, Lemon Zest</p><br />\n<p>Contains: almond, dairy</p>",
+          "visible": 1,
+          "revisionId": 1177,
+          "revisionStatus": "active",
+          "pricingUnit": "each",
+          "squareEnabled": false,
+          "regularSquareUnitCents": null,
+          "packages": [
+            {
+              "id": 527084,
+              "productId": 806022,
+              "name": "each",
+              "price": "3.00",
+              "sku": null,
+              "unit": "ea",
+              "quantity": 1,
+              "squareItemId": null,
+              "squareVariationId": null,
+              "regularSquareCents": null,
+              "currentLink": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "squareItemId": "MOJ4L5ZDPWNRWJKLGNHKGTW5",
+      "squareItemName": "EE Chocolat Chip Brownie",
+      "squareVariations": [
+        {
+          "id": "2OVGD362LFNAQXBO6G6OWOR3",
+          "name": "Regular",
+          "amount": 350,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Keep existing local link",
+      "reason": "Gluten Free Brownie Bite with Chocolate Chips already has a valid Square link ($2.50). This unlinked listing is $3.50; confirm it is the same size before calling it a duplicate.",
+      "localCandidates": [
+        {
+          "id": 806030,
+          "name": "Gluten Free Brownie Bite with Chocolate Chips",
+          "vendor": "Elegant Elephant Baking Co.",
+          "description": "<p>Gluten free, soy free.</p>",
+          "visible": 1,
+          "revisionId": 1185,
+          "revisionStatus": "active",
+          "pricingUnit": "each",
+          "squareEnabled": false,
+          "regularSquareUnitCents": null,
+          "packages": [
+            {
+              "id": 527092,
+              "productId": 806030,
+              "name": "each",
+              "price": "2.50",
+              "sku": null,
+              "unit": "ea",
+              "quantity": 1,
+              "squareItemId": "FXULFLYHKH2IXRWNOWOT4N5Z",
+              "squareVariationId": "FJB4PYJB5DS7JH23BC3NIDRK",
+              "regularSquareCents": null,
+              "currentLink": {
+                "valid": true,
+                "itemName": "Gluten Free Brownie Bite with Chocolate Chips",
+                "variationName": "each",
+                "amount": 250,
+                "unitId": null
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "squareItemId": "5BVR3AIT4637XBCBJGQLDNZQ",
+      "squareItemName": "EE chocolate donut",
+      "squareVariations": [
+        {
+          "id": "JIQGIEDPU6QGXHHH7YHY7MBQ",
+          "name": "Regular",
+          "amount": 330,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Keep existing local link",
+      "reason": "Gluten Free Chocolate Donut already has a valid Square link ($2.35). This unlinked listing is $3.30; keep the existing match.",
+      "localCandidates": [
+        {
+          "id": 806038,
+          "name": "Gluten Free Chocolate Donut",
+          "vendor": "Elegant Elephant Baking Co.",
+          "description": "The elegance of chocolate ganache and sprinkles together.",
+          "visible": 1,
+          "revisionId": 1193,
+          "revisionStatus": "active",
+          "pricingUnit": "each",
+          "squareEnabled": false,
+          "regularSquareUnitCents": null,
+          "packages": [
+            {
+              "id": 527100,
+              "productId": 806038,
+              "name": "each",
+              "price": "2.35",
+              "sku": null,
+              "unit": "ea",
+              "quantity": 1,
+              "squareItemId": "XHEH6EXU5CSKY4V3FLUWA4PN",
+              "squareVariationId": "OP7GVICC4NK4QADUYGVKJFVP",
+              "regularSquareCents": null,
+              "currentLink": {
+                "valid": true,
+                "itemName": "Gluten Free Chocolate Donut",
+                "variationName": "each",
+                "amount": 235,
+                "unitId": null
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "squareItemId": "EVUJYHLMQAKKN4NSYLQAJ7VI",
+      "squareItemName": "Fresh Garlic Sausage Links",
+      "squareVariations": [
+        {
+          "id": "3KGYHKQW52EDX4S6VRSHKPMD",
+          "name": "Regular",
+          "amount": 1950,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Suggest link",
+      "reason": "Same product name and $19.50 each saved Square price; review against the local 12 oz package.",
+      "localCandidates": [
+        {
+          "id": 805686,
+          "name": "Fresh Garlic Sausage Links",
+          "vendor": "Deck Family Farm",
+          "description": "Our 12oz Fresh Garlic Sausage Links come separated into four links, offering a clean, fresh taste that’s not overly garlicky. This versatile sausage is a favorite for everything from pasta dishes to grilling. Made from heritage hogs that roam open pastures and oak woodlands, their diet of dairy, hazelnuts, and custom-milled grains results in high-quality, flavorful meat praised throughout the Willamette Valley. \nIngredients: All-Natural Pork, Water Contains 2% Or Less Of: Salt, Lemon Juice (Water, Lemon from Concentrate, Lemon Oil, Spices, Turb",
+          "visible": 1,
+          "revisionId": 2276,
+          "revisionStatus": "pending",
+          "pricingUnit": "each",
+          "squareEnabled": true,
+          "regularSquareUnitCents": 1950,
+          "packages": [
+            {
+              "id": 526739,
+              "productId": 805686,
+              "name": "12 oz",
+              "price": "10.55",
+              "sku": "999999000083",
+              "unit": "pk",
+              "quantity": 1,
+              "squareItemId": null,
+              "squareVariationId": null,
+              "regularSquareCents": 1950,
+              "currentLink": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "squareItemId": "3QXI3INIUXQOJQ2SDU4QBIF3",
+      "squareItemName": "Ham",
+      "squareVariations": [
+        {
+          "id": "2XVTYG4RHL3NBICYZ5VUXRSW",
+          "name": "Regular",
+          "amount": 2000,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Hold: identify preparation and package",
+      "reason": "Local options are sliced ham and ends/pieces in 8 oz packages; Square’s generic Ham does not identify which.",
+      "localCandidates": [
+        {
+          "id": 921372,
+          "name": "Honey Maple Ham, Ends & Pieces",
+          "vendor": "Deck Family Farm",
+          "description": "<p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Perfectly balanced--a little sweet and a little salty, meaty with flavorful veins of marbling. These packs are the ends after the main portion of the hammed pork leg has been sliced. Great for omelettes, pastas, or salads :)</span></p><p dir=\"ltr\"><br></p><p dir=\"ltr\"><span style=\"white-space: pre-wrap;\">*recipes may not match photo, are liable to change and may include a small amount of sugar*</span></p>",
+          "visible": 0,
+          "revisionId": null,
+          "revisionStatus": null,
+          "pricingUnit": null,
+          "packages": [
+            {
+              "id": 667825,
+              "productId": 921372,
+              "name": "8 oz",
+              "price": "7.80",
+              "sku": null,
+              "unit": "pk",
+              "quantity": 1,
+              "squareItemId": null,
+              "squareVariationId": null,
+              "currentLink": null
+            }
+          ]
+        },
+        {
+          "id": 805693,
+          "name": "Honey Maple Ham, Sliced",
+          "vendor": "Deck Family Farm",
+          "description": "Perfectly balanced--a little sweet and a little salty, meaty with flavorful veins of marbling. Great in sandwiches or for all-day snacking. Try shredding it into thin strips to scramble with some eggs!*recipes may not match photo, are liable to change and may include a small amount of sugar*  Our products come from pasture‑raised animals and are tended on pastures and forests with care. Because they are not factory‑farmed, natural variation in size, shape, weight, and flavor is expected. These differences are a hallmark of truly humane, artisan",
+          "visible": 0,
+          "revisionId": null,
+          "revisionStatus": null,
+          "pricingUnit": null,
+          "packages": [
+            {
+              "id": 526746,
+              "productId": 805693,
+              "name": "8 oz",
+              "price": "10.55",
+              "sku": "999999000084",
+              "unit": "pk",
+              "quantity": 1,
+              "squareItemId": null,
+              "squareVariationId": null,
+              "currentLink": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "squareItemId": "ICKLKGWCJDPGBEXWSGG4TTAM",
+      "squareItemName": "Honey 1/2 pint",
+      "squareVariations": [
+        {
+          "id": "G4GC5T2AQXKINQL4FSFIIKSI",
+          "name": "Regular",
+          "amount": 1700,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Keep existing local link",
+      "reason": "Raw Honey, 1/2 pint already has a valid Square link; the extra listing has the same size and $17 price.",
+      "localCandidates": [
+        {
+          "id": 940998,
+          "name": "Raw Honey, 1/2 pint",
+          "vendor": "Deck Family Farm",
+          "description": "Deep amber in color and always raw, these bees feast on clover, berries, and native flowers. The resulting product is distinct to the Willamette Valley, thick, sweet, and potent. We use honey as a healthful substitute to processed sugars.",
+          "visible": 1,
+          "revisionId": 1449,
+          "revisionStatus": "partial",
+          "pricingUnit": "each",
+          "squareEnabled": true,
+          "regularSquareUnitCents": 1700,
+          "packages": [
+            {
+              "id": 694994,
+              "productId": 940998,
+              "name": "1/2 pint",
+              "price": "9.20",
+              "sku": "999999000001",
+              "unit": "ea",
+              "quantity": 1,
+              "squareItemId": "UDZUFDD4BZQV4OKACAQ55ZGA",
+              "squareVariationId": "5L6WZFWO6HESVITXZYJELIQJ",
+              "regularSquareCents": 1700,
+              "currentLink": {
+                "valid": true,
+                "itemName": "Raw Honey, 1/2 pint",
+                "variationName": "1/2 pint",
+                "amount": 1700,
+                "unitId": null
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "squareItemId": "L5TENQNPPCD7U7SFT7MRCFVA",
+      "squareItemName": "Hotdogs Beef&Pork",
+      "squareVariations": [
+        {
+          "id": "LVMAPHC27CSY42WPCUFNCN2P",
+          "name": "Regular",
+          "amount": 1950,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Keep existing local link",
+      "reason": "Possible Old World Style Hot Dogs, which already has a valid Square link at $19.50. Do not replace its existing mapping without package confirmation.",
+      "localCandidates": [
+        {
+          "id": 1131922,
+          "name": "Old World Style Hot Dogs",
+          "vendor": "Deck Family Farm",
+          "description": "<div class=\"gmail_default\" style=\"color: rgb(0, 0, 0); font-family: Arial, Helvetica, sans-serif; font-size: small;\"><font face=\"arial, sans-serif\">With a juicy snap and a delicate blend of spices, our Old World Style Hot Dogs are sure to satisfy. Made with pasture-raised pork and beef and crafted without added nitrates or nitrites, these premium hot dogs deliver exceptional flavor and quality. Perfect for camping trips, backyard BBQs, game day gatherings, or a quick and delicious meal any day of the week.&nbsp;</font></div><div class=\"gmail_de",
+          "visible": 1,
+          "revisionId": 1649,
+          "revisionStatus": "active",
+          "pricingUnit": "each",
+          "squareEnabled": true,
+          "regularSquareUnitCents": 1950,
+          "packages": [
+            {
+              "id": 966337,
+              "productId": 1131922,
+              "name": "ea",
+              "price": "10.55",
+              "sku": null,
+              "unit": "14 oz",
+              "quantity": 1,
+              "squareItemId": "FKULRXIWE4PAV5FT5UFCEIJ2",
+              "squareVariationId": "7ZMRF4LFZTTE6W5HA6QEP4DZ",
+              "regularSquareCents": 1950,
+              "currentLink": {
+                "valid": true,
+                "itemName": "Old World Style Hot Dogs",
+                "variationName": "ea",
+                "amount": 1950,
+                "unitId": null
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "squareItemId": "NUAYVKIQK6LY3I4WM3Z3F6IZ",
+      "squareItemName": "Kombucha",
+      "squareVariations": [
+        {
+          "id": "JVOGXOXO5K5HXHJ7BPSL55CP",
+          "name": "Regular",
+          "amount": 450,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Hold: identify flavor and size",
+      "reason": "Local products are specific kombucha/Jun/cider flavors. Square provides no flavor, size or SKU; do not assign a generic listing to an arbitrary flavor.",
+      "localCandidates": []
+    },
+    {
+      "squareItemId": "JLKTUM5MXH7F3JTHB7K4VBJC",
+      "squareItemName": "Kroppkakkor",
+      "squareVariations": [
+        {
+          "id": "T2DFZBY27YQPN2TMWDV5DYKY",
+          "name": "Regular",
+          "amount": 1000,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Hold: identify serving/package",
+      "reason": "Local Swedish Sausage Potato Dumplings is a 13 oz/10-dumpling retail package, already linked at $18. The Square $10 listing may be a prepared serving; confirm before linking.",
+      "localCandidates": [
+        {
+          "id": 1011872,
+          "name": "Swedish Sausage Potato Dumplings",
+          "vendor": "Deck Family Farm's Hyland Artisinal Meats",
+          "description": "Did you miss our booth at the Junction City Scandinavian Festival? Or maybe you loved our dish so much, you’ve been craving it ever since? Well, now’s your chance to bring it home!\n\nOur special Swedish Pork Sausage, wrapped in soft, pillowy potato dough, is a comforting traditional dish that’s perfect for the season. Whether you're reliving a festival favorite or trying it for the first time, it’s sure to keep you full, cozy, and satisfied as the cool weather rolls in.\n\nPreparation Instruction\n\nPrepare from Frozen\n\nBring a pot of water to a hea",
+          "visible": 0,
+          "revisionId": 2002,
+          "revisionStatus": "partial",
+          "pricingUnit": "each",
+          "squareEnabled": true,
+          "regularSquareUnitCents": 1800,
+          "packages": [
+            {
+              "id": 795004,
+              "productId": 1011872,
+              "name": "13oz/ 10 Dumplings/Pack",
+              "price": "10.82",
+              "sku": null,
+              "unit": "ea",
+              "quantity": 1,
+              "squareItemId": "BZSBJ76772CXFNCQVKRT7DTT",
+              "squareVariationId": "KF6PWHPNK4MJPTDJBLLYH3Z5",
+              "regularSquareCents": 1800,
+              "currentLink": {
+                "valid": true,
+                "itemName": "Swedish Sausage Potato Dumplings",
+                "variationName": "13oz/ 10 Dumplings/Pack",
+                "amount": 1800,
+                "unitId": null
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "squareItemId": "NRHOVYAY6UIJS27DWAQEOXZM",
+      "squareItemName": "Lonesome whistle popcorn",
+      "squareVariations": [
+        {
+          "id": "NKKENZA5K27X2J476OTLUSBX",
+          "name": "Regular",
+          "amount": 600,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Hold: identify flavor and size",
+      "reason": "Local options include 2 lb Dakota Black popcorn and 0.4 lb flavored popcorn bags. Square’s generic listing does not distinguish them.",
+      "localCandidates": []
+    },
+    {
+      "squareItemId": "C44VX4IKA7YX3EVRZ6TTL456",
+      "squareItemName": "LW Popcorn",
+      "squareVariations": [
+        {
+          "id": "GPMTZZLKAHRC2VGFPPMNFTAW",
+          "name": "Regular",
+          "amount": 560,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Hold: identify flavor and size",
+      "reason": "Local options include 2 lb Dakota Black popcorn and 0.4 lb flavored popcorn bags. Square’s generic listing does not distinguish them.",
+      "localCandidates": []
+    },
+    {
+      "squareItemId": "7NOGPYESRU2QAO32SYQEMAZI",
+      "squareItemName": "Pepperoni stick, individual",
+      "squareVariations": [
+        {
+          "id": "LK7DSTHQABMBBZZDHZ374SV4",
+          "name": "Individual stick",
+          "amount": 300,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Keep intentionally Square-only",
+      "reason": "User explicitly preserved this $3 individual-stick product. The local pepperoni product is a 6 oz retail package.",
+      "localCandidates": []
+    },
+    {
+      "squareItemId": "EJTUO45BLYB5I74RVSPRRNOM",
+      "squareItemName": "Pint Honey",
+      "squareVariations": [
+        {
+          "id": "AJDOYXU4YINBCM6W4AXZATY2",
+          "name": "Regular",
+          "amount": 2600,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Keep existing local link",
+      "reason": "Raw Honey, 1 pint already has a valid Square link; the extra listing has the same size and $26 price.",
+      "localCandidates": [
+        {
+          "id": 806161,
+          "name": "Raw Honey, 1 pint",
+          "vendor": "Deck Family Farm",
+          "description": "Deep amber in color and always raw, these bees feast on clover, berries, and native flowers. The resulting product is distinct to the Willamette Valley, thick, sweet, and potent. We use honey as a healthful substitute to processed sugars.",
+          "visible": 1,
+          "revisionId": 1262,
+          "revisionStatus": "partial",
+          "pricingUnit": "each",
+          "squareEnabled": true,
+          "regularSquareUnitCents": 2600,
+          "packages": [
+            {
+              "id": 527228,
+              "productId": 806161,
+              "name": "1 pint",
+              "price": "14.07",
+              "sku": "999999000002",
+              "unit": "ea",
+              "quantity": 1,
+              "squareItemId": "IRMSDE3RXXZRQ5RGXN5MAUFY",
+              "squareVariationId": "VBA7QNBQN4DAJEBMIWY5BZ4I",
+              "regularSquareCents": 2600,
+              "currentLink": {
+                "valid": true,
+                "itemName": "Raw Honey, 1 pint",
+                "variationName": "1 pint",
+                "amount": 2600,
+                "unitId": null
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "squareItemId": "PCGER3JHKMWG3NC4NWAE7PXM",
+      "squareItemName": "Pork Chops",
+      "squareVariations": [
+        {
+          "id": "HE3CDAY5PTKGQSLNASLM5SUC",
+          "name": "Regular",
+          "amount": 1950,
+          "currency": "USD",
+          "unit": "lb"
+        }
+      ],
+      "action": "Keep existing links; identify old listing",
+      "reason": "Both Pork Chop, Bone-in and Pork Chop, Boneless already have valid separate Square links. This generic $19.50/lb listing does not identify bone-in versus boneless.",
+      "localCandidates": [
+        {
+          "id": 805652,
+          "name": "Pork Chop, Bone-in",
+          "vendor": "Deck Family Farm",
+          "description": "Our Heritage Pork Chops are the king of pork cuts – tender, juicy, and packed with flavor that’s perfect for any occasion. Whether it’s a dinner for two or a personal treat, these chops deliver a satisfying, melt-in-your-mouth experience. Raised on open pastures and oak woodlands, our heritage hogs enjoy a natural diet of dairy, hazelnuts, and custom-milled grains, producing high-quality, flavorful meat that’s consistently praised throughout the Willamette Valley. For a foolproof cooking method, check out our blog for the perfect pork chop reci",
+          "visible": 0,
+          "revisionId": 1015,
+          "revisionStatus": "partial",
+          "pricingUnit": "lb",
+          "squareEnabled": true,
+          "regularSquareUnitCents": 1600,
+          "packages": [
+            {
+              "id": 526705,
+              "productId": 805652,
+              "name": "1.20 - 1.50 lbs",
+              "price": "11.69",
+              "sku": "999999000000",
+              "unit": "ea",
+              "quantity": 1,
+              "squareItemId": "ILHEC25TNXQ4LPPDALYQPVZH",
+              "squareVariationId": "4DJSRX4DMOZJFDETAVUDZDHN",
+              "regularSquareCents": 1600,
+              "currentLink": {
+                "valid": true,
+                "itemName": "Pork Chop, Bone-in",
+                "variationName": "1.20 - 1.50 lbs",
+                "amount": 1600,
+                "unitId": "IC5AI62JDKMVPS4K7EJN2RAJ"
+              }
+            }
+          ]
+        },
+        {
+          "id": 832792,
+          "name": "Pork Chop, Boneless",
+          "vendor": "Deck Family Farm",
+          "description": "Our Heritage Pork Chops are the king of pork cuts – tender, juicy, and packed with flavor that’s perfect for any occasion. Whether it’s a dinner for two or a personal treat, these chops deliver a satisfying, melt-in-your-mouth experience. Raised on open pastures and oak woodlands, our heritage hogs enjoy a natural diet of dairy, hazelnuts, and custom-milled grains, producing high-quality, flavorful meat that’s consistently praised throughout the Willamette Valley. For a foolproof cooking method, check out our blog for the perfect pork chop reci",
+          "visible": 0,
+          "revisionId": 1317,
+          "revisionStatus": "partial",
+          "pricingUnit": "lb",
+          "squareEnabled": true,
+          "regularSquareUnitCents": 1800,
+          "packages": [
+            {
+              "id": 558509,
+              "productId": 832792,
+              "name": "1.20 - 1.50 lbs",
+              "price": "13.15",
+              "sku": "999999000041",
+              "unit": "pk",
+              "quantity": 1,
+              "squareItemId": "7TZ2PHV5WBRXETZIWZWGIHBA",
+              "squareVariationId": "AR35EOVCDNFZ4AVG3BN6K445",
+              "regularSquareCents": 1800,
+              "currentLink": {
+                "valid": true,
+                "itemName": "Pork Chop, Boneless",
+                "variationName": "1.20 - 1.50 lbs",
+                "amount": 1800,
+                "unitId": "IC5AI62JDKMVPS4K7EJN2RAJ"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "squareItemId": "K36JLIEGZO6T4UEWCGEKIDYB",
+      "squareItemName": "Pullet Dz",
+      "squareVariations": [
+        {
+          "id": "OFJIHPLGZ43KQUYQ7UPI7ANR",
+          "name": "Regular",
+          "amount": 500,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Confirm identity and complete pricing",
+      "reason": "Possible Small Organic Pasture Raised Chicken Eggs, 1 dozen. Confirm these are the small organic eggs, then save complete pricing and selling unit.",
+      "localCandidates": [
+        {
+          "id": 995135,
+          "name": "Small Organic Pasture Raised Chicken Eggs",
+          "vendor": "Deck Family Farm",
+          "description": "Size small of our certified organic eggs from pasture-raised hens. Our eggs are renowned up and down the Willamette Valley for their rainbow-colored shells and rich, dark yolks. Compared to conventional eggs, pasture-raised eggs contain less cholesterol and more vitamin A, omega-3 fatty-acids, vitamin E, and beta-carotene.  Our products come from pasture‑raised animals and are tended on pastures and forests with care. Because they are not factory‑farmed, natural variation in size, shape, weight, and flavor is expected. These differences are a h",
+          "visible": 0,
+          "revisionId": null,
+          "revisionStatus": null,
+          "pricingUnit": null,
+          "packages": [
+            {
+              "id": 769257,
+              "productId": 995135,
+              "name": "1 dozen",
+              "price": "5.41",
+              "sku": "999999000166",
+              "unit": "ea",
+              "quantity": 1,
+              "squareItemId": null,
+              "squareVariationId": null,
+              "currentLink": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "squareItemId": "IEQ5XOFLC5AFPNJI5WZEEFKN",
+      "squareItemName": "Quart Honey",
+      "squareVariations": [
+        {
+          "id": "EBGFWL37CWOWFIQXHEWWDRMJ",
+          "name": "Regular",
+          "amount": 4750,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Keep existing local link",
+      "reason": "Raw Honey, 1 quart already has a valid Square link; the extra listing has the same size and $47.50 price.",
+      "localCandidates": [
+        {
+          "id": 941000,
+          "name": "Raw Honey, 1 quart",
+          "vendor": "Deck Family Farm",
+          "description": "Deep amber in color and always raw, these bees feast on clover, berries, and native flowers. The resulting product is distinct to the Willamette Valley, thick, sweet, and potent. We use honey as a healthful substitute to processed sugars.",
+          "visible": 1,
+          "revisionId": 1450,
+          "revisionStatus": "partial",
+          "pricingUnit": "each",
+          "squareEnabled": true,
+          "regularSquareUnitCents": 4750,
+          "packages": [
+            {
+              "id": 694996,
+              "productId": 941000,
+              "name": "1 quart",
+              "price": "25.71",
+              "sku": "999999000003",
+              "unit": "ea",
+              "quantity": 1,
+              "squareItemId": "7NILSMS7L35D2AIXMEWLSOAJ",
+              "squareVariationId": "WJG7GD5EUZ67ATJWK7QEQCAV",
+              "regularSquareCents": 4750,
+              "currentLink": {
+                "valid": true,
+                "itemName": "Raw Honey, 1 quart",
+                "variationName": "1 quart",
+                "amount": 4750,
+                "unitId": null
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "squareItemId": "NE42LNRBOWKK2F4OE6DFZHP6",
+      "squareItemName": "Scandi Kombucha",
+      "squareVariations": [
+        {
+          "id": "BHSMSHWHVSMJSYZNRVQ7UTIX",
+          "name": "Regular",
+          "amount": 500,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Hold: identify flavor and size",
+      "reason": "Local products are specific kombucha/Jun/cider flavors. Square provides no flavor, size or SKU; do not assign a generic listing to an arbitrary flavor.",
+      "localCandidates": []
+    },
+    {
+      "squareItemId": "4MJHJVJYDZNCHSKIFKWF553J",
+      "squareItemName": "Smoked Pork Shanks - Skin-on and Smoked",
+      "squareVariations": [
+        {
+          "id": "HSJOOTEOZJRIWVHGSEEDWSH6",
+          "name": "Shank",
+          "amount": 1650,
+          "currency": "USD",
+          "unit": "lb"
+        }
+      ],
+      "action": "Repair stale link; review selling unit",
+      "reason": "The old linked variation is deleted. Candidate is the same item’s current Shank variation. Local price is $16.50 per package, while Square is $16.50/lb. Resolve selling basis before syncing.",
+      "localCandidates": [
+        {
+          "id": 1013988,
+          "name": "Smoked Pork Shanks - Skin-on and Smoked",
+          "vendor": "Deck Family Farm",
+          "description": "Boasting more meat than the hocks, these savory, smoky shanks infuse dishes with rich, deep flavor and ample amounts of shredded meat.\nIngredients: Pork Shanks, Sugar, Salt, Less than 2% Water, Celery Powder, Sea Salt, Cherry Powder",
+          "visible": 1,
+          "revisionId": 1561,
+          "revisionStatus": "partial",
+          "pricingUnit": "each",
+          "squareEnabled": true,
+          "regularSquareUnitCents": 1650,
+          "packages": [
+            {
+              "id": 798012,
+              "productId": 1013988,
+              "name": "2 - 2.5 lbs",
+              "price": "8.93",
+              "sku": "999999000170",
+              "unit": "ea",
+              "quantity": 1,
+              "squareItemId": "4MJHJVJYDZNCHSKIFKWF553J",
+              "squareVariationId": "HSN75FILHGFLQGROEUIIC2XC",
+              "regularSquareCents": 1650,
+              "currentLink": {
+                "valid": false,
+                "itemName": "Smoked Pork Shanks - Skin-on and Smoked",
+                "unitId": null
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "squareItemId": "7DEDXYV4AKC5ODQTCMLSUNL5",
+      "squareItemName": "Walnuts (1lb.)",
+      "squareVariations": [
+        {
+          "id": "WMAHDOAPQPUVEJUO76GHES6Q",
+          "name": "Regular",
+          "amount": 2500,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Suggest link",
+      "reason": "Raw Walnuts, 1 lb is unlinked; package size and $25 each price match.",
+      "localCandidates": [
+        {
+          "id": 806159,
+          "name": "Raw Walnuts, 1 lb",
+          "vendor": "Deck Family Farm",
+          "description": "Walnuts grown on Deck Family Farm.<b>&nbsp;</b>&nbsp; Hand harvested under the farm's walnut tree.&nbsp; Note that we do not process these walnuts along-side any other types of nut.<b>&nbsp;&nbsp;</b>Disclaimer: these walnuts have been hand-cracked and sorted and while we do our best to make sure that all the shell has been removed, there can be occasional pieces!",
+          "visible": 0,
+          "revisionId": 1261,
+          "revisionStatus": "partial",
+          "pricingUnit": "each",
+          "squareEnabled": true,
+          "regularSquareUnitCents": 2500,
+          "packages": [
+            {
+              "id": 527225,
+              "productId": 806159,
+              "name": "1 lb",
+              "price": "13.53",
+              "sku": "999999000005",
+              "unit": "ea",
+              "quantity": 1,
+              "squareItemId": null,
+              "squareVariationId": null,
+              "regularSquareCents": 2500,
+              "currentLink": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "squareItemId": "H6XJOPIQKDYIX54KKCOSFAUN",
+      "squareItemName": "Whole CRX (POP)",
+      "squareVariations": [
+        {
+          "id": "XS44NNISRWTQP4HYFGEMORRR",
+          "name": "Regular",
+          "amount": 810,
+          "currency": "USD",
+          "unit": "lb"
+        }
+      ],
+      "action": "Hold: identify size",
+      "reason": "Local Cornish roasting chickens are split into four sizes with distinct rates, three already linked. The generic $8.10/lb Square listing identifies no size.",
+      "localCandidates": [
+        {
+          "id": 805673,
+          "name": "Cornish Roasting Chicken, Extra Large",
+          "vendor": "Deck Family Farm",
+          "description": "Our Cornish Roaster is a juicy and tender whole chicken that offers superior flavor and nutrition, thanks to the natural, pasture-raised environment in which these birds are raised. With up to 20% of their diet consisting of grass, herbs, and clover, these birds roam freely and enjoy a well-rounded, healthy diet, resulting in rich, flavorful meat. Perfect for roasting, this chicken delivers a far-cry from conventional varieties. Plus, don’t forget to save the bones to make a delicious homemade chicken stock! Note that the chicken in the photo i",
+          "visible": 0,
+          "revisionId": 1029,
+          "revisionStatus": "active",
+          "pricingUnit": "lb",
+          "squareEnabled": true,
+          "regularSquareUnitCents": 800,
+          "packages": [
+            {
+              "id": 608372,
+              "productId": 805673,
+              "name": "Extra Large, 5.00 - 6.00 lbs",
+              "price": "23.81",
+              "sku": "999999000133",
+              "unit": "ea",
+              "quantity": 1,
+              "squareItemId": "DJ3NBI3FOA6DXLKVALZWLPGI",
+              "squareVariationId": "NLWN3KCU2KHYIOS52LHM66ED",
+              "regularSquareCents": 800,
+              "currentLink": {
+                "valid": true,
+                "itemName": "Cornish Roasting Chicken, Extra Large",
+                "variationName": "Extra Large, 5.00 - 6.00 lbs",
+                "amount": 800,
+                "unitId": "IC5AI62JDKMVPS4K7EJN2RAJ"
+              }
+            }
+          ]
+        },
+        {
+          "id": 953035,
+          "name": "Cornish Roasting Chicken, Large",
+          "vendor": "Deck Family Farm",
+          "description": "Our Cornish Roaster is a juicy and tender whole chicken that offers superior flavor and nutrition, thanks to the natural, pasture-raised environment in which these birds are raised. With up to 20% of their diet consisting of grass, herbs, and clover, these birds roam freely and enjoy a well-rounded, healthy diet, resulting in rich, flavorful meat. Perfect for roasting, this chicken delivers a far-cry from conventional varieties. Plus, don’t forget to save the bones to make a delicious homemade chicken stock! Note that the chicken in the photo i",
+          "visible": 1,
+          "revisionId": 1461,
+          "revisionStatus": "active",
+          "pricingUnit": "lb",
+          "squareEnabled": true,
+          "regularSquareUnitCents": 850,
+          "packages": [
+            {
+              "id": 710619,
+              "productId": 953035,
+              "name": "Large, 4.21 - 4.99 lbs",
+              "price": "21.16",
+              "sku": "999999000060",
+              "unit": "ea",
+              "quantity": 1,
+              "squareItemId": "3F6IUR3J5TAXR76YKRFJTIJZ",
+              "squareVariationId": "6FTWRRVJOABLCLDGSXTCYAUQ",
+              "regularSquareCents": 850,
+              "currentLink": {
+                "valid": true,
+                "itemName": "Cornish Roasting Chicken, Large",
+                "variationName": "Large, 4.21 - 4.99 lbs",
+                "amount": 850,
+                "unitId": "IC5AI62JDKMVPS4K7EJN2RAJ"
+              }
+            }
+          ]
+        },
+        {
+          "id": 953036,
+          "name": "Cornish Roasting Chicken, Medium",
+          "vendor": "Deck Family Farm",
+          "description": "Our Cornish Roaster is a juicy and tender whole chicken that offers superior flavor and nutrition, thanks to the natural, pasture-raised environment in which these birds are raised. With up to 20% of their diet consisting of grass, herbs, and clover, these birds roam freely and enjoy a well-rounded, healthy diet, resulting in rich, flavorful meat. Perfect for roasting, this chicken delivers a far-cry from conventional varieties. Plus, don’t forget to save the bones to make a delicious homemade chicken stock! Note that the chicken in the photo i",
+          "visible": 1,
+          "revisionId": 1462,
+          "revisionStatus": "active",
+          "pricingUnit": "lb",
+          "squareEnabled": true,
+          "regularSquareUnitCents": 900,
+          "packages": [
+            {
+              "id": 710620,
+              "productId": 953036,
+              "name": "Medium, 3.20 - 4.20 lbs",
+              "price": "18.02",
+              "sku": "999999000059",
+              "unit": "ea",
+              "quantity": 1,
+              "squareItemId": "ZE5WMCI4TGVZN2W6QYIP6MQZ",
+              "squareVariationId": "C5XBHSXVG74ZVU7RFLFDZIS3",
+              "regularSquareCents": 900,
+              "currentLink": {
+                "valid": true,
+                "itemName": "Cornish Roasting Chicken, Medium",
+                "variationName": "Medium, 3.20 - 4.20 lbs",
+                "amount": 900,
+                "unitId": "IC5AI62JDKMVPS4K7EJN2RAJ"
+              }
+            }
+          ]
+        },
+        {
+          "id": 953039,
+          "name": "Cornish Roasting Chicken, Small",
+          "vendor": "Deck Family Farm",
+          "description": "Our Cornish Roaster is a juicy and tender whole chicken that offers superior flavor and nutrition, thanks to the natural, pasture-raised environment in which these birds are raised. With up to 20% of their diet consisting of grass, herbs, and clover, these birds roam freely and enjoy a well-rounded, healthy diet, resulting in rich, flavorful meat. Perfect for roasting, this chicken delivers a far-cry from conventional varieties. Plus, don’t forget to save the bones to make a delicious homemade chicken stock! Note that the chicken in the photo i",
+          "visible": 1,
+          "revisionId": 1463,
+          "revisionStatus": "partial",
+          "pricingUnit": "lb",
+          "squareEnabled": true,
+          "regularSquareUnitCents": 950,
+          "packages": [
+            {
+              "id": 710624,
+              "productId": 953039,
+              "name": "Small, 2.50 - 3.19 lbs",
+              "price": "14.63",
+              "sku": "999999000058",
+              "unit": "ea",
+              "quantity": 1,
+              "squareItemId": null,
+              "squareVariationId": null,
+              "regularSquareCents": 950,
+              "currentLink": null
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "additionalVariations": [
+    {
+      "squareItemId": "WXM5MVVZNSSOZIQHHDQMWAK6",
+      "squareItemName": "Broad Breasted White Thanksgiving Turkeys, Medium",
+      "squareVariations": [
+        {
+          "variationId": "42LRBQYMLK7NRFRLU3AZV262",
+          "name": "Heritage Large 18-25 lbs",
+          "sku": "",
+          "amount": 14000,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Hold: turkey weight ranges differ",
+      "reason": "Square labels use 18–25 lb and 25+ lb ranges; local catalog turkeys use 9–12, 12.01–14 and 14.01–16 lb ranges. Matching price does not establish equivalent birds. No turkey preorder stock or order mappings are involved.",
+      "localCandidates": []
+    },
+    {
+      "squareItemId": "WXM5MVVZNSSOZIQHHDQMWAK6",
+      "squareItemName": "Broad Breasted White Thanksgiving Turkeys, Medium",
+      "squareVariations": [
+        {
+          "variationId": "KLWMVQQZER4MT7TLQCPNYQXX",
+          "name": "White Large 25+ lbs",
+          "sku": "",
+          "amount": 15000,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Hold: turkey weight ranges differ",
+      "reason": "Square labels use 18–25 lb and 25+ lb ranges; local catalog turkeys use 9–12, 12.01–14 and 14.01–16 lb ranges. Matching price does not establish equivalent birds. No turkey preorder stock or order mappings are involved.",
+      "localCandidates": []
+    },
+    {
+      "squareItemId": "WXM5MVVZNSSOZIQHHDQMWAK6",
+      "squareItemName": "Broad Breasted White Thanksgiving Turkeys, Medium",
+      "squareVariations": [
+        {
+          "variationId": "FDWAASU5AXRHVPD4KGJ7VJYA",
+          "name": "Heritage Large 25+ lbs",
+          "sku": "",
+          "amount": 15000,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Hold: turkey weight ranges differ",
+      "reason": "Square labels use 18–25 lb and 25+ lb ranges; local catalog turkeys use 9–12, 12.01–14 and 14.01–16 lb ranges. Matching price does not establish equivalent birds. No turkey preorder stock or order mappings are involved.",
+      "localCandidates": []
+    },
+    {
+      "squareItemId": "WRXBRMIVAISDWMBWEFPPHIW2",
+      "squareItemName": "Pepperoni stick",
+      "squareVariations": [
+        {
+          "variationId": "YZYUYQR4AIXIY3KRKGCSBKBA",
+          "name": "Single Stick",
+          "sku": "",
+          "amount": 200,
+          "currency": "USD",
+          "unit": "each/package"
+        }
+      ],
+      "action": "Keep unlinked: legacy individual-stick variation",
+      "reason": "This old $2 Single Stick variation is not the 6 oz local package. The newer $3 individual-stick item remains intentionally Square-only.",
+      "localCandidates": []
+    }
+  ]
+}

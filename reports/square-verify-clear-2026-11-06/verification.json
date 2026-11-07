@@ -1,0 +1,2722 @@
+{
+  "summary": {
+    "checkedAt": "2026-11-06T20:52:00.357Z",
+    "locationId": "C0T7DVZY5XVG5",
+    "clearMatches": 106,
+    "livePricesAndUnitsVerified": 106,
+    "activeSalePricesVerified": 7,
+    "greenSquareBadges": 105,
+    "pricesOrUnitsNeedingReview": [],
+    "badgesNeedingReview": [
+      {
+        "name": "Cajun Chaurice Sausage Links",
+        "reason": "Sale pending"
+      }
+    ],
+    "publicationsRecorded": 98,
+    "squareChanges": [
+      {
+        "name": "Chicken Feet",
+        "releaseId": 1052,
+        "status": "verified"
+      }
+    ],
+    "held": [
+      {
+        "productId": 856878,
+        "name": "Brisket, Large",
+        "reasons": [
+          "Square item name differs from local product; mapping review needed"
+        ]
+      },
+      {
+        "productId": 941001,
+        "name": "Brisket, Medium",
+        "reasons": [
+          "No approved Square links",
+          "Not every local package has one approved link",
+          "A linked Square variation is missing"
+        ]
+      },
+      {
+        "productId": 941002,
+        "name": "Brisket, Small",
+        "reasons": [
+          "No approved Square links",
+          "Not every local package has one approved link",
+          "A linked Square variation is missing"
+        ]
+      },
+      {
+        "productId": 910775,
+        "name": "Broad Breasted White Turkeys, Large",
+        "reasons": [
+          "No approved Square links",
+          "Not every local package has one approved link",
+          "A linked Square variation is missing"
+        ]
+      },
+      {
+        "productId": 1008413,
+        "name": "Broad Breasted White Turkeys, Small",
+        "reasons": [
+          "No approved Square links",
+          "Not every local package has one approved link",
+          "A linked Square variation is missing"
+        ]
+      },
+      {
+        "productId": 818957,
+        "name": "Chicken Hearts",
+        "reasons": [
+          "Complete saved enterprise pricing is missing",
+          "Saved Square package price is missing or invalid",
+          "Set the local Retail Price unit (lb or each) in Products before syncing Square."
+        ]
+      },
+      {
+        "productId": 1011877,
+        "name": "Classic Beef Broth",
+        "reasons": [
+          "Square item name differs from local product; mapping review needed",
+          "Square item is shared by multiple local products"
+        ]
+      },
+      {
+        "productId": 1131920,
+        "name": "Classic Chicken Broth",
+        "reasons": [
+          "Square item name differs from local product; mapping review needed",
+          "Square item is shared by multiple local products"
+        ]
+      },
+      {
+        "productId": 1061161,
+        "name": "Classic Pork Broth",
+        "reasons": [
+          "Square item name differs from local product; mapping review needed",
+          "Square item is shared by multiple local products"
+        ]
+      },
+      {
+        "productId": 1011876,
+        "name": "Classic Pork Broth",
+        "reasons": [
+          "Square item name differs from local product; mapping review needed",
+          "Square item is shared by multiple local products"
+        ]
+      },
+      {
+        "productId": 953039,
+        "name": "Cornish Roasting Chicken, Small",
+        "reasons": [
+          "No approved Square links",
+          "Not every local package has one approved link",
+          "A linked Square variation is missing"
+        ]
+      },
+      {
+        "productId": 1010693,
+        "name": "Deck Family Farm Insulated Bag",
+        "reasons": [
+          "Square is disabled in saved pricing",
+          "Not every local package has one approved link",
+          "Saved Square package price is missing or invalid",
+          "A linked Square variation is missing"
+        ]
+      },
+      {
+        "productId": 806025,
+        "name": "Gluten Free Blueberry Scone",
+        "reasons": [
+          "Square is disabled in saved pricing",
+          "Saved Square package price is missing or invalid"
+        ]
+      },
+      {
+        "productId": 806030,
+        "name": "Gluten Free Brownie Bite with Chocolate Chips",
+        "reasons": [
+          "Square is disabled in saved pricing",
+          "Saved Square package price is missing or invalid"
+        ]
+      },
+      {
+        "productId": 806038,
+        "name": "Gluten Free Chocolate Donut",
+        "reasons": [
+          "Square is disabled in saved pricing",
+          "Saved Square package price is missing or invalid"
+        ]
+      },
+      {
+        "productId": 1008414,
+        "name": "Heritage Thanksgiving Turkey, Small",
+        "reasons": [
+          "No approved Square links",
+          "Not every local package has one approved link",
+          "A linked Square variation is missing"
+        ]
+      },
+      {
+        "productId": 816472,
+        "name": "Heritage Turkeys, Large",
+        "reasons": [
+          "No approved Square links",
+          "Not every local package has one approved link",
+          "A linked Square variation is missing"
+        ]
+      },
+      {
+        "productId": 910776,
+        "name": "Heritage Turkeys, Medium",
+        "reasons": [
+          "No approved Square links",
+          "Not every local package has one approved link",
+          "A linked Square variation is missing"
+        ]
+      },
+      {
+        "productId": 913064,
+        "name": "Lamb Chops, 4 pack",
+        "reasons": [
+          "No approved Square links",
+          "Not every local package has one approved link",
+          "A linked Square variation is missing"
+        ]
+      },
+      {
+        "productId": 805688,
+        "name": "Natural Ground Beef",
+        "reasons": [
+          "Square item name differs from local product; mapping review needed",
+          "Square item is shared by multiple local products"
+        ]
+      },
+      {
+        "productId": 805689,
+        "name": "Organic Ground Beef",
+        "reasons": [
+          "Square item name differs from local product; mapping review needed",
+          "Square item is shared by multiple local products"
+        ]
+      },
+      {
+        "productId": 805654,
+        "name": "Pork Shoulder Roast, Small",
+        "reasons": [
+          "No approved Square links",
+          "Not every local package has one approved link",
+          "A linked Square variation is missing"
+        ]
+      },
+      {
+        "productId": 806159,
+        "name": "Raw Walnuts, 1 lb",
+        "reasons": [
+          "No approved Square links",
+          "Not every local package has one approved link",
+          "A linked Square variation is missing"
+        ]
+      },
+      {
+        "productId": 1004600,
+        "name": "Red Ranger Roasting Chicken, Large",
+        "reasons": [
+          "Square location C0T7DVZY5XVG5 has a separate price (USD 10.00). Review that location price in Square before publishing; CSA Store updates the base variation price."
+        ]
+      },
+      {
+        "productId": 894282,
+        "name": "Skirt Steak, Small",
+        "reasons": [
+          "No approved Square links",
+          "Not every local package has one approved link",
+          "A linked Square variation is missing"
+        ]
+      },
+      {
+        "productId": 1013988,
+        "name": "Smoked Pork Shanks - Skin-on and Smoked",
+        "reasons": [
+          "A linked Square variation is missing"
+        ]
+      },
+      {
+        "productId": 805694,
+        "name": "Tamari Pressed Beef Jerky",
+        "reasons": [
+          "Square item name differs from local product; mapping review needed",
+          "Square item is shared by multiple local products"
+        ]
+      },
+      {
+        "productId": 1107078,
+        "name": "Tamari Pressed Beef Jerky - 12 oz",
+        "reasons": [
+          "Square item name differs from local product; mapping review needed",
+          "Square item is shared by multiple local products"
+        ]
+      },
+      {
+        "productId": 805699,
+        "name": "Turkey Liver",
+        "reasons": [
+          "No approved Square links",
+          "Not every local package has one approved link",
+          "A linked Square variation is missing"
+        ]
+      },
+      {
+        "productId": 883799,
+        "name": "Unrendered Beef Tallow",
+        "reasons": [
+          "No approved Square links",
+          "Not every local package has one approved link",
+          "A linked Square variation is missing"
+        ]
+      }
+    ],
+    "localLineWrites": 0
+  },
+  "rows": [
+    {
+      "productId": 816242,
+      "name": "Baby Back Ribs",
+      "packageId": 538686,
+      "packageName": "0.90 - 1.50 lbs",
+      "squareItemId": "5UOYFMPA22EZ4IBLF2NH4KMT",
+      "squareVariationId": "LISW32VK23KXNB33ENFT477O",
+      "localRegularCents": 1800,
+      "localSellingCents": 1800,
+      "squareRegularCents": 1800,
+      "squareSellingCents": 1800,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805653,
+      "name": "Bacon Ends & Pieces, Pork",
+      "packageId": 526706,
+      "packageName": "8 oz",
+      "squareItemId": "624YSUGQGVL4Q6N6XTRJI3W5",
+      "squareVariationId": "S3VRZSN4RMWEZYGOJPBD7E7A",
+      "localRegularCents": 1100,
+      "localSellingCents": 1100,
+      "squareRegularCents": 1100,
+      "squareSellingCents": 1100,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805724,
+      "name": "Bacon, Pork",
+      "packageId": 526778,
+      "packageName": "8 oz",
+      "squareItemId": "IE234OJWSW3XBJVMLNNWHKPW",
+      "squareVariationId": "LLQPAZZFUS4TG46PVVOW4P6T",
+      "localRegularCents": 1300,
+      "localSellingCents": 1300,
+      "squareRegularCents": 1300,
+      "squareSellingCents": 1300,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 1163728,
+      "name": "Bavarian Style Grazier's Sausage",
+      "packageId": 1011354,
+      "packageName": "ea",
+      "squareItemId": "IS5M2UVFIMSFPBAGYZZ7T22C",
+      "squareVariationId": "7NG2FP6SV5D3EJVLG4FEN34Q",
+      "localRegularCents": 1000,
+      "localSellingCents": 1000,
+      "squareRegularCents": 1000,
+      "squareSellingCents": 1000,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 960228,
+      "name": "Bavette Steak",
+      "packageId": 720358,
+      "packageName": "0.9 - 1.6 lbs",
+      "squareItemId": "CDWO26QVN3QAPSU3RFO46A7R",
+      "squareVariationId": "HY4IZXY6GM4AI6EC66ESAZK4",
+      "localRegularCents": 2600,
+      "localSellingCents": 2600,
+      "squareRegularCents": 2600,
+      "squareSellingCents": 2600,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 813072,
+      "name": "Beef Back Ribs",
+      "packageId": 535102,
+      "packageName": "2.00 - 3.00 lbs",
+      "squareItemId": "ANOBF7MHTR5DKMLRW3KEJ52P",
+      "squareVariationId": "ESFETJY6J3E3YNPYEUT3P4BJ",
+      "localRegularCents": 1600,
+      "localSellingCents": 1600,
+      "squareRegularCents": 1600,
+      "squareSellingCents": 1600,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 922135,
+      "name": "Beef Bones",
+      "packageId": 669030,
+      "packageName": "3.00 - 5.00 lbs",
+      "squareItemId": "EKVB7B3EUDOEUW4YKY4WKAH6",
+      "squareVariationId": "FO4U2WMBU6CNP3M4TJVGSCXJ",
+      "localRegularCents": 250,
+      "localSellingCents": 250,
+      "squareRegularCents": 250,
+      "squareSellingCents": 250,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 813075,
+      "name": "Beef Flat Iron Steak",
+      "packageId": 535105,
+      "packageName": "0.70 - 1.10 lbs",
+      "squareItemId": "RTUI22MY5EU7CX6ALHETPMBO",
+      "squareVariationId": "B6UDTUDPUQKV2THQ5PFPC6SZ",
+      "localRegularCents": 2600,
+      "localSellingCents": 2600,
+      "squareRegularCents": 2600,
+      "squareSellingCents": 2600,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805660,
+      "name": "Beef Heart",
+      "packageId": 526713,
+      "packageName": "2.50 - 3.5 lbs",
+      "squareItemId": "IL4HKH32KJU43QZF2WTE57CM",
+      "squareVariationId": "VMS35LF22K4ZIIQLENRZ562Y",
+      "localRegularCents": 950,
+      "localSellingCents": 950,
+      "squareRegularCents": 950,
+      "squareSellingCents": 950,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 825832,
+      "name": "Beef Kidney",
+      "packageId": 549811,
+      "packageName": "0.80 - 1.00 lbs",
+      "squareItemId": "E7BTUWHFLBSEQADC5HY3J2NP",
+      "squareVariationId": "YZD2KCNWUJOWGWKFT7DCG42C",
+      "localRegularCents": 1500,
+      "localSellingCents": 1500,
+      "squareRegularCents": 1500,
+      "squareSellingCents": 1500,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 841579,
+      "name": "Beef Liver",
+      "packageId": 569100,
+      "packageName": "0.90 - 1.30 lbs",
+      "squareItemId": "PLQR3XP6GQOWX6GLDFJQZI6D",
+      "squareVariationId": "DPHMZXG5A3S4YOMA3V3FICUI",
+      "localRegularCents": 1500,
+      "localSellingCents": 1350,
+      "squareRegularCents": 1500,
+      "squareSellingCents": 1350,
+      "squareDiscountCents": 150,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 825834,
+      "name": "Beef Marrow Bones",
+      "packageId": 549813,
+      "packageName": "3.00 - 5.00 lbs",
+      "squareItemId": "SHZS54JA7XZFU4WNB3O4CLSO",
+      "squareVariationId": "PJUREPBRNPEO4OGFFYYA7Q7Z",
+      "localRegularCents": 250,
+      "localSellingCents": 250,
+      "squareRegularCents": 250,
+      "squareSellingCents": 250,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 813076,
+      "name": "Beef Oxtail",
+      "packageId": 535106,
+      "packageName": "1.40 - 1.90 lbs",
+      "squareItemId": "AY5RVFQFLHXRD5USE52DU5BD",
+      "squareVariationId": "HKHJAL5T7IGLNBNP2SHGWFET",
+      "localRegularCents": 1300,
+      "localSellingCents": 1300,
+      "squareRegularCents": 1300,
+      "squareSellingCents": 1300,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 813071,
+      "name": "Beef Shank Osso Buco",
+      "packageId": 535101,
+      "packageName": "2.10 - 2.40 lbs",
+      "squareItemId": "YO6NZ2ZRLEGTFOWDKE4EC6E5",
+      "squareVariationId": "36KI54KEJJZP76I7I2AAQASZ",
+      "localRegularCents": 1950,
+      "localSellingCents": 1950,
+      "squareRegularCents": 1950,
+      "squareSellingCents": 1950,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 894281,
+      "name": "Beef Short Rib",
+      "packageId": 634544,
+      "packageName": "1.30 - 2.10 lbs",
+      "squareItemId": "IYPQ3PXHDAX25MEP2EFYMKTH",
+      "squareVariationId": "73CWJJUMSGTLRLWKCHTYZNCV",
+      "localRegularCents": 1950,
+      "localSellingCents": 1950,
+      "squareRegularCents": 1950,
+      "squareSellingCents": 1950,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805667,
+      "name": "Beef Stew Meat",
+      "packageId": 526720,
+      "packageName": "1.1 - 1.3 lbs",
+      "squareItemId": "NJRMSC2BLHXCJCDR5ULCPPXX",
+      "squareVariationId": "VINTQXAU46GLF3MVILEBL2GN",
+      "localRegularCents": 1850,
+      "localSellingCents": 1850,
+      "squareRegularCents": 1850,
+      "squareSellingCents": 1850,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 813067,
+      "name": "Beef Tenderloin",
+      "packageId": 535097,
+      "packageName": "0.40 - 0.70 lbs",
+      "squareItemId": "QZ6L4PORGVUVAZSDTH6XIC76",
+      "squareVariationId": "QGDFUX4RZYYUBRYCXCW2ZW4O",
+      "localRegularCents": 4300,
+      "localSellingCents": 4300,
+      "squareRegularCents": 4300,
+      "squareSellingCents": 4300,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 825833,
+      "name": "Beef Tongue",
+      "packageId": 549812,
+      "packageName": "2.50 - 3.00 lbs",
+      "squareItemId": "CTUQPFQYSCASKP4QBTONH255",
+      "squareVariationId": "XLUIITLT42YYIEAIIQMM43SU",
+      "localRegularCents": 950,
+      "localSellingCents": 950,
+      "squareRegularCents": 950,
+      "squareSellingCents": 950,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 869027,
+      "name": "Beef Tri-Tip",
+      "packageId": 600217,
+      "packageName": "1.90 - 2.20 lbs",
+      "squareItemId": "VO7YEQD5FKOYVWGHGFI3ISA3",
+      "squareVariationId": "MG34WSHAPYGTK5C2F7WJY7HH",
+      "localRegularCents": 2100,
+      "localSellingCents": 2100,
+      "squareRegularCents": 2100,
+      "squareSellingCents": 2100,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 813084,
+      "name": "Bratwurst",
+      "packageId": 535115,
+      "packageName": "12 oz",
+      "squareItemId": "6V7DQMGSLUABL7JI3GMVXULZ",
+      "squareVariationId": "JL4WOYSE5LX75MYTNGRJEU24",
+      "localRegularCents": 1950,
+      "localSellingCents": 1950,
+      "squareRegularCents": 1950,
+      "squareSellingCents": 1950,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 910774,
+      "name": "Broad Breasted White Thanksgiving Turkeys, Medium",
+      "packageId": 655862,
+      "packageName": "12.01 - 14.00  lbs",
+      "squareItemId": "WXM5MVVZNSSOZIQHHDQMWAK6",
+      "squareVariationId": "ACSBCUQ54CQ6XNUJQYH6VREQ",
+      "localRegularCents": 11500,
+      "localSellingCents": 11500,
+      "squareRegularCents": 11500,
+      "squareSellingCents": 11500,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 840823,
+      "name": "Bulk English Breakfast Sausage",
+      "packageId": 568237,
+      "packageName": "12 oz",
+      "squareItemId": "DSKZWD2Z6KSSTTADHICAXC5G",
+      "squareVariationId": "GVDPMOIBYDM7FPJUH6PKQPT2",
+      "localRegularCents": 1650,
+      "localSellingCents": 1485,
+      "squareRegularCents": 1650,
+      "squareSellingCents": 1485,
+      "squareDiscountCents": 165,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 913652,
+      "name": "Bulk Farm Made Chorizo Rojo Sausage",
+      "packageId": 659188,
+      "packageName": "12 oz",
+      "squareItemId": "DFUN7N54SAZMPXVCNTW3EPBP",
+      "squareVariationId": "C6SVDIWSCNJKRFIFD6XM2RQF",
+      "localRegularCents": 1800,
+      "localSellingCents": 1800,
+      "squareRegularCents": 1800,
+      "squareSellingCents": 1800,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 1163729,
+      "name": "Bulk Hot Italian Sausage",
+      "packageId": 1011355,
+      "packageName": "ea",
+      "squareItemId": "6WRAOOSLV3PZMGQZAF737G73",
+      "squareVariationId": "YHJJOW32FDVHQ4QIY4622POB",
+      "localRegularCents": 1650,
+      "localSellingCents": 1650,
+      "squareRegularCents": 1650,
+      "squareSellingCents": 1650,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 913651,
+      "name": "Bulk Thai Curry Sausage",
+      "packageId": 659187,
+      "packageName": "12 oz",
+      "squareItemId": "56JW4CHELXLEOPRF7E4K4B4Z",
+      "squareVariationId": "LF5N3PXAP6GF6SPZA5R3RC2Z",
+      "localRegularCents": 1650,
+      "localSellingCents": 1650,
+      "squareRegularCents": 1650,
+      "squareSellingCents": 1650,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 816905,
+      "name": "Cajun Chaurice Sausage Links",
+      "packageId": 539546,
+      "packageName": "4 links/ pack 14 oz pack",
+      "squareItemId": "BKII4YYPR7FUPZVKDYUHUXVD",
+      "squareVariationId": "WBDNBYBMRDK55JR6NCQG6FGD",
+      "localRegularCents": 2000,
+      "localSellingCents": 2000,
+      "squareRegularCents": 2000,
+      "squareSellingCents": 2000,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "attention",
+        "reason": "Sale pending"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805669,
+      "name": "Chicken Breast, Bone-In",
+      "packageId": 526722,
+      "packageName": "1.30 - 1.70 lbs",
+      "squareItemId": "7PRNL7OITHV4F5PMM3IDACU3",
+      "squareVariationId": "GWUVAKYUHDRBOBPDJH3UHMYW",
+      "localRegularCents": 1200,
+      "localSellingCents": 1200,
+      "squareRegularCents": 1200,
+      "squareSellingCents": 1200,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 1163732,
+      "name": "Chicken Drumsticks",
+      "packageId": 1011358,
+      "packageName": "ea",
+      "squareItemId": "JC2T5KZH3TVIIXDDJA2EYVQS",
+      "squareVariationId": "ZO43VQG6PHP7LWKPZXZP2P44",
+      "localRegularCents": 1200,
+      "localSellingCents": 1200,
+      "squareRegularCents": 1200,
+      "squareSellingCents": 1200,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 813079,
+      "name": "Chicken Feet",
+      "packageId": 642344,
+      "packageName": "1 lb bag",
+      "squareItemId": "Y2PVWBPZ7DHNBNIX5ARR7MAG",
+      "squareVariationId": "XMIVORSH742SXBF3RIIZWWM4",
+      "localRegularCents": 950,
+      "localSellingCents": 950,
+      "squareRegularCents": 950,
+      "squareSellingCents": 950,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805676,
+      "name": "Chicken Hindquarters",
+      "packageId": 526729,
+      "packageName": "1.00 - 1.50 lbs",
+      "squareItemId": "VPT2HXYYYWXSK2VCZTTI7JGL",
+      "squareVariationId": "ALBBJSQDXTEHY2ICGAX62AEJ",
+      "localRegularCents": 1200,
+      "localSellingCents": 1200,
+      "squareRegularCents": 1200,
+      "squareSellingCents": 1200,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805677,
+      "name": "Chicken Liver",
+      "packageId": 526730,
+      "packageName": "1/2 lb bag",
+      "squareItemId": "H44FXVNEJLWUBUJSH6KJ3I6N",
+      "squareVariationId": "73RVVYB5OR6HIWVLV5PD2TAG",
+      "localRegularCents": 950,
+      "localSellingCents": 950,
+      "squareRegularCents": 950,
+      "squareSellingCents": 950,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 1163731,
+      "name": "Chicken Thighs",
+      "packageId": 1011357,
+      "packageName": "1.00 - 1.50 lbs",
+      "squareItemId": "VOQME3YDXUVD2ZVARTKIS42R",
+      "squareVariationId": "DBJMH2UAKWRD33AMSUN5ZWYY",
+      "localRegularCents": 1200,
+      "localSellingCents": 1200,
+      "squareRegularCents": 1200,
+      "squareSellingCents": 1200,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805679,
+      "name": "Chicken Wings",
+      "packageId": 526732,
+      "packageName": "1.50 - 2.00",
+      "squareItemId": "AL5UGDCUIRSMFYGSHY6I3JCG",
+      "squareVariationId": "YNI5TRGXHPXMEY3RJI34NLXK",
+      "localRegularCents": 1200,
+      "localSellingCents": 1200,
+      "squareRegularCents": 1200,
+      "squareSellingCents": 1200,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 932132,
+      "name": "Chorizo Verde",
+      "packageId": 684511,
+      "packageName": "4 links/ pack 14 oz pack",
+      "squareItemId": "CB5RBKV2UCS7T6K2GNRHHMTX",
+      "squareVariationId": "TKXIYOEX25R4SBDAH2QHNCXK",
+      "localRegularCents": 2000,
+      "localSellingCents": 2000,
+      "squareRegularCents": 2000,
+      "squareSellingCents": 2000,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805658,
+      "name": "Chuck roast",
+      "packageId": 526711,
+      "packageName": "2.30 - 2.90 lbs",
+      "squareItemId": "RTQ6INIYGMMDJ3RKTT64KVFN",
+      "squareVariationId": "7JHSSGCRX4A6VQ5CHHLSB7J5",
+      "localRegularCents": 1600,
+      "localSellingCents": 1600,
+      "squareRegularCents": 1600,
+      "squareSellingCents": 1600,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 1163730,
+      "name": "Classic Meatballs",
+      "packageId": 1011356,
+      "packageName": "12oz/13 Meatballs/Pack",
+      "squareItemId": "LEVEFO7MFXRUONIC3I7H3HFE",
+      "squareVariationId": "MKNBU4O77EKKU3PRMBO4AJLJ",
+      "localRegularCents": 1650,
+      "localSellingCents": 1650,
+      "squareRegularCents": 1650,
+      "squareSellingCents": 1650,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805673,
+      "name": "Cornish Roasting Chicken, Extra Large",
+      "packageId": 608372,
+      "packageName": "Extra Large, 5.00 - 6.00 lbs",
+      "squareItemId": "DJ3NBI3FOA6DXLKVALZWLPGI",
+      "squareVariationId": "NLWN3KCU2KHYIOS52LHM66ED",
+      "localRegularCents": 800,
+      "localSellingCents": 720,
+      "squareRegularCents": 800,
+      "squareSellingCents": 720,
+      "squareDiscountCents": 80,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 953035,
+      "name": "Cornish Roasting Chicken, Large",
+      "packageId": 710619,
+      "packageName": "Large, 4.21 - 4.99 lbs",
+      "squareItemId": "3F6IUR3J5TAXR76YKRFJTIJZ",
+      "squareVariationId": "6FTWRRVJOABLCLDGSXTCYAUQ",
+      "localRegularCents": 850,
+      "localSellingCents": 765,
+      "squareRegularCents": 850,
+      "squareSellingCents": 765,
+      "squareDiscountCents": 85,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 953036,
+      "name": "Cornish Roasting Chicken, Medium",
+      "packageId": 710620,
+      "packageName": "Medium, 3.20 - 4.20 lbs",
+      "squareItemId": "ZE5WMCI4TGVZN2W6QYIP6MQZ",
+      "squareVariationId": "C5XBHSXVG74ZVU7RFLFDZIS3",
+      "localRegularCents": 900,
+      "localSellingCents": 810,
+      "squareRegularCents": 900,
+      "squareSellingCents": 810,
+      "squareDiscountCents": 90,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 813086,
+      "name": "Country Sausage, Bulk",
+      "packageId": 535117,
+      "packageName": "12 oz",
+      "squareItemId": "ZOZ27GYI6FO3XADQSKYEVETK",
+      "squareVariationId": "SM7UBX6YKK2EZJJFACUYR5P6",
+      "localRegularCents": 1550,
+      "localSellingCents": 1550,
+      "squareRegularCents": 1550,
+      "squareSellingCents": 1550,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 813074,
+      "name": "Flank Steak",
+      "packageId": 535104,
+      "packageName": "1.10 - 1.40 lbs",
+      "squareItemId": "CQAVFLDGU4BEMOZ4TH6FI3SG",
+      "squareVariationId": "CH2P36B35NEX5GQB24N6TQ6Y",
+      "localRegularCents": 2600,
+      "localSellingCents": 2600,
+      "squareRegularCents": 2600,
+      "squareSellingCents": 2600,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805686,
+      "name": "Fresh Garlic Sausage Links",
+      "packageId": 526739,
+      "packageName": "12 oz",
+      "squareItemId": "EVUJYHLMQAKKN4NSYLQAJ7VI",
+      "squareVariationId": "3KGYHKQW52EDX4S6VRSHKPMD",
+      "localRegularCents": 1950,
+      "localSellingCents": 1950,
+      "squareRegularCents": 1950,
+      "squareSellingCents": 1950,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 913653,
+      "name": "Grass-Fed Organ Blend",
+      "packageId": 659189,
+      "packageName": "1 lb pack",
+      "squareItemId": "X5ZOGUSJ5AABXRHEGRAJQNQU",
+      "squareVariationId": "DVO2SXTU7A5IQIHBUJ5AWUZ2",
+      "localRegularCents": 1500,
+      "localSellingCents": 1500,
+      "squareRegularCents": 1500,
+      "squareSellingCents": 1500,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 818963,
+      "name": "Greek Loukaniko Sausage Links",
+      "packageId": 541754,
+      "packageName": "4 links/ pack 14 oz pack",
+      "squareItemId": "5VM3KJOZZW3Q3I3ITPZVOTX2",
+      "squareVariationId": "BEPUBK767D7WACNDBXCJH3L4",
+      "localRegularCents": 2000,
+      "localSellingCents": 2000,
+      "squareRegularCents": 2000,
+      "squareSellingCents": 2000,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 813092,
+      "name": "Ground Lamb",
+      "packageId": 535123,
+      "packageName": "1.00 lbs",
+      "squareItemId": "W6TLTOS5DEHZUYMO47WBSGOE",
+      "squareVariationId": "I4326UJUHXDELAFK7M2BZ4Z6",
+      "localRegularCents": 1700,
+      "localSellingCents": 1700,
+      "squareRegularCents": 1700,
+      "squareSellingCents": 1700,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805691,
+      "name": "Ground Pork",
+      "packageId": 526744,
+      "packageName": "1.00 lbs",
+      "squareItemId": "ZWYKIFSJHXRJAMUTBROCLXDV",
+      "squareVariationId": "ATTBVR3RYMNJXCOHHWZ7LUE7",
+      "localRegularCents": 1200,
+      "localSellingCents": 1200,
+      "squareRegularCents": 1200,
+      "squareSellingCents": 1200,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805664,
+      "name": "Hamburger Patties",
+      "packageId": 526717,
+      "packageName": "1.00 lbs",
+      "squareItemId": "ZWZUCQRCDOB2CJF4KCGQJYI5",
+      "squareVariationId": "T5CTPJKL4O3BTPFAD4IEBOYY",
+      "localRegularCents": 1550,
+      "localSellingCents": 1550,
+      "squareRegularCents": 1550,
+      "squareSellingCents": 1550,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 825830,
+      "name": "Hanger Steak",
+      "packageId": 568280,
+      "packageName": "0.40 - 0.70 lbs",
+      "squareItemId": "WSEWP54CB6EZWHXJTDFT5M6W",
+      "squareVariationId": "U2RS4TBUI2S7DJ6NO2O665TI",
+      "localRegularCents": 2600,
+      "localSellingCents": 2600,
+      "squareRegularCents": 2600,
+      "squareSellingCents": 2600,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 871143,
+      "name": "Hot Italian Sausage Links",
+      "packageId": 604158,
+      "packageName": "4 links/ pack 14 oz pack",
+      "squareItemId": "6GZJ5FIDENXSI2UBMEER2SQC",
+      "squareVariationId": "IZC4B3HYKVYJGWP2ZFFWZLMB",
+      "localRegularCents": 2000,
+      "localSellingCents": 2000,
+      "squareRegularCents": 2000,
+      "squareSellingCents": 2000,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805701,
+      "name": "Korean Style Beef Ribs",
+      "packageId": 526754,
+      "packageName": "1.20 - 1.40 lbs",
+      "squareItemId": "Q6RDEMHLOLEZNQZO2RDBFYEC",
+      "squareVariationId": "MVFD66GNBFVK6CV4WF46J4JY",
+      "localRegularCents": 1950,
+      "localSellingCents": 1950,
+      "squareRegularCents": 1950,
+      "squareSellingCents": 1950,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 825835,
+      "name": "Lamb Bones",
+      "packageId": 549814,
+      "packageName": "3.00 - 5.00 lbs",
+      "squareItemId": "X5JEUWVLEY7Q32PNRSNNUUKG",
+      "squareVariationId": "GLJBCAFOB4EJTMLFCS5WRPTN",
+      "localRegularCents": 250,
+      "localSellingCents": 250,
+      "squareRegularCents": 250,
+      "squareSellingCents": 250,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 922133,
+      "name": "Lamb Chops, 2 pack",
+      "packageId": 669028,
+      "packageName": "2 pack, 0.70 - 1.10 lbs",
+      "squareItemId": "Z4DXDFPKC6EH7VGLBH27Y4UO",
+      "squareVariationId": "SBF426S4VJ72E7QUX6ORWUAU",
+      "localRegularCents": 2100,
+      "localSellingCents": 2100,
+      "squareRegularCents": 2100,
+      "squareSellingCents": 2100,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 939774,
+      "name": "Lamb Heart",
+      "packageId": 693441,
+      "packageName": "2 pack, 0.8 - 1.1 lbs",
+      "squareItemId": "UO24DZZIVNHSYSA3GTKKWCTV",
+      "squareVariationId": "RKGYVDNZTZAFRMSTU24YL4KU",
+      "localRegularCents": 950,
+      "localSellingCents": 950,
+      "squareRegularCents": 950,
+      "squareSellingCents": 950,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 825839,
+      "name": "Lamb Kabob",
+      "packageId": 549818,
+      "packageName": "1.1 - 1.35",
+      "squareItemId": "C2RZ7V6MHLDDVGQOX6UPNR66",
+      "squareVariationId": "3XPZAKU4J3TIKCYIMUP43TWZ",
+      "localRegularCents": 2150,
+      "localSellingCents": 2150,
+      "squareRegularCents": 2150,
+      "squareSellingCents": 2150,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 913648,
+      "name": "Lamb Merguez Sausage Links",
+      "packageId": 659184,
+      "packageName": "4 links/pack 14 oz pack",
+      "squareItemId": "N7X3GEGY2OGLMSPQ4KCM4OGO",
+      "squareVariationId": "U37CHXXOQNKCISKGN4INWKO3",
+      "localRegularCents": 2400,
+      "localSellingCents": 2400,
+      "squareRegularCents": 2400,
+      "squareSellingCents": 2400,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805703,
+      "name": "Lamb Neck Slices",
+      "packageId": 526756,
+      "packageName": "1.10 - 1.50 lbs",
+      "squareItemId": "Z7QJDOALKFNWSUBRGSAGVRDO",
+      "squareVariationId": "TZTMDSMJTAGOJCQF46SKBXMR",
+      "localRegularCents": 1550,
+      "localSellingCents": 1550,
+      "squareRegularCents": 1550,
+      "squareSellingCents": 1550,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 825840,
+      "name": "Lamb Shank Osso Buco",
+      "packageId": 549819,
+      "packageName": "1.10 - 1.40 lbs",
+      "squareItemId": "WUIXU3UL54OQLCEZKXCHA5AT",
+      "squareVariationId": "HKPTHCXRUEDJY6C2VGFXW3GJ",
+      "localRegularCents": 1400,
+      "localSellingCents": 1400,
+      "squareRegularCents": 1400,
+      "squareSellingCents": 1400,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805710,
+      "name": "Lamb Shank, Whole",
+      "packageId": 526763,
+      "packageName": "2.00 - 2.50 lbs",
+      "squareItemId": "DPVXXTQWQAB5FDSY37Q6FAXK",
+      "squareVariationId": "B3RFRXZ5A7OE2QMW7HARI2KP",
+      "localRegularCents": 1200,
+      "localSellingCents": 1200,
+      "squareRegularCents": 1200,
+      "squareSellingCents": 1200,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805711,
+      "name": "Lamb Shoulder Roast",
+      "packageId": 526764,
+      "packageName": "2.30 - 2.70 lbs",
+      "squareItemId": "HXKKRP3BEDWFO3JXC6T6ICIT",
+      "squareVariationId": "7GPYF465GTEEMVHTQLHJIN2Q",
+      "localRegularCents": 2000,
+      "localSellingCents": 2000,
+      "squareRegularCents": 2000,
+      "squareSellingCents": 2000,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805712,
+      "name": "Lamb Stew",
+      "packageId": 526765,
+      "packageName": "0.90 - 1.10 lbs",
+      "squareItemId": "MCJCI6NPYSTJWMOKY3AK4EUV",
+      "squareVariationId": "UXP7TNX3XOY2T2HG5MWDTU5A",
+      "localRegularCents": 2150,
+      "localSellingCents": 2150,
+      "squareRegularCents": 2150,
+      "squareSellingCents": 2150,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 963826,
+      "name": "Lamb Sundried Tomato Basil Sausage",
+      "packageId": 724882,
+      "packageName": "12 oz",
+      "squareItemId": "OKA5MQIK5LAZKH6OZKLBA47E",
+      "squareVariationId": "PCIAN5L2GXDTCDITJYCQPL3S",
+      "localRegularCents": 2150,
+      "localSellingCents": 2150,
+      "squareRegularCents": 2150,
+      "squareSellingCents": 2150,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805713,
+      "name": "Landjaeger Jerky, 3 pack",
+      "packageId": 526766,
+      "packageName": "3 oz",
+      "squareItemId": "2HWBBERFI42SO727UETRX3LC",
+      "squareVariationId": "TEZ2TYOGPELCZV5Z76SLIUQO",
+      "localRegularCents": 1650,
+      "localSellingCents": 1650,
+      "squareRegularCents": 1650,
+      "squareSellingCents": 1650,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805716,
+      "name": "New York Steak",
+      "packageId": 526769,
+      "packageName": "0.50 - 0.90 lbs",
+      "squareItemId": "3BVXZIN53VTEAN7WKAN5H5IT",
+      "squareVariationId": "DR6FL7HZECDHPLKVARMFC5ZP",
+      "localRegularCents": 3700,
+      "localSellingCents": 3700,
+      "squareRegularCents": 3700,
+      "squareSellingCents": 3700,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 1131922,
+      "name": "Old World Style Hot Dogs",
+      "packageId": 966337,
+      "packageName": "ea",
+      "squareItemId": "FKULRXIWE4PAV5FT5UFCEIJ2",
+      "squareVariationId": "7ZMRF4LFZTTE6W5HA6QEP4DZ",
+      "localRegularCents": 1950,
+      "localSellingCents": 1950,
+      "squareRegularCents": 1950,
+      "squareSellingCents": 1950,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 827440,
+      "name": "Olympia Provisions Frankfurter",
+      "packageId": 551690,
+      "packageName": "12 oz",
+      "squareItemId": "M2EUZHR6CW3FIKE46TVJRZKS",
+      "squareVariationId": "VMFVU6NDPXNNERM3NDFILLLQ",
+      "localRegularCents": 2000,
+      "localSellingCents": 2000,
+      "squareRegularCents": 2000,
+      "squareSellingCents": 2000,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 901753,
+      "name": "Olympia Provisions Saucisson D'Arles Salami",
+      "packageId": 644080,
+      "packageName": "4.5 oz",
+      "squareItemId": "NCRK2CIGU3RWNKQZ5DSPEJHD",
+      "squareVariationId": "JRXWL5BZVA7NYHYPW3CF7KDE",
+      "localRegularCents": 1500,
+      "localSellingCents": 1500,
+      "squareRegularCents": 1500,
+      "squareSellingCents": 1500,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 859028,
+      "name": "Olympia Provisions, Dog Treats",
+      "packageId": 588612,
+      "packageName": "5 oz",
+      "squareItemId": "WWWJVCE57A35KUIF5UDYVR4Z",
+      "squareVariationId": "7ONA7WTZJVR2U67PQAQ3GHDS",
+      "localRegularCents": 1800,
+      "localSellingCents": 1800,
+      "squareRegularCents": 1800,
+      "squareSellingCents": 1800,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805675,
+      "name": "Olympia Provisions, Rosette D'Oregon Salami",
+      "packageId": 526728,
+      "packageName": "4.5 oz",
+      "squareItemId": "5OHLTPGX3CFC65MUI72NMXJH",
+      "squareVariationId": "TFCA4G67CDKQ7QANG6E2EUYG",
+      "localRegularCents": 2000,
+      "localSellingCents": 2000,
+      "squareRegularCents": 2000,
+      "squareSellingCents": 2000,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 941005,
+      "name": "Organic Pasture Raised Chicken Eggs, 1 dozen",
+      "packageId": 695001,
+      "packageName": "1 dozen",
+      "squareItemId": "W3RENYXRDGQYXHKYBTHAEGAA",
+      "squareVariationId": "C4BHMDGUH33BFC5C7DTOMRN2",
+      "localRegularCents": 1200,
+      "localSellingCents": 1200,
+      "squareRegularCents": 1200,
+      "squareSellingCents": 1200,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805459,
+      "name": "Organic Pasture Raised Chicken Eggs, 1/2 dozen",
+      "packageId": 600222,
+      "packageName": "1/2 dozen",
+      "squareItemId": "WCJEJEUJB6IDKOGHDNB7FTCV",
+      "squareVariationId": "WMQYKADWBE26JTN7VMEISO5L",
+      "localRegularCents": 700,
+      "localSellingCents": 700,
+      "squareRegularCents": 700,
+      "squareSellingCents": 700,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805719,
+      "name": "Pastrami, Sliced",
+      "packageId": 526772,
+      "packageName": "8 oz",
+      "squareItemId": "MKVN3BV4B3OC3TBFSOH6ZFRW",
+      "squareVariationId": "HGB7UEJ7Z7FWXTD33M6L3J2Z",
+      "localRegularCents": 2000,
+      "localSellingCents": 2000,
+      "squareRegularCents": 2000,
+      "squareSellingCents": 2000,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805720,
+      "name": "Peppered Knife Cut Beef Jerky",
+      "packageId": 526773,
+      "packageName": "3 oz",
+      "squareItemId": "2DADSQP2PYSGJRZ7KUERQELH",
+      "squareVariationId": "567FGAI43XNCIV55IV2AJWSD",
+      "localRegularCents": 1800,
+      "localSellingCents": 1800,
+      "squareRegularCents": 1800,
+      "squareSellingCents": 1800,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805721,
+      "name": "Pepperoni stick",
+      "packageId": 526775,
+      "packageName": "6 oz",
+      "squareItemId": "WRXBRMIVAISDWMBWEFPPHIW2",
+      "squareVariationId": "DMFXNHXS7V5RTGKNKITJ67OM",
+      "localRegularCents": 2000,
+      "localSellingCents": 2000,
+      "squareRegularCents": 2000,
+      "squareSellingCents": 2000,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 813080,
+      "name": "Pet Food, Organ Blend",
+      "packageId": 535111,
+      "packageName": "1.00 lbs",
+      "squareItemId": "KMIWMJLL7C73ADSABAGDF4KO",
+      "squareVariationId": "U3KGBMTUXU63EPJN6A2CITXP",
+      "localRegularCents": 1200,
+      "localSellingCents": 1200,
+      "squareRegularCents": 1200,
+      "squareSellingCents": 1200,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805682,
+      "name": "Polish Kielbasa",
+      "packageId": 526735,
+      "packageName": "12 oz",
+      "squareItemId": "3QTLT4QV3NIQQBA3765JDEF4",
+      "squareVariationId": "HHOQSQYLPYEQC43R7E77SDNR",
+      "localRegularCents": 1950,
+      "localSellingCents": 1950,
+      "squareRegularCents": 1950,
+      "squareSellingCents": 1950,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 813078,
+      "name": "Pork Bones",
+      "packageId": 535108,
+      "packageName": "3.00 - 5.00 lbs",
+      "squareItemId": "HIBUHRVFDXAGQIDKI3N5UNVM",
+      "squareVariationId": "4Q3SG46WA27GRXGSATR4ZWCY",
+      "localRegularCents": 250,
+      "localSellingCents": 250,
+      "squareRegularCents": 250,
+      "squareSellingCents": 250,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805652,
+      "name": "Pork Chop, Bone-in",
+      "packageId": 526705,
+      "packageName": "1.20 - 1.50 lbs",
+      "squareItemId": "ILHEC25TNXQ4LPPDALYQPVZH",
+      "squareVariationId": "4DJSRX4DMOZJFDETAVUDZDHN",
+      "localRegularCents": 1600,
+      "localSellingCents": 1600,
+      "squareRegularCents": 1600,
+      "squareSellingCents": 1600,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 832792,
+      "name": "Pork Chop, Boneless",
+      "packageId": 558509,
+      "packageName": "1.20 - 1.50 lbs",
+      "squareItemId": "7TZ2PHV5WBRXETZIWZWGIHBA",
+      "squareVariationId": "AR35EOVCDNFZ4AVG3BN6K445",
+      "localRegularCents": 1800,
+      "localSellingCents": 1800,
+      "squareRegularCents": 1800,
+      "squareSellingCents": 1800,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 861798,
+      "name": "Pork Shank",
+      "packageId": 591682,
+      "packageName": "2.40 - 3.10 lbs",
+      "squareItemId": "K4HL4E6PATADGVGUS35GACMG",
+      "squareVariationId": "U6KFVHFNWEC2MTLAJWRHOVMW",
+      "localRegularCents": 1700,
+      "localSellingCents": 1700,
+      "squareRegularCents": 1700,
+      "squareSellingCents": 1700,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 940995,
+      "name": "Pork Shoulder Roast, Large",
+      "packageId": 694991,
+      "packageName": "Large, 2.80 - 3.50 lbs",
+      "squareItemId": "H52IIMV53U3SVJDSLMCPJB6Y",
+      "squareVariationId": "NCEKYJ2A7WLQT7NM6CQLV6SV",
+      "localRegularCents": 1800,
+      "localSellingCents": 1800,
+      "squareRegularCents": 1800,
+      "squareSellingCents": 1800,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 816241,
+      "name": "Pork Spare Ribs",
+      "packageId": 538685,
+      "packageName": "2.00 - 3.00 lbs",
+      "squareItemId": "CEBZQ67NEX43LADVLREWJ5RU",
+      "squareVariationId": "CA2YUN42QQ223DUUVGBVMR3G",
+      "localRegularCents": 1450,
+      "localSellingCents": 1450,
+      "squareRegularCents": 1450,
+      "squareSellingCents": 1450,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 816246,
+      "name": "Pork Tenderloin",
+      "packageId": 590546,
+      "packageName": "0.80 - 1.30 lbs",
+      "squareItemId": "7ZJBLPBIRJ553NT6K35NCQH4",
+      "squareVariationId": "UH3V2ZZSJBNSILFQ3OSCEFPU",
+      "localRegularCents": 1450,
+      "localSellingCents": 1450,
+      "squareRegularCents": 1450,
+      "squareSellingCents": 1450,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805659,
+      "name": "Rack of Lamb",
+      "packageId": 526712,
+      "packageName": "2.50 - 3.10 lbs",
+      "squareItemId": "KGXWEJBOL6XYYP6WDIGY7XKS",
+      "squareVariationId": "LBER4XSN4A4IEU5ERQNX6ZUE",
+      "localRegularCents": 2150,
+      "localSellingCents": 2150,
+      "squareRegularCents": 2150,
+      "squareSellingCents": 2150,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 806161,
+      "name": "Raw Honey, 1 pint",
+      "packageId": 527228,
+      "packageName": "1 pint",
+      "squareItemId": "IRMSDE3RXXZRQ5RGXN5MAUFY",
+      "squareVariationId": "VBA7QNBQN4DAJEBMIWY5BZ4I",
+      "localRegularCents": 2600,
+      "localSellingCents": 2600,
+      "squareRegularCents": 2600,
+      "squareSellingCents": 2600,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 941000,
+      "name": "Raw Honey, 1 quart",
+      "packageId": 694996,
+      "packageName": "1 quart",
+      "squareItemId": "7NILSMS7L35D2AIXMEWLSOAJ",
+      "squareVariationId": "WJG7GD5EUZ67ATJWK7QEQCAV",
+      "localRegularCents": 4750,
+      "localSellingCents": 4750,
+      "squareRegularCents": 4750,
+      "squareSellingCents": 4750,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 940998,
+      "name": "Raw Honey, 1/2 pint",
+      "packageId": 694994,
+      "packageName": "1/2 pint",
+      "squareItemId": "UDZUFDD4BZQV4OKACAQ55ZGA",
+      "squareVariationId": "5L6WZFWO6HESVITXZYJELIQJ",
+      "localRegularCents": 1700,
+      "localSellingCents": 1700,
+      "squareRegularCents": 1700,
+      "squareSellingCents": 1700,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 940994,
+      "name": "Raw Walnuts, 1/2 lb",
+      "packageId": 694990,
+      "packageName": "1/2 lb",
+      "squareItemId": "EYHJG4R7QXDA3RKAAGCCKO2N",
+      "squareVariationId": "ISXY3B7BIMVUUMYLEDGMEOX5",
+      "localRegularCents": 1400,
+      "localSellingCents": 1400,
+      "squareRegularCents": 1400,
+      "squareSellingCents": 1400,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 1004599,
+      "name": "Red Ranger Roasting Chicken, Medium",
+      "packageId": 784655,
+      "packageName": "Medium, 4.01 - 5.00 lbs",
+      "squareItemId": "N54VBMXA4Z5ZGU4DQZLCZWLD",
+      "squareVariationId": "RGGMDJ7X4YYPHNJ5RKPXDHJY",
+      "localRegularCents": 1000,
+      "localSellingCents": 900,
+      "squareRegularCents": 1000,
+      "squareSellingCents": 900,
+      "squareDiscountCents": 100,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805661,
+      "name": "Red Ranger Roasting Chicken, Small",
+      "packageId": 642346,
+      "packageName": "Small, 3.00 - 4.00 lbs",
+      "squareItemId": "RV3JWBI2MVGAZEFD3Z7RMLJL",
+      "squareVariationId": "MJLIJD3MJWYRUJDXYWKVBMCF",
+      "localRegularCents": 1000,
+      "localSellingCents": 900,
+      "squareRegularCents": 1000,
+      "squareSellingCents": 900,
+      "squareDiscountCents": 100,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805663,
+      "name": "Rendered Beef Tallow, 16 oz",
+      "packageId": 547722,
+      "packageName": "16 oz",
+      "squareItemId": "RKGG5ZUGZUOVIXY2KHABI5N7",
+      "squareVariationId": "3Y2UCCDHYT3VY5O63IAHKH6Z",
+      "localRegularCents": 2000,
+      "localSellingCents": 2000,
+      "squareRegularCents": 2000,
+      "squareSellingCents": 2000,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 941045,
+      "name": "Rendered Beef Tallow, 8 oz",
+      "packageId": 695051,
+      "packageName": "8 oz",
+      "squareItemId": "HVG4VFTHE3RMCAWBXDGPTBKG",
+      "squareVariationId": "4HFME7B2JIQDOLKVUVLVS6F7",
+      "localRegularCents": 1000,
+      "localSellingCents": 1000,
+      "squareRegularCents": 1000,
+      "squareSellingCents": 1000,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 929464,
+      "name": "Rendered Pork Leaf Lard, 16 oz",
+      "packageId": 677954,
+      "packageName": "16 oz",
+      "squareItemId": "WCUGXGC3XZNNDGNQLI6VQRCR",
+      "squareVariationId": "ZEJEZMPCSE323KHSR7HIV3CE",
+      "localRegularCents": 1600,
+      "localSellingCents": 1600,
+      "squareRegularCents": 1600,
+      "squareSellingCents": 1600,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805665,
+      "name": "Rendered Pork Leaf Lard, 8 oz",
+      "packageId": 595381,
+      "packageName": "8 oz",
+      "squareItemId": "SA4JK56BISQNLCQQWMRTR3UL",
+      "squareVariationId": "FSUAAXZ62XGTPFHUOBYNVTOI",
+      "localRegularCents": 1000,
+      "localSellingCents": 1000,
+      "squareRegularCents": 1000,
+      "squareSellingCents": 1000,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805668,
+      "name": "Ribeye Steak",
+      "packageId": 526721,
+      "packageName": "0.80 - 1.10 lbs",
+      "squareItemId": "SRKRCQW6FG5XOUPKH2TAGASK",
+      "squareVariationId": "XNUP7RT3X5TIKGXT6Z76HU2H",
+      "localRegularCents": 4050,
+      "localSellingCents": 4050,
+      "squareRegularCents": 4050,
+      "squareSellingCents": 4050,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805670,
+      "name": "Roast Beef, Sliced",
+      "packageId": 526723,
+      "packageName": "8 oz",
+      "squareItemId": "HQLROZH2OWSLSF3QZBETCFUU",
+      "squareVariationId": "NXIETAVWPT7OOSV3NRW2P5N2",
+      "localRegularCents": 2000,
+      "localSellingCents": 2000,
+      "squareRegularCents": 2000,
+      "squareSellingCents": 2000,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805678,
+      "name": "Sage & Sea Salt Sausage",
+      "packageId": 526731,
+      "packageName": "8 oz",
+      "squareItemId": "OL5XFDPFV7YXP5O4AHK6R464",
+      "squareVariationId": "22VTXVWPWRUOGSAMRP3FBFSD",
+      "localRegularCents": 1650,
+      "localSellingCents": 1650,
+      "squareRegularCents": 1650,
+      "squareSellingCents": 1650,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 929452,
+      "name": "Skirt Steak, Large",
+      "packageId": 677939,
+      "packageName": "Large, .80 - 1.20 lbs",
+      "squareItemId": "77WYOWU6KBIMIGE2NPMLNPFH",
+      "squareVariationId": "TVIOJDKULJFKZ7DC75ADRLML",
+      "localRegularCents": 2600,
+      "localSellingCents": 2600,
+      "squareRegularCents": 2600,
+      "squareSellingCents": 2600,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 1013987,
+      "name": "Smoked Pork Hocks -Skin-on and Smoked",
+      "packageId": 798011,
+      "packageName": "0.8 - 1.2 lbs",
+      "squareItemId": "R4NQPB7JMMTFNNECJOKHDET4",
+      "squareVariationId": "KGOFCNSLBVXUD75TOLKHFQB7",
+      "localRegularCents": 1650,
+      "localSellingCents": 1650,
+      "squareRegularCents": 1650,
+      "squareSellingCents": 1650,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805685,
+      "name": "Stewing Hen",
+      "packageId": 526738,
+      "packageName": "2 - 3 lbs",
+      "squareItemId": "SWAAL32DIRG2YSI7CY4652MD",
+      "squareVariationId": "42F457CBYE46V4266HXQBCFB",
+      "localRegularCents": 2200,
+      "localSellingCents": 2200,
+      "squareRegularCents": 2200,
+      "squareSellingCents": 2200,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805687,
+      "name": "Summer Sausage",
+      "packageId": 526740,
+      "packageName": "8 oz",
+      "squareItemId": "IGVW5XO7MRUVRIPCIM7VWN2Y",
+      "squareVariationId": "634VPLABW35HBLQMFSCMU6HA",
+      "localRegularCents": 1700,
+      "localSellingCents": 1700,
+      "squareRegularCents": 1700,
+      "squareSellingCents": 1700,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 1011872,
+      "name": "Swedish Sausage Potato Dumplings",
+      "packageId": 795004,
+      "packageName": "13oz/ 10 Dumplings/Pack",
+      "squareItemId": "BZSBJ76772CXFNCQVKRT7DTT",
+      "squareVariationId": "KF6PWHPNK4MJPTDJBLLYH3Z5",
+      "localRegularCents": 1800,
+      "localSellingCents": 1800,
+      "squareRegularCents": 1800,
+      "squareSellingCents": 1800,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 805692,
+      "name": "Sweet Italian Sausage Links",
+      "packageId": 526745,
+      "packageName": "12 oz",
+      "squareItemId": "4LJ2ZOMW2M7ZVJ6KA5VXFCY3",
+      "squareVariationId": "GG3UTPG3X2GJ2J2RCRGYBMMQ",
+      "localRegularCents": 1950,
+      "localSellingCents": 1950,
+      "squareRegularCents": 1950,
+      "squareSellingCents": 1950,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 813069,
+      "name": "Teres Major Steak",
+      "packageId": 535099,
+      "packageName": "0.40 - 0.70 lbs",
+      "squareItemId": "IEAP53MPU6KHNAAHK55UTMDH",
+      "squareVariationId": "QGGOCDMYYFFICWGSUMGZUQNP",
+      "localRegularCents": 2600,
+      "localSellingCents": 2600,
+      "squareRegularCents": 2600,
+      "squareSellingCents": 2600,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 913650,
+      "name": "Thai Curry Sausage Links",
+      "packageId": 659186,
+      "packageName": "4 links/ pack 14 oz pack",
+      "squareItemId": "YV5NJYNQTUZQY7FEXCLEU5VU",
+      "squareVariationId": "26M5W4W6YJGAXVNWVIOUSNUU",
+      "localRegularCents": 2000,
+      "localSellingCents": 2000,
+      "squareRegularCents": 2000,
+      "squareSellingCents": 2000,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 814845,
+      "name": "Top Sirloin Steak",
+      "packageId": 536948,
+      "packageName": "1.30 - 1.60 lbs",
+      "squareItemId": "XRZSVBUMXIX6WN46EJWZP3NW",
+      "squareVariationId": "JZ7GSDAEMS6X7ENYGAG3MO2Z",
+      "localRegularCents": 2500,
+      "localSellingCents": 2500,
+      "squareRegularCents": 2500,
+      "squareSellingCents": 2500,
+      "squareDiscountCents": 0,
+      "unit": "lb",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    },
+    {
+      "productId": 1131921,
+      "name": "Turkey Apple Sage Sausage Links",
+      "packageId": 966336,
+      "packageName": "ea",
+      "squareItemId": "EMLOI6VDW2L4CQCOJWU2BDGO",
+      "squareVariationId": "PNCJYNXMQKMJD64ANYNXGGQC",
+      "localRegularCents": 2000,
+      "localSellingCents": 2000,
+      "squareRegularCents": 2000,
+      "squareSellingCents": 2000,
+      "squareDiscountCents": 0,
+      "unit": "each",
+      "publicationStatus": "verified",
+      "sync": {
+        "platform": "square",
+        "label": "Sq",
+        "state": "matched",
+        "reason": "Prices match the latest channel check"
+      },
+      "verified": true,
+      "issues": []
+    }
+  ]
+}

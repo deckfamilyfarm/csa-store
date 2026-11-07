@@ -1,0 +1,38 @@
+{
+  "status": "completed",
+  "drumsticks": {
+    "name": "CRX Drumsticks",
+    "price": 12,
+    "unit": "lb",
+    "squareItemId": "JC2T5KZH3TVIIXDDJA2EYVQS",
+    "squareVariationId": "ZO43VQG6PHP7LWKPZXZP2P44"
+  },
+  "deletedItems": 12,
+  "deletedNames": [
+    "EE Blackberry Handpie",
+    "EE 7 layer bar",
+    "EE 7 Layer Bar",
+    "Chorizo (Bulk)",
+    "EE Chocolat Chip Brownie",
+    "EE chocolate donut",
+    "Honey 1/2 pint",
+    "Pint Honey",
+    "Quart Honey",
+    "Hotdogs Beef&Pork",
+    "Chops (Pork)",
+    "Pork Chops"
+  ],
+  "protectedLinkedItems": [
+    "Bulk Farm Made Chorizo Rojo Sausage",
+    "Gluten Free Brownie Bite with Chocolate Chips",
+    "Gluten Free Chocolate Donut",
+    "Raw Honey, 1/2 pint",
+    "Raw Honey, 1 pint",
+    "Raw Honey, 1 quart",
+    "Old World Style Hot Dogs",
+    "Pork Chop, Bone-in",
+    "Pork Chop, Boneless"
+  ],
+  "localPackageLinksUnchanged": true,
+  "confirmedAt": "2026-11-06T20:16:37.690Z"
+}
