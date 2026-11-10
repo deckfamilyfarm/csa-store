@@ -1,0 +1,75 @@
+{
+  "status": "completed",
+  "activeDiscounts": 8,
+  "locationsVerified": 12,
+  "allSquareLocations": true,
+  "hillsdale": [
+    {
+      "name": "Bulk English Breakfast Sausage",
+      "unit": "each",
+      "regular": 16.5,
+      "sale": 14.85,
+      "discountPercent": 10,
+      "verified": true
+    },
+    {
+      "name": "Beef Liver",
+      "unit": "lb",
+      "regular": 15,
+      "sale": 13.5,
+      "discountPercent": 10,
+      "verified": true
+    },
+    {
+      "name": "Red Ranger Roasting Chicken, Small",
+      "unit": "lb",
+      "regular": 10,
+      "sale": 9,
+      "discountPercent": 10,
+      "verified": true
+    },
+    {
+      "name": "Red Ranger Roasting Chicken, Medium",
+      "unit": "lb",
+      "regular": 10,
+      "sale": 9,
+      "discountPercent": 10,
+      "verified": true
+    },
+    {
+      "name": "Red Ranger Roasting Chicken, Large",
+      "unit": "lb",
+      "regular": 10,
+      "sale": 9,
+      "discountPercent": 10,
+      "verified": true
+    },
+    {
+      "name": "Cornish Roasting Chicken, Large",
+      "unit": "lb",
+      "regular": 8.5,
+      "sale": 7.65,
+      "discountPercent": 10,
+      "verified": true
+    },
+    {
+      "name": "Cornish Roasting Chicken, Medium",
+      "unit": "lb",
+      "regular": 9,
+      "sale": 8.1,
+      "discountPercent": 10,
+      "verified": true
+    },
+    {
+      "name": "Cornish Roasting Chicken, Extra Large",
+      "unit": "lb",
+      "regular": 8,
+      "sale": 7.2,
+      "discountPercent": 10,
+      "verified": true
+    }
+  ],
+  "localPricesAndSalesUnchanged": true,
+  "localLineWrites": 0,
+  "confirmedAt": "2026-11-08T17:53:32.801Z"
+}

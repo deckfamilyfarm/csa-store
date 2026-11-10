@@ -1,0 +1,35 @@
+{
+  "rows": [
+    {
+      "product": "Bulk English Breakfast Sausage",
+      "from": 16.5,
+      "to": 14.5,
+      "changedAt": "2026-11-07T18:16:10.733Z",
+      "pacific": "Nov 7, 2026, 10:16:10 AM PST",
+      "source": "Not identified; no matching CSA Store publication receipt found",
+      "device": null,
+      "originatingLocation": null
+    },
+    {
+      "product": "Beef Liver",
+      "from": 15,
+      "to": 13.5,
+      "changedAt": "2026-11-07T21:15:28.381Z",
+      "pacific": "Nov 7, 2026, 1:15:28 PM PST",
+      "source": "Not identified; no matching CSA Store publication receipt found",
+      "device": null,
+      "originatingLocation": null
+    },
+    {
+      "product": "Red Ranger Roasting Chicken, Large",
+      "from": 10,
+      "to": 9,
+      "changedAt": "2026-10-01T20:06:05.616Z",
+      "pacific": "Oct 1, 2026, 1:06:05 PM PDT",
+      "source": "CSA Store Product Sync release 3, account jdeck",
+      "device": null,
+      "originatingLocation": null
+    }
+  ],
+  "limitations": "Square catalog version records identify values and times, but do not expose an editing user, device, or originating location. A shared base-price edit does not establish the physical location where it was made. Recorded CSA account attribution is available only for the chicken publication."
+}

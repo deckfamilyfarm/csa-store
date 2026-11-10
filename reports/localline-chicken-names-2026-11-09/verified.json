@@ -1,0 +1,19 @@
+{
+  "status": "completed",
+  "changes": [
+    {
+      "localProductId": 1163731,
+      "localLineProductId": 1164544,
+      "previousName": "CRX Thighs",
+      "name": "Chicken Thighs"
+    },
+    {
+      "localProductId": 1163732,
+      "localLineProductId": 1164545,
+      "previousName": "CRX Drumsticks",
+      "name": "Chicken Drumsticks"
+    }
+  ],
+  "pricesPackagesInventoryAndLocalCatalogUnchanged": true,
+  "confirmedAt": "2026-11-09T14:53:31.457Z"
+}
