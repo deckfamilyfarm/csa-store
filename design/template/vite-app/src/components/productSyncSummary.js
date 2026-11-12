@@ -4,6 +4,10 @@ export const syncMoney = cents => cents == null || !Number.isFinite(Number(cents
 const priceCents = value => value == null || value === "" || !Number.isFinite(Number(value)) ? null : Math.round(Number(value) * 100);
 export function productSyncSummary(action) {
   if (action.direction === "incoming") return null;
+  if (action.platform === 'square' && action.kind === 'image') return {
+    prices: [], notes: ['Use the saved primary product photo as the POS icon at every location where this Square item is available. This also updates the primary Square Online image. Other Square photos are kept.'],
+    otherGroups: [], changed: action.status !== 'synced'
+  };
   const groups = comparisonGroups(action);
   const notes = [];
   const prices = [];

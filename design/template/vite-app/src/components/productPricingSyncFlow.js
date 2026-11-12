@@ -9,12 +9,13 @@ export const publicationRunning = release => ['queued', 'running'].includes(rele
 export function publicationMessage(release) {
   const platforms = releasePlatforms(release);
   const label = channelNames(platforms.length ? platforms : ['localline']);
-  if (release.status === 'completed') return label === 'Local Line' ? 'Synced — Local Line prices and sale verified.' : `Synced — ${label} prices verified.`;
+  const changes = (release.actions || []).some(a => a.kind === 'image') ? 'prices and Square photos' : 'prices';
+  if (release.status === 'completed') return label === 'Local Line' ? 'Synced — Local Line prices and sale verified.' : `Synced — ${label} ${changes} verified.`;
   if (release.status === 'queued') return 'Waiting for the server to start your update…';
   const labels = {
     'Checking local values, product match, and current remote values.': `Fetching prices from ${label} and checking your saved changes…`,
-    'Applying approved values.': label === 'Local Line' ? 'Updating prices and sale on Local Line…' : `Updating prices on ${label}…`,
-    'Confirming the published values with the destination.': `Verifying the updated prices on ${label}…`
+    'Applying approved values.': label === 'Local Line' ? 'Updating prices and sale on Local Line…' : `Updating ${changes} on ${label}…`,
+    'Confirming the published values with the destination.': `Verifying the updated ${changes} on ${label}…`
   };
   const messages = [...new Set((release.actions || []).filter(a => a.status !== 'completed' || platforms.length > 1).map(a => {
     const message = a.status === 'completed' ? 'Synced.' : labels[a.message] || a.message;
@@ -43,6 +44,7 @@ export async function syncProductChannels({ productId, data, resume, get, post, 
     progress(`Fetching current prices from ${label}…`);
     const audit = await post('product-sync/audits', { platforms, productIds: [Number(productId)],
       productScope: 'selected', vendorGroup: 'all', enterpriseRevisionId: data.revisionId,
+      ...(platforms.includes('square') ? { includeSquareImages: true } : {}),
       publicationScope: onlyLL ? 'localline-prices-and-sales' : 'enterprise-selected-prices', incoming: false, productEditorSync: true });
     job = { auditId: audit.id, revisionId: data.revisionId, platforms };
     saveJob(job);

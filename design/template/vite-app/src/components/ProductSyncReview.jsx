@@ -38,6 +38,14 @@ function ComparisonTables({ groups, action }) {
     <tbody>{group.rows.map(row => <tr key={row.key}><th scope="row">{row.label}</th><td>{valueText(row.current)}</td><td>{valueText(row.proposed)}</td></tr>)}</tbody></table></div>);
 }
 export function Comparison({ action, all = false }) {
+  if (action.platform === 'square' && action.kind === 'image') return <div className="sync-comparison">
+    <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+      {['current', 'proposed'].map(side => <figure key={side} style={{ margin: 0 }}><figcaption>{side === 'current' ? 'Current Square icon' : 'Saved product photo'}</figcaption>
+        {action.display?.[side]?.image ? <img src={action.display[side].image} alt={side === 'current' ? `${action.productName}: current Square photo` : `${action.productName}: proposed Square photo`} loading="lazy" style={{ width: 140, height: 140, objectFit: 'contain' }} /> : <p>No photo</p>}
+      </figure>)}
+    </div>
+    <p className="small">Applies to every location where this item is available, including its primary Square Online image. Other Square photos are kept.</p>
+  </div>;
   const groups = comparisonGroups(action, !all);
   const summary = productSyncSummary(action);
   return <div className="sync-comparison">
@@ -60,13 +68,13 @@ export function ActionRow({ action, selected, onToggle, eligible, busy }) {
   return <div className="sync-action">
     <div className="sync-action-heading">
       <label><input type="checkbox" checked={selected} onChange={onToggle} disabled={busy || !eligible} aria-label={`Select ${PLATFORM_NAMES[action.platform]} ${action.productName} ${action.packageName || action.kind}`} />
-        <strong>{PLATFORM_NAMES[action.platform]}</strong> {action.packageName || (action.kind === "create" ? "Create product" : action.direction === "incoming" ? "Local catalog repair" : "Product update")}
+        <strong>{PLATFORM_NAMES[action.platform]}</strong> {action.packageName || (action.kind === 'image' ? 'Primary photo · all locations' : action.kind === "create" ? "Create product" : action.direction === "incoming" ? "Local catalog repair" : "Product update")}
       </label>
       <span className={`sync-status ${action.status}`}>{action.released ? "In release" : action.status}</span>
     </div>
     {action.message && <p className="small">{action.message}</p>}
     {action.result?.message && <p className="small">{action.result.message}</p>}
-    {action.display && <>
+    {action.display && action.kind === 'image' ? <Comparison action={action} /> : action.display && <>
       <div className="sync-preview">{differences.slice(0, 3).map(row => <span key={row.key}><b>{fieldLabel(row.key)}:</b> {valueText(row.current)} → {valueText(row.proposed)}</span>)}</div>
       <details><summary>Review {differences.length} changed fields and all proposed values</summary><Comparison action={action} all /></details>
     </>}

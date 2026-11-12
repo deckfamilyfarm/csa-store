@@ -101,8 +101,16 @@ test('Square-only and Both sync include exactly the selected destinations', asyn
     assert.deepEqual(h.posts[0].body.platforms,platforms);
     assert.equal(h.posts[0].body.productEditorSync,true);
     assert.equal(h.posts[0].body.publicationScope,'enterprise-selected-prices');
+    assert.equal(h.posts[0].body.includeSquareImages,true);
     assert.equal(h.posts[1].body.actionIds.length,platforms.length);
   }
+});
+test('Square photo work uses the same release and appears in publication status', async () => {
+  const actions = [{ ...action, platform: 'square', kind: 'price' }, { ...action, id: 8, platform: 'square', kind: 'image' }];
+  const h = harness({ actions });
+  await syncProductChannels({ ...h.args, data: { ...data, input: { squareEnabled: true } }, platforms: ['square'] });
+  assert.deepEqual(h.posts.at(-1).body.actionIds, [7, 8]);
+  assert.match(publicationMessage({ status: 'completed', actions }), /photos.*verified/);
 });
 test('Both sync refuses partial checks; recovery cannot switch destinations', async()=>{
   const h=harness();

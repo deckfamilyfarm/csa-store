@@ -45,7 +45,7 @@ export function auditScopeText(audit) {
   const products = scope === "all" ? `All ${options.auditedProductCount ?? ""} products`.replace("  ", " ")
     : `${requested} ${scope} product${requested === 1 ? "" : "s"}${options.auditedProductCount != null && options.auditedProductCount !== requested ? ` (${options.auditedProductCount} in vendor scope)` : ""}`;
   const vendors = options.vendorGroup === "deck-enterprises" ? "Deck Enterprises" : options.vendorGroup === "all" ? "All vendors" : "Previous vendor scope";
-  return `${products} · ${vendors} · ${(options.platforms || []).map(platform => PLATFORM_NAMES[platform]).join(" + ")}`;
+  return `${products} · ${vendors} · ${(options.platforms || []).map(platform => PLATFORM_NAMES[platform]).join(" + ")}${options.squareImagesOnly ? ' · Product images — all locations' : options.includeSquareImages ? ' · Includes saved photos' : ''}`;
 }
 export function pacificDateTime(value) {
   if (!value) return "Never";

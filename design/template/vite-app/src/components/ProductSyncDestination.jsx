@@ -11,6 +11,7 @@ export function ProductSyncDestination({ platform, token, roles, connection, han
   const label = PLATFORM_NAMES[platform];
   const [open, setOpen] = useState(true);
   const [vendorGroup, setVendorGroup] = useState("deck-enterprises");
+  const [squareCheck, setSquareCheck] = useState('prices');
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [localMatches, setLocalMatches] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
@@ -103,7 +104,8 @@ export function ProductSyncDestination({ platform, token, roles, connection, han
       const included = new Set(productIds);
       const result = await adminPost("product-sync/audits", token, { platforms: [platform], vendorGroup, productIds,
         productScope: productIds.length ? "selected" : "all", incoming,
-        staged: (scope?.staged || []).filter(row => included.has(row.productId)) });
+        ...(platform === 'square' ? squareCheck === 'images' ? { squareImagesOnly: true } : { includeSquareImages: true } : {}),
+        staged: platform === 'square' && squareCheck === 'images' ? [] : (scope?.staged || []).filter(row => included.has(row.productId)) });
       setAudit(await adminGet(`product-sync/audits/${result.id}`, token));
       setSelection([]); setData(emptyResults()); setFilters({ status: "changed", search: "", vendor: "", page: 1 });
       onAuditCreated?.(result.id, platform);
@@ -135,9 +137,9 @@ export function ProductSyncDestination({ platform, token, roles, connection, han
         const scheduledAt = approval.mode === "schedule" ? candidates[foldChoice] : null;
         if (approval.mode === "schedule" && (!scheduledAt || Date.parse(scheduledAt) <= Date.now())) throw new Error("Choose a future hourly Pacific time.");
         const result = await adminPost("product-sync/releases", token, { auditId: audit.id, actionIds: selection, name: releaseName, scheduledAt, background: !scheduledAt });
-        onReleaseCreated(result, scope?.entries || []);
+        onReleaseCreated(result, audit.options?.squareImagesOnly ? [] : scope?.entries || []);
         const ids = new Set((result.actions || []).map(action => action.productId));
-        setScope(prev => prev ? { ...prev, staged: (prev.staged || []).filter(row => !ids.has(row.productId)), entries: (prev.entries || []).filter(entry => !ids.has(entry.meta.productId)) } : null);
+        if (!audit.options?.squareImagesOnly) setScope(prev => prev ? { ...prev, staged: (prev.staged || []).filter(row => !ids.has(row.productId)), entries: (prev.entries || []).filter(entry => !ids.has(entry.meta.productId)) } : null);
         if (scheduledAt) setMessage(`Scheduled “${result.name}” for ${pacificDateTime(scheduledAt)}. See history below.`);
       }
       setApproval(null); setSelection([]); setReload(value => value + 1); onRefresh();
@@ -145,18 +147,22 @@ export function ProductSyncDestination({ platform, token, roles, connection, han
     });
   }
   const checkBusy = !!busy || auditing || loadingProducts;
-  const allLabel = incoming ? "Check incoming Local Line changes" : scopedIds ? `Check ${scopedIds.length} products from Products` : platform === "square" ? "Check Square prices" : vendorGroup === "all" ? "Check all vendors’ products" : "Check all Deck Enterprises products";
+  const squareImages = platform === 'square' && squareCheck === 'images';
+  const allLabel = incoming ? "Check incoming Local Line changes" : scopedIds ? `Check ${scopedIds.length} products from Products` : platform === "square" ? squareImages ? "Check Square images" : "Check Square prices & images" : vendorGroup === "all" ? "Check all vendors’ products" : "Check all Deck Enterprises products";
   return <details className="sync-destination" open={open} onToggle={event => setOpen(event.currentTarget.open)}>
-    <summary>{incoming ? "Incoming Local Line repairs" : platform === "localline" ? "Local Line — Products & updates" : "Square — Matches & prices"}</summary>
+    <summary>{incoming ? "Incoming Local Line repairs" : platform === "localline" ? "Local Line — Products & updates" : "Square — Matches, prices & images"}</summary>
     <div className="sync-destination-body">
-      <p>{incoming ? "Review supported changes from Local Line before changing local products. Formula price differences remain review only." : platform === "localline" ? "See your product links, check Local Line for differences, then review what to publish." : "Connect local packages to Square items and update Square from your local retail prices."}</p>
+      <p>{incoming ? "Review supported changes from Local Line before changing local products. Formula price differences remain review only." : platform === "localline" ? "See your product links, check Local Line for differences, then review what to publish." : "Connect local packages to Square items and publish reviewed prices or saved product photos."}</p>
       <p className="small">{connection?.enabled ? "Connected" : "Not configured"} · Last comparison refresh: {pacificDateTime(connection?.lastRefresh)} · Last publication: {pacificDateTime(connection?.lastPush)} · {connection?.pending || 0} approved updates waiting · {connection?.failed || 0} need attention</p>
       {error && <div className="form-message error" role="alert">{error}</div>}{message && <div className="form-message success" role="status">{message}</div>}
       <div className="sync-audit-controls">
+        {platform === 'square' && <label>Check<select className="input" aria-label="Square check type" value={squareCheck} disabled={checkBusy} onChange={event => { setSquareCheck(event.target.value); resetResults(); }}><option value="prices">Prices, selling units & images</option><option value="images">Product images — all locations</option></select></label>}
         <label>Vendors<select className="input" aria-label={`${label} vendors`} value={vendorGroup} disabled={checkBusy} onChange={event => changeVendor(event.target.value)}><option value="deck-enterprises">Deck Enterprises</option><option value="all">All vendors</option></select></label>
         <button className="button" disabled={checkBusy || !connection?.enabled || (incoming && !has("localline_pull"))} onClick={() => runAudit()}>{auditing ? "Checking…" : allLabel}</button>
         {!incoming && <button className="button alt" disabled={checkBusy || !connection?.enabled || !selectedProducts.length} onClick={() => runAudit(selectedProducts)}>Check selected products ({selectedProducts.length})</button>}
       </div>
+      {squareImages && <p className="small">Use each product’s saved primary photo as its Square POS icon at every location where the matched item is available. This also changes the primary Square Online image. Other Square photos are kept; products without saved photos are left unchanged. Select All vendors to check the entire catalog.</p>}
+      {platform === 'square' && !squareImages && <p className="small">Checks include saved primary photos as well as prices and selling units. Photo updates apply to every location where the item is available and its primary Square Online image. Other Square photos are kept.</p>}
       <p className="small">{vendorGroup === "deck-enterprises" ? "Deck Enterprises: Deck Family Farm, Hyland, and Creamy Cow. " : "All vendors. "}Checking reads current data; it does not publish. {scopedIds ? "Limited to the selection from Products." : "The full check includes all products in this vendor scope, regardless of search or status filters."}</p>
       {scopedIds && <div className="sync-scope"><span>{scopedIds.length} products from Products · {scope?.staged?.length || 0} staged drafts</span><button disabled={checkBusy} onClick={() => { setScope(null); setSelectedProducts([]); resetResults(); onClearScope?.(); }}>Clear selection from Products</button></div>}
       {platform === "localline" && !incoming && <LocalLineProductMatches rows={localMatches} vendorGroup={vendorGroup} scopeIds={scopedIds} selected={selectedProducts} onSelect={setSelectedProducts} onCheck={runAudit} onReview={row => loadSaved(row.latestComparison.auditId, row.id)} busy={!!busy || auditing} loading={loadingProducts} />}
@@ -167,7 +173,7 @@ export function ProductSyncDestination({ platform, token, roles, connection, han
         {auditing ? <div className="sync-audit-loading" role="status"><strong><span className="sync-spinner" />Checking {label} products…</strong><p>Nothing is being published. You can leave this page and return.</p><p>{(audit.overview || []).filter(row => row.platform === platform && row.direction === direction).reduce((count, row) => count + row.productCount, 0)} products checked</p></div> : <>
           <div className="sync-filters"><input className="input" type="search" aria-label={`Search ${label} review`} placeholder="Search reviewed products" value={filters.search} onChange={event => changeFilter("search", event.target.value)} /><select className="input" aria-label={`${label} review status`} value={filters.status} onChange={event => changeFilter("status", event.target.value)}>{["changed", "all", "synced", "blocked", "review", "held", "applied"].map(value => <option key={value} value={value}>{value === "changed" ? "Updates awaiting approval" : value === "synced" ? "Matching at time of check" : value === "all" ? "All results" : value}</option>)}</select></div>
           <div className="sync-selection"><span>{selection.length} {incoming ? "repairs" : "updates"} selected · {data.productCount || 0} products in this review</span><button disabled={resultsStale || !!busy || !has(incoming ? "localline_pull" : `${platform}_push`)} onClick={selectFiltered}>Select all eligible updates in this view</button><button disabled={!selection.length || !!busy} onClick={() => setSelection([])}>Clear updates</button>
-            <button className="button" disabled={!selection.length || !!busy || resultsStale} onClick={() => openApproval(incoming ? "incoming" : "now")}>{incoming ? "Review selected repairs" : platform === "square" ? "Publish selected prices to Square" : "Publish selected to Local Line"}</button>
+            <button className="button" disabled={!selection.length || !!busy || resultsStale} onClick={() => openApproval(incoming ? "incoming" : "now")}>{incoming ? "Review selected repairs" : platform === "square" ? audit.options?.squareImagesOnly ? "Publish selected images to Square" : audit.options?.includeSquareImages ? "Publish selected updates to Square" : "Publish selected prices to Square" : "Publish selected to Local Line"}</button>
             {!incoming && has("pricing_admin") && <button className="button alt" disabled={!selection.length || !!busy || resultsStale} onClick={() => openApproval("schedule")}>Schedule updates</button>}
           </div>
           {resultsStale && <p role="status">{resultsLoading || filters.search !== search ? "Loading comparison results…" : "Results could not refresh. Refresh the page to try again."}</p>}

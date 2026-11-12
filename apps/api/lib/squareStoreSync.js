@@ -131,7 +131,7 @@ async function fetchSquare(path, options = {}) {
     headers: {
       Authorization: `Bearer ${config.accessToken}`,
       "Square-Version": config.apiVersion,
-      "Content-Type": "application/json",
+      ...(options.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
       ...(options.headers || {})
     }
   });

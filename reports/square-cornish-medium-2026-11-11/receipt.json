@@ -1,0 +1,769 @@
+{
+  "createdAt": "2026-11-11T22:24:38.895Z",
+  "targetHash": "a4baff6de1cd0a594fc885b5a2e17746203945f7815490d7fd6abd7350645906",
+  "locations": [
+    {
+      "id": "C0T7DVZY5XVG5",
+      "name": "Deck Family Farm Market Booths and Farm Sales"
+    },
+    {
+      "id": "LJS8Z7FW504J5",
+      "name": "Hillsdale"
+    },
+    {
+      "id": "L1MHNE83A8XPY",
+      "name": "Hollywood"
+    },
+    {
+      "id": "LP8AY4081PK5E",
+      "name": "King"
+    },
+    {
+      "id": "LWREC814AB8A4",
+      "name": "LCFM"
+    },
+    {
+      "id": "LJGEXCF3N7XJ4",
+      "name": "Montavilla"
+    },
+    {
+      "id": "LVKCGC3H1QMYX",
+      "name": "PSU"
+    },
+    {
+      "id": "LBECN1NEXPGRJ",
+      "name": "Scandinavian Festival"
+    },
+    {
+      "id": "L307W0S4THZP3",
+      "name": "Springfield"
+    },
+    {
+      "id": "L373VS1QADC37",
+      "name": "St. John’s"
+    },
+    {
+      "id": "LKX3NDPZ68H74",
+      "name": "Woodstock"
+    }
+  ],
+  "category": {
+    "id": "4BULFZ6WXLWXCCQF32Q6Z3FV",
+    "name": "Roasters & Turkeys"
+  },
+  "actions": [
+    {
+      "name": "Cornish Roasting Chicken, Large",
+      "active": false,
+      "before": {
+        "type": "ITEM",
+        "id": "3F6IUR3J5TAXR76YKRFJTIJZ",
+        "updated_at": "2026-11-11T22:22:35.258Z",
+        "created_at": "2026-11-06T15:03:48.499Z",
+        "version": 1794435755258,
+        "is_deleted": false,
+        "present_at_all_locations": true,
+        "item_data": {
+          "name": "Cornish Roasting Chicken, Large",
+          "abbreviation": "CRX",
+          "is_taxable": true,
+          "variations": [
+            {
+              "type": "ITEM_VARIATION",
+              "id": "6FTWRRVJOABLCLDGSXTCYAUQ",
+              "updated_at": "2026-11-11T20:53:48.8Z",
+              "created_at": "2026-11-06T15:03:48.499Z",
+              "version": 1794430428800,
+              "is_deleted": false,
+              "present_at_all_locations": true,
+              "item_variation_data": {
+                "item_id": "3F6IUR3J5TAXR76YKRFJTIJZ",
+                "name": "Large, 4.21 - 4.99 lbs",
+                "sku": "999999000060",
+                "ordinal": 0,
+                "pricing_type": "FIXED_PRICING",
+                "price_money": {
+                  "amount": 900,
+                  "currency": "USD"
+                },
+                "service_duration": 0,
+                "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+                "sellable": true,
+                "stockable": true,
+                "channels": [
+                  "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o",
+                  "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC"
+                ]
+              }
+            }
+          ],
+          "product_type": "REGULAR",
+          "skip_modifier_screen": false,
+          "ecom_visibility": "VISIBLE",
+          "image_ids": [
+            "EQWWMPQ2AV6SISJFZUNLRKXU"
+          ],
+          "channels": [
+            "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o",
+            "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC"
+          ],
+          "is_archived": false
+        }
+      },
+      "request": {
+        "idempotency_key": "3bf99246-022f-418d-b4f8-9b1d161abed1",
+        "object": {
+          "type": "ITEM",
+          "id": "3F6IUR3J5TAXR76YKRFJTIJZ",
+          "updated_at": "2026-11-11T22:22:35.258Z",
+          "created_at": "2026-11-06T15:03:48.499Z",
+          "version": 1794435755258,
+          "is_deleted": false,
+          "present_at_all_locations": true,
+          "item_data": {
+            "name": "Cornish Roasting Chicken, Large",
+            "abbreviation": "CRX",
+            "is_taxable": true,
+            "variations": [
+              {
+                "type": "ITEM_VARIATION",
+                "id": "6FTWRRVJOABLCLDGSXTCYAUQ",
+                "updated_at": "2026-11-11T20:53:48.8Z",
+                "created_at": "2026-11-06T15:03:48.499Z",
+                "version": 1794430428800,
+                "is_deleted": false,
+                "present_at_all_locations": true,
+                "item_variation_data": {
+                  "item_id": "3F6IUR3J5TAXR76YKRFJTIJZ",
+                  "name": "Large, 4.21 - 4.99 lbs",
+                  "sku": "999999000060",
+                  "ordinal": 0,
+                  "pricing_type": "FIXED_PRICING",
+                  "price_money": {
+                    "amount": 900,
+                    "currency": "USD"
+                  },
+                  "service_duration": 0,
+                  "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+                  "sellable": true,
+                  "stockable": true,
+                  "channels": [
+                    "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o",
+                    "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC"
+                  ]
+                },
+                "absent_at_location_ids": [
+                  "C0T7DVZY5XVG5",
+                  "L1MHNE83A8XPY",
+                  "L307W0S4THZP3",
+                  "L373VS1QADC37",
+                  "LBECN1NEXPGRJ",
+                  "LJGEXCF3N7XJ4",
+                  "LJS8Z7FW504J5",
+                  "LKX3NDPZ68H74",
+                  "LP8AY4081PK5E",
+                  "LVKCGC3H1QMYX",
+                  "LWREC814AB8A4"
+                ]
+              }
+            ],
+            "product_type": "REGULAR",
+            "skip_modifier_screen": false,
+            "ecom_visibility": "VISIBLE",
+            "image_ids": [
+              "EQWWMPQ2AV6SISJFZUNLRKXU"
+            ],
+            "channels": [
+              "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o",
+              "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC"
+            ],
+            "is_archived": false,
+            "categories": [
+              {
+                "id": "4BULFZ6WXLWXCCQF32Q6Z3FV"
+              }
+            ]
+          },
+          "absent_at_location_ids": [
+            "C0T7DVZY5XVG5",
+            "L1MHNE83A8XPY",
+            "L307W0S4THZP3",
+            "L373VS1QADC37",
+            "LBECN1NEXPGRJ",
+            "LJGEXCF3N7XJ4",
+            "LJS8Z7FW504J5",
+            "LKX3NDPZ68H74",
+            "LP8AY4081PK5E",
+            "LVKCGC3H1QMYX",
+            "LWREC814AB8A4"
+          ]
+        }
+      },
+      "status": "confirmed",
+      "confirmed": {
+        "type": "ITEM",
+        "id": "3F6IUR3J5TAXR76YKRFJTIJZ",
+        "updated_at": "2026-11-11T22:24:51.026Z",
+        "created_at": "2026-11-06T15:03:48.499Z",
+        "version": 1794435891026,
+        "is_deleted": false,
+        "present_at_all_locations": true,
+        "absent_at_location_ids": [
+          "C0T7DVZY5XVG5",
+          "L1MHNE83A8XPY",
+          "L307W0S4THZP3",
+          "L373VS1QADC37",
+          "LBECN1NEXPGRJ",
+          "LJGEXCF3N7XJ4",
+          "LJS8Z7FW504J5",
+          "LKX3NDPZ68H74",
+          "LP8AY4081PK5E",
+          "LVKCGC3H1QMYX",
+          "LWREC814AB8A4"
+        ],
+        "item_data": {
+          "name": "Cornish Roasting Chicken, Large",
+          "abbreviation": "CRX",
+          "is_taxable": true,
+          "variations": [
+            {
+              "type": "ITEM_VARIATION",
+              "id": "6FTWRRVJOABLCLDGSXTCYAUQ",
+              "updated_at": "2026-11-11T22:24:51.026Z",
+              "created_at": "2026-11-06T15:03:48.499Z",
+              "version": 1794435891026,
+              "is_deleted": false,
+              "present_at_all_locations": true,
+              "absent_at_location_ids": [
+                "C0T7DVZY5XVG5",
+                "L1MHNE83A8XPY",
+                "L307W0S4THZP3",
+                "L373VS1QADC37",
+                "LBECN1NEXPGRJ",
+                "LJGEXCF3N7XJ4",
+                "LJS8Z7FW504J5",
+                "LKX3NDPZ68H74",
+                "LP8AY4081PK5E",
+                "LVKCGC3H1QMYX",
+                "LWREC814AB8A4"
+              ],
+              "item_variation_data": {
+                "item_id": "3F6IUR3J5TAXR76YKRFJTIJZ",
+                "name": "Large, 4.21 - 4.99 lbs",
+                "sku": "999999000060",
+                "ordinal": 0,
+                "pricing_type": "FIXED_PRICING",
+                "price_money": {
+                  "amount": 900,
+                  "currency": "USD"
+                },
+                "service_duration": 0,
+                "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+                "sellable": true,
+                "stockable": true,
+                "channels": [
+                  "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o",
+                  "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC"
+                ]
+              }
+            }
+          ],
+          "product_type": "REGULAR",
+          "skip_modifier_screen": false,
+          "ecom_visibility": "VISIBLE",
+          "image_ids": [
+            "EQWWMPQ2AV6SISJFZUNLRKXU"
+          ],
+          "categories": [
+            {
+              "id": "4BULFZ6WXLWXCCQF32Q6Z3FV",
+              "ordinal": 1099545182208
+            }
+          ],
+          "channels": [
+            "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o",
+            "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC"
+          ],
+          "is_archived": false
+        }
+      },
+      "confirmedAt": "2026-11-11T22:24:51.436Z"
+    },
+    {
+      "name": "Cornish Roasting Chicken, Medium",
+      "active": true,
+      "before": {
+        "type": "ITEM",
+        "id": "ZE5WMCI4TGVZN2W6QYIP6MQZ",
+        "updated_at": "2026-11-11T22:22:39.56Z",
+        "created_at": "2026-11-06T15:03:51.406Z",
+        "version": 1794435759560,
+        "is_deleted": false,
+        "present_at_all_locations": true,
+        "absent_at_location_ids": [
+          "C0T7DVZY5XVG5",
+          "L1MHNE83A8XPY",
+          "L307W0S4THZP3",
+          "L373VS1QADC37",
+          "LBECN1NEXPGRJ",
+          "LJGEXCF3N7XJ4",
+          "LJS8Z7FW504J5",
+          "LKX3NDPZ68H74",
+          "LP5542Q9WCHX2",
+          "LP8AY4081PK5E",
+          "LVKCGC3H1QMYX",
+          "LWREC814AB8A4"
+        ],
+        "item_data": {
+          "name": "Cornish Roasting Chicken, Medium",
+          "is_taxable": true,
+          "variations": [
+            {
+              "type": "ITEM_VARIATION",
+              "id": "C5XBHSXVG74ZVU7RFLFDZIS3",
+              "updated_at": "2026-11-11T21:58:36.789Z",
+              "created_at": "2026-11-06T15:03:51.406Z",
+              "version": 1794434316789,
+              "is_deleted": false,
+              "present_at_all_locations": true,
+              "absent_at_location_ids": [
+                "C0T7DVZY5XVG5",
+                "L1MHNE83A8XPY",
+                "L307W0S4THZP3",
+                "L373VS1QADC37",
+                "LBECN1NEXPGRJ",
+                "LJGEXCF3N7XJ4",
+                "LJS8Z7FW504J5",
+                "LKX3NDPZ68H74",
+                "LP5542Q9WCHX2",
+                "LP8AY4081PK5E",
+                "LVKCGC3H1QMYX",
+                "LWREC814AB8A4"
+              ],
+              "item_variation_data": {
+                "item_id": "ZE5WMCI4TGVZN2W6QYIP6MQZ",
+                "name": "Medium, 3.20 - 4.20 lbs",
+                "sku": "999999000059",
+                "ordinal": 0,
+                "pricing_type": "FIXED_PRICING",
+                "price_money": {
+                  "amount": 900,
+                  "currency": "USD"
+                },
+                "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+                "sellable": true,
+                "stockable": true,
+                "channels": [
+                  "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+                  "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+                ]
+              }
+            }
+          ],
+          "product_type": "REGULAR",
+          "ecom_visibility": "VISIBLE",
+          "image_ids": [
+            "EQWWMPQ2AV6SISJFZUNLRKXU"
+          ],
+          "channels": [
+            "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+            "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+          ],
+          "is_archived": false
+        }
+      },
+      "request": {
+        "idempotency_key": "90a13a19-e959-43af-abf3-b71b30041106",
+        "object": {
+          "type": "ITEM",
+          "id": "ZE5WMCI4TGVZN2W6QYIP6MQZ",
+          "updated_at": "2026-11-11T22:22:39.56Z",
+          "created_at": "2026-11-06T15:03:51.406Z",
+          "version": 1794435759560,
+          "is_deleted": false,
+          "present_at_all_locations": true,
+          "absent_at_location_ids": [
+            "LP5542Q9WCHX2"
+          ],
+          "item_data": {
+            "name": "Cornish Roasting Chicken, Medium",
+            "is_taxable": true,
+            "variations": [
+              {
+                "type": "ITEM_VARIATION",
+                "id": "C5XBHSXVG74ZVU7RFLFDZIS3",
+                "updated_at": "2026-11-11T21:58:36.789Z",
+                "created_at": "2026-11-06T15:03:51.406Z",
+                "version": 1794434316789,
+                "is_deleted": false,
+                "present_at_all_locations": true,
+                "absent_at_location_ids": [
+                  "LP5542Q9WCHX2"
+                ],
+                "item_variation_data": {
+                  "item_id": "ZE5WMCI4TGVZN2W6QYIP6MQZ",
+                  "name": "Medium, 3.20 - 4.20 lbs",
+                  "sku": "999999000059",
+                  "ordinal": 0,
+                  "pricing_type": "FIXED_PRICING",
+                  "price_money": {
+                    "amount": 900,
+                    "currency": "USD"
+                  },
+                  "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+                  "sellable": true,
+                  "stockable": true,
+                  "channels": [
+                    "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+                    "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+                  ]
+                }
+              }
+            ],
+            "product_type": "REGULAR",
+            "ecom_visibility": "VISIBLE",
+            "image_ids": [
+              "EQWWMPQ2AV6SISJFZUNLRKXU"
+            ],
+            "channels": [
+              "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+              "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+            ],
+            "is_archived": false,
+            "categories": [
+              {
+                "id": "4BULFZ6WXLWXCCQF32Q6Z3FV"
+              }
+            ]
+          }
+        }
+      },
+      "status": "confirmed",
+      "confirmed": {
+        "type": "ITEM",
+        "id": "ZE5WMCI4TGVZN2W6QYIP6MQZ",
+        "updated_at": "2026-11-11T22:24:51.714Z",
+        "created_at": "2026-11-06T15:03:51.406Z",
+        "version": 1794435891714,
+        "is_deleted": false,
+        "present_at_all_locations": true,
+        "absent_at_location_ids": [
+          "LP5542Q9WCHX2"
+        ],
+        "item_data": {
+          "name": "Cornish Roasting Chicken, Medium",
+          "is_taxable": true,
+          "variations": [
+            {
+              "type": "ITEM_VARIATION",
+              "id": "C5XBHSXVG74ZVU7RFLFDZIS3",
+              "updated_at": "2026-11-11T22:24:51.714Z",
+              "created_at": "2026-11-06T15:03:51.406Z",
+              "version": 1794435891714,
+              "is_deleted": false,
+              "present_at_all_locations": true,
+              "absent_at_location_ids": [
+                "LP5542Q9WCHX2"
+              ],
+              "item_variation_data": {
+                "item_id": "ZE5WMCI4TGVZN2W6QYIP6MQZ",
+                "name": "Medium, 3.20 - 4.20 lbs",
+                "sku": "999999000059",
+                "ordinal": 0,
+                "pricing_type": "FIXED_PRICING",
+                "price_money": {
+                  "amount": 900,
+                  "currency": "USD"
+                },
+                "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+                "sellable": true,
+                "stockable": true,
+                "channels": [
+                  "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+                  "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+                ]
+              }
+            }
+          ],
+          "product_type": "REGULAR",
+          "ecom_visibility": "VISIBLE",
+          "image_ids": [
+            "EQWWMPQ2AV6SISJFZUNLRKXU"
+          ],
+          "categories": [
+            {
+              "id": "4BULFZ6WXLWXCCQF32Q6Z3FV",
+              "ordinal": 1099561959424
+            }
+          ],
+          "channels": [
+            "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+            "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+          ],
+          "is_archived": false
+        }
+      },
+      "confirmedAt": "2026-11-11T22:24:52.041Z"
+    },
+    {
+      "name": "Cornish Roasting Chicken, Extra Large",
+      "active": false,
+      "before": {
+        "type": "ITEM",
+        "id": "DJ3NBI3FOA6DXLKVALZWLPGI",
+        "updated_at": "2026-11-11T22:16:22.261Z",
+        "created_at": "2026-11-06T15:03:54.248Z",
+        "version": 1794435382261,
+        "is_deleted": false,
+        "present_at_all_locations": true,
+        "absent_at_location_ids": [
+          "C0T7DVZY5XVG5",
+          "L1MHNE83A8XPY",
+          "L307W0S4THZP3",
+          "L373VS1QADC37",
+          "LBECN1NEXPGRJ",
+          "LJGEXCF3N7XJ4",
+          "LJS8Z7FW504J5",
+          "LKX3NDPZ68H74",
+          "LP5542Q9WCHX2",
+          "LP8AY4081PK5E",
+          "LVKCGC3H1QMYX",
+          "LWREC814AB8A4"
+        ],
+        "item_data": {
+          "name": "Cornish Roasting Chicken, Extra Large",
+          "is_taxable": true,
+          "variations": [
+            {
+              "type": "ITEM_VARIATION",
+              "id": "NLWN3KCU2KHYIOS52LHM66ED",
+              "updated_at": "2026-11-11T21:58:37.428Z",
+              "created_at": "2026-11-06T15:03:54.248Z",
+              "version": 1794434317428,
+              "is_deleted": false,
+              "present_at_all_locations": true,
+              "absent_at_location_ids": [
+                "C0T7DVZY5XVG5",
+                "L1MHNE83A8XPY",
+                "L307W0S4THZP3",
+                "L373VS1QADC37",
+                "LBECN1NEXPGRJ",
+                "LJGEXCF3N7XJ4",
+                "LJS8Z7FW504J5",
+                "LKX3NDPZ68H74",
+                "LP5542Q9WCHX2",
+                "LP8AY4081PK5E",
+                "LVKCGC3H1QMYX",
+                "LWREC814AB8A4"
+              ],
+              "item_variation_data": {
+                "item_id": "DJ3NBI3FOA6DXLKVALZWLPGI",
+                "name": "Extra Large, 5.00 - 6.00 lbs",
+                "sku": "999999000133",
+                "ordinal": 0,
+                "pricing_type": "FIXED_PRICING",
+                "price_money": {
+                  "amount": 800,
+                  "currency": "USD"
+                },
+                "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+                "sellable": true,
+                "stockable": true,
+                "channels": [
+                  "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+                  "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+                ]
+              }
+            }
+          ],
+          "product_type": "REGULAR",
+          "ecom_visibility": "VISIBLE",
+          "image_ids": [
+            "EQWWMPQ2AV6SISJFZUNLRKXU"
+          ],
+          "channels": [
+            "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+            "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+          ],
+          "is_archived": false
+        }
+      },
+      "request": {
+        "idempotency_key": "adfc925c-0796-445a-a00a-37df188fe7e0",
+        "object": {
+          "type": "ITEM",
+          "id": "DJ3NBI3FOA6DXLKVALZWLPGI",
+          "updated_at": "2026-11-11T22:16:22.261Z",
+          "created_at": "2026-11-06T15:03:54.248Z",
+          "version": 1794435382261,
+          "is_deleted": false,
+          "present_at_all_locations": true,
+          "absent_at_location_ids": [
+            "C0T7DVZY5XVG5",
+            "L1MHNE83A8XPY",
+            "L307W0S4THZP3",
+            "L373VS1QADC37",
+            "LBECN1NEXPGRJ",
+            "LJGEXCF3N7XJ4",
+            "LJS8Z7FW504J5",
+            "LKX3NDPZ68H74",
+            "LP5542Q9WCHX2",
+            "LP8AY4081PK5E",
+            "LVKCGC3H1QMYX",
+            "LWREC814AB8A4"
+          ],
+          "item_data": {
+            "name": "Cornish Roasting Chicken, Extra Large",
+            "is_taxable": true,
+            "variations": [
+              {
+                "type": "ITEM_VARIATION",
+                "id": "NLWN3KCU2KHYIOS52LHM66ED",
+                "updated_at": "2026-11-11T21:58:37.428Z",
+                "created_at": "2026-11-06T15:03:54.248Z",
+                "version": 1794434317428,
+                "is_deleted": false,
+                "present_at_all_locations": true,
+                "absent_at_location_ids": [
+                  "C0T7DVZY5XVG5",
+                  "L1MHNE83A8XPY",
+                  "L307W0S4THZP3",
+                  "L373VS1QADC37",
+                  "LBECN1NEXPGRJ",
+                  "LJGEXCF3N7XJ4",
+                  "LJS8Z7FW504J5",
+                  "LKX3NDPZ68H74",
+                  "LP5542Q9WCHX2",
+                  "LP8AY4081PK5E",
+                  "LVKCGC3H1QMYX",
+                  "LWREC814AB8A4"
+                ],
+                "item_variation_data": {
+                  "item_id": "DJ3NBI3FOA6DXLKVALZWLPGI",
+                  "name": "Extra Large, 5.00 - 6.00 lbs",
+                  "sku": "999999000133",
+                  "ordinal": 0,
+                  "pricing_type": "FIXED_PRICING",
+                  "price_money": {
+                    "amount": 800,
+                    "currency": "USD"
+                  },
+                  "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+                  "sellable": true,
+                  "stockable": true,
+                  "channels": [
+                    "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+                    "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+                  ]
+                }
+              }
+            ],
+            "product_type": "REGULAR",
+            "ecom_visibility": "VISIBLE",
+            "image_ids": [
+              "EQWWMPQ2AV6SISJFZUNLRKXU"
+            ],
+            "channels": [
+              "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+              "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+            ],
+            "is_archived": false,
+            "categories": [
+              {
+                "id": "4BULFZ6WXLWXCCQF32Q6Z3FV"
+              }
+            ]
+          }
+        }
+      },
+      "status": "confirmed",
+      "confirmed": {
+        "type": "ITEM",
+        "id": "DJ3NBI3FOA6DXLKVALZWLPGI",
+        "updated_at": "2026-11-11T22:24:52.323Z",
+        "created_at": "2026-11-06T15:03:54.248Z",
+        "version": 1794435892323,
+        "is_deleted": false,
+        "present_at_all_locations": true,
+        "absent_at_location_ids": [
+          "C0T7DVZY5XVG5",
+          "L1MHNE83A8XPY",
+          "L307W0S4THZP3",
+          "L373VS1QADC37",
+          "LBECN1NEXPGRJ",
+          "LJGEXCF3N7XJ4",
+          "LJS8Z7FW504J5",
+          "LKX3NDPZ68H74",
+          "LP5542Q9WCHX2",
+          "LP8AY4081PK5E",
+          "LVKCGC3H1QMYX",
+          "LWREC814AB8A4"
+        ],
+        "item_data": {
+          "name": "Cornish Roasting Chicken, Extra Large",
+          "is_taxable": true,
+          "variations": [
+            {
+              "type": "ITEM_VARIATION",
+              "id": "NLWN3KCU2KHYIOS52LHM66ED",
+              "updated_at": "2026-11-11T21:58:37.428Z",
+              "created_at": "2026-11-06T15:03:54.248Z",
+              "version": 1794434317428,
+              "is_deleted": false,
+              "present_at_all_locations": true,
+              "absent_at_location_ids": [
+                "C0T7DVZY5XVG5",
+                "L1MHNE83A8XPY",
+                "L307W0S4THZP3",
+                "L373VS1QADC37",
+                "LBECN1NEXPGRJ",
+                "LJGEXCF3N7XJ4",
+                "LJS8Z7FW504J5",
+                "LKX3NDPZ68H74",
+                "LP5542Q9WCHX2",
+                "LP8AY4081PK5E",
+                "LVKCGC3H1QMYX",
+                "LWREC814AB8A4"
+              ],
+              "item_variation_data": {
+                "item_id": "DJ3NBI3FOA6DXLKVALZWLPGI",
+                "name": "Extra Large, 5.00 - 6.00 lbs",
+                "sku": "999999000133",
+                "ordinal": 0,
+                "pricing_type": "FIXED_PRICING",
+                "price_money": {
+                  "amount": 800,
+                  "currency": "USD"
+                },
+                "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+                "sellable": true,
+                "stockable": true,
+                "channels": [
+                  "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+                  "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+                ]
+              }
+            }
+          ],
+          "product_type": "REGULAR",
+          "ecom_visibility": "VISIBLE",
+          "image_ids": [
+            "EQWWMPQ2AV6SISJFZUNLRKXU"
+          ],
+          "categories": [
+            {
+              "id": "4BULFZ6WXLWXCCQF32Q6Z3FV",
+              "ordinal": 1099578736640
+            }
+          ],
+          "channels": [
+            "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+            "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+          ],
+          "is_archived": false
+        }
+      },
+      "confirmedAt": "2026-11-11T22:24:52.638Z"
+    }
+  ]
+}

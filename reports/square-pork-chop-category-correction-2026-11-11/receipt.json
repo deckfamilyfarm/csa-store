@@ -1,0 +1,375 @@
+{
+  "createdAt": "2026-11-11T22:33:40.068Z",
+  "targetHash": "a4baff6de1cd0a594fc885b5a2e17746203945f7815490d7fd6abd7350645906",
+  "actions": [
+    {
+      "name": "Pork Chop, Bone-in",
+      "categoryName": "Pasture Raised Pork",
+      "categoryId": "O7EKTJ6OMBXBQEMAUQ7PQIO7",
+      "before": {
+        "type": "ITEM",
+        "id": "ILHEC25TNXQ4LPPDALYQPVZH",
+        "updated_at": "2026-11-11T22:30:29.85Z",
+        "created_at": "2026-11-06T19:29:32.63Z",
+        "version": 1794436229850,
+        "is_deleted": false,
+        "present_at_all_locations": true,
+        "item_data": {
+          "name": "Pork Chop, Bone-in",
+          "is_taxable": true,
+          "variations": [
+            {
+              "type": "ITEM_VARIATION",
+              "id": "4DJSRX4DMOZJFDETAVUDZDHN",
+              "updated_at": "2026-11-06T19:29:32.578Z",
+              "created_at": "2026-11-06T19:29:32.63Z",
+              "version": 1793993372578,
+              "is_deleted": false,
+              "present_at_all_locations": true,
+              "item_variation_data": {
+                "item_id": "ILHEC25TNXQ4LPPDALYQPVZH",
+                "name": "1.20 - 1.50 lbs",
+                "sku": "999999000000",
+                "ordinal": 0,
+                "pricing_type": "FIXED_PRICING",
+                "price_money": {
+                  "amount": 1600,
+                  "currency": "USD"
+                },
+                "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+                "sellable": true,
+                "stockable": true,
+                "channels": [
+                  "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+                  "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+                ]
+              }
+            }
+          ],
+          "product_type": "REGULAR",
+          "ecom_visibility": "VISIBLE",
+          "image_ids": [
+            "JIMCAEHINVBZMPAXMSYTNNOG"
+          ],
+          "categories": [
+            {
+              "id": "4BULFZ6WXLWXCCQF32Q6Z3FV",
+              "ordinal": 1099612291072
+            }
+          ],
+          "channels": [
+            "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+            "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+          ],
+          "is_archived": false
+        }
+      },
+      "request": {
+        "idempotency_key": "7799ff46-5427-4db5-b4b1-7d246d1852a9",
+        "object": {
+          "type": "ITEM",
+          "id": "ILHEC25TNXQ4LPPDALYQPVZH",
+          "updated_at": "2026-11-11T22:30:29.85Z",
+          "created_at": "2026-11-06T19:29:32.63Z",
+          "version": 1794436229850,
+          "is_deleted": false,
+          "present_at_all_locations": true,
+          "item_data": {
+            "name": "Pork Chop, Bone-in",
+            "is_taxable": true,
+            "variations": [
+              {
+                "type": "ITEM_VARIATION",
+                "id": "4DJSRX4DMOZJFDETAVUDZDHN",
+                "updated_at": "2026-11-06T19:29:32.578Z",
+                "created_at": "2026-11-06T19:29:32.63Z",
+                "version": 1793993372578,
+                "is_deleted": false,
+                "present_at_all_locations": true,
+                "item_variation_data": {
+                  "item_id": "ILHEC25TNXQ4LPPDALYQPVZH",
+                  "name": "1.20 - 1.50 lbs",
+                  "sku": "999999000000",
+                  "ordinal": 0,
+                  "pricing_type": "FIXED_PRICING",
+                  "price_money": {
+                    "amount": 1600,
+                    "currency": "USD"
+                  },
+                  "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+                  "sellable": true,
+                  "stockable": true,
+                  "channels": [
+                    "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+                    "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+                  ]
+                }
+              }
+            ],
+            "product_type": "REGULAR",
+            "ecom_visibility": "VISIBLE",
+            "image_ids": [
+              "JIMCAEHINVBZMPAXMSYTNNOG"
+            ],
+            "categories": [
+              {
+                "id": "O7EKTJ6OMBXBQEMAUQ7PQIO7"
+              }
+            ],
+            "channels": [
+              "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+              "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+            ],
+            "is_archived": false
+          }
+        }
+      },
+      "status": "confirmed",
+      "confirmed": {
+        "type": "ITEM",
+        "id": "ILHEC25TNXQ4LPPDALYQPVZH",
+        "updated_at": "2026-11-11T22:33:43.982Z",
+        "created_at": "2026-11-06T19:29:32.63Z",
+        "version": 1794436423982,
+        "is_deleted": false,
+        "present_at_all_locations": true,
+        "item_data": {
+          "name": "Pork Chop, Bone-in",
+          "is_taxable": true,
+          "variations": [
+            {
+              "type": "ITEM_VARIATION",
+              "id": "4DJSRX4DMOZJFDETAVUDZDHN",
+              "updated_at": "2026-11-06T19:29:32.578Z",
+              "created_at": "2026-11-06T19:29:32.63Z",
+              "version": 1793993372578,
+              "is_deleted": false,
+              "present_at_all_locations": true,
+              "item_variation_data": {
+                "item_id": "ILHEC25TNXQ4LPPDALYQPVZH",
+                "name": "1.20 - 1.50 lbs",
+                "sku": "999999000000",
+                "ordinal": 0,
+                "pricing_type": "FIXED_PRICING",
+                "price_money": {
+                  "amount": 1600,
+                  "currency": "USD"
+                },
+                "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+                "sellable": true,
+                "stockable": true,
+                "channels": [
+                  "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+                  "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+                ]
+              }
+            }
+          ],
+          "product_type": "REGULAR",
+          "ecom_visibility": "VISIBLE",
+          "image_ids": [
+            "JIMCAEHINVBZMPAXMSYTNNOG"
+          ],
+          "categories": [
+            {
+              "id": "O7EKTJ6OMBXBQEMAUQ7PQIO7",
+              "ordinal": 1511862042624
+            }
+          ],
+          "channels": [
+            "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+            "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+          ],
+          "is_archived": false
+        }
+      },
+      "confirmedAt": "2026-11-11T22:33:44.240Z"
+    },
+    {
+      "name": "Pork Chop, Boneless",
+      "categoryName": "Pasture Raised Pork",
+      "categoryId": "O7EKTJ6OMBXBQEMAUQ7PQIO7",
+      "before": {
+        "type": "ITEM",
+        "id": "7TZ2PHV5WBRXETZIWZWGIHBA",
+        "updated_at": "2026-11-11T22:30:30.547Z",
+        "created_at": "2026-11-06T19:29:46.935Z",
+        "version": 1794436230547,
+        "is_deleted": false,
+        "present_at_all_locations": true,
+        "item_data": {
+          "name": "Pork Chop, Boneless",
+          "is_taxable": true,
+          "variations": [
+            {
+              "type": "ITEM_VARIATION",
+              "id": "AR35EOVCDNFZ4AVG3BN6K445",
+              "updated_at": "2026-11-06T19:29:46.875Z",
+              "created_at": "2026-11-06T19:29:46.935Z",
+              "version": 1793993386875,
+              "is_deleted": false,
+              "present_at_all_locations": true,
+              "item_variation_data": {
+                "item_id": "7TZ2PHV5WBRXETZIWZWGIHBA",
+                "name": "1.20 - 1.50 lbs",
+                "sku": "999999000041",
+                "ordinal": 0,
+                "pricing_type": "FIXED_PRICING",
+                "price_money": {
+                  "amount": 1800,
+                  "currency": "USD"
+                },
+                "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+                "sellable": true,
+                "stockable": true,
+                "channels": [
+                  "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+                  "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+                ]
+              }
+            }
+          ],
+          "product_type": "REGULAR",
+          "skip_modifier_screen": false,
+          "ecom_visibility": "VISIBLE",
+          "image_ids": [
+            "3JFIKXSLDWL3CBN4QSI3MJ7K"
+          ],
+          "categories": [
+            {
+              "id": "4BULFZ6WXLWXCCQF32Q6Z3FV",
+              "ordinal": 1099629068288
+            }
+          ],
+          "channels": [
+            "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o",
+            "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC"
+          ],
+          "is_archived": false
+        }
+      },
+      "request": {
+        "idempotency_key": "6d69c47c-fa5f-49b5-bf76-071d03c03689",
+        "object": {
+          "type": "ITEM",
+          "id": "7TZ2PHV5WBRXETZIWZWGIHBA",
+          "updated_at": "2026-11-11T22:30:30.547Z",
+          "created_at": "2026-11-06T19:29:46.935Z",
+          "version": 1794436230547,
+          "is_deleted": false,
+          "present_at_all_locations": true,
+          "item_data": {
+            "name": "Pork Chop, Boneless",
+            "is_taxable": true,
+            "variations": [
+              {
+                "type": "ITEM_VARIATION",
+                "id": "AR35EOVCDNFZ4AVG3BN6K445",
+                "updated_at": "2026-11-06T19:29:46.875Z",
+                "created_at": "2026-11-06T19:29:46.935Z",
+                "version": 1793993386875,
+                "is_deleted": false,
+                "present_at_all_locations": true,
+                "item_variation_data": {
+                  "item_id": "7TZ2PHV5WBRXETZIWZWGIHBA",
+                  "name": "1.20 - 1.50 lbs",
+                  "sku": "999999000041",
+                  "ordinal": 0,
+                  "pricing_type": "FIXED_PRICING",
+                  "price_money": {
+                    "amount": 1800,
+                    "currency": "USD"
+                  },
+                  "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+                  "sellable": true,
+                  "stockable": true,
+                  "channels": [
+                    "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+                    "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+                  ]
+                }
+              }
+            ],
+            "product_type": "REGULAR",
+            "skip_modifier_screen": false,
+            "ecom_visibility": "VISIBLE",
+            "image_ids": [
+              "3JFIKXSLDWL3CBN4QSI3MJ7K"
+            ],
+            "categories": [
+              {
+                "id": "O7EKTJ6OMBXBQEMAUQ7PQIO7"
+              }
+            ],
+            "channels": [
+              "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o",
+              "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC"
+            ],
+            "is_archived": false
+          }
+        }
+      },
+      "status": "confirmed",
+      "confirmed": {
+        "type": "ITEM",
+        "id": "7TZ2PHV5WBRXETZIWZWGIHBA",
+        "updated_at": "2026-11-11T22:33:44.525Z",
+        "created_at": "2026-11-06T19:29:46.935Z",
+        "version": 1794436424525,
+        "is_deleted": false,
+        "present_at_all_locations": true,
+        "item_data": {
+          "name": "Pork Chop, Boneless",
+          "is_taxable": true,
+          "variations": [
+            {
+              "type": "ITEM_VARIATION",
+              "id": "AR35EOVCDNFZ4AVG3BN6K445",
+              "updated_at": "2026-11-06T19:29:46.875Z",
+              "created_at": "2026-11-06T19:29:46.935Z",
+              "version": 1793993386875,
+              "is_deleted": false,
+              "present_at_all_locations": true,
+              "item_variation_data": {
+                "item_id": "7TZ2PHV5WBRXETZIWZWGIHBA",
+                "name": "1.20 - 1.50 lbs",
+                "sku": "999999000041",
+                "ordinal": 0,
+                "pricing_type": "FIXED_PRICING",
+                "price_money": {
+                  "amount": 1800,
+                  "currency": "USD"
+                },
+                "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+                "sellable": true,
+                "stockable": true,
+                "channels": [
+                  "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+                  "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+                ]
+              }
+            }
+          ],
+          "product_type": "REGULAR",
+          "skip_modifier_screen": false,
+          "ecom_visibility": "VISIBLE",
+          "image_ids": [
+            "3JFIKXSLDWL3CBN4QSI3MJ7K"
+          ],
+          "categories": [
+            {
+              "id": "O7EKTJ6OMBXBQEMAUQ7PQIO7",
+              "ordinal": 1511878819840
+            }
+          ],
+          "channels": [
+            "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o",
+            "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC"
+          ],
+          "is_archived": false
+        }
+      },
+      "confirmedAt": "2026-11-11T22:33:44.825Z"
+    }
+  ]
+}

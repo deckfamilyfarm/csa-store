@@ -46,3 +46,13 @@ test("unit-only Square changes and non-price changes remain visible", () => {
   assert(productSyncSummary(changed).otherGroups.some(group => group.title === "Visibility & inventory"));
   assert.equal(productSyncSummary({ ...action, direction: "incoming" }), null);
 });
+test('Square image reviews describe shared primary photos without inventing price changes', () => {
+  const result = productSyncSummary({ platform: 'square', kind: 'image', status: 'changed', display: {
+    current: { image: null }, proposed: { image: 'https://photos.test/beef.jpg' }
+  } });
+  assert.deepEqual(result.prices, []);
+  assert.equal(result.changed, true);
+  assert.match(result.notes.join(' '), /every location/);
+  assert.match(result.notes.join(' '), /Square Online/);
+  assert.match(result.notes.join(' '), /Other Square photos are kept/);
+});

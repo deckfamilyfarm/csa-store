@@ -551,7 +551,8 @@ test("saved prices activate locally before independently approved channel public
     let {audit,actions}=await check();
     assert.ok(actions.length && actions.every(a=>a.platform==='square'&&['changed','synced'].includes(a.status)),JSON.stringify(actions));
     await assert.rejects(sync.createProductSyncRelease({auditId:audit.id,actionIds:actions.map(a=>a.id)}, {userId:2,adminRoles:['pricing_publisher','localline_push']}),/Square|square/);
-    let release=await sync.createProductSyncRelease({auditId:audit.id,actionIds:actions.map(a=>a.id)},user);
+    let release=await sync.createProductSyncRelease({auditId:audit.id,actionIds:actions.map(a=>a.id),localWorkerOnly:true},user);
+    assert.match((await sync.getProductSyncRelease(release.id)).scheduledAt,/^9999-01-01/,'an operator-owned selected-channel release is reserved for its worker');
     assert.equal((await sync.runProductSyncRelease(release.id,{user,allowFuture:true})).status,'completed');
     assert.ok(writes.slice(before).length>0 && writes.slice(before).every(w=>w.platform==='square'));
     assert.deepEqual(remote,llBefore,'Square-only sync cannot change Local Line');

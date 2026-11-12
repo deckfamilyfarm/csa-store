@@ -1,0 +1,771 @@
+{
+  "createdAt": "2026-11-11T22:34:20.572Z",
+  "targetHash": "a4baff6de1cd0a594fc885b5a2e17746203945f7815490d7fd6abd7350645906",
+  "locations": [
+    {
+      "id": "C0T7DVZY5XVG5",
+      "name": "Deck Family Farm Market Booths and Farm Sales"
+    },
+    {
+      "id": "LJS8Z7FW504J5",
+      "name": "Hillsdale"
+    },
+    {
+      "id": "L1MHNE83A8XPY",
+      "name": "Hollywood"
+    },
+    {
+      "id": "LP8AY4081PK5E",
+      "name": "King"
+    },
+    {
+      "id": "LWREC814AB8A4",
+      "name": "LCFM"
+    },
+    {
+      "id": "LJGEXCF3N7XJ4",
+      "name": "Montavilla"
+    },
+    {
+      "id": "LVKCGC3H1QMYX",
+      "name": "PSU"
+    },
+    {
+      "id": "LBECN1NEXPGRJ",
+      "name": "Scandinavian Festival"
+    },
+    {
+      "id": "L307W0S4THZP3",
+      "name": "Springfield"
+    },
+    {
+      "id": "L373VS1QADC37",
+      "name": "St. John’s"
+    },
+    {
+      "id": "LKX3NDPZ68H74",
+      "name": "Woodstock"
+    }
+  ],
+  "category": {
+    "id": "4BULFZ6WXLWXCCQF32Q6Z3FV",
+    "name": "Roasters & Turkeys"
+  },
+  "actions": [
+    {
+      "name": "Red Ranger Roasting Chicken, Large",
+      "active": false,
+      "before": {
+        "type": "ITEM",
+        "id": "C7SLODSFPL74WVKTHCG47MY2",
+        "updated_at": "2026-11-11T22:22:56.901Z",
+        "created_at": "2021-06-18T20:38:22.148Z",
+        "version": 1794435776901,
+        "is_deleted": false,
+        "catalog_v1_ids": [
+          {
+            "catalog_v1_id": "9E2E8879-F36D-451C-811B-7D3B7ED92DA6",
+            "location_id": "C0T7DVZY5XVG5"
+          }
+        ],
+        "present_at_all_locations": true,
+        "item_data": {
+          "name": "Red Ranger Roasting Chicken, Large",
+          "abbreviation": "",
+          "label_color": "B21212",
+          "is_taxable": true,
+          "variations": [
+            {
+              "type": "ITEM_VARIATION",
+              "id": "4BSDTHCNQU27C42FET6ITBH2",
+              "updated_at": "2026-11-08T19:25:18.236Z",
+              "created_at": "2021-06-18T20:38:22.148Z",
+              "version": 1794165918236,
+              "is_deleted": false,
+              "catalog_v1_ids": [
+                {
+                  "catalog_v1_id": "83E61F44-9DB3-4560-8214-3CBB39289D70",
+                  "location_id": "C0T7DVZY5XVG5"
+                }
+              ],
+              "present_at_all_locations": true,
+              "item_variation_data": {
+                "item_id": "C7SLODSFPL74WVKTHCG47MY2",
+                "name": "Large, 5.01 - 5.70 lbs",
+                "ordinal": 1,
+                "pricing_type": "FIXED_PRICING",
+                "price_money": {
+                  "amount": 1000,
+                  "currency": "USD"
+                },
+                "track_inventory": false,
+                "inventory_alert_type": "NONE",
+                "service_duration": 0,
+                "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+                "sellable": true,
+                "stockable": true,
+                "channels": [
+                  "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+                ]
+              }
+            }
+          ],
+          "product_type": "REGULAR",
+          "skip_modifier_screen": true,
+          "ecom_visibility": "VISIBLE",
+          "image_ids": [
+            "DQXYOEVMYEFQSJA2VOI2VQO5"
+          ],
+          "categories": [
+            {
+              "id": "4BULFZ6WXLWXCCQF32Q6Z3FV",
+              "ordinal": 687194767360
+            }
+          ],
+          "channels": [
+            "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+          ],
+          "is_archived": false,
+          "reporting_category": {
+            "id": "4BULFZ6WXLWXCCQF32Q6Z3FV",
+            "ordinal": 687194767360
+          },
+          "is_alcoholic": false
+        }
+      },
+      "request": {
+        "idempotency_key": "8a2eb9ac-2cbd-4aa4-aaf9-ff163959f28a",
+        "object": {
+          "type": "ITEM",
+          "id": "C7SLODSFPL74WVKTHCG47MY2",
+          "updated_at": "2026-11-11T22:22:56.901Z",
+          "created_at": "2021-06-18T20:38:22.148Z",
+          "version": 1794435776901,
+          "is_deleted": false,
+          "catalog_v1_ids": [
+            {
+              "catalog_v1_id": "9E2E8879-F36D-451C-811B-7D3B7ED92DA6",
+              "location_id": "C0T7DVZY5XVG5"
+            }
+          ],
+          "present_at_all_locations": true,
+          "item_data": {
+            "name": "Red Ranger Roasting Chicken, Large",
+            "abbreviation": "",
+            "label_color": "B21212",
+            "is_taxable": true,
+            "variations": [
+              {
+                "type": "ITEM_VARIATION",
+                "id": "4BSDTHCNQU27C42FET6ITBH2",
+                "updated_at": "2026-11-08T19:25:18.236Z",
+                "created_at": "2021-06-18T20:38:22.148Z",
+                "version": 1794165918236,
+                "is_deleted": false,
+                "catalog_v1_ids": [
+                  {
+                    "catalog_v1_id": "83E61F44-9DB3-4560-8214-3CBB39289D70",
+                    "location_id": "C0T7DVZY5XVG5"
+                  }
+                ],
+                "present_at_all_locations": true,
+                "item_variation_data": {
+                  "item_id": "C7SLODSFPL74WVKTHCG47MY2",
+                  "name": "Large, 5.01 - 5.70 lbs",
+                  "ordinal": 1,
+                  "pricing_type": "FIXED_PRICING",
+                  "price_money": {
+                    "amount": 1000,
+                    "currency": "USD"
+                  },
+                  "track_inventory": false,
+                  "inventory_alert_type": "NONE",
+                  "service_duration": 0,
+                  "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+                  "sellable": true,
+                  "stockable": true,
+                  "channels": [
+                    "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+                  ]
+                },
+                "absent_at_location_ids": [
+                  "C0T7DVZY5XVG5",
+                  "L1MHNE83A8XPY",
+                  "L307W0S4THZP3",
+                  "L373VS1QADC37",
+                  "LBECN1NEXPGRJ",
+                  "LJGEXCF3N7XJ4",
+                  "LJS8Z7FW504J5",
+                  "LKX3NDPZ68H74",
+                  "LP8AY4081PK5E",
+                  "LVKCGC3H1QMYX",
+                  "LWREC814AB8A4"
+                ]
+              }
+            ],
+            "product_type": "REGULAR",
+            "skip_modifier_screen": true,
+            "ecom_visibility": "VISIBLE",
+            "image_ids": [
+              "DQXYOEVMYEFQSJA2VOI2VQO5"
+            ],
+            "categories": [
+              {
+                "id": "4BULFZ6WXLWXCCQF32Q6Z3FV",
+                "ordinal": 687194767360
+              }
+            ],
+            "channels": [
+              "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+            ],
+            "is_archived": false,
+            "reporting_category": {
+              "id": "4BULFZ6WXLWXCCQF32Q6Z3FV",
+              "ordinal": 687194767360
+            },
+            "is_alcoholic": false
+          },
+          "absent_at_location_ids": [
+            "C0T7DVZY5XVG5",
+            "L1MHNE83A8XPY",
+            "L307W0S4THZP3",
+            "L373VS1QADC37",
+            "LBECN1NEXPGRJ",
+            "LJGEXCF3N7XJ4",
+            "LJS8Z7FW504J5",
+            "LKX3NDPZ68H74",
+            "LP8AY4081PK5E",
+            "LVKCGC3H1QMYX",
+            "LWREC814AB8A4"
+          ]
+        }
+      },
+      "status": "confirmed",
+      "confirmed": {
+        "type": "ITEM",
+        "id": "C7SLODSFPL74WVKTHCG47MY2",
+        "updated_at": "2026-11-11T22:34:46.54Z",
+        "created_at": "2021-06-18T20:38:22.148Z",
+        "version": 1794436486540,
+        "is_deleted": false,
+        "catalog_v1_ids": [
+          {
+            "catalog_v1_id": "9E2E8879-F36D-451C-811B-7D3B7ED92DA6",
+            "location_id": "C0T7DVZY5XVG5"
+          }
+        ],
+        "present_at_all_locations": true,
+        "absent_at_location_ids": [
+          "C0T7DVZY5XVG5",
+          "L1MHNE83A8XPY",
+          "L307W0S4THZP3",
+          "L373VS1QADC37",
+          "LBECN1NEXPGRJ",
+          "LJGEXCF3N7XJ4",
+          "LJS8Z7FW504J5",
+          "LKX3NDPZ68H74",
+          "LP8AY4081PK5E",
+          "LVKCGC3H1QMYX",
+          "LWREC814AB8A4"
+        ],
+        "item_data": {
+          "name": "Red Ranger Roasting Chicken, Large",
+          "abbreviation": "",
+          "label_color": "B21212",
+          "is_taxable": true,
+          "variations": [
+            {
+              "type": "ITEM_VARIATION",
+              "id": "4BSDTHCNQU27C42FET6ITBH2",
+              "updated_at": "2026-11-11T22:34:46.54Z",
+              "created_at": "2021-06-18T20:38:22.148Z",
+              "version": 1794436486540,
+              "is_deleted": false,
+              "catalog_v1_ids": [
+                {
+                  "catalog_v1_id": "83E61F44-9DB3-4560-8214-3CBB39289D70",
+                  "location_id": "C0T7DVZY5XVG5"
+                }
+              ],
+              "present_at_all_locations": true,
+              "absent_at_location_ids": [
+                "C0T7DVZY5XVG5",
+                "L1MHNE83A8XPY",
+                "L307W0S4THZP3",
+                "L373VS1QADC37",
+                "LBECN1NEXPGRJ",
+                "LJGEXCF3N7XJ4",
+                "LJS8Z7FW504J5",
+                "LKX3NDPZ68H74",
+                "LP8AY4081PK5E",
+                "LVKCGC3H1QMYX",
+                "LWREC814AB8A4"
+              ],
+              "item_variation_data": {
+                "item_id": "C7SLODSFPL74WVKTHCG47MY2",
+                "name": "Large, 5.01 - 5.70 lbs",
+                "ordinal": 1,
+                "pricing_type": "FIXED_PRICING",
+                "price_money": {
+                  "amount": 1000,
+                  "currency": "USD"
+                },
+                "track_inventory": false,
+                "inventory_alert_type": "NONE",
+                "service_duration": 0,
+                "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+                "sellable": true,
+                "stockable": true,
+                "channels": [
+                  "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+                ]
+              }
+            }
+          ],
+          "product_type": "REGULAR",
+          "skip_modifier_screen": true,
+          "ecom_visibility": "VISIBLE",
+          "image_ids": [
+            "DQXYOEVMYEFQSJA2VOI2VQO5"
+          ],
+          "categories": [
+            {
+              "id": "4BULFZ6WXLWXCCQF32Q6Z3FV",
+              "ordinal": 687194767360
+            }
+          ],
+          "channels": [
+            "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+          ],
+          "is_archived": false,
+          "reporting_category": {
+            "id": "4BULFZ6WXLWXCCQF32Q6Z3FV",
+            "ordinal": 687194767360
+          },
+          "is_alcoholic": false
+        }
+      },
+      "confirmedAt": "2026-11-11T22:34:47.177Z"
+    },
+    {
+      "name": "Red Ranger Roasting Chicken, Small",
+      "active": false,
+      "before": {
+        "type": "ITEM",
+        "id": "RV3JWBI2MVGAZEFD3Z7RMLJL",
+        "updated_at": "2026-11-11T22:30:31.725Z",
+        "created_at": "2026-11-06T15:03:42.646Z",
+        "version": 1794436231725,
+        "is_deleted": false,
+        "present_at_all_locations": true,
+        "item_data": {
+          "name": "Red Ranger Roasting Chicken, Small",
+          "is_taxable": true,
+          "variations": [
+            {
+              "type": "ITEM_VARIATION",
+              "id": "MJLIJD3MJWYRUJDXYWKVBMCF",
+              "updated_at": "2026-11-06T15:03:42.587Z",
+              "created_at": "2026-11-06T15:03:42.646Z",
+              "version": 1793977422587,
+              "is_deleted": false,
+              "present_at_all_locations": true,
+              "item_variation_data": {
+                "item_id": "RV3JWBI2MVGAZEFD3Z7RMLJL",
+                "name": "Small, 3.00 - 4.00 lbs",
+                "sku": "999999000061",
+                "ordinal": 0,
+                "pricing_type": "FIXED_PRICING",
+                "price_money": {
+                  "amount": 1000,
+                  "currency": "USD"
+                },
+                "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+                "sellable": true,
+                "stockable": true,
+                "channels": [
+                  "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+                  "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+                ]
+              }
+            }
+          ],
+          "product_type": "REGULAR",
+          "ecom_visibility": "VISIBLE",
+          "image_ids": [
+            "DQXYOEVMYEFQSJA2VOI2VQO5"
+          ],
+          "categories": [
+            {
+              "id": "4BULFZ6WXLWXCCQF32Q6Z3FV",
+              "ordinal": 1099662622720
+            }
+          ],
+          "channels": [
+            "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+            "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+          ],
+          "is_archived": false
+        }
+      },
+      "request": {
+        "idempotency_key": "b49ea771-cc65-4976-b3f3-f63cb98e514d",
+        "object": {
+          "type": "ITEM",
+          "id": "RV3JWBI2MVGAZEFD3Z7RMLJL",
+          "updated_at": "2026-11-11T22:30:31.725Z",
+          "created_at": "2026-11-06T15:03:42.646Z",
+          "version": 1794436231725,
+          "is_deleted": false,
+          "present_at_all_locations": true,
+          "item_data": {
+            "name": "Red Ranger Roasting Chicken, Small",
+            "is_taxable": true,
+            "variations": [
+              {
+                "type": "ITEM_VARIATION",
+                "id": "MJLIJD3MJWYRUJDXYWKVBMCF",
+                "updated_at": "2026-11-06T15:03:42.587Z",
+                "created_at": "2026-11-06T15:03:42.646Z",
+                "version": 1793977422587,
+                "is_deleted": false,
+                "present_at_all_locations": true,
+                "item_variation_data": {
+                  "item_id": "RV3JWBI2MVGAZEFD3Z7RMLJL",
+                  "name": "Small, 3.00 - 4.00 lbs",
+                  "sku": "999999000061",
+                  "ordinal": 0,
+                  "pricing_type": "FIXED_PRICING",
+                  "price_money": {
+                    "amount": 1000,
+                    "currency": "USD"
+                  },
+                  "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+                  "sellable": true,
+                  "stockable": true,
+                  "channels": [
+                    "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+                    "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+                  ]
+                },
+                "absent_at_location_ids": [
+                  "C0T7DVZY5XVG5",
+                  "L1MHNE83A8XPY",
+                  "L307W0S4THZP3",
+                  "L373VS1QADC37",
+                  "LBECN1NEXPGRJ",
+                  "LJGEXCF3N7XJ4",
+                  "LJS8Z7FW504J5",
+                  "LKX3NDPZ68H74",
+                  "LP8AY4081PK5E",
+                  "LVKCGC3H1QMYX",
+                  "LWREC814AB8A4"
+                ]
+              }
+            ],
+            "product_type": "REGULAR",
+            "ecom_visibility": "VISIBLE",
+            "image_ids": [
+              "DQXYOEVMYEFQSJA2VOI2VQO5"
+            ],
+            "categories": [
+              {
+                "id": "4BULFZ6WXLWXCCQF32Q6Z3FV",
+                "ordinal": 1099662622720
+              }
+            ],
+            "channels": [
+              "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+              "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+            ],
+            "is_archived": false
+          },
+          "absent_at_location_ids": [
+            "C0T7DVZY5XVG5",
+            "L1MHNE83A8XPY",
+            "L307W0S4THZP3",
+            "L373VS1QADC37",
+            "LBECN1NEXPGRJ",
+            "LJGEXCF3N7XJ4",
+            "LJS8Z7FW504J5",
+            "LKX3NDPZ68H74",
+            "LP8AY4081PK5E",
+            "LVKCGC3H1QMYX",
+            "LWREC814AB8A4"
+          ]
+        }
+      },
+      "status": "confirmed",
+      "confirmed": {
+        "type": "ITEM",
+        "id": "RV3JWBI2MVGAZEFD3Z7RMLJL",
+        "updated_at": "2026-11-11T22:34:47.465Z",
+        "created_at": "2026-11-06T15:03:42.646Z",
+        "version": 1794436487465,
+        "is_deleted": false,
+        "present_at_all_locations": true,
+        "absent_at_location_ids": [
+          "C0T7DVZY5XVG5",
+          "L1MHNE83A8XPY",
+          "L307W0S4THZP3",
+          "L373VS1QADC37",
+          "LBECN1NEXPGRJ",
+          "LJGEXCF3N7XJ4",
+          "LJS8Z7FW504J5",
+          "LKX3NDPZ68H74",
+          "LP8AY4081PK5E",
+          "LVKCGC3H1QMYX",
+          "LWREC814AB8A4"
+        ],
+        "item_data": {
+          "name": "Red Ranger Roasting Chicken, Small",
+          "is_taxable": true,
+          "variations": [
+            {
+              "type": "ITEM_VARIATION",
+              "id": "MJLIJD3MJWYRUJDXYWKVBMCF",
+              "updated_at": "2026-11-11T22:34:47.465Z",
+              "created_at": "2026-11-06T15:03:42.646Z",
+              "version": 1794436487465,
+              "is_deleted": false,
+              "present_at_all_locations": true,
+              "absent_at_location_ids": [
+                "C0T7DVZY5XVG5",
+                "L1MHNE83A8XPY",
+                "L307W0S4THZP3",
+                "L373VS1QADC37",
+                "LBECN1NEXPGRJ",
+                "LJGEXCF3N7XJ4",
+                "LJS8Z7FW504J5",
+                "LKX3NDPZ68H74",
+                "LP8AY4081PK5E",
+                "LVKCGC3H1QMYX",
+                "LWREC814AB8A4"
+              ],
+              "item_variation_data": {
+                "item_id": "RV3JWBI2MVGAZEFD3Z7RMLJL",
+                "name": "Small, 3.00 - 4.00 lbs",
+                "sku": "999999000061",
+                "ordinal": 0,
+                "pricing_type": "FIXED_PRICING",
+                "price_money": {
+                  "amount": 1000,
+                  "currency": "USD"
+                },
+                "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+                "sellable": true,
+                "stockable": true,
+                "channels": [
+                  "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+                  "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+                ]
+              }
+            }
+          ],
+          "product_type": "REGULAR",
+          "ecom_visibility": "VISIBLE",
+          "image_ids": [
+            "DQXYOEVMYEFQSJA2VOI2VQO5"
+          ],
+          "categories": [
+            {
+              "id": "4BULFZ6WXLWXCCQF32Q6Z3FV",
+              "ordinal": 1099662622720
+            }
+          ],
+          "channels": [
+            "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+            "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+          ],
+          "is_archived": false
+        }
+      },
+      "confirmedAt": "2026-11-11T22:34:47.713Z"
+    },
+    {
+      "name": "Red Ranger Roasting Chicken, Medium",
+      "active": true,
+      "before": {
+        "type": "ITEM",
+        "id": "N54VBMXA4Z5ZGU4DQZLCZWLD",
+        "updated_at": "2026-11-11T22:30:31.075Z",
+        "created_at": "2026-11-06T15:03:45.604Z",
+        "version": 1794436231075,
+        "is_deleted": false,
+        "present_at_all_locations": true,
+        "item_data": {
+          "name": "Red Ranger Roasting Chicken, Medium",
+          "is_taxable": true,
+          "variations": [
+            {
+              "type": "ITEM_VARIATION",
+              "id": "RGGMDJ7X4YYPHNJ5RKPXDHJY",
+              "updated_at": "2026-11-06T15:03:45.554Z",
+              "created_at": "2026-11-06T15:03:45.604Z",
+              "version": 1793977425554,
+              "is_deleted": false,
+              "present_at_all_locations": true,
+              "item_variation_data": {
+                "item_id": "N54VBMXA4Z5ZGU4DQZLCZWLD",
+                "name": "Medium, 4.01 - 5.00 lbs",
+                "sku": "999999000062",
+                "ordinal": 0,
+                "pricing_type": "FIXED_PRICING",
+                "price_money": {
+                  "amount": 1000,
+                  "currency": "USD"
+                },
+                "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+                "sellable": true,
+                "stockable": true,
+                "channels": [
+                  "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+                  "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+                ]
+              }
+            }
+          ],
+          "product_type": "REGULAR",
+          "ecom_visibility": "VISIBLE",
+          "image_ids": [
+            "DQXYOEVMYEFQSJA2VOI2VQO5"
+          ],
+          "categories": [
+            {
+              "id": "4BULFZ6WXLWXCCQF32Q6Z3FV",
+              "ordinal": 1099645845504
+            }
+          ],
+          "channels": [
+            "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+            "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+          ],
+          "is_archived": false
+        }
+      },
+      "request": {
+        "idempotency_key": "e5d3023a-6eb4-4081-954a-fbff5489ae23",
+        "object": {
+          "type": "ITEM",
+          "id": "N54VBMXA4Z5ZGU4DQZLCZWLD",
+          "updated_at": "2026-11-11T22:30:31.075Z",
+          "created_at": "2026-11-06T15:03:45.604Z",
+          "version": 1794436231075,
+          "is_deleted": false,
+          "present_at_all_locations": true,
+          "item_data": {
+            "name": "Red Ranger Roasting Chicken, Medium",
+            "is_taxable": true,
+            "variations": [
+              {
+                "type": "ITEM_VARIATION",
+                "id": "RGGMDJ7X4YYPHNJ5RKPXDHJY",
+                "updated_at": "2026-11-06T15:03:45.554Z",
+                "created_at": "2026-11-06T15:03:45.604Z",
+                "version": 1793977425554,
+                "is_deleted": false,
+                "present_at_all_locations": true,
+                "item_variation_data": {
+                  "item_id": "N54VBMXA4Z5ZGU4DQZLCZWLD",
+                  "name": "Medium, 4.01 - 5.00 lbs",
+                  "sku": "999999000062",
+                  "ordinal": 0,
+                  "pricing_type": "FIXED_PRICING",
+                  "price_money": {
+                    "amount": 1000,
+                    "currency": "USD"
+                  },
+                  "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+                  "sellable": true,
+                  "stockable": true,
+                  "channels": [
+                    "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+                    "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+                  ]
+                },
+                "absent_at_location_ids": []
+              }
+            ],
+            "product_type": "REGULAR",
+            "ecom_visibility": "VISIBLE",
+            "image_ids": [
+              "DQXYOEVMYEFQSJA2VOI2VQO5"
+            ],
+            "categories": [
+              {
+                "id": "4BULFZ6WXLWXCCQF32Q6Z3FV",
+                "ordinal": 1099645845504
+              }
+            ],
+            "channels": [
+              "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+              "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+            ],
+            "is_archived": false
+          },
+          "absent_at_location_ids": []
+        }
+      },
+      "status": "confirmed",
+      "confirmed": {
+        "type": "ITEM",
+        "id": "N54VBMXA4Z5ZGU4DQZLCZWLD",
+        "updated_at": "2026-11-11T22:30:31.075Z",
+        "created_at": "2026-11-06T15:03:45.604Z",
+        "version": 1794436231075,
+        "is_deleted": false,
+        "present_at_all_locations": true,
+        "item_data": {
+          "name": "Red Ranger Roasting Chicken, Medium",
+          "is_taxable": true,
+          "variations": [
+            {
+              "type": "ITEM_VARIATION",
+              "id": "RGGMDJ7X4YYPHNJ5RKPXDHJY",
+              "updated_at": "2026-11-06T15:03:45.554Z",
+              "created_at": "2026-11-06T15:03:45.604Z",
+              "version": 1793977425554,
+              "is_deleted": false,
+              "present_at_all_locations": true,
+              "item_variation_data": {
+                "item_id": "N54VBMXA4Z5ZGU4DQZLCZWLD",
+                "name": "Medium, 4.01 - 5.00 lbs",
+                "sku": "999999000062",
+                "ordinal": 0,
+                "pricing_type": "FIXED_PRICING",
+                "price_money": {
+                  "amount": 1000,
+                  "currency": "USD"
+                },
+                "measurement_unit_id": "IC5AI62JDKMVPS4K7EJN2RAJ",
+                "sellable": true,
+                "stockable": true,
+                "channels": [
+                  "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+                  "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+                ]
+              }
+            }
+          ],
+          "product_type": "REGULAR",
+          "ecom_visibility": "VISIBLE",
+          "image_ids": [
+            "DQXYOEVMYEFQSJA2VOI2VQO5"
+          ],
+          "categories": [
+            {
+              "id": "4BULFZ6WXLWXCCQF32Q6Z3FV",
+              "ordinal": 1099645845504
+            }
+          ],
+          "channels": [
+            "CH_AxyOQCrL2zT57ze0DvMnBrBcKMKhRasLyj1QOQlQuYC",
+            "CH_douNx7hKmsjj9aMRJLfisvn5MJVBBd0vekaROtZi9945o"
+          ],
+          "is_archived": false
+        }
+      },
+      "confirmedAt": "2026-11-11T22:34:47.963Z"
+    }
+  ]
+}

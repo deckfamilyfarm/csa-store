@@ -344,7 +344,7 @@ function buildFileNameFromUrl(url, fallback = "product-image.jpg") {
   }
 }
 
-async function getLocalProductImageSources(db, productId) {
+export async function getLocalProductImageSources(db, productId) {
   let mediaRows = [];
   try {
     mediaRows = await db.select().from(productMedia).where(eq(productMedia.productId, productId));

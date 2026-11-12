@@ -1,0 +1,455 @@
+{
+  "capturedAt": "2026-11-11T22:25:28.371Z",
+  "activeLocations": [
+    {
+      "id": "C0T7DVZY5XVG5",
+      "name": "Deck Family Farm Market Booths and Farm Sales"
+    },
+    {
+      "id": "LJS8Z7FW504J5",
+      "name": "Hillsdale"
+    },
+    {
+      "id": "L1MHNE83A8XPY",
+      "name": "Hollywood"
+    },
+    {
+      "id": "LP8AY4081PK5E",
+      "name": "King"
+    },
+    {
+      "id": "LWREC814AB8A4",
+      "name": "LCFM"
+    },
+    {
+      "id": "LJGEXCF3N7XJ4",
+      "name": "Montavilla"
+    },
+    {
+      "id": "LVKCGC3H1QMYX",
+      "name": "PSU"
+    },
+    {
+      "id": "LBECN1NEXPGRJ",
+      "name": "Scandinavian Festival"
+    },
+    {
+      "id": "L307W0S4THZP3",
+      "name": "Springfield"
+    },
+    {
+      "id": "L373VS1QADC37",
+      "name": "St. John’s"
+    },
+    {
+      "id": "LKX3NDPZ68H74",
+      "name": "Woodstock"
+    }
+  ],
+  "rows": [
+    {
+      "id": "IS5M2UVFIMSFPBAGYZZ7T22C",
+      "name": "Bavarian Style Grazier's Sausage",
+      "categoryIds": [],
+      "categories": [],
+      "reportingCategory": null,
+      "variations": [
+        {
+          "id": "7NG2FP6SV5D3EJVLG4FEN34Q",
+          "name": "ea",
+          "sku": ""
+        }
+      ],
+      "availableAt": [
+        "Deck Family Farm Market Booths and Farm Sales",
+        "Hillsdale",
+        "Hollywood",
+        "King",
+        "LCFM",
+        "Montavilla",
+        "PSU",
+        "Scandinavian Festival",
+        "Springfield",
+        "St. John’s",
+        "Woodstock"
+      ]
+    },
+    {
+      "id": "X5UX2PTIWGXDQ3S5U3MORXZT",
+      "name": "BNF Kombucha",
+      "categoryIds": [],
+      "categories": [],
+      "reportingCategory": null,
+      "variations": [
+        {
+          "id": "GIXC63SXBXRHERVGAUP4OLQV",
+          "name": "Regular",
+          "sku": ""
+        }
+      ],
+      "availableAt": [
+        "Scandinavian Festival"
+      ]
+    },
+    {
+      "id": "WXM5MVVZNSSOZIQHHDQMWAK6",
+      "name": "Broad Breasted White Thanksgiving Turkeys, Medium",
+      "categoryIds": [],
+      "categories": [],
+      "reportingCategory": null,
+      "variations": [
+        {
+          "id": "42LRBQYMLK7NRFRLU3AZV262",
+          "name": "Heritage Large 18-25 lbs",
+          "sku": ""
+        },
+        {
+          "id": "ACSBCUQ54CQ6XNUJQYH6VREQ",
+          "name": "12.01 - 14.00  lbs",
+          "sku": ""
+        },
+        {
+          "id": "KLWMVQQZER4MT7TLQCPNYQXX",
+          "name": "White Large 25+ lbs",
+          "sku": ""
+        },
+        {
+          "id": "FDWAASU5AXRHVPD4KGJ7VJYA",
+          "name": "Heritage Large 25+ lbs",
+          "sku": ""
+        }
+      ],
+      "availableAt": [
+        "Deck Family Farm Market Booths and Farm Sales",
+        "Hillsdale",
+        "Hollywood",
+        "King",
+        "LCFM",
+        "Montavilla",
+        "PSU",
+        "Springfield",
+        "St. John’s",
+        "Woodstock"
+      ]
+    },
+    {
+      "id": "VOQME3YDXUVD2ZVARTKIS42R",
+      "name": "Chicken Thighs",
+      "categoryIds": [],
+      "categories": [],
+      "reportingCategory": null,
+      "variations": [
+        {
+          "id": "DBJMH2UAKWRD33AMSUN5ZWYY",
+          "name": "1.00 - 1.50 lbs",
+          "sku": ""
+        }
+      ],
+      "availableAt": [
+        "Deck Family Farm Market Booths and Farm Sales",
+        "Hillsdale",
+        "Hollywood",
+        "King",
+        "LCFM",
+        "Montavilla",
+        "PSU",
+        "Scandinavian Festival",
+        "Springfield",
+        "St. John’s",
+        "Woodstock"
+      ]
+    },
+    {
+      "id": "LEVEFO7MFXRUONIC3I7H3HFE",
+      "name": "Classic Meatballs",
+      "categoryIds": [],
+      "categories": [],
+      "reportingCategory": null,
+      "variations": [
+        {
+          "id": "MKNBU4O77EKKU3PRMBO4AJLJ",
+          "name": "12oz/13 Meatballs/Pack",
+          "sku": ""
+        }
+      ],
+      "availableAt": [
+        "Deck Family Farm Market Booths and Farm Sales",
+        "Hillsdale",
+        "Hollywood",
+        "King",
+        "LCFM",
+        "Montavilla",
+        "PSU",
+        "Scandinavian Festival",
+        "Springfield",
+        "St. John’s",
+        "Woodstock"
+      ]
+    },
+    {
+      "id": "R7R5YLMIBYYUXAQH5I55WE5N",
+      "name": "Deck Family Farm Insulated Bag",
+      "categoryIds": [],
+      "categories": [],
+      "reportingCategory": null,
+      "variations": [
+        {
+          "id": "USUT3WAE46WL2TOQAIY4SCKL",
+          "name": "Green Bag",
+          "sku": ""
+        }
+      ],
+      "availableAt": [
+        "Deck Family Farm Market Booths and Farm Sales",
+        "Hillsdale",
+        "Hollywood",
+        "King",
+        "LCFM",
+        "Montavilla",
+        "PSU",
+        "Springfield",
+        "St. John’s",
+        "Woodstock"
+      ]
+    },
+    {
+      "id": "SQ6ANRDASE5UMIAPXJDLXK7R",
+      "name": "Deck Family Farm Insulated Bag",
+      "categoryIds": [],
+      "categories": [],
+      "reportingCategory": null,
+      "variations": [
+        {
+          "id": "QQ6O2UWSJ7VAGMT3XHTRSLVF",
+          "name": "Blue Bag",
+          "sku": ""
+        }
+      ],
+      "availableAt": [
+        "Deck Family Farm Market Booths and Farm Sales",
+        "Hillsdale",
+        "Hollywood",
+        "King",
+        "LCFM",
+        "Montavilla",
+        "PSU",
+        "Springfield",
+        "St. John’s",
+        "Woodstock"
+      ]
+    },
+    {
+      "id": "52GV4CMWOZSDWW7VC3Z6573X",
+      "name": "Gluten Free Blueberry Scone",
+      "categoryIds": [],
+      "categories": [],
+      "reportingCategory": null,
+      "variations": [
+        {
+          "id": "ZKKXZXF5WODVW6XOHCDKC32A",
+          "name": "each",
+          "sku": ""
+        }
+      ],
+      "availableAt": [
+        "Scandinavian Festival"
+      ]
+    },
+    {
+      "id": "XHEH6EXU5CSKY4V3FLUWA4PN",
+      "name": "Gluten Free Chocolate Donut",
+      "categoryIds": [],
+      "categories": [],
+      "reportingCategory": null,
+      "variations": [
+        {
+          "id": "OP7GVICC4NK4QADUYGVKJFVP",
+          "name": "each",
+          "sku": ""
+        }
+      ],
+      "availableAt": [
+        "Scandinavian Festival"
+      ]
+    },
+    {
+      "id": "JLKTUM5MXH7F3JTHB7K4VBJC",
+      "name": "Kroppkakkor",
+      "categoryIds": [],
+      "categories": [],
+      "reportingCategory": null,
+      "variations": [
+        {
+          "id": "T2DFZBY27YQPN2TMWDV5DYKY",
+          "name": "Regular",
+          "sku": ""
+        }
+      ],
+      "availableAt": [
+        "Deck Family Farm Market Booths and Farm Sales"
+      ]
+    },
+    {
+      "id": "FKULRXIWE4PAV5FT5UFCEIJ2",
+      "name": "Old World Style Hot Dogs",
+      "categoryIds": [],
+      "categories": [],
+      "reportingCategory": null,
+      "variations": [
+        {
+          "id": "7ZMRF4LFZTTE6W5HA6QEP4DZ",
+          "name": "ea",
+          "sku": ""
+        }
+      ],
+      "availableAt": [
+        "Deck Family Farm Market Booths and Farm Sales",
+        "Hillsdale",
+        "Hollywood",
+        "King",
+        "LCFM",
+        "Montavilla",
+        "PSU",
+        "Scandinavian Festival",
+        "Springfield",
+        "St. John’s",
+        "Woodstock"
+      ]
+    },
+    {
+      "id": "ILHEC25TNXQ4LPPDALYQPVZH",
+      "name": "Pork Chop, Bone-in",
+      "categoryIds": [],
+      "categories": [],
+      "reportingCategory": null,
+      "variations": [
+        {
+          "id": "4DJSRX4DMOZJFDETAVUDZDHN",
+          "name": "1.20 - 1.50 lbs",
+          "sku": "999999000000"
+        }
+      ],
+      "availableAt": [
+        "Deck Family Farm Market Booths and Farm Sales",
+        "Hillsdale",
+        "Hollywood",
+        "King",
+        "LCFM",
+        "Montavilla",
+        "PSU",
+        "Scandinavian Festival",
+        "Springfield",
+        "St. John’s",
+        "Woodstock"
+      ]
+    },
+    {
+      "id": "7TZ2PHV5WBRXETZIWZWGIHBA",
+      "name": "Pork Chop, Boneless",
+      "categoryIds": [],
+      "categories": [],
+      "reportingCategory": null,
+      "variations": [
+        {
+          "id": "AR35EOVCDNFZ4AVG3BN6K445",
+          "name": "1.20 - 1.50 lbs",
+          "sku": "999999000041"
+        }
+      ],
+      "availableAt": [
+        "Deck Family Farm Market Booths and Farm Sales",
+        "Hillsdale",
+        "Hollywood",
+        "King",
+        "LCFM",
+        "Montavilla",
+        "PSU",
+        "Scandinavian Festival",
+        "Springfield",
+        "St. John’s",
+        "Woodstock"
+      ]
+    },
+    {
+      "id": "N54VBMXA4Z5ZGU4DQZLCZWLD",
+      "name": "Red Ranger Roasting Chicken, Medium",
+      "categoryIds": [],
+      "categories": [],
+      "reportingCategory": null,
+      "variations": [
+        {
+          "id": "RGGMDJ7X4YYPHNJ5RKPXDHJY",
+          "name": "Medium, 4.01 - 5.00 lbs",
+          "sku": "999999000062"
+        }
+      ],
+      "availableAt": [
+        "Deck Family Farm Market Booths and Farm Sales",
+        "Hillsdale",
+        "Hollywood",
+        "King",
+        "LCFM",
+        "Montavilla",
+        "PSU",
+        "Scandinavian Festival",
+        "Springfield",
+        "St. John’s",
+        "Woodstock"
+      ]
+    },
+    {
+      "id": "RV3JWBI2MVGAZEFD3Z7RMLJL",
+      "name": "Red Ranger Roasting Chicken, Small",
+      "categoryIds": [],
+      "categories": [],
+      "reportingCategory": null,
+      "variations": [
+        {
+          "id": "MJLIJD3MJWYRUJDXYWKVBMCF",
+          "name": "Small, 3.00 - 4.00 lbs",
+          "sku": "999999000061"
+        }
+      ],
+      "availableAt": [
+        "Deck Family Farm Market Booths and Farm Sales",
+        "Hillsdale",
+        "Hollywood",
+        "King",
+        "LCFM",
+        "Montavilla",
+        "PSU",
+        "Scandinavian Festival",
+        "Springfield",
+        "St. John’s",
+        "Woodstock"
+      ]
+    },
+    {
+      "id": "R4NQPB7JMMTFNNECJOKHDET4",
+      "name": "Smoked Pork Hocks -Skin-on and Smoked",
+      "categoryIds": [],
+      "categories": [],
+      "reportingCategory": null,
+      "variations": [
+        {
+          "id": "KGOFCNSLBVXUD75TOLKHFQB7",
+          "name": "0.8 - 1.2 lbs",
+          "sku": "999999000171"
+        }
+      ],
+      "availableAt": [
+        "Deck Family Farm Market Booths and Farm Sales",
+        "Hillsdale",
+        "Hollywood",
+        "King",
+        "LCFM",
+        "Montavilla",
+        "PSU",
+        "Scandinavian Festival",
+        "Springfield",
+        "St. John’s",
+        "Woodstock"
+      ]
+    }
+  ]
+}

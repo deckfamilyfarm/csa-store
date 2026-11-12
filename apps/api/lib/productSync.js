@@ -12,6 +12,7 @@ import { auditVendorGroup, auditProductScope, auditProducts } from "./productSyn
 import { PRICELIST_PENDING_REMOTE_APPLY_SQL } from "./productWorkspaceFilters.js";
 import { assertProductWideSaleAllowed } from './customerPriceOverrides.js';
 import { assertLegacyPricingPublicationAllowed, getApprovedEnterpriseRevision, recordEnterpriseAuditResult, recordEnterpriseReleaseResult } from './enterprisePricingService.js';
+import { prepareSquareImageActions } from './squareProductImages.js';
 
 export async function loadCurrentSnapshot(connection, productId) {
   const [rows] = await connection.query(`SELECT p.id AS productId, p.name AS productName, p.visible, p.track_inventory AS trackInventory, p.inventory,
@@ -62,6 +63,12 @@ export async function createProductSyncAudit(options, user) {
   const roles = user.adminRoles || [];
   const platforms = [...new Set(options.platforms || [])];
   if (!platforms.length || platforms.some(platform => !PLATFORM_LABEL[platform])) fail("Select Local Line, Square, or both.");
+  const squareImagesOnly = options.squareImagesOnly === true;
+  const includeSquareImages = options.includeSquareImages === true;
+  if (options.squareImagesOnly != null && typeof options.squareImagesOnly !== 'boolean') fail('Invalid Square image check.');
+  if (options.includeSquareImages != null && typeof options.includeSquareImages !== 'boolean') fail('Invalid Square image inclusion.');
+  if (includeSquareImages && (!platforms.includes('square') || options.incoming || squareImagesOnly)) fail('Include photos with an outgoing Square check, or select images only.');
+  if (squareImagesOnly && (platforms.length !== 1 || platforms[0] !== 'square' || options.incoming || options.enterpriseRevisionId || options.publicationScope || options.staged?.length)) fail('Check Square images separately, without pricing, staged edits, or incoming repairs.');
   for (const platform of platforms) {
     if (![`${platform}_pull`, `${platform}_push`, "pricing_admin", "pricing_publisher"].some(role => hasGrant(roles, role))) fail(`You cannot audit ${PLATFORM_LABEL[platform]}.`, 403);
   }
@@ -80,7 +87,7 @@ export async function createProductSyncAudit(options, user) {
     if (!same(platforms.slice().sort(), expectedPlatforms.slice().sort())) fail("Check every required destination for the approved product.");
   }
   if (Object.keys(staged).some(id => productIds.length && !productIds.includes(Number(id)))) fail("Staged products must be in the audit scope.");
-  const normalized = { platforms, staged, productIds, enterpriseRevisionId, ...((localLinePricesOnly || selectedPrices) ? { publicationScope: options.publicationScope, productEditorSync: options.productEditorSync === true } : {}), productScope: auditProductScope(options, productIds), incoming: Boolean(options.incoming), vendorGroup: auditVendorGroup(options) };
+  const normalized = { platforms, staged, productIds, enterpriseRevisionId, ...(squareImagesOnly ? { squareImagesOnly: true } : {}), ...(includeSquareImages ? { includeSquareImages: true } : {}), ...((localLinePricesOnly || selectedPrices) ? { publicationScope: options.publicationScope, productEditorSync: options.productEditorSync === true } : {}), productScope: auditProductScope(options, productIds), incoming: Boolean(options.incoming), vendorGroup: auditVendorGroup(options) };
   const [result] = await getPool().query(`INSERT INTO product_sync_audits (status, options_json, created_by, created_at) VALUES ('running', ?, ?, UTC_TIMESTAMP())`, [JSON.stringify(normalized), user.userId || user.adminId || null]);
   const id = Number(result.insertId);
   // Work survives navigation. All progress and results are stored centrally.
@@ -115,7 +122,12 @@ async function runProductSyncAudit(id, options, userId) {
         if (!scopedIds.length) continue;
         await syncSquareCatalogCache({ userId });
         await getPool().query("UPDATE product_sync_audits SET square_refreshed_at=UTC_TIMESTAMP(), progress_at=UTC_TIMESTAMP() WHERE id=?", [id]);
+        if (options.squareImagesOnly) {
+          await prepareSquareImageActions(products, save);
+          continue;
+        }
         for (const action of await prepareSquareActions({ ...options, productIds: scopedIds, includeAllProducts: true, enterpriseRevision })) await save(action);
+        if (options.includeSquareImages) await prepareSquareImageActions(products, save, { enterpriseRevision, staged: options.staged, includeMissing: false });
         const matches = await buildSquareMatchReview({ includeAllProducts: true, productIds: scopedIds });
         for (const row of matches.rows || []) {
           if (row.linked || !productSet.has(Number(row.productId))) continue;
@@ -235,7 +247,10 @@ export async function createProductSyncRelease(body, user) {
         if (required.some(platform => !auditActions.some(row => row.platform === platform))) fail("The coordinated audit is missing a required destination.");
         if (auditActions.some(row => ["blocked", "review", "held"].includes(row.status))) fail("Resolve every destination blocker before publishing this product.");
         if (auditActions.some(row => ["changed", "synced"].includes(row.status) && !actions.some(action => action.id === Number(row.id)))) fail("Select every required destination action for this product.");
-      } else await assertLegacyPricingPublicationAllowed(productIds);
+      } else {
+        const pricingIds = [...new Set(actions.filter(action => !(action.platform === 'square' && action.kind === 'image')).map(action => action.productId))];
+        if (pricingIds.length) await assertLegacyPricingPublicationAllowed(pricingIds);
+      }
       // Serialize against other approvals and legacy releases; no product can have conflicting staged plans.
       await connection.query("SELECT id FROM products WHERE id IN (?) FOR UPDATE", [productIds]);
       const [conflicts] = await connection.query(`SELECT DISTINCT a.product_name FROM product_sync_release_actions ra
@@ -244,10 +259,10 @@ export async function createProductSyncRelease(body, user) {
       const [legacy] = await connection.query(`SELECT i.product_name FROM pricelist_change_items i JOIN pricelist_change_batches b ON b.id=i.batch_id
         WHERE i.product_id IN (?) AND b.status IN ('scheduled','running') AND i.status IN ('pending','local_applied')`, [productIds]);
       if (conflicts.length || legacy.length) fail(`${conflicts[0]?.product_name || legacy[0]?.product_name} already has unfinished release actions. Resolve or review that release first.`, 409);
-      // A laptop-owned price batch must not be resumed by an older deployed
-      // scheduler that lacks sale-baseline support. The CLI resumes its receipt
+      // A laptop-owned price/image batch must not be resumed by an older deployed
+      // scheduler that lacks this protocol. The CLI resumes its receipt
       // explicitly with allowFuture; this is not a customer-scheduled release.
-      const localWorkerOnly = body.localWorkerOnly && !validateSelectedPriceScope(audit.options) && validateLocalLinePriceScope(audit.options);
+      const localWorkerOnly = body.localWorkerOnly && (audit.options.squareImagesOnly || validateSelectedPriceScope(audit.options) || validateLocalLinePriceScope(audit.options));
       const [result] = await connection.query(`INSERT INTO product_sync_releases (audit_id, name, status, scheduled_at, is_scheduled, created_by, created_at)
         VALUES (?, ?, 'scheduled', ?, ?, ?, UTC_TIMESTAMP())`, [body.auditId, String(body.name || "Product release").slice(0, 255), localWorkerOnly ? "9999-01-01 00:00:00" : scheduledAt || utcNow(), Number(Boolean(scheduledAt)), user.userId || user.adminId || null]);
       const releaseId = Number(result.insertId);
@@ -288,6 +303,7 @@ export async function getProductSyncReleaseProgress(id) {
   if (!rows.length) fail("Release not found.", 404);
   const [actions] = await getPool().query(`SELECT a.id, a.product_id AS productId, a.product_name AS productName, a.platform,
     ra.status, ra.message, JSON_UNQUOTE(JSON_EXTRACT(a.data_json, '$.packageName')) AS packageName,
+    JSON_UNQUOTE(JSON_EXTRACT(a.data_json, '$.kind')) AS kind,
     DATE_FORMAT(ra.updated_at, '%Y-%m-%d %H:%i:%s') AS updatedUtc
     FROM product_sync_release_actions ra JOIN product_sync_actions a ON a.id=ra.action_id
     WHERE ra.release_id=? ORDER BY a.product_id, a.platform, a.id`, [id]);
@@ -473,7 +489,7 @@ export async function reviewProductSyncRelease(id, user) {
   const unfinished = release.actions.filter(action => ["held", "failed"].includes(action.status));
   if (!unfinished.length) fail("No unfinished actions need review.");
   const [products] = await getPool().query("SELECT * FROM product_sync_release_products WHERE release_id=?", [id]);
-  return createProductSyncAudit({ enterpriseRevisionId: sourceAudit.options.enterpriseRevisionId, publicationScope: sourceAudit.options.publicationScope, vendorGroup: sourceAudit.options.vendorGroup, incoming: false, platforms: [...new Set(unfinished.map(action => action.platform))], productIds: [...new Set(unfinished.map(action => action.productId))], includeAllProducts: true,
+  return createProductSyncAudit({ squareImagesOnly: sourceAudit.options.squareImagesOnly, includeSquareImages: sourceAudit.options.includeSquareImages && unfinished.some(action => action.platform === 'square'), enterpriseRevisionId: sourceAudit.options.enterpriseRevisionId, publicationScope: sourceAudit.options.publicationScope, vendorGroup: sourceAudit.options.vendorGroup, incoming: false, platforms: [...new Set(unfinished.map(action => action.platform))], productIds: [...new Set(unfinished.map(action => action.productId))], includeAllProducts: true,
     staged: products.filter(product => unfinished.some(action => action.productId === Number(product.product_id)) && !product.local_applied_at && Object.keys(parseJson(product.staged_json, {})).length).map(product => ({ productId: product.product_id, changes: parseJson(product.staged_json) })) }, user);
 }
 export async function applyProductSyncIncoming(body, user) {

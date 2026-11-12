@@ -136,6 +136,7 @@ export function ProductPricingSync({ productId, token, roles, dirty, onChanged, 
       busy={!!request || running} refreshVersion={setupRefresh} onSetup={setSquareSetup}
       onBusy={value => { setSquareBusy(value); callbacks.current.onRequestBusy?.(value); }} onChanged={squareChanged} />}
     {data && !data.input?.squareEnabled && <p>Square is disabled for this product. Enable Square in Pricing and save to set up its links here.</p>}
+    {data?.input?.squareEnabled && <p className="small">Sync Square also updates the saved primary photo at every location where the item is available, including its primary Square Online image. Other Square photos are kept. Products without a saved photo keep their current icon.</p>}
     <div className="admin-actions product-sync-actions">
       {[
         {label:'Sync Local Line',platforms:['localline']},

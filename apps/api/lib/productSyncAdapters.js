@@ -25,6 +25,7 @@ import { liveLocalLinePriceComparison, refreshEnterprisePriceCache } from './ent
 import { same, preflight } from "./productSyncCore.js";
 import { parseJson } from "./productSyncSchema.js";
 import { normalizeCustomerPriceOverrides } from './customerPriceOverrides.js';
+import { inspectSquareImage, executeSquareImage } from './squareProductImages.js';
 
 const pick = (row, keys) => Object.fromEntries(keys.map(key => [key, row?.[key] ?? null]));
 const number = value => value == null ? null : Number(value);
@@ -236,6 +237,7 @@ export async function prepareLocalLineAction(product, staged = {}, { onRefresh, 
   return action;
 }
 export async function inspectAction(action, saveCheckpoint = async () => {}) {
+  if (action.platform === 'square' && action.kind === 'image') return inspectSquareImage(action);
   requireEnterpriseCostPolicy(action);
   if(action.platform==='localline')assertNoUnsafeLocalLineStock(action.checkpoint?.payload || action.payload || {});
   const checkpoint = action.checkpoint || {};
@@ -345,6 +347,7 @@ async function finishCreatedLink(action, checkpoint, token, saveCheckpoint) {
   await saveCheckpoint(checkpoint);
 }
 export async function executeAction(action, current, saveCheckpoint) {
+  if (action.platform === 'square' && action.kind === 'image') return executeSquareImage(action, current, saveCheckpoint);
   requireEnterpriseCostPolicy(action);
   if (action.platform === "square") {
     const checkpoint = action.checkpoint || {};

@@ -85,7 +85,7 @@ try:
     env.update(PRODUCT_SYNC_TEST_SOCKET=str(root / 'mysql.sock'),
         STOREFRONT_TEST_SOCKET=str(root / 'mysql.sock'), REQUIRE_STABILIZATION_INTEGRATION='true')
     tests = ['memberFinancial', 'localLineOrders', 'enterprisePricing', 'productSync',
-        'productFarmStock', 'storefront', 'squareProductCreation']
+        'productFarmStock', 'storefront', 'squareProductCreation', 'squareProductImages']
     result = subprocess.run(['node', '--test', '--test-concurrency=1',
         *[f'apps/api/lib/{name}.integration.test.js' for name in tests]], env=env, cwd=repo)
     raise SystemExit(result.returncode)

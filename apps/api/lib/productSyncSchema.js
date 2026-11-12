@@ -39,6 +39,11 @@ async function bootstrap() {
     ) ENGINE=InnoDB`,
     `CREATE TABLE IF NOT EXISTS product_sync_image_receipts (
       product_id INT PRIMARY KEY, sources_json LONGTEXT NOT NULL, remote_json LONGTEXT NOT NULL
+    ) ENGINE=InnoDB`,
+    `CREATE TABLE IF NOT EXISTS square_sync_images (
+      id CHAR(64) PRIMARY KEY, content_sha256 CHAR(64) NOT NULL,
+      image_bytes MEDIUMBLOB NOT NULL, request_key CHAR(36) NOT NULL,
+      result_json LONGTEXT, created_at DATETIME NOT NULL
     ) ENGINE=InnoDB`
   ]) await getPool().query(sql);
 }
