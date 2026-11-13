@@ -1,0 +1,91 @@
+{
+  "verifiedAt": "2026-11-13T21:28:20.352Z",
+  "categories": [
+    {
+      "id": "BDZUJK5AJ6AL2BOBRPW5QQHR",
+      "name": "Eggs"
+    },
+    {
+      "id": "LLVZKNQ2X2TLTDN35Q72SSAR",
+      "name": "Grassfed Beef"
+    },
+    {
+      "id": "6C5TECIVAYKYC5YDVCFU5W4W",
+      "name": "Honey, Nuts, and Fruit"
+    },
+    {
+      "id": "AXVAKAQI7FC435RERZ27RK5G",
+      "name": "Hyland Processing"
+    },
+    {
+      "id": "ZHCRXCR7Q3MRKICXKVWVZECW",
+      "name": "Pasture Raised Pork"
+    },
+    {
+      "id": "4JSBKDXUUSTEGUDE7CEAQ7QT",
+      "name": "Roasters"
+    },
+    {
+      "id": "S2ARYYCTRBTEVTVOR4IHEPPS",
+      "name": "Sausages & N Free Cures"
+    },
+    {
+      "id": "O3LO55EVBWU3QXNAJGOGFJNV",
+      "name": "Spring Lamb"
+    },
+    {
+      "id": "FVL2C232OWWY5XYAOMYOUDQ7",
+      "name": "Variety & Other"
+    }
+  ],
+  "counts": {
+    "product": 122,
+    "square-item": 131,
+    "category": 5
+  },
+  "defaults": [
+    {
+      "localCategoryId": "3",
+      "localCategoryName": "Pasture-raised Pork 🐖",
+      "squareCategories": [
+        "Pasture Raised Pork"
+      ]
+    },
+    {
+      "localCategoryId": "5",
+      "localCategoryName": "Grass-fed Beef 🐮",
+      "squareCategories": [
+        "Grassfed Beef"
+      ]
+    },
+    {
+      "localCategoryId": "7",
+      "localCategoryName": "Pasture-raised Poultry🐔",
+      "squareCategories": [
+        "Roasters"
+      ]
+    },
+    {
+      "localCategoryId": "6",
+      "localCategoryName": "Spring Lamb 🐑",
+      "squareCategories": [
+        "Spring Lamb"
+      ]
+    },
+    {
+      "localCategoryId": "23",
+      "localCategoryName": "Organic Eggs 🍳 🥚",
+      "squareCategories": [
+        "Eggs"
+      ]
+    }
+  ],
+  "issues": [],
+  "validation": {
+    "focusedTests": 61,
+    "disposableDatabaseTests": 61,
+    "skipped": 0,
+    "database": "Native MySQL 8.4; Docker unavailable",
+    "frontendBuild": "passed"
+  }
+}

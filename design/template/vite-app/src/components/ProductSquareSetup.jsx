@@ -10,6 +10,7 @@ const label = row => [row.itemName, row.variationName].filter(Boolean).join(' / 
 export function ProductSquareSetup({ productId, token, roles = [], data, dirty, busy = false, refreshVersion = 0, onSetup, onBusy, onChanged }) {
   const [setup, setSetup] = useState(null), [loading, setLoading] = useState(true), [search, setSearch] = useState('');
   const [selections, setSelections] = useState({}), [creation, setCreation] = useState(null);
+  const [categoryChoice, setCategoryChoice] = useState('');
   const [request, setRequest] = useState(''), [error, setError] = useState(''), [message, setMessage] = useState('');
   const mounted = useRef(false), sequence = useRef(0), requestLock = useRef(false);
   const creationReview = useRef(null);
@@ -22,6 +23,7 @@ export function ProductSquareSetup({ productId, token, roles = [], data, dirty, 
     const result = await get(`enterprise-pricing/products/${productId}/square-setup${query.trim() ? `?search=${encodeURIComponent(query.trim())}` : ''}`);
     if (mounted.current && version === sequence.current) {
       setSetup(result); callbacks.current.onSetup?.(result);
+      setCategoryChoice(result.categoryMapping?.override ? result.categoryMapping.assignment?.categoryIds?.[0] || '' : 'inherit');
       if (recoverableSquareCreation(result.creation)) setCreation(result.creation);
     }
     return result;
@@ -113,6 +115,26 @@ export function ProductSquareSetup({ productId, token, roles = [], data, dirty, 
             placeholder="Search the existing Square catalog" /></label>
           <button type="button" className="button alt" onClick={refreshCatalog} disabled={disabled || !canLink || !setup.enabled}>Refresh Square catalog</button>
         </div>
+        {setup.categoryMapping && <div className="product-square-package">
+          <label htmlFor={`square-category-${productId}`}>Square category mapping</label>
+          <p>{setup.categoryMapping.categoryNames.length ? setup.categoryMapping.categoryNames.join(', ') : 'Choose a category before creating this product in Square.'}
+            {setup.categoryMapping.source === 'category' ? ' (local category default)' : ''}</p>
+          <select id={`square-category-${productId}`} className="input" value={categoryChoice} onChange={e => setCategoryChoice(e.target.value)} disabled={disabled || !canLink}>
+            <option value="inherit">Use saved item mapping or local category default</option>
+            {setup.categoryMapping.categories.map(category => <option key={category.id} value={category.id}>{category.name}</option>)}
+          </select>
+          <button type="button" className="button alt" disabled={disabled || !canLink || !categoryChoice} onClick={() => run('Saving the category mapping…', async () => {
+            await post(`enterprise-pricing/products/${productId}/square-category`, { categoryId: categoryChoice === 'inherit' ? null : categoryChoice, expectedRevision: setup.categoryMapping.revision });
+            if (mounted.current) { if (!recoverableSquareCreation(creation)) setCreation(null); setMessage('Square category mapping saved locally. New item creation will include it.'); }
+            await load();
+          })}>Save category mapping</button>
+          <button type="button" className="button alt" disabled={disabled || !canLink} onClick={() => run('Refreshing Square category names…', async () => {
+            await post('enterprise-pricing/square-categories/refresh', {}); await load();
+            if (mounted.current) setMessage('Square category names refreshed. Saved product assignments are preserved.');
+          })}>Refresh category names</button>
+          <p className="small">Used when creating a new Square item. Saving this mapping does not move an existing Square item or change its price.</p>
+          {setup.categoryMapping.issue && <p role="alert">{setup.categoryMapping.issue}</p>}
+        </div>}
         {!setup.rows.length && <p>Add a local package before matching or creating this product in Square.</p>}
         {setup.rows.map(row => {
           const choices = squareMatchChoices(row);
@@ -149,6 +171,7 @@ export function ProductSquareSetup({ productId, token, roles = [], data, dirty, 
         <h5>{recoverableSquareCreation(creation) ? 'Finish Square creation' : 'Review Create in Square'}</h5>
         <p>Create <strong>{creation.productName}</strong> in Square ({creation.environment}) and link these packages.</p>
         {creation.presentAtAllLocations && <p className="small">The item and variations will be available at all Square locations.</p>}
+        {creation.squareCategory && <p>Square category: {creation.squareCategory.categories.map(row => row.name).join(', ')}</p>}
         <div className="table-wrap"><table className="admin-table"><thead><tr><th>Package</th><th>Square price</th><th>Selling unit</th></tr></thead><tbody>
           {creation.variations.map(row => <tr key={row.packageId}><td>{row.name}</td><td>{money(row.amount, row.currency)}</td><td>{row.unit || row.sellingUnit?.unit || 'each/package'}</td></tr>)}
         </tbody></table></div>

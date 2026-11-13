@@ -7,6 +7,7 @@ import { computeSquareRetailPackagePrice, fetchSquare, getSquareConfig, listSqua
 import { expectedSquareUnit, planSquareUnit, squareUnitSnapshot } from './squarePricingUnits.js';
 import { same } from './productSyncCore.js';
 import { ensureEnterprisePricingSchema } from './enterprisePricingSchema.js';
+import { squareCategoryForCreation, verifyCreatedSquareCategories } from './squareCategoryCrosswalk.js';
 
 const parse = value => typeof value === "string" ? JSON.parse(value) : value;
 const fail = (message, status = 409) => Object.assign(new Error(message), { status });
@@ -71,6 +72,8 @@ export function squareCreationRequest(preview, id) {
   const itemId = `#product-${preview.productId}`;
   return { idempotency_key: id, object: { type: "ITEM", id: itemId, ...availability, item_data: {
     name: preview.productName, product_type: "REGULAR",
+    ...(preview.squareCategory ? { categories: preview.squareCategory.categoryIds.map(id => ({id})),
+      reporting_category: {id:preview.squareCategory.reportingCategoryId} } : {}),
     variations: preview.variations.map(row => ({ type: "ITEM_VARIATION", id: `#package-${row.packageId}`, ...availability,
       item_variation_data: { item_id: itemId, name: row.name, ...(row.sku ? { sku: row.sku } : {}),
         ...(row.sellingUnit?.id ? { measurement_unit_id: row.sellingUnit.id } : {}),
@@ -99,9 +102,10 @@ async function loadPreview(productId) {
   const enterpriseRevision = state ? { id: state.id, status: state.status, input: parse(state.inputJson), output: parse(state.outputJson) } : null;
   const { packagesByProductId, metaByPackageId } = await loadPackagesByProduct([productId]);
   const units = await loadSquareMeasurementUnits();
-  return buildSquareCreationPreview({ ...row, enterpriseRevision, profile: row, vendor: { id: row.vendorId, name: row.vendorName,
+  const preview = buildSquareCreationPreview({ ...row, enterpriseRevision, profile: row, vendor: { id: row.vendorId, name: row.vendorName,
     priceListMarkup: row.vendorPriceListMarkup, sourceMultiplier: row.vendorSourceMultiplier,
     guestMarkup: row.vendorGuestMarkup, memberMarkup: row.vendorMemberMarkup } }, packagesByProductId.get(productId) || [], metaByPackageId, units);
+  return { ...preview, squareCategory: await squareCategoryForCreation(productId) };
 }
 async function requireUnlinked(productId, connection = getPool()) {
   const [links] = await connection.query("SELECT package_id FROM square_variation_links WHERE product_id=?", [productId]);
@@ -158,6 +162,7 @@ export function creationLinks(preview, result, confirmed) {
   const itemId = mappings.get(`#product-${preview.productId}`);
   if (!itemId || confirmed?.id !== itemId || confirmed.type !== "ITEM" || confirmed.is_deleted
     || confirmed.item_data?.name !== preview.productName) throw fail("The created Square item needs review before links can be saved.");
+  verifyCreatedSquareCategories(preview.squareCategory, confirmed);
   const variations = confirmed.item_data?.variations || [];
   // Older in-flight requests retain their approved location settings when retried.
   if (preview.presentAtAllLocations && [confirmed, ...variations].some(object =>

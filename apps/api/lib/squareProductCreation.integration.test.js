@@ -27,6 +27,16 @@ test("Square creation previews, explicit approval, durable recovery, and guarded
   await pool.query("INSERT INTO vendors (id,name) VALUES (1,'Hyland')");
   const { previewSquareProductCreation: preview, applySquareProductCreation: apply, getSquareProductCreation } = await import("./squareProductCreation.js");
   const receipts = new Map(), objects = new Map(), requests = [];
+  const {migrateSquareCategorySchema} = await import('./squareCategorySchema.js');
+  const {squareCategoryTarget,getSquareCategorySetup,saveSquareProductCategory,refreshSquareCategoryRegistry,importSquareCategoryCrosswalk} = await import('./squareCategoryCrosswalk.js');
+  await migrateSquareCategorySchema(pool);
+  const category={id:'MEAT-CATEGORY',type:'CATEGORY',version:1,category_data:{name:'Meat',category_type:'REGULAR_CATEGORY'}};
+  objects.set(category.id,category);
+  const categoryTarget=squareCategoryTarget();
+  await pool.query('INSERT INTO square_category_registry(target_hash,square_category_id,name,raw_json,updated_at) VALUES (?,?,?,?,NOW())',
+    [categoryTarget,category.id,'Meat',JSON.stringify(category)]);
+  await pool.query("INSERT INTO square_category_crosswalk(target_hash,scope,source_id,assignment_json,evidence_json,updated_at) VALUES (?,'category','1',?,'{}',NOW())",
+    [categoryTarget,JSON.stringify({categoryIds:[category.id],reportingCategoryId:category.id})]);
   let loseResponse = false, failRead = false, rejectNext = false, pauseCreate = null;
   t.mock.method(globalThis, "fetch", async (url, options = {}) => {
     const parsed = new URL(url); assert.equal(parsed.hostname, "square.test");
@@ -49,7 +59,7 @@ test("Square creation previews, explicit approval, durable recovery, and guarded
       return json(receipt);
     }
     if (parsed.pathname.startsWith("/v2/catalog/object/")) {
-      if (failRead) { failRead = false; throw new Error("Confirmation unavailable"); }
+      if (failRead && !objects.get(parsed.pathname.split('/').pop())?.category_data) { failRead = false; throw new Error("Confirmation unavailable"); }
       return json({ object: objects.get(parsed.pathname.split("/").pop()) });
     }
     throw new Error(`Unexpected request ${url}`);
@@ -65,6 +75,7 @@ test("Square creation previews, explicit approval, durable recovery, and guarded
   await t.test("preview does not publish; approve creates and confirms all packages once", async () => {
     await product(1); const draft = await preview(1, 7);
     assert.equal(writes().length, 0); assert.equal(draft.variations[0].amount, 1000);
+    assert.deepEqual(draft.squareCategory.categoryIds,[category.id]);
     assert.equal((await preview(1, 8)).id, draft.id);
     const done = await apply(draft.id, 7);
     assert.equal(done.status, "completed"); assert.equal((await links(1)).length, 2);
@@ -234,6 +245,73 @@ test("Square creation previews, explicit approval, durable recovery, and guarded
       }
     }
   });
+  await t.test('category mappings require review, freeze at creation, reject stale edits and survive lost responses', async () => {
+    await product(31);
+    const alternate={id:'OTHER-CATEGORY',type:'CATEGORY',version:1,category_data:{name:'Variety & Other',category_type:'REGULAR_CATEGORY'}};
+    objects.set(alternate.id,alternate);
+    await pool.query('INSERT INTO square_category_registry(target_hash,square_category_id,name,raw_json,updated_at) VALUES (?,?,?,?,NOW())',
+      [categoryTarget,alternate.id,alternate.category_data.name,JSON.stringify(alternate)]);
+    const initial=await getSquareCategorySetup(31);
+    assert.equal(initial.source,'category');
+    const count=writes().length;
+    const explicit=await saveSquareProductCategory(31,{categoryId:alternate.id,expectedRevision:initial.revision},7);
+    assert.equal(explicit.source,'product');assert.deepEqual(explicit.assignment.categoryIds,[alternate.id]);
+    assert.equal(writes().length,count,'Saving local mapping must never publish.');
+    await assert.rejects(saveSquareProductCategory(31,{categoryId:category.id,expectedRevision:initial.revision},7),/changed/);
+    const draft=await preview(31,7);
+    await saveSquareProductCategory(31,{categoryId:category.id,expectedRevision:explicit.revision},7);
+    await assert.rejects(apply(draft.id,7),/changed/);
+    const revised=await preview(31,7); loseResponse=true;
+    await assert.rejects(apply(revised.id,7),/Connection lost/);
+    const saved=await getSquareCategorySetup(31);
+    await saveSquareProductCategory(31,{categoryId:alternate.id,expectedRevision:saved.revision},7);
+    await apply(revised.id,7);
+    const attempts=writes().filter(row=>row.body.idempotency_key===revised.id);
+    assert.equal(attempts.length,2); assert.deepEqual(attempts[0].body,attempts[1].body);
+    assert.deepEqual(attempts[0].body.object.item_data.categories,[{id:category.id}]);
+    await product(32); await pool.query('UPDATE products SET category_id=NULL WHERE id=32');
+    await assert.rejects(preview(32,7),/Choose a Square category/);
+    const unassigned=await getSquareCategorySetup(32);
+    await saveSquareProductCategory(32,{categoryId:alternate.id,expectedRevision:unassigned.revision},7);
+    const pending=await preview(32,7);
+    alternate.is_deleted=true;
+    await assert.rejects(apply(pending.id,7),/changed or was deleted/);
+    delete alternate.is_deleted;
+    const current=await getSquareCategorySetup(32);
+    await saveSquareProductCategory(32,{categoryId:null,expectedRevision:current.revision},7);
+    assert.equal((await getSquareCategorySetup(32)).assignment,null);
+  });
+  await t.test('legacy in-flight creation keeps its original uncategorized body during recovery', async()=>{
+    await product(33); const draft=await preview(33,7);
+    const [[saved]]=await pool.query('SELECT preview_json,request_json FROM square_product_creations WHERE id=?',[draft.id]);
+    const oldPreview=JSON.parse(saved.preview_json),oldRequest=JSON.parse(saved.request_json);
+    delete oldPreview.squareCategory;delete oldRequest.object.item_data.categories;delete oldRequest.object.item_data.reporting_category;
+    await pool.query("UPDATE square_product_creations SET status='sending',preview_json=?,request_json=? WHERE id=?",[JSON.stringify(oldPreview),JSON.stringify(oldRequest),draft.id]);
+    await apply(draft.id,7);
+    assert.deepEqual(writes().find(row=>row.body.idempotency_key===draft.id).body,oldRequest);
+  });
+  await t.test('category name refresh preserves assignments, tracks deleted IDs and never guesses replacement IDs',async()=>{
+    await product(34);
+    const before=await getSquareCategorySetup(34);
+    const [[savedBefore]]=await pool.query("SELECT assignment_json FROM square_category_crosswalk WHERE target_hash=? AND scope='category' AND source_id='1'",[categoryTarget]);
+    const count=writes().length;
+    category.category_data.name='Renamed Meat';
+    await assert.rejects(preview(34,7),/category changed/);
+    await refreshSquareCategoryRegistry();
+    const renamed=await getSquareCategorySetup(34);
+    assert.deepEqual(renamed.categoryNames,['Renamed Meat']);assert.notEqual(renamed.revision,before.revision);
+    const draft=await preview(34,7);
+    assert.equal(draft.squareCategory.categories[0].name,'Renamed Meat');
+    category.is_deleted=true;
+    await refreshSquareCategoryRegistry();
+    assert.match((await getSquareCategorySetup(34)).issue,/unavailable/);
+    const [[savedAfter]]=await pool.query("SELECT assignment_json FROM square_category_crosswalk WHERE target_hash=? AND scope='category' AND source_id='1'",[categoryTarget]);
+    assert.equal(savedAfter.assignment_json,savedBefore.assignment_json);
+    assert.equal(writes().length,count);
+    delete category.is_deleted;category.category_data.name='Meat';await refreshSquareCategoryRegistry();
+    await assert.rejects(importSquareCategoryCrosswalk({registry:[],bindings:[]},categoryTarget),/already exists/);
+    await assert.rejects(importSquareCategoryCrosswalk({registry:[],bindings:[]},'different-target'),/connection changed/);
+  });
   await t.test('pricing popup setup is scoped, searchable, read-only and recovers the durable creation receipt', async () => {
     const { default: router } = await import('../routes/enterprisePricing.js');
     const { upsertReturnedSquareObjects } = await import('./squareStoreSync.js');
@@ -261,6 +339,7 @@ test("Square creation previews, explicit approval, durable recovery, and guarded
     assert.equal(setup.result.rows.length, 2);
     assert.ok(setup.result.rows.every(row => row.productId === 15));
     assert.equal(setup.result.creation, null);
+    assert.equal(setup.result.categoryMapping.source,'category');
     assert.equal((await links(15)).length, 0);
     const searched = await read(15, 'EXACT-MANUAL');
     assert.ok(searched.result.rows.every(row => row.candidates.length === 1 && row.candidates[0].squareVariationId === 'manual-variation'));
@@ -276,6 +355,14 @@ test("Square creation previews, explicit approval, durable recovery, and guarded
       await handlers[0]({ admin: { adminRoles: roles } }, { status(code) { status = code; return this; }, json() {} }, () => { allowed = true; });
       assert.equal(allowed, roles[0] !== 'pricing_editor');
       assert.equal(status, allowed ? 200 : 403);
+    }
+    for (const path of ['/products/:id/square-category','/square-categories/refresh']) {
+      const permission=router.stack.find(layer=>layer.route?.path===path).route.stack[0].handle;
+      for (const role of ['square_pull','square_push','pricing_editor','admin']) {
+        let allowed=false;
+        await permission({admin:{adminRoles:[role]}},{status(){return this;},json(){}},()=>{allowed=true;});
+        assert.equal(allowed,['square_pull','admin'].includes(role));
+      }
     }
   });
 });

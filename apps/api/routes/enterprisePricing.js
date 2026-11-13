@@ -7,6 +7,7 @@ import { SELECTED_PRICE_SCOPE, validateSelectedPriceScope } from '../lib/localLi
 import { requireAdminPermission } from "../middleware/auth.js";
 import { buildSquareMatchReview, isSquareEnabled } from '../lib/squareStoreSync.js';
 import { getSquareProductCreation } from '../lib/squareProductCreation.js';
+import { getSquareCategorySetup, saveSquareProductCategory, refreshSquareCategoryRegistry } from '../lib/squareCategoryCrosswalk.js';
 import { listBundles, getBundle, previewBundle, saveBundle, createBundle } from '../lib/enterpriseBundles.js';
 import {
   approveEnterprisePricingRevision, enterprisePricingMigrationReport, enterprisePricingSummary, getEnterprisePricingProduct,
@@ -54,12 +55,15 @@ router.get('/products/:id/square-setup', requireAdminPermission(['square_pull', 
   const productId = Number(req.params.id);
   if (!Number.isSafeInteger(productId) || productId <= 0) throw Object.assign(new Error('A valid product is required.'), { status: 400 });
   const search = String(req.query.search || '').trim().slice(0, 120);
-  const [matches, creation] = await Promise.all([
+  const [matches, creation, categoryMapping] = await Promise.all([
     buildSquareMatchReview({ includeAllProducts: true, productIds: [productId], limitCandidates: search ? 30 : 10, search }),
-    getSquareProductCreation(productId)
+    getSquareProductCreation(productId), getSquareCategorySetup(productId)
   ]);
-  return { productId, enabled: isSquareEnabled(), rows: matches.rows, summary: matches.summary, creation };
+  return { productId, enabled: isSquareEnabled(), rows: matches.rows, summary: matches.summary, creation, categoryMapping };
 }));
+router.post('/products/:id/square-category', requireAdminPermission('square_pull'), route(req =>
+  saveSquareProductCategory(Number(req.params.id), req.body, req.admin?.userId || req.admin?.adminId)));
+router.post('/square-categories/refresh', requireAdminPermission('square_pull'), route(() => refreshSquareCategoryRegistry()));
 router.post("/products/:id/buy-price", edit, route(req => saveEnterpriseBuyPrice(
   req.params.id, req.body?.price, req.body?.expectedRevision, req.admin)));
 router.post("/products/:id/preview", edit, route(req => previewEnterprisePricing(req.params.id, req.body?.input)));
