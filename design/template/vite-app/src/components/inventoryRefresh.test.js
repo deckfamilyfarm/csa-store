@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { refreshInventoryBatches, applyInventorySaveToRow } from "./inventoryRefresh.js";
+import { refreshInventoryBatches, applyInventorySaveToRow, trackedInventoryIds } from "./inventoryRefresh.js";
 import { adminResponseError } from "../adminErrors.js";
 
 test("inventory updates arrive in small batches and a failed batch preserves successful results", async () => {
@@ -42,4 +42,11 @@ test('saved rows adopt confirmed zero quantities and farm values without refresh
  assert.equal(next.inventory,0);assert.equal(next.visible,false);assert.equal(next.stockOnFarm,false);assert.equal(next.stockOnFarmLbs,0);
  assert.equal(applyInventorySaveToRow(row,undefined),row);
  assert.deepEqual(applyInventorySaveToRow(row,{savedFields:[]}),row);
+});
+
+test('stock checks include only saved tracked rows whose draft tracking remains enabled',async()=>{
+ const rows=[{productId:1,trackInventory:true},{productId:2,trackInventory:false},{productId:3,trackInventory:true}];
+ assert.deepEqual(trackedInventoryIds(rows,{2:{values:{trackInventory:true}},3:{values:{trackInventory:false}}}),[1]);
+ assert.deepEqual(trackedInventoryIds([{id:4,ffTrackInventory:false},{id:5,ffTrackInventory:true}]),[5]);
+ await refreshInventoryBatches(trackedInventoryIds([{id:4,ffTrackInventory:false}]),()=>assert.fail('No remote check when tracking is off'),()=>{});
 });

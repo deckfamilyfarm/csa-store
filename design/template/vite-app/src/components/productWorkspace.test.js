@@ -278,7 +278,7 @@ test("Inventory saves push only dirty stock, tracking, and visibility fields and
   const result=await saveInventoryDraft(entry,productCapabilities(["inventory_admin"]),{
     post:async(path,body)=>{
       assert.equal(path,"products/7/inventory");
-      assert.deepEqual(body,{changes:{inventory:5,trackInventory:0,visible:0},expectedInventory:{inventory:12,trackInventory:true}});
+      assert.deepEqual(body,{changes:{trackInventory:0,visible:0}});
       return {ok:true,localLineUpdate:true};
     }
   });
@@ -287,7 +287,7 @@ test("Inventory saves push only dirty stock, tracking, and visibility fields and
   assert.deepEqual(dirtyFields(remaining).sort(),["onSale","sourceUnitPrice"]);
   const failure=await saveInventoryDraft(entry,productCapabilities(["inventory_admin"]),{post:async()=>{throw new Error("Local Line unavailable");}});
   assert.equal(failure.ok,false); assert.deepEqual(failure.savedFields,[]);
-  assert.ok(dirtyFields(acknowledgeSave(entry,entry,failure.savedFields)).includes("inventory"));
+  assert.ok(dirtyFields(acknowledgeSave(entry,entry,failure.savedFields)).includes("trackInventory"));
 });
 
 test("inventory saves preserve existing authorized editors and reject other role combinations", async () => {
@@ -670,4 +670,14 @@ test('batched Full Farm failure keeps independently successful farm fields saved
  });
  assert.equal(results[0].partial,true);assert.ok(results[0].savedFields.includes('stockOnFarm'));
  assert.ok(!results[0].savedFields.includes('inventory'));
+});
+
+test('turning tracking off discards quantity drafts and never submits hidden stock',async()=>{
+ let drafts=patchProductDraft({},product,{inventory:5});
+ drafts=patchProductDraft(drafts,product,{trackInventory:false});
+ assert.equal(drafts[7].values.inventory,product.inventory);
+ const result=await saveInventoryDraft(drafts[7],productCapabilities(['admin']),{post:async(_,body)=>{
+   assert.deepEqual(body,{changes:{trackInventory:0}});return {ok:true,localLineUpdate:true};
+ }});
+ assert.equal(result.ok,true);assert.deepEqual(result.savedFields,['trackInventory']);
 });

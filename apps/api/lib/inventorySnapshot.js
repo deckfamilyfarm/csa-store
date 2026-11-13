@@ -33,6 +33,8 @@ export function inventoryConflict(remote,expected,mappings=[],targets=null){
  return current.inventory!==expected.inventory?current:null;
 }
 export function stockPayload(remote,changes,expected,mappings){
+ if(!remote.track_inventory)fail('Full Farm inventory tracking is off. Refresh before editing stock.',409);
+
  const current=remoteInventory(remote,mappings),packageMode=current.inventoryType==='package';
  const targets=changes.packageInventory;
  if(expected&&(current.inventoryType||'product')!==(expected.inventoryType||'product'))return {conflict:current};
@@ -40,7 +42,6 @@ export function stockPayload(remote,changes,expected,mappings){
  if(!packageMode&&targets)fail('This product now tracks stock by product. Refresh before editing.',409);
  const conflict=inventoryConflict(remote,expected,mappings,targets);
  if(conflict)return {conflict};
- if(!remote.track_inventory&&changes.trackInventory!==1)fail('Full Farm inventory tracking is off. Refresh before editing stock.',409);
  if(!packageMode)return {payload:{set_inventory:changes.inventory}};
  for(const target of targets){if(!current.packages.some(p=>p.packageId===target.packageId))fail('Package mapping changed. Refresh and review before editing.',409);}
  // Include all IDs to preserve siblings, but set stock only on explicitly edited packages.

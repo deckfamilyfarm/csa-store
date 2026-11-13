@@ -24,3 +24,9 @@ export function applyInventorySaveToRow(row,result,submitted) {
   if(result.savedFields.includes('visible'))next.visible=submitted.values.visible;
   return next;
 }
+
+export function trackedInventoryIds(rows,drafts={}) {
+  return rows.filter(row=>Boolean(row.trackInventory ?? row.ffTrackInventory) &&
+    (drafts[row.productId ?? row.id]?.values.trackInventory ?? true))
+    .map(row=>row.productId ?? row.id);
+}

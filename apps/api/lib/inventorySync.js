@@ -29,6 +29,7 @@ export function inventoryChanges(changes = {}) {
     if (["trackInventory", "visible"].includes(key) && ![0, 1].includes(number)) fail("Inventory tracking and visibility must be on or off.");
     result[key] = number;
   }
+  if(result.trackInventory===0 && (Object.hasOwn(result,'inventory')||result.packageInventory))fail('Enable tracking and refresh stock before changing quantities.');
   return result;
 }
 
@@ -94,6 +95,7 @@ async function saveInventoryRequest({id,changes,expected,quantityEdit},user,conn
         WHERE p.id=? FOR UPDATE OF p, lm`, [id]);
       if (!product || product.is_deleted || product.categoryName?.trim().toLowerCase() === "membership") fail("This product is not available in Inventory.");
       if (!(Number(product.remoteId) > 0)) fail("Create and link this product through Product Sync before updating its Local Line inventory.");
+      if(quantityEdit && !product.track_inventory)fail('Save tracking as enabled and refresh stock before changing quantities.',409);
       const vendor = requireProductVendor(product,{id:product.vendorId,name:product.vendorName});
       let payload = {};
 
@@ -139,7 +141,7 @@ async function saveInventoryRequest({id,changes,expected,quantityEdit},user,conn
         (Object.hasOwn(changes, "visible") && remote.visible !== Boolean(changes.visible))) {
         fail("Local Line did not confirm the requested inventory. Check its stock before retrying; local inventory was not changed.");
       }
-      const current=remoteInventory(remote,mappings);
+      const current=remote.track_inventory===false?{trackInventory:false,inventory:null,checkedAt:new Date().toISOString()}:remoteInventory(remote,mappings);
       if((before.inventory_type||'product')!==(remote.inventory_type||'product') || changes.packageInventory?.some(target=>!current.packages?.some(p=>p.packageId===target.packageId&&p.inventory===target.inventory)) ||
         changes.packageInventory&&before.packages.some(p=>!remote.packages?.some(after=>after.id===p.id)))fail('Local Line did not confirm the requested package inventory. Refresh before retrying.');
       const columns = { trackInventory: "track_inventory", visible: "visible" };
@@ -154,6 +156,12 @@ async function saveInventoryRequest({id,changes,expected,quantityEdit},user,conn
 
 
 async function cacheInventory(db,id,remote,mappings){
+ if(remote.track_inventory===false) {
+  await db.query('UPDATE products SET track_inventory=0 WHERE id=?',[id]);
+  await db.query('UPDATE local_line_product_meta SET track_inventory=0,visible=?,last_synced_at=UTC_TIMESTAMP() WHERE product_id=?',[Number(Boolean(remote.visible)),id]);
+  return {trackInventory:false,inventory:null,checkedAt:new Date().toISOString()};
+ }
+
  const current=remoteInventory(remote,mappings);
  // The product-level count remains separate; never replace it with a sum of package counts.
  await db.query('UPDATE products SET inventory=?,track_inventory=? WHERE id=?',[remote.inventory??null,Number(current.trackInventory),id]);
@@ -175,13 +183,17 @@ export async function refreshFullFarmInventory(productIds) {
   const ids=normalizeIds(productIds);
   if(!ids.length||ids.length>100) fail('Select between 1 and 100 products.');
   if(process.env.CSA_LOCAL_ONLY==='true'||!isLocalLineEnabled()||process.env.LOCALLINE_TEST==='true') fail('Local Line inventory checks are not enabled.');
-  const token=await getLocalLineAccessToken();
-  const [vendors,[products]]=await Promise.all([fetchLocalLineVendors(token),getPool().query(`${inventoryProductRead} WHERE p.id IN (?)`,[ids])]);
+  const [products]=await getPool().query(`${inventoryProductRead} WHERE p.id IN (?)`,[ids]);
   const byId=new Map(products.map(p=>[Number(p.id),p]));
-  const rows=[];let cursor=0;
+  const rows=ids.filter(id=>byId.has(id)&&!byId.get(id).track_inventory).map(productId=>({productId,trackInventory:false,inventory:null,skipped:true}));
+  const trackedIds=ids.filter(id=>!byId.has(id)||Boolean(byId.get(id).track_inventory));
+  if(!trackedIds.length)return {rows};
+  const token=await getLocalLineAccessToken();
+  const vendors=await fetchLocalLineVendors(token);
+  let cursor=0;
   await Promise.all(Array.from({length:3},async()=>{
-    while(cursor<ids.length) {
-      const id=ids[cursor++];
+    while(cursor<trackedIds.length) {
+      const id=trackedIds[cursor++];
       let db;
       try {
         const p=byId.get(id);

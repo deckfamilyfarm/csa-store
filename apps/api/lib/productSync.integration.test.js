@@ -491,6 +491,29 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
   assert.match((await delayedRefresh).rows[0].error,/changed during this refresh/);
   assert.equal((await pool.query('SELECT inventory FROM products WHERE id=138'))[0][0].inventory,11,'A delayed refresh cannot overwrite confirmed stock');
 
+  await product(139);
+  await pool.query('UPDATE products SET track_inventory=0,inventory=17 WHERE id=139');
+  remoteProducts.get(1139).track_inventory=false;
+  remoteProducts.get(1139).inventory=999;
+  let offStart=requests.length;
+  const untracked=await refreshFullFarmInventory([139]);
+  assert.equal(untracked.rows[0].skipped,true);
+  assert.equal(untracked.rows[0].inventory,null);
+  assert.equal(requests.length,offStart,'Untracked refresh makes no provider request, including vendors');
+  assert.equal((await pool.query('SELECT inventory FROM products WHERE id=139'))[0][0].inventory,17);
+  await assert.rejects(saveInventoryToLocalLine(139,{inventory:4},inventoryUser,{inventory:17,trackInventory:false}),{status:409});
+  assert.equal(requests.length,offStart,'Untracked quantities are rejected before provider reads');
+  const visibilityOnly=await saveInventoryToLocalLine(139,{visible:0},inventoryUser);
+  assert.equal(visibilityOnly.currentInventory.trackInventory,false);
+  assert.equal((await pool.query('SELECT inventory FROM products WHERE id=139'))[0][0].inventory,17,'Verifying visibility does not copy untracked quantities');
+  const enabled=await saveInventoryToLocalLine(139,{trackInventory:1},inventoryUser);
+  assert.equal(enabled.currentInventory.inventory,999,'Saving tracking enabled supplies a fresh stock baseline');
+  await saveInventoryToLocalLine(139,{inventory:5},inventoryUser,enabled.currentInventory);
+  await saveInventoryToLocalLine(139,{trackInventory:0},inventoryUser);
+  offStart=requests.length;
+  await refreshFullFarmInventory([139]);
+  assert.equal(requests.length,offStart,'Turning tracking off stops subsequent stock reads');
+
   await product(140);
   remoteProducts.get(1140).vendor = null;
   const vendorAudit = await audit([140], [], { platforms: ["localline"] });

@@ -6,8 +6,9 @@ export function EnterpriseInventoryCell({row, token, roles = [], localOnly, onSa
   const [edit,setEdit]=useState(null), [busy,setBusy]=useState(false), [error,setError]=useState('');
   const lock=useRef(false);
   const snapshot=edit?.snapshot || row.ffInventorySnapshot;
+  const tracked=Boolean(row.ffTrackInventory) && snapshot?.trackInventory !== false;
   async function start() {
-    if(lock.current)return;
+    if(lock.current||!tracked)return;
     lock.current=true;setBusy(true);setError('');
     try {
       const result=await adminPost('products/inventory/refresh',token,{productIds:[row.id]});
@@ -17,7 +18,7 @@ export function EnterpriseInventoryCell({row, token, roles = [], localOnly, onSa
     }catch(e){setError(e.message);}finally{lock.current=false;setBusy(false);}
   }
   async function save() {
-    if(lock.current)return;
+    if(lock.current||!tracked)return;
     const packages=edit.snapshot.inventoryType==='package';
     const targets=packages?edit.snapshot.packages.filter(p=>p.packageId && String(p.inventory)!==String(edit.values[p.packageId])):[{packageId:'product'}];
     if(targets.some(p=>edit.values[p.packageId]==='' || !Number.isSafeInteger(Number(edit.values[p.packageId])) || Number(edit.values[p.packageId])<0)){setError('Enter a nonnegative whole number.');return;}
@@ -32,9 +33,10 @@ export function EnterpriseInventoryCell({row, token, roles = [], localOnly, onSa
     finally{lock.current=false;setBusy(false);}
   }
   const packages=snapshot?.inventoryType==='package'?snapshot.packages:[{packageId:'product',inventory:snapshot?.inventory}];
+  if(!tracked)return null;
   return <div className="enterprise-inventory-cell">
     {!snapshot?<small role="status">{row.ffInventoryError || (localOnly?'Live stock checks disabled':'Checking current stock…')}</small>:
-      !snapshot.trackInventory?<span>Not tracked</span>:packages.map((pkg,index)=><label key={pkg.remoteId || index}>
+      !snapshot.trackInventory?null:packages.map((pkg,index)=><label key={pkg.remoteId || index}>
         {pkg.name && <small>{pkg.name} </small>}
         {edit?<input className="input" aria-label={`FF stock: ${row.name}${pkg.name?` — ${pkg.name}`:''}`} type="number" min="0" step="1" value={edit.values[pkg.packageId] ?? ''}
           disabled={busy||edit.conflict||!pkg.packageId} onChange={e=>setEdit({...edit,values:{...edit.values,[pkg.packageId]:e.target.value}})} />:<span>{pkg.inventory ?? '—'}</span>}

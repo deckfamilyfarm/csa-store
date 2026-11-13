@@ -58,7 +58,7 @@ export function inventorySaveSummary(result) {
 
 export async function saveInventoryDraft(entry, capabilities, api, queueFullFarm = null) {
   const dirty = dirtyFields(entry);
-  const fields = dirty.filter(key => FULL_FARM_INVENTORY_FIELDS.includes(key));
+  const fields = dirty.filter(key => FULL_FARM_INVENTORY_FIELDS.includes(key) && (entry.values.trackInventory || !['inventory','packageInventory'].includes(key)));
   const result = { productId: entry.meta.productId, productName: entry.values.name, inventoryOnly: true, ok: false, savedFields: [], savedPackageIds: [], errors: [] };
   try {
     if (!capabilities.edit) throw new Error("Product editing permission is required.");
@@ -70,7 +70,7 @@ export async function saveInventoryDraft(entry, capabilities, api, queueFullFarm
       if (!capabilities.inventoryPush) throw new Error("Inventory Admin, or product editing and Local Line Push permissions, are required.");
       const changes = Object.fromEntries(fields.map(key => [key, key==='packageInventory'?entry.values.packageInventory.filter(p=>p.inventory!==entry.defaults.packageInventory.find(old=>old.packageId===p.packageId)?.inventory).map(p=>({packageId:p.packageId,inventory:p.inventory===''?NaN:Number(p.inventory)})):(key==='inventory' && entry.values[key]===''?NaN:Number(entry.values[key]))]));
       if (Object.hasOwn(changes, "inventory") && (!Number.isInteger(changes.inventory) || changes.inventory < 0)) throw new Error("Full Farm Stock must be a nonnegative whole number.");
-      if(entry.meta.inventoryConflict)throw new Error('Review current Full Farm stock before retrying.');
+      if(entry.meta.inventoryConflict && (Object.hasOwn(changes,'inventory')||changes.packageInventory))throw new Error('Review current Full Farm stock before retrying.');
       const request={changes,...((Object.hasOwn(changes,"inventory")||changes.packageInventory) ? {expectedInventory:entry.meta.inventorySnapshot||{inventory:Number(entry.defaults.inventory),trackInventory:Boolean(entry.defaults.trackInventory)}} : {})};
       if(queueFullFarm)queueFullFarm({request,fields,result});
       else {
@@ -247,6 +247,10 @@ export function patchProductDraft(drafts, product, patch) {
     if (changes.stockOnFarm === false) changes.stockOnFarmLbs = "0";
     else if (changes.stockOnFarm === null) changes.stockOnFarmLbs = "";
     else if (entry.values.stockOnFarmLbs !== "" && Number(entry.values.stockOnFarmLbs) === 0) changes.stockOnFarmLbs = "";
+  }
+  if(changes.trackInventory===false) {
+    changes.inventory=entry.defaults.inventory;
+    changes.packageInventory=entry.defaults.packageInventory;
   }
   return {
     ...drafts,

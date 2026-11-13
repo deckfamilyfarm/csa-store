@@ -1,4 +1,4 @@
-import { INVENTORY_REFRESH_BATCH_SIZE, applyInventorySaveToRow } from "./inventoryRefresh.js";
+import { INVENTORY_REFRESH_BATCH_SIZE, applyInventorySaveToRow, trackedInventoryIds } from "./inventoryRefresh.js";
 import React, { useEffect, useRef, useState } from "react";
 import { adminGet, adminPost } from "../adminApi.js";
 import { categoryLabel } from "../categoryLabel.js";
@@ -277,6 +277,7 @@ export function AdminProductsSection({
   const [message, setMessage] = useState("");
   const rowCache = useRef(new Map());
   const requestId = useRef(0);
+  const draftsRef=useRef(drafts);draftsRef.current=drafts;
   const inventorySaveVersions=useRef(new Map());
   const inventorySavingIds=useRef(new Set());
   const [reload, setReload] = useState(0);
@@ -341,10 +342,12 @@ export function AdminProductsSection({
         if (!compactInventory && response.pagination?.page && response.pagination.page !== page)
           setPage(response.pagination.page);
         if(view==='inventory'){
-          const ids=(response.rows||[]).map(r=>r.productId);
+          const ids=trackedInventoryIds(response.rows||[],draftsRef.current);
           for(let offset=0;offset<ids.length;offset+=INVENTORY_REFRESH_BATCH_SIZE){
             if(cancelled||requestId.current!==id)break;
-            const batch=ids.slice(offset,offset+INVENTORY_REFRESH_BATCH_SIZE);let stocks;
+            const eligible=new Set(trackedInventoryIds(response.rows||[],draftsRef.current));
+            const batch=ids.slice(offset,offset+INVENTORY_REFRESH_BATCH_SIZE).filter(id=>eligible.has(id));let stocks;
+            if(!batch.length)continue;
             const versions=new Map(batch.map(id=>[id,inventorySaveVersions.current.get(id)]));
             try{stocks=(await adminPost('products/inventory/refresh',token,{productIds:batch})).rows;}
             catch(e){stocks=batch.map(productId=>({productId,error:e.message}));}
@@ -565,6 +568,8 @@ export function AdminProductsSection({
         );
         return view === "inventory" ? <label className="products-inventory-checkbox">{checkbox}</label> : checkbox;
       case "inventory": {
+        if(!values.trackInventory)return null;
+        if(!row.trackInventory && !drafts[row.productId]?.meta.inventorySnapshot?.trackInventory)return <small>Save tracking to check stock.</small>;
         if(view==='inventory'&&!row.inventorySnapshot)return <small role="status">{row.inventoryError||'Checking current stock…'}</small>;
         const entry=drafts[row.productId];
         const snapshot=entry?.meta.inventorySnapshot || row.inventorySnapshot;

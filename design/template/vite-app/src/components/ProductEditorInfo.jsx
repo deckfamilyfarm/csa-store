@@ -38,7 +38,7 @@ export const ProductEditorInfo = forwardRef(function ProductEditorInfo({ product
     }).catch(error => { if (!cancelled) setError(error.message); });
     return () => { cancelled = true; };
   }, [productId, token, retry]);
-  useEffect(()=>{let live=true;setStock(null);setStockError('');adminPost('products/inventory/refresh',token,{productIds:[productId]}).then(result=>{if(!live)return;const row=result.rows?.[0];if(row?.error)setStockError(row.error);else setStock(row);}).catch(e=>{if(live)setStockError(e.message);});return()=>{live=false;};},[productId,token]);
+  useEffect(()=>{let live=true;setStock(null);setStockError('');if(!product?.trackInventory || Number(product.id)!==Number(productId))return;adminPost('products/inventory/refresh',token,{productIds:[productId]}).then(result=>{if(!live)return;const row=result.rows?.[0];if(row?.error)setStockError(row.error);else setStock(row);}).catch(e=>{if(live)setStockError(e.message);});return()=>{live=false;};},[productId,token,product?.id,product?.trackInventory]);
   const dirty = !!draft && JSON.stringify(draft) !== JSON.stringify(baseline);
   useEffect(() => { onDirty(dirty); }, [dirty, onDirty]);
   useImperativeHandle(ref, () => ({
@@ -72,7 +72,7 @@ export const ProductEditorInfo = forwardRef(function ProductEditorInfo({ product
     <section id="editor-inventory" className="product-editor-section"><h3>Inventory</h3>
       {product ? <><div className="product-editor-inventory"><span>On farm: {product.stockOnFarm == null ? "Not checked" : product.stockOnFarm ? "Yes" : "No"}</span>
         <span>On-farm pounds: {product.stockOnFarmLbs ?? "Unknown"}</span>
-        {stockError?<span role="alert">{stockError}</span>:!stock?<span>Checking Full Farm stock…</span>:<><span>Tracking: {stock.trackInventory?'On':'Off'}</span>{stock.inventoryType==='package'?stock.packages.map(p=><span key={p.remoteId}>{p.name}: {p.inventory??'Unknown'}</span>):<span>Full Farm quantity: {stock.inventory??'Unknown'}</span>}</>}</div>
+        {!product.trackInventory || stock?.trackInventory===false?null:stockError?<span role="alert">{stockError}</span>:!stock?<span>Checking Full Farm stock…</span>:<><span>Tracking: {stock.trackInventory?'On':'Off'}</span>{stock.inventoryType==='package'?stock.packages.map(p=><span key={p.remoteId}>{p.name}: {p.inventory??'Unknown'}</span>):<span>Full Farm quantity: {stock.inventory??'Unknown'}</span>}</>}</div>
         <p className="small">Manage stock, tracking, and visibility in Store → Inventory.</p></> : <p>Loading inventory…</p>}
     </section>
   </>;
