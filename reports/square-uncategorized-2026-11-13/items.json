@@ -1,0 +1,50 @@
+{
+  "capturedAt": "2026-11-13T16:33:04.087Z",
+  "activeLocations": [
+    {
+      "id": "C0T7DVZY5XVG5",
+      "name": "Deck Family Farm Market Booths and Farm Sales"
+    },
+    {
+      "id": "LJS8Z7FW504J5",
+      "name": "Hillsdale"
+    },
+    {
+      "id": "L1MHNE83A8XPY",
+      "name": "Hollywood"
+    },
+    {
+      "id": "LP8AY4081PK5E",
+      "name": "King"
+    },
+    {
+      "id": "LWREC814AB8A4",
+      "name": "LCFM"
+    },
+    {
+      "id": "LJGEXCF3N7XJ4",
+      "name": "Montavilla"
+    },
+    {
+      "id": "LVKCGC3H1QMYX",
+      "name": "PSU"
+    },
+    {
+      "id": "LBECN1NEXPGRJ",
+      "name": "Scandinavian Festival"
+    },
+    {
+      "id": "L307W0S4THZP3",
+      "name": "Springfield"
+    },
+    {
+      "id": "L373VS1QADC37",
+      "name": "St. John’s"
+    },
+    {
+      "id": "LKX3NDPZ68H74",
+      "name": "Woodstock"
+    }
+  ],
+  "rows": []
+}

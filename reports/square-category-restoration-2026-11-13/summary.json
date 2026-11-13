@@ -1,0 +1,1004 @@
+{
+  "confirmedAt": "2026-11-13T16:32:50.963Z",
+  "status": "confirmed",
+  "categoriesRestored": [
+    "Eggs, Organic Layers",
+    "Sausages & N Free Cures",
+    "Pasture Raised Pork",
+    "Beef, 100% grassfed",
+    "Spring Lamb",
+    "Roasters & Turkeys",
+    "Fruits/Nuts Honey",
+    "Hyland Processing",
+    "Lamb Front Shank",
+    "FFCSA",
+    "Scandifest",
+    "Event"
+  ],
+  "productsCategorized": 132,
+  "locations": [
+    {
+      "id": "C0T7DVZY5XVG5",
+      "name": "Deck Family Farm Market Booths and Farm Sales",
+      "categorizedAvailableProducts": 121
+    },
+    {
+      "id": "LJS8Z7FW504J5",
+      "name": "Hillsdale",
+      "categorizedAvailableProducts": 120
+    },
+    {
+      "id": "L1MHNE83A8XPY",
+      "name": "Hollywood",
+      "categorizedAvailableProducts": 120
+    },
+    {
+      "id": "LP8AY4081PK5E",
+      "name": "King",
+      "categorizedAvailableProducts": 120
+    },
+    {
+      "id": "LWREC814AB8A4",
+      "name": "LCFM",
+      "categorizedAvailableProducts": 120
+    },
+    {
+      "id": "LJGEXCF3N7XJ4",
+      "name": "Montavilla",
+      "categorizedAvailableProducts": 120
+    },
+    {
+      "id": "LVKCGC3H1QMYX",
+      "name": "PSU",
+      "categorizedAvailableProducts": 120
+    },
+    {
+      "id": "LBECN1NEXPGRJ",
+      "name": "Scandinavian Festival",
+      "categorizedAvailableProducts": 86
+    },
+    {
+      "id": "L307W0S4THZP3",
+      "name": "Springfield",
+      "categorizedAvailableProducts": 120
+    },
+    {
+      "id": "L373VS1QADC37",
+      "name": "St. John’s",
+      "categorizedAvailableProducts": 120
+    },
+    {
+      "id": "LKX3NDPZ68H74",
+      "name": "Woodstock",
+      "categorizedAvailableProducts": 120
+    }
+  ],
+  "products": [
+    {
+      "id": "RTQ6INIYGMMDJ3RKTT64KVFN",
+      "name": "Chuck roast",
+      "categories": [
+        "Beef, 100% grassfed"
+      ]
+    },
+    {
+      "id": "HXKKRP3BEDWFO3JXC6T6ICIT",
+      "name": "Lamb Shoulder Roast",
+      "categories": [
+        "Spring Lamb"
+      ]
+    },
+    {
+      "id": "XJV3K7ISGJYS3ERSUYR3I32H",
+      "name": "Ground Beef",
+      "categories": [
+        "Beef, 100% grassfed"
+      ]
+    },
+    {
+      "id": "NJRMSC2BLHXCJCDR5ULCPPXX",
+      "name": "Beef Stew Meat",
+      "categories": [
+        "Beef, 100% grassfed"
+      ]
+    },
+    {
+      "id": "W6TLTOS5DEHZUYMO47WBSGOE",
+      "name": "Ground Lamb",
+      "categories": [
+        "Spring Lamb"
+      ]
+    },
+    {
+      "id": "ZWYKIFSJHXRJAMUTBROCLXDV",
+      "name": "Ground Pork",
+      "categories": [
+        "Pasture Raised Pork"
+      ]
+    },
+    {
+      "id": "6V7DQMGSLUABL7JI3GMVXULZ",
+      "name": "Bratwurst",
+      "categories": [
+        "Sausages & N Free Cures"
+      ]
+    },
+    {
+      "id": "IGVW5XO7MRUVRIPCIM7VWN2Y",
+      "name": "Summer Sausage",
+      "categories": [
+        "Sausages & N Free Cures"
+      ]
+    },
+    {
+      "id": "IE234OJWSW3XBJVMLNNWHKPW",
+      "name": "Bacon, Pork",
+      "categories": [
+        "Sausages & N Free Cures"
+      ]
+    },
+    {
+      "id": "4LJ2ZOMW2M7ZVJ6KA5VXFCY3",
+      "name": "Sweet Italian Sausage Links",
+      "categories": [
+        "Sausages & N Free Cures"
+      ]
+    },
+    {
+      "id": "EVUJYHLMQAKKN4NSYLQAJ7VI",
+      "name": "Fresh Garlic Sausage Links",
+      "categories": [
+        "Sausages & N Free Cures"
+      ]
+    },
+    {
+      "id": "OL5XFDPFV7YXP5O4AHK6R464",
+      "name": "Sage & Sea Salt Sausage",
+      "categories": [
+        "Sausages & N Free Cures"
+      ]
+    },
+    {
+      "id": "ZOZ27GYI6FO3XADQSKYEVETK",
+      "name": "Country Sausage, Bulk",
+      "categories": [
+        "Sausages & N Free Cures"
+      ]
+    },
+    {
+      "id": "ZWZUCQRCDOB2CJF4KCGQJYI5",
+      "name": "Hamburger Patties",
+      "categories": [
+        "Beef, 100% grassfed"
+      ]
+    },
+    {
+      "id": "SWAAL32DIRG2YSI7CY4652MD",
+      "name": "Stewing Hen",
+      "categories": [
+        "Roasters & Turkeys"
+      ]
+    },
+    {
+      "id": "Z4DXDFPKC6EH7VGLBH27Y4UO",
+      "name": "Lamb Chops, 2 pack",
+      "categories": [
+        "Spring Lamb"
+      ]
+    },
+    {
+      "id": "MCJCI6NPYSTJWMOKY3AK4EUV",
+      "name": "Lamb Stew",
+      "categories": [
+        "Spring Lamb"
+      ]
+    },
+    {
+      "id": "C2RZ7V6MHLDDVGQOX6UPNR66",
+      "name": "Lamb Kabob",
+      "categories": [
+        "Spring Lamb"
+      ]
+    },
+    {
+      "id": "WUIXU3UL54OQLCEZKXCHA5AT",
+      "name": "Lamb Shank Osso Buco",
+      "categories": [
+        "Spring Lamb"
+      ]
+    },
+    {
+      "id": "SRKRCQW6FG5XOUPKH2TAGASK",
+      "name": "Ribeye Steak",
+      "categories": [
+        "Beef, 100% grassfed"
+      ]
+    },
+    {
+      "id": "3BVXZIN53VTEAN7WKAN5H5IT",
+      "name": "New York Steak",
+      "categories": [
+        "Beef, 100% grassfed"
+      ]
+    },
+    {
+      "id": "XRZSVBUMXIX6WN46EJWZP3NW",
+      "name": "Top Sirloin Steak",
+      "categories": [
+        "Beef, 100% grassfed"
+      ]
+    },
+    {
+      "id": "DFUN7N54SAZMPXVCNTW3EPBP",
+      "name": "Bulk Farm Made Chorizo Rojo Sausage",
+      "categories": [
+        "Hyland Processing"
+      ]
+    },
+    {
+      "id": "PLQR3XP6GQOWX6GLDFJQZI6D",
+      "name": "Beef Liver",
+      "categories": [
+        "Beef, 100% grassfed"
+      ]
+    },
+    {
+      "id": "IL4HKH32KJU43QZF2WTE57CM",
+      "name": "Beef Heart",
+      "categories": [
+        "Beef, 100% grassfed"
+      ]
+    },
+    {
+      "id": "CTUQPFQYSCASKP4QBTONH255",
+      "name": "Beef Tongue",
+      "categories": [
+        "Beef, 100% grassfed"
+      ]
+    },
+    {
+      "id": "EKVB7B3EUDOEUW4YKY4WKAH6",
+      "name": "Beef Bones",
+      "categories": [
+        "Beef, 100% grassfed"
+      ]
+    },
+    {
+      "id": "SHZS54JA7XZFU4WNB3O4CLSO",
+      "name": "Beef Marrow Bones",
+      "categories": [
+        "Beef, 100% grassfed"
+      ]
+    },
+    {
+      "id": "X5JEUWVLEY7Q32PNRSNNUUKG",
+      "name": "Lamb Bones",
+      "categories": [
+        "Spring Lamb"
+      ]
+    },
+    {
+      "id": "HIBUHRVFDXAGQIDKI3N5UNVM",
+      "name": "Pork Bones",
+      "categories": [
+        "Pasture Raised Pork"
+      ]
+    },
+    {
+      "id": "W3RENYXRDGQYXHKYBTHAEGAA",
+      "name": "Organic Pasture Raised Chicken Eggs, 1 dozen",
+      "categories": [
+        "Eggs, Organic Layers"
+      ]
+    },
+    {
+      "id": "H52IIMV53U3SVJDSLMCPJB6Y",
+      "name": "Pork Shoulder Roast, Large",
+      "categories": [
+        "Pasture Raised Pork"
+      ]
+    },
+    {
+      "id": "H44FXVNEJLWUBUJSH6KJ3I6N",
+      "name": "Chicken Liver",
+      "categories": [
+        "Roasters & Turkeys"
+      ]
+    },
+    {
+      "id": "Y2PVWBPZ7DHNBNIX5ARR7MAG",
+      "name": "Chicken Feet",
+      "categories": [
+        "Roasters & Turkeys"
+      ]
+    },
+    {
+      "id": "UDZUFDD4BZQV4OKACAQ55ZGA",
+      "name": "Raw Honey, 1/2 pint",
+      "categories": [
+        "Fruits/Nuts Honey"
+      ]
+    },
+    {
+      "id": "IYPQ3PXHDAX25MEP2EFYMKTH",
+      "name": "Beef Short Rib",
+      "categories": [
+        "Beef, 100% grassfed"
+      ]
+    },
+    {
+      "id": "BB4BQ436YGC4LUSOU4HLL27D",
+      "name": "Brisket",
+      "categories": [
+        "Beef, 100% grassfed"
+      ]
+    },
+    {
+      "id": "CQAVFLDGU4BEMOZ4TH6FI3SG",
+      "name": "Flank Steak",
+      "categories": [
+        "Beef, 100% grassfed"
+      ]
+    },
+    {
+      "id": "77WYOWU6KBIMIGE2NPMLNPFH",
+      "name": "Skirt Steak, Large",
+      "categories": [
+        "Beef, 100% grassfed"
+      ]
+    },
+    {
+      "id": "RTUI22MY5EU7CX6ALHETPMBO",
+      "name": "Beef Flat Iron Steak",
+      "categories": [
+        "Beef, 100% grassfed"
+      ]
+    },
+    {
+      "id": "QZ6L4PORGVUVAZSDTH6XIC76",
+      "name": "Beef Tenderloin",
+      "categories": [
+        "Beef, 100% grassfed"
+      ]
+    },
+    {
+      "id": "HQLROZH2OWSLSF3QZBETCFUU",
+      "name": "Roast Beef, Sliced",
+      "categories": [
+        "Sausages & N Free Cures"
+      ]
+    },
+    {
+      "id": "Z7QJDOALKFNWSUBRGSAGVRDO",
+      "name": "Lamb Neck Slices",
+      "categories": [
+        "Spring Lamb"
+      ]
+    },
+    {
+      "id": "7ZJBLPBIRJ553NT6K35NCQH4",
+      "name": "Pork Tenderloin",
+      "categories": [
+        "Pasture Raised Pork"
+      ]
+    },
+    {
+      "id": "VO7YEQD5FKOYVWGHGFI3ISA3",
+      "name": "Beef Tri-Tip",
+      "categories": [
+        "Beef, 100% grassfed"
+      ]
+    },
+    {
+      "id": "624YSUGQGVL4Q6N6XTRJI3W5",
+      "name": "Bacon Ends & Pieces, Pork",
+      "categories": [
+        "Sausages & N Free Cures"
+      ]
+    },
+    {
+      "id": "IEAP53MPU6KHNAAHK55UTMDH",
+      "name": "Teres Major Steak",
+      "categories": [
+        "Beef, 100% grassfed"
+      ]
+    },
+    {
+      "id": "DPVXXTQWQAB5FDSY37Q6FAXK",
+      "name": "Lamb Shank, Whole",
+      "categories": [
+        "Spring Lamb"
+      ]
+    },
+    {
+      "id": "2HWBBERFI42SO727UETRX3LC",
+      "name": "Landjaeger Jerky, 3 pack",
+      "categories": [
+        "Sausages & N Free Cures"
+      ]
+    },
+    {
+      "id": "WCJEJEUJB6IDKOGHDNB7FTCV",
+      "name": "Organic Pasture Raised Chicken Eggs, 1/2 dozen",
+      "categories": [
+        "Eggs, Organic Layers"
+      ]
+    },
+    {
+      "id": "C7SLODSFPL74WVKTHCG47MY2",
+      "name": "Red Ranger Roasting Chicken, Large",
+      "categories": [
+        "Roasters & Turkeys"
+      ]
+    },
+    {
+      "id": "YFEXZYORRBLWM4GLIBVZ6DVR",
+      "name": "Chicken Hearts",
+      "categories": [
+        "Roasters & Turkeys"
+      ]
+    },
+    {
+      "id": "WSEWP54CB6EZWHXJTDFT5M6W",
+      "name": "Hanger Steak",
+      "categories": [
+        "Beef, 100% grassfed"
+      ]
+    },
+    {
+      "id": "7PRNL7OITHV4F5PMM3IDACU3",
+      "name": "Chicken Breast, Bone-In",
+      "categories": [
+        "Roasters & Turkeys"
+      ]
+    },
+    {
+      "id": "VPT2HXYYYWXSK2VCZTTI7JGL",
+      "name": "Chicken Hindquarters",
+      "categories": [
+        "Roasters & Turkeys"
+      ]
+    },
+    {
+      "id": "AL5UGDCUIRSMFYGSHY6I3JCG",
+      "name": "Chicken Wings",
+      "categories": [
+        "Roasters & Turkeys"
+      ]
+    },
+    {
+      "id": "2DADSQP2PYSGJRZ7KUERQELH",
+      "name": "Peppered Knife Cut Beef Jerky",
+      "categories": [
+        "Sausages & N Free Cures"
+      ]
+    },
+    {
+      "id": "OUU6M6GFFCZ2DPE455MXY3SB",
+      "name": "Tamari Pressed Jerky",
+      "categories": [
+        "Sausages & N Free Cures"
+      ]
+    },
+    {
+      "id": "ANOBF7MHTR5DKMLRW3KEJ52P",
+      "name": "Beef Back Ribs",
+      "categories": [
+        "Beef, 100% grassfed"
+      ]
+    },
+    {
+      "id": "Q6RDEMHLOLEZNQZO2RDBFYEC",
+      "name": "Korean Style Beef Ribs",
+      "categories": [
+        "Beef, 100% grassfed"
+      ]
+    },
+    {
+      "id": "5UOYFMPA22EZ4IBLF2NH4KMT",
+      "name": "Baby Back Ribs",
+      "categories": [
+        "Test",
+        "Pasture Raised Pork"
+      ]
+    },
+    {
+      "id": "CEBZQ67NEX43LADVLREWJ5RU",
+      "name": "Pork Spare Ribs",
+      "categories": [
+        "Pasture Raised Pork"
+      ]
+    },
+    {
+      "id": "WCUGXGC3XZNNDGNQLI6VQRCR",
+      "name": "Rendered Pork Leaf Lard, 16 oz",
+      "categories": [
+        "Hyland Processing"
+      ]
+    },
+    {
+      "id": "HVG4VFTHE3RMCAWBXDGPTBKG",
+      "name": "Rendered Beef Tallow, 8 oz",
+      "categories": [
+        "Hyland Processing"
+      ]
+    },
+    {
+      "id": "SA4JK56BISQNLCQQWMRTR3UL",
+      "name": "Rendered Pork Leaf Lard, 8 oz",
+      "categories": [
+        "Hyland Processing"
+      ]
+    },
+    {
+      "id": "3QTLT4QV3NIQQBA3765JDEF4",
+      "name": "Polish Kielbasa",
+      "categories": [
+        "Sausages & N Free Cures"
+      ]
+    },
+    {
+      "id": "RKGG5ZUGZUOVIXY2KHABI5N7",
+      "name": "Rendered Beef Tallow, 16 oz",
+      "categories": [
+        "Hyland Processing"
+      ]
+    },
+    {
+      "id": "YO6NZ2ZRLEGTFOWDKE4EC6E5",
+      "name": "Beef Shank Osso Buco",
+      "categories": [
+        "Beef, 100% grassfed"
+      ]
+    },
+    {
+      "id": "BKII4YYPR7FUPZVKDYUHUXVD",
+      "name": "Cajun Chaurice Sausage Links",
+      "categories": [
+        "Hyland Processing"
+      ]
+    },
+    {
+      "id": "5VM3KJOZZW3Q3I3ITPZVOTX2",
+      "name": "Greek Loukaniko Sausage Links",
+      "categories": [
+        "Hyland Processing"
+      ]
+    },
+    {
+      "id": "K4HL4E6PATADGVGUS35GACMG",
+      "name": "Pork Shank",
+      "categories": [
+        "Pasture Raised Pork"
+      ]
+    },
+    {
+      "id": "M2EUZHR6CW3FIKE46TVJRZKS",
+      "name": "Olympia Provisions Frankfurter",
+      "categories": [
+        "Sausages & N Free Cures"
+      ]
+    },
+    {
+      "id": "VGQP22CRRBUOGZDMILJRVADG",
+      "name": "British  Bangers",
+      "categories": [
+        "Hyland Processing"
+      ]
+    },
+    {
+      "id": "DSKZWD2Z6KSSTTADHICAXC5G",
+      "name": "Bulk English Breakfast Sausage",
+      "categories": [
+        "Hyland Processing"
+      ]
+    },
+    {
+      "id": "6GZJ5FIDENXSI2UBMEER2SQC",
+      "name": "Hot Italian Sausage Links",
+      "categories": [
+        "Hyland Processing"
+      ]
+    },
+    {
+      "id": "UO24DZZIVNHSYSA3GTKKWCTV",
+      "name": "Lamb Heart",
+      "categories": [
+        "Spring Lamb"
+      ]
+    },
+    {
+      "id": "E7BTUWHFLBSEQADC5HY3J2NP",
+      "name": "Beef Kidney",
+      "categories": [
+        "Beef, 100% grassfed"
+      ]
+    },
+    {
+      "id": "KMIWMJLL7C73ADSABAGDF4KO",
+      "name": "Pet Food, Organ Blend",
+      "categories": [
+        "Pasture Raised Pork"
+      ]
+    },
+    {
+      "id": "MKVN3BV4B3OC3TBFSOH6ZFRW",
+      "name": "Pastrami, Sliced",
+      "categories": [
+        "Sausages & N Free Cures"
+      ]
+    },
+    {
+      "id": "YV5NJYNQTUZQY7FEXCLEU5VU",
+      "name": "Thai Curry Sausage Links",
+      "categories": [
+        "Hyland Processing"
+      ]
+    },
+    {
+      "id": "X5ZOGUSJ5AABXRHEGRAJQNQU",
+      "name": "Grass-Fed Organ Blend",
+      "categories": [
+        "Hyland Processing"
+      ]
+    },
+    {
+      "id": "CB5RBKV2UCS7T6K2GNRHHMTX",
+      "name": "Chorizo Verde",
+      "categories": [
+        "Hyland Processing"
+      ]
+    },
+    {
+      "id": "56JW4CHELXLEOPRF7E4K4B4Z",
+      "name": "Bulk Thai Curry Sausage",
+      "categories": [
+        "Hyland Processing"
+      ]
+    },
+    {
+      "id": "AY5RVFQFLHXRD5USE52DU5BD",
+      "name": "Beef Oxtail",
+      "categories": [
+        "Beef, 100% grassfed"
+      ]
+    },
+    {
+      "id": "BUENXTWWPCTTFJ7RYVH672GY",
+      "name": "Chaurice (Bulk)",
+      "categories": [
+        "Hyland Processing"
+      ]
+    },
+    {
+      "id": "WRXBRMIVAISDWMBWEFPPHIW2",
+      "name": "Pepperoni stick",
+      "categories": [
+        "Sausages & N Free Cures"
+      ]
+    },
+    {
+      "id": "K36JLIEGZO6T4UEWCGEKIDYB",
+      "name": "Pullet Dz",
+      "categories": [
+        "Eggs, Organic Layers"
+      ]
+    },
+    {
+      "id": "CDWO26QVN3QAPSU3RFO46A7R",
+      "name": "Bavette Steak",
+      "categories": [
+        "Beef, 100% grassfed"
+      ]
+    },
+    {
+      "id": "5OHLTPGX3CFC65MUI72NMXJH",
+      "name": "Olympia Provisions, Rosette D'Oregon Salami",
+      "categories": [
+        "Sausages & N Free Cures"
+      ]
+    },
+    {
+      "id": "3QXI3INIUXQOJQ2SDU4QBIF3",
+      "name": "Ham",
+      "categories": [
+        "Sausages & N Free Cures"
+      ]
+    },
+    {
+      "id": "OKA5MQIK5LAZKH6OZKLBA47E",
+      "name": "Lamb Sundried Tomato Basil Sausage",
+      "categories": [
+        "Sausages & N Free Cures"
+      ]
+    },
+    {
+      "id": "7DEDXYV4AKC5ODQTCMLSUNL5",
+      "name": "Walnuts (1lb.)",
+      "categories": [
+        "Fruits/Nuts Honey"
+      ]
+    },
+    {
+      "id": "EYHJG4R7QXDA3RKAAGCCKO2N",
+      "name": "Raw Walnuts, 1/2 lb",
+      "categories": [
+        "Fruits/Nuts Honey"
+      ]
+    },
+    {
+      "id": "N7X3GEGY2OGLMSPQ4KCM4OGO",
+      "name": "Lamb Merguez Sausage Links",
+      "categories": [
+        "Hyland Processing"
+      ]
+    },
+    {
+      "id": "JLKTUM5MXH7F3JTHB7K4VBJC",
+      "name": "Kroppkakkor",
+      "categories": [
+        "Scandifest"
+      ]
+    },
+    {
+      "id": "SQ6ANRDASE5UMIAPXJDLXK7R",
+      "name": "Deck Family Farm Insulated Bag",
+      "categories": [
+        "FFCSA"
+      ]
+    },
+    {
+      "id": "R7R5YLMIBYYUXAQH5I55WE5N",
+      "name": "Deck Family Farm Insulated Bag",
+      "categories": [
+        "FFCSA"
+      ]
+    },
+    {
+      "id": "BZSBJ76772CXFNCQVKRT7DTT",
+      "name": "Swedish Sausage Potato Dumplings",
+      "categories": [
+        "Hyland Processing"
+      ]
+    },
+    {
+      "id": "4MJHJVJYDZNCHSKIFKWF553J",
+      "name": "Smoked Pork Shanks - Skin-on and Smoked",
+      "categories": [
+        "Pasture Raised Pork"
+      ]
+    },
+    {
+      "id": "STOLBNKXICC2JBBIP4575AQW",
+      "name": "Broth",
+      "categories": [
+        "Hyland Processing"
+      ]
+    },
+    {
+      "id": "WXM5MVVZNSSOZIQHHDQMWAK6",
+      "name": "Broad Breasted White Thanksgiving Turkeys, Medium",
+      "categories": [
+        "Roasters & Turkeys"
+      ]
+    },
+    {
+      "id": "KGXWEJBOL6XYYP6WDIGY7XKS",
+      "name": "Rack of Lamb",
+      "categories": [
+        "Spring Lamb"
+      ]
+    },
+    {
+      "id": "NCRK2CIGU3RWNKQZ5DSPEJHD",
+      "name": "Olympia Provisions Saucisson D'Arles Salami",
+      "categories": [
+        "Sausages & N Free Cures"
+      ]
+    },
+    {
+      "id": "EMLOI6VDW2L4CQCOJWU2BDGO",
+      "name": "Turkey Apple Sage Sausage Links",
+      "categories": [
+        "Sausages & N Free Cures"
+      ]
+    },
+    {
+      "id": "WWWJVCE57A35KUIF5UDYVR4Z",
+      "name": "Olympia Provisions, Dog Treats",
+      "categories": [
+        "Sausages & N Free Cures"
+      ]
+    },
+    {
+      "id": "C44VX4IKA7YX3EVRZ6TTL456",
+      "name": "LW Popcorn",
+      "categories": [
+        "FFCSA"
+      ]
+    },
+    {
+      "id": "XHEH6EXU5CSKY4V3FLUWA4PN",
+      "name": "Gluten Free Chocolate Donut",
+      "categories": [
+        "FFCSA"
+      ]
+    },
+    {
+      "id": "52GV4CMWOZSDWW7VC3Z6573X",
+      "name": "Gluten Free Blueberry Scone",
+      "categories": [
+        "FFCSA"
+      ]
+    },
+    {
+      "id": "X5UX2PTIWGXDQ3S5U3MORXZT",
+      "name": "BNF Kombucha",
+      "categories": [
+        "FFCSA"
+      ]
+    },
+    {
+      "id": "TZTWZVQKHLSUBLIJQYIZ6VVI",
+      "name": "Cabbage",
+      "categories": [
+        "Scandifest"
+      ]
+    },
+    {
+      "id": "NE42LNRBOWKK2F4OE6DFZHP6",
+      "name": "Scandi Kombucha",
+      "categories": [
+        "Scandifest"
+      ]
+    },
+    {
+      "id": "IS5M2UVFIMSFPBAGYZZ7T22C",
+      "name": "Bavarian Style Grazier's Sausage",
+      "categories": [
+        "Sausages & N Free Cures"
+      ]
+    },
+    {
+      "id": "IRMSDE3RXXZRQ5RGXN5MAUFY",
+      "name": "Raw Honey, 1 pint",
+      "categories": [
+        "Fruits/Nuts Honey"
+      ]
+    },
+    {
+      "id": "7NILSMS7L35D2AIXMEWLSOAJ",
+      "name": "Raw Honey, 1 quart",
+      "categories": [
+        "Fruits/Nuts Honey"
+      ]
+    },
+    {
+      "id": "NRHOVYAY6UIJS27DWAQEOXZM",
+      "name": "Lonesome whistle popcorn",
+      "categories": [
+        "FFCSA"
+      ]
+    },
+    {
+      "id": "FXULFLYHKH2IXRWNOWOT4N5Z",
+      "name": "Gluten Free Brownie Bite with Chocolate Chips",
+      "categories": [
+        "FFCSA"
+      ]
+    },
+    {
+      "id": "NUAYVKIQK6LY3I4WM3Z3F6IZ",
+      "name": "Kombucha",
+      "categories": [
+        "FFCSA"
+      ]
+    },
+    {
+      "id": "JC2T5KZH3TVIIXDDJA2EYVQS",
+      "name": "Chicken Drumsticks",
+      "categories": [
+        "Roasters & Turkeys"
+      ]
+    },
+    {
+      "id": "6WRAOOSLV3PZMGQZAF737G73",
+      "name": "Bulk Hot Italian Sausage",
+      "categories": [
+        "Hyland Processing"
+      ]
+    },
+    {
+      "id": "LEVEFO7MFXRUONIC3I7H3HFE",
+      "name": "Classic Meatballs",
+      "categories": [
+        "Hyland Processing"
+      ]
+    },
+    {
+      "id": "7NOGPYESRU2QAO32SYQEMAZI",
+      "name": "Pepperoni stick, individual",
+      "categories": [
+        "Sausages & N Free Cures"
+      ]
+    },
+    {
+      "id": "RV3JWBI2MVGAZEFD3Z7RMLJL",
+      "name": "Red Ranger Roasting Chicken, Small",
+      "categories": [
+        "Roasters & Turkeys"
+      ]
+    },
+    {
+      "id": "N54VBMXA4Z5ZGU4DQZLCZWLD",
+      "name": "Red Ranger Roasting Chicken, Medium",
+      "categories": [
+        "Roasters & Turkeys"
+      ]
+    },
+    {
+      "id": "3F6IUR3J5TAXR76YKRFJTIJZ",
+      "name": "Cornish Roasting Chicken, Large",
+      "categories": [
+        "Roasters & Turkeys"
+      ]
+    },
+    {
+      "id": "ZE5WMCI4TGVZN2W6QYIP6MQZ",
+      "name": "Cornish Roasting Chicken, Medium",
+      "categories": [
+        "Roasters & Turkeys"
+      ]
+    },
+    {
+      "id": "DJ3NBI3FOA6DXLKVALZWLPGI",
+      "name": "Cornish Roasting Chicken, Extra Large",
+      "categories": [
+        "Roasters & Turkeys"
+      ]
+    },
+    {
+      "id": "VOQME3YDXUVD2ZVARTKIS42R",
+      "name": "Chicken Thighs",
+      "categories": [
+        "Roasters & Turkeys"
+      ]
+    },
+    {
+      "id": "ILHEC25TNXQ4LPPDALYQPVZH",
+      "name": "Pork Chop, Bone-in",
+      "categories": [
+        "Pasture Raised Pork"
+      ]
+    },
+    {
+      "id": "7TZ2PHV5WBRXETZIWZWGIHBA",
+      "name": "Pork Chop, Boneless",
+      "categories": [
+        "Pasture Raised Pork"
+      ]
+    },
+    {
+      "id": "R4NQPB7JMMTFNNECJOKHDET4",
+      "name": "Smoked Pork Hocks -Skin-on and Smoked",
+      "categories": [
+        "Pasture Raised Pork"
+      ]
+    },
+    {
+      "id": "FKULRXIWE4PAV5FT5UFCEIJ2",
+      "name": "Old World Style Hot Dogs",
+      "categories": [
+        "Sausages & N Free Cures"
+      ]
+    },
+    {
+      "id": "335SYARADAHLDFMQHOE7LFHI",
+      "name": "Raw Honey, 1/4 pint",
+      "categories": [
+        "Fruits/Nuts Honey"
+      ]
+    }
+  ],
+  "verification": "Read back all 132 active items; categories and reporting categories confirmed. All other current item and variation fields preserved (excluding server timestamps/versions). Existing Test category preserved. Archived items unchanged."
+}
