@@ -1,0 +1,89 @@
+{
+  "confirmedAt": "2026-11-13T16:39:38.613Z",
+  "status": "confirmed",
+  "renames": [
+    [
+      "Beef, 100% grassfed",
+      "Grassfed Beef"
+    ],
+    [
+      "Eggs, Organic Layers",
+      "Eggs"
+    ],
+    [
+      "Fruits/Nuts Honey",
+      "Honey, Nuts, and Fruit"
+    ],
+    [
+      "Roasters & Turkeys",
+      "Roasters"
+    ],
+    [
+      "FFCSA",
+      "Other"
+    ]
+  ],
+  "movedProducts": [
+    {
+      "id": "JLKTUM5MXH7F3JTHB7K4VBJC",
+      "name": "Kroppkakkor"
+    },
+    {
+      "id": "TZTWZVQKHLSUBLIJQYIZ6VVI",
+      "name": "Cabbage"
+    },
+    {
+      "id": "NE42LNRBOWKK2F4OE6DFZHP6",
+      "name": "Scandi Kombucha"
+    }
+  ],
+  "deleted": [
+    {
+      "id": "7NF2435GAVFT3DC7EYBZFL2G",
+      "name": "Scandifest",
+      "status": "confirmed",
+      "deletedObjectIds": [
+        "7NF2435GAVFT3DC7EYBZFL2G"
+      ],
+      "dependentGridTiles": 0
+    },
+    {
+      "id": "WXM5MVVZNSSOZIQHHDQMWAK6",
+      "name": "Broad Breasted White Thanksgiving Turkeys, Medium",
+      "status": "confirmed",
+      "deletedObjectIds": [
+        "26SJWWDCAHH7FH4VMGGHQ27A",
+        "3PMJ2JNQBXINMLZH2MKZIMPO",
+        "42LRBQYMLK7NRFRLU3AZV262",
+        "4LSCRUQPTP3HKRYNBGKS2K45",
+        "ACSBCUQ54CQ6XNUJQYH6VREQ",
+        "FDWAASU5AXRHVPD4KGJ7VJYA",
+        "IDQMEREDGATKSQBA3RZWM7MV",
+        "IHQCOBF2SWHYD5TPEMHZ2ONC",
+        "KLWMVQQZER4MT7TLQCPNYQXX",
+        "SBBBV32POO2YECRPOPVDD4QU",
+        "WXM5MVVZNSSOZIQHHDQMWAK6"
+      ],
+      "dependentGridTiles": 6
+    }
+  ],
+  "verification": {
+    "activeProducts": 131,
+    "uncategorized": 0,
+    "otherProducts": [
+      "Kroppkakkor",
+      "Deck Family Farm Insulated Bag",
+      "Deck Family Farm Insulated Bag",
+      "LW Popcorn",
+      "Gluten Free Chocolate Donut",
+      "Gluten Free Blueberry Scone",
+      "BNF Kombucha",
+      "Cabbage",
+      "Scandi Kombucha",
+      "Lonesome whistle popcorn",
+      "Gluten Free Brownie Bite with Chocolate Chips",
+      "Kombucha"
+    ],
+    "turkeySausagePreserved": true
+  }
+}
