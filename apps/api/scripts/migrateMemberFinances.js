@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import { inventoryOperationsPreflight, migrateInventoryOperationsSchema } from '../lib/inventoryOperationsSchema.js';
 import { getPool, migrateLegacySubscriptionPortalSchema } from '../db.js';
 import { financialPreflight, migrateMemberFinancialSchema } from '../lib/memberFinancialSchema.js';
 
@@ -10,7 +11,10 @@ dotenv.config({ path: new URL('../../../.env', import.meta.url).pathname, quiet:
 const pool = getPool();
 const connection = await pool.getConnection();
 try {
-  const result = process.argv.includes('--apply')
+  const inventoryOnly=process.argv.includes('--inventory-only');
+  const result = inventoryOnly
+    ? await (process.argv.includes('--apply') ? migrateInventoryOperationsSchema(connection) : inventoryOperationsPreflight(connection))
+    : process.argv.includes('--apply')
     ? await migrateMemberFinancialSchema(connection, migrateLegacySubscriptionPortalSchema)
     : { issues: await financialPreflight(connection) };
   console.log(JSON.stringify(result, null, 2));

@@ -12,3 +12,15 @@ export async function refreshInventoryBatches(ids, fetchBatch, receive, cancelle
     receive(rows, Math.min(offset + batch.length, ids.length), ids.length);
   }
 }
+
+export function applyInventorySaveToRow(row,result,submitted) {
+  if(!result)return row;
+  const next={...row};
+  if(result.farmStock)Object.assign(next,{stockOnFarm:result.farmStock.stockOnFarm,stockOnFarmLbs:result.farmStock.stockOnFarmLbs,farmStockRevision:result.farmStock.farmStockRevision});
+  if(result.currentInventory) {
+    const stock=result.currentInventory;
+    Object.assign(next,{inventory:stock.inventory,trackInventory:stock.trackInventory,inventoryType:stock.inventoryType || 'product',packageInventory:stock.packages || [],inventorySnapshot:stock,inventoryError:null});
+  }
+  if(result.savedFields.includes('visible'))next.visible=submitted.values.visible;
+  return next;
+}

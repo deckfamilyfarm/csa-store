@@ -87,10 +87,19 @@ credit-sync endpoint is compatibility routing to that queue, not a balance sette
 - A tracking/visibility request with a lost response is confirmed from the current
   remote result on retry. A conflicting result is held, not resent. The durable
   receipt is in `local_line_inventory_operations`.
-- Make Full Farm quantity corrections in Local Line, then refresh CSA Store.
-  No verified conditional or atomic-delta contract was available in local source
-  evidence. Re-enabling quantity pushes requires a provider capability check and
-  a regression proving that a sale between read and write cannot be overwritten.
+- As explicitly approved on 2026-11-12, Pricing and Inventory support best-effort
+  FF quantity edits. The dedicated save checks the displayed baseline against live
+  quantities, tracking, inventory type and target package links; conflicts require
+  review. CSA publications are serialized, quantity PATCHes are attempted once,
+  and a read-back precedes the local cache update. Confirmed retries return the
+  latest stock without resending. Uncertain quantity receipts stay held for manual
+  reconciliation in `local_line_inventory_operations`; refreshing does not clear them.
+  Review the receipt's payload and current LL stock, correct stock in LL as needed,
+  then have an operator reconcile the receipt before another CSA quantity edit.
+  This is not atomic: a remote sale/edit between the check and PATCH can still be
+  overwritten. The UI discloses that limitation. Legacy and Product Sync stock
+  publication remain blocked. No schema migration is introduced.
+
 
 Rollback stops new commands via the gates, preserves all operation/event receipts,
 and keeps verified webhook/recovery processing running. Do not roll back to the
@@ -113,3 +122,26 @@ accepted by this runner. Without `--docker`, the runner uses an installed local
 `mysqld` with TCP networking disabled. CI separately acquires MySQL 8.4 before
 running the same tests. No live provider/POS validation or production reconciliation
 is implied by these local checks.
+
+## Inventory batching and receipt installation
+
+Inventory saves use batches of up to six products with at most three product
+requests in flight. A batch shares a live vendor list, receipt readiness check,
+and publication lock; each product retains an independent transaction, fresh
+stock check, single PATCH and confirmed receipt. Failures remain per product.
+Background refreshes fetch remote stock without database row locks, then reject
+cache writes if local identity or cached state changed during the request.
+Inventory saves update confirmed rows without reloading the entire catalog.
+
+Inventory readiness checks only its receipt table. For an installation missing
+that table, use the explicit, scoped migration (no member financial schema changes):
+
+```sh
+npm --prefix apps/api run migrate:member-finances -- --inventory-only --check
+npm --prefix apps/api run migrate:member-finances -- --inventory-only --apply
+```
+
+The check reports whether the table exists; apply creates only
+`local_line_inventory_operations` if missing, validates its columns/primary key,
+and leaves existing receipts intact. The full member financial migration remains
+required for member financial features.

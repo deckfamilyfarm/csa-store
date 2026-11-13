@@ -11,7 +11,7 @@ import { AdminStorefront } from "./AdminStorefront.jsx";
 import { AdminProductsSection } from "./AdminProductsSection.jsx";
 import { CustomerPricingEditor } from './CustomerPricingEditor.jsx';
 import { categoryLabel } from "../categoryLabel.js";
-import { productCapabilities, buildProductDraftFromProduct, createDraftPackage, hydrateProductDraft, dirtyFields, hasDraftChanges, acknowledgeSave, saveProductDraft, saveInventoryDraft, INVENTORY_FIELDS, unsupportedScheduleFields, buildScheduleUpdate } from "./productWorkspace.js";
+import { productCapabilities, buildProductDraftFromProduct, createDraftPackage, hydrateProductDraft, dirtyFields, hasDraftChanges, acknowledgeSave, saveProductDraft, saveInventoryDraftBatch, INVENTORY_FIELDS, unsupportedScheduleFields, buildScheduleUpdate } from "./productWorkspace.js";
 import { AdminProductSyncSection } from "./AdminProductSyncSection.jsx";
 import { EnterpriseMigrationSection } from "./EnterpriseMigrationSection.jsx";
 import { EnterprisePricingSection } from "./EnterprisePricingSection.jsx";
@@ -2017,10 +2017,18 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh, sessionTarg
     setProductSaveLoading(true);
     const results = [];
     try {
+      if(options.inventoryOnly) {
+        return await saveInventoryDraftBatch(entries,capabilities,{
+          put:(path,payload)=>adminPut(path,token,payload),post:(path,payload)=>adminPost(path,token,payload)
+        },(result,entry,completed,total)=>{
+          options.onProgress?.(`${completed} of ${total} products processed`);
+          setWorkspaceDrafts(prev=>({...prev,[entry.meta.productId]:acknowledgeSave(prev[entry.meta.productId],entry,result.savedFields,result.savedPackageIds,result)}));
+        });
+      }
       for (const entry of entries) {
         options.onProgress?.(`${results.length} of ${entries.length} products processed — ${options.inventoryOnly ? "saving inventory for" : "saving"} ${entry.values.name}…`);
         const submitted = { ...entry, values: { ...entry.values, description: sanitizeHtml(entry.values.description) } };
-        const result = await (options.inventoryOnly ? saveInventoryDraft : saveProductDraft)(submitted, capabilities, {
+        const result = await saveProductDraft(submitted, capabilities, {
           put: (path, payload) => adminPut(path, token, payload),
           post: (path, payload) => adminPost(path, token, payload)
         });

@@ -1,4 +1,4 @@
-import { INVENTORY_REFRESH_BATCH_SIZE } from "./inventoryRefresh.js";
+import { INVENTORY_REFRESH_BATCH_SIZE, applyInventorySaveToRow } from "./inventoryRefresh.js";
 import React, { useEffect, useRef, useState } from "react";
 import { adminGet, adminPost } from "../adminApi.js";
 import { categoryLabel } from "../categoryLabel.js";
@@ -15,6 +15,7 @@ import {
   FULL_FARM_INVENTORY_FIELDS,
   inventorySaveSummary,
   reviewFarmStockConflict,
+  reviewInventoryConflict,
 } from "./productWorkspace.js";
 import "./AdminProductsSection.css";
 
@@ -276,6 +277,8 @@ export function AdminProductsSection({
   const [message, setMessage] = useState("");
   const rowCache = useRef(new Map());
   const requestId = useRef(0);
+  const inventorySaveVersions=useRef(new Map());
+  const inventorySavingIds=useRef(new Set());
   const [reload, setReload] = useState(0);
   const [saveResults, setSaveResults] = useState([]);
   const compactInventory = view === "inventory";
@@ -342,17 +345,20 @@ export function AdminProductsSection({
           for(let offset=0;offset<ids.length;offset+=INVENTORY_REFRESH_BATCH_SIZE){
             if(cancelled||requestId.current!==id)break;
             const batch=ids.slice(offset,offset+INVENTORY_REFRESH_BATCH_SIZE);let stocks;
+            const versions=new Map(batch.map(id=>[id,inventorySaveVersions.current.get(id)]));
             try{stocks=(await adminPost('products/inventory/refresh',token,{productIds:batch})).rows;}
             catch(e){stocks=batch.map(productId=>({productId,error:e.message}));}
             if(cancelled||requestId.current!==id)break;
-            const map=new Map(stocks.map(s=>[s.productId,s]));
-            const refreshed=response.rows.map(row=>{
-              const stock=map.get(row.productId);if(!stock)return row;
+            const changed=new Map();
+            for(const stock of stocks) {
+              const productId=Number(stock.productId);
+              if(inventorySavingIds.current.has(productId)||versions.get(productId)!==inventorySaveVersions.current.get(productId))continue;
+              const row=rowCache.current.get(productId);if(!row)continue;
               const next=stock.error?{...row,inventoryError:stock.error}:{...row,inventory:stock.inventory,trackInventory:stock.trackInventory,inventoryType:stock.inventoryType||'product',packageInventory:stock.packages||[],inventorySnapshot:stock,inventoryError:null};
-              rowCache.current.set(next.productId,next);return next;
-            });
-            response={...response,rows:refreshed};setData(response);
-            setDrafts(existing=>Object.fromEntries(Object.entries(existing).map(([key,value])=>{const row=refreshed.find(r=>r.productId===Number(key));return [key,row?hydrateProductDraft(value,row):value];})));
+              rowCache.current.set(productId,next);changed.set(productId,next);
+            }
+            setData(previous=>({...previous,rows:previous.rows.map(row=>changed.get(row.productId)||row)}));
+            setDrafts(existing=>Object.fromEntries(Object.entries(existing).map(([key,value])=>{const row=changed.get(Number(key));return [key,row?hydrateProductDraft(value,row):value];})));
           }
         }
       })
@@ -426,14 +432,26 @@ export function AdminProductsSection({
   }
   async function save() {
     const inventoryOnly = view === "inventory";
-    const results = await onSave(null, { inventoryOnly, onProgress: setMessage });
-    setSaveResults(results);
-    setMessage(
-      results.some((result) => !result.ok)
-        ? "Some changes could not be saved. The remaining edits are still available below."
-        : inventoryOnly ? [...new Set(results.map(inventorySaveSummary))].join(". ") : "Local changes saved.",
-    );
-    setReload((value) => value + 1);
+    const submitted=new Map(inventoryDrafts.map(entry=>[entry.meta.productId,entry]));
+    if(inventoryOnly)for(const id of submitted.keys()){
+      inventorySavingIds.current.add(id);
+      inventorySaveVersions.current.set(id,(inventorySaveVersions.current.get(id)||0)+1);
+    }
+    try {
+      const results = await onSave(null, { inventoryOnly, onProgress: setMessage });
+      setSaveResults(results);
+      setMessage(results.some(result=>!result.ok)?"Some changes could not be saved. The remaining edits are still available below.":inventoryOnly?[...new Set(results.map(inventorySaveSummary))].join(". "):"Local changes saved.");
+      if(inventoryOnly) {
+        const byId=new Map(results.map(result=>[result.productId,result]));
+        for(const [id,result] of byId){const row=rowCache.current.get(id);if(row)rowCache.current.set(id,applyInventorySaveToRow(row,result,submitted.get(id)));}
+        setData(previous=>({...previous,rows:previous.rows.map(row=>applyInventorySaveToRow(row,byId.get(row.productId),submitted.get(row.productId)))}));
+      } else setReload(value=>value+1);
+    } finally {
+      if(inventoryOnly)for(const id of submitted.keys()){
+        inventorySavingIds.current.delete(id);
+        inventorySaveVersions.current.set(id,(inventorySaveVersions.current.get(id)||0)+1);
+      }
+    }
   }
   async function deleteRow(row) {
     setBusy(true);
@@ -471,7 +489,7 @@ export function AdminProductsSection({
         value={values[key]}
         onChange={(event) =>
           patch(row, {
-            [key]: pricing ? event.target.value : Number(event.target.value),
+            [key]: pricing || key === "inventory" ? event.target.value : Number(event.target.value),
           })
         }
       />
@@ -548,8 +566,17 @@ export function AdminProductsSection({
         return view === "inventory" ? <label className="products-inventory-checkbox">{checkbox}</label> : checkbox;
       case "inventory": {
         if(view==='inventory'&&!row.inventorySnapshot)return <small role="status">{row.inventoryError||'Checking current stock…'}</small>;
-        const snapshot=row.inventorySnapshot;
-        return <span title="Manage quantities in Local Line, then refresh here.">{snapshot?.inventoryType==='package'?(snapshot.packages || []).map(pkg=><span key={pkg.remoteId}>{pkg.name}: {pkg.inventory ?? '—'} </span>):values.inventory ?? '—'}</span>;
+        const entry=drafts[row.productId];
+        const snapshot=entry?.meta.inventorySnapshot || row.inventorySnapshot;
+        const conflict=entry?.meta.inventoryConflict;
+        if(conflict)return <div role="alert">Full Farm stock changed. <button type="button" disabled={disabled} onClick={()=>setDrafts(existing=>({...existing,[row.productId]:reviewInventoryConflict(existing[row.productId])}))}>Use current stock and re-enter edit</button></div>;
+        if(!snapshot)return <span>{values.inventory ?? '—'}</span>;
+        if(snapshot.inventoryType==='package')return <div>{(values.packageInventory || []).map(pkg=><label key={pkg.remoteId}>{pkg.name}
+          <input className="input products-number" type="number" min="0" step="1" aria-label={`Full Farm Stock: ${row.name} — ${pkg.name}`}
+            disabled={disabled||!capabilities.inventoryPush||!values.trackInventory||!pkg.packageId} value={pkg.inventory ?? ''}
+            onChange={event=>patch(row,{packageInventory:values.packageInventory.map(p=>p.remoteId===pkg.remoteId?{...p,inventory:event.target.value}:p)})}/>
+        </label>)}</div>;
+        return numericInput('inventory');
       }
 
       case "saleDiscount":
@@ -716,7 +743,7 @@ export function AdminProductsSection({
       {compactInventory && <progress className="compact-inventory-progress" aria-label="Farm inventory checked" max={mobile.total || 1}
         value={mobileLoaded && !loading ? mobile.checked : undefined} />}
       <p className="small products-inventory-description">
-        {view === "inventory" ? "Save Inventory Changes saves Stock on Farm locally and confirms changed Full Farm fields in Local Line. Full Farm Track Inventory enables stock limits; Full Farm Visible controls storefront availability. Stock on Farm records physical availability anywhere in a farm freezer or fridge, independently of Full Farm inventory."
+        {view === "inventory" ? "Save Inventory Changes saves Stock on Farm locally and confirms changed Full Farm fields in Local Line. Quantity saves check current Local Line stock first; a simultaneous remote sale or edit can still be overwritten. Full Farm Track Inventory enables stock limits; Full Farm Visible controls storefront availability. Stock on Farm records physical availability anywhere in a farm freezer or fridge, independently of Full Farm inventory."
           : "Manage product details and pricing. Save changes locally; syncing and scheduling are in Product Sync. Use Inventory to send stock, tracking, and visibility changes directly to Local Line."}
       </p>
       {view === "inventory" && !capabilities.inventoryPush && <p className="small">Stock on Farm can be saved locally. Saving Full Farm fields requires Inventory Admin, or product editing and Local Line Push permissions.</p>}

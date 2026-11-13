@@ -198,6 +198,27 @@ async function patchLocalLineProduct(productId, accessToken, payload) {
   }
 }
 
+// Dedicated inventory workflow only: one attempt, never automatic PATCH retries.
+export async function patchReviewedLocalLineInventory(productId, accessToken, payload) {
+  const validCount = n => Number.isSafeInteger(n) && n >= 0 && n <= 2147483647;
+  const keys = Object.keys(payload);
+  if (!keys.length || keys.some(k => !['set_inventory','packages','track_inventory','visible'].includes(k)) ||
+      (Object.hasOwn(payload,'set_inventory') && !validCount(payload.set_inventory)) ||
+      ['track_inventory','visible'].some(k => Object.hasOwn(payload,k) && typeof payload[k] !== 'boolean') ||
+      (payload.packages && (!Array.isArray(payload.packages) || !payload.packages.length || payload.packages.some(p =>
+        !Number.isSafeInteger(p.id) || p.id <= 0 || Object.keys(p).some(k => !['id','set_inventory'].includes(k)) ||
+        (Object.hasOwn(p,'set_inventory') && !validCount(p.set_inventory)))))) {
+    throw new Error('Invalid reviewed inventory payload.');
+  }
+  const companyBaseUrl = process.env.LL_COMPANY_BASEURL || '';
+  const response = await fetch(`${LL_BASEURL}products/${productId}/`, {
+    method: 'PATCH', headers: {Authorization: `Bearer ${accessToken}`, 'Content-Type':'application/json',
+      ...(companyBaseUrl ? {Referer:companyBaseUrl,Origin:companyBaseUrl} : {})},
+    body: JSON.stringify(payload), signal: AbortSignal.timeout(30000)
+  });
+  if (!response.ok) throw new Error(`LocalLine inventory PATCH failed: ${response.status}`);
+}
+
 async function deleteLocalLineProduct(productId, accessToken) {
   const url = `${LL_BASEURL}products/${productId}/`;
   const companyBaseUrl = process.env.LL_COMPANY_BASEURL || "";
@@ -287,9 +308,13 @@ export async function fetchAllLocalLineFulfillmentStrategies() {
   return fetchLocalLineCollection("fulfillment-strategies/?page_size=100", accessToken);
 }
 
+export async function fetchLocalLineVendors(token) {
+  return fetchLocalLineCollection("vendors/?page_size=100", token);
+}
+
 export async function resolveLocalLineVendor(context, token) {
   requireProductVendor(context.product, context.vendor);
-  return matchLocalLineVendor(context.product, context.vendor, await fetchLocalLineCollection("vendors/?page_size=100", token));
+  return matchLocalLineVendor(context.product, context.vendor, await fetchLocalLineVendors(token));
 }
 
 export async function verifyReviewedLocalLineVendor(context, vendorId, token) {

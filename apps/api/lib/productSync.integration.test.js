@@ -36,7 +36,7 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
   const squareObjects = new Map();
   const requests = [];
   const remoteVendors = [{ id: 101, name: "Deck Family Farm" }, { id: 102, name: "Creamy Cow, LLC" }, { id: 103, name: "Hyland Meats" }, { id: 104, name: "Other Farm" }];
-  let failSquare = false, loseCreateResponse = false, failCreateReads = 0, pausePublication = null, dropVendor = false, loseInventoryResponseFor = null;
+  let failSquare = false, loseCreateResponse = false, failCreateReads = 0, pausePublication = null, dropVendor = false, loseInventoryResponseFor = null, sellAfterInventoryPatchFor = null, inventoryProbe = null, pauseInventoryRead = null;
   t.mock.method(globalThis, "fetch", async (url, options = {}) => {
     const parsed = new URL(url); assert.ok(["localline.test", "square.test"].includes(parsed.hostname), `Unexpected external request: ${parsed.hostname}`);
     const method = options.method || "GET"; const body = options.body ? JSON.parse(options.body) : null;
@@ -58,6 +58,8 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
     if (productMatch) {
       const id = Number(productMatch[1]); const remote = remoteProducts.get(id);
       if (!remote) return json({ error: "missing" }, 404);
+      if(method==='GET' && pauseInventoryRead?.id===id){const pause=pauseInventoryRead;pauseInventoryRead=null;const snapshot=structuredClone(remote);pause.entered();await pause.wait;return json(snapshot);}
+      if(method==='GET' && inventoryProbe?.ids.has(id)){const probe=inventoryProbe;probe.active++;probe.max=Math.max(probe.max,probe.active);await new Promise(resolve=>setTimeout(resolve,40));probe.active--;}
       if (method === "GET" && id > 99000 && failCreateReads > 0) { failCreateReads -= 1; throw new Error("Interrupted after confirmed creation"); }
       if (method === "PATCH") {
         if (pausePublication?.id === id) { pausePublication.entered(); await pausePublication.wait; }
@@ -66,6 +68,7 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
         Object.assign(remote, body);if(mergedPackages)remote.packages=mergedPackages;
         if (Object.hasOwn(body, "set_inventory")) remote.inventory = body.set_inventory;
         if (dropVendor && Object.hasOwn(body, "vendor")) remote.vendor = null;
+        if(sellAfterInventoryPatchFor===id){sellAfterInventoryPatchFor=null;remote.inventory-=1;}
         if(loseInventoryResponseFor===id){loseInventoryResponseFor=null;throw new Error('Lost inventory response');}
       }
       return json(remote);
@@ -320,11 +323,18 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
   assert.equal((await waitForRelease(approval.id)).status,"completed");
   assert.equal((await waitForRelease(nextApproval.id)).status,"completed");
   assert.equal(requests.filter(row=>row.path.endsWith('/products/1120/')&&row.method==='PATCH').length,1,"Retries and status polling never resend the confirmed Local Line change");
-  const {refreshFullFarmInventory,saveInventoryToLocalLine}=await import('./inventorySync.js');
-  const {migrateMemberFinancialSchema}=await import('./memberFinancialSchema.js');
-  const {migrateLegacySubscriptionPortalSchema}=await import('../db.js');
+  const {refreshFullFarmInventory,saveInventoryToLocalLine,saveInventoryBatch}=await import('./inventorySync.js');
+  const {inventoryOperationsPreflight,migrateInventoryOperationsSchema,assertInventoryOperationsSchema}=await import('./inventoryOperationsSchema.js');
   const migrationConnection=await pool.getConnection();
-  try {await migrateMemberFinancialSchema(migrationConnection,migrateLegacySubscriptionPortalSchema);}finally{migrationConnection.release();}
+  try {
+    const beforeTables=(await migrationConnection.query('SHOW TABLES'))[0].map(row=>Object.values(row)[0]);
+    assert.equal((await inventoryOperationsPreflight(migrationConnection)).exists,false);
+    await assert.rejects(assertInventoryOperationsSchema(migrationConnection),{status:503});
+    assert.equal((await migrateInventoryOperationsSchema(migrationConnection)).created,true);
+    assert.equal((await migrateInventoryOperationsSchema(migrationConnection)).created,false);
+    const added=(await migrationConnection.query('SHOW TABLES'))[0].map(row=>Object.values(row)[0]).filter(name=>!beforeTables.includes(name));
+    assert.deepEqual(added,['local_line_inventory_operations'],'Scoped migration creates only inventory receipts');
+  }finally{migrationConnection.release();}
   const inventoryUser = { userId: 1, adminRoles: ["inventory_admin"] };
   await product(130);
   await pool.query("UPDATE product_pricing_profiles SET remote_sync_status='synced', updated_at='2026-01-01', remote_synced_at='2026-01-02' WHERE product_id=130");
@@ -340,7 +350,7 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
   const startRequests=requests.length;
   await saveProductFarmStock(130, { stockOnFarmLbs: 18.5, expectedRevision: 0 }, inventoryUser);
   assert.equal(requests.length, startRequests, 'Farm-only saves never contact remote services');
-  await assert.rejects(saveInventoryToLocalLine(130,{inventory:7},inventoryUser),{code:'LOCAL_LINE_STOCK_READ_ONLY'});
+  await assert.rejects(saveInventoryToLocalLine(130,{inventory:7},inventoryUser),{status:428});
   const inventoryResult=await saveInventoryToLocalLine(130,{trackInventory:1,visible:0},inventoryUser);
   assert.equal(inventoryResult.localLineUpdate,true);
   const inventoryRequests=requests.slice(startRequests);
@@ -369,14 +379,14 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
   assert.equal(remoteProducts.get(1130).visible,false,"An unrelated pricing release must not overwrite visibility");
   remoteProducts.get(1130).inventory=3;
   const beforeConflict=requests.filter(r=>r.method==='PATCH').length;
-  await assert.rejects(saveInventoryToLocalLine(130,{inventory:8},inventoryUser,{inventory:7,trackInventory:true}),{code:'LOCAL_LINE_STOCK_READ_ONLY'});
+  await assert.rejects(saveInventoryToLocalLine(130,{inventory:8},inventoryUser,{inventory:7,trackInventory:true}),{status:409});
   assert.equal(requests.filter(r=>r.method==='PATCH').length,beforeConflict,'stale stock never sends a PATCH');
   assert.equal((await pool.query('SELECT inventory FROM products WHERE id=130'))[0][0].inventory,20);
   remoteProducts.get(1130).inventory=2;
   const fresh=await refreshFullFarmInventory([130]);assert.equal(fresh.rows[0].inventory,2);
   assert.equal(requests.filter(r=>r.method==='PATCH').length,beforeConflict,'refresh only reads the channel');
   await pool.query("UPDATE product_pricing_profiles SET remote_sync_status='pending' WHERE product_id=130");
-  await assert.rejects(saveInventoryToLocalLine(130,{inventory:6},inventoryUser),{code:'LOCAL_LINE_STOCK_READ_ONLY'});
+  await assert.rejects(saveInventoryToLocalLine(130,{inventory:6},inventoryUser),{status:428});
   await saveInventoryToLocalLine(130,{visible:1},inventoryUser);
   assert.equal(remoteProducts.get(1130).visible,true);
   assert.equal((await service.pendingProductSync()).rows.some(row=>row.productId===130),true,"Inventory does not clear pending pricing changes");
@@ -397,10 +407,89 @@ test("persisted audits, pagination, mixed releases, retries, drift, and legacy c
   const refreshedPackage=(await refreshFullFarmInventory([132])).rows[0];
   assert.equal(refreshedPackage.inventory,null);assert.equal(refreshedPackage.packages[0].inventory,9);
   assert.equal((await pool.query('SELECT inventory FROM packages WHERE id=?',[pkgLocal]))[0][0].inventory,9);
-  const beforePackageRequests=requests.length;
-  await assert.rejects(saveInventoryToLocalLine(132,{packageInventory:[{packageId:pkgLocal,inventory:5}]},inventoryUser,refreshedPackage),{code:'LOCAL_LINE_STOCK_READ_ONLY'});
-  assert.equal(requests.length,beforePackageRequests,'Unsupported quantity edits fail before any remote request');
-  assert.equal(packageRemote.packages[0].current_inventory,9);
+  const packageResult=await saveInventoryToLocalLine(132,{packageInventory:[{packageId:pkgLocal,inventory:5}]},inventoryUser,refreshedPackage);
+  assert.equal(packageResult.currentInventory.packages[0].inventory,5);
+  assert.equal(packageRemote.packages[1].current_inventory,7,'Sibling stock is preserved');
+  const packageWrites=requests.filter(r=>r.method==='PATCH').length;
+  packageRemote.packages[0].current_inventory=4; // A sale after the confirmed save.
+  const replay=await saveInventoryToLocalLine(132,{packageInventory:[{packageId:pkgLocal,inventory:5}]},inventoryUser,refreshedPackage);
+  assert.equal(replay.replayed,true);
+  assert.equal(replay.currentInventory.packages[0].inventory,4);
+  assert.equal(requests.filter(r=>r.method==='PATCH').length,packageWrites,'A confirmed retry never overwrites a subsequent sale');
+  await product(133);
+  remoteProducts.get(1133).track_inventory=true;
+  const baseline=(await refreshFullFarmInventory([133])).rows[0];
+  const saved=await saveInventoryToLocalLine(133,{inventory:6},inventoryUser,baseline);
+  assert.equal(saved.currentInventory.inventory,6);
+  assert.equal((await pool.query('SELECT inventory FROM products WHERE id=133'))[0][0].inventory,6);
+  const nextBaseline=(await refreshFullFarmInventory([133])).rows[0];
+  loseInventoryResponseFor=1133;
+  await assert.rejects(saveInventoryToLocalLine(133,{inventory:8},inventoryUser,nextBaseline),/Lost inventory response/);
+  const uncertainWrites=requests.filter(r=>r.method==='PATCH').length;
+  await assert.rejects(saveInventoryToLocalLine(133,{inventory:8},inventoryUser,nextBaseline),/uncertain outcome/);
+  remoteProducts.get(1133).inventory=7;
+  const latestBaseline=(await refreshFullFarmInventory([133])).rows[0];
+  await assert.rejects(saveInventoryToLocalLine(133,{inventory:9},inventoryUser,latestBaseline),/uncertain outcome/);
+  assert.equal(requests.filter(r=>r.method==='PATCH').length,uncertainWrites,'No replacement PATCH after uncertain stock writes');
+
+  await product(134);
+  remoteProducts.get(1134).track_inventory=true;
+  const concurrentBaseline=(await refreshFullFarmInventory([134])).rows[0];
+  const competing=await Promise.allSettled([
+    saveInventoryToLocalLine(134,{inventory:6},inventoryUser,concurrentBaseline),
+    saveInventoryToLocalLine(134,{inventory:7},inventoryUser,concurrentBaseline)
+  ]);
+  assert.equal(competing.filter(r=>r.status==='fulfilled').length,1,'CSA quantity saves are serialized');
+  assert.equal(competing.find(r=>r.status==='rejected').reason.status,409);
+  const postSaleBaseline=(await refreshFullFarmInventory([134])).rows[0];
+  sellAfterInventoryPatchFor=1134;
+  await assert.rejects(saveInventoryToLocalLine(134,{inventory:10},inventoryUser,postSaleBaseline),/did not confirm/);
+  const postSaleWrites=requests.filter(r=>r.method==='PATCH').length;
+  await assert.rejects(saveInventoryToLocalLine(134,{inventory:10},inventoryUser,postSaleBaseline),/uncertain outcome/);
+  assert.equal(requests.filter(r=>r.method==='PATCH').length,postSaleWrites,'Read-back mismatch holds instead of overwriting a sale');
+
+  for(const id of [135,136,137]){await product(id);remoteProducts.get(id+1000).track_inventory=true;}
+  let requestStart=requests.length;
+  const batchBaselines=(await refreshFullFarmInventory([135,136,137])).rows;
+  assert.equal(requests.slice(requestStart).filter(r=>r.path.endsWith('/vendors/')).length,1,'Refresh shares vendor verification across the batch');
+  inventoryProbe={ids:new Set([1135,1136,1137]),active:0,max:0};
+  requestStart=requests.length;
+  const batchItems=batchBaselines.map(row=>({productId:row.productId,changes:{inventory:8},expectedInventory:row}));
+  const batchResult=await saveInventoryBatch(batchItems,inventoryUser);
+  assert.equal(batchResult.rows.filter(r=>r.ok).length,3);
+  assert.ok(inventoryProbe.max>=2,'Different products overlap remote reads instead of serializing on shared vendor/category rows');
+  inventoryProbe=null;
+  assert.equal(requests.slice(requestStart).filter(r=>r.path.endsWith('/vendors/')).length,1,'One live vendor list per save batch');
+  assert.equal(requests.slice(requestStart).filter(r=>r.method==='PATCH').length,3,'Each product receives exactly one PATCH');
+  const freshBatch=(await refreshFullFarmInventory([135,136,137])).rows;
+  remoteProducts.get(1136).inventory=7;
+  const mixed=await saveInventoryBatch(freshBatch.map(row=>({productId:row.productId,changes:{inventory:9},expectedInventory:row})),inventoryUser);
+  assert.deepEqual(mixed.rows.map(r=>[r.productId,r.ok]).sort((a,b)=>a[0]-b[0]),[[135,true],[136,false],[137,true]]);
+  assert.equal(mixed.rows.find(r=>r.productId===136).inventoryConflict.inventory,7);
+  const beforeBatchRetry=requests.filter(r=>r.method==='PATCH').length;
+  await saveInventoryBatch(freshBatch.map(row=>({productId:row.productId,changes:{inventory:9},expectedInventory:row})),inventoryUser);
+  assert.equal(requests.filter(r=>r.method==='PATCH').length,beforeBatchRetry,'Confirmed members of a partially failed batch never resend');
+  await assert.rejects(saveInventoryBatch([batchItems[0],batchItems[0]],inventoryUser),/unique product IDs/);
+  await assert.rejects(saveInventoryBatch(batchItems,{adminRoles:['pricing_admin']}),{status:403});
+
+  await product(138);remoteProducts.get(1138).track_inventory=true;
+  const refreshBaseline=(await refreshFullFarmInventory([138])).rows[0];
+  let readEntered,resumeRead;
+  const readStarted=new Promise(resolve=>{readEntered=resolve;});
+  const readWait=new Promise(resolve=>{resumeRead=resolve;});
+  pauseInventoryRead={id:1138,entered:readEntered,wait:readWait};
+  const delayedRefresh=refreshFullFarmInventory([138]);
+  await readStarted;
+  let timeout;
+  try {
+    const result=await Promise.race([
+      saveInventoryToLocalLine(138,{inventory:11},inventoryUser,refreshBaseline),
+      new Promise((_,reject)=>{timeout=setTimeout(()=>reject(new Error('Slow refresh blocked a stock save')),2000);})
+    ]);
+    assert.equal(result.currentInventory.inventory,11);
+  }finally{clearTimeout(timeout);resumeRead();}
+  assert.match((await delayedRefresh).rows[0].error,/changed during this refresh/);
+  assert.equal((await pool.query('SELECT inventory FROM products WHERE id=138'))[0][0].inventory,11,'A delayed refresh cannot overwrite confirmed stock');
 
   await product(140);
   remoteProducts.get(1140).vendor = null;

@@ -6,7 +6,7 @@ import productSyncRouter from "./productSync.js";
 import enterprisePricingRouter from "./enterprisePricing.js";
 import enterprisePromotionsRouter from "./enterprisePromotions.js";
 import { assertLegacyPricingPublicationAllowed, assertNoMigratedLegacySquarePublication } from "../lib/enterprisePricingService.js";
-import { saveInventoryToLocalLine, refreshFullFarmInventory } from "../lib/inventorySync.js";
+import { saveInventoryToLocalLine, saveInventoryBatch, refreshFullFarmInventory } from "../lib/inventorySync.js";
 import { saveProductFarmStock } from "../lib/productFarmStock.js";
 import { farmInventorySnapshot } from "../lib/farmInventory.js";
 import { validateVendorAssignment, validateSavedProductVendor } from "../lib/productVendor.js";
@@ -220,6 +220,10 @@ router.put("/products/:id/farm-stock", requireAdminPermission(["inventory_admin"
 
 router.post('/products/inventory/refresh', requireAdminPermission(['inventory_admin','pricing_admin','pricing_editor','pricing_publisher','local_pricelist_admin','localline_pull','localline_push']), async(req,res)=>{
  try{res.json(await refreshFullFarmInventory(req.body?.productIds));}catch(e){res.status(e.status||400).json({error:e.message});}
+});
+router.post('/products/inventory/batch', requireAdminPermission(['inventory_admin','pricing_admin','local_pricelist_admin']), async(req,res)=>{
+  try{res.json(await saveInventoryBatch(req.body?.items,req.admin));}
+  catch(error){res.status(error.status || 400).json({error:error.message});}
 });
 router.post("/products/:id/inventory", requireAdminPermission(["inventory_admin", "pricing_admin", "local_pricelist_admin"]), async (req, res) => {
   try {

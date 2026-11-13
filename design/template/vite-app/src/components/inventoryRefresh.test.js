@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { refreshInventoryBatches } from "./inventoryRefresh.js";
+import { refreshInventoryBatches, applyInventorySaveToRow } from "./inventoryRefresh.js";
 import { adminResponseError } from "../adminErrors.js";
 
 test("inventory updates arrive in small batches and a failed batch preserves successful results", async () => {
@@ -34,4 +34,12 @@ test("an HTML gateway timeout is explained without a misleading create error", a
 test("inventory conflict details and backend validation messages survive", async () => {
   const error = await adminResponseError(new Response(JSON.stringify({ error: "Review current stock", inventoryConflict: { inventory: 9 } }), { status: 409 }), "Failed");
   assert.equal(error.message, "Review current stock"); assert.deepEqual(error.inventoryConflict, { inventory: 9 });
+});
+
+test('saved rows adopt confirmed zero quantities and farm values without refreshing unrelated rows',()=>{
+ const row={productId:7,inventory:12,visible:true,stockOnFarm:true};
+ const next=applyInventorySaveToRow(row,{savedFields:['inventory','visible','stockOnFarm'],currentInventory:{inventory:0,trackInventory:true},farmStock:{stockOnFarm:false,stockOnFarmLbs:0,farmStockRevision:3}},{values:{visible:false}});
+ assert.equal(next.inventory,0);assert.equal(next.visible,false);assert.equal(next.stockOnFarm,false);assert.equal(next.stockOnFarmLbs,0);
+ assert.equal(applyInventorySaveToRow(row,undefined),row);
+ assert.deepEqual(applyInventorySaveToRow(row,{savedFields:[]}),row);
 });

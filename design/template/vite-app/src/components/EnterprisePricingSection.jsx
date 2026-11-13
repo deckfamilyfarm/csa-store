@@ -338,7 +338,7 @@ function EnterpriseProductsSection({ token, roles = [], createdProductId }) {
         }} /></td>
         <td><EnterpriseInventoryCell row={row} token={token} roles={roles} localOnly={summary?.localOnly !== false} onSaved={(quantity,snapshot)=>{
           setRows(current=>current.map(item=>item.id===row.id?{...item,ffInventorySnapshot:snapshot,ffInventory:quantity,ffTrackInventory:snapshot?.trackInventory??item.ffTrackInventory,ffInventoryCheckedAt:new Date().toISOString(),ffInventoryError:null}:item));
-          setMessage(`${row.name}: FF inventory updated to ${quantity}. Confirmed in Local Line.`);
+          setMessage(`${row.name}: FF inventory confirmed in Local Line.`);
         }} /></td>
         <td><PricingSyncStatus row={row} onReview={() => selectProduct(row.id, false, "editor-sync")} /></td>
       </tr>; })}</tbody></table></div>

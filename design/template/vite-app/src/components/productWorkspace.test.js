@@ -8,11 +8,13 @@ import {
   acknowledgeSave,
   saveProductDraft,
   saveInventoryDraft,
+  saveInventoryDraftBatch,
   unsupportedScheduleFields,
   syncLabel,
   previewProductPrices,
   buildScheduleUpdate,
   reviewFarmStockConflict,
+  reviewInventoryConflict,
 } from "./productWorkspace.js";
 import { computeProductPricingSnapshot } from "../../../../../apps/api/lib/productPricing.js";
 import { mobileInventoryView } from "./mobileInventoryView.js";
@@ -603,4 +605,69 @@ test('package inventory saves only dirty packages with frozen remote mappings',a
  assert.deepEqual(result.savedFields,['packageInventory']);
  const refreshed=hydrateProductDraft(entry,{...product,packageInventory:snapshot.packages.map(p=>({...p,inventory:1})),inventorySnapshot:{...snapshot,packages:[]}});
  assert.equal(refreshed.values.packageInventory[0].inventory,5);assert.equal(refreshed.meta.inventorySnapshot.packages[0].inventory,9);
+});
+
+test('FF conflicts require explicit review, preserving farm and price drafts', async()=>{
+ const initial={...product,inventorySnapshot:{inventory:12,trackInventory:true}};
+ let entry=patchProductDraft({},initial,{inventory:'15',stockOnFarm:true,sourceUnitPrice:'20'})[7];
+ const current={inventory:10,trackInventory:true,checkedAt:'2026-11-12T00:00:00Z'};
+ const result=await saveInventoryDraft(entry,productCapabilities(['admin']),{put:async()=>{throw new Error('offline');},post:async()=>{throw Object.assign(new Error('Stock changed'),{inventoryConflict:current});}});
+ entry=acknowledgeSave(entry,entry,result.savedFields,[],result);
+ assert.equal(entry.values.inventory,'15');
+ assert.deepEqual(entry.meta.inventoryConflict,current);
+ const reviewed=reviewInventoryConflict(entry);
+ assert.equal(reviewed.values.inventory,10);
+ assert.equal(reviewed.meta.inventoryConflict,null);
+ assert.equal(reviewed.values.stockOnFarm,true);
+ assert.equal(reviewed.values.sourceUnitPrice,'20');
+ assert.deepEqual(reviewed.meta.inventorySnapshot,current);
+});
+
+test('confirmed retry adopts current stock after intervening sales without losing concurrent edits',()=>{
+ const submitted=patchProductDraft({},product,{inventory:15})[7];
+ const result={savedFields:['inventory'],savedPackageIds:[],currentInventory:{inventory:13,trackInventory:true}};
+ const settled=acknowledgeSave(submitted,submitted,result.savedFields,[],result);
+ assert.equal(settled.values.inventory,13);
+ assert.equal(settled.defaults.inventory,13);
+ const edited={...submitted,values:{...submitted.values,inventory:17}};
+ assert.equal(acknowledgeSave(edited,submitted,result.savedFields,[],result).values.inventory,17);
+});
+
+test('blank FF quantity never submits an accidental zero',async()=>{
+ const entry=patchProductDraft({},product,{inventory:''})[7];
+ const result=await saveInventoryDraft(entry,productCapabilities(['admin']),{post:async()=>assert.fail('No write for blank stock')});
+ assert.equal(result.ok,false);
+ assert.match(result.errors.join(' '),/nonnegative whole number/);
+});
+
+test('inventory batch groups six products, preserves successes and retains conflicts for review',async()=>{
+ const entries=Array.from({length:8},(_,i)=>patchProductDraft({}, {...product,productId:100+i,inventorySnapshot:{inventory:12,trackInventory:true}},{inventory:15})[100+i]);
+ const calls=[],acknowledged=[];
+ const results=await saveInventoryDraftBatch(entries,productCapabilities(['admin']),{post:async(path,body)=>{
+   assert.equal(path,'products/inventory/batch');calls.push(body.items);
+   return {rows:body.items.map(item=>item.productId===102?{productId:102,ok:false,error:'Stock changed',inventoryConflict:{inventory:11,trackInventory:true}}:{productId:item.productId,ok:true,localLineUpdate:true,currentInventory:{inventory:15,trackInventory:true}})};
+ }},result=>acknowledged.push(result.productId));
+ assert.deepEqual(calls.map(items=>items.length),[6,2]);
+ assert.equal(acknowledged.length,8);
+ assert.equal(results.filter(r=>r.ok).length,7);
+ assert.deepEqual(results.find(r=>r.productId===102).savedFields,[]);
+ assert.equal(results.find(r=>r.productId===102).inventoryConflict.inventory,11);
+});
+
+test('lost batch response preserves all stock drafts and never submits a replacement request',async()=>{
+ const entries=[patchProductDraft({},product,{inventory:15})[7]];
+ let calls=0;
+ const results=await saveInventoryDraftBatch(entries,productCapabilities(['admin']),{post:async()=>{calls++;throw new Error('Lost response');}});
+ assert.equal(calls,1);assert.equal(results[0].ok,false);assert.deepEqual(results[0].savedFields,[]);
+ assert.equal(entries[0].values.inventory,15);
+});
+
+test('batched Full Farm failure keeps independently successful farm fields saved',async()=>{
+ const entry=patchProductDraft({},product,{stockOnFarm:true,inventory:15})[7];
+ const results=await saveInventoryDraftBatch([entry],productCapabilities(['admin']),{
+   put:async()=>({ok:true,stockOnFarm:true,stockOnFarmLbs:null,farmStockRevision:1}),
+   post:async()=>({rows:[{productId:7,ok:false,error:'Stock changed',inventoryConflict:{inventory:11,trackInventory:true}}]})
+ });
+ assert.equal(results[0].partial,true);assert.ok(results[0].savedFields.includes('stockOnFarm'));
+ assert.ok(!results[0].savedFields.includes('inventory'));
 });

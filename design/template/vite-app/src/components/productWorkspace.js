@@ -56,7 +56,7 @@ export function inventorySaveSummary(result) {
   return saved.join("; ") || "No inventory changes saved";
 }
 
-export async function saveInventoryDraft(entry, capabilities, api) {
+export async function saveInventoryDraft(entry, capabilities, api, queueFullFarm = null) {
   const dirty = dirtyFields(entry);
   const fields = dirty.filter(key => FULL_FARM_INVENTORY_FIELDS.includes(key));
   const result = { productId: entry.meta.productId, productName: entry.values.name, inventoryOnly: true, ok: false, savedFields: [], savedPackageIds: [], errors: [] };
@@ -68,18 +68,47 @@ export async function saveInventoryDraft(entry, capabilities, api) {
   if (fields.length) {
     try {
       if (!capabilities.inventoryPush) throw new Error("Inventory Admin, or product editing and Local Line Push permissions, are required.");
-      const changes = Object.fromEntries(fields.map(key => [key, key==='packageInventory'?entry.values.packageInventory.filter(p=>p.inventory!==entry.defaults.packageInventory.find(old=>old.packageId===p.packageId)?.inventory).map(p=>({packageId:p.packageId,inventory:p.inventory===''?NaN:Number(p.inventory)})):Number(entry.values[key])]));
+      const changes = Object.fromEntries(fields.map(key => [key, key==='packageInventory'?entry.values.packageInventory.filter(p=>p.inventory!==entry.defaults.packageInventory.find(old=>old.packageId===p.packageId)?.inventory).map(p=>({packageId:p.packageId,inventory:p.inventory===''?NaN:Number(p.inventory)})):(key==='inventory' && entry.values[key]===''?NaN:Number(entry.values[key]))]));
       if (Object.hasOwn(changes, "inventory") && (!Number.isInteger(changes.inventory) || changes.inventory < 0)) throw new Error("Full Farm Stock must be a nonnegative whole number.");
       if(entry.meta.inventoryConflict)throw new Error('Review current Full Farm stock before retrying.');
-      const response = await api.post(`products/${entry.meta.productId}/inventory`, { changes, ...((Object.hasOwn(changes,"inventory")||changes.packageInventory) ? {expectedInventory:entry.meta.inventorySnapshot||{inventory:Number(entry.defaults.inventory),trackInventory:Boolean(entry.defaults.trackInventory)}} : {}) });
-      if (!response?.ok || !response?.localLineUpdate) throw new Error(response?.message || "Local Line inventory was not confirmed.");
-      result.currentInventory=response.currentInventory;
-      result.savedFields.push(...fields);
+      const request={changes,...((Object.hasOwn(changes,"inventory")||changes.packageInventory) ? {expectedInventory:entry.meta.inventorySnapshot||{inventory:Number(entry.defaults.inventory),trackInventory:Boolean(entry.defaults.trackInventory)}} : {})};
+      if(queueFullFarm)queueFullFarm({request,fields,result});
+      else {
+        const response = await api.post(`products/${entry.meta.productId}/inventory`,request);
+        if (!response?.ok || !response?.localLineUpdate) throw new Error(response?.message || "Local Line inventory was not confirmed.");
+        result.currentInventory=response.currentInventory;
+        result.savedFields.push(...fields);
+      }
     } catch (error) { if(error.inventoryConflict)result.inventoryConflict=error.inventoryConflict; result.errors.push(`Full Farm: ${error.message || "Inventory update failed."}`); }
   }
   result.ok = result.errors.length === 0;
   result.partial = !result.ok && result.savedFields.length > 0;
   return result;
+}
+
+// Keep partial successes, conflicts, and frozen retry baselines per product.
+export async function saveInventoryDraftBatch(entries,capabilities,api,onResult=()=>{}) {
+  const results=[];
+  for(let offset=0;offset<entries.length;offset+=6) {
+    const group=entries.slice(offset,offset+6),jobs=[];
+    const saved=await Promise.all(group.map(entry=>saveInventoryDraft(entry,capabilities,api,job=>jobs.push(job))));
+    if(jobs.length) {
+      let response,error;
+      try {response=await api.post('products/inventory/batch',{items:jobs.map(({result,request})=>({productId:result.productId,...request}))});}
+      catch(e){error=e;}
+      for(const {result,fields} of jobs) {
+        const row=response?.rows?.find(row=>row.productId===result.productId);
+        if(row?.ok&&row.localLineUpdate) {result.currentInventory=row.currentInventory;result.savedFields.push(...fields);}
+        else {
+          if(row?.inventoryConflict)result.inventoryConflict=row.inventoryConflict;
+          result.errors.push(`Full Farm: ${row?.error || error?.message || 'Inventory response was not confirmed. Retry the original draft to recover its receipt.'}`);
+        }
+        result.ok=result.errors.length===0;result.partial=!result.ok&&result.savedFields.length>0;
+      }
+    }
+    saved.forEach((result,index)=>{results.push(result);onResult(result,group[index],results.length,entries.length);});
+  }
+  return results;
 }
 
 export function productCapabilities(roles = []) {
@@ -253,7 +282,17 @@ export function acknowledgeSave(
     meta.farmStockRevision = result.farmStock.farmStockRevision;
     delete meta.farmStockConflict;
   }
-  if(result.currentInventory){meta.inventorySnapshot=result.currentInventory;meta.inventoryType=result.currentInventory.inventoryType||'product';delete meta.inventoryConflict;}
+  if(result.currentInventory){
+    const currentStock=result.currentInventory;
+    const confirmed={inventory:currentStock.inventory ?? '',packageInventory:currentStock.packages || [],trackInventory:currentStock.trackInventory};
+    for(const [key,value] of Object.entries(confirmed)) {
+      if(savedFields.includes(key) || valuesEqual(current.values[key],current.defaults[key])) {
+        defaults[key]=value;
+        if(valuesEqual(current.values[key],submitted.values[key]))values[key]=value;
+      }
+    }
+    meta.inventorySnapshot=currentStock;meta.inventoryType=currentStock.inventoryType||'product';delete meta.inventoryConflict;
+  }
   if(result.inventoryConflict)meta.inventoryConflict=result.inventoryConflict;
   if (result.farmStockConflict) meta.farmStockConflict = result.farmStockConflict;
   return { ...current, defaults, values, meta };
@@ -548,4 +587,13 @@ export function previewProductPrices(row, values) {
     }
   }
   return result;
+}
+
+// Explicitly discard only the conflicted FF draft; keep farm and pricing edits.
+export function reviewInventoryConflict(entry) {
+  const current=entry.meta.inventoryConflict;
+  if(!current)return entry;
+  const fields={inventory:current.inventory ?? '',packageInventory:current.packages || [],trackInventory:current.trackInventory};
+  return {...entry,defaults:{...entry.defaults,...fields},values:{...entry.values,...fields},
+    meta:{...entry.meta,inventorySnapshot:current,inventoryType:current.inventoryType || 'product',inventoryConflict:null}};
 }
