@@ -1,0 +1,58 @@
+{
+  "confirmedAt": "2026-11-13T16:43:02.326Z",
+  "status": "confirmed",
+  "categoryId": "FVL2C232OWWY5XYAOMYOUDQ7",
+  "oldName": "Other",
+  "newName": "Variety & Other",
+  "productsPreserved": [
+    {
+      "id": "JLKTUM5MXH7F3JTHB7K4VBJC",
+      "name": "Kroppkakkor"
+    },
+    {
+      "id": "SQ6ANRDASE5UMIAPXJDLXK7R",
+      "name": "Deck Family Farm Insulated Bag"
+    },
+    {
+      "id": "R7R5YLMIBYYUXAQH5I55WE5N",
+      "name": "Deck Family Farm Insulated Bag"
+    },
+    {
+      "id": "C44VX4IKA7YX3EVRZ6TTL456",
+      "name": "LW Popcorn"
+    },
+    {
+      "id": "XHEH6EXU5CSKY4V3FLUWA4PN",
+      "name": "Gluten Free Chocolate Donut"
+    },
+    {
+      "id": "52GV4CMWOZSDWW7VC3Z6573X",
+      "name": "Gluten Free Blueberry Scone"
+    },
+    {
+      "id": "X5UX2PTIWGXDQ3S5U3MORXZT",
+      "name": "BNF Kombucha"
+    },
+    {
+      "id": "TZTWZVQKHLSUBLIJQYIZ6VVI",
+      "name": "Cabbage"
+    },
+    {
+      "id": "NE42LNRBOWKK2F4OE6DFZHP6",
+      "name": "Scandi Kombucha"
+    },
+    {
+      "id": "NRHOVYAY6UIJS27DWAQEOXZM",
+      "name": "Lonesome whistle popcorn"
+    },
+    {
+      "id": "FXULFLYHKH2IXRWNOWOT4N5Z",
+      "name": "Gluten Free Brownie Bite with Chocolate Chips"
+    },
+    {
+      "id": "NUAYVKIQK6LY3I4WM3Z3F6IZ",
+      "name": "Kombucha"
+    }
+  ],
+  "localDatabaseChanged": false
+}
