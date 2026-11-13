@@ -37,8 +37,10 @@ export function CompactInventoryList({ rows, drafts, renderField, saving, saveRe
               </div>
             </div>
           <div className="compact-inventory-full-farm" role="group" aria-label={`Full Farm inventory: ${row.name}`}>
-            {[["inventory", "Qty", "Full Farm Stock"], ["trackInventory", "Track", "Full Farm Track Inventory"], ["visible", "Visible", "Full Farm Visible"]].filter(([key])=>key!=="inventory" || (draft?.values.trackInventory ?? row.trackInventory)).map(([key, shortLabel, label]) =>
-              <div className="compact-inventory-field" key={key}>
+            {[["inventory", "Qty", "Full Farm Stock"], ["trackInventory", "Track", "Full Farm Track Inventory"], ["visible", "Visible", "Full Farm Visible"]].map(([key, shortLabel, label]) =>
+              key === "inventory" && !(draft?.values.trackInventory ?? row.trackInventory)
+                ? <div className="compact-inventory-field" key={key} aria-hidden="true" />
+                : <div className="compact-inventory-field" key={key}>
                 <span>{shortLabel}</span>
                 {renderField(key, row)}
                 <InventoryFieldInfo field={key} label={label} />
