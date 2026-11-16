@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { adminGet, adminPut, adminPost, adminDownload } from '../adminApi.js';
 import { ProductDescription } from './ProductDescription.jsx';
+import { TurkeyCancellationDialog } from './TurkeyCancellationDialog.jsx';
 import './turkey.css';
 
 const money = cents => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(cents / 100);
@@ -19,6 +20,7 @@ export function AdminTurkeyPreorders({ token }) {
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
   const [productChoice, setProductChoice] = useState('');
+  const [cancellingOrder, setCancellingOrder] = useState(null);
   const query = new URLSearchParams(Object.entries(filters).filter(([, value]) => value)).toString();
   function applyData(next) {
     setData(next);
@@ -86,6 +88,15 @@ export function AdminTurkeyPreorders({ token }) {
       await Promise.all([loadOrders(), loadSetup()]);
       setMessage(action === 'refund' ? 'Refund requested. Pending refunds retain stock until Stripe confirms success.' : 'Order updated.');
     });
+  }
+  async function cancellationUpdated(order) {
+    await Promise.all([loadOrders(), adminGet('storefront/setup', token).then(refreshInventory)]);
+    setMessage(order.status === 'refund_pending' ? 'Cancellation submitted. The selected birds remain committed until the refund succeeds.' :
+      order.status === 'refund_failed' ? 'The refund failed and needs review in Stripe. No birds were released for that cancellation.' :
+      order.status === 'refunded' ? 'Refund confirmed. No turkeys remain on this order.' : 'Cancellation confirmed. The remaining turkeys keep their original pickup date.');
+  }
+  async function checkCancellation(order, operation) {
+    await run(async () => cancellationUpdated(await adminPost(`storefront/orders/${order.id}/cancellations/${operation.id}/confirm`, token, {})));
   }
   async function attachReceipt(order) {
     const sessionId = window.prompt('Enter the Checkout Session ID from Stripe for this order. The store will verify its order reference and total before reconciling it.');
@@ -232,11 +243,21 @@ export function AdminTurkeyPreorders({ token }) {
         <div className="turkey-table-wrap turkey-print-orders"><table><thead><tr><th>Order / status</th><th>Customer</th><th>Turkeys / total</th><th>Pickup</th><th className="no-print">Actions</th></tr></thead><tbody>{orders.map(order => <tr key={order.id}>
           <td><strong>{order.number}</strong><div>{order.status.replaceAll('_',' ')}</div>{order.stripeMode && <div>{order.stripeMode === 'test' ? 'Stripe test mode' : 'Stripe live mode'}</div>}<small>{pacific(order.createdMs)} PT</small>{order.refundStatus && <p>Refund: {order.refundStatus} ({money(order.refundedCents)})</p>}{order.lastError && <p className="turkey-error no-print">{order.lastError}</p>}</td>
           <td><strong>{order.customer.name}</strong><div>{order.customer.email}</div><div>{order.customer.phone}</div><details className="no-print"><summary>Address</summary><p>{[order.customer.addressLine1,order.customer.addressLine2,order.customer.city,order.customer.state,order.customer.postalCode,order.customer.country].filter(Boolean).join(', ')}</p></details></td>
-          <td>{order.items.map(item => <div key={item.optionId}>{item.quantity} × {item.typeLabel && item.sizeLabel ? `${item.typeLabel}, ${item.sizeLabel}` : item.label}</div>)}<strong>{money(order.totalCents)}</strong></td>
+          <td>{order.items.map(item => <div key={item.optionId}>{item.remainingQuantity} × {item.typeLabel && item.sizeLabel ? `${item.typeLabel}, ${item.sizeLabel}` : item.label}
+            {item.cancelledQuantity > 0 && <small> · {item.cancelledQuantity} cancelled of {item.quantity} originally ordered</small>}</div>)}
+            <strong>{money(order.remainingTotalCents)} {order.paidMs ? 'remaining paid' : 'order total'}</strong>{order.refundedCents > 0 && <div><small>{money(order.totalCents)} originally paid · {money(order.refundedCents)} refunded</small></div>}
+            {order.cancellations?.map(operation => <div className="no-print" key={operation.id}><small>Cancellation #{operation.id}: {operation.status} · {money(operation.amountCents)}<br />{operation.reason}</small>{operation.error && <p className="turkey-error">{operation.error}</p>}</div>)}
+          </td>
           <td><small>{order.pickup.groupName}</small><div>{order.pickup.name}</div><div>{order.pickup.date}</div><small>{order.pickup.hours}</small>{order.collectedMs && <div>Collected {pacific(order.collectedMs)} PT</div>}</td>
-          <td className="no-print"><div className="turkey-order-actions">{order.status === 'paid' && !order.refundedCents && !order.refundStatus && <button disabled={busy} onClick={() => orderAction(order, 'collect')}>Mark collected</button>}{['paid','refund_pending'].includes(order.status) && !order.collectedMs && <button disabled={busy} onClick={() => orderAction(order, 'refund')}>{order.status === 'refund_pending' ? 'Check refund' : 'Cancel & refund'}</button>}<button disabled={busy} onClick={() => orderAction(order, 'reconcile')}>Reconcile payment</button>{order.status === 'review' && !order.stripeSessionId && <button disabled={busy} onClick={() => attachReceipt(order)}>Link Stripe receipt</button>}</div></td>
+          <td className="no-print"><div className="turkey-order-actions">
+            {order.canCollect && <button disabled={busy} onClick={() => orderAction(order, 'collect')}>Mark collected</button>}
+            {order.canCancelItems && <button disabled={busy} onClick={() => setCancellingOrder(order)}>Cancel items</button>}
+            {order.cancellations?.filter(operation => !operation.confirmedMs && operation.status !== 'failed').map(operation => <button key={operation.id} disabled={busy} onClick={() => checkCancellation(order, operation)}>Check cancellation #{operation.id}</button>)}
+            {order.status === 'refund_pending' && !order.cancellations?.some(operation => !operation.confirmedMs) && <button disabled={busy} onClick={() => orderAction(order, 'refund')}>Check refund</button>}
+            <button disabled={busy} onClick={() => orderAction(order, 'reconcile')}>Reconcile payment</button>{order.status === 'review' && !order.stripeSessionId && <button disabled={busy} onClick={() => attachReceipt(order)}>Link Stripe receipt</button>}</div></td>
         </tr>)}</tbody></table></div>
       </>}
     </>}
+    {cancellingOrder && <TurkeyCancellationDialog order={cancellingOrder} token={token} onClose={() => setCancellingOrder(null)} onUpdated={cancellationUpdated} />}
   </section>;
 }

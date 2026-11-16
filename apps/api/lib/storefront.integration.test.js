@@ -4,6 +4,7 @@ import crypto from 'node:crypto';
 import mysql from 'mysql2/promise';
 import { createStorefrontService } from './storefrontService.js';
 import { DEFAULT_HERITAGE_DESCRIPTION, DEFAULT_BROAD_BREASTED_DESCRIPTION } from './storefrontDescriptions.js';
+import { storefrontEmailContent } from './storefrontEmail.js';
 
 // Never load .env. This suite only accepts a disposable socket under /tmp.
 const socket = process.env.STOREFRONT_TEST_SOCKET;
@@ -17,6 +18,7 @@ test('turkey checkout, inventory, fulfillment and refunds on isolated MySQL', { 
   let clock = Date.parse('2026-10-02T12:00:00Z');
   const sessions = new Map(), checkoutKeys = new Map(), refunds = new Map(), refundKeys = new Map(), sent = [];
   let loseCheckoutResponse = false, expireDuringPayment = false, refundPending = false, loseRefundResponse = false, mailFails = false;
+  let refundCalls = 0, failBeforeRefund = false;
   const stripe = {
     checkout: { sessions: {
       create: async (payload, { idempotencyKey }) => {
@@ -39,9 +41,11 @@ test('turkey checkout, inventory, fulfillment and refunds on isolated MySQL', { 
     refunds: {
       list: async ({ payment_intent }) => ({ data: [...refunds.values()].filter(r => r.payment_intent === payment_intent).map(r => structuredClone(r)), has_more: false }),
       create: async (payload, { idempotencyKey }) => {
+        refundCalls++;
+        if (failBeforeRefund) throw new Error('Connection lost before refund outcome known');
         let refund = refundKeys.get(idempotencyKey);
         if (!refund) {
-          refund = { ...payload, id: `re_${refunds.size+1}`, status: refundPending ? 'pending' : 'succeeded' };
+          refund = { ...payload, currency: 'usd', id: `re_${refunds.size+1}`, status: refundPending ? 'pending' : 'succeeded' };
           refunds.set(refund.id, refund); refundKeys.set(idempotencyKey, refund);
         }
         if (loseRefundResponse) { loseRefundResponse = false; throw new Error('Lost refund response'); }
@@ -517,6 +521,146 @@ test('turkey checkout, inventory, fulfillment and refunds on isolated MySQL', { 
     assert.equal(old.items[0].sizeLabel,null);
     assert.equal(old.items[0].optionId,firstId);
   });
+  await t.test('reviewed item cancellations keep refunds, remaining orders and stock consistent', async t => {
+    await service.adjustStock(secondId, { delta: 100, reason: 'Cancellation fixtures' }, 1);
+    const selection = quantity => ({ reason: 'Customer requested one fewer turkey', items: [{ optionId: secondId, quantity }] });
+    const paid = async (quantity = 2) => { const input = body(secondId, quantity); const result = await service.checkout(input); const session = await pay(result); return { ...result, input, session }; };
+    const read = async id => (await service.orders({})).find(o => o.id === id);
+    await t.test('two $105 birds: review, pending refund, webhook, pickup list, email and collection', async () => {
+      await pool.query('UPDATE product_pricing_profiles SET source_unit_price=105 WHERE product_id=2');
+      const p = await paid(); const before = await stock(secondId);
+      const [[original]] = await pool.query('SELECT stripe_request_json,total_cents FROM storefront_orders WHERE id=?', [p.orderId]);
+      const preview = await service.reviewCancellation(p.orderId, selection(1), 7);
+      assert.equal(preview.amountCents, 10500); assert.equal(preview.remainingTotalCents, 10500);
+      assert.equal(preview.remainingItems[0].quantity, 1); assert.deepEqual(await stock(secondId), before);
+      await pool.query('UPDATE product_pricing_profiles SET source_unit_price=170 WHERE product_id=2');
+      refundPending = true;
+      const pending = await service.applyCancellation(p.orderId, preview.id, 8);
+      refundPending = false;
+      assert.equal(pending.status, 'refund_pending'); assert.equal(pending.items[0].remainingQuantity, 2);
+      assert.equal((await stock(secondId)).onHand, before.onHand);
+      await assert.rejects(service.collect(p.orderId, 8), /without a refund/);
+      await assert.rejects(service.reviewCancellation(p.orderId, selection(1), 8), /fully reconciled/);
+      const receipt = [...refunds.values()].find(r => r.payment_intent === p.session.payment_intent);
+      assert.equal(receipt.amount, 10500); const calls = refundCalls;
+      await service.issueRefund(p.orderId, 8); assert.equal(refundCalls, calls, 'legacy retry must not send a full refund');
+      receipt.status = 'succeeded';
+      const event = { id: 'evt_item_cancel', type: 'refund.updated', data: { object: receipt } };
+      await service.webhook(event); await service.webhook(event);
+      await service.applyCancellation(p.orderId, preview.id, 8);
+      const updated = await read(p.orderId);
+      assert.equal(updated.status, 'paid'); assert.equal(updated.canCollect, true);
+      assert.equal(updated.items[0].quantity, 2); assert.equal(updated.items[0].cancelledQuantity, 1); assert.equal(updated.items[0].remainingQuantity, 1);
+      assert.equal(updated.refundedCents, 10500); assert.equal(updated.remainingTotalCents, 10500);
+      assert.equal((await stock(secondId)).onHand, before.onHand + 1); assert.equal((await stock(secondId)).purchased, before.purchased - 1);
+      const [[frozen]] = await pool.query('SELECT stripe_request_json,total_cents FROM storefront_orders WHERE id=?', [p.orderId]);
+      assert.deepEqual(frozen, original);
+      const csv = await service.exportOrders({ search: updated.number });
+      assert.match(csv, /"Quantity"/); assert.match(csv, /"1","105.00","210.00"/);
+      await service.deliverEmails(); await service.deliverEmails();
+      const notices = sent.filter(n => n.id === p.orderId && n.kind === 'cancellation');
+      assert.equal(notices.length, 1); assert.equal(notices[0].cancellation.amountCents, 10500);
+      const content = storefrontEmailContent(notices[0]).lines.join('\n');
+      assert.match(content, /\$105.00 has been refunded/); assert.match(content, /Still reserved for pickup:\n1 ×/);
+      assert.match(content, /Remaining paid: \$105.00/); assert.match(content, /Pickup:/);
+      await service.collect(p.orderId, 8); await assert.rejects(service.reviewCancellation(p.orderId, selection(1), 8), /uncollected/);
+    });
+    await t.test('invalid selection and stale reviews never submit a refund; remaining items can later be cancelled', async () => {
+      const p = await paid(3); const before = await stock(secondId); const calls = refundCalls;
+      for (const input of [{ ...selection(1), items: [] }, selection(0), selection(4), selection(1.5), { ...selection(1), items: [...selection(1).items, ...selection(1).items] }, { ...selection(1), items: [{ optionId: 999, quantity: 1 }] }]) {
+        await assert.rejects(service.reviewCancellation(p.orderId, input, 1));
+      }
+      assert.equal(refundCalls, calls);
+      const a = await service.reviewCancellation(p.orderId, selection(1), 1);
+      const stale = await service.reviewCancellation(p.orderId, selection(2), 1);
+      await service.applyCancellation(p.orderId, a.id, 1);
+      await assert.rejects(service.applyCancellation(p.orderId, stale.id, 1), /changed after review/);
+      await assert.rejects(service.applyCancellation(firstResult.orderId, a.id, 1), /not found/);
+      const b = await service.reviewCancellation(p.orderId, selection(2), 1);
+      await service.applyCancellation(p.orderId, b.id, 1); await service.applyCancellation(p.orderId, a.id, 1);
+      const updated = await read(p.orderId);
+      assert.equal(updated.status, 'refunded'); assert.equal(updated.items[0].remainingQuantity, 0);
+      assert.equal((await stock(secondId)).onHand, before.onHand + 3);
+      assert.equal(refundCalls, calls + 2);
+    });
+    await t.test('lost response and concurrent confirms reuse the same durable operation', async () => {
+      const p = await paid(); const before = await stock(secondId);
+      const review = await service.reviewCancellation(p.orderId, selection(1), 1);
+      loseRefundResponse = true;
+      await assert.rejects(service.applyCancellation(p.orderId, review.id, 1), /Lost refund response/);
+      assert.equal((await stock(secondId)).onHand, before.onHand);
+      const count = refunds.size, calls = refundCalls;
+      const results = await Promise.allSettled([service.applyCancellation(p.orderId, review.id, 1), service.applyCancellation(p.orderId, review.id, 1)]);
+      assert.ok(results.some(r => r.status === 'fulfilled'));
+      for (const r of results.filter(r => r.status === 'rejected')) assert.equal(r.reason.status, 409);
+      assert.equal(refunds.size, count); assert.equal(refundCalls, calls); assert.equal((await stock(secondId)).onHand, before.onHand + 1);
+    });
+    await t.test('uncertain requests older than the Stripe key retention window are held', async () => {
+      const p = await paid(); const review = await service.reviewCancellation(p.orderId, selection(1), 1);
+      failBeforeRefund = true;
+      try { await assert.rejects(service.applyCancellation(p.orderId, review.id, 1), /Connection lost/); } finally { failBeforeRefund = false; }
+      await pool.query('UPDATE storefront_cancellations SET attempted_ms=? WHERE id=?', [clock - 24 * 3600000, review.id]);
+      const calls = refundCalls;
+      await assert.rejects(service.applyCancellation(p.orderId, review.id, 1), /older than 23 hours/);
+      assert.equal(refundCalls, calls); assert.equal((await read(p.orderId)).items[0].remainingQuantity, 2);
+      await assert.rejects(service.reviewCancellation(p.orderId, selection(1), 1), /fully reconciled/);
+    });
+    await t.test('wrong refund attribution, failed refunds and external refunds do not silently release items', async () => {
+      const p = await paid(); const before = await stock(secondId); const review = await service.reviewCancellation(p.orderId, selection(1), 1);
+      refundPending = true; await service.applyCancellation(p.orderId, review.id, 1); refundPending = false;
+      const receipt = [...refunds.values()].find(r => r.payment_intent === p.session.payment_intent);
+      receipt.status = 'succeeded'; receipt.currency = 'eur';
+      await assert.rejects(service.reconcile(p.orderId), /does not match/); assert.equal((await stock(secondId)).onHand, before.onHand);
+      receipt.currency = 'usd'; receipt.status = 'failed';
+      await service.reconcile(p.orderId);
+      assert.equal((await read(p.orderId)).status, 'refund_failed'); assert.equal((await stock(secondId)).onHand, before.onHand);
+      const calls = refundCalls;
+      await assert.rejects(service.applyCancellation(p.orderId, review.id, 1), /failed refund/); assert.equal(refundCalls, calls);
+      const external = await paid();
+      refunds.set('re_item_external', { id: 're_item_external', status: 'succeeded', amount: 100, payment_intent: external.session.payment_intent });
+      await assert.rejects(service.reviewCancellation(external.orderId, selection(1), 1), /fully reconciled/);
+      await assert.rejects(service.collect(external.orderId, 1), /without a refund/);
+    });
+    await t.test('stock and item application roll back together, then reconcile without a second payment request', async () => {
+      const p = await paid(); const before = await stock(secondId); const review = await service.reviewCancellation(p.orderId, selection(1), 1);
+      await pool.query(`CREATE TRIGGER reject_item_return BEFORE INSERT ON storefront_stock_history FOR EACH ROW
+        BEGIN IF NEW.reason LIKE 'Item cancellation%' THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='simulated stock transaction failure'; END IF; END`);
+      try { await assert.rejects(service.applyCancellation(p.orderId, review.id, 1), /simulated stock transaction failure/); }
+      finally { await pool.query('DROP TRIGGER reject_item_return'); }
+      assert.equal((await read(p.orderId)).items[0].cancelledQuantity, 0); assert.equal((await stock(secondId)).onHand, before.onHand);
+      const calls = refundCalls;
+      await service.reconcile(p.orderId); await service.reconcile(p.orderId);
+      assert.equal((await read(p.orderId)).items[0].cancelledQuantity, 1); assert.equal((await stock(secondId)).onHand, before.onHand + 1); assert.equal(refundCalls, calls);
+      // A later full external refund can return only the remaining bird.
+      refunds.set('re_remaining_external', { id: 're_remaining_external', status: 'succeeded', amount: 17000, payment_intent: p.session.payment_intent });
+      await service.reconcile(p.orderId); await service.reconcile(p.orderId);
+      assert.equal((await stock(secondId)).onHand, before.onHand + 2);
+    });
+    await t.test('mixed variants retain original labels, prices and pickup details', async () => {
+      await service.adjustStock(firstId, { delta: 2, reason: 'Mixed cancellation fixture' }, 1);
+      const input = body(firstId, 1, 4); input.items.push({ optionId: secondId, quantity: 2 });
+      const p = await service.checkout(input); await pay(p);
+      const original = await read(p.orderId), a = await stock(firstId), b = await stock(secondId);
+      const review = await service.reviewCancellation(p.orderId, { reason: 'Customer changed quantities', items: [{ optionId: secondId, quantity: 1 }, { optionId: firstId, quantity: 1 }] }, 1);
+      const expected = original.items.reduce((sum, i) => sum + i.priceCents, 0);
+      assert.equal(review.amountCents, expected);
+      await service.applyCancellation(p.orderId, review.id, 1);
+      const updated = await read(p.orderId);
+      assert.deepEqual(updated.pickup, original.pickup);
+      assert.equal(updated.items.find(i => i.optionId === firstId).remainingQuantity, 0);
+      assert.equal(updated.items.find(i => i.optionId === secondId).remainingQuantity, 1);
+      assert.equal((await stock(firstId)).onHand, a.onHand + 1); assert.equal((await stock(secondId)).onHand, b.onHand + 1);
+    });
+    await t.test('an unrelated pending refund holds a retry of an uncertain cancellation', async () => {
+      const p = await paid(), review = await service.reviewCancellation(p.orderId, selection(1), 1);
+      failBeforeRefund = true;
+      try { await assert.rejects(service.applyCancellation(p.orderId, review.id, 1)); } finally { failBeforeRefund = false; }
+      refunds.set('re_external_during_retry', { id: 're_external_during_retry', status: 'pending', amount: 100, payment_intent: p.session.payment_intent });
+      const calls = refundCalls;
+      await assert.rejects(service.applyCancellation(p.orderId, review.id, 1), /external refund/);
+      assert.equal(refundCalls, calls); assert.equal((await read(p.orderId)).items[0].remainingQuantity, 2);
+    });
+  });
   await t.test('Stripe mode changes preserve refund, checkout retry and webhook safety', async t => {
     const before = await stock(secondId);
     await service.adjustStock(secondId, { onHand: before.onHand + 10, expectedOnHand: before.onHand, expectedReserved: before.reserved, reason: 'Mode regression fixtures' }, 1);
@@ -547,7 +691,7 @@ test('turkey checkout, inventory, fulfillment and refunds on isolated MySQL', { 
             state.calls++; checkPayment(payload.payment_intent);
             let refund = state.refundKeys.get(idempotencyKey);
             if (!refund) {
-              refund = { ...payload, id: `re_${mode}_${state.refunds.size + 1}`, status: 'pending', livemode: mode === 'live' };
+              refund = { ...payload, currency: 'usd', id: `re_${mode}_${state.refunds.size + 1}`, status: 'pending', livemode: mode === 'live' };
               state.refunds.set(refund.id, refund); state.refundKeys.set(idempotencyKey, refund);
             }
             if (state.loseRefund) { state.loseRefund = false; throw new Error('Lost mode refund response'); }
@@ -637,6 +781,20 @@ test('turkey checkout, inventory, fulfillment and refunds on isolated MySQL', { 
       await liveWithTest.issueRefund(result.orderId, 1);
       const refund = [...testStripe.state.refunds.values()].find(refund => refund.payment_intent === session.payment_intent);
       refund.status = 'succeeded'; await liveWithTest.reconcile(result.orderId);
+    });
+    await t.test('partial cancellations retain the purchase mode after live checkout is enabled', async () => {
+      const result = await testService.checkout(body(secondId, 2));
+      const session = testStripe.paidSession(result.orderId); await testService.reconcile(result.orderId);
+      const review = await testService.reviewCancellation(result.orderId, { reason: 'Cancel one test bird', items: [{ optionId: secondId, quantity: 1 }] }, 1);
+      const liveCalls = liveStripe.state.calls;
+      await assert.rejects(liveOnly.applyCancellation(result.orderId, review.id, 1), /test-mode order/);
+      testStripe.state.loseRefund = true;
+      await assert.rejects(liveWithTest.applyCancellation(result.orderId, review.id, 1), /Lost mode refund/);
+      const receipt = [...testStripe.state.refunds.values()].find(r => r.payment_intent === session.payment_intent);
+      receipt.status = 'succeeded'; const count = testStripe.state.refunds.size;
+      const updated = await liveWithTest.applyCancellation(result.orderId, review.id, 1);
+      assert.equal(updated.items[0].remainingQuantity, 1); assert.equal(updated.canCollect, true);
+      assert.equal(testStripe.state.refunds.size, count); assert.equal(liveStripe.state.calls, liveCalls);
     });
   });
   await t.test('cutoff enforcement, CSV and stock isolation from Local Line', async () => {

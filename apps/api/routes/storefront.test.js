@@ -11,7 +11,7 @@ test('storefront admin rejects unauthenticated requests and webhooks require a v
   const server = await new Promise(resolve => { const instance = app.listen(0, '127.0.0.1', () => resolve(instance)); });
   t.after(() => new Promise(resolve => server.close(resolve)));
   const base = `http://127.0.0.1:${server.address().port}`;
-  for (const [path, method] of [['settings','GET'],['settings','PUT'],['setup','GET'],['setup','PUT'],['orders','GET'],['orders/example/refund','POST'],['stock/1','POST']]) {
+  for (const [path, method] of [['settings','GET'],['settings','PUT'],['setup','GET'],['setup','PUT'],['orders','GET'],['orders/example/refund','POST'],['orders/example/cancellations/review','POST'],['orders/example/cancellations/1/confirm','POST'],['stock/1','POST']]) {
     const response = await fetch(`${base}/admin/${path}`, { method });
     assert.equal(response.status, 401);
   }
@@ -39,5 +39,8 @@ test('product editors cannot change store visibility or authorize a staff previe
   for (const method of ['GET', 'PUT']) {
     const response = await fetch(`http://127.0.0.1:${server.address().port}/admin/settings`, { method });
     assert.equal(response.status, 403);
+  }
+  for (const path of ['orders/example/cancellations/review', 'orders/example/cancellations/1/confirm']) {
+    assert.equal((await fetch(`http://127.0.0.1:${server.address().port}/admin/${path}`, { method: 'POST' })).status, 403);
   }
 });

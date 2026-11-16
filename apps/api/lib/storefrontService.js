@@ -4,6 +4,7 @@ import { ensureStorefrontSchema } from './storefrontSchema.js';
 import { readStorefrontProducts, duplicateTurkeyVariants } from './storefrontProducts.js';
 import { preorderDescriptions, turkeyDescription, turkeyAboutDescription } from './storefrontDescriptions.js';
 import { stripeOrderMode, stripeModeError, storefrontStripeError } from './storefrontStripe.js';
+import { remainingQuantity, cancelledValue, canFulfill, cancellationBaseline, cancellationPlan, cancellationView } from './storefrontCancellations.js';
 import { HOLD_MS, hash, parse, fail, integer, recordId, text, email, tokenHash, checkoutReturnOrigin, normalizeCheckout, parsePacificInput, pacificInput, validatePublish, csvCell } from './storefrontCore.js';
 
 // All writes are confined to storefront_* tables. Never use catalog inventory here.
@@ -72,7 +73,8 @@ export function createStorefrontService({ pool, stripe, stripeClients = {}, send
     const [rows] = await connection.query(`SELECT * FROM storefront_orders WHERE id=?${forUpdate ? ' FOR UPDATE' : ''}`, [id]);
     if (!rows[0]) fail('Order not found.', 404);
     const [items] = await connection.query('SELECT * FROM storefront_order_items WHERE order_id=? ORDER BY option_id', [id]);
-    return { ...rows[0], items };
+    const [cancellations] = await connection.query('SELECT * FROM storefront_cancellations WHERE order_id=? ORDER BY id', [id]);
+    return { ...rows[0], items, cancellations };
   }
   function orderView(row, admin = false) {
     const view = {
@@ -80,11 +82,15 @@ export function createStorefrontService({ pool, stripe, stripeClients = {}, send
       totalCents: row.total_cents, currency: row.currency, createdMs: Number(row.created_ms), paidMs: row.paid_ms && Number(row.paid_ms),
       collectedMs: row.collected_ms && Number(row.collected_ms), expiresMs: Number(row.expires_ms),
       refundStatus: row.refund_status, refundedCents: row.refunded_cents,
+      remainingTotalCents: row.total_cents - row.refunded_cents,
       contactEmail: row.contact_email,
       items: row.items.map(item => ({ optionId: item.option_id, productId: item.product_id, typeLabel: item.turkey_type,
-        sizeLabel: item.size_label, label: item.label, quantity: item.quantity, priceCents: item.price_cents }))
+        sizeLabel: item.size_label, label: item.label, quantity: item.quantity, priceCents: item.price_cents,
+        cancelledQuantity: item.cancelled_quantity || 0, remainingQuantity: row.status === 'refunded' ? 0 : remainingQuantity(item) }))
     };
-    if (admin) Object.assign(view, { lastError: row.last_error, stripeMode: stripeOrderMode(row), stripeSessionId: row.stripe_session_id, stripePaymentId: row.stripe_payment_id,
+    if (admin) Object.assign(view, { canCollect: canFulfill(row), canCancelItems: canFulfill(row),
+      cancellations: (row.cancellations || []).filter(c => c.attempted_ms).map(cancellationView),
+      lastError: row.last_error, stripeMode: stripeOrderMode(row), stripeSessionId: row.stripe_session_id, stripePaymentId: row.stripe_payment_id,
       refundRequestedBy: row.refund_requested_by, refundRequestedMs: row.refund_requested_ms && Number(row.refund_requested_ms) });
     return view;
   }
@@ -109,7 +115,7 @@ export function createStorefrontService({ pool, stripe, stripeClients = {}, send
     await ready();
     const [[saleRows], [options], [pickups], [groups], products] = await Promise.all([
       db().query('SELECT * FROM storefront_sales WHERE id=1'),
-      db().query(`SELECT o.*, COALESCE((SELECT SUM(i.quantity) FROM storefront_order_items i
+      db().query(`SELECT o.*, COALESCE((SELECT SUM(i.quantity-i.cancelled_quantity) FROM storefront_order_items i
         JOIN storefront_orders r ON r.id=i.order_id WHERE i.option_id=o.id AND r.paid_ms IS NOT NULL AND r.status <> 'refunded'),0) AS purchased
         FROM storefront_options o WHERE sale_id=1 ORDER BY id`),
       db().query('SELECT * FROM storefront_pickups WHERE sale_id=1 ORDER BY id'),
@@ -466,24 +472,138 @@ export function createStorefrontService({ pool, stripe, stripeClients = {}, send
     if (refunds.has_more) fail('Refund history requires manual review.', 409);
     const refunded = refunds.data.filter(r => r.status === 'succeeded').reduce((sum, r) => sum + r.amount, 0);
     const requested = refunds.data.find(r => r.id === row.refund_id || (row.refund_key && r.metadata?.storefront_refund_key === row.refund_key));
-    const externalPending = refunds.data.some(r => r !== requested && ['pending', 'requires_action'].includes(r.status));
+    const externalPending = refunds.data.some(r => r !== requested && ['pending', 'requires_action'].includes(r.status) &&
+      !row.cancellations.some(op => op.attempted_ms && (r.id === op.refund_id || r.metadata?.storefront_cancellation_key === op.refund_key)));
     await transaction(async c => {
-      const current = await order(id, c, true);
+      let current = await order(id, c, true);
+      const applied = [];
+      // Recover each frozen item cancellation by receipt or metadata, never by amount alone.
+      for (const operation of current.cancellations.filter(op => op.attempted_ms)) {
+        const matches = refunds.data.filter(r => r.id === operation.refund_id || r.metadata?.storefront_cancellation_key === operation.refund_key);
+        if (matches.length > 1) fail('Multiple refunds match a cancellation. Review the Stripe receipts.', 409);
+        const receipt = matches[0];
+        if (!receipt) {
+          if (operation.applied_ms) fail('A confirmed cancellation refund is missing from Stripe. Review its receipt.', 409);
+          continue;
+        }
+        const request = parse(operation.request_json);
+        if (receipt.amount !== operation.amount_cents || receipt.currency !== current.currency ||
+          (typeof receipt.payment_intent === 'string' ? receipt.payment_intent : receipt.payment_intent?.id) !== request.payment_intent ||
+          request.payment_intent !== current.stripe_payment_id ||
+          receipt.metadata?.storefront_order_id !== id || receipt.metadata?.storefront_cancellation_key !== operation.refund_key ||
+          (operation.stripe_mode && receipt.livemode !== (operation.stripe_mode === 'live'))) {
+          fail('The cancellation refund does not match its frozen order, amount, or Stripe mode. Review its receipt.', 409);
+        }
+        if (operation.applied_ms && receipt.status !== 'succeeded') fail('A confirmed cancellation refund changed status. Review its receipt.', 409);
+        const status = receipt.status === 'succeeded' ? 'succeeded' : ['failed','canceled'].includes(receipt.status) ? 'failed' : 'pending';
+        await c.query('UPDATE storefront_cancellations SET refund_id=?,status=?,last_error=? WHERE id=?',
+          [receipt.id, status, status === 'failed' ? 'Refund failed or was cancelled. Review in Stripe; no items have been released.' : null, operation.id]);
+        if (receipt.status !== 'succeeded' || operation.applied_ms) continue;
+        if (current.collected_ms) fail('A cancellation refund needs review because this order was collected.', 409);
+        const plan = parse(operation.plan_json);
+        for (const item of plan.items) {
+          const [updated] = await c.query(`UPDATE storefront_order_items SET cancelled_quantity=cancelled_quantity+?
+            WHERE order_id=? AND option_id=? AND quantity-cancelled_quantity>=?`, [item.quantity, id, item.optionId, item.quantity]);
+          if (!updated.affectedRows) fail('Cancelled quantities conflict with the order. Review before releasing stock.', 409);
+          await stock(c, item.optionId, item.quantity, 0, `Item cancellation #${operation.id}: ${plan.reason}`, id, operation.approved_by);
+        }
+        await c.query('UPDATE storefront_cancellations SET applied_ms=? WHERE id=?', [now(), operation.id]);
+        applied.push(operation);
+      }
+      current = await order(id, c, true);
+      const pendingCancellation = current.cancellations.some(op => op.attempted_ms && !op.applied_ms && op.status !== 'failed');
+      const failedCancellation = current.cancellations.some(op => op.status === 'failed');
       await c.query('UPDATE storefront_orders SET refunded_cents=?,refund_status=?,refund_id=COALESCE(?,refund_id) WHERE id=?', [refunded,
-        requested?.status || (externalPending ? 'pending_external' : refunded ? (refunded >= current.total_cents ? 'succeeded' : 'partial') : current.refund_status), requested?.id || null, id]);
+        externalPending ? 'pending_external' : pendingCancellation ? 'pending_items' : failedCancellation ? 'failed_items' :
+          requested?.status || (refunded ? (refunded >= current.total_cents ? 'succeeded' : 'partial') : current.refund_status), requested?.id || null, id]);
       if (refunded >= current.total_cents && current.status !== 'refunded') {
         if (!current.collected_ms) {
-          for (const item of current.items) await stock(c, item.option_id, item.quantity, 0, 'Full refund: return uncollected turkey', id, current.refund_requested_by);
+          for (const item of current.items) if (remainingQuantity(item)) await stock(c, item.option_id, remainingQuantity(item), 0, 'Full refund: return uncollected turkey', id, current.refund_requested_by);
+          await c.query('UPDATE storefront_order_items SET cancelled_quantity=quantity WHERE order_id=?', [id]);
         }
         await c.query("UPDATE storefront_orders SET status='refunded',cancelled_ms=?,last_error=NULL WHERE id=?", [now(), id]);
-        await queueEmail(c, id, 'refund');
+        if (!applied.length) await queueEmail(c, id, 'refund');
+      } else if (current.status !== 'refunded' && pendingCancellation) {
+        await c.query("UPDATE storefront_orders SET status='refund_pending' WHERE id=?", [id]);
+      } else if (current.status !== 'refunded' && failedCancellation) {
+        await c.query("UPDATE storefront_orders SET status='refund_failed',last_error='Item refund failed. Review its receipt in Stripe.' WHERE id=?", [id]);
+      } else if (applied.length && refunded === cancelledValue(current)) {
+        await c.query("UPDATE storefront_orders SET status='paid',last_error=NULL WHERE id=?", [id]);
       } else if (requested && ['failed', 'canceled'].includes(requested.status)) {
         await c.query("UPDATE storefront_orders SET status='refund_failed',last_error=? WHERE id=? AND status <> 'refunded'", ['Stripe refund failed or was cancelled. Review the payment before retrying.', id]);
       }
+      for (const operation of applied) {
+        const updated = await order(id, c);
+        const notice = { ...orderView(updated), notifyEmail: updated.notify_email, kind: 'cancellation',
+          cancellation: cancellationView({ ...operation, status: 'succeeded', applied_ms: now() }) };
+        await c.query('UPDATE storefront_cancellations SET email_json=? WHERE id=?', [JSON.stringify(notice), operation.id]);
+        await queueEmail(c, id, `c-${operation.id}`);
+      }
+    });
+  }
+  async function reviewCancellation(id, input, actorId) {
+    await ready();
+    return locked(id, async () => {
+      await syncRefunds(id);
+      const row = await order(id);
+      const plan = cancellationPlan(row, input);
+      const key = crypto.randomUUID();
+      const request = { payment_intent: row.stripe_payment_id, amount: plan.amountCents, reason: 'requested_by_customer',
+        metadata: { storefront_order_id: id, storefront_cancellation_key: key } };
+      const [result] = await db().query(`INSERT INTO storefront_cancellations
+        (order_id,baseline_hash,plan_json,request_json,refund_key,amount_cents,created_ms,reviewed_by,stripe_mode) VALUES (?,?,?,?,?,?,?,?,?)`,
+      [id, cancellationBaseline(row), JSON.stringify(plan), JSON.stringify(request), key, plan.amountCents, now(), actorId, stripeOrderMode(row)]);
+      return cancellationView((await order(id)).cancellations.find(op => op.id === result.insertId));
+    });
+  }
+  async function applyCancellation(id, cancellationId, actorId) {
+    await ready();
+    return locked(id, async () => {
+      const operationId = recordId(cancellationId, 'Cancellation ID');
+      let row = await order(id);
+      let operation = row.cancellations.find(op => op.id === operationId);
+      if (!operation) fail('Cancellation review not found for this order.', 404);
+      await syncRefunds(id);
+      row = await order(id); operation = row.cancellations.find(op => op.id === operationId);
+      if (operation.applied_ms) return orderView(row, true);
+      if (row.collected_ms || row.status === 'refunded') fail('This order can no longer be cancelled.', 409);
+      if (operation.status === 'failed') fail('Review the failed refund in Stripe. A replacement refund will not be created.', 409);
+      if (!operation.attempted_ms) {
+        if (!canFulfill(row) || operation.baseline_hash !== cancellationBaseline(row)) fail('The order changed after review. Refresh and review the cancellation again.', 409);
+        await transaction(async c => {
+          await c.query("UPDATE storefront_cancellations SET status='submitting',attempted_ms=?,approved_by=? WHERE id=?", [now(), actorId, operation.id]);
+          await c.query("UPDATE storefront_orders SET status='refund_pending',refund_status='pending_items',last_error=NULL WHERE id=?", [id]);
+        });
+        operation.attempted_ms = now();
+      }
+      if (operation.refund_id) return orderView(await order(id), true);
+      if (row.refund_status === 'pending_external' || row.refunded_cents !== cancelledValue(row)) {
+        fail('An external refund needs review before this cancellation can be submitted again.', 409);
+      }
+      // The same frozen request/key can recover a recent lost response. Older unknown outcomes stay held.
+      if (now() - Number(operation.attempted_ms) > 23 * 3600000) {
+        const message = 'Uncertain cancellation older than 23 hours. Reconcile its existing Stripe refund; do not create a replacement.';
+        await db().query('UPDATE storefront_cancellations SET last_error=? WHERE id=?', [message, operation.id]);
+        fail(message, 409);
+      }
+      try {
+        const client = stripeForOrder({ ...row, stripe_mode: operation.stripe_mode });
+        const receipt = await client.refunds.create(parse(operation.request_json), { idempotencyKey: `storefront-items-${operation.refund_key}` });
+        // Save the receipt before read-back. Validation and inventory changes happen only in syncRefunds.
+        await db().query('UPDATE storefront_cancellations SET refund_id=? WHERE id=?', [receipt.id, operation.id]);
+        await syncRefunds(id);
+      } catch (error) {
+        await db().query('UPDATE storefront_cancellations SET last_error=? WHERE id=?', [error.message, operation.id]);
+        throw error;
+      }
+      return orderView(await order(id), true);
     });
   }
   async function issueRefund(id, actorId) {
     await ready();
+    // A legacy retry/maintenance call must resume the durable item operation, never submit a full refund.
+    const pending = (await order(id)).cancellations.find(op => op.attempted_ms && !op.applied_ms);
+    if (pending) return applyCancellation(id, pending.id, actorId);
     await locked(id, async () => {
       let row = await order(id);
       if (row.collected_ms) fail('Collected orders cannot be cancelled and restocked.', 409);
@@ -492,6 +612,7 @@ export function createStorefrontService({ pool, stripe, stripeClients = {}, send
       await syncRefunds(id);
       row = await order(id);
       if (row.status === 'refunded') return;
+      if (row.cancellations.some(op => op.attempted_ms && !op.applied_ms)) fail('Check the existing item cancellation before requesting another refund.', 409);
       if (row.refund_status === 'pending_external') fail('A refund is already pending in Stripe. Reconcile it before requesting another.', 409);
       if (row.refunded_cents) fail('This order has an external partial refund. Finish reconciliation in Stripe.', 409);
       if (!['paid', 'refund_pending', 'refund_failed'].includes(row.status)) fail('Order is not eligible for a refund.', 409);
@@ -516,7 +637,7 @@ export function createStorefrontService({ pool, stripe, stripeClients = {}, send
       await transaction(async c => {
         const row = await order(id, c, true);
         if (row.collected_ms) return;
-        if (row.status !== 'paid' || row.refunded_cents || row.refund_status) fail('Only a paid order without a refund can be marked collected.', 409);
+        if (!canFulfill(row)) fail('Only a paid order without a refund needing review can be marked collected.', 409);
         await c.query("UPDATE storefront_orders SET status='collected',collected_ms=?,collected_by=? WHERE id=?", [now(), actorId, id]);
       });
     });
@@ -531,16 +652,18 @@ export function createStorefrontService({ pool, stripe, stripeClients = {}, send
     const [rows] = await db().query(`SELECT * FROM storefront_orders WHERE ${where.join(' AND ')} ORDER BY created_ms DESC LIMIT 5000`, args);
     if (!rows.length) return [];
     const [items] = await db().query('SELECT * FROM storefront_order_items WHERE order_id IN (?) ORDER BY option_id', [rows.map(row => row.id)]);
+    const [cancellations] = await db().query('SELECT * FROM storefront_cancellations WHERE order_id IN (?) AND attempted_ms IS NOT NULL ORDER BY id', [rows.map(row => row.id)]);
     const byOrder = new Map();
     for (const item of items) { if (!byOrder.has(item.order_id)) byOrder.set(item.order_id, []); byOrder.get(item.order_id).push(item); }
-    return rows.map(row => orderView({ ...row, items: byOrder.get(row.id) || [] }, true));
+    return rows.map(row => orderView({ ...row, items: byOrder.get(row.id) || [], cancellations: cancellations.filter(op => op.order_id === row.id) }, true));
   }
   async function exportOrders(filters) {
     const rows = await orders(filters);
-    const header = ['Order','Status','Name','Email','Phone','Address','Pickup group','Pickup location','Pickup date','Pickup address','Pickup hours','Turkey size','Quantity','Unit price USD','Order total USD','Variant ID','Catalog product ID','Turkey type','Weight range'];
+    const header = ['Order','Status','Name','Email','Phone','Address','Pickup group','Pickup location','Pickup date','Pickup address','Pickup hours','Turkey size','Quantity','Unit price USD','Order total USD','Variant ID','Catalog product ID','Turkey type','Weight range','Original quantity','Cancelled quantity','Refunded USD','Remaining paid USD'];
     return [header, ...rows.flatMap(row => row.items.map(item => [row.number, row.status, row.customer.name, row.customer.email,
       row.customer.phone, [row.customer.addressLine1,row.customer.addressLine2,row.customer.city,row.customer.state,row.customer.postalCode,row.customer.country].filter(Boolean).join(', '),
-      row.pickup.groupName,row.pickup.name,row.pickup.date,row.pickup.address,row.pickup.hours,item.label,item.quantity,(item.priceCents / 100).toFixed(2),(row.totalCents / 100).toFixed(2),item.optionId,item.productId,item.typeLabel,item.sizeLabel]))].map(row => row.map(csvCell).join(',')).join('\r\n');
+      row.pickup.groupName,row.pickup.name,row.pickup.date,row.pickup.address,row.pickup.hours,item.label,item.remainingQuantity,(item.priceCents / 100).toFixed(2),(row.totalCents / 100).toFixed(2),item.optionId,item.productId,item.typeLabel,item.sizeLabel,
+      item.quantity,item.cancelledQuantity,(row.refundedCents / 100).toFixed(2),(row.remainingTotalCents / 100).toFixed(2)]))].map(row => row.map(csvCell).join(',')).join('\r\n');
   }
   async function webhook(event) {
     await ready();
@@ -577,7 +700,13 @@ export function createStorefrontService({ pool, stripe, stripeClients = {}, send
             continue;
           }
           // SMTP offers at-least-once delivery; a stable Message-ID lets recipients deduplicate retries.
-          await sendEmail({ ...orderView(data), notifyEmail: data.notify_email, kind: row.kind, messageId: `<storefront-${row.order_id}-${row.kind}@deckfamilyfarm.com>` });
+          let notice = { ...orderView(data), notifyEmail: data.notify_email, kind: row.kind };
+          if (/^c-\d+$/.test(row.kind)) {
+            const operation = data.cancellations.find(op => String(op.id) === row.kind.slice(2));
+            if (!operation?.email_json || !operation.applied_ms) fail('Cancellation confirmation is not ready.', 409);
+            notice = parse(operation.email_json);
+          }
+          await sendEmail({ ...notice, messageId: `<storefront-${row.order_id}-${row.kind}@deckfamilyfarm.com>` });
           await db().query("UPDATE storefront_emails SET status='sent',sent_ms=?,attempts=attempts+1,last_error=NULL WHERE id=?", [now(), row.id]);
         } catch (error) {
           await db().query('UPDATE storefront_emails SET attempts=attempts+1,last_error=?,next_attempt_ms=? WHERE id=?', [error.message, now() + Math.min(3600000, 60000 * 2 ** Math.min(row.attempts, 6)), row.id]);
@@ -629,5 +758,5 @@ export function createStorefrontService({ pool, stripe, stripeClients = {}, send
     if (!result.affectedRows) fail('Store visibility changed elsewhere. Reload the settings before saving.', 409);
     return { showProducts: input.showProducts, version: version + 1 };
   }
-  return { storeSettings, saveStoreSettings, catalog, saveSetup, adjustStock, checkout, guestOrder, reconcile, cancelReservation, attachSession, issueRefund, collect, orders, exportOrders, webhook, maintain, deliverEmails, stockHistory, emailStatus };
+  return { storeSettings, saveStoreSettings, catalog, saveSetup, adjustStock, checkout, guestOrder, reconcile, cancelReservation, attachSession, issueRefund, reviewCancellation, applyCancellation, collect, orders, exportOrders, webhook, maintain, deliverEmails, stockHistory, emailStatus };
 }

@@ -84,7 +84,21 @@ A paid order can still have an unavailable confirmation page if checkout started
 
 ## Staff operations and recovery
 
-Filter Orders by location and Paid status to produce remaining pickup lists; export CSV or print. **Mark collected** is repeat-safe. **Cancel & refund** requests a full refund for an uncollected paid order and returns birds only once Stripe reports success. Pending/failed refunds keep stock committed. Partial refunds and refunds of collected orders never automatically replenish stock.
+Filter Orders by location and Paid status to produce remaining pickup lists; export CSV or print. **Mark collected** is repeat-safe, including after a confirmed item cancellation. Quantities on screen and in the CSV are the remaining birds; the CSV also retains original/cancelled quantities and original/refunded/remaining payment totals.
+
+To cancel part of an uncollected paid order:
+
+1. Open **Store → Turkey Preorders → Orders** and search the customer or order number.
+2. Choose **Cancel items**, enter the quantity to cancel for each size, and record the reason.
+3. Choose **Review cancellation**. Review the server-calculated refund, remaining birds, and remaining paid balance. The original order's prices apply, even if catalog prices have changed.
+4. Choose **Confirm cancellation & refund $…**. Selecting every remaining bird cancels the entire order. Until Stripe confirms success, the selected birds remain committed and collection is blocked.
+5. Once confirmed, only the cancelled birds return to preorder inventory. The customer and staff notification address receive an amended confirmation; the remaining birds keep the original pickup details and can be marked collected normally.
+
+If a response is lost or a refund is pending, use **Check cancellation #…** (or **Reconcile payment**). The operation, amount, original Stripe mode, item quantities, request, and idempotency key are saved before submission. Repeated confirmation resumes the same operation. An unknown outcome older than 23 hours stays held for receipt reconciliation; it must never generate a replacement refund. Failed refunds require Stripe review. A stale review requires refreshing and reviewing again before any refund is submitted. The legacy full-refund endpoint and older in-flight refunds retain their existing keys and behavior.
+
+`storefront_cancellations` holds durable reviews/receipts and frozen email snapshots. The additive `storefront_order_items.cancelled_quantity` field leaves original quantities, totals, and checkout requests intact. Success updates cancelled quantities, stock history, receipt application, and the email outbox in one transaction. These additions use the existing storefront-only schema bootstrap; no member-financial or catalog tables are modified. Preserve these columns, receipts, and outbox records on rollback; older application versions do not understand remaining pickup quantities and should not be used to fulfill partially cancelled orders.
+
+Refunds made outside this item workflow cannot identify which birds were cancelled: external partial refunds still require review, do not restock, and block collection. A later successful full refund returns only the uncollected birds not already returned by item cancellations. Refunds of collected orders never automatically replenish stock.
 
 Use **Reconcile payment** to read back Stripe state. Uncertain checkout creation reuses the same Stripe idempotency key; after 23 hours it is held for manual review instead of risking a second session after key expiration. **Link Stripe receipt** appears for these held orders and accepts a Checkout Session ID only after verifying its order metadata, currency, and total. If no session can be found, keep the stock held until an operator establishes the outcome; never delete or reset the order to retry a payment.
 

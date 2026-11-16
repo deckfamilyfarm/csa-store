@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import nodemailer from "nodemailer";
+import { storefrontEmailContent } from './storefrontEmail.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -83,20 +84,7 @@ export async function sendOperationalEmail({ to, subject, text, html, messageId 
 export async function sendStorefrontEmail(order) {
   const transporter = createTransporter();
   if (!transporter || !getSenderAddress()) throw new Error("Storefront email delivery is not configured.");
-  const money = cents => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(cents / 100);
-  const refunded = order.kind === "refund";
-  const title = refunded ? `Turkey preorder refunded — ${order.number}` : `Your turkey preorder — ${order.number}`;
-  const lines = [
-    `Hello ${order.customer.name},`, "",
-    refunded ? `Your payment of ${money(order.totalCents)} has been refunded.${order.collectedMs ? '' : ' Your preorder is cancelled.'}` : "Thank you! Your turkey preorder is paid and confirmed.",
-    `Order: ${order.number}`, ...order.items.map(item => `${item.quantity} × ${item.typeLabel && item.sizeLabel ? `Thanksgiving Turkey — ${item.typeLabel}, ${item.sizeLabel}` : item.label} — ${money(item.priceCents)} each`),
-    `Total paid: ${money(order.totalCents)}`, "",
-    ...(refunded ? [] : [
-      `Pickup: ${[order.pickup.groupName, order.pickup.name].filter(Boolean).join(' — ')}`, `Date: ${order.pickup.date}`, `Hours: ${order.pickup.hours} (Pacific time)`,
-      `Address: ${order.pickup.address}`, order.pickup.instructions, "Bring your order number when you pick up your turkey."
-    ]), "", `Questions or changes? Contact ${order.contactEmail}.`, "",
-    `Customer: ${order.customer.name}`, `Phone: ${order.customer.phone}`
-  ];
+  const { title, lines } = storefrontEmailContent(order);
   await transporter.sendMail({
     from: getSenderAddress(), to: order.customer.email, bcc: order.notifyEmail,
     replyTo: order.contactEmail, subject: title, messageId: order.messageId,

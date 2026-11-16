@@ -53,6 +53,13 @@ storefrontAdminRouter.post('/orders/:id/refund', wrap(async (req, res, service) 
   res.json(await service.issueRefund(req.params.id, actor(req)));
   service.deliverEmails().catch(error => console.error('Storefront mail retry deferred:', error.message));
 }));
+storefrontAdminRouter.post('/orders/:id/cancellations/review', wrap(async (req, res, service) => {
+  res.json(await service.reviewCancellation(req.params.id, req.body, actor(req)));
+}));
+storefrontAdminRouter.post('/orders/:id/cancellations/:cancellationId/confirm', wrap(async (req, res, service) => {
+  res.json(await service.applyCancellation(req.params.id, req.params.cancellationId, actor(req)));
+  service.deliverEmails().catch(error => console.error('Storefront mail retry deferred:', error.message));
+}));
 storefrontAdminRouter.post('/orders/:id/reconcile', wrap(async (req, res, service) => res.json(await service.reconcile(req.params.id))));
 storefrontAdminRouter.post('/orders/:id/stripe-receipt', wrap(async (req, res, service) => res.json(await service.attachSession(req.params.id, req.body.sessionId))));
 

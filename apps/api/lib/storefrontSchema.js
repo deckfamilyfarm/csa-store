@@ -61,6 +61,15 @@ async function bootstrap(pool) {
       delta_on_hand INT NOT NULL, delta_reserved INT NOT NULL, reason VARCHAR(500) NOT NULL,
       actor_id INT, created_ms BIGINT NOT NULL, INDEX stock_option (option_id, id)
     ) ENGINE=InnoDB`,
+    `CREATE TABLE IF NOT EXISTS storefront_cancellations (
+      id INT AUTO_INCREMENT PRIMARY KEY, order_id CHAR(36) NOT NULL,
+      status VARCHAR(24) NOT NULL DEFAULT 'reviewed', baseline_hash CHAR(64) NOT NULL,
+      plan_json MEDIUMTEXT NOT NULL, request_json MEDIUMTEXT NOT NULL,
+      refund_key CHAR(36) NOT NULL UNIQUE, refund_id VARCHAR(255) UNIQUE, stripe_mode VARCHAR(8),
+      amount_cents INT NOT NULL, created_ms BIGINT NOT NULL, reviewed_by INT,
+      attempted_ms BIGINT, approved_by INT, applied_ms BIGINT, last_error TEXT, email_json MEDIUMTEXT,
+      INDEX order_cancellations (order_id, id)
+    ) ENGINE=InnoDB`,
     `CREATE TABLE IF NOT EXISTS storefront_webhooks (
       event_id VARCHAR(255) PRIMARY KEY, event_type VARCHAR(100) NOT NULL, processed_ms BIGINT NOT NULL
     ) ENGINE=InnoDB`,
@@ -82,6 +91,7 @@ async function bootstrap(pool) {
     ['storefront_order_items', 'product_id', 'INT'],
     ['storefront_order_items', 'turkey_type', 'VARCHAR(40)'],
     ['storefront_order_items', 'size_label', 'VARCHAR(120)'],
+    ['storefront_order_items', 'cancelled_quantity', 'INT NOT NULL DEFAULT 0'],
     ['storefront_options', 'product_id', 'INT'],
     ['storefront_pickups', 'group_id', 'INT NOT NULL DEFAULT 1'],
     ['storefront_pickups', 'active', 'TINYINT NOT NULL DEFAULT 1']

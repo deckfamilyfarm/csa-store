@@ -151,3 +151,11 @@
   .turkey-location-cards,.turkey-pickup-notes { grid-template-columns:1fr; }
   .turkey-pickup-notes { padding:22px; gap:24px; }
 }
+.turkey-cancellation-overlay { position: fixed; inset: 0; z-index: 1500; background: rgba(20, 28, 20, .55); display: flex; align-items: center; justify-content: center; padding: 16px; }
+.turkey-cancellation-dialog { width: min(620px, 100%); max-height: 90vh; overflow-y: auto; background: white; }
+.turkey-cancellation-dialog h3 { margin-right: auto; }
+.turkey-cancellation-dialog label { display: block; margin: 16px 0; }
+.turkey-cancellation-dialog textarea { display: block; width: 100%; min-height: 70px; }
+.turkey-cancellation-dialog .turkey-cancellation-item { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.turkey-cancellation-item input { display: block; width: 100px; }
+@media (max-width: 500px) { .turkey-cancellation-dialog .turkey-cancellation-item { align-items: flex-start; flex-direction: column; } }
