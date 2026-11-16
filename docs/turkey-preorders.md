@@ -86,13 +86,50 @@ A paid order can still have an unavailable confirmation page if checkout started
 
 Filter Orders by location and Paid status to produce remaining pickup lists; export CSV or print. **Mark collected** is repeat-safe, including after a confirmed item cancellation. Quantities on screen and in the CSV are the remaining birds; the CSV also retains original/cancelled quantities and original/refunded/remaining payment totals.
 
-To cancel part of an uncollected paid order:
+### SOP: Turkey Preorder Cancellations
 
-1. Open **Store → Turkey Preorders → Orders** and search the customer or order number.
-2. Choose **Cancel items**, enter the quantity to cancel for each size, and record the reason.
-3. Choose **Review cancellation**. Review the server-calculated refund, remaining birds, and remaining paid balance. The original order's prices apply, even if catalog prices have changed.
-4. Choose **Confirm cancellation & refund $…**. Selecting every remaining bird cancels the entire order. Until Stripe confirms success, the selected birds remain committed and collection is blocked.
-5. Once confirmed, only the cancelled birds return to preorder inventory. The customer and staff notification address receive an amended confirmation; the remaining birds keep the original pickup details and can be marked collected normally.
+*Care for every customer, account for every bird, and make pickup day easy.*
+
+1. **Find the order**
+   - Open **Store → Turkey Preorders → Orders**.
+   - Search by customer name, email, or order number.
+   - Confirm the order is paid and has not been collected.
+
+2. **Confirm the customer's request**
+   - Verify the turkey type, size, and quantity they want to cancel.
+   - Confirm how many birds should remain and their pickup location.
+   - Example: for two turkeys purchased at $105 each, cancelling one refunds **$105** and leaves **one turkey** for the original pickup.
+
+3. **Select the items to cancel**
+   - Click **Cancel items**.
+   - Enter the quantity to cancel for each affected size.
+   - Record a short reason, such as “Customer requested one fewer turkey.”
+   - To cancel the entire order, select all remaining birds.
+
+4. **Review before confirming**
+   - Click **Review cancellation**.
+   - Check the refund amount, remaining birds, and remaining paid balance.
+   - Refunds use the original purchase price.
+   - When everything matches the request, click **Confirm cancellation & refund $…**.
+
+5. **Verify the refund outcome**
+   - If pending, use **Check cancellation #…** or **Reconcile payment**.
+   - After a lost response, check the existing cancellation; do not start another refund.
+   - If failed or held for review, ask the administrator to investigate.
+   - Inventory returns automatically after success—do not manually add those birds back.
+
+6. **Confirm the updated order**
+   - Verify the remaining quantity and refunded amount in Orders.
+   - The system emails an amended confirmation to the customer and the staff notification address.
+   - Check **emails awaiting delivery** for any delivery problem.
+   - Remaining birds retain their original pickup details.
+
+7. **Prepare for pickup**
+   - Filter Orders by pickup location and **Paid** status.
+   - Export or print a fresh pickup list after cancellations.
+   - Hand over only the remaining quantity, then click **Mark collected**.
+
+### Recovery and implementation notes
 
 If a response is lost or a refund is pending, use **Check cancellation #…** (or **Reconcile payment**). The operation, amount, original Stripe mode, item quantities, request, and idempotency key are saved before submission. Repeated confirmation resumes the same operation. An unknown outcome older than 23 hours stays held for receipt reconciliation; it must never generate a replacement refund. Failed refunds require Stripe review. A stale review requires refreshing and reviewing again before any refund is submitted. The legacy full-refund endpoint and older in-flight refunds retain their existing keys and behavior.
 
