@@ -3,6 +3,7 @@ import {
   int,
   varchar,
   text,
+  longtext,
   datetime,
   decimal,
   tinyint,
@@ -871,7 +872,7 @@ export const localLineOrders = mysqlTable(
     total: decimal("total", { precision: 10, scale: 2 }),
     discount: decimal("discount", { precision: 10, scale: 2 }),
     productCount: int("product_count"),
-    rawJson: text("raw_json"),
+    rawJson: longtext("raw_json"),
     createdAt: datetime("created_at"),
     updatedAt: datetime("updated_at"),
     lastSyncedAt: datetime("last_synced_at")
@@ -901,7 +902,7 @@ export const localLineOrderEntries = mysqlTable(
     chargeType: varchar("charge_type", { length: 64 }),
     trackType: varchar("track_type", { length: 64 }),
     packWeight: decimal("pack_weight", { precision: 10, scale: 3 }),
-    rawJson: text("raw_json"),
+    rawJson: longtext("raw_json"),
     createdAt: datetime("created_at"),
     updatedAt: datetime("updated_at"),
     lastSyncedAt: datetime("last_synced_at")

@@ -1,6 +1,6 @@
 import fs from "fs";
-import path from "path";
 import { getQboAccountingMethod } from "./qboConfig.js";
+import { storedAccessToken } from './qboTokenStore.js';
 
 function parseJsonResponse(text, label) {
   try {
@@ -13,15 +13,10 @@ function parseJsonResponse(text, label) {
 export class QuickBooksClient {
   constructor(config = {}) {
     this.config = config;
-    this.accessToken = null;
-    this.accessTokenExpiresAt = 0;
     const storedRefreshToken = this.loadRefreshTokenFromStores();
     this.refreshToken = storedRefreshToken?.token || config.refreshToken || "";
-    if (storedRefreshToken?.token && storedRefreshToken.path !== config.tokenStorePath) {
-      this.saveRefreshTokenToStore(storedRefreshToken.token);
-    } else if (config.refreshToken && !storedRefreshToken?.token) {
-      this.saveRefreshTokenToStore(config.refreshToken);
-    }
+    // Construction never copies credentials. Every refresh rereads the durable
+    // store under the same lock/cache protocol as the accounting service.
   }
 
   baseUrl() {
@@ -42,41 +37,22 @@ export class QuickBooksClient {
   }
 
   async ensureAccessToken() {
-    const now = Date.now();
-    if (this.accessToken && now < this.accessTokenExpiresAt - 60000) {
-      return this.accessToken;
-    }
-
     const basic = Buffer.from(`${this.config.clientId}:${this.config.clientSecret}`).toString("base64");
-    const body = new URLSearchParams({
-      grant_type: "refresh_token",
-      refresh_token: this.refreshToken
+    return storedAccessToken({ ...this.config, refreshToken: this.refreshToken }, async refreshToken => {
+      const body = new URLSearchParams({ grant_type: "refresh_token", refresh_token: refreshToken });
+      const response = await this.fetchWithTimeout("https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer", {
+        method: "POST",
+        headers: {
+          Authorization: `Basic ${basic}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+          Accept: "application/json"
+        },
+        body: body.toString()
+      });
+      const text = await response.text();
+      if (!response.ok) throw new Error(`QBO token refresh failed (${response.status}): ${text}`);
+      return parseJsonResponse(text, "QBO token refresh");
     });
-    const response = await this.fetchWithTimeout("https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer", {
-      method: "POST",
-      headers: {
-        Authorization: `Basic ${basic}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-        Accept: "application/json"
-      },
-      body: body.toString()
-    });
-    const text = await response.text();
-    if (!response.ok) {
-      throw new Error(`QBO token refresh failed (${response.status}): ${text}`);
-    }
-    const parsed = parseJsonResponse(text, "QBO token refresh");
-    this.accessToken = parsed.access_token || null;
-    if (!this.accessToken) {
-      throw new Error("QBO token refresh did not return an access token.");
-    }
-    if (parsed.refresh_token) {
-      this.refreshToken = parsed.refresh_token;
-      this.saveRefreshTokenToStore(parsed.refresh_token);
-    }
-    const expiresIn = Number(parsed.expires_in) || 3600;
-    this.accessTokenExpiresAt = Date.now() + expiresIn * 1000;
-    return this.accessToken;
   }
 
   async qboGet(pathname, params = {}) {
@@ -188,32 +164,4 @@ export class QuickBooksClient {
     }
   }
 
-  saveRefreshTokenToStore(token) {
-    if (!token) return;
-    const paths = [
-      this.config.tokenStorePath,
-      this.config.fallbackTokenStorePath
-    ]
-      .filter(Boolean)
-      .filter((tokenStorePath, index, allPaths) => allPaths.indexOf(tokenStorePath) === index);
-
-    for (const tokenStorePath of paths) {
-      try {
-        fs.mkdirSync(path.dirname(tokenStorePath), { recursive: true });
-        let existing = {};
-        if (fs.existsSync(tokenStorePath)) {
-          existing = JSON.parse(fs.readFileSync(tokenStorePath, "utf8"));
-        }
-        existing[this.config.realmId] = token;
-        fs.writeFileSync(tokenStorePath, JSON.stringify(existing, null, 2), "utf8");
-        try {
-          fs.chmodSync(tokenStorePath, 0o600);
-        } catch {
-          // Best effort on non-POSIX filesystems.
-        }
-      } catch {
-        // Best effort only; the in-memory token can still be used for this process.
-      }
-    }
-  }
 }

@@ -477,7 +477,7 @@ function buildOrdersExportUrl(startStr, endStr) {
   return `${baseUrl}orders/export/?${params.toString()}`;
 }
 
-async function syncLocalLineOrderReportingCache({
+export async function syncLocalLineOrderReportingCache({
   connection,
   reportProgress = () => {},
   startDate = new Date("2026-01-01T00:00:00.000Z"),

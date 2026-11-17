@@ -162,10 +162,11 @@ Useful one-off commands:
   - `npm run qbo:reauthorize -- --test --skip-report`
 
 Token storage notes
-- The script writes the new refresh token to `.qbo/qbo-refresh.json`.
+- The script writes the new refresh token to `QBO_TOKEN_STORE`, defaulting to `.qbo/qbo-refresh.json`.
+- When CSA Store and accounting-reports use the same Intuit app/company, configure both server applications to use the same absolute `QBO_TOKEN_STORE` path. Their shared file-lock and access-cache protocol serializes token refresh and reauthorization; never copy an older per-application token over that store. Tokens are written atomically with owner-only permissions, and corrupt stores or persistence failures stop the request.
 - QBO env values are loaded from this repo only: `.env`, then `apps/api/.env` if present. The dashboard publisher no longer reads `../accounting-reports/.env`.
 - Do not commit token files. They are local/server secrets.
-- Avoid running multiple QBO refresh/reauthorization jobs at the same time on different machines. Intuit rotates refresh tokens; using an old token after a newer one has been issued can trigger another `invalid_grant`.
+- Keep token refresh on the server. Other machines should use accounting-reports' configured server reader. Independent token stores on different machines cannot share the filesystem lock and can become stale after Intuit rotates credentials.
 
 Store pricelist sync
 - Preview the store master pricelist export with `npm run export:master-pricelist:preview`.

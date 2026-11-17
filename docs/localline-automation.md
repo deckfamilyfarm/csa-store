@@ -53,6 +53,8 @@ Manual export and preview commands continue to work at any time. Check the sched
 
 ## Tracking
 
+Order and order-entry snapshots use `LONGTEXT` so complete provider responses over 64 KB can be preserved. Upgrade existing columns explicitly with `npm --prefix apps/api run migrate:member-finances -- --order-snapshots-only --check`, review the two-column plan, then run the same command with `--apply`. This scoped migration only widens operational snapshot storage; it does not migrate member-finance tables. Order reads and pulls do not run this DDL. Rerun the tracked order pull after migration, then publish the dashboard after it completes.
+
 - Admin > Local Line shows the latest automation job plus child job details.
 - CLI logs go to `tmp/localline-automation.log` when run through cron.
 - Dataset cursors remain in `local_line_sync_cursors`.
@@ -103,6 +105,7 @@ Optional automation tuning:
 - `LOCAL_LINE_AUTOMATION_JOB_TIMEOUT_MS`, default 3 hours.
 - `LOCAL_LINE_AUTOMATION_DASHBOARD_MAX_PULL_AGE_HOURS`, default 26 hours.
 - `LOCAL_LINE_JOB_STALE_SECONDS`, default 1800 seconds before an old queued/running job is marked stale.
+- `LL_ORDER_FETCH_TIMEOUT_MS`, default 60000 ms (15–120 second bounds) for slow Local Line order reads. Other request timeouts are unchanged. Explicit operational recoveries can use the API's opened, fulfillment and payment date filters and retain that scope in their job receipt.
 
 ### Dashboard supplier costs and KPI summary
 

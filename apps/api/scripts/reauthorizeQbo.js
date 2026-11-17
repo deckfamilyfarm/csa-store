@@ -12,6 +12,7 @@ import {
 } from "../lib/qboConfig.js";
 import { QuickBooksClient } from "../lib/quickBooksClient.js";
 import { parseDashboardPnlReport } from "../lib/qboDashboard.js";
+import { withTokenStoreLock, saveRefreshTokenLocked } from '../lib/qboTokenStore.js';
 
 const TOKEN_URL = "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer";
 const AUTH_URL = "https://appcenter.intuit.com/connect/oauth2";
@@ -133,25 +134,6 @@ function parseCallbackInput(value, config) {
     code: pasted,
     realmId: config.realmId
   };
-}
-
-function writeRefreshTokenToStore(tokenStorePath, realmId, refreshToken) {
-  if (!tokenStorePath) return false;
-  fs.mkdirSync(path.dirname(tokenStorePath), { recursive: true });
-  let existing = {};
-  try {
-    existing = JSON.parse(fs.readFileSync(tokenStorePath, "utf8"));
-  } catch {
-    existing = {};
-  }
-  existing[realmId] = refreshToken;
-  fs.writeFileSync(tokenStorePath, JSON.stringify(existing, null, 2), "utf8");
-  try {
-    fs.chmodSync(tokenStorePath, 0o600);
-  } catch {
-    // Best effort on non-POSIX filesystems.
-  }
-  return true;
 }
 
 async function exchangeCode({ config, code, redirectUri }) {
@@ -325,19 +307,13 @@ async function exchangeCallback(args) {
     throw new Error(`Missing redirect URI for token exchange.\n\n${usage()}`);
   }
 
-  const tokenResponse = await exchangeCode({
-    config,
-    code: callback.code,
-    redirectUri
-  });
   const tokenStores = resolveQboTokenStorePaths();
-  const writtenPaths = [
-    tokenStores.tokenStorePath,
-    tokenStores.fallbackTokenStorePath
-  ]
-    .filter(Boolean)
-    .filter((tokenStorePath, index, paths) => paths.indexOf(tokenStorePath) === index)
-    .filter((tokenStorePath) => writeRefreshTokenToStore(tokenStorePath, callback.realmId, tokenResponse.refresh_token));
+  const tokenResponse = await withTokenStoreLock(tokenStores.tokenStorePath, async () => {
+    const tokens = await exchangeCode({ config, code: callback.code, redirectUri });
+    saveRefreshTokenLocked(tokenStores.tokenStorePath, callback.realmId, tokens.refresh_token);
+    return tokens;
+  });
+  const writtenPaths = [tokenStores.tokenStorePath];
 
   let companyName = "";
   try {

@@ -113,13 +113,13 @@ export function isLocalLineEnabled() {
   return isLocalLineAuthConfigured();
 }
 
-async function fetchLocalLineWithRetry(url, options, label) {
+async function fetchLocalLineWithRetry(url, options, label, timeoutMs = 15000) {
   let lastError = null;
   // A lost POST/PATCH response is uncertain, not permission to send it again.
   const attempts = !options.method || options.method === 'GET' ? LOCAL_LINE_RETRY_ATTEMPTS : 1;
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     try {
-      return await fetch(url, { ...options, signal: AbortSignal.timeout(15000) });
+      return await fetch(url, { ...options, signal: AbortSignal.timeout(timeoutMs) });
     } catch (error) {
       lastError = error;
       if (attempt >= attempts) {
@@ -340,10 +340,15 @@ export async function fetchLocalLineOrdersPage(options = {}) {
     page_size: String(Math.max(1, pageSize)),
     ordering
   });
+  const allowedDateFilters = new Set(['start_date','end_date','fulfillment_date_start','fulfillment_date_end','payment_date_start','payment_date_end']);
+  for (const [key,value] of Object.entries(options.dateFilters || {})) {
+    if (!allowedDateFilters.has(key) || !/^\d{4}-\d{2}-\d{2}$/.test(String(value))) throw new Error('Invalid Local Line order date filter.');
+    params.set(key,String(value));
+  }
   const url = `${LL_BASEURL}orders/?${params.toString()}`;
   const response = await fetchLocalLineWithRetry(url, {
     headers: { Authorization: `Bearer ${accessToken}` }
-  }, "LocalLine orders fetch");
+  }, "LocalLine orders fetch", Math.max(15000, Math.min(120000, Number(process.env.LL_ORDER_FETCH_TIMEOUT_MS) || 60000)));
   if (!response.ok) {
     const body = await response.text();
     throw new Error(`LocalLine orders fetch failed: ${response.status} ${body}`);

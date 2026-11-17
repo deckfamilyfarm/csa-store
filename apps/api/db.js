@@ -1623,7 +1623,7 @@ const LOCAL_LINE_TABLE_STATEMENTS = [
       total DECIMAL(10, 2),
       discount DECIMAL(10, 2),
       product_count INT,
-      raw_json TEXT,
+      raw_json LONGTEXT,
       created_at DATETIME,
       updated_at DATETIME,
       last_synced_at DATETIME
@@ -1648,7 +1648,7 @@ const LOCAL_LINE_TABLE_STATEMENTS = [
       charge_type VARCHAR(64),
       track_type VARCHAR(64),
       pack_weight DECIMAL(10, 3),
-      raw_json TEXT,
+      raw_json LONGTEXT,
       created_at DATETIME,
       updated_at DATETIME,
       last_synced_at DATETIME

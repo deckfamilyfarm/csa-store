@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import { inventoryOperationsPreflight, migrateInventoryOperationsSchema } from '../lib/inventoryOperationsSchema.js';
 import { getPool, migrateLegacySubscriptionPortalSchema } from '../db.js';
 import { financialPreflight, migrateMemberFinancialSchema } from '../lib/memberFinancialSchema.js';
+import { orderSnapshotPreflight, migrateOrderSnapshotSchema } from '../lib/localLineOrderSnapshotSchema.js';
 
 // Intentionally explicit: deployment runs --check, reviews conflicts, then --apply.
 if (!process.argv.includes('--check') && !process.argv.includes('--apply')) {
@@ -12,7 +13,11 @@ const pool = getPool();
 const connection = await pool.getConnection();
 try {
   const inventoryOnly=process.argv.includes('--inventory-only');
-  const result = inventoryOnly
+  const orderSnapshotsOnly=process.argv.includes('--order-snapshots-only');
+  if (inventoryOnly && orderSnapshotsOnly) throw new Error('Select only one scoped migration.');
+  const result = orderSnapshotsOnly
+    ? await (process.argv.includes('--apply') ? migrateOrderSnapshotSchema(connection) : orderSnapshotPreflight(connection))
+    : inventoryOnly
     ? await (process.argv.includes('--apply') ? migrateInventoryOperationsSchema(connection) : inventoryOperationsPreflight(connection))
     : process.argv.includes('--apply')
     ? await migrateMemberFinancialSchema(connection, migrateLegacySubscriptionPortalSchema)
