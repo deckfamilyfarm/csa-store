@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {cleanCart,cartKey,cartAfterPayment,rememberAccess,orderAccess,readPending,MERCH_PENDING} from './merchandiseCart.js';
+import {cleanCart,cartKey,cartAfterPayment,rememberAccess,orderAccess,readPending,merchandiseCartLines,MERCH_PENDING} from './merchandiseCart.js';
 import {usesMerchandiseStorefront,usesTurkeyStorefront,usesAdminPortal} from '../storefrontRouting.js';
 test('merchandise storage keeps only IDs, counts and displayed prices; duplicate/invalid rows are rejected',()=>{
   const row={variantId:1,quantity:1,expectedPriceCents:1000,email:'private@example.com'};
@@ -22,4 +22,14 @@ test('merchandise routes preserve existing turkey, admin and password recovery e
   assert.equal(usesMerchandiseStorefront('https://admin.deckfamilyfarm.com/#/merchandise'),false);
   assert.equal(usesAdminPortal('https://admin.deckfamilyfarm.com/#/merchandise'),true);
   assert.equal(usesMerchandiseStorefront('https://store.deckfamilyfarm.com/merchandise#/reset-password'),false);
+});
+test('cart review identifies price changes and unavailable items and uses the matching photo',()=>{
+  const cart=[{variantId:1,quantity:2,expectedPriceCents:2500},{variantId:2,quantity:1,expectedPriceCents:1000}];
+  const catalog={products:[{name:'Farm cap',images:[{src:'other-color'},{src:'navy',variantIds:[1]}],variants:[{id:1,title:'Navy',retailCents:3000}]}]};
+  const [changed, removed]=merchandiseCartLines(cart,catalog);
+  assert.equal(changed.priceChanged,true);
+  assert.equal(changed.expectedPriceCents,2500);
+  assert.equal(changed.variant.imageUrl,'navy');
+  assert.equal(removed.unavailable,true);
+  assert.equal(merchandiseCartLines([{...cart[0],expectedPriceCents:3000}],catalog)[0].priceChanged,false);
 });

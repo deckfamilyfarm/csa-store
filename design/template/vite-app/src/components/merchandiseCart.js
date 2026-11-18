@@ -8,6 +8,19 @@ export function cleanCart(value) {
     .map(({variantId,quantity,expectedPriceCents})=>({variantId,quantity,expectedPriceCents}));
 }
 export const cartKey=cart=>JSON.stringify(cleanCart(cart).sort((a,b)=>a.variantId-b.variantId));
+export function merchandiseCartLines(cart, catalog) {
+  const variants = new Map();
+  for (const product of catalog?.products || []) {
+    for (const variant of product.variants) {
+      const image = product.images.find(photo => photo.variantIds?.includes(variant.id)) || product.images[0];
+      variants.set(variant.id, { ...variant, productName: product.name, imageUrl: image?.src });
+    }
+  }
+  return cart.map(row => {
+    const variant = variants.get(row.variantId);
+    return { ...row, variant, unavailable: !variant, priceChanged: Boolean(variant && variant.retailCents !== row.expectedPriceCents) };
+  });
+}
 export function readCart(storage) { try { return cleanCart(JSON.parse(storage.getItem(MERCH_CART))); } catch { return []; } }
 export function readPending(storage,now=Date.now()) {
   try { const value=JSON.parse(storage.getItem(MERCH_PENDING)); return validToken(value?.token)&&typeof value.quoteId==='string'&&value.expiresMs>now?value:null; } catch { return null; }
