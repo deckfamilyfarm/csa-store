@@ -1,0 +1,614 @@
+{
+  "capturedAt": "2026-11-18T00:28:59.093Z",
+  "status": "captured_with_gaps",
+  "tokenVerified": true,
+  "shopsRetrieved": true,
+  "shops": [
+    {
+      "id": 18832188,
+      "title": "Deck Family Farm",
+      "sales_channel": "wix"
+    }
+  ],
+  "shopCount": 1,
+  "productCount": 14,
+  "variantCount": 1529,
+  "enabledVariantCount": 186,
+  "existingWixShopIds": [
+    18832188
+  ],
+  "fulfillmentShopDecision": "pending_approval_policy_and_order_channel_verification",
+  "artworkCount": 19,
+  "artworkMetadataRetrievedCount": 18,
+  "artworkVerified": false,
+  "rawSnapshotDirectory": "raw/catalog-2026-11-17",
+  "products": [
+    {
+      "shopId": 18832188,
+      "shopTitle": "Deck Family Farm",
+      "salesChannel": "wix",
+      "productId": "693363ca627ec2eca5056957",
+      "title": "Enamel Camping Mug",
+      "blueprintId": 483,
+      "blueprintTitle": "Enamel Camping Mug",
+      "printProviderId": 28,
+      "printProvider": "District Photo",
+      "visible": true,
+      "locked": false,
+      "variantCount": 1,
+      "enabledVariantCount": 1,
+      "enabledAvailableVariantCount": 1,
+      "enabledUnknownAvailabilityCount": 0,
+      "existingRetailMinCents": 1865,
+      "existingRetailMaxCents": 1865,
+      "supplierCostMinCents": 1141,
+      "supplierCostMaxCents": 1141,
+      "currency": null,
+      "imageCount": 4,
+      "descriptionCaptured": true,
+      "artworkIds": [
+        "6933638a3503711c953f2d3a",
+        "67bd06c95e953c8625716dc3"
+      ],
+      "decorationMethods": [
+        "dye-sublimation"
+      ],
+      "external": {
+        "id": "c3a68b44-b34c-4846-991f-1ff3a9e45f49",
+        "handle": "/product-page/enamel-camping-mug",
+        "type": 9
+      },
+      "shippingCaptured": true,
+      "catalogVariantsCaptured": true,
+      "artworkVisualVerification": "pending"
+    },
+    {
+      "shopId": 18832188,
+      "shopTitle": "Deck Family Farm",
+      "salesChannel": "wix",
+      "productId": "67eb5a9637e95d6cd203cf54",
+      "title": "Make Milk Raw Again Mug",
+      "blueprintId": 478,
+      "blueprintTitle": "Ceramic Mug, (11oz, 15oz)",
+      "printProviderId": 28,
+      "printProvider": "District Photo",
+      "visible": true,
+      "locked": false,
+      "variantCount": 2,
+      "enabledVariantCount": 1,
+      "enabledAvailableVariantCount": 1,
+      "enabledUnknownAvailabilityCount": 0,
+      "existingRetailMinCents": 1000,
+      "existingRetailMaxCents": 1000,
+      "supplierCostMinCents": 509,
+      "supplierCostMaxCents": 509,
+      "currency": null,
+      "imageCount": 3,
+      "descriptionCaptured": true,
+      "artworkIds": [
+        "67eb558b2e929b36919684da",
+        "67b647a04010cd85f2db2215"
+      ],
+      "decorationMethods": [
+        "dye-sublimation"
+      ],
+      "external": {
+        "id": "812113e4-a2cb-4779-b3db-9f18d29da863",
+        "handle": "/product-page/make-milk-raw-again-mug",
+        "type": 9
+      },
+      "shippingCaptured": true,
+      "catalogVariantsCaptured": true,
+      "artworkVisualVerification": "pending"
+    },
+    {
+      "shopId": 18832188,
+      "shopTitle": "Deck Family Farm",
+      "salesChannel": "wix",
+      "productId": "67bd097441b52f41e807420b",
+      "title": "Farm Collage Long Sleeve T-Shirt",
+      "blueprintId": 710,
+      "blueprintTitle": "Unisex Garment-dyed Long Sleeve T-Shirt",
+      "printProviderId": 99,
+      "printProvider": "Printify Choice",
+      "visible": false,
+      "locked": false,
+      "variantCount": 210,
+      "enabledVariantCount": 30,
+      "enabledAvailableVariantCount": 30,
+      "enabledUnknownAvailabilityCount": 0,
+      "existingRetailMinCents": 2238,
+      "existingRetailMaxCents": 2736,
+      "supplierCostMinCents": 2232,
+      "supplierCostMaxCents": 2729,
+      "currency": null,
+      "imageCount": 15,
+      "descriptionCaptured": true,
+      "artworkIds": [
+        "67bd06c95e953c8625716dc3"
+      ],
+      "decorationMethods": [
+        "dtg"
+      ],
+      "external": {
+        "id": "d310cc46-3907-42ee-aeb6-f5519fc778ee",
+        "handle": "/product-page/farm-collage-long-sleeve-t-shirt",
+        "type": 9
+      },
+      "shippingCaptured": true,
+      "catalogVariantsCaptured": true,
+      "artworkVisualVerification": "pending"
+    },
+    {
+      "shopId": 18832188,
+      "shopTitle": "Deck Family Farm",
+      "salesChannel": "wix",
+      "productId": "67bd01b3c16c5c6aae0ec17d",
+      "title": "Dirty Dung Beetle Mug",
+      "blueprintId": 478,
+      "blueprintTitle": "Ceramic Mug, (11oz, 15oz)",
+      "printProviderId": 28,
+      "printProvider": "District Photo",
+      "visible": true,
+      "locked": false,
+      "variantCount": 2,
+      "enabledVariantCount": 1,
+      "enabledAvailableVariantCount": 1,
+      "enabledUnknownAvailabilityCount": 0,
+      "existingRetailMinCents": 1000,
+      "existingRetailMaxCents": 1000,
+      "supplierCostMinCents": 509,
+      "supplierCostMaxCents": 509,
+      "currency": null,
+      "imageCount": 2,
+      "descriptionCaptured": true,
+      "artworkIds": [
+        "67b64b1e064e1655ee5e6af4"
+      ],
+      "decorationMethods": [
+        "dye-sublimation"
+      ],
+      "external": {
+        "id": "146ddb9b-814d-4e92-b779-b656c9a9146d",
+        "handle": "/product-page/ceramic-mug-11oz-15oz",
+        "type": 9
+      },
+      "shippingCaptured": true,
+      "catalogVariantsCaptured": true,
+      "artworkVisualVerification": "pending"
+    },
+    {
+      "shopId": 18832188,
+      "shopTitle": "Deck Family Farm",
+      "salesChannel": "wix",
+      "productId": "67b8b7cfb89bfd9f900c42e9",
+      "title": "Dirty Worm T-shirt",
+      "blueprintId": 710,
+      "blueprintTitle": "Unisex Garment-dyed Long Sleeve T-Shirt",
+      "printProviderId": 99,
+      "printProvider": "Printify Choice",
+      "visible": true,
+      "locked": false,
+      "variantCount": 210,
+      "enabledVariantCount": 36,
+      "enabledAvailableVariantCount": 36,
+      "enabledUnknownAvailabilityCount": 0,
+      "existingRetailMinCents": 2800,
+      "existingRetailMaxCents": 3100,
+      "supplierCostMinCents": 2901,
+      "supplierCostMaxCents": 3398,
+      "currency": null,
+      "imageCount": 12,
+      "descriptionCaptured": true,
+      "artworkIds": [
+        "67d0a995ecc51ae476a18f54",
+        "67e7119ba7b8281bb2acdb8f",
+        "67b8b5af9644fca6e161b3ba",
+        "67e71250dd9613f9a07b595f"
+      ],
+      "decorationMethods": [
+        "dtg"
+      ],
+      "external": {
+        "id": "c9c00fbe-274d-43da-a0db-9fb3b8f21e86",
+        "handle": "/product-page/dirty-worm-t-shirt",
+        "type": 9
+      },
+      "shippingCaptured": true,
+      "catalogVariantsCaptured": true,
+      "artworkVisualVerification": "pending"
+    },
+    {
+      "shopId": 18832188,
+      "shopTitle": "Deck Family Farm",
+      "salesChannel": "wix",
+      "productId": "67b8b42f607140d79f02953d",
+      "title": "It's the How Sweatshirt",
+      "blueprintId": 1436,
+      "blueprintTitle": "Unisex Midweight Softstyle Fleece Crewneck Sweatshirt",
+      "printProviderId": 99,
+      "printProvider": "Printify Choice",
+      "visible": true,
+      "locked": false,
+      "variantCount": 112,
+      "enabledVariantCount": 35,
+      "enabledAvailableVariantCount": 35,
+      "enabledUnknownAvailabilityCount": 0,
+      "existingRetailMinCents": 2600,
+      "existingRetailMaxCents": 3300,
+      "supplierCostMinCents": 2776,
+      "supplierCostMaxCents": 3595,
+      "currency": null,
+      "imageCount": 10,
+      "descriptionCaptured": true,
+      "artworkIds": [
+        "67e7119ba7b8281bb2acdb8f",
+        "67d0ad33fc41bd7719b2339b",
+        "67e71250dd9613f9a07b595f",
+        "67b64829473c4d3078b51008"
+      ],
+      "decorationMethods": [
+        "dtg"
+      ],
+      "external": {
+        "id": "95da0004-63c0-48ba-9238-5be8b92dcfb5",
+        "handle": "/product-page/how-cow-sweatshirt",
+        "type": 9
+      },
+      "shippingCaptured": true,
+      "catalogVariantsCaptured": true,
+      "artworkVisualVerification": "pending"
+    },
+    {
+      "shopId": 18832188,
+      "shopTitle": "Deck Family Farm",
+      "salesChannel": "wix",
+      "productId": "67b8b2581f7bd7f1a700b5fd",
+      "title": "Dirty Dung Beetle Sweatshirt",
+      "blueprintId": 49,
+      "blueprintTitle": "Unisex Heavy Blend™ Crewneck Sweatshirt",
+      "printProviderId": 99,
+      "printProvider": "Printify Choice",
+      "visible": false,
+      "locked": false,
+      "variantCount": 306,
+      "enabledVariantCount": 48,
+      "enabledAvailableVariantCount": 48,
+      "enabledUnknownAvailabilityCount": 0,
+      "existingRetailMinCents": 2600,
+      "existingRetailMaxCents": 3300,
+      "supplierCostMinCents": 2428,
+      "supplierCostMaxCents": 3153,
+      "currency": null,
+      "imageCount": 12,
+      "descriptionCaptured": true,
+      "artworkIds": [
+        "67b64b1e064e1655ee5e6af4",
+        "67e71250dd9613f9a07b595f",
+        "5941187eb8e7e37b3f0e62e5",
+        "67e727c7798e7c78ebf36b20",
+        "67e7119ba7b8281bb2acdb8f"
+      ],
+      "decorationMethods": [
+        "dtg",
+        "dtf"
+      ],
+      "external": {
+        "id": "83fe90a3-6e4e-411a-9908-11084d9d1e16",
+        "handle": "/product-page/dirty-dung-beetle-sweatshirt-1",
+        "type": 9
+      },
+      "shippingCaptured": true,
+      "catalogVariantsCaptured": true,
+      "artworkVisualVerification": "pending"
+    },
+    {
+      "shopId": 18832188,
+      "shopTitle": "Deck Family Farm",
+      "salesChannel": "wix",
+      "productId": "67b6615da1e8a765f40570c3",
+      "title": "More Farms Less Pharma Hoodie",
+      "blueprintId": 650,
+      "blueprintTitle": null,
+      "printProviderId": 87,
+      "printProvider": null,
+      "visible": false,
+      "locked": false,
+      "variantCount": 45,
+      "enabledVariantCount": 0,
+      "enabledAvailableVariantCount": 0,
+      "enabledUnknownAvailabilityCount": 0,
+      "existingRetailMinCents": null,
+      "existingRetailMaxCents": null,
+      "supplierCostMinCents": null,
+      "supplierCostMaxCents": null,
+      "currency": null,
+      "imageCount": 0,
+      "descriptionCaptured": true,
+      "artworkIds": [
+        "67ec35eeb9da42ad50ac52c3",
+        "67e7119ba7b8281bb2acdb8f"
+      ],
+      "decorationMethods": [
+        "dtg"
+      ],
+      "external": {
+        "id": "f9ea9760-17f0-406c-8385-beae807441fe",
+        "handle": "/product-page/more-farms-less-pharma-sweatshirt",
+        "type": 9
+      },
+      "shippingCaptured": false,
+      "catalogVariantsCaptured": false,
+      "artworkVisualVerification": "pending"
+    },
+    {
+      "shopId": 18832188,
+      "shopTitle": "Deck Family Farm",
+      "salesChannel": "wix",
+      "productId": "67b64d71a1e8a765f4056bf6",
+      "title": "Dirty Dung Beetle Hoodie",
+      "blueprintId": 650,
+      "blueprintTitle": null,
+      "printProviderId": 87,
+      "printProvider": null,
+      "visible": false,
+      "locked": false,
+      "variantCount": 45,
+      "enabledVariantCount": 0,
+      "enabledAvailableVariantCount": 0,
+      "enabledUnknownAvailabilityCount": 0,
+      "existingRetailMinCents": null,
+      "existingRetailMaxCents": null,
+      "supplierCostMinCents": null,
+      "supplierCostMaxCents": null,
+      "currency": null,
+      "imageCount": 0,
+      "descriptionCaptured": true,
+      "artworkIds": [
+        "67e727c7798e7c78ebf36b20",
+        "67e7119ba7b8281bb2acdb8f",
+        "67b64b1e064e1655ee5e6af4",
+        "67e71250dd9613f9a07b595f"
+      ],
+      "decorationMethods": [
+        "dtg"
+      ],
+      "external": {
+        "id": "d0950c2c-76ac-450f-a914-18b18df6d7ca",
+        "handle": "/product-page/dirty-dung-beetle-sweatshirt",
+        "type": 9
+      },
+      "shippingCaptured": false,
+      "catalogVariantsCaptured": false,
+      "artworkVisualVerification": "pending"
+    },
+    {
+      "shopId": 18832188,
+      "shopTitle": "Deck Family Farm",
+      "salesChannel": "wix",
+      "productId": "674017e26abac8a2d30d2df0",
+      "title": "How-Cow Mug",
+      "blueprintId": 478,
+      "blueprintTitle": "Ceramic Mug, (11oz, 15oz)",
+      "printProviderId": 28,
+      "printProvider": "District Photo",
+      "visible": true,
+      "locked": false,
+      "variantCount": 2,
+      "enabledVariantCount": 1,
+      "enabledAvailableVariantCount": 1,
+      "enabledUnknownAvailabilityCount": 0,
+      "existingRetailMinCents": 1000,
+      "existingRetailMaxCents": 1000,
+      "supplierCostMinCents": 509,
+      "supplierCostMaxCents": 509,
+      "currency": null,
+      "imageCount": 3,
+      "descriptionCaptured": true,
+      "artworkIds": [
+        "67b64829473c4d3078b51008"
+      ],
+      "decorationMethods": [
+        "dye-sublimation"
+      ],
+      "external": {
+        "id": "382d8e3c-cb7c-4ea6-b17b-55c39aeba4ca",
+        "handle": "/product-page/its-not-the-cow-its-the-how",
+        "type": 9
+      },
+      "shippingCaptured": true,
+      "catalogVariantsCaptured": true,
+      "artworkVisualVerification": "pending"
+    },
+    {
+      "shopId": 18832188,
+      "shopTitle": "Deck Family Farm",
+      "salesChannel": "wix",
+      "productId": "6722801ba3d01e481f0523b3",
+      "title": "Full Farm CSA Mug",
+      "blueprintId": 478,
+      "blueprintTitle": "Ceramic Mug, (11oz, 15oz)",
+      "printProviderId": 28,
+      "printProvider": "District Photo",
+      "visible": true,
+      "locked": false,
+      "variantCount": 2,
+      "enabledVariantCount": 1,
+      "enabledAvailableVariantCount": 1,
+      "enabledUnknownAvailabilityCount": 0,
+      "existingRetailMinCents": 699,
+      "existingRetailMaxCents": 699,
+      "supplierCostMinCents": 509,
+      "supplierCostMaxCents": 509,
+      "currency": null,
+      "imageCount": 4,
+      "descriptionCaptured": true,
+      "artworkIds": [
+        "67228031360265a3ef14ff1b"
+      ],
+      "decorationMethods": [
+        "dye-sublimation"
+      ],
+      "external": {
+        "id": "f4f2aece-c50b-44aa-8f03-5e572a8342ed",
+        "handle": "/product-page/ceramic-mug-full-farm-csa",
+        "type": 9
+      },
+      "shippingCaptured": true,
+      "catalogVariantsCaptured": true,
+      "artworkVisualVerification": "pending"
+    },
+    {
+      "shopId": 18832188,
+      "shopTitle": "Deck Family Farm",
+      "salesChannel": "wix",
+      "productId": "672272feb4d2929f1d0bafe0",
+      "title": "Deck Family Farm Cap",
+      "blueprintId": 1447,
+      "blueprintTitle": "Classic Dad Cap",
+      "printProviderId": 99,
+      "printProvider": "Printify Choice",
+      "visible": true,
+      "locked": false,
+      "variantCount": 11,
+      "enabledVariantCount": 1,
+      "enabledAvailableVariantCount": 1,
+      "enabledUnknownAvailabilityCount": 0,
+      "existingRetailMinCents": 2500,
+      "existingRetailMaxCents": 2500,
+      "supplierCostMinCents": 2136,
+      "supplierCostMaxCents": 2136,
+      "currency": null,
+      "imageCount": 4,
+      "descriptionCaptured": true,
+      "artworkIds": [
+        "672272f33a0085896494a57d"
+      ],
+      "decorationMethods": [
+        "embroidery"
+      ],
+      "external": {
+        "id": "4fefea2a-d8c8-487f-a9b9-f0e1f940dcfa",
+        "handle": "/product-page/deck-family-farm-cap",
+        "type": 9
+      },
+      "shippingCaptured": true,
+      "catalogVariantsCaptured": true,
+      "artworkVisualVerification": "pending"
+    },
+    {
+      "shopId": 18832188,
+      "shopTitle": "Deck Family Farm",
+      "salesChannel": "wix",
+      "productId": "67227182950180ed7502c6ef",
+      "title": "Deck Family Farm Mug",
+      "blueprintId": 478,
+      "blueprintTitle": "Ceramic Mug, (11oz, 15oz)",
+      "printProviderId": 28,
+      "printProvider": "District Photo",
+      "visible": true,
+      "locked": false,
+      "variantCount": 2,
+      "enabledVariantCount": 1,
+      "enabledAvailableVariantCount": 1,
+      "enabledUnknownAvailabilityCount": 0,
+      "existingRetailMinCents": 1000,
+      "existingRetailMaxCents": 1000,
+      "supplierCostMinCents": 509,
+      "supplierCostMaxCents": 509,
+      "currency": null,
+      "imageCount": 2,
+      "descriptionCaptured": true,
+      "artworkIds": [
+        "67227163c95b7bc58a7fde36"
+      ],
+      "decorationMethods": [
+        "dye-sublimation"
+      ],
+      "external": {
+        "id": "4a6e3d82-ef70-42ac-bfc1-eff95c0244d1",
+        "handle": "/product-page/deck-family-farm-ceramic-mug-11oz-15oz",
+        "type": 9
+      },
+      "shippingCaptured": true,
+      "catalogVariantsCaptured": true,
+      "artworkVisualVerification": "pending"
+    },
+    {
+      "shopId": 18832188,
+      "shopTitle": "Deck Family Farm",
+      "salesChannel": "wix",
+      "productId": "672267d86f08a0487f03ffee",
+      "title": "Deck Family Farm Tee Shirt",
+      "blueprintId": 6,
+      "blueprintTitle": "Unisex Heavy Cotton Tee",
+      "printProviderId": 99,
+      "printProvider": "Printify Choice",
+      "visible": false,
+      "locked": false,
+      "variantCount": 579,
+      "enabledVariantCount": 30,
+      "enabledAvailableVariantCount": 25,
+      "enabledUnknownAvailabilityCount": 0,
+      "existingRetailMinCents": 2000,
+      "existingRetailMaxCents": 2000,
+      "supplierCostMinCents": 1593,
+      "supplierCostMaxCents": 1802,
+      "currency": null,
+      "imageCount": 15,
+      "descriptionCaptured": true,
+      "artworkIds": [
+        "672267ceb5457a76d88ecf66",
+        "672267837e5014194575b70a",
+        "5941187eb8e7e37b3f0e62e5"
+      ],
+      "decorationMethods": [
+        "dtg",
+        "dtf"
+      ],
+      "external": {
+        "id": "02d1002b-ae2e-4c9f-8040-d411c2ff7a42",
+        "handle": "/product-page/unisex-heavy-cotton-tee",
+        "type": 9
+      },
+      "shippingCaptured": true,
+      "catalogVariantsCaptured": true,
+      "artworkVisualVerification": "pending"
+    }
+  ],
+  "errors": [
+    {
+      "endpoint": "catalog/blueprints/650.json",
+      "status": 404,
+      "capturedAt": "2026-11-18T00:28:37.167Z"
+    },
+    {
+      "endpoint": "catalog/print_providers/87.json",
+      "status": 404,
+      "capturedAt": "2026-11-18T00:28:37.993Z"
+    },
+    {
+      "endpoint": "catalog/blueprints/650/print_providers/87.json",
+      "status": 404,
+      "capturedAt": "2026-11-18T00:28:38.613Z"
+    },
+    {
+      "endpoint": "catalog/blueprints/650/print_providers/87/variants.json?show-out-of-stock=1",
+      "status": 404,
+      "capturedAt": "2026-11-18T00:28:39.286Z"
+    },
+    {
+      "endpoint": "catalog/blueprints/650/print_providers/87/shipping.json",
+      "status": 404,
+      "capturedAt": "2026-11-18T00:28:40.144Z"
+    },
+    {
+      "endpoint": "uploads/5941187eb8e7e37b3f0e62e5.json",
+      "status": 404,
+      "capturedAt": "2026-11-18T00:28:54.070Z"
+    }
+  ],
+  "remoteWritesPerformed": false,
+  "wixDisconnected": false,
+  "note": "Prices are existing channel values, not approved CSA retail. Currency must be verified where absent. No supplier order or shop mutation was attempted."
+}

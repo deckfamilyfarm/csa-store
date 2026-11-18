@@ -1,0 +1,452 @@
+{
+  "reviewedAt": "2026-11-18T00:30:33.661Z",
+  "sourceCapturedAt": "2026-11-18T00:28:59.093Z",
+  "visibleProductCount": 9,
+  "hiddenProductCount": 5,
+  "productsWithEnabledVariants": 12,
+  "enabledVariants": 186,
+  "enabledAvailableVariants": 181,
+  "enabledVariantsMissingFromCatalog": 0,
+  "variantsBelowReportedProductionCost": 71,
+  "productImageReferenceCount": 86,
+  "artworkReferenceCount": 19,
+  "retrievableUploadMetadataCount": 18,
+  "artworkVisualVerification": "not_performed",
+  "binaryImagesArchived": false,
+  "productPriceCurrency": "not_explicit_in_product_or_shop_response; verify before importing money values",
+  "shippingRateCurrencies": [
+    "USD"
+  ],
+  "fulfillmentShopRecommendation": "Existing Wix shop is an API reuse candidate. Do not copy automatically; review approval policy, test isolation, non-media layers and legacy provider gaps first.",
+  "productionApprovalSettings": "not_exposed_by_retrieved_shop_list; verify in Printify before any order creation",
+  "integrationPermissionCheck": "Read-only GET access verified; no order creation, production submission or write-permission probe performed.",
+  "comparisons": [
+    {
+      "productId": "693363ca627ec2eca5056957",
+      "title": "Enamel Camping Mug",
+      "enabledVariants": 1,
+      "enabledAvailableVariants": 1,
+      "enabledMissingFromCatalog": 0,
+      "disabledMissingFromCatalog": 0,
+      "belowReportedCostVariants": 0,
+      "unresolvedArtworkReferenceCount": 0,
+      "currencyVerified": false
+    },
+    {
+      "productId": "67eb5a9637e95d6cd203cf54",
+      "title": "Make Milk Raw Again Mug",
+      "enabledVariants": 1,
+      "enabledAvailableVariants": 1,
+      "enabledMissingFromCatalog": 0,
+      "disabledMissingFromCatalog": 0,
+      "belowReportedCostVariants": 0,
+      "unresolvedArtworkReferenceCount": 0,
+      "currencyVerified": false
+    },
+    {
+      "productId": "67bd097441b52f41e807420b",
+      "title": "Farm Collage Long Sleeve T-Shirt",
+      "enabledVariants": 30,
+      "enabledAvailableVariants": 30,
+      "enabledMissingFromCatalog": 0,
+      "disabledMissingFromCatalog": 0,
+      "belowReportedCostVariants": 0,
+      "unresolvedArtworkReferenceCount": 0,
+      "currencyVerified": false
+    },
+    {
+      "productId": "67bd01b3c16c5c6aae0ec17d",
+      "title": "Dirty Dung Beetle Mug",
+      "enabledVariants": 1,
+      "enabledAvailableVariants": 1,
+      "enabledMissingFromCatalog": 0,
+      "disabledMissingFromCatalog": 0,
+      "belowReportedCostVariants": 0,
+      "unresolvedArtworkReferenceCount": 0,
+      "currencyVerified": false
+    },
+    {
+      "productId": "67b8b7cfb89bfd9f900c42e9",
+      "title": "Dirty Worm T-shirt",
+      "enabledVariants": 36,
+      "enabledAvailableVariants": 36,
+      "enabledMissingFromCatalog": 0,
+      "disabledMissingFromCatalog": 0,
+      "belowReportedCostVariants": 36,
+      "unresolvedArtworkReferenceCount": 0,
+      "currencyVerified": false
+    },
+    {
+      "productId": "67b8b42f607140d79f02953d",
+      "title": "It's the How Sweatshirt",
+      "enabledVariants": 35,
+      "enabledAvailableVariants": 35,
+      "enabledMissingFromCatalog": 0,
+      "disabledMissingFromCatalog": 0,
+      "belowReportedCostVariants": 35,
+      "unresolvedArtworkReferenceCount": 0,
+      "currencyVerified": false
+    },
+    {
+      "productId": "67b8b2581f7bd7f1a700b5fd",
+      "title": "Dirty Dung Beetle Sweatshirt",
+      "enabledVariants": 48,
+      "enabledAvailableVariants": 48,
+      "enabledMissingFromCatalog": 0,
+      "disabledMissingFromCatalog": 29,
+      "belowReportedCostVariants": 0,
+      "unresolvedArtworkReferenceCount": 4,
+      "currencyVerified": false
+    },
+    {
+      "productId": "67b6615da1e8a765f40570c3",
+      "title": "More Farms Less Pharma Hoodie",
+      "enabledVariants": 0,
+      "enabledAvailableVariants": 0,
+      "enabledMissingFromCatalog": null,
+      "disabledMissingFromCatalog": null,
+      "belowReportedCostVariants": 0,
+      "unresolvedArtworkReferenceCount": 0,
+      "currencyVerified": false
+    },
+    {
+      "productId": "67b64d71a1e8a765f4056bf6",
+      "title": "Dirty Dung Beetle Hoodie",
+      "enabledVariants": 0,
+      "enabledAvailableVariants": 0,
+      "enabledMissingFromCatalog": null,
+      "disabledMissingFromCatalog": null,
+      "belowReportedCostVariants": 0,
+      "unresolvedArtworkReferenceCount": 0,
+      "currencyVerified": false
+    },
+    {
+      "productId": "674017e26abac8a2d30d2df0",
+      "title": "How-Cow Mug",
+      "enabledVariants": 1,
+      "enabledAvailableVariants": 1,
+      "enabledMissingFromCatalog": 0,
+      "disabledMissingFromCatalog": 0,
+      "belowReportedCostVariants": 0,
+      "unresolvedArtworkReferenceCount": 0,
+      "currencyVerified": false
+    },
+    {
+      "productId": "6722801ba3d01e481f0523b3",
+      "title": "Full Farm CSA Mug",
+      "enabledVariants": 1,
+      "enabledAvailableVariants": 1,
+      "enabledMissingFromCatalog": 0,
+      "disabledMissingFromCatalog": 0,
+      "belowReportedCostVariants": 0,
+      "unresolvedArtworkReferenceCount": 0,
+      "currencyVerified": false
+    },
+    {
+      "productId": "672272feb4d2929f1d0bafe0",
+      "title": "Deck Family Farm Cap",
+      "enabledVariants": 1,
+      "enabledAvailableVariants": 1,
+      "enabledMissingFromCatalog": 0,
+      "disabledMissingFromCatalog": 0,
+      "belowReportedCostVariants": 0,
+      "unresolvedArtworkReferenceCount": 0,
+      "currencyVerified": false
+    },
+    {
+      "productId": "67227182950180ed7502c6ef",
+      "title": "Deck Family Farm Mug",
+      "enabledVariants": 1,
+      "enabledAvailableVariants": 1,
+      "enabledMissingFromCatalog": 0,
+      "disabledMissingFromCatalog": 0,
+      "belowReportedCostVariants": 0,
+      "unresolvedArtworkReferenceCount": 0,
+      "currencyVerified": false
+    },
+    {
+      "productId": "672267d86f08a0487f03ffee",
+      "title": "Deck Family Farm Tee Shirt",
+      "enabledVariants": 30,
+      "enabledAvailableVariants": 25,
+      "enabledMissingFromCatalog": 0,
+      "disabledMissingFromCatalog": 0,
+      "belowReportedCostVariants": 0,
+      "unresolvedArtworkReferenceCount": 1,
+      "currencyVerified": false
+    }
+  ],
+  "holds": [
+    {
+      "productId": "67bd097441b52f41e807420b",
+      "title": "Farm Collage Long Sleeve T-Shirt",
+      "reasons": [
+        "source_product_hidden_preserve_until_review"
+      ],
+      "belowCostVariantIds": [],
+      "unresolvedLayers": []
+    },
+    {
+      "productId": "67b8b7cfb89bfd9f900c42e9",
+      "title": "Dirty Worm T-shirt",
+      "reasons": [
+        "saved_retail_below_reported_production_cost"
+      ],
+      "belowCostVariantIds": [
+        98744,
+        98755,
+        98818,
+        98743,
+        98774,
+        98754,
+        98804,
+        98803,
+        98745,
+        98753,
+        98773,
+        98805,
+        98772,
+        98830,
+        98775,
+        98828,
+        98752,
+        98827,
+        98820,
+        98817,
+        98829,
+        98819,
+        98742,
+        98802,
+        98821,
+        98756,
+        98776,
+        98806,
+        98746,
+        98831,
+        98895,
+        98899,
+        98910,
+        98908,
+        98905,
+        98892
+      ],
+      "unresolvedLayers": []
+    },
+    {
+      "productId": "67b8b42f607140d79f02953d",
+      "title": "It's the How Sweatshirt",
+      "reasons": [
+        "saved_retail_below_reported_production_cost"
+      ],
+      "belowCostVariantIds": [
+        104786,
+        104765,
+        104730,
+        104800,
+        104744,
+        104761,
+        104762,
+        104784,
+        104783,
+        104799,
+        104764,
+        104741,
+        104726,
+        104763,
+        104743,
+        104782,
+        104740,
+        104742,
+        104797,
+        104798,
+        104728,
+        104785,
+        104796,
+        104727,
+        104729,
+        104746,
+        104732,
+        104788,
+        104802,
+        104767,
+        104766,
+        104731,
+        104745,
+        104801,
+        104787
+      ],
+      "unresolvedLayers": []
+    },
+    {
+      "productId": "67b8b2581f7bd7f1a700b5fd",
+      "title": "Dirty Dung Beetle Sweatshirt",
+      "reasons": [
+        "non_media_or_unresolved_artwork_reference_requires_copy_review",
+        "source_product_hidden_preserve_until_review"
+      ],
+      "belowCostVariantIds": [],
+      "unresolvedLayers": [
+        {
+          "artworkId": "5941187eb8e7e37b3f0e62e5",
+          "layerName": "text_layer.svg",
+          "type": "text/plain",
+          "position": "neck",
+          "enabledVariantIds": [
+            25510,
+            25518,
+            25501,
+            25509,
+            25416,
+            25487,
+            25394,
+            25425,
+            25448,
+            25439,
+            25447,
+            25417,
+            25408,
+            25456,
+            25470,
+            25479,
+            25478,
+            25377,
+            25385,
+            25386,
+            25549,
+            25532,
+            25541,
+            25540,
+            25594,
+            25563
+          ]
+        },
+        {
+          "artworkId": "5941187eb8e7e37b3f0e62e5",
+          "layerName": "text_layer.svg",
+          "type": "text/plain",
+          "position": "neck",
+          "enabledVariantIds": [
+            25528,
+            25404,
+            25497,
+            25435,
+            25466,
+            25559
+          ]
+        },
+        {
+          "artworkId": "5941187eb8e7e37b3f0e62e5",
+          "layerName": "text_layer.svg",
+          "type": "text/plain",
+          "position": "neck",
+          "enabledVariantIds": [
+            25503,
+            25472,
+            25410,
+            25441,
+            25379,
+            25534,
+            25596,
+            25565
+          ]
+        },
+        {
+          "artworkId": "5941187eb8e7e37b3f0e62e5",
+          "layerName": "text_layer.svg",
+          "type": "text/plain",
+          "position": "neck",
+          "enabledVariantIds": [
+            25512,
+            25388,
+            25419,
+            25481,
+            25450,
+            25543,
+            25605,
+            25574
+          ]
+        }
+      ]
+    },
+    {
+      "productId": "67b6615da1e8a765f40570c3",
+      "title": "More Farms Less Pharma Hoodie",
+      "reasons": [
+        "no_enabled_variants",
+        "supplier_catalog_or_shipping_unavailable",
+        "source_product_hidden_preserve_until_review"
+      ],
+      "belowCostVariantIds": [],
+      "unresolvedLayers": []
+    },
+    {
+      "productId": "67b64d71a1e8a765f4056bf6",
+      "title": "Dirty Dung Beetle Hoodie",
+      "reasons": [
+        "no_enabled_variants",
+        "supplier_catalog_or_shipping_unavailable",
+        "source_product_hidden_preserve_until_review"
+      ],
+      "belowCostVariantIds": [],
+      "unresolvedLayers": []
+    },
+    {
+      "productId": "672267d86f08a0487f03ffee",
+      "title": "Deck Family Farm Tee Shirt",
+      "reasons": [
+        "non_media_or_unresolved_artwork_reference_requires_copy_review",
+        "enabled_availability_requires_review",
+        "source_product_hidden_preserve_until_review"
+      ],
+      "belowCostVariantIds": [],
+      "unresolvedLayers": [
+        {
+          "artworkId": "5941187eb8e7e37b3f0e62e5",
+          "layerName": "text_layer.svg",
+          "type": "text/plain",
+          "position": "neck",
+          "enabledVariantIds": [
+            12191,
+            12193,
+            12192,
+            12190,
+            12088,
+            12089,
+            12091,
+            12090,
+            64730,
+            12037,
+            12167,
+            64728,
+            12169,
+            64727,
+            11915,
+            11914,
+            64729,
+            12168,
+            11916,
+            12036,
+            12166,
+            12035,
+            12034,
+            11917,
+            12194,
+            12092,
+            12170,
+            64731,
+            11918,
+            12038
+          ]
+        }
+      ]
+    }
+  ],
+  "validation": {
+    "mappingCountMatches": true,
+    "mappingKeysUnique": true,
+    "capturedVariantFieldsMatch": true,
+    "variantOptionsResolve": true
+  },
+  "remoteWritesPerformed": false,
+  "csaDatabaseWritesPerformed": false
+}

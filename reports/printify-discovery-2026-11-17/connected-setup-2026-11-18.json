@@ -1,0 +1,33 @@
+{
+  "recordedAt": "2026-11-18T10:52:42.410Z",
+  "database": "store",
+  "connectedDevelopmentUrl": "http://127.0.0.1:5180/admin",
+  "schema": {
+    "ready": true,
+    "missing": [],
+    "missingColumns": [],
+    "existingFarmAndFinancialTablesChanged": false
+  },
+  "products": 14,
+  "variants": 1529,
+  "activeProducts": 0,
+  "approvedRetailVariants": 0,
+  "vendors": [
+    3153
+  ],
+  "mode": "test",
+  "checkoutEnabled": false,
+  "controls": {
+    "liveCheckout": false,
+    "supplierOrders": false,
+    "production": false
+  },
+  "externalWritesPerformed": false,
+  "existingFarmMemberTurkeyTablesChanged": false,
+  "applicationCodeDeployed": false,
+  "regressions": {
+    "passed": 88,
+    "failed": 0,
+    "skipped": 0
+  }
+}

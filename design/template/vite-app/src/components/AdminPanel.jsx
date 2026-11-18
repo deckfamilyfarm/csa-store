@@ -8,6 +8,7 @@ import { AdminMembershipSection } from "./AdminMembershipSection.jsx";
 import { AdminOrdersSection } from "./AdminOrdersSection.jsx";
 import { AdminTurkeyPreorders } from "./AdminTurkeyPreorders.jsx";
 import { AdminStorefront } from "./AdminStorefront.jsx";
+import { AdminMerchandise } from './AdminMerchandise.jsx';
 import { AdminProductsSection } from "./AdminProductsSection.jsx";
 import { CustomerPricingEditor } from './CustomerPricingEditor.jsx';
 import { categoryLabel } from "../categoryLabel.js";
@@ -41,6 +42,8 @@ function hasRole(roleKeys, roleKey) {
 function canAccessAdminSection(roleKeys, section) {
   if (roleKeys.includes("admin")) return true;
   switch (section) {
+    case 'merchandise':
+      return roleKeys.includes('merchandise_admin');
     case "storefront":
     case "turkeyPreorders":
       return roleKeys.includes("storefront_admin");
@@ -113,6 +116,7 @@ function getDefaultAdminSection(roleKeys = []) {
     "inventory",
     "turkeyPreorders",
     "storefront",
+    "merchandise",
     "googleDrive",
     "localLine",
     "productSync",
@@ -144,6 +148,7 @@ const ADMIN_NAV_GROUPS = [
       { section: "migrationComparison", label: "Migration comparison" },
       { section: "storefront", label: "Storefront" },
       { section: "turkeyPreorders", label: "Turkey Preorders" },
+      { section: 'merchandise', label: 'Merchandise' },
       { section: "localLine", label: "Local Line Data" },
       { section: "productSync", label: "Product Sync" },
       { section: "orders", label: "Orders" }
@@ -4779,6 +4784,7 @@ export function AdminPanel({ onCatalogRefresh, onSiteContentRefresh, sessionTarg
           {activeSection === "storefront" && canAccessAdminSection(currentAdminRoles, "storefront") && (
             <AdminStorefront token={token} onVisibilityChange={() => window.dispatchEvent(new Event('store-visibility-changed'))} />
           )}
+          {activeSection === 'merchandise' && canAccessAdminSection(currentAdminRoles,'merchandise') && <AdminMerchandise token={token} />}
 
           {activeSection === "membership" && canManageMembership && (
             <AdminMembershipSection

@@ -1,0 +1,75 @@
+{
+  "recordedAt": "2026-11-18T05:12:19.363Z",
+  "approvedChoices": {
+    "implementation": "test mode",
+    "checkoutScope": "merchandise first; mixed checkout deferred",
+    "catalog": "all 14 as disabled drafts",
+    "retail": "unapproved proposal for review"
+  },
+  "localImport": {
+    "createdAt": "2026-11-18T05:07:37.023Z",
+    "database": "csa_pricing_local_20261021000300",
+    "environment": "isolated_local",
+    "products": 14,
+    "variants": 1529,
+    "activeProducts": 0,
+    "approvedRetailVariants": 0,
+    "enabledLocalVariants": 0,
+    "liveConfigurationChanged": false,
+    "supplierOrdersCreated": 0,
+    "priceProposal": {
+      "productionMargin": 0.45,
+      "rounding": "up to whole dollars",
+      "approved": false,
+      "excludes": [
+        "shipping",
+        "supplier tax",
+        "Stripe fees"
+      ],
+      "currencyRequiresConfirmation": true
+    }
+  },
+  "localVendor": {
+    "id": 3153,
+    "name": "Deck Family Farm",
+    "newVendorCreated": false
+  },
+  "validation": {
+    "requiredDockerIntegration": {
+      "passed": 88,
+      "failed": 0,
+      "skipped": 0,
+      "mockedProviders": true,
+      "envFileLoaded": false
+    },
+    "focusedRegressions": {
+      "passed": 29,
+      "failed": 0,
+      "skipped": 0
+    },
+    "frontendBuild": "passed",
+    "browserReview": "local admin and catalog preview verified; drafts cannot be purchased"
+  },
+  "liveCheckoutEnabled": false,
+  "printifyOrderCreationEnabled": false,
+  "printifyProductionEnabled": false,
+  "productionDatabaseChanged": false,
+  "productionDeployed": false,
+  "sourceCommitted": false,
+  "hostedStripeTestPaymentPerformed": false,
+  "missingConfiguration": [
+    "MERCH_STRIPE_TEST_WEBHOOK_SECRET",
+    "PRINTIFY_WEBHOOK_SECRET"
+  ],
+  "remainingLaunchGates": [
+    "retail-price review",
+    "supplier currency confirmation",
+    "artwork/neck-layer review",
+    "unavailable hoodie/provider resolution",
+    "shipping and tax policy review",
+    "Printify shop/manual-approval verification",
+    "hosted Stripe test with real signed webhook delivery",
+    "separate approval for controlled real order and live release"
+  ],
+  "documentation": "docs/merchandise.md"
+}

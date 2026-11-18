@@ -1,0 +1,104 @@
+Printify catalog discovery: Deck Family Farm
+Captured 2026-11-18 00:28:59 UTC (November 17, Pacific time).
+Scope: read-only API discovery using the local .env token. No production changes.
+
+ACCOUNT AND CATALOG
+
+One shop: Deck Family Farm, ID 18832188, sales_channel=wix.
+14 products; 1,529 source variant records; 186 enabled variants.
+181 enabled variants are reported available; five enabled Deck Family Farm Tee
+Shirt variants are unavailable. All 186 enabled variant IDs exist in the current
+supplier catalog. Nine products are visible and five are hidden in Printify;
+visibility is captured as source data, not proof of the current Wix page state.
+
+Product                             Enabled variants   Source visible
+Enamel Camping Mug                  1                  Yes
+Make Milk Raw Again Mug              1                  Yes
+Farm Collage Long Sleeve T-Shirt     30                 No
+Dirty Dung Beetle Mug                1                  Yes
+Dirty Worm T-shirt                  36                 Yes
+It's the How Sweatshirt             35                 Yes
+Dirty Dung Beetle Sweatshirt         48                 No
+More Farms Less Pharma Hoodie       0                  No
+Dirty Dung Beetle Hoodie             0                  No
+How-Cow Mug                         1                  Yes
+Full Farm CSA Mug                   1                  Yes
+Deck Family Farm Cap                1                  Yes
+Deck Family Farm Mug                1                  Yes
+Deck Family Farm Tee Shirt          30                 No
+
+The cap's front placement is explicitly marked embroidery. Current provider
+records identify District Photo for mugs and Printify Choice for the supported
+apparel/cap products. Preserve those production choices and size/color options.
+
+Saved material includes full descriptions, 86 mockup/image references, print
+areas/placements and 19 distinct artwork/layer references. Eighteen upload
+metadata records were retrieved. Binary artwork/mockups have not been archived
+or visually approved; metadata capture is not artwork-fidelity verification.
+
+REVIEW BEFORE COPYING OR ENABLING
+
+1. Both hoodie records have zero enabled variants, no mockup images and no
+   available variants. Blueprint 650 and provider 87 endpoints return 404,
+   including catalog variants and shipping. Preserve the records as disabled;
+   any replacement provider or blueprint requires an explicit reviewed mapping.
+
+2. Dirty Dung Beetle Sweatshirt and Deck Family Farm Tee Shirt contain neck
+   layers named text_layer.svg with type text/plain. Their shared reference
+   5941187eb8e7e37b3f0e62e5 returns 404 from the uploads endpoint. This may be a
+   generated/non-media layer, not a missing ordinary artwork upload. Do not
+   silently omit it when copying products or claim a faithful copy is verified.
+
+3. All 36 enabled Dirty Worm T-shirt variants and all 35 enabled It's the How
+   Sweatshirt variants have saved channel retail values below the API-reported
+   production cost. Farm Collage Long Sleeve T-Shirt has only 6-7 cents between
+   these saved values and reported cost, before any shipping, tax or fees.
+   These are source-record comparisons, not approved CSA prices or actual order
+   cost quotes. Require a retail-price review instead of copying them blindly.
+
+4. Product/shop responses do not explicitly state the currency of their price
+   fields. Shipping profiles identify USD, but that alone does not establish the
+   product-money currency. Preserve the raw integer cent fields and confirm the
+   account currency before importing money values.
+
+5. Preserve all five hidden product states and every disabled/unavailable
+   variant. Refresh availability before eventual checkout; do not enable variants
+   simply because a catalog record exists.
+
+SHOP DECISION
+
+The existing Wix shop and its product IDs are accessible through the API, so a
+new shop is not required for catalog discovery. Printify documents support for
+extending existing sales-channel integrations through its API:
+https://developers.printify.com/
+
+Reusing the existing product records is a candidate for preserving production
+details, especially the non-media layers. Direct order submission, production
+approval policy and channel bookkeeping have not been exercised. The retrieved
+shop list does not expose approval settings. Before choosing fulfillment through
+this shop, review how test/manual approval would coexist with Wix orders. A
+separate API shop remains an option if isolation is needed; copying is not safe
+to assume for every legacy product. Do not change the Wix approval policy as an
+implicit part of testing. Do not disconnect Wix or remove source products.
+
+FILES AND VALIDATION
+
+products.csv: 14 product rows, IDs, provider, image counts and enabled price/cost
+ranges. Currency is blank where unverified; values are raw integer cents.
+variants.csv: all 1,529 variant mappings with options, enabled/available state,
+cost and saved retail. Target/local IDs remain blank until reviewed import.
+variant-migration-mapping.json: structured equivalent of source variant mapping.
+catalog-inventory.json: shop/product summaries and all six API metadata gaps.
+catalog-review.json: product holds, affected variant IDs and integrity results.
+raw/catalog-2026-11-17/: restricted, Git-ignored full API snapshots, including
+descriptions, mockup references, artwork metadata and supplier shipping profiles.
+The token and request authentication headers are not stored in these artifacts.
+
+Offline validation passed: product/variant counts match; mapping keys are unique;
+captured price/cost/enabled/availability values match; option references resolve.
+The source snapshot is not an atomic supplier transaction; refresh and compare
+it before import or checkout. No CSA database writes, Printify writes, order
+creation, Stripe payments, production submission or deployment were performed.
+
+The owner approved the recommended local test implementation after this review.
+Live checkout, actual Printify orders/production and Wix retirement remain gated.

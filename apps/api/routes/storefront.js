@@ -3,6 +3,9 @@ import { requireAdminPermission } from '../middleware/auth.js';
 import { getStorefrontService } from '../lib/storefrontRuntime.js';
 import { getStripeClient } from '../lib/memberPortal.js';
 import { storefrontWebhookEvent } from '../lib/storefrontStripe.js';
+import { dispatchStorefrontStripeEvent } from '../lib/storefrontStripeDispatch.js';
+import { getMerchandiseService } from '../lib/merchandiseRuntime.js';
+import { getPool } from '../db.js';
 
 export const storefrontRouter = express.Router();
 export const storefrontAdminRouter = express.Router();
@@ -63,18 +66,24 @@ storefrontAdminRouter.post('/orders/:id/cancellations/:cancellationId/confirm', 
 storefrontAdminRouter.post('/orders/:id/reconcile', wrap(async (req, res, service) => res.json(await service.reconcile(req.params.id))));
 storefrontAdminRouter.post('/orders/:id/stripe-receipt', wrap(async (req, res, service) => res.json(await service.attachSession(req.params.id, req.body.sessionId))));
 
-export async function storefrontStripeWebhook(req, res) {
-  const stripe = getStripeClient();
-  let event;
-  try { event = storefrontWebhookEvent(stripe, req.body, req.headers['stripe-signature']); }
-  catch (error) { return res.status(error.status || 400).send(error.message); }
-  try {
-    const service = getStorefrontService();
-    await service.webhook(event);
-    res.json({ received: true });
-    service.deliverEmails().catch(error => console.error('Storefront mail retry deferred:', error.message));
-  } catch (error) {
-    console.error('Storefront webhook deferred:', event.id, error.message);
-    res.status(500).json({ error: 'Retry webhook processing.' });
-  }
+export function createStorefrontStripeWebhook({
+  verifyEvent = (body, signature) => storefrontWebhookEvent(getStripeClient(), body, signature),
+  dispatchEvent = event => dispatchStorefrontStripeEvent(event, {
+    pool: getPool(), storefront: getStorefrontService, merchandise: getMerchandiseService
+  })
+} = {}) {
+  return async (req, res) => {
+    let event;
+    try { event = verifyEvent(req.body, req.headers['stripe-signature']); }
+    catch (error) { return res.status(error.status || 400).send(error.message); }
+    try {
+      const { service } = await dispatchEvent(event);
+      res.json({ received: true });
+      service.deliverEmails().catch(error => console.error('Storefront mail retry deferred:', error.message));
+    } catch (error) {
+      console.error('Storefront webhook deferred:', event.id, error.message);
+      res.status(500).json({ error: 'Retry webhook processing.' });
+    }
+  };
 }
+export const storefrontStripeWebhook = createStorefrontStripeWebhook();

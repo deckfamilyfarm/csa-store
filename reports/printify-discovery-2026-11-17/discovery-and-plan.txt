@@ -1,0 +1,191 @@
+Deck Family Farm: Printify discovery and proposed migration
+Reviewed: 2026-11-17
+Status: DISCOVERY REPORT / APPROVED TEST PLAN; live production remains disabled.
+The owner accepted all recommended review choices. The implementation now exists
+locally; see implementation-status.json and docs/merchandise.md for current state.
+Update: local .env token verified and source catalog captured. See
+catalog-findings.txt, products.csv, variants.csv and catalog-review.json.
+
+DISCOVERY
+
+CSA Store and the turkey storefront share the Express API, MySQL database,
+React/Vite application and PM2 deployment. Nginx sends the store, turkey, admin,
+subscribe and dropsites hosts to the same process on port 5176. The inspected
+server is on main at dd5660c7254353734e7168f0208d12aff26fac44, with no tracked
+changes. Turkey checkout is live and has paid orders; protect it during rollout.
+
+The primary live Stripe key and the configured storefront test key both identify
+account acct_1CbGeKISp82feLus. Reuse this account. storefrontStripe.js already
+provides mode-aware clients and raw-body webhook signature verification.
+storefrontService.js provides frozen Checkout requests, price snapshots,
+idempotency keys, payment attribution, durable webhook processing, reconciliation,
+email delivery and explicit refund/cancellation workflows. Maintenance runs every
+five minutes. Membership also uses the primary Stripe credential, through a
+separate service and webhook route.
+
+These are reusable services and patterns, but the current order handler is
+specific to turkey sale 1, pickup locations and preorder reservations. It cannot
+accept merchandise unchanged. Preserve its routes, requests, tokens, receipts,
+stock tables, modes and existing orders. Extract shared utilities only with
+regression coverage; extend the same application rather than deploying another
+checkout service.
+
+Existing products/packages/images/vendors/categories support the farm catalog.
+Users represent local accounts; turkey orders also preserve guest customer
+snapshots. Shared email addresses do not establish account ownership. The
+storefront_* tables contain turkey orders, items, payments, cancellations,
+reservations, webhook receipts and email work. Local Line orders/entries are
+operational mirrors, not a native farm checkout order API.
+
+The farm storefront currently has a placeholder cart and inactive add-to-cart
+controls. No complete native farm payment/reservation pipeline was found.
+There is no generic fulfillment split, shipping quote or Printify model. Current
+turkey Checkout requests do not configure shipping or automatic tax. Stripe Tax
+reports pending, with no default tax code or behavior. Tax settings and shipping
+policy require review before merchandise sales.
+
+Environment configuration uses the ignored root .env through dotenv, alongside
+process configuration. start.sh builds the frontend and starts PM2; configuration
+changes need a controlled deployment. No secret-manager integration was found.
+At the initial inspection, no Printify configuration or integration was found.
+The owner subsequently added PRINTIFY_API_TOKEN to the local .env; read-only
+access is now verified. One Wix shop has 14 products and 1,529 variant records,
+of which 186 are enabled and 181 enabled variants are reported available.
+
+OFFICIAL API FINDINGS
+
+Source: https://developers.printify.com/ (reviewed 2026-11-17).
+Bearer-token access lists shops and shop-scoped products. Shipping can be quoted
+before creating an order. Existing-product orders reference product/variant IDs.
+An external_id is unique within a shop; a duplicate returns 409 and the existing
+order reference. Webhooks use raw-body HMAC-SHA256 in X-Pfy-Signature.
+New shops default to automatic approval after 24 hours: creating an order can
+cause production even without calling send_to_production. Verify manual approval
+in Printify before any real API test order. Existing-channel functionality is
+supported, but suitability of this particular Wix shop remains unverified.
+
+PROPOSED PLAN FOR REVIEW
+
+1. Read-only account and catalog inventory
+   Securely provision PRINTIFY_API_TOKEN with the read permissions needed for
+   discovery, in ignored server configuration or an approved secret store. Never
+   put it in chat, source or reports. Enumerate shops, identify the Wix channel,
+   paginate every product and capture product details and catalog/provider data.
+   Save restricted raw JSON plus a reviewable CSV mapping of shop/product/variant
+   IDs, sizes/colors, enabled state, blueprint/provider, supplier cost/currency,
+   images, descriptions, artwork references/placements and shipping information.
+   Compare every variant and verify artwork, including embroidery requirements.
+   Hold missing or unrecoverable assets for review.
+
+   Decide whether to fulfill through the existing shop or a separate API shop
+   after inspecting account capabilities and approval settings. Prefer isolation
+   where it protects Wix orders, but do not copy products merely by assumption.
+   If copying is needed, review a source-to-target mapping and verify provider,
+   artwork, print areas and variants before enabling any copied product. Preserve
+   the Wix connection and all original products.
+
+2. Native merchandise catalog and administration
+   Add Branded Merchandise within CSA Store with explicit supplier/fulfillment
+   identity and provider-neutral supplier records. Decide the additive catalog
+   schema after the inventory is reviewed. Keep retail prices and enable/disable
+   state local; refresh supplier specifications and availability through a
+   reviewable diff without overwriting retail prices. Preserve source and target
+   IDs separately. Exclude merchandise from farm inventory, formula pricing,
+   Local Line/Square publication and member-credit workflows by explicit type.
+   Reuse admin authentication/roles; add explicit merchandise permissions.
+
+3. Checkout, fulfillment and customer status
+   Extend existing Stripe utilities and durable payment processing with an
+   explicit merchandise order kind. Merchandise mode selection must use the
+   existing test client independently of the live primary key. Never switch the
+   shared primary credential to test merchandise. Start with checkout disabled,
+   supplier order creation disabled and production submission disabled.
+
+   Collect a shipping address before requesting a supplier quote. Freeze the
+   address, selected service, variants, retail prices, shipping, tax and expiry
+   before Checkout creation. An address change requires a new quote; Stripe must
+   not silently accept an unquoted destination. Review shipping destinations,
+   retail tax configuration and supplier tax separately. Record order kind and
+   fulfillment IDs in Stripe metadata and retain payment/session IDs locally.
+
+   Only verified, attributed successful payment can atomically mark an order paid
+   and enqueue fulfillment. A supplier adapter processes a durable outbox with a
+   frozen body, stable external reference and stored receipts. Reconcile unknown
+   outcomes before any retry; never replace an uncertain operation with a new
+   order reference. Production release is a separate controlled step. Persist
+   signed provider events, deduplicate delivery and reconcile current supplier
+   state before transitions. Add polling recovery, bounded retries, error logs
+   without secrets, admin recovery actions and multiple-shipment tracking.
+   Reuse authenticated access and secure guest order tokens for customer status.
+   Reuse the existing storefront Stripe destinations, signing secrets and
+   verified-event route, dispatching merchandise using metadata and persisted
+   payment ownership. Configure the existing test destination's missing signing
+   secret separately from live. Add a Printify webhook secret during reviewed
+   setup; existing turkey live signing configuration stays intact.
+
+4. Mixed farm and merchandise checkout
+   Preserve the requested eventual shared checkout, but implement its missing
+   farm order/reservation contract before enabling mixed sales. A parent customer
+   order should own payment and allocation records, with independent farm and
+   supplier fulfillment children. Review how farm stock is reserved and orders
+   are handed to existing pickup/delivery operations; do not insert fake sales
+   into Local Line mirror tables. Merchandise shipping is charged independently
+   of farm delivery eligibility. A supplier failure must leave farm fulfillment
+   operable. Recommend merchandise-only validation first, then mixed checkout
+   validation as a distinct release gate. This does not remove mixed checkout
+   from the requested deliverables.
+
+5. Administration, reporting and refunds
+   Show variant availability, local retail, timestamped supplier costs, payment,
+   production, shipment/tracking and errors. Retain gross item sales, discounts,
+   shipping charged, tax, supplier production/shipping costs, refunds and actual
+   Stripe fees from balance transactions. Allocate shared fees consistently and
+   label profit estimates until actual costs are known. Keep merchandise revenue
+   identifiable by order/line kind. Cancellation and refund are separate reviewed
+   operations: a payment refund never proves supplier cancellation. Preserve
+   uncertain receipts and expose recovery without duplicating fulfillment.
+
+VALIDATION AND RELEASE GATES
+
+Use explicit additive migrations with check/apply steps; never financial DDL at
+startup. Test with mocked providers and disposable databases, then Stripe test
+mode and verified webhooks. Cover catalog/artwork parity; stale variants/prices;
+shipping/address/quote changes; tax configuration; duplicate and out-of-order
+events; lost responses; account/mode/amount attribution; partial shipments;
+retries; supplier cancellation and Stripe refunds; and mixed fulfillment where
+one child fails. Run python3 scripts/test-stabilization.py --docker with no
+skipped integration suites, plus focused new suites and turkey checkout/refund
+regressions. Verify the existing turkey behavior remains unchanged.
+
+Do not assume a Printify sandbox exists. Mock supplier requests first; verify
+manual approval before a controlled non-production API order. One real paid
+merchandise order and production release require explicit approval after tests.
+Retire Wix only after successful validation and separate explicit authorization.
+
+CURRENT DELIVERABLES AND BLOCKERS
+
+Completed: repository/deployment/payment discovery, this reviewable plan, source
+catalog inventory and source variant mapping. Target/local IDs are intentionally
+unset because no import or product copy has been approved or performed. Supplier
+gaps and unresolved non-media layer references are documented in catalog-review.
+Pending: visual artwork verification, product-money currency confirmation,
+production approval settings, final shop choice and retail-price approval.
+Subsequent approved work: native catalog, checkout, supplier adapter, durable
+operations/tracking, admin dashboard and deployment documentation are implemented
+locally. All 14 products remain disabled drafts with no approved retail prices.
+The required mocked-provider integration tests, focused checks and build passed;
+see implementation-status.json. The discovery scripts issue GETs only. No live
+configuration, orders, products or channels were changed. No deployment occurred.
+
+Key repository evidence:
+apps/api/lib/storefrontStripe.js
+apps/api/lib/storefrontService.js
+apps/api/lib/storefrontRuntime.js
+apps/api/lib/storefrontSchema.js
+apps/api/routes/storefront.js
+apps/api/lib/memberPortal.js
+apps/api/schema.js
+design/template/vite-app/src/components/Storefront.jsx
+design/template/vite-app/src/storefrontRouting.js
+docs/turkey-preorders.md
+start.sh

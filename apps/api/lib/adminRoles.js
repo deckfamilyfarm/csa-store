@@ -1,5 +1,10 @@
 export const ADMIN_ROLE_DEFINITIONS = [
   {
+    key: 'merchandise_admin',
+    label: 'Merchandise Admin',
+    description: 'Review supplier merchandise, approve local retail prices, and manage merchandise payments, fulfillment and refunds.'
+  },
+  {
     key: "storefront_admin",
     label: "Storefront Admin",
     description: "Manage store visibility, turkey preorders, independent storefront stock, pickup lists, and refunds."

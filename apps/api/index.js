@@ -23,6 +23,7 @@ import memberRoutes, { stripeWebhookHandler } from "./routes/member.js";
 import { storefrontRouter, storefrontAdminRouter, storefrontStripeWebhook } from "./routes/storefront.js";
 import { assertFinancialSchema } from './lib/memberFinancialSchema.js';
 import { getPool } from './db.js';
+import { merchandiseRouter, merchandiseAdminRouter, merchandiseStripeWebhook, merchandisePrintifyWebhook } from './routes/merchandise.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -49,6 +50,8 @@ app.set("etag", false);
 app.use(cors());
 app.post("/api/member/stripe/webhook", express.raw({ type: "application/json" }), stripeWebhookHandler);
 app.post("/api/storefront/stripe/webhook", express.raw({ type: "application/json", limit: "2mb" }), storefrontStripeWebhook);
+app.post('/api/merchandise/stripe/webhook', express.raw({type:'application/json',limit:'2mb'}), merchandiseStripeWebhook);
+app.post('/api/merchandise/printify/webhook', express.raw({type:'application/json',limit:'2mb'}), merchandisePrintifyWebhook);
 app.use(express.json({ limit: "2mb" }));
 app.use("/api", (_req, res, next) => {
   res.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
@@ -100,6 +103,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/member", memberRoutes);
 app.use("/api/storefront", storefrontRouter);
 app.use("/api/admin/storefront", storefrontAdminRouter);
+app.use('/api/merchandise', merchandiseRouter);
+app.use('/api/admin/merchandise', merchandiseAdminRouter);
 app.use("/api/admin", adminRoutes);
 
 if (serveFrontend) {

@@ -1,0 +1,52 @@
+{
+  "observedDate": "2026-11-18",
+  "inspection": "Read-only Stripe endpoint listing using the server's existing mode-specific credentials. No Stripe or server configuration was changed.",
+  "destinations": [
+    {
+      "mode": "live",
+      "id": "we_1UMbcCISp82feLusLbCXRCwJ",
+      "url": "https://turkeys.deckfamilyfarm.com/api/storefront/stripe/webhook",
+      "status": "enabled",
+      "signingSecretConfiguredOnServer": true
+    },
+    {
+      "mode": "test",
+      "id": "we_1UMYfjISp82feLus0CRaUUHa",
+      "url": "https://store.deckfamilyfarm.com/api/storefront/stripe/webhook",
+      "status": "enabled",
+      "testSpecificSigningSecretConfiguredOnServer": false
+    }
+  ],
+  "enabledEventsOnBoth": [
+    "checkout.session.completed",
+    "checkout.session.expired",
+    "checkout.session.async_payment_failed",
+    "checkout.session.async_payment_succeeded",
+    "refund.created",
+    "refund.updated",
+    "refund.failed",
+    "charge.refunded"
+  ],
+  "localConfiguration": {
+    "primaryStripeMode": "test",
+    "storefrontSigningSecretPresent": false,
+    "merchandiseSigningSecretPresent": false
+  },
+  "implementation": {
+    "sharedRoute": "/api/storefront/stripe/webhook",
+    "newStripeAccountRequired": false,
+    "newStripeDestinationRequired": false,
+    "routing": "Verify the existing raw-body signature, then dispatch by order metadata or persisted payment ownership for refunds. Preserve turkey service behavior and isolate optional merchandise setup.",
+    "deployed": false,
+    "liveCheckoutOrProductionEnabled": false
+  },
+  "validation": {
+    "disposableDatabaseRegressionTestsPassed": 89,
+    "disposableDatabaseRegressionTestsSkipped": 0,
+    "focusedUnitAndCartTestsPassed": 30,
+    "existingTurkeyHttpRouteTestsPassed": 2,
+    "diffCheckPassed": true,
+    "realStripeTestWebhookDeliveryVerified": false
+  },
+  "remainingSetup": "Copy the existing test destination's signing secret from Stripe Workbench into STOREFRONT_STRIPE_TEST_WEBHOOK_SECRET for the receiving API, deploy the shared dispatcher, and verify a real test payment. Local forwarding uses the Stripe CLI listener's own secret. Preserve the server's current live credentials and secret."
+}

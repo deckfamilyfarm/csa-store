@@ -17,3 +17,10 @@ export function usesTurkeyStorefront(href) {
   if (['subscribe','dropsites','store'].includes(url.searchParams.get('experience'))) return false;
   return url.hostname === 'turkeys.deckfamilyfarm.com' || pathRoute === 'turkeys' || url.searchParams.get('experience') === 'turkeys' || route === 'turkeys' || route.startsWith('turkeys/');
 }
+
+export function usesMerchandiseStorefront(href) {
+  if(usesAdminPortal(href))return false;
+  const url=new URL(href),route=url.hash.replace(/^#\/?/,'').split('?')[0];
+  if(['reset-password','account','admin'].includes(route))return false;
+  return route==='merchandise'||route.startsWith('merchandise/')||url.pathname==='/merchandise'||url.pathname.startsWith('/merchandise/');
+}
