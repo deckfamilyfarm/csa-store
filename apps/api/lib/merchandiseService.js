@@ -1,6 +1,7 @@
 import {
   fail, integer, text, hash, tokenHash, parse, checkoutReturnOrigin, json, uuid,
-  fingerprint, addressInput, cartInput, proposedRetail, supplierProduct, verifySupplierOrder, US_SHIPPING_REGIONS
+  fingerprint, addressInput, cartInput, proposedRetail, merchandiseSellingPrice, supplierProduct,
+  verifySupplierOrder, US_SHIPPING_REGIONS
 } from './merchandiseCore.js';
 import { assertMerchandiseSchema } from './merchandiseSchema.js';
 
@@ -40,15 +41,23 @@ export function createMerchandiseService({ pool, stripeClients = {}, provider, c
   async function rows(c=pool) {
     const [products]=await c.query('SELECT * FROM merch_products ORDER BY name,id');
     const [variants]=await c.query('SELECT * FROM merch_variants ORDER BY product_id,id');
-    return products.map(p=>({ id:p.id, name:p.name, description:p.description, category:p.category,vendorId:p.vendor_id,
+    return products.map(p=>{
+      const source=parse(p.source_json);
+      const supplierVariants=source.catalog?.shipping && source.catalog?.provider
+        ? new Set(source.catalog.variants?.variants?.map(v=>v.id))
+        : new Set();
+      return { id:p.id, name:p.name, description:p.description, category:p.category,vendorId:p.vendor_id,
       images:parse(p.images_json), supplier:'printify', shopId:Number(p.shop_id), externalId:p.external_id,
       provider:p.provider_name, active:Boolean(p.active), artworkReviewed:Boolean(p.artwork_reviewed),
       currency:p.currency, version:p.version, holds:parse(p.holds_json), updatedMs:Number(p.updated_ms),
-      sourceVisible:parse(p.source_json).product.visible===true,
+      sourceVisible:source.product.visible===true,
       variants:variants.filter(v=>v.product_id===p.id).map(v=>({ id:v.id, externalId:Number(v.external_id), title:v.title, sku:v.sku,
         options:parse(v.options_json), sourceEnabled:Boolean(v.source_enabled), available:Boolean(v.available),
+        canSell:Boolean(v.source_enabled && v.available && supplierVariants.has(Number(v.external_id))),
         enabled:Boolean(v.enabled), retailCents:v.retail_cents, proposedRetailCents:proposedRetail(v.cost_cents),
-        costCents:v.cost_cents, channelPriceCents:v.channel_price_cents })) }));
+        sellingPriceCents:merchandiseSellingPrice(v.cost_cents,v.retail_cents),
+        costCents:v.cost_cents, channelPriceCents:v.channel_price_cents })) };
+    });
   }
   async function catalog(admin=false) {
     if (!admin && !config.catalogEnabled) return { enabled:false, products:[], checkoutEnabled:false };
@@ -61,8 +70,8 @@ export function createMerchandiseService({ pool, stripeClients = {}, provider, c
       checkoutEnabled:Boolean(config.checkoutEnabled && (config.mode!=='live' || config.liveEnabled)), mode:config.mode || 'test',
       ...(admin ? { vendors,controls:{ liveCheckout:Boolean(config.liveEnabled), supplierOrders:Boolean(config.ordersEnabled), production:Boolean(config.productionEnabled) } } : {}),
       products:admin ? products : products.filter(p=>p.active).map(p=>({ id:p.id,name:p.name,description:p.description,
-        category:p.category,images:p.images.map(image=>({src:image.src,variantIds:p.variants.filter(v=>image.variant_ids?.includes(v.externalId)).map(v=>v.id)})),currency:p.currency,variants:p.variants.filter(v=>v.enabled && v.sourceEnabled && v.available && v.retailCents!=null)
-          .map(v=>({id:v.id,title:v.title,options:v.options,retailCents:v.retailCents})) })) };
+        category:p.category,images:p.images.map(image=>({src:image.src,variantIds:p.variants.filter(v=>image.variant_ids?.includes(v.externalId)).map(v=>v.id)})),currency:p.currency,variants:p.variants.filter(v=>v.enabled && v.canSell && v.sellingPriceCents!==null)
+          .map(v=>({id:v.id,title:v.title,options:v.options,retailCents:v.sellingPriceCents})) })) };
   }
   async function importRecords(records, actor, expected, {initialOnly=false}={}) {
     if (!Array.isArray(records) || !records.length || records.length>1000) fail('Provide a supplier snapshot.');
@@ -132,7 +141,7 @@ export function createMerchandiseService({ pool, stripeClients = {}, provider, c
         if (!selected.length) fail('Enable at least one available variant.');
         for (const v of selected) {
           if (!v.source_enabled || !v.available || !record.catalog.variants.variants.some(row=>row.id===Number(v.external_id))) fail('A selected variant is not currently available from the supplier.');
-          if (!Number.isInteger(v.retail_cents) || v.cost_cents==null || v.retail_cents<=v.cost_cents) fail('Approve retail prices above the reported production cost.');
+          if (merchandiseSellingPrice(v.cost_cents,v.retail_cents)===null) fail('Each selected variant needs a valid price above its Printify production cost. Review its default or modified price.');
         }
       }
       for (const v of variants) if (seen.has(v.id)) await c.query('UPDATE merch_variants SET retail_cents=?,enabled=? WHERE id=?',[v.retail_cents,v.enabled?1:0,v.id]);
@@ -153,10 +162,12 @@ export function createMerchandiseService({ pool, stripeClients = {}, provider, c
     for (const input of items) {
       const [[v]]=await c.query(`SELECT v.*,p.shop_id,p.external_id product_external_id,p.name,p.vendor_id,local_vendor.name vendor_name,p.source_json,p.source_hash,p.currency,p.version,p.active,p.artwork_reviewed
         FROM merch_variants v JOIN merch_products p ON p.id=v.product_id JOIN vendors local_vendor ON local_vendor.id=p.vendor_id WHERE v.id=? AND NULLIF(TRIM(local_vendor.name),'') IS NOT NULL`,[input.variantId]);
-      if (!v || !v.active || !v.artwork_reviewed || !v.enabled || !v.source_enabled || !v.available || v.retail_cents==null || v.currency!=='USD') fail('A merchandise variant is unavailable. Refresh the catalog.',409);
-      if (v.retail_cents!==input.expectedPriceCents) fail('A retail price changed. Review the updated price.',409);
+      if (!v || !v.active || !v.artwork_reviewed || !v.enabled || !v.source_enabled || !v.available || v.currency!=='USD') fail('A merchandise variant is unavailable. Refresh the catalog.',409);
+      const retailCents=merchandiseSellingPrice(v.cost_cents,v.retail_cents);
+      if (retailCents===null) fail('A merchandise variant is unavailable. Refresh the catalog.',409);
+      if (retailCents!==input.expectedPriceCents) fail('A retail price changed. Review the updated price.',409);
       result.push({ variantId:v.id,productId:v.product_id,shopId:Number(v.shop_id),externalProductId:v.product_external_id,
-        externalVariantId:Number(v.external_id),name:v.name,title:v.title,quantity:input.quantity,retailCents:v.retail_cents,costCents:v.cost_cents,
+        externalVariantId:Number(v.external_id),name:v.name,title:v.title,quantity:input.quantity,retailCents,costCents:v.cost_cents,
         productVersion:v.version,sourceHash:v.source_hash,vendorId:v.vendor_id,vendorName:v.vendor_name,productionHash:fingerprint(production(parse(v.source_json).product)) });
     }
     if (new Set(result.map(v=>v.shopId)).size!==1) fail('These products use different supplier shops. Separate checkout is required.');

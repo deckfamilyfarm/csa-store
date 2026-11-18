@@ -291,4 +291,23 @@ test('native merchandise catalog, Stripe payments and independent supplier fulfi
     assert.equal(supplierCalls,before);
     const report=await live.report();assert.equal(report.find(r=>r.mode==='live').paidOrders,1);
   });
+  await t.test('a blank modified price lists and charges the default price',async()=>{
+    let p=(await service.catalog(true)).products[0];
+    const editable={active:true,artworkReviewed:true,currency:'USD'};
+    assert.equal(p.variants.find(v=>v.id===localVariant).canSell,true);
+    assert.equal(p.variants.find(v=>v.id!==localVariant).canSell,false);
+    p=await service.saveProduct(p.id,{...editable,version:p.version,variants:[{id:localVariant,enabled:true,retailCents:null}]},1);
+    assert.equal(p.variants.find(v=>v.id===localVariant).retailCents,null);
+    assert.equal((await service.catalog()).products[0].variants[0].retailCents,1500);
+
+    const items=[{variantId:localVariant,quantity:1,expectedPriceCents:1500}];
+    const q=await makeQuote(token(),{items});
+    assert.equal(q.quote.totalCents,2000);
+    const result=await service.checkout({quoteId:q.quote.quoteId,token:q.access},'http://localhost:5177');
+    const stale=await makeQuote(token(),{items});
+    await service.saveProduct(p.id,{...editable,version:p.version,variants:[{id:localVariant,enabled:true,retailCents:1800}]},1);
+    assert.equal((await service.catalog()).products[0].variants[0].retailCents,1800);
+    await assert.rejects(service.checkout({quoteId:stale.quote.quoteId,token:stale.access},'http://localhost:5177'),/retail price changed/);
+    assert.equal((await service.viewOrder(result.orderId,q.access)).items[0].retailCents,1500);
+  });
 });

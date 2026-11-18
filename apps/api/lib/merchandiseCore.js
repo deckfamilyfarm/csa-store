@@ -42,6 +42,11 @@ export function proposedRetail(cost) {
   if (!Number.isSafeInteger(cost) || cost < 0) return null;
   return Math.max(MIN_SUGGESTED_RETAIL_CENTS, Math.round(cost * 1.5));
 }
+export function merchandiseSellingPrice(cost, modifiedPrice) {
+  const price = modifiedPrice ?? proposedRetail(cost);
+  if (!Number.isSafeInteger(cost) || cost < 0 || !Number.isSafeInteger(price)) return null;
+  return price >= 50 && price <= MAX_CENTS && price > cost ? price : null;
+}
 export function safeImage(url) {
   try { const value = new URL(url); return value.protocol === 'https:' && !value.username && !value.password ? value.href : null; } catch { return null; }
 }

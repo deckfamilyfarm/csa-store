@@ -24,10 +24,11 @@ preserved, including disabled and unavailable variants. Do not enable unavailabl
 hoodies, substitute their missing provider, or discard generated neck layers.
 Confirm supplier currency and artwork/placements before enabling any product.
 
-Suggested retail is **Printify production cost plus a 50% markup**, rounded to
-the nearest cent, with a **$10.00 minimum**. It excludes shipping, supplier tax and payment fees. The admin
-catalog calculates current suggestions from saved supplier costs. Approved
-retail prices are managed separately.
+The **Default** retail price is **Printify production cost plus a 50% markup**,
+rounded to the nearest cent, with a **$10.00 minimum**. It excludes shipping,
+supplier tax and payment fees. An optional **Modified Price** overrides the
+default. Clearing it restores the default. Existing saved prices are retained as
+modified prices.
 
 ## Explicit migration and isolated import
 
@@ -158,9 +159,9 @@ it does not manufacture anything while these gates are off. The signed Printify
 webhook and five-minute merchandise maintenance runner handle future tracking
 and reconciliation. Preserve all existing Wix webhook subscriptions.
 
-Approve a product in Admin → Store → Merchandise before buying: confirm artwork
-and USD, set approved retail prices, enable available variants and the product,
-then save. Existing drafts are not automatically approved by deployment. Verify
+Approve a product in Admin → Store → Merchandise before buying. Confirm artwork
+and USD, select the variants individually or use **Sell all available variants**,
+show the product in the CSA Store, then save. Verify
 the resulting payment in Merchandise orders before separately enabling supplier
 creation after Manual order approval is verified in Printify.
 

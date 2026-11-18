@@ -33,7 +33,10 @@ function ProductCard({product,add,disabled,preview}) {
       <span className="merch-gallery-announcement" aria-live="polite" aria-atomic="true">Photo {currentPhoto+1} of {images.length}</span>
     </>}
   </div>}<h2>{product.name}</h2><div className="merch-description"><ProductDescription description={product.description}/></div>
-    {variants.length?<><label>Size / color<select value={selected?.id || ''} onChange={e=>setVariantId(e.target.value)}>{variants.map(v=><option key={v.id} value={v.id}>{v.title} — {v.retailCents==null?'Price awaiting review':money(v.retailCents)}{v.available===false?' — Unavailable':''}</option>)}</select></label>{preview?<p>Draft preview — not available for purchase</p>:<button disabled={disabled||!selected} onClick={()=>add(selected)}>Add to cart</button>}</>:<p>Draft — not available for purchase</p>}</article>;
+    {variants.length?<><label>Size / color<select value={selected?.id || ''} onChange={e=>setVariantId(e.target.value)}>{variants.map(v=>{
+      const price=preview?v.sellingPriceCents:v.retailCents;
+      return <option key={v.id} value={v.id}>{v.title} — {price==null?'Price unavailable':money(price)}{v.available===false?' — Unavailable':''}</option>;
+    })}</select></label>{preview?<p>Draft preview — not available for purchase</p>:<button disabled={disabled||!selected} onClick={()=>add(selected)}>Add to cart</button>}</>:<p>Draft — not available for purchase</p>}</article>;
 }
 export function MerchandiseStorefront() {
   const [route,setRoute]=useState(window.location.hash),[catalog,setCatalog]=useState(null),[cart,setCart]=useState(()=>readCart(localStorage)),[pending,setPending]=useState(()=>readPending(localStorage)),[quote,setQuote]=useState(null),[order,setOrder]=useState(null),[error,setError]=useState(''),[busy,setBusy]=useState(false);

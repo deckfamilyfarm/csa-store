@@ -9,6 +9,13 @@ function Editor({product,vendors,token,onSaved,onAction}) {
   useEffect(()=>{setDraft(product);setDirty(false);},[product]);
   const change=(key,value)=>{setDraft(d=>({...d,[key]:value}));setDirty(true);};
   const variant=(id,values)=>{setDraft(d=>({...d,variants:d.variants.map(v=>v.id===id?{...v,...values}:v)}));setDirty(true);};
+  const availableVariants = draft.variants.filter(v=>v.canSell);
+  const allAvailableSelected = availableVariants.length>0 && availableVariants.every(v=>v.enabled);
+  const someAvailableSelected = availableVariants.some(v=>v.enabled);
+  function sellAllVariants(enabled) {
+    setDraft(d=>({...d,variants:d.variants.map(v=>({...v,enabled:enabled && v.canSell}))}));
+    setDirty(true);
+  }
   async function save(){setBusy(true);setError('');try{
     const prices=Object.fromEntries(Object.entries(priceInputs).map(([id,value])=>{
       if(value!==''&&!/^\d+(?:\.\d{1,2})?$/.test(value))throw new Error('Enter retail prices with at most two decimal places.');
@@ -22,15 +29,30 @@ function Editor({product,vendors,token,onSaved,onAction}) {
     <div className="merch-product-heading">{product.images[0]&&<img src={product.images[0].src} alt={product.name} loading="lazy"/>}
       <div><p>{product.provider || 'Supplier catalog unavailable'} · Shop {product.shopId} · {product.externalId}</p><p>{product.holds.join(' ')}</p>
       <label>Local vendor<select value={draft.vendorId || ''} onChange={e=>change('vendorId',Number(e.target.value))}><option value="">Choose an existing vendor</option>{vendors.map(v=><option key={v.id} value={v.id}>{v.name}</option>)}</select></label>
-      <p>Supplier visibility: {product.sourceVisible?'Visible':'Hidden'}. Suggested retail adds 50% to Printify production cost, with a $10.00 minimum. Shipping, supplier tax and payment fees are separate.</p>
+      <p>Supplier visibility: {product.sourceVisible?'Visible':'Hidden'}. Default prices add 50% to Printify production cost, with a $10.00 minimum.</p>
       <label><input type="checkbox" checked={draft.artworkReviewed} onChange={e=>change('artworkReviewed',e.target.checked)}/> I reviewed the artwork, placements and any generated layers for these existing supplier products.</label>
       <label><input type="checkbox" checked={draft.currency==='USD'} onChange={e=>change('currency',e.target.checked?'USD':null)}/> I confirmed the supplier money values are USD.</label>
       <label><input type="checkbox" checked={draft.active} onChange={e=>change('active',e.target.checked)}/> Show this product in the CSA Store</label></div></div>
-    <label><input type="checkbox" checked={showAll} onChange={e=>setShowAll(e.target.checked)}/> Show all source variants, including disabled options</label>
-    <div className="merch-table-scroll"><table><thead><tr><th>Variant</th><th>Supplier</th><th>Cost</th><th>Saved channel price</th><th>Proposal</th><th>Approved retail</th><th>Sell this variant</th></tr></thead>
-      <tbody>{draft.variants.filter(v=>showAll||v.sourceEnabled||v.enabled).map(v=><tr key={v.id}><td>{v.title}<small>{v.sku}</small></td><td>{!v.sourceEnabled?'Not enabled':v.available?'Available':'Unavailable'}</td><td>{money(v.costCents)}</td><td>{money(v.channelPriceCents)}</td><td>{money(v.proposedRetailCents)} <button type="button" disabled={v.proposedRetailCents==null} onClick={()=>{setPriceInputs(inputs=>({...inputs,[v.id]:(v.proposedRetailCents/100).toFixed(2)}));setDirty(true);}}>Use proposal</button></td><td><input aria-label={`${v.title} approved retail dollars`} type="text" inputMode="decimal" value={priceInputs[v.id]??(v.retailCents==null?'':(v.retailCents/100).toFixed(2))} onChange={e=>{setPriceInputs(inputs=>({...inputs,[v.id]:e.target.value}));setDirty(true);}}/></td><td><input aria-label={`Sell ${v.title} in the CSA Store`} type="checkbox" disabled={!v.sourceEnabled||!v.available} checked={v.enabled} onChange={e=>variant(v.id,{enabled:e.target.checked})}/></td></tr>)}</tbody></table></div>
+    <div className="merch-actions">
+      <label><input type="checkbox" checked={allAvailableSelected} disabled={!availableVariants.length || busy}
+        ref={input=>{if(input)input.indeterminate=someAvailableSelected && !allAvailableSelected;}}
+        onChange={e=>sellAllVariants(e.target.checked)}/> Sell all available variants ({availableVariants.length})</label>
+      <label><input type="checkbox" checked={showAll} onChange={e=>setShowAll(e.target.checked)}/> Show all source variants, including disabled options</label>
+    </div>
+    <p>Leave Modified Price blank to use the Default price.</p>
+    <div className="merch-table-scroll"><table><thead><tr><th>Variant</th><th>Supplier</th><th>Cost</th><th>Saved channel price</th><th>Default</th><th>Modified Price</th><th>Sell this variant</th></tr></thead>
+      <tbody>{draft.variants.filter(v=>showAll||v.sourceEnabled||v.enabled).map(v=><tr key={v.id}>
+        <td>{v.title}<small>{v.sku}</small></td>
+        <td>{!v.sourceEnabled?'Not enabled':!v.available?'Unavailable':v.canSell?'Available':'Needs supplier review'}</td>
+        <td>{money(v.costCents)}</td><td>{money(v.channelPriceCents)}</td><td>{money(v.proposedRetailCents)}</td>
+        <td><input aria-label={`${v.title} modified price in dollars`} type="text" inputMode="decimal"
+          value={priceInputs[v.id]??(v.retailCents==null?'':(v.retailCents/100).toFixed(2))}
+          onChange={e=>{setPriceInputs(inputs=>({...inputs,[v.id]:e.target.value}));setDirty(true);}}/></td>
+        <td><input aria-label={`Sell ${v.title} in the CSA Store`} type="checkbox" disabled={(!v.canSell && !v.enabled) || busy}
+          checked={v.enabled} onChange={e=>variant(v.id,{enabled:e.target.checked})}/></td>
+      </tr>)}</tbody></table></div>
     <div className="merch-actions"><button type="button" disabled={busy} onClick={save}>{busy?'Saving…':'Save merchandise settings'}</button>
-      <button type="button" disabled={busy||dirty} onClick={()=>onAction(()=>adminPost(`merchandise/products/${product.id}/refresh`,token,{}))}>Refresh supplier information</button><span>{dirty?'Save local edits before refreshing.':'A supplier change disables the product for review and preserves approved retail values.'}</span></div>
+      <button type="button" disabled={busy||dirty} onClick={()=>onAction(()=>adminPost(`merchandise/products/${product.id}/refresh`,token,{}))}>Refresh supplier information</button><span>{dirty?'Save local edits before refreshing.':'A supplier change disables the product for review and preserves modified prices.'}</span></div>
   </details>;
 }
 export function AdminMerchandise({token}) {
