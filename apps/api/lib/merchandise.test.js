@@ -89,10 +89,11 @@ test('merchandise inputs reject mixed fulfillment, duplicate variants and invali
   assert.throws(()=>cartInput([{variantId:1,quantity:1,expectedPriceCents:100},{variantId:1,quantity:1,expectedPriceCents:100}]),/duplicate/);
   assert.throws(()=>addressInput({firstName:'A',lastName:'B',email:'a@b.com',phone:'5551234567',addressLine1:'1 Main',city:'City',state:'OR',postalCode:'97401',country:'CA'}),/US shipping/);
 });
-test('retail suggestions apply the $10 floor after the 50% markup',()=>{
+test('default retail applies a 40% markup with a $10 floor',()=>{
   assert.equal(proposedRetail(0),1000);
-  assert.equal(proposedRetail(666),1000);
-  assert.equal(proposedRetail(667),1001);
-  assert.equal(proposedRetail(1001),1502);
+  assert.equal(proposedRetail(713),1000);
+  assert.equal(proposedRetail(714),1000);
+  assert.equal(proposedRetail(715),1001);
+  assert.equal(proposedRetail(1001),1401);
   assert.equal(proposedRetail(null),null);
 });

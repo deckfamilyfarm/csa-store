@@ -97,7 +97,7 @@ test('native merchandise catalog, Stripe payments and independent supplier fulfi
     await assert.rejects(service.importRecords([{shopId:1,vendorId:2,product,catalog:metadata}],1),/existing named/);
     await service.importRecords([{shopId:1,vendorId:1,product,catalog:metadata}],1,undefined,{initialOnly:true});
     let p=(await service.catalog(true)).products[0];localProduct=p.id;localVariant=p.variants[0].id;
-    assert.equal(p.active,false);assert.equal(p.currency,null);assert.equal(p.variants[0].retailCents,null);assert.equal(p.variants[0].proposedRetailCents,1500);
+    assert.equal(p.active,false);assert.equal(p.currency,null);assert.equal(p.variants[0].retailCents,null);assert.equal(p.variants[0].proposedRetailCents,1400);
     await service.importRecords([{shopId:1,vendorId:1,product,catalog:metadata}],1,undefined,{initialOnly:true});
     assert.equal((await service.catalog(true)).products[0].id,p.id);
     p=await service.saveProduct(p.id,{version:p.version,active:true,artworkReviewed:true,currency:'USD',variants:[{id:localVariant,enabled:true,retailCents:2000}]},1);
@@ -264,7 +264,7 @@ test('native merchandise catalog, Stripe payments and independent supplier fulfi
     await assert.rejects(live.quote({...body,customer:{...customer,state:'WA'}}),/Tax configuration/);
     await pool.query('UPDATE merch_variants SET proposed_retail_cents=1900 WHERE id=?',[localVariant]);
     const [variant] = (await live.catalog(true)).products[0].variants;
-    assert.equal(variant.proposedRetailCents,1500);
+    assert.equal(variant.proposedRetailCents,1400);
     assert.equal(variant.retailCents,2000);
     liveConfig.usDefaultTax='not_collecting';
     liveConfig.taxRules['US:WA']={rateId:'txr_reviewed',shippingTaxable:true};
@@ -298,16 +298,16 @@ test('native merchandise catalog, Stripe payments and independent supplier fulfi
     assert.equal(p.variants.find(v=>v.id!==localVariant).canSell,false);
     p=await service.saveProduct(p.id,{...editable,version:p.version,variants:[{id:localVariant,enabled:true,retailCents:null}]},1);
     assert.equal(p.variants.find(v=>v.id===localVariant).retailCents,null);
-    assert.equal((await service.catalog()).products[0].variants[0].retailCents,1500);
+    assert.equal((await service.catalog()).products[0].variants[0].retailCents,1400);
 
-    const items=[{variantId:localVariant,quantity:1,expectedPriceCents:1500}];
+    const items=[{variantId:localVariant,quantity:1,expectedPriceCents:1400}];
     const q=await makeQuote(token(),{items});
-    assert.equal(q.quote.totalCents,2000);
+    assert.equal(q.quote.totalCents,1900);
     const result=await service.checkout({quoteId:q.quote.quoteId,token:q.access},'http://localhost:5177');
     const stale=await makeQuote(token(),{items});
     await service.saveProduct(p.id,{...editable,version:p.version,variants:[{id:localVariant,enabled:true,retailCents:1800}]},1);
     assert.equal((await service.catalog()).products[0].variants[0].retailCents,1800);
     await assert.rejects(service.checkout({quoteId:stale.quote.quoteId,token:stale.access},'http://localhost:5177'),/retail price changed/);
-    assert.equal((await service.viewOrder(result.orderId,q.access)).items[0].retailCents,1500);
+    assert.equal((await service.viewOrder(result.orderId,q.access)).items[0].retailCents,1400);
   });
 });

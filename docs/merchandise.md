@@ -24,7 +24,7 @@ preserved, including disabled and unavailable variants. Do not enable unavailabl
 hoodies, substitute their missing provider, or discard generated neck layers.
 Confirm supplier currency and artwork/placements before enabling any product.
 
-The **Default** retail price is **Printify production cost plus a 50% markup**,
+The **Default** retail price is **Printify production cost plus a 40% markup**,
 rounded to the nearest cent, with a **$10.00 minimum**. It excludes shipping,
 supplier tax and payment fees. An optional **Modified Price** overrides the
 default. Clearing it restores the default. Existing saved prices are retained as

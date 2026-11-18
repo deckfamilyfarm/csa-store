@@ -29,7 +29,7 @@ function Editor({product,vendors,token,onSaved,onAction}) {
     <div className="merch-product-heading">{product.images[0]&&<img src={product.images[0].src} alt={product.name} loading="lazy"/>}
       <div><p>{product.provider || 'Supplier catalog unavailable'} · Shop {product.shopId} · {product.externalId}</p><p>{product.holds.join(' ')}</p>
       <label>Local vendor<select value={draft.vendorId || ''} onChange={e=>change('vendorId',Number(e.target.value))}><option value="">Choose an existing vendor</option>{vendors.map(v=><option key={v.id} value={v.id}>{v.name}</option>)}</select></label>
-      <p>Supplier visibility: {product.sourceVisible?'Visible':'Hidden'}. Default prices add 50% to Printify production cost, with a $10.00 minimum.</p>
+      <p>Supplier visibility: {product.sourceVisible?'Visible':'Hidden'}. Default prices add 40% to Printify production cost, with a $10.00 minimum.</p>
       <label><input type="checkbox" checked={draft.artworkReviewed} onChange={e=>change('artworkReviewed',e.target.checked)}/> I reviewed the artwork, placements and any generated layers for these existing supplier products.</label>
       <label><input type="checkbox" checked={draft.currency==='USD'} onChange={e=>change('currency',e.target.checked?'USD':null)}/> I confirmed the supplier money values are USD.</label>
       <label><input type="checkbox" checked={draft.active} onChange={e=>change('active',e.target.checked)}/> Show this product in the CSA Store</label></div></div>
