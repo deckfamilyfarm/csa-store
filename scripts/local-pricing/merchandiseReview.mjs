@@ -2,7 +2,7 @@
 import fs from 'node:fs/promises';
 import {getPool} from '../../apps/api/db.js';
 import {createMerchandiseService} from '../../apps/api/lib/merchandiseService.js';
-import {proposedRetail} from '../../apps/api/lib/merchandiseCore.js';
+import {MIN_SUGGESTED_RETAIL_CENTS,proposedRetail} from '../../apps/api/lib/merchandiseCore.js';
 const pool=getPool(),out=new URL('../../reports/printify-discovery-2026-11-17/',import.meta.url);
 const csv=value=>{let text=String(value??'');if(/^[=+@\-\t\r]/.test(text))text="'"+text;return '"'+text.replaceAll('"','""')+'"';};
 try {
@@ -24,7 +24,7 @@ try {
   const status={createdAt:new Date().toISOString(),database:process.env.STORE_DB_DATABASE,environment:'isolated_local',products:products.length,variants:mappings.length,
     activeProducts:products.filter(p=>p.active).length,approvedRetailVariants:mappings.filter(v=>v.retailCents!==null).length,
     enabledLocalVariants:mappings.filter(v=>v.enabled).length,liveConfigurationChanged:false,supplierOrdersCreated:0,
-    priceProposal:{productionCostMarkup:0.5,rounding:'nearest cent',approved:false,excludes:['shipping','supplier tax','Stripe fees'],currencyRequiresConfirmation:true}};
+    priceProposal:{productionCostMarkup:0.5,minimumCents:MIN_SUGGESTED_RETAIL_CENTS,rounding:'nearest cent',approved:false,excludes:['shipping','supplier tax','Stripe fees'],currencyRequiresConfirmation:true}};
   await fs.writeFile(new URL('local-import-mapping.json',out),JSON.stringify({status,mappings},null,2)+'\n',{mode:0o600});
   console.log(JSON.stringify({status,priceProposal:summary.map(({product,proposedRetailMinCents,proposedRetailMaxCents})=>({product,proposedRetailMinCents,proposedRetailMaxCents}))},null,2));
 }finally{await pool.end();}

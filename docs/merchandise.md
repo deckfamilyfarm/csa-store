@@ -25,7 +25,7 @@ hoodies, substitute their missing provider, or discard generated neck layers.
 Confirm supplier currency and artwork/placements before enabling any product.
 
 Suggested retail is **Printify production cost plus a 50% markup**, rounded to
-the nearest cent. It excludes shipping, supplier tax and payment fees. The admin
+the nearest cent, with a **$10.00 minimum**. It excludes shipping, supplier tax and payment fees. The admin
 catalog calculates current suggestions from saved supplier costs. Approved
 retail prices are managed separately.
 

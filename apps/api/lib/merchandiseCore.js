@@ -4,6 +4,7 @@ export { fail, integer, text, email, hash, tokenHash, parse, checkoutReturnOrigi
 export const json = value => JSON.stringify(value);
 export const uuid = () => crypto.randomUUID();
 export const MAX_CENTS = 10000000;
+export const MIN_SUGGESTED_RETAIL_CENTS = 1000;
 export const US_SHIPPING_REGIONS = Object.freeze(
   'AL AK AZ AR CA CO CT DE DC FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY'
     .split(' ').map(state => `US:${state}`)
@@ -36,9 +37,10 @@ export function cartInput(items) {
     return { variantId, quantity: integer(item.quantity, 'Quantity', 1, 20), expectedPriceCents: integer(item.expectedPriceCents, 'Displayed price', 50, MAX_CENTS) };
   }).sort((a,b) => a.variantId-b.variantId);
 }
-// Suggested retail is production cost plus 50%, rounded to the nearest cent.
+// The minimum applies after calculating the markup and rounding to the nearest cent.
 export function proposedRetail(cost) {
-  return Number.isSafeInteger(cost) && cost >= 0 ? Math.round(cost * 1.5) : null;
+  if (!Number.isSafeInteger(cost) || cost < 0) return null;
+  return Math.max(MIN_SUGGESTED_RETAIL_CENTS, Math.round(cost * 1.5));
 }
 export function safeImage(url) {
   try { const value = new URL(url); return value.protocol === 'https:' && !value.username && !value.password ? value.href : null; } catch { return null; }
