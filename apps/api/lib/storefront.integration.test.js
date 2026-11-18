@@ -665,7 +665,7 @@ test('turkey checkout, inventory, fulfillment and refunds on isolated MySQL', { 
     const before = await stock(secondId);
     await service.adjustStock(secondId, { onHand: before.onHand + 10, expectedOnHand: before.onHand, expectedReserved: before.reserved, reason: 'Mode regression fixtures' }, 1);
     function modeClient(mode) {
-      const state = { sessions: new Map(), refunds: new Map(), checkoutKeys: new Map(), refundKeys: new Map(), calls: 0, loseCheckout: false, loseRefund: false };
+      const state = { sessions: new Map(), refunds: new Map(), checkoutKeys: new Map(), refundKeys: new Map(), calls: 0, refundCreates: 0, loseCheckout: false, loseRefund: false };
       const read = id => { const session = state.sessions.get(id); assert.ok(session, `${mode} client must access only its own sessions`); return session; };
       const checkPayment = id => assert.ok([...state.sessions.values()].some(session => session.payment_intent === id), `${mode} client must access only its own payments`);
       const client = {
@@ -688,10 +688,10 @@ test('turkey checkout, inventory, fulfillment and refunds on isolated MySQL', { 
         refunds: {
           list: async ({ payment_intent }) => { state.calls++; checkPayment(payment_intent); return { data: [...state.refunds.values()].filter(refund => refund.payment_intent === payment_intent).map(refund => structuredClone(refund)), has_more: false }; },
           create: async (payload, { idempotencyKey }) => {
-            state.calls++; checkPayment(payload.payment_intent);
+            state.calls++; state.refundCreates++; checkPayment(payload.payment_intent);
             let refund = state.refundKeys.get(idempotencyKey);
             if (!refund) {
-              refund = { ...payload, currency: 'usd', id: `re_${mode}_${state.refunds.size + 1}`, status: 'pending', livemode: mode === 'live' };
+              refund = { ...payload, currency: 'usd', id: `re_${mode}_${state.refunds.size + 1}`, status: 'pending' };
               state.refunds.set(refund.id, refund); state.refundKeys.set(idempotencyKey, refund);
             }
             if (state.loseRefund) { state.loseRefund = false; throw new Error('Lost mode refund response'); }
@@ -795,6 +795,32 @@ test('turkey checkout, inventory, fulfillment and refunds on isolated MySQL', { 
       const updated = await liveWithTest.applyCancellation(result.orderId, review.id, 1);
       assert.equal(updated.items[0].remainingQuantity, 1); assert.equal(updated.canCollect, true);
       assert.equal(testStripe.state.refunds.size, count); assert.equal(liveStripe.state.calls, liveCalls);
+    });
+    await t.test('a saved live item refund can be reconciled without issuing another refund', async () => {
+      const result = await liveWithTest.checkout(body(secondId, 2));
+      const session = liveStripe.paidSession(result.orderId);
+      await liveWithTest.reconcile(result.orderId);
+      const before = await stock(secondId);
+      const review = await liveWithTest.reviewCancellation(result.orderId, {
+        reason: 'Cancel one live bird', items: [{ optionId: secondId, quantity: 1 }]
+      }, 1);
+      const creates = liveStripe.state.refundCreates;
+      const pending = await liveWithTest.applyCancellation(result.orderId, review.id, 1);
+      const receipt = [...liveStripe.state.refunds.values()].find(r => r.payment_intent === session.payment_intent);
+      const [[saved]] = await pool.query('SELECT refund_id FROM storefront_cancellations WHERE id=?', [review.id]);
+      assert.equal(saved.refund_id, receipt.id);
+      assert.equal(pending.status, 'refund_pending');
+      assert.equal(pending.items[0].remainingQuantity, 2);
+      assert.equal((await stock(secondId)).onHand, before.onHand);
+
+      receipt.status = 'succeeded';
+      const updated = await liveWithTest.reconcile(result.orderId);
+      assert.equal(updated.refundedCents, review.amountCents);
+      assert.equal(updated.items[0].remainingQuantity, 1);
+      assert.equal(updated.canCollect, true);
+      await liveWithTest.applyCancellation(result.orderId, review.id, 1);
+      assert.equal((await stock(secondId)).onHand, before.onHand + 1);
+      assert.equal(liveStripe.state.refundCreates, creates + 1);
     });
   });
   await t.test('cutoff enforcement, CSV and stock isolation from Local Line', async () => {

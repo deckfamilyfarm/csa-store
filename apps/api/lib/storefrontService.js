@@ -487,11 +487,12 @@ export function createStorefrontService({ pool, stripe, stripeClients = {}, send
           continue;
         }
         const request = parse(operation.request_json);
+        // Stripe Refund objects omit livemode. stripeForOrder already routed the read by the order's mode.
         if (receipt.amount !== operation.amount_cents || receipt.currency !== current.currency ||
           (typeof receipt.payment_intent === 'string' ? receipt.payment_intent : receipt.payment_intent?.id) !== request.payment_intent ||
           request.payment_intent !== current.stripe_payment_id ||
           receipt.metadata?.storefront_order_id !== id || receipt.metadata?.storefront_cancellation_key !== operation.refund_key ||
-          (operation.stripe_mode && receipt.livemode !== (operation.stripe_mode === 'live'))) {
+          (operation.stripe_mode && operation.stripe_mode !== stripeOrderMode(row))) {
           fail('The cancellation refund does not match its frozen order, amount, or Stripe mode. Review its receipt.', 409);
         }
         if (operation.applied_ms && receipt.status !== 'succeeded') fail('A confirmed cancellation refund changed status. Review its receipt.', 409);
