@@ -5,6 +5,7 @@ import {ProductDescription} from './ProductDescription.jsx';
 import {buildSubscribeNavLinks} from './subscribeNavigation.js';
 import { readCart, readPending, cartKey, cartAfterPayment, rememberAccess, orderAccess, merchandiseCartLines, MERCH_CART, MERCH_PENDING } from './merchandiseCart.js';
 import { CheckoutRecovery, MerchandiseCheckout, MerchandiseConfirmation, merchandiseLink, merchandiseMoney as money } from './MerchandiseCheckout.jsx';
+import { merchandiseOptionGroups, merchandiseVariantForOptions } from './merchandiseVariants.js';
 import './merchandise.css';
 const base=import.meta.env.VITE_API_BASE || '/api';
 const newToken=()=>Array.from(crypto.getRandomValues(new Uint8Array(32)),b=>b.toString(16).padStart(2,'0')).join('');
@@ -24,27 +25,72 @@ async function request(path,{body,token,admin=false}={}) {
     throw error;
   } finally { clearTimeout(timeout); }
 }
-function ProductCard({product,add,disabled,preview}) {
+function ProductCard({product,cart,add,disabled,preview}) {
   const [variantId,setVariantId]=useState(''),[photo,setPhoto]=useState(0);
+  const [chosenOptions,setChosenOptions]=useState({});
+  const [addFeedback,setAddFeedback]=useState(null);
   const variants=preview?product.variants.filter(v=>v.sourceEnabled):product.variants.filter(v=>v.retailCents!=null && (v.available!==false) && (v.enabled!==false));
-  const selected=variants.find(v=>String(v.id)===(variantId || String(variants[0]?.id)));
-  const matching=product.images.filter(image=>image.variantIds?.includes(selected?.id)||image.variant_ids?.includes(selected?.externalId));
+  const groups=merchandiseOptionGroups(variants);
+  const choices=Object.fromEntries(groups.map(({type,values})=>[
+    type, values.some(value=>value.id===chosenOptions[type])?chosenOptions[type]:values[0].id
+  ]));
+  const selected=groups.length ? merchandiseVariantForOptions(variants,choices)
+    : variants.find(v=>String(v.id)===variantId) || variants[0];
+  const quantity=cart.find(row=>row.variantId===selected?.id)?.quantity || 0;
+  const feedback=addFeedback?.variantId===selected?.id ? addFeedback : null;
+  const photoVariant=selected || (choices.color ? merchandiseVariantForOptions(variants,{color:choices.color}) : null);
+  const matching=product.images.filter(image=>image.variantIds?.includes(photoVariant?.id)||image.variant_ids?.includes(photoVariant?.externalId));
   const images=matching.length?matching:product.images;
   const currentPhoto=images.length?photo%images.length:0;
   const movePhoto=direction=>setPhoto(p=>(p+direction+images.length)%images.length);
-  useEffect(()=>setPhoto(0),[selected?.id]);
+  const price=preview?selected?.sellingPriceCents:selected?.retailCents;
+  const photoOption=selected?.title || groups.find(group=>group.type==='color')?.values.find(value=>value.id===choices.color)?.title;
+  useEffect(()=>setPhoto(0),[photoVariant?.id]);
   return <article className="merch-card">{images.length>0&&<div className="merch-gallery" role="group" aria-roledescription="carousel" aria-label={`${product.name} photos`}
     onKeyDown={event=>{if(images.length>1&&['ArrowLeft','ArrowRight'].includes(event.key)){event.preventDefault();movePhoto(event.key==='ArrowLeft'?-1:1);}}}>
-    <img src={images[currentPhoto].src} alt={`${product.name}${selected?` — ${selected.title}`:''}`} loading="lazy"/>
+    <img src={images[currentPhoto].src} alt={`${product.name}${photoOption?` — ${photoOption}`:''}`} loading="lazy"/>
     {images.length>1&&<>
       <div className="merch-gallery-dots" role="group" aria-label="Choose a photo">{images.map((image,index)=><button key={`${image.src}:${index}`} type="button" aria-label={`Show photo ${index+1} of ${images.length} of ${product.name}`} aria-current={index===currentPhoto?'true':undefined} onClick={()=>setPhoto(index)}/>)}</div>
       <span className="merch-gallery-announcement" aria-live="polite" aria-atomic="true">Photo {currentPhoto+1} of {images.length}</span>
     </>}
   </div>}<h2>{product.name}</h2><div className="merch-description"><ProductDescription description={product.description}/></div>
-    {variants.length?<><label>Size / color<select value={selected?.id || ''} onChange={e=>setVariantId(e.target.value)}>{variants.map(v=>{
-      const price=preview?v.sellingPriceCents:v.retailCents;
-      return <option key={v.id} value={v.id}>{v.title} — {price==null?'Price unavailable':money(price)}{v.available===false?' — Unavailable':''}</option>;
-    })}</select></label>{preview?<p>Draft preview — not available for purchase</p>:<button disabled={disabled||!selected} onClick={()=>add(selected)}>Add to cart</button>}</>:<p>Draft — not available for purchase</p>}</article>;
+    {variants.length?<>
+      {groups.length>0 ? <div className="merch-variant-controls">
+        {groups.filter(group=>group.values.length>1).map(({type,values})=><label key={type}>
+          {type==='color'?'Color':type==='size'?'Size':type[0].toUpperCase()+type.slice(1)}
+          <select value={choices[type]} onChange={event=>{
+            setChosenOptions({...choices,[type]:event.target.value});
+            setAddFeedback(null);
+          }}>
+            {values.map(value=><option key={value.id} value={value.id}>{value.title}</option>)}
+          </select>
+        </label>)}
+      </div> : variants.length>1 && <label>Option<select value={selected?.id || ''} onChange={event=>{
+        setVariantId(event.target.value);
+        setAddFeedback(null);
+      }}>{variants.map(variant=><option key={variant.id} value={variant.id}>{variant.title}{variant.available===false?' — Unavailable':''}</option>)}</select></label>}
+      <p className="merch-variant-price" role="status" aria-atomic="true">
+        {selected ? <>
+          {variants.length===1 && <span>{selected.title}</span>}
+          {groups.filter(group=>group.values.length===1).map(group=><span key={group.type}>{group.values[0].title}</span>)}
+          <strong>{price==null?'Price unavailable':money(price)}</strong>
+          {selected.available===false && <span>Unavailable</span>}
+        </> : 'This combination is unavailable. Choose another option.'}
+      </p>
+      {preview?<p>Draft preview — not available for purchase</p>:<>
+      <div className="merch-buy-actions">
+        <button className="merch-primary" type="button" disabled={disabled||!selected} onClick={()=>{
+          const error=add(selected);
+          setAddFeedback({variantId:selected.id,error});
+        }}>Add to cart</button>
+        {quantity>0 && <a className="merch-back-link" href={merchandiseLink('cart')}>View cart</a>}
+      </div>
+      <p className={`merch-add-feedback${feedback?.error?' merch-add-feedback-error':''}`} role="status" aria-atomic="true">
+        {feedback?.error || (quantity>0 && <>
+          {feedback && <><span aria-hidden="true">✓</span> Added to cart · </>}{quantity} in cart
+        </>)}
+      </p>
+    </>}</>:<p>Draft — not available for purchase</p>}</article>;
 }
 export function MerchandiseStorefront() {
   const [route, setRoute] = useState(window.location.hash);
@@ -57,7 +103,6 @@ export function MerchandiseStorefront() {
   const [error, setError] = useState('');
   const [orderError, setOrderError] = useState('');
   const [orderRefresh, setOrderRefresh] = useState(0);
-  const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
   const [cartReview, setCartReview] = useState(null);
   const [reviewAttempt, setReviewAttempt] = useState(0);
@@ -200,18 +245,17 @@ export function MerchandiseStorefront() {
       : current.filter(row => row.variantId !== id));
     if (change?.expectedPriceCents != null) refreshCatalog();
   }
-  function add(variant, productName) {
-    if (pending || gate.current || !catalog?.checkoutEnabled) return;
+  function add(variant) {
+    if (pending || gate.current || !catalog?.checkoutEnabled) return 'Your cart can’t be changed right now.';
     const existing = cart.find(row => row.variantId === variant.id);
     if (existing?.quantity >= 20 || (!existing && cart.length >= 30)) {
-      setNotice(existing ? 'You can order up to 20 of each option.' : 'Your cart holds up to 30 different options.');
-      return;
+      return existing ? 'You can order up to 20 of each option.' : 'Your cart holds up to 30 different options.';
     }
     setQuote(null);
     setError('');
     setCart(current => existing ? current.map(row => row.variantId === variant.id ? { ...row, quantity: row.quantity + 1 } : row)
       : [...current, { variantId: variant.id, quantity: 1, expectedPriceCents: variant.retailCents }]);
-    setNotice(`${productName} added to your cart.`);
+    return null;
   }
   function changeCustomer(name, value) {
     setQuote(null);
@@ -307,9 +351,8 @@ export function MerchandiseStorefront() {
             {catalog && !catalog.products.length && <p>Our merchandise collection is coming soon.</p>}
             {catalog?.shipsNationwide ? <p>Ships to all 50 states and Washington, D.C. Shipping is calculated at checkout.</p>
               : catalog?.shippingRegions?.length > 0 && <p>Shipping available to {catalog.shippingRegions.map(region => region === 'US:OR' ? 'Oregon' : region.replace('US:', '')).join(', ')}.</p>}
-            <p className="merch-cart-notice" role="status">{!preview && notice}</p>
             <div className="merch-grid">{catalog?.products.map(product => <ProductCard key={product.id} product={product}
-              add={variant => add(variant, product.name)} preview={preview}
+              cart={cart} add={add} preview={preview}
               disabled={busy || Boolean(pending) || preview || !catalog.checkoutEnabled} />)}</div>
           </>}
     </main>

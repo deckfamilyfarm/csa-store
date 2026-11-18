@@ -67,8 +67,15 @@
   font-size:.9rem;
   font-variant-numeric:tabular-nums;
 }
-.merch-cart-notice { color:#436146; margin:10px 0 0; }
-.merch-cart-notice:empty { margin:0; }
+.merch-buy-actions { display:flex; flex-wrap:wrap; align-items:center; gap:8px 16px; }
+.merch-variant-controls { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.merch-variant-controls label:only-child { grid-column:1 / -1; }
+.merch-variant-controls label { min-width:0; margin-bottom:0; }
+.merch-variant-price { display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 12px; margin:14px 0; }
+.merch-variant-price strong { font-size:1.15rem; }
+.merch-add-feedback { color:#314f3a; font-size:.88rem; font-weight:600; margin:10px 0 0; }
+.merch-add-feedback:empty { margin:0; }
+.merch-add-feedback-error { color:#8a3528; }
 .merch-store .merch-flow { padding-top:32px; }
 .merch-store .merch-flow h1 {
   font-family:var(--serif);

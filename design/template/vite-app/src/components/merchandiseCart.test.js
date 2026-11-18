@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {cleanCart,cartKey,cartAfterPayment,rememberAccess,orderAccess,readPending,merchandiseCartLines,MERCH_PENDING} from './merchandiseCart.js';
 import {usesMerchandiseStorefront,usesTurkeyStorefront,usesAdminPortal} from '../storefrontRouting.js';
+import {merchandiseOptionGroups,merchandiseVariantForOptions} from './merchandiseVariants.js';
 test('merchandise storage keeps only IDs, counts and displayed prices; duplicate/invalid rows are rejected',()=>{
   const row={variantId:1,quantity:1,expectedPriceCents:1000,email:'private@example.com'};
   assert.deepEqual(cleanCart([row,row,{variantId:2,quantity:-1,expectedPriceCents:1000}]),[{variantId:1,quantity:1,expectedPriceCents:1000}]);
@@ -34,4 +35,15 @@ test('cart review identifies price changes and unavailable items and uses the ma
   assert.equal(merchandiseCartLines([{...cart[0],expectedPriceCents:3000}],catalog)[0].priceChanged,false);
   const [held]=merchandiseCartLines(cart,catalog,[{variantId:1,code:'supplier_review'}]);
   assert.equal(held.issue,'supplier_review');
+});
+test('separate color and size choices resolve only to an existing sellable variant',()=>{
+  const navy={type:'color',id:10,title:'Navy'}, white={type:'color',id:11,title:'White'};
+  const small={type:'size',id:1,title:'S'}, medium={type:'size',id:2,title:'M'};
+  const variants=[{id:20,options:[navy,small]},{id:21,options:[medium,navy]},{id:22,options:[white,medium]}];
+  const groups=merchandiseOptionGroups(variants);
+  assert.deepEqual(groups.map(group=>group.values.map(value=>value.title)),[['Navy','White'],['S','M']]);
+  assert.equal(merchandiseVariantForOptions(variants,{color:'11',size:'2'}).id,22);
+  assert.equal(merchandiseVariantForOptions(variants,{color:'11',size:'1'}),undefined);
+  assert.deepEqual(merchandiseOptionGroups(variants.slice(0,1)),[]);
+  assert.deepEqual(merchandiseOptionGroups([...variants,{id:23,options:[white,medium]}]),[]);
 });
