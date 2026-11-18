@@ -24,10 +24,10 @@ preserved, including disabled and unavailable variants. Do not enable unavailabl
 hoodies, substitute their missing provider, or discard generated neck layers.
 Confirm supplier currency and artwork/placements before enabling any product.
 
-The proposal targets **45% production margin**, rounded up to whole dollars. It
-excludes shipping, supplier tax and payment fees, and assumes USD pending explicit
-currency confirmation. It is saved separately from approved retail. Review
-`reports/printify-discovery-2026-11-17/retail-price-proposal.csv` before accepting it.
+Suggested retail is **Printify production cost plus a 50% markup**, rounded to
+the nearest cent. It excludes shipping, supplier tax and payment fees. The admin
+catalog calculates current suggestions from saved supplier costs. Approved
+retail prices are managed separately.
 
 ## Explicit migration and isolated import
 
@@ -147,11 +147,8 @@ existing production configuration, without replacing its primary test key.
 `MERCH_CHECKOUT_ENABLED=true` and `MERCH_LIVE_CHECKOUT_ENABLED=true` enable the
 payment path at `https://store.deckfamilyfarm.com/#/merchandise`.
 `MERCH_BASE_URL=https://store.deckfamilyfarm.com` sets its return origin.
-`MERCH_TAX_RULES_JSON={"US:OR":{"exempt":true}}` permits Oregon shipping only;
-all other destinations remain blocked. Oregon has no general sales tax; the
-configuration was checked against the [Oregon Department of Revenue](https://www.oregon.gov/dor/programs/businesses/Pages/sales-tax.aspx).
-Do not expand destinations without reviewing their collection obligations and
-configuring corresponding tax rules. Shipping continues to use Printify quotes.
+The pilot used `MERCH_TAX_RULES_JSON={"US:OR":{"exempt":true}}` for Oregon shipping.
+Oregon has no general sales tax. [Oregon Department of Revenue](https://www.oregon.gov/dor/programs/businesses/Pages/sales-tax.aspx)
 
 `PRINTIFY_APPROVED_SHOP_ID=18832188` identifies the existing shop.
 `PRINTIFY_ORDER_CREATION_ENABLED=false`, `PRINTIFY_PRODUCTION_ENABLED=false`
@@ -176,13 +173,15 @@ shipping and tax drift invalidate a quote. Quotes expire after ten minutes;
 the resulting frozen Stripe Checkout Session lasts thirty minutes.
 
 Shipping is a separate labeled Stripe line, independent of farm delivery.
-`MERCH_TAX_RULES_JSON` must map each permitted `US:STATE` to an explicitly reviewed
-rule: `{ "exempt": true }`, or `{ "rateId": "txr_...", "shippingTaxable": true }`.
-There are no built-in exemptions or guessed rates. The server retrieves the
-configured active exclusive Stripe tax rate and verifies jurisdiction before
-quoting. Session totals must match the frozen quote. Stripe Tax automatic
-calculation is not enabled; live account tax settings remain pending and require
-review before launch. International shipping is held for a later reviewed scope.
+`MERCH_US_DEFAULT_TAX=not_collecting` allows checkout for all 50 states and
+Washington, D.C. using Printify's shipping quote. Use it after reviewing where
+the business must collect sales tax. For a destination with no explicit rule,
+checkout records the configured decision to collect zero customer sales tax.
+Each `US:STATE` entry in `MERCH_TAX_RULES_JSON` takes precedence. Use
+`{ "exempt": true }` or `{ "rateId": "txr_...", "shippingTaxable": true }` as
+appropriate. Without the default setting, checkout requires an explicit state
+rule. The server verifies active exclusive Stripe tax rates and checks the saved
+shipping and tax amounts again before creating a payment session.
 
 ## Durable fulfillment, status and recovery
 

@@ -6,8 +6,11 @@ import { createMerchandiseService } from './merchandiseService.js';
 export function merchandiseConfig(env=process.env) {
   let taxRules={};
   try { taxRules=JSON.parse(env.MERCH_TAX_RULES_JSON || '{}'); } catch { throw new Error('MERCH_TAX_RULES_JSON must be valid JSON.'); }
+  if (!taxRules || typeof taxRules !== 'object' || Array.isArray(taxRules)) throw new Error('MERCH_TAX_RULES_JSON must be an object.');
+  const usDefaultTax = env.MERCH_US_DEFAULT_TAX || '';
+  if (usDefaultTax && usDefaultTax !== 'not_collecting') throw new Error('MERCH_US_DEFAULT_TAX must be not_collecting or unset.');
   const mode=env.MERCH_STRIPE_MODE || 'test';
-  return {mode,taxRules,catalogEnabled:env.MERCH_CATALOG_ENABLED==='true',checkoutEnabled:env.MERCH_CHECKOUT_ENABLED==='true',
+  return {mode,taxRules,usDefaultTax,catalogEnabled:env.MERCH_CATALOG_ENABLED==='true',checkoutEnabled:env.MERCH_CHECKOUT_ENABLED==='true',
     liveEnabled:env.MERCH_LIVE_CHECKOUT_ENABLED==='true',ordersEnabled:env.PRINTIFY_ORDER_CREATION_ENABLED==='true',
     productionEnabled:env.PRINTIFY_PRODUCTION_ENABLED==='true',manualApprovalVerified:env.PRINTIFY_MANUAL_APPROVAL_VERIFIED==='true',
     approvedShopId:env.PRINTIFY_APPROVED_SHOP_ID || '',accountId:env.MERCH_STRIPE_ACCOUNT_ID || '',

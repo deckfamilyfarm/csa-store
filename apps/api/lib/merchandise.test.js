@@ -88,5 +88,5 @@ test('merchandise inputs reject mixed fulfillment, duplicate variants and invali
   assert.throws(()=>cartInput([{variantId:1,quantity:1,expectedPriceCents:100,fulfillmentKind:'farm'}]),/Mixed/);
   assert.throws(()=>cartInput([{variantId:1,quantity:1,expectedPriceCents:100},{variantId:1,quantity:1,expectedPriceCents:100}]),/duplicate/);
   assert.throws(()=>addressInput({firstName:'A',lastName:'B',email:'a@b.com',phone:'5551234567',addressLine1:'1 Main',city:'City',state:'OR',postalCode:'97401',country:'CA'}),/US shipping/);
-  assert.equal(proposedRetail(1000),1900);assert.equal(proposedRetail(1100),2000);assert.equal(proposedRetail(null),null);
+  assert.equal(proposedRetail(1000),1500);assert.equal(proposedRetail(1001),1502);assert.equal(proposedRetail(null),null);
 });

@@ -1,6 +1,6 @@
 import {
   fail, integer, text, hash, tokenHash, parse, checkoutReturnOrigin, json, uuid,
-  fingerprint, addressInput, cartInput, proposedRetail, supplierProduct, verifySupplierOrder
+  fingerprint, addressInput, cartInput, proposedRetail, supplierProduct, verifySupplierOrder, US_SHIPPING_REGIONS
 } from './merchandiseCore.js';
 import { assertMerchandiseSchema } from './merchandiseSchema.js';
 
@@ -47,15 +47,17 @@ export function createMerchandiseService({ pool, stripeClients = {}, provider, c
       sourceVisible:parse(p.source_json).product.visible===true,
       variants:variants.filter(v=>v.product_id===p.id).map(v=>({ id:v.id, externalId:Number(v.external_id), title:v.title, sku:v.sku,
         options:parse(v.options_json), sourceEnabled:Boolean(v.source_enabled), available:Boolean(v.available),
-        enabled:Boolean(v.enabled), retailCents:v.retail_cents, proposedRetailCents:v.proposed_retail_cents,
+        enabled:Boolean(v.enabled), retailCents:v.retail_cents, proposedRetailCents:proposedRetail(v.cost_cents),
         costCents:v.cost_cents, channelPriceCents:v.channel_price_cents })) }));
   }
   async function catalog(admin=false) {
     if (!admin && !config.catalogEnabled) return { enabled:false, products:[], checkoutEnabled:false };
     await ready(); const products=await rows();
     const [vendors]=admin?await pool.query("SELECT id,name FROM vendors WHERE NULLIF(TRIM(name),'') IS NOT NULL ORDER BY name"): [[]];
+    const shipsNationwide=config.usDefaultTax==='not_collecting';
+    const configuredRegions=Object.keys(config.taxRules || {}).filter(key=>/^US:[A-Z]{2}$/.test(key));
     return { category:'Branded Merchandise', enabled:Boolean(config.catalogEnabled),
-      shippingRegions:Object.keys(config.taxRules || {}).filter(key=>/^US:[A-Z]{2}$/.test(key)).sort(),
+      shipsNationwide,shippingRegions:[...new Set([...configuredRegions,...(shipsNationwide?US_SHIPPING_REGIONS:[])])].sort(),
       checkoutEnabled:Boolean(config.checkoutEnabled && (config.mode!=='live' || config.liveEnabled)), mode:config.mode || 'test',
       ...(admin ? { vendors,controls:{ liveCheckout:Boolean(config.liveEnabled), supplierOrders:Boolean(config.ordersEnabled), production:Boolean(config.productionEnabled) } } : {}),
       products:admin ? products : products.filter(p=>p.active).map(p=>({ id:p.id,name:p.name,description:p.description,
@@ -169,8 +171,16 @@ export function createMerchandiseService({ pool, stripeClients = {}, provider, c
     }
   }
   async function tax(items, shipping, address, mode) {
-    const rule=config.taxRules?.[`${address.country}:${address.region}`];
-    if (!rule) fail('Tax configuration for this shipping destination has not been reviewed.',409);
+    const region=`${address.country}:${address.region}`;
+    const rules=config.taxRules || {};
+    if (!Object.hasOwn(rules,region)) {
+      if (config.usDefaultTax==='not_collecting' && US_SHIPPING_REGIONS.includes(region)) {
+        return { cents:0, rateId:null, shippingTaxable:false, basis:'configured_no_collection', rule:fingerprint({region,policy:config.usDefaultTax}) };
+      }
+      fail('Tax configuration for this shipping destination has not been reviewed.',409);
+    }
+    const rule=rules[region];
+    if (!rule || typeof rule !== 'object' || Array.isArray(rule)) fail('Complete the reviewed tax configuration.',503);
     if (rule.exempt===true) return { cents:0, rateId:null, shippingTaxable:false, basis:'configured_exemption', rule:fingerprint(rule) };
     if (!rule.rateId || typeof rule.shippingTaxable!=='boolean') fail('Complete the reviewed tax configuration.',503);
     const rate=await client(mode).taxRates.retrieve(rule.rateId);

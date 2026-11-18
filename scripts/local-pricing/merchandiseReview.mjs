@@ -24,7 +24,7 @@ try {
   const status={createdAt:new Date().toISOString(),database:process.env.STORE_DB_DATABASE,environment:'isolated_local',products:products.length,variants:mappings.length,
     activeProducts:products.filter(p=>p.active).length,approvedRetailVariants:mappings.filter(v=>v.retailCents!==null).length,
     enabledLocalVariants:mappings.filter(v=>v.enabled).length,liveConfigurationChanged:false,supplierOrdersCreated:0,
-    priceProposal:{productionMargin:0.45,rounding:'up to whole dollars',approved:false,excludes:['shipping','supplier tax','Stripe fees'],currencyRequiresConfirmation:true}};
+    priceProposal:{productionCostMarkup:0.5,rounding:'nearest cent',approved:false,excludes:['shipping','supplier tax','Stripe fees'],currencyRequiresConfirmation:true}};
   await fs.writeFile(new URL('local-import-mapping.json',out),JSON.stringify({status,mappings},null,2)+'\n',{mode:0o600});
   console.log(JSON.stringify({status,priceProposal:summary.map(({product,proposedRetailMinCents,proposedRetailMaxCents})=>({product,proposedRetailMinCents,proposedRetailMaxCents}))},null,2));
 }finally{await pool.end();}
