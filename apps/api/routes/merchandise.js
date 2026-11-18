@@ -3,7 +3,7 @@ import { requireAdminPermission } from '../middleware/auth.js';
 import { getMerchandiseService,merchandiseStripeEvent,merchandisePrintifyEvent } from '../lib/merchandiseRuntime.js';
 export function createMerchandiseRouters({getService=getMerchandiseService,adminAuth=requireAdminPermission('merchandise_admin')}={}) {
   const publicRouter=express.Router(), adminRouter=express.Router();
-  const wrap=fn=>async(req,res)=>{try{await fn(req,res,getService());}catch(e){if(!e.status)console.error('Merchandise request failed',{route:req.route?.path,code:e.code || 'internal'});res.status(e.status || 500).json({error:e.status?e.message:'Unable to complete merchandise request. Retry the same order if checkout was interrupted.',...(e.checkoutRejected===true?{checkoutRejected:true}:{})});}};
+  const wrap=fn=>async(req,res)=>{try{await fn(req,res,getService());}catch(e){if(!e.status)console.error('Merchandise request failed',{route:req.route?.path,code:e.code || 'internal'});res.status(e.status || 500).json({error:e.status?e.message:'Unable to complete merchandise request. Retry the same order if checkout was interrupted.',...(e.checkoutRejected===true?{checkoutRejected:true}:{}),...(e.cartReviewRequired===true?{cartReviewRequired:true}:{})});}};
   const access=req=>String(req.headers.authorization || '').replace(/^Bearer /,'');
   const actor=req=>req.admin?.userId || req.admin?.adminId;
   const attempts=new Map();
@@ -15,6 +15,7 @@ export function createMerchandiseRouters({getService=getMerchandiseService,admin
     attempts.set(req.ip,row);next();
   });
   publicRouter.get('/catalog',wrap(async(_req,res,s)=>res.json(await s.catalog())));
+  publicRouter.post('/cart-review',wrap(async(req,res,s)=>res.json(await s.reviewCart(req.body))));
   publicRouter.post('/quote',wrap(async(req,res,s)=>res.json(await s.quote(req.body))));
   publicRouter.post('/checkout',wrap(async(req,res,s)=>res.json(await s.checkout(req.body,req.get('origin')))));
   publicRouter.post('/orders/:id/resume',wrap(async(req,res,s)=>res.json(await s.resumeCheckout(req.params.id,access(req)))));

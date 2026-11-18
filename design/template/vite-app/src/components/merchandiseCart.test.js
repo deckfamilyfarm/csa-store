@@ -32,4 +32,6 @@ test('cart review identifies price changes and unavailable items and uses the ma
   assert.equal(changed.variant.imageUrl,'navy');
   assert.equal(removed.unavailable,true);
   assert.equal(merchandiseCartLines([{...cart[0],expectedPriceCents:3000}],catalog)[0].priceChanged,false);
+  const [held]=merchandiseCartLines(cart,catalog,[{variantId:1,code:'supplier_review'}]);
+  assert.equal(held.issue,'supplier_review');
 });

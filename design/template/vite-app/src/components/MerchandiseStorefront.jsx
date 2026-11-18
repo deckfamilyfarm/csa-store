@@ -12,7 +12,9 @@ async function request(path,{body,token,admin=false}={}) {
   const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),30000);
   try {
     const response=await fetch(`${base}/${admin?'admin/merchandise':'merchandise'}/${path}`,{signal:controller.signal,cache:'no-store',method:body?'POST':'GET',headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},...(body?{body:JSON.stringify(body)}:{})});
-    const value=await response.json();if(!response.ok)throw Object.assign(new Error(value.error || 'Unable to complete your request.'),{checkoutRejected:value.checkoutRejected===true});return value;
+    const value=await response.json();if(!response.ok)throw Object.assign(new Error(value.error || 'Unable to complete your request.'),{
+      checkoutRejected:value.checkoutRejected===true, cartReviewRequired:value.cartReviewRequired===true
+    });return value;
   } catch (error) {
     if (error.name === 'AbortError') {
       if (path === 'checkout') throw new Error('Checkout timed out. Resume the same checkout to see its status.');
@@ -57,6 +59,8 @@ export function MerchandiseStorefront() {
   const [orderRefresh, setOrderRefresh] = useState(0);
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
+  const [cartReview, setCartReview] = useState(null);
+  const [reviewAttempt, setReviewAttempt] = useState(0);
   const [customer, setCustomer] = useState({ firstName: '', lastName: '', email: '', phone: '', addressLine1: '',
     addressLine2: '', city: '', state: '', postalCode: '', country: 'US' });
   const gate = useRef(false);
@@ -70,7 +74,11 @@ export function MerchandiseStorefront() {
   const path = (hashPath.replace(/^#/, '') || window.location.pathname).replace(/\/$/, '');
   const view = orderId ? 'order' : !preview && path === '/merchandise/cart' ? 'cart'
     : !preview && path === '/merchandise/checkout' ? 'checkout' : 'shop';
-  const currentQuote = quote?.cartKey === cartKey(cart) ? quote : null;
+  const currentCartKey = cartKey(cart);
+  const checkingCart = !pending && !preview && (view === 'cart' || view === 'checkout') && cart.length > 0 && catalog?.checkoutEnabled;
+  const review = checkingCart && cartReview?.key === currentCartKey && cartReview.attempt === reviewAttempt ? cartReview : null;
+  const reviewState = review?.state || (checkingCart ? 'checking' : 'idle');
+  const currentQuote = quote?.cartKey === currentCartKey ? quote : null;
   const isReview = view === 'checkout' && Boolean(currentQuote) && (!pending || busy);
   const title = view === 'checkout' ? isReview ? 'Review your order' : 'Checkout' : view === 'cart' ? 'Your cart'
     : view === 'order' ? 'Your order' : 'Merchandise';
@@ -113,6 +121,16 @@ export function MerchandiseStorefront() {
   useEffect(() => {
     if (view !== 'order') refreshCatalog();
   }, [view, preview]);
+  useEffect(() => {
+    if (!checkingCart) { setCartReview(null); return; }
+    let active = true;
+    request('cart-review', {body:{items:cart}}).then(result => {
+      if (active) setCartReview({key:currentCartKey,attempt:reviewAttempt,state:result.issues.length?'blocked':'ready',issues:result.issues});
+    }).catch(failure => {
+      if (active) setCartReview({key:currentCartKey,attempt:reviewAttempt,state:'error',message:failure.message});
+    });
+    return () => { active = false; };
+  }, [checkingCart, currentCartKey, reviewAttempt]);
   useEffect(() => {
     try { localStorage.setItem(MERCH_CART, JSON.stringify(cart)); }
     catch { setError('Enable browser storage to save your cart and recover your checkout.'); }
@@ -180,6 +198,7 @@ export function MerchandiseStorefront() {
     setError('');
     setCart(current => change ? current.map(row => row.variantId === id ? { ...row, ...change } : row)
       : current.filter(row => row.variantId !== id));
+    if (change?.expectedPriceCents != null) refreshCatalog();
   }
   function add(variant, productName) {
     if (pending || gate.current || !catalog?.checkoutEnabled) return;
@@ -199,7 +218,7 @@ export function MerchandiseStorefront() {
     setError('');
     setCustomer(current => ({ ...current, [name]: value }));
   }
-  async function action(fn) {
+  async function action(fn, startsPayment = false) {
     if (gate.current || preview) return;
     gate.current = true;
     setBusy(true);
@@ -214,12 +233,18 @@ export function MerchandiseStorefront() {
         setQuote(null);
         refreshCatalog();
       }
+      if (failure.cartReviewRequired && (!startsPayment || failure.checkoutRejected)) {
+        setQuote(null);
+        setReviewAttempt(value => value + 1);
+        window.location.hash = '#/merchandise/cart';
+      }
     } finally {
       gate.current = false;
       setBusy(false);
     }
   }
   async function calculateQuote() {
+    if (reviewState !== 'ready') return;
     await action(async () => {
       const token = newToken();
       const value = await request('quote', { body: { token, items: cart, customer } });
@@ -238,6 +263,7 @@ export function MerchandiseStorefront() {
         setQuote(null);
         throw new Error('Review your order again to get an updated total.');
       }
+      if (!pending && reviewState !== 'ready') return;
       const attempt = pending || { quoteId: quote.quoteId, token: quote.token, cartKey: quote.cartKey, expiresMs: Date.now() + 7 * 86400000 };
       localStorage.setItem(MERCH_PENDING, JSON.stringify(attempt));
       setPending(attempt);
@@ -252,10 +278,10 @@ export function MerchandiseStorefront() {
         window.location.hash = `#/merchandise/order?order=${encodeURIComponent(result.orderId)}`;
         setOrderRefresh(value => value + 1);
       }
-    });
+    }, true);
   }
 
-  const lines = merchandiseCartLines(cart, catalog);
+  const lines = merchandiseCartLines(cart, catalog, review?.issues);
   const count = cart.reduce((sum, row) => sum + row.quantity, 0);
   return <div className="merch-store">
     <DeckPageHeader navLinks={buildSubscribeNavLinks()} />
@@ -267,6 +293,7 @@ export function MerchandiseStorefront() {
           : !catalog ? <button type="button" onClick={refreshCatalog}>Retry loading the catalog</button>
             : <MerchandiseCheckout view={view} lines={lines} quote={currentQuote} customer={customer} regions={catalog.shippingRegions}
               checkoutEnabled={catalog.checkoutEnabled && !catalogError} busy={busy} pending={pending} headingRef={heading}
+              reviewState={reviewState} reviewMessage={review?.message} onRecheck={() => setReviewAttempt(value => value + 1)}
               onChangeLine={changeLine} onChangeCustomer={changeCustomer} onQuote={calculateQuote}
               onEdit={() => { setQuote(null); setError(''); }} onPay={pay} />)
           : <>

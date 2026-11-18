@@ -8,8 +8,9 @@ export function cleanCart(value) {
     .map(({variantId,quantity,expectedPriceCents})=>({variantId,quantity,expectedPriceCents}));
 }
 export const cartKey=cart=>JSON.stringify(cleanCart(cart).sort((a,b)=>a.variantId-b.variantId));
-export function merchandiseCartLines(cart, catalog) {
+export function merchandiseCartLines(cart, catalog, issues = []) {
   const variants = new Map();
+  const issuesById = new Map(issues.map(issue => [issue.variantId, issue]));
   for (const product of catalog?.products || []) {
     for (const variant of product.variants) {
       const image = product.images.find(photo => photo.variantIds?.includes(variant.id)) || product.images[0];
@@ -18,7 +19,11 @@ export function merchandiseCartLines(cart, catalog) {
   }
   return cart.map(row => {
     const variant = variants.get(row.variantId);
-    return { ...row, variant, unavailable: !variant, priceChanged: Boolean(variant && variant.retailCents !== row.expectedPriceCents) };
+    const issue = issuesById.get(row.variantId);
+    const currentPriceCents = issue?.retailCents ?? variant?.retailCents;
+    return { ...row, variant, issue: issue?.code, currentPriceCents,
+      unavailable: !variant || issue?.code === 'unavailable',
+      priceChanged: currentPriceCents != null && currentPriceCents !== row.expectedPriceCents };
   });
 }
 export function readCart(storage) { try { return cleanCart(JSON.parse(storage.getItem(MERCH_CART))); } catch { return []; } }

@@ -46,10 +46,12 @@ function CartLine({ line, locked, onChange }) {
       {variant && <p>{variant.title}</p>}
       <p>{merchandiseMoney(expectedPriceCents)} each</p>
       {line.unavailable && <p className="merch-item-issue">Remove this item to check out.</p>}
+      {line.issue === 'supplier_review' && <p className="merch-item-issue">This item needs a stock or design review. Remove it to continue.</p>}
+      {line.issue === 'verification_unavailable' && <p className="merch-item-issue">Availability couldn’t be confirmed. Recheck or remove this item.</p>}
       {line.priceChanged && <p className="merch-item-issue">
         Price changed. <button className="merch-text-button" type="button" disabled={locked}
-          onClick={() => onChange({ expectedPriceCents: variant.retailCents })}>
-          Update to {merchandiseMoney(variant.retailCents)}
+          onClick={() => onChange({ expectedPriceCents: line.currentPriceCents })}>
+          Update to {merchandiseMoney(line.currentPriceCents)}
         </button>
       </p>}
       <div className="merch-quantity-row">
@@ -139,10 +141,12 @@ export function CheckoutRecovery({ busy, onResume }) {
 }
 
 export function MerchandiseCheckout({ view, lines, customer, regions, quote, checkoutEnabled, busy, pending,
-  onChangeLine, onChangeCustomer, onQuote, onEdit, onPay, headingRef }) {
+  reviewState, reviewMessage, onRecheck, onChangeLine, onChangeCustomer, onQuote, onEdit, onPay, headingRef }) {
   const review = view === 'checkout' && Boolean(quote) && (!pending || busy);
-  const needsReview = lines.some(line => line.unavailable || line.priceChanged);
-  const canContinue = checkoutEnabled && lines.length > 0 && !needsReview;
+  const needsReview = lines.some(line => line.unavailable || line.priceChanged || line.issue);
+  const canContinue = checkoutEnabled && lines.length > 0 && !needsReview && reviewState === 'ready';
+  const checking = reviewState === 'checking';
+  const canRecheck = reviewState === 'error' || lines.some(line => line.issue === 'verification_unavailable');
   const title = view === 'cart' ? 'Your cart' : review ? 'Review your order' : 'Checkout';
   return <>
     <Progress view={view} review={review} />
@@ -160,12 +164,15 @@ export function MerchandiseCheckout({ view, lines, customer, regions, quote, che
       </ul></section>
       <OrderSummary lines={lines}>
         {!pending && (canContinue && !busy ? <a className="merch-primary merch-fullwidth" href={merchandiseLink('checkout')}>Continue to checkout</a>
-          : <button className="merch-primary merch-fullwidth" disabled>Continue to checkout</button>)}
+          : <button className="merch-primary merch-fullwidth" disabled>{checking ? 'Checking availability…' : 'Continue to checkout'}</button>)}
         {needsReview && <p className="merch-panel-note">Review the items in your cart before checking out.</p>}
+        {reviewMessage && <p className="merch-panel-note" role="alert">{reviewMessage}</p>}
+        {canRecheck && <button className="merch-text-button" type="button" onClick={onRecheck}>Recheck availability</button>}
         {!checkoutEnabled && <p className="merch-panel-note">Checkout is currently unavailable.</p>}
       </OrderSummary>
-    </div> : pending && !review ? null : needsReview ? <section className="merch-panel">
-      <h2>Review your cart</h2><p>Some prices or availability have changed.</p><a className="merch-primary" href={merchandiseLink('cart')}>Return to cart</a>
+    </div> : pending && !review ? null : checking && !review ? <section className="merch-panel" role="status">Checking cart availability…</section>
+    : !canContinue && !review ? <section className="merch-panel">
+      <h2>Review your cart</h2><p>Confirm item availability and prices before entering your shipping details.</p><a className="merch-primary" href={merchandiseLink('cart')}>Return to cart</a>
     </section> : <form className="merch-order-layout" onSubmit={event => { event.preventDefault(); if (canContinue && !busy) (review ? onPay : onQuote)(); }}>
       {review ? <div className="merch-review-details">
         <section className="merch-panel">

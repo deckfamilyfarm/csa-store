@@ -1,14 +1,14 @@
 import {
   fail, integer, text, hash, tokenHash, parse, checkoutReturnOrigin, json, uuid,
   fingerprint, addressInput, cartInput, proposedRetail, merchandiseSellingPrice, supplierProduct,
-  verifySupplierOrder, US_SHIPPING_REGIONS
+  verifySupplierOrder, US_SHIPPING_REGIONS, printifyProduction, printifyProductionFingerprint
 } from './merchandiseCore.js';
 import { assertMerchandiseSchema } from './merchandiseSchema.js';
 
 const RETRY_WINDOW = 23 * 3600000;
-const production = p => ({ blueprint: p.blueprint_id, provider: p.print_provider_id, areas: p.print_areas, details: p.print_details });
 const cents = value => value == null ? null : integer(value, 'Provider amount', 0, 100000000);
 const id = value => text(value, 'record ID', 100);
+const cartError = (message, status=409) => Object.assign(new Error(message), {status, cartReviewRequired:true});
 export function createMerchandiseService({ pool, stripeClients = {}, provider, config = {}, now = Date.now, sendEmail } = {}) {
   const ready = () => assertMerchandiseSchema(pool);
   async function atomic(c, fn) { await c.beginTransaction(); try { const result=await fn(); await c.commit(); return result; } catch(e) { await c.rollback(); throw e; } }
@@ -157,29 +157,86 @@ export function createMerchandiseService({ pool, stripeClients = {}, provider, c
     const catalog=await provider.metadata(product);
     return importRecords([{shopId:Number(p.shop_id),vendorId:p.vendor_id,product,catalog}],actor,{id:p.id,version:p.version});
   }
-  async function selected(items, c=pool) {
+  async function resolveCart(items, c=pool) {
     const result=[];
+    const issues=[];
     for (const input of items) {
       const [[v]]=await c.query(`SELECT v.*,p.shop_id,p.external_id product_external_id,p.name,p.vendor_id,local_vendor.name vendor_name,p.source_json,p.source_hash,p.currency,p.version,p.active,p.artwork_reviewed
         FROM merch_variants v JOIN merch_products p ON p.id=v.product_id JOIN vendors local_vendor ON local_vendor.id=p.vendor_id WHERE v.id=? AND NULLIF(TRIM(local_vendor.name),'') IS NOT NULL`,[input.variantId]);
-      if (!v || !v.active || !v.artwork_reviewed || !v.enabled || !v.source_enabled || !v.available || v.currency!=='USD') fail('A merchandise variant is unavailable. Refresh the catalog.',409);
-      const retailCents=merchandiseSellingPrice(v.cost_cents,v.retail_cents);
-      if (retailCents===null) fail('A merchandise variant is unavailable. Refresh the catalog.',409);
-      if (retailCents!==input.expectedPriceCents) fail('A retail price changed. Review the updated price.',409);
+      const retailCents=v && merchandiseSellingPrice(v.cost_cents,v.retail_cents);
+      if (!v || !v.active || !v.artwork_reviewed || !v.enabled || !v.source_enabled || !v.available || v.currency!=='USD' || retailCents===null) {
+        issues.push({variantId:input.variantId,code:'unavailable'});
+        continue;
+      }
+      if (retailCents!==input.expectedPriceCents) {
+        issues.push({variantId:input.variantId,code:'price_changed',retailCents});
+        continue;
+      }
+      const source=parse(v.source_json).product;
       result.push({ variantId:v.id,productId:v.product_id,shopId:Number(v.shop_id),externalProductId:v.product_external_id,
         externalVariantId:Number(v.external_id),name:v.name,title:v.title,quantity:input.quantity,retailCents,costCents:v.cost_cents,
-        productVersion:v.version,sourceHash:v.source_hash,vendorId:v.vendor_id,vendorName:v.vendor_name,productionHash:fingerprint(production(parse(v.source_json).product)) });
+        productVersion:v.version,sourceHash:v.source_hash,vendorId:v.vendor_id,vendorName:v.vendor_name,
+        productionHash:fingerprint(printifyProduction(source)),productionStableHash:printifyProductionFingerprint(source) });
     }
-    if (new Set(result.map(v=>v.shopId)).size!==1) fail('These products use different supplier shops. Separate checkout is required.');
-    return result;
+    if (new Set(result.map(v=>v.shopId)).size>1) fail('These products use different supplier shops. Separate checkout is required.');
+    return {items:result,issues};
   }
-  async function verifyCurrent(items) {
+  async function selected(input,c=pool) {
+    const {items,issues}=await resolveCart(input,c);
+    if (issues.some(issue=>issue.code==='unavailable')) throw cartError('An item is no longer available. Review your cart.');
+    if (issues.length) throw cartError('A retail price changed. Review the updated price in your cart.');
+    return items;
+  }
+  const cartSupplierCache=new Map();
+  function supplierForCart(row) {
+    const key=`${row.shopId}/${row.externalProductId}`;
+    const saved=cartSupplierCache.get(key);
+    if (saved && saved.expiresAt>now()) return saved.read;
+    for (const [id,entry] of cartSupplierCache) if (entry.expiresAt<=now()) cartSupplierCache.delete(id);
+    if (cartSupplierCache.size>=80) cartSupplierCache.delete(cartSupplierCache.keys().next().value);
+    const entry={expiresAt:now()+15000,read:provider.product(row.shopId,row.externalProductId)};
+    cartSupplierCache.set(key,entry);
+    entry.read.catch(()=>{ if (cartSupplierCache.get(key)===entry) cartSupplierCache.delete(key); });
+    return entry.read;
+  }
+  async function matchesProduction(row,product) {
+    const liveStableHash=printifyProductionFingerprint(product);
+    if (row.productionStableHash) return liveStableHash===row.productionStableHash;
+    if (fingerprint(printifyProduction(product))===row.productionHash) return true;
+    // An old paid order contains only the raw digest. Use its original source
+    // record if still present, and confirm it matches the frozen digest first.
+    const [[original]]=await pool.query('SELECT source_json FROM merch_products WHERE id=? AND source_hash=?',[row.productId,row.sourceHash]);
+    const source=original && parse(original.source_json).product;
+    return Boolean(source && fingerprint(printifyProduction(source))===row.productionHash && printifyProductionFingerprint(source)===liveStableHash);
+  }
+  async function supplierIssues(items,preview=false) {
     const products=new Map();
-    for (const row of items) {
-      if (!products.has(row.externalProductId)) products.set(row.externalProductId,await provider.product(row.shopId,row.externalProductId));
-      const p=products.get(row.externalProductId), v=p.variants.find(v=>v.id===row.externalVariantId);
-      if (Number(p.shop_id)!==row.shopId || !v?.is_enabled || !v.is_available || v.cost!==row.costCents || fingerprint(production(p))!==row.productionHash) fail('Supplier cost, availability or production details changed. Refresh and review before checkout or fulfillment.',409);
+    const results=await Promise.all(items.map(async row=>{
+      const key=`${row.shopId}/${row.externalProductId}`;
+      if (!products.has(key)) products.set(key,preview?supplierForCart(row):provider.product(row.shopId,row.externalProductId));
+      let product;
+      try { product=await products.get(key); }
+      catch (error) { return {variantId:row.variantId,code:error.providerStatus===404?'unavailable':'verification_unavailable'}; }
+      const variant=product.variants?.find(v=>v.id===row.externalVariantId);
+      if (Number(product.shop_id)!==row.shopId || !variant?.is_enabled || !variant.is_available) return {variantId:row.variantId,code:'unavailable'};
+      if (variant.cost!==row.costCents || !await matchesProduction(row,product)) return {variantId:row.variantId,code:'supplier_review'};
+      return null;
+    }));
+    return results.filter(Boolean);
+  }
+  async function verifyCurrent(items,fulfillment=false) {
+    const issues=await supplierIssues(items);
+    const affected=new Set(issues.map(issue=>issue.variantId));
+    for (const row of items) if (affected.has(row.variantId)) cartSupplierCache.delete(`${row.shopId}/${row.externalProductId}`);
+    if (issues.some(issue=>issue.code==='verification_unavailable')) {
+      throw cartError(fulfillment?'Unable to verify the supplier listing. Retry fulfillment.':'We couldn’t confirm availability. Check your cart and try again.',503);
     }
+    if (issues.length) throw cartError(fulfillment?'Supplier cost, availability or artwork changed. Review before fulfillment.':'An item changed and needs review. Return to your cart for details.');
+  }
+  async function reviewCart(body) {
+    enabled(); await ready();
+    const {items,issues}=await resolveCart(cartInput(body.items));
+    return {issues:[...issues,...await supplierIssues(items,true)]};
   }
   async function tax(items, shipping, address, mode) {
     const region=`${address.country}:${address.region}`;
@@ -237,8 +294,12 @@ export function createMerchandiseService({ pool, stripeClients = {}, provider, c
       if (snapshot.mode!==(config.mode || 'test')) fail('Checkout mode changed. Request a fresh quote.',409);
       await account(snapshot.mode,snapshot.stripeAccount);
       const current=await selected(snapshot.items.map(row=>({variantId:row.variantId,quantity:row.quantity,expectedPriceCents:row.retailCents})),c);
-      if (fingerprint(current)!==fingerprint(snapshot.items)) fail('Catalog changed after quoting. Request a fresh quote.',409);
-      await verifyCurrent(snapshot.items);
+      // Quotes created before stable artwork IDs were introduced retain their
+      // original digest in the Stripe snapshot. Compare those without the new field.
+      const comparable=current.map(({productionStableHash,...row},index)=>snapshot.items[index]?.productionStableHash
+        ? {...row,productionStableHash} : row);
+      if (fingerprint(comparable)!==fingerprint(snapshot.items)) throw cartError('The catalog changed after quoting. Review your cart for an updated quote.');
+      await verifyCurrent(current);
       const shipping=await provider.quoteShipping(snapshot.items[0].shopId,{line_items:supplierLines(snapshot.items),address_to:snapshot.address});
       if (shipping.standard!==snapshot.shippingCents || fingerprint(await tax(snapshot.items,snapshot.shippingCents,snapshot.address,snapshot.mode))!==fingerprint(snapshot.tax)) fail('Shipping or tax changed. Review a new quote.',409);
       const orderId=uuid(), fulfillmentId=uuid(), returnOrigin=checkoutReturnOrigin(config.baseUrl || 'https://store.deckfamilyfarm.com',origin), expires=Math.floor(now()/1000)+1800;
@@ -271,7 +332,7 @@ export function createMerchandiseService({ pool, stripeClients = {}, provider, c
         // Set this flag only while holding this token's lock and after any local
         // transaction rolled back. Unknown/committed outcomes retain the token.
         const [[saved]]=await c.query('SELECT id FROM commerce_orders WHERE token_hash=?',[access]);
-        if (!saved && [400,409].includes(error.status)) error.checkoutRejected=true;
+        if (!saved && ([400,409].includes(error.status) || error.cartReviewRequired)) error.checkoutRejected=true;
         throw error;
       }
     });
@@ -418,7 +479,7 @@ export function createMerchandiseService({ pool, stripeClients = {}, provider, c
       const finances=await syncRefunds(c,o,false);
       if (finances.refundedCents || finances.financialHold) fail('Stripe refunds hold new supplier submission. Review financial receipts.',409);
       const body=parse(f.request_json);
-      await verifyCurrent(parse(o.snapshot_json).items);
+      await verifyCurrent(parse(o.snapshot_json).items,true);
       await c.query("UPDATE commerce_fulfillments SET attempted_ms=?,status='creating',updated_ms=? WHERE id=?",[now(),now(),f.id]);
       try {
         let receipt;
@@ -661,6 +722,6 @@ export function createMerchandiseService({ pool, stripeClients = {}, provider, c
     }
     await deliverEmails(); return results;
   }
-  return {catalog,importRecords,saveProduct,refreshProduct,quote,checkout,resumeCheckout,stripeWebhook,viewOrder,
+  return {catalog,importRecords,saveProduct,refreshProduct,reviewCart,quote,checkout,resumeCheckout,stripeWebhook,viewOrder,
     processFulfillment,printifyWebhook,reviewOperation,confirmOperation,reconcileFinances,recoverCheckout,refreshFees,orders,report,deliverEmails,maintenance};
 }

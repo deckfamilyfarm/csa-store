@@ -140,6 +140,33 @@ test('native merchandise catalog, Stripe payments and independent supplier fulfi
     await assert.rejects(makeQuote(token(),{items:[{variantId:localVariant,quantity:1,expectedPriceCents:2000,fulfillmentKind:'farm'}]}),/Mixed/);
     await assert.rejects(makeQuote(token(),{customer:{...customer,state:'CA'}}),/Tax configuration/);
   });
+  await t.test('cart review accepts a rotating Printify layer ID and blocks real drift before payment',async()=>{
+    const items=[{variantId:localVariant,quantity:1,expectedPriceCents:2000}];
+    const layer=product.print_areas[0].placeholders[0].images[0];
+    const before=checkoutCalls;
+    layer.imageId='generated-first';
+    try {
+      assert.deepEqual(await service.reviewCart({items}),{issues:[]});
+      assert.deepEqual(await service.reviewCart({items:[{...items[0],expectedPriceCents:1800}]}),
+        {issues:[{variantId:localVariant,code:'price_changed',retailCents:2000}]});
+      layer.imageId='generated-second';
+      const checked=await makeQuote();
+      layer.x=.6;
+      await assert.rejects(service.checkout({quoteId:checked.quote.quoteId,token:checked.access},'http://localhost:5177'),
+        error=>error.checkoutRejected && error.cartReviewRequired);
+      assert.equal(checkoutCalls,before);
+      assert.deepEqual(await service.reviewCart({items}),{issues:[{variantId:localVariant,code:'supplier_review'}]});
+      layer.x=.5;
+      product.variants[0].is_available=false;
+      clock+=15001;
+      assert.deepEqual(await service.reviewCart({items}),{issues:[{variantId:localVariant,code:'unavailable'}]});
+    } finally {
+      delete layer.imageId;
+      layer.x=.5;
+      product.variants[0].is_available=true;
+      clock+=15001;
+    }
+  });
   let first,event;
   await t.test('existing signed storefront endpoint rejects unverified requests and routes turkey events separately',async()=>{
     const body=JSON.stringify({id:'evt_turkey_existing',livemode:false,type:'checkout.session.completed',data:{object:{metadata:{storefront_order_id:'1'}}}});

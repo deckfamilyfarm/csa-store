@@ -16,6 +16,21 @@ export function canonical(value) {
   return value;
 }
 export const fingerprint = value => hash(json(canonical(value)));
+export const printifyProduction = product => ({ blueprint: product.blueprint_id, provider: product.print_provider_id,
+  areas: product.print_areas, details: product.print_details });
+export function printifyProductionFingerprint(product) {
+  const production = structuredClone(printifyProduction(product));
+  for (const area of production.areas || []) {
+    for (const placeholder of area.placeholders || []) {
+      for (const layer of placeholder.images || []) {
+        // Printify regenerates imageId on every read. The upload ID and all
+        // other layer properties, including position and layer order, still count.
+        if (typeof layer.id === 'string' && layer.id.trim()) delete layer.imageId;
+      }
+    }
+  }
+  return fingerprint(production);
+}
 export function addressInput(input = {}) {
   const result = {
     first_name: text(input.firstName, 'first name', 80), last_name: text(input.lastName, 'last name', 80),
