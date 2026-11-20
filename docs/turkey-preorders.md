@@ -86,6 +86,18 @@ A paid order can still have an unavailable confirmation page if checkout started
 
 Filter Orders by location and Paid status to produce remaining pickup lists; export CSV or print. **Mark collected** is repeat-safe, including after a confirmed item cancellation. Quantities on screen and in the CSV are the remaining birds; the CSV also retains original/cancelled quantities and original/refunded/remaining payment totals.
 
+### Print turkey pickup labels
+
+From the repository root, generate a PDF from the configured storefront database:
+
+```sh
+node --env-file=.env apps/api/scripts/printTurkeyLabels.js --output /private/tmp/turkey-pickup-labels.pdf
+```
+
+Use `--sale-id` to select a sale other than sale 1. The PDF has one label per live paid bird after cancellations, including birds marked collected. Labels are grouped in PSU, Hollywood, LCFM, then Farm Pickup order and sorted by customer name within each market. The output includes customer names and phone numbers, so store it with the pickup records. Use a fresh output filename for each run.
+
+Print on US Letter **Avery 5164 / 8164** sheets in color at **Actual size / 100%**, with six 4 × 3⅓ in labels per sheet.
+
 ### SOP: Turkey Preorder Cancellations
 
 *Care for every customer, account for every bird, and make pickup day easy.*
