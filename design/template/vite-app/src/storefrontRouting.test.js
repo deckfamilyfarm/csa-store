@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { usesAdminPortal, usesTurkeyStorefront } from './storefrontRouting.js';
+import { usesAdminPortal, usesTurkeyStorefront, usesMerchandiseStorefront } from './storefrontRouting.js';
 
 test('the admin host and local entry points open the staff portal', () => {
   for (const url of [
@@ -48,4 +48,44 @@ test('turkey detail and cart routes work on local, turkey, and legacy store URLs
   for (const host of ['https://store.deckfamilyfarm.com','https://turkeys.deckfamilyfarm.com','http://localhost:5176']) {
     for (const route of ['product','cart']) assert.equal(usesTurkeyStorefront(`${host}/#/turkeys/${route}?preview=1`), true);
   }
+});
+
+test('merchandise has a dedicated host, local path, preview mode and legacy hash routes', () => {
+  for (const url of [
+    'https://merchandise.deckfamilyfarm.com/',
+    'https://merchandise.deckfamilyfarm.com/#/merchandise/cart',
+    'https://merchandise.deckfamilyfarm.com/#/merchandise/checkout',
+    'https://merchandise.deckfamilyfarm.com/#/merchandise/order?order=existing',
+    'http://localhost:5176/merchandise',
+    'http://127.0.0.1:5176/merchandise/cart',
+    'http://localhost:5176/?experience=merchandise',
+    'https://store.deckfamilyfarm.com/#/merchandise?preview=1',
+    'https://store.deckfamilyfarm.com/#/merchandise/order?order=existing',
+    'https://turkeys.deckfamilyfarm.com/#/merchandise'
+  ]) {
+    assert.equal(usesMerchandiseStorefront(url), true, url);
+    assert.equal(usesTurkeyStorefront(url), false, url);
+  }
+  for (const url of [
+    'https://store.deckfamilyfarm.com/',
+    'https://subscribe.deckfamilyfarm.com/',
+    'https://dropsites.deckfamilyfarm.com/',
+    'https://turkeys.deckfamilyfarm.com/',
+    'https://admin.deckfamilyfarm.com/#/merchandise',
+    'https://merchandise.deckfamilyfarm.com.evil.example/',
+    'http://localhost:5176/merchandise-other',
+    'https://merchandise.deckfamilyfarm.com/?experience=store'
+  ]) assert.equal(usesMerchandiseStorefront(url), false, url);
+});
+
+test('merchandise keeps public navigation, staff access and account recovery available', () => {
+  const origin = 'https://merchandise.deckfamilyfarm.com';
+  for (const path of [
+    '/admin', '/#/admin', '/#/account', '/#/reset-password?token=reset',
+    '/merchandise#/reset-password?token=reset', '/subscribe', '/#/subscribe',
+    '/dropsites', '/#/dropsites', '/liability/visitor', '/#/liability/horse',
+    '/?experience=subscribe', '/?experience=dropsites', '/?experience=turkeys',
+    '/turkeys', '/#/turkeys', '/#/turkeys/cart', '/#/turkeys?order=existing'
+  ]) assert.equal(usesMerchandiseStorefront(`${origin}${path}`), false, path);
+  assert.equal(usesTurkeyStorefront(`${origin}/#/turkeys?order=existing`), true);
 });

@@ -11,16 +11,20 @@ export function usesTurkeyStorefront(href) {
   if (usesAdminPortal(href)) return false;
   const url = new URL(href);
   const route = url.hash.replace(/^#\/?/, '').split('?')[0];
-  const reserved = ['admin', 'account', 'subscribe', 'dropsites', 'reset-password'];
+  const reserved = ['admin', 'account', 'subscribe', 'dropsites', 'merchandise', 'reset-password'];
   const pathRoute = url.pathname.replace(/^\//, '').split('/')[0];
-  if (reserved.includes(route) || reserved.includes(pathRoute) || route.startsWith('liability/') || pathRoute === 'liability') return false;
-  if (['subscribe','dropsites','store'].includes(url.searchParams.get('experience'))) return false;
+  if (reserved.includes(route.split('/')[0]) || reserved.includes(pathRoute) || route.startsWith('liability/') || pathRoute === 'liability') return false;
+  if (['subscribe','dropsites','store','merchandise'].includes(url.searchParams.get('experience'))) return false;
   return url.hostname === 'turkeys.deckfamilyfarm.com' || pathRoute === 'turkeys' || url.searchParams.get('experience') === 'turkeys' || route === 'turkeys' || route.startsWith('turkeys/');
 }
 
 export function usesMerchandiseStorefront(href) {
-  if(usesAdminPortal(href))return false;
-  const url=new URL(href),route=url.hash.replace(/^#\/?/,'').split('?')[0];
-  if(['reset-password','account','admin'].includes(route))return false;
-  return route==='merchandise'||route.startsWith('merchandise/')||url.pathname==='/merchandise'||url.pathname.startsWith('/merchandise/');
+  if (usesAdminPortal(href)) return false;
+  const url = new URL(href);
+  const route = url.hash.replace(/^#\/?/, '').split('?')[0];
+  const pathRoute = url.pathname.replace(/^\//, '').split('/')[0];
+  const reserved = ['admin', 'account', 'subscribe', 'dropsites', 'turkeys', 'reset-password'];
+  if (reserved.includes(route.split('/')[0]) || reserved.includes(pathRoute) || route.startsWith('liability/') || pathRoute === 'liability') return false;
+  if (['subscribe', 'dropsites', 'store', 'turkeys'].includes(url.searchParams.get('experience'))) return false;
+  return url.hostname === 'merchandise.deckfamilyfarm.com' || pathRoute === 'merchandise' || url.searchParams.get('experience') === 'merchandise' || route === 'merchandise' || route.startsWith('merchandise/');
 }

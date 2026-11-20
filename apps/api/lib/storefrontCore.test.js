@@ -7,12 +7,16 @@ const customer = { name: 'Turkey Buyer', email: 'buyer@example.com', phone: '541
 test('Stripe returns to the same trusted storefront origin without accepting open redirects', () => {
   const store = 'https://store.deckfamilyfarm.com';
   const turkeys = 'https://turkeys.deckfamilyfarm.com';
+  const merchandise = 'https://merchandise.deckfamilyfarm.com';
   assert.equal(checkoutReturnOrigin(store, turkeys), turkeys);
   assert.equal(checkoutReturnOrigin(turkeys, store), store);
+  assert.equal(checkoutReturnOrigin(store, merchandise), merchandise);
+  assert.equal(checkoutReturnOrigin(merchandise, store), store);
+  assert.equal(checkoutReturnOrigin(merchandise), merchandise);
   assert.equal(checkoutReturnOrigin(store), store);
   assert.equal(checkoutReturnOrigin('http://localhost:5176', 'http://localhost:5176'), 'http://localhost:5176');
   assert.equal(checkoutReturnOrigin('https://staging.example.com', 'https://staging.example.com'), 'https://staging.example.com');
-  for (const origin of ['null', 'https://evil.example', 'https://store.deckfamilyfarm.com.evil.example', 'https://evil.example@store.deckfamilyfarm.com', 'https://store.deckfamilyfarm.com/evil', 'http://store.deckfamilyfarm.com']) {
+  for (const origin of ['null', 'https://evil.example', 'https://store.deckfamilyfarm.com.evil.example', 'https://evil.example@store.deckfamilyfarm.com', 'https://store.deckfamilyfarm.com/evil', 'http://store.deckfamilyfarm.com', 'https://merchandise.deckfamilyfarm.com.evil.example', 'http://merchandise.deckfamilyfarm.com']) {
     assert.throws(() => checkoutReturnOrigin(store, origin), /store website/);
   }
   for (const configured of ['not a URL', 'http://evil.example', 'ftp://localhost', 'https://user:password@example.com']) {

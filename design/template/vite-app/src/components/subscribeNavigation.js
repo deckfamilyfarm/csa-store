@@ -28,6 +28,10 @@ export function getTurkeyHostUrl() {
   return isLocalHost() ? localPath("/turkeys") : "https://turkeys.deckfamilyfarm.com/";
 }
 
+export function getMerchandiseHostUrl() {
+  return isLocalHost() ? localPath("/merchandise") : "https://merchandise.deckfamilyfarm.com/";
+}
+
 export function buildSubscribeNavLinks() {
   return [
     {
@@ -53,7 +57,7 @@ export function buildSubscribeNavLinks() {
       children: [
         { label: "Turkeys", href: getTurkeyHostUrl() },
         { label: "CSA Shopping", href: subscriptionStoreUrl() },
-        { label: "Merchandise", href: "https://www.deckfamilyfarm.com/merchandise" }
+        { label: "Merchandise", href: getMerchandiseHostUrl() }
       ]
     }
   ];

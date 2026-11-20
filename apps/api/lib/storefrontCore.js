@@ -38,8 +38,8 @@ export function checkoutReturnOrigin(configuredUrl, requestOrigin) {
     fail('Storefront URL must use HTTPS.', 503);
   }
   if (!requestOrigin) return configured.origin;
-  const allowed = new Set([configured.origin, 'https://store.deckfamilyfarm.com', 'https://turkeys.deckfamilyfarm.com']);
-  if (!allowed.has(requestOrigin)) fail('Please open the turkey page on the store website before starting checkout.');
+  const allowed = new Set([configured.origin, 'https://store.deckfamilyfarm.com', 'https://turkeys.deckfamilyfarm.com', 'https://merchandise.deckfamilyfarm.com']);
+  if (!allowed.has(requestOrigin)) fail('Please open the store website before starting checkout.');
   return requestOrigin;
 }
 export function normalizeCheckout(body) {

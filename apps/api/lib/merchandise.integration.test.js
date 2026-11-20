@@ -180,9 +180,18 @@ test('native merchandise catalog, Stripe payments and independent supplier fulfi
   });
   await t.test('lost Stripe response recovers one session; guest reads cannot mark paid; verified webhook enqueues once',async()=>{
     const q=await makeQuote();const before=checkoutCalls;loseCheckout=true;
-    await assert.rejects(service.checkout({quoteId:q.quote.quoteId,token:q.access},'http://localhost:5177'),/outcome is unknown/);
-    const result=await service.checkout({quoteId:q.quote.quoteId,token:q.access},'http://localhost:5177');first={...q,result};
+    const origin='https://merchandise.deckfamilyfarm.com';
+    await assert.rejects(service.checkout({quoteId:q.quote.quoteId,token:q.access},origin),/outcome is unknown/);
+    const [[frozen]]=await pool.query('SELECT stripe_request_json,stripe_key FROM commerce_orders WHERE token_hash=?',[crypto.createHash('sha256').update(q.access).digest('hex')]);
+    const result=await service.checkout({quoteId:q.quote.quoteId,token:q.access},origin);first={...q,result};
     assert.equal(checkoutCalls-before,2);assert.equal(sessionKeys.size,sessions.size);
+    const [[saved]]=await pool.query('SELECT stripe_request_json,stripe_key FROM commerce_orders WHERE id=?',[result.orderId]);
+    assert.deepEqual(saved,frozen);
+    const request=JSON.parse(saved.stripe_request_json);
+    assert.equal(request.success_url,`${origin}/#/merchandise/order?order=${result.orderId}`);
+    assert.equal(request.cancel_url,`${origin}/#/merchandise/order?order=${result.orderId}&cancelled=1`);
+    await assert.rejects(service.checkout({quoteId:q.quote.quoteId,token:q.access},'https://store.deckfamilyfarm.com'),/different frozen order/);
+    assert.equal(checkoutCalls-before,2);
     assert.equal((await service.viewOrder(result.orderId,q.access)).paid,false);
     await assert.rejects(service.viewOrder(result.orderId,token()),/not found/);
     await assert.rejects(service.processFulfillment((await fulfillment(result.orderId)).id),/webhook/);

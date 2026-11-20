@@ -19,6 +19,10 @@ Turkey preorders
 - `turkeys.deckfamilyfarm.com` (locally `/turkeys`) has a turkey preorder storefront with independent stock, guest Stripe checkout, and **Store → Turkey Preorders** administration.
 - The sale starts as a draft with checkout disabled. See [configuration, launch, maintenance, and tests](docs/turkey-preorders.md).
 
+Merchandise
+- `merchandise.deckfamilyfarm.com` (locally `/merchandise`) opens the branded merchandise shop. Subscribe, Dropsites, Turkeys and Merchandise share the same menu, including **Shop → Merchandise**.
+- See [merchandise hostname and nginx setup](docs/merchandise.md#dedicated-hostname-and-nginx) for the server configuration and certificate steps.
+
 How To Edit The Site Directly
 - This site is not edited through Wix or a visual CMS. It is edited directly in this repo using normal files.
 - The current subscribe page is a React page. If you want to change wording, images, layout, or styling, you edit the files below and rebuild the frontend.
@@ -39,7 +43,7 @@ Files to edit
 
 What to edit where
 - Header/menu links:
-  - update `SUBSCRIBE_NAV_LINKS` in `SubscribePage.jsx`
+  - update `buildSubscribeNavLinks` in `design/template/vite-app/src/components/subscribeNavigation.js`
 - Plan cards and plan dropdown labels:
   - update `SUBSCRIBE_PLANS` in `SubscribePage.jsx`
 - Hero text, herdshare text, FAQ text, section headings, and other written copy:
