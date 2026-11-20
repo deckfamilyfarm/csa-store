@@ -342,7 +342,7 @@ export function MerchandiseStorefront() {
               onEdit={() => { setQuote(null); setError(''); }} onPay={pay} />)
           : <>
             <div className="merch-shop-heading">
-              <div><p className="merch-eyebrow">Deck Family Farm</p><h1 ref={heading} tabIndex={-1}>Branded Merchandise</h1></div>
+              <div><p className="merch-eyebrow">Deck Family Farm</p><h1 ref={heading} tabIndex={-1}>Deck Family Farm Merch!</h1></div>
               {!preview && <a className="merch-cart-link" href={merchandiseLink('cart')}>Cart <span>{count}</span></a>}
             </div>
             {preview && <p className="merch-status">Staff preview. Disabled drafts cannot be purchased.</p>}

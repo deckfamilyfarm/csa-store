@@ -266,8 +266,12 @@ img {
   box-shadow: var(--shadow);
 }
 
-.subscribe-page {
+.subscribe-page,
+.subscribe-header {
   --subscribe-serif: "Cormorant Garamond", "Fraunces", "Times New Roman", serif;
+}
+
+.subscribe-page {
   --subscribe-background: #8d9475;
   min-height: 100vh;
   background: #fff;
