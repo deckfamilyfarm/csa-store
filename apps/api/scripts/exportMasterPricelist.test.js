@@ -60,6 +60,15 @@ function exportedProduct(result) {
   return Object.fromEntries(result.sheetValues[0].map((name, index) => [name, result.sheetValues[1][index]]));
 }
 
+test("the master pricelist exports the linked Local Line ID independently of the CSA Store ID", () => {
+  const linked = exportedProduct(buildPricelistSheetValues(pricingFixture({
+    productMetaRows: [{ productId: 42, localLineProductId: 83 }]
+  })));
+  assert.equal(linked.id, 42);
+  assert.equal(linked.localLineProductID, 83);
+  assert.equal(exportedProduct(buildPricelistSheetValues(pricingFixture())).localLineProductID, "");
+});
+
 test("Google master pricelist defaults to Deck Family Farm, Hyland, and Creamy Cow", () => {
   const fixture = pricingFixture({
     productRows: [

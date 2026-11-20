@@ -10833,6 +10833,56 @@ router.put("/products/:id", requireAdminPermission(["inventory_admin", "pricing_
   res.json({ ok: true });
 });
 
+router.put("/products/:id/package-names", requireAdminPermission(["pricing_admin", "pricing_editor", "local_pricelist_admin"]), async (req, res) => {
+  const productId = Number(req.params.id);
+  const changes = req.body?.packages;
+  if (!Number.isSafeInteger(productId) || productId <= 0 || !Array.isArray(changes) || !changes.length) {
+    return res.status(400).json({ error: "A product and at least one package name are required." });
+  }
+  const names = new Map();
+  for (const change of changes) {
+    const { packageId, name: rawName, expectedName } = change ?? {};
+    if (!Number.isSafeInteger(packageId) || packageId <= 0 || names.has(packageId) ||
+      (expectedName !== null && typeof expectedName !== "string")) {
+      return res.status(400).json({ error: "Each package needs a unique ID and its original name." });
+    }
+    const name = typeof rawName === "string" ? rawName.trim() : "";
+    if (!name || [...name].length > 255) {
+      return res.status(400).json({ error: "Enter a package name of 1 to 255 characters." });
+    }
+    names.set(packageId, { name, expectedName });
+  }
+
+  let connection;
+  try {
+    connection = await getPool().getConnection();
+    await connection.beginTransaction();
+    const [[product]] = await connection.query("SELECT vendor_id AS vendorId, is_deleted AS isDeleted FROM products WHERE id = ? FOR UPDATE", [productId]);
+    if (!product || product.isDeleted) throw Object.assign(new Error("Product not found."), { status: 404 });
+    await validateVendorAssignment(connection, product.vendorId);
+    const [currentPackages] = await connection.query(
+      "SELECT id, name FROM packages WHERE product_id = ? AND id IN (?) ORDER BY id FOR UPDATE", [productId, [...names.keys()]]
+    );
+    if (currentPackages.length !== names.size) throw Object.assign(new Error("A package is no longer on this product. Reopen the product and try again."), { status: 409 });
+    const saved = [];
+    for (const current of currentPackages) {
+      const { name, expectedName } = names.get(current.id);
+      if (current.name !== name) {
+        if (current.name !== expectedName) throw Object.assign(new Error("A package name changed since you opened this product. Reopen it to review the current names."), { status: 409 });
+        await connection.query("UPDATE packages SET name = ? WHERE id = ? AND product_id = ?", [name, current.id, productId]);
+      }
+      saved.push({ packageId: current.id, name });
+    }
+    await connection.commit();
+    return res.json({ packages: saved });
+  } catch (error) {
+    await connection?.rollback().catch(() => {});
+    return res.status(error.status || 500).json({ error: error.message });
+  } finally {
+    connection?.release();
+  }
+});
+
 router.put('/products/:id/customer-prices', requireAdminPermission(['pricing_admin', 'local_pricelist_admin']), async (req, res) => {
   try {
     await assertLegacyPricingPublicationAllowed([Number(req.params.id)]);

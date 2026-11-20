@@ -4,11 +4,11 @@ import { EnterpriseInventoryCell } from "./EnterpriseInventoryCell.jsx";
 import { EnterpriseVisibilityCell } from "./EnterpriseVisibilityCell.jsx";
 import { EnterpriseSaleCell, SalePrice } from "./EnterpriseSaleCell.jsx";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { adminGet, adminPost } from "../adminApi.js";
+import { adminGet, adminPost, adminPut } from "../adminApi.js";
 import { EnterprisePromotionEditor } from "./EnterprisePromotionEditor.jsx";
 import { EnterpriseMarkupCell } from "./EnterpriseMarkup.jsx";
 import { ProductEditorDialog } from "./ProductEditorDialog.jsx";
-import { ProductPricingFields } from "./ProductPricingFields.jsx";
+import { ProductPackageFields, ProductPricingFields } from "./ProductPricingFields.jsx";
 import { EnterpriseProductCreate } from "./EnterpriseProductCreate.jsx";
 import { ProductEditorInfo } from "./ProductEditorInfo.jsx";
 import { PricingSyncStatus } from "./PricingSyncStatus.jsx";
@@ -80,6 +80,7 @@ function EnterpriseProductsSection({ token, roles = [], createdProductId }) {
   const [selectedId, setSelectedId] = useState(() => Number(new URLSearchParams(window.location.search).get("pricingProduct")) || null);
   const [detail, setDetail] = useState(null);
   const [draft, setDraft] = useState(null);
+  const [packageNames, setPackageNames] = useState({});
   const [preview, setPreview] = useState(null);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
@@ -190,9 +191,12 @@ function EnterpriseProductsSection({ token, roles = [], createdProductId }) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [warningRow]);
 
+  const depositProduct = isDepositPricing(detail?.product);
+  const detailProductId = detail?.product.id;
+  const vendorRequired = detail?.product.vendorRequired;
   useEffect(() => {
-    if (!selectedId || !draft || !canEdit || Number(detail?.product.id) !== Number(selectedId) || isDepositPricing(detail?.product)) return;
-    if (detail.product.vendorRequired) { setPreview(null); return; }
+    if (!selectedId || !draft || !canEdit || Number(detailProductId) !== Number(selectedId) || depositProduct) return;
+    if (vendorRequired) { setPreview(null); return; }
     setPreview(null);
     if (draft.customMarkupBp === "") { setMessage("Enter a markup percentage."); return; }
     let cancelled = false;
@@ -202,7 +206,7 @@ function EnterpriseProductsSection({ token, roles = [], createdProductId }) {
         .catch(error => { if (!cancelled) { setPreview(null); setMessage(error.message); } });
     }, 350);
     return () => { cancelled = true; clearTimeout(timer); };
-  }, [selectedId, token, draft, canEdit, detail]);
+  }, [selectedId, token, draft, canEdit, detailProductId, vendorRequired, depositProduct]);
 
   const visible = rows;
   const changeSort = key => {
@@ -235,8 +239,14 @@ function EnterpriseProductsSection({ token, roles = [], createdProductId }) {
     setMessage(saved.pricing ? "Cost saved. Updated selling prices are now in use locally." : "Cost saved. Complete the product’s pricing inputs to calculate selling prices.");
   }
 
-  const pricingDirty = !!draft && !isDepositPricing(detail?.product) && JSON.stringify(draft) !== pricingBaseline;
-  const editorDirty = pricingDirty || infoDirty || saleDirty;
+  const pricingDirty = !!draft && !depositProduct && JSON.stringify(draft) !== pricingBaseline;
+  const packageNameChanges = (detail?.packages || []).flatMap(pkg => {
+    const name = packageNames[pkg.packageId];
+    return name !== undefined && name !== (pkg.name ?? "") ? [{ packageId: Number(pkg.packageId), name, expectedName: pkg.name ?? null }] : [];
+  });
+  const changePackageName = (packageId, name) => setPackageNames(current => ({ ...current, [packageId]: name }));
+  const editorDirty = pricingDirty || infoDirty || packageNameChanges.length > 0 || saleDirty;
+  const canSave = (pricingDirty || infoDirty || packageNameChanges.length > 0) && (!pricingDirty || preview?.output);
   const selectedIndex = rows.findIndex(row => Number(row.id) === Number(selectedId));
   const canLeaveEditor = () => !saveBusy.current && !saleBusy && !syncRequestBusy && (!editorDirty || window.confirm("Discard unsaved changes to this product?"));
   function selectProduct(id, force = false, section = null) {
@@ -246,16 +256,25 @@ function EnterpriseProductsSection({ token, roles = [], createdProductId }) {
     const url = new URL(window.location.href);
     if (id) url.searchParams.set("pricingProduct", String(id)); else url.searchParams.delete("pricingProduct");
     window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
-    setSelectedId(id); setDetail(null); setDraft(null); setPreview(null); setPricingBaseline(null); setInfoDirty(false); setSaleDirty(false); setSaleBusy(false); setDetailError(""); setMessage("");
+    setSelectedId(id); setDetail(null); setDraft(null); setPackageNames({}); setPreview(null); setPricingBaseline(null); setInfoDirty(false); setSaleDirty(false); setSaleBusy(false); setDetailError(""); setMessage("");
   }
   async function save(closeAfter = false) {
     if (!detail || !draft || saveBusy.current) return;
+    if (packageNameChanges.some(pkg => !pkg.name.trim())) { setMessage("Enter a name for each edited package."); return; }
     saveBusy.current = true; setLoading(true); setMessage("");
-    let infoSaved = false;
+    const saved = [];
     try {
-      if (infoDirty) { await productInfoRef.current.save(); infoSaved = true; }
+      if (infoDirty) { await productInfoRef.current.save(); saved.push("product info"); }
+      if (packageNameChanges.length) {
+        const result = await adminPut(`products/${selectedId}/package-names`, token, { packages: packageNameChanges });
+        const names = new Map(result.packages.map(pkg => [Number(pkg.packageId), pkg.name]));
+        setDetail(current => ({ ...current, packages: current.packages.map(pkg => names.has(Number(pkg.packageId))
+          ? { ...pkg, name: names.get(Number(pkg.packageId)) } : pkg) }));
+        setPackageNames({});
+        saved.push("package names");
+      }
       if (pricingDirty) {
-        const result = await adminPost(`enterprise-pricing/products/${selectedId}/revisions`, token, {
+        await adminPost(`enterprise-pricing/products/${selectedId}/revisions`, token, {
           input: draft, expectedLatestRevisionId: detail.latest?.id || null,
           expectedBuyPriceRevision: detail.buyPrice?.revision || 0
         });
@@ -263,10 +282,10 @@ function EnterpriseProductsSection({ token, roles = [], createdProductId }) {
         setPricingBaseline(JSON.stringify(draft));
         setDetailRefresh(value => value + 1);
         setMessage("Prices saved and now in use. Channel synchronization is separate.");
-      } else setMessage("Product info saved locally.");
+      } else setMessage(packageNameChanges.length ? "Package names saved locally." : "Product info saved locally.");
       setMarkupRefresh(value => value + 1);
       if (closeAfter && (!saleDirty || window.confirm("Your sale proposal has unsaved changes. Discard it and go back?"))) selectProduct(null, true);
-    } catch (error) { setMessage(`${infoSaved ? "Product info saved. Pricing was not saved: " : ""}${error.message}`); }
+    } catch (error) { setMessage(`${saved.length ? `Saved ${saved.join(" and ")}. ` : ""}${error.message}`); }
     finally { saveBusy.current = false; setLoading(false); }
   }
 
@@ -359,13 +378,13 @@ function EnterpriseProductsSection({ token, roles = [], createdProductId }) {
       onPrevious={selectedIndex > 0 ? () => selectProduct(rows[selectedIndex - 1].id) : null}
       onNext={selectedIndex >= 0 && selectedIndex < rows.length - 1 ? () => selectProduct(rows[selectedIndex + 1].id) : null}
       sections={[["editor-info", "Product info"], ["editor-inventory", "Inventory"],
-        ...(!detail || isDepositPricing(detail.product) ? [] : [["editor-pricing", "Pricing"], ["editor-packages", "Packages"], ["editor-wholesale", "Wholesale"], ["editor-sales", "Sales"]]),
+        ...(!detail ? [] : depositProduct ? [["editor-packages", "Packages"]] : [["editor-pricing", "Pricing"], ["editor-packages", "Packages"], ["editor-wholesale", "Wholesale"], ["editor-sales", "Sales"]]),
         ["editor-channels", "Channel prices"], ["editor-sync", "Sync"]]}
       footer={<><button type="button" className="button alt" disabled={loading || syncRequestBusy} onClick={() => selectProduct(null)}>Back</button>
         {canEdit && <button type="button" className="button alt" disabled={loading || saleBusy || syncRequestBusy || !detail || editorDirty} title={editorDirty ? "Save or discard changes before duplicating" : "Create a separate local copy"} onClick={duplicateProduct}>Duplicate product</button>}
         {(canEdit || roles.some(role => ["admin", "inventory_admin", "pricing_admin", "local_pricelist_admin"].includes(role))) && <>
-          <button type="button" className="button alt" disabled={loading || saleBusy || syncRequestBusy || !(pricingDirty || infoDirty) || (pricingDirty && !preview?.output)} onClick={() => save(false)}>{loading ? "Saving…" : "Save"}</button>
-          <button type="button" className="button" disabled={loading || saleBusy || syncRequestBusy || !(pricingDirty || infoDirty) || (pricingDirty && !preview?.output)} onClick={() => save(true)}>Save and go back</button>
+          <button type="button" className="button alt" disabled={loading || saleBusy || syncRequestBusy || !canSave} onClick={() => save(false)}>{loading ? "Saving…" : "Save"}</button>
+          <button type="button" className="button" disabled={loading || saleBusy || syncRequestBusy || !canSave} onClick={() => save(true)}>Save and go back</button>
         </>}</>}>
       {!detail && <section className="product-editor-section"><p role="status">{detailError || "Loading product…"}</p>
         {detailError && <button type="button" className="button alt" onClick={() => setDetailRefresh(value => value + 1)}>Retry</button>}</section>}
@@ -376,9 +395,13 @@ function EnterpriseProductsSection({ token, roles = [], createdProductId }) {
             vendorRequired: updates.vendorId ? false : value.product.vendorRequired } }));
           setRows(value => value.map(row => Number(row.id) === Number(selectedId) ? { ...row, ...updates } : row));
         }} />
-      {isDepositPricing(detail.product) ? <p className="small">Fixed deposit amount, with no markup. Managed through the existing deposit workflow.</p> : <p className="small">Saving updates our prices immediately. Use Sync below to review Square links, create a missing Square item, and publish this product to either channel.{summary?.localOnly && ' Remote updates are disabled in local test mode.'}</p>}
-      {!isDepositPricing(detail.product) && <>
-      <ProductPricingFields draft={draft} detail={detail} preview={preview} canEdit={canEdit} loading={loading} update={update} />
+      {depositProduct ? <>
+        <p className="small">Fixed deposit amount, with no markup. Managed through the existing deposit workflow.</p>
+        <ProductPackageFields detail={detail} canEdit={canEdit} loading={loading} packageNames={packageNames} onPackageNameChange={changePackageName} />
+      </> : <p className="small">Saving updates our prices immediately. Use Sync below to review Square links, create a missing Square item, and publish this product to either channel.{summary?.localOnly && ' Remote updates are disabled in local test mode.'}</p>}
+      {!depositProduct && <>
+      <ProductPricingFields draft={draft} detail={detail} preview={preview} canEdit={canEdit} loading={loading} update={update}
+        packageNames={packageNames} onPackageNameChange={changePackageName} />
       <section id="editor-sales" className="product-editor-section"><h3>Sales</h3>
       {rows.find(row=>Number(row.id)===Number(selectedId)) && <EnterpriseSaleCell row={rows.find(row=>Number(row.id)===Number(selectedId))} token={token} canEdit={canEdit} onReview={()=>setMessage("Review the existing promotion in Review & Publish → Sales.")} onSaved={()=>{setMarkupRefresh(v=>v+1);setMessage("Sale saved locally. Publish it from Review & Publish → Sales.");}} />}
       {!detail.active && <p>Save regular pricing before planning a sale.</p>}

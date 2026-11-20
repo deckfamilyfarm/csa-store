@@ -11,10 +11,42 @@ const localDateTime = value => {
   return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
 };
 
-export function ProductPricingFields({ draft, detail, preview, canEdit = true, loading = false, update, creating = false }) {
+export function ProductPackageFields({ draft, detail, preview, canEdit = true, loading = false, update, creating = false,
+  packageNames = {}, onPackageNameChange }) {
+  const updatePackage = (index, patch) => update({ packages: draft.packages.map((row, i) => i === index ? { ...row, ...patch } : row) });
+  const pricingById = new Map((draft?.packages || []).map((row, index) => [Number(row.packageId), { row, index }]));
+  return <section id="editor-packages" className="product-editor-section"><h3>Packages</h3>
+    {(creating ? draft.packages : detail.packages).map(pkg => {
+      const pricing = pricingById.get(Number(pkg.packageId));
+      const changePrice = patch => updatePackage(pricing.index, patch);
+      const name = packageNames[pkg.packageId] ?? pkg.name ?? "";
+      return <div className="admin-grid enterprise-pricing-repeat-grid" key={pkg.packageId}>
+        <label>Package name<input className="input" maxLength={255} disabled={!canEdit || loading} value={name}
+          onChange={event => creating ? changePrice({ name: event.target.value }) : onPackageNameChange(pkg.packageId, event.target.value)} /></label>
+        {pricing && <>
+          {draft.pricingUnit === "lb" ? <>
+            <label>Minimum lb<input className="input" type="number" step="0.001" disabled={!canEdit || loading} value={textValue(pricing.row.minWeight)} onChange={event => changePrice({ minWeight: event.target.value })} /></label>
+            <label>Maximum lb<input className="input" type="number" step="0.001" disabled={!canEdit || loading} value={textValue(pricing.row.maxWeight)} onChange={event => changePrice({ maxWeight: event.target.value })} /></label>
+            <label>Average override lb<input className="input" type="number" step="0.001" disabled={!canEdit || loading} value={textValue(pricing.row.avgWeightOverride)} onChange={event => changePrice({ avgWeightOverride: event.target.value })} /></label>
+          </> : <label>Units in package<input className="input" type="number" min="1" step="1" disabled={!canEdit || loading} value={textValue(pricing.row.quantity)} onChange={event => changePrice({ quantity: event.target.value })} /></label>}
+          {draft.pricingUnit === "each" && <label>Package Cost<input className="input" type="number" min="0.01" step="0.01" disabled={!canEdit || loading}
+            aria-label={`Package Cost for ${name || 'package'}`}
+            placeholder="Use default × quantity" value={textValue(pricing.row.packageBuyPrice)} onChange={event => changePrice({ packageBuyPrice: event.target.value || null, packageBuyPriceEnterpriseId: Number(draft.retailEnterpriseId) })} />
+            <small>Total cost of this package. Blank uses the default Cost × quantity.</small></label>}
+          <span>FF Package Price {money(preview?.output?.packages?.find(row => row.packageId === Number(pkg.packageId))?.localLineRegularCents)}</span>
+          {creating && draft.packages.length > 1 && <button type="button" className="button alt" onClick={() => update({ packages: draft.packages.filter(row => row.packageId !== pkg.packageId) })}>Remove package</button>}
+        </>}
+      </div>;
+    })}
+    {!creating && !detail.packages.length && <p>No packages on this product.</p>}
+    {creating && <button type="button" className="button alt" onClick={() => update({ packages: [...draft.packages, { packageId: Math.max(...draft.packages.map(p => p.packageId)) + 1, name: "", quantity: 1 }] })}>Add package</button>}
+  </section>;
+}
+
+export function ProductPricingFields({ draft, detail, preview, canEdit = true, loading = false, update, creating = false,
+  packageNames, onPackageNameChange }) {
   const changeRow = (key, index, patch) => update({ [key]: draft[key].map((row, i) => i === index ? { ...row, ...patch } : row) });
   const updateCost = (i, patch) => changeRow("purchaseCosts", i, patch);
-  const updatePackage = (i, patch) => changeRow("packages", i, patch);
   const updateWholesale = (i, patch) => changeRow("wholesale", i, patch);
   return <>
       <section id="editor-pricing" className="product-editor-section"><h3>Pricing</h3>
@@ -39,23 +71,7 @@ export function ProductPricingFields({ draft, detail, preview, canEdit = true, l
       {canEdit && <button className="button alt" type="button" onClick={() => update({ purchaseCosts: [...draft.purchaseCosts, { enterpriseId: detail.enterprises[0]?.id, cost: "", effectiveAt: new Date().toISOString().slice(0, 10), documentationRef: "" }] })}>Add Cost</button>}
       <MarkupCalculation input={draft} output={preview?.output} settings={detail.settings} packageNames={Object.fromEntries(detail.packages.map(p=>[p.packageId,p.name]))} />
       </section>
-      <section id="editor-packages" className="product-editor-section"><h3>Packages</h3>
-      {draft.packages.map((pkg, index) => <div className="admin-grid enterprise-pricing-repeat-grid" key={pkg.packageId}>
-        {creating ? <label>Package name<input className="input" value={pkg.name || ""} onChange={event => updatePackage(index, { name: event.target.value })} /></label> : <strong>{detail.packages.find(row => Number(row.packageId) === Number(pkg.packageId))?.name || pkg.packageId}</strong>}
-        {draft.pricingUnit === "lb" ? <>
-          <label>Minimum lb<input className="input" type="number" step="0.001" disabled={!canEdit || loading} value={textValue(pkg.minWeight)} onChange={event => updatePackage(index, { minWeight: event.target.value })} /></label>
-          <label>Maximum lb<input className="input" type="number" step="0.001" disabled={!canEdit || loading} value={textValue(pkg.maxWeight)} onChange={event => updatePackage(index, { maxWeight: event.target.value })} /></label>
-          <label>Average override lb<input className="input" type="number" step="0.001" disabled={!canEdit || loading} value={textValue(pkg.avgWeightOverride)} onChange={event => updatePackage(index, { avgWeightOverride: event.target.value })} /></label>
-        </> : <label>Units in package<input className="input" type="number" min="1" step="1" disabled={!canEdit || loading} value={textValue(pkg.quantity)} onChange={event => updatePackage(index, { quantity: event.target.value })} /></label>}
-        {draft.pricingUnit === "each" && <label>Package Cost<input className="input" type="number" min="0.01" step="0.01" disabled={!canEdit || loading}
-          aria-label={`Package Cost for ${pkg.name || detail.packages.find(row=>Number(row.packageId)===Number(pkg.packageId))?.name || 'package'}`}
-          placeholder="Use default × quantity" value={textValue(pkg.packageBuyPrice)} onChange={event=>updatePackage(index,{packageBuyPrice:event.target.value || null,packageBuyPriceEnterpriseId:Number(draft.retailEnterpriseId)})} />
-          <small>Total cost of this package. Blank uses the default Cost × quantity.</small></label>}
-        <span>FF Package Price {money(preview?.output?.packages?.find(row => row.packageId === Number(pkg.packageId))?.localLineRegularCents)}</span>
-        {creating && draft.packages.length > 1 && <button type="button" className="button alt" onClick={() => update({ packages: draft.packages.filter((_, i) => i !== index) })}>Remove package</button>}
-      </div>)}
-      {creating && <button type="button" className="button alt" onClick={() => update({ packages: [...draft.packages, { packageId: Math.max(...draft.packages.map(p => p.packageId)) + 1, name: "", quantity: 1 }] })}>Add package</button>}
-      </section>
+      <ProductPackageFields {...{ draft, detail, preview, canEdit, loading, update, creating, packageNames, onPackageNameChange }} />
       <section id="editor-wholesale" className="product-editor-section"><h3>Wholesale resale prices</h3>
       {draft.wholesale.map((row, index) => <div className="admin-grid enterprise-pricing-repeat-grid" key={index}>
         <select className="input" aria-label="Selling enterprise" disabled={!canEdit || loading} value={row.sellingEnterpriseId} onChange={event => updateWholesale(index, { sellingEnterpriseId: Number(event.target.value) })}>{detail.enterprises.map(enterprise => <option value={enterprise.id} key={enterprise.id}>{enterprise.name}</option>)}</select>

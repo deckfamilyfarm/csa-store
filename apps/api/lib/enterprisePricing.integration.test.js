@@ -409,6 +409,25 @@ test("saved prices activate locally before independently approved channel public
       assert.equal(basketRow.exclude_from_guest,1);assert.equal(basketRow.exclude_from_snap,1);
       assert.equal(writes.length,writesBefore,'Editing basket exclusions never publishes');
 
+      const renamePackages = (packages, role = "pricing_editor") => nativeFetch(`${url}/admin/products/${packSaved.productId}/package-names`, {
+        method: "PUT", headers: { "Content-Type": "application/json", "x-test-role": role }, body: JSON.stringify({ packages })
+      });
+      const readPackages = async () => (await pool.query("SELECT * FROM packages WHERE product_id=? ORDER BY id", [packSaved.productId]))[0];
+      const beforeRename = await readPackages();
+      const [first, second] = beforeRename;
+      const rename = { packageId: first.id, name: "4 links / 16 oz pack", expectedName: first.name };
+      assert.equal((await renamePackages([rename], "pricing_publisher")).status, 403);
+      assert.equal((await renamePackages([{ ...rename, name: " " }])).status, 400);
+      assert.equal((await renamePackages([rename, { packageId: second.id, name: "5 pack renamed", expectedName: "stale" }])).status, 409);
+      assert.equal((await renamePackages([{ ...rename, packageId: packages[0].id }])).status, 409);
+      assert.deepEqual(await readPackages(), beforeRename, "a rejected batch leaves every package unchanged");
+      const savedNames = await renamePackages([rename]);
+      assert.equal(savedNames.status, 200);
+      assert.deepEqual((await savedNames.json()).packages, [{ packageId: first.id, name: rename.name }]);
+      assert.equal((await renamePackages([rename])).status, 200, "an identical retry is safe");
+      assert.deepEqual(await readPackages(), [{ ...first, name: rename.name }, second]);
+      assert.equal((await pricing.getEnterprisePricingProduct(packSaved.productId)).active.id, edited.revisionId);
+      assert.equal(writes.length, writesBefore, "package names save without a provider write");
     } finally { await new Promise(resolve => server.close(resolve)); }
   });
 

@@ -8,6 +8,7 @@ import { fileURLToPath } from "url";
 import {
   categories,
   localLinePackageMeta,
+  localLineProductMeta,
   packages,
   productPricingProfiles,
   products,
@@ -808,14 +809,16 @@ async function buildSheetValues({ vendorNameMatcher = isGooglePricelistVendorNam
     profileRows,
     saleRows,
     categoryRows,
-    vendorRows
+    vendorRows,
+    productMetaRows
   ] = await Promise.all([
     db.select().from(products),
     db.select().from(packages),
     db.select().from(productPricingProfiles),
     db.select().from(productSales),
     db.select().from(categories),
-    db.select().from(vendors)
+    db.select().from(vendors),
+    db.select({ productId: localLineProductMeta.productId, localLineProductId: localLineProductMeta.localLineProductId }).from(localLineProductMeta)
   ]);
 
   let packageMetaRows = [];
@@ -833,7 +836,7 @@ async function buildSheetValues({ vendorNameMatcher = isGooglePricelistVendorNam
   catch(error){if(error.code!=='ER_NO_SUCH_TABLE')throw error;}
   return buildPricelistSheetValues({
     enterprisePrices,bundleProductIds,productRows, packageRows, profileRows, saleRows, categoryRows, vendorRows,
-    packageMetaRows, vendorNameMatcher
+    productMetaRows, packageMetaRows, vendorNameMatcher
   });
 }
 
@@ -846,6 +849,7 @@ export function buildPricelistSheetValues({
   saleRows = [],
   categoryRows = [],
   vendorRows = [],
+  productMetaRows = [],
   packageMetaRows = [],
   vendorNameMatcher = isGooglePricelistVendorName
 } = {}) {
@@ -853,6 +857,7 @@ export function buildPricelistSheetValues({
   const vendorMap = new Map(vendorRows.map((row) => [Number(row.id), row]));
   const saleByProductId = new Map(saleRows.map((row) => [Number(row.productId), row]));
   const profileByProductId = new Map(profileRows.map((row) => [Number(row.productId), row]));
+  const localLineIdByProductId = new Map(productMetaRows.map((row) => [Number(row.productId), Number(row.localLineProductId)]));
   const packageMetaByPackageId = new Map(packageMetaRows.map((row) => [Number(row.packageId), row]));
   const packagesByProductId = packageRows.reduce((acc, row) => {
     const key = Number(row.productId);
@@ -937,7 +942,7 @@ export function buildPricelistSheetValues({
     const saleEnabled = Boolean(snapshot.profile.onSale);
     const rowValues = {
       id: productId,
-      localLineProductID: productId,
+      localLineProductID: localLineIdByProductId.get(productId) || "",
       category: categoryMap.get(Number(product.categoryId)) || "Uncategorized",
       vendor: vendor?.name || "",
       productName: product.name || "",
