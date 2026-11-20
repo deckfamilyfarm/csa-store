@@ -132,8 +132,66 @@ from real Printify order creation**, even if every supplier flag is enabled.
 `MERCH_BASE_URL` is the trusted checkout return origin. Staff preview is
 `/#/merchandise?preview=1`; it requires admin authentication and cannot buy drafts.
 The current isolated preview is served at `http://127.0.0.1:5176/admin` →
-Store → Merchandise. Public merchandise remains hidden by default; the Wix navigation link stays in
-place until a reviewed launch.
+Store → Merchandise. Public merchandise remains hidden by default. The shared
+Shop → Merchandise link opens the dedicated merchandise host (locally
+`/merchandise`); the catalog and checkout switches still control availability.
+
+## Dedicated hostname and nginx
+
+`https://merchandise.deckfamilyfarm.com/` opens the existing branded merchandise
+shop. Local `/merchandise`, `?experience=merchandise` and existing
+`store.deckfamilyfarm.com/#/merchandise` links remain supported. Subscribe,
+Dropsites, Turkeys and Merchandise use `buildSubscribeNavLinks`, so the same
+Shop → Merchandise destination is used in every desktop and mobile menu.
+Account recovery, staff login, liability links and turkey order routes remain
+available on the merchandise host.
+
+On November 19, 2026, both merchandise and turkey DNS resolved to this server,
+`146.190.123.155`. Merchandise still needed its own nginx block and HTTPS
+certificate. The existing hosts all proxy to the same app at `127.0.0.1:5176`;
+no additional process, database or Stripe webhook destination is required.
+
+From `/home/jdeck/code/csa-store`, install the prepared HTTP configuration, then
+let Certbot add the certificate and HTTP-to-HTTPS redirect:
+
+```sh
+sudo install -m 644 deploy/nginx/merchandise.deckfamilyfarm.com.conf /etc/nginx/sites-available/merchandise.deckfamilyfarm.com
+sudo ln -s /etc/nginx/sites-available/merchandise.deckfamilyfarm.com /etc/nginx/sites-enabled/merchandise.deckfamilyfarm.com
+sudo nginx -t && sudo systemctl reload nginx
+sudo certbot --nginx -d merchandise.deckfamilyfarm.com --redirect
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+The template is for first installation only: do not copy it over a working
+HTTPS configuration on a later deployment. If a site file or enabled link
+already exists, inspect it first. The nginx Host header must reach the app
+unchanged so the browser selects the merchandise landing page. Proxy all paths,
+including `/api`, `/images`, `/assets` and `/liability`.
+
+After routing tests and the required stabilization runner pass, build the
+frontend. The running production app serves `design/template/vite-app/dist`
+directly. A frontend-only build does not require an API restart. The checkout
+origin allowlist change in `storefrontCore.js` requires restarting the PM2
+`store` process once:
+
+```sh
+npm --prefix design/template/vite-app run build
+pm2 restart store
+curl -fsS https://merchandise.deckfamilyfarm.com/api/health
+curl -fsS https://merchandise.deckfamilyfarm.com/api/merchandise/catalog
+```
+
+New checkouts preserve the browser's trusted starting hostname, including the
+merchandise host, even if `MERCH_BASE_URL` still names the store. Optionally set
+`MERCH_BASE_URL=https://merchandise.deckfamilyfarm.com` as the default for requests
+without an Origin header. Existing checkout requests, return URLs, keys and
+receipts stay frozen. Keep the store hostname and existing webhook endpoints
+working for earlier purchases; browser carts and guest order access are scoped
+to each origin and are not copied across hosts.
+
+Verify the landing page, product photos, cart and the four shared menu
+destinations in a browser. Opening a page does not require a purchase or a
+Printify submission.
 
 ## Initial production payment verification
 
