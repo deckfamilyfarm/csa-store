@@ -213,6 +213,11 @@ Verify the landing page, product photos, cart and the four shared menu
 destinations in a browser. Opening a page does not require a purchase or a
 Printify submission.
 
+Storefront product photos open an enlarged photo dialog on click or keyboard
+activation. Previous/Next buttons, thumbnails and the photo count appear only
+inside that popup. Arrow keys navigate photos; Escape or Close dismisses it and
+returns focus to the product photo. Photos continue to match the selected variant.
+
 ## Initial production payment verification
 
 The November 18 rollout enables live merchandise checkout using the existing

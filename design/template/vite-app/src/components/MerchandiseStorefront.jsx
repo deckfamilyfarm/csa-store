@@ -6,6 +6,7 @@ import {buildSubscribeNavLinks} from './subscribeNavigation.js';
 import { readCart, readPending, cartKey, cartAfterPayment, rememberAccess, orderAccess, merchandiseCartLines, MERCH_CART, MERCH_PENDING } from './merchandiseCart.js';
 import { CheckoutRecovery, MerchandiseCheckout, MerchandiseConfirmation, merchandiseLink, merchandiseMoney as money } from './MerchandiseCheckout.jsx';
 import { merchandiseOptionGroups, merchandiseVariantForOptions } from './merchandiseVariants.js';
+import { MerchandisePhotoGallery } from './MerchandisePhotoGallery.jsx';
 import './merchandise.css';
 const base=import.meta.env.VITE_API_BASE || '/api';
 const newToken=()=>Array.from(crypto.getRandomValues(new Uint8Array(32)),b=>b.toString(16).padStart(2,'0')).join('');
@@ -26,7 +27,7 @@ async function request(path,{body,token,admin=false}={}) {
   } finally { clearTimeout(timeout); }
 }
 function ProductCard({product,cart,add,disabled,preview}) {
-  const [variantId,setVariantId]=useState(''),[photo,setPhoto]=useState(0);
+  const [variantId,setVariantId]=useState('');
   const [chosenOptions,setChosenOptions]=useState({});
   const [addFeedback,setAddFeedback]=useState(null);
   const variants=preview?product.variants.filter(v=>v.sourceEnabled):product.variants.filter(v=>v.retailCents!=null && (v.available!==false) && (v.enabled!==false));
@@ -41,19 +42,11 @@ function ProductCard({product,cart,add,disabled,preview}) {
   const photoVariant=selected || (choices.color ? merchandiseVariantForOptions(variants,{color:choices.color}) : null);
   const matching=product.images.filter(image=>image.variantIds?.includes(photoVariant?.id)||image.variant_ids?.includes(photoVariant?.externalId));
   const images=matching.length?matching:product.images;
-  const currentPhoto=images.length?photo%images.length:0;
-  const movePhoto=direction=>setPhoto(p=>(p+direction+images.length)%images.length);
   const price=preview?selected?.sellingPriceCents:selected?.retailCents;
   const photoOption=selected?.title || groups.find(group=>group.type==='color')?.values.find(value=>value.id===choices.color)?.title;
-  useEffect(()=>setPhoto(0),[photoVariant?.id]);
-  return <article className="merch-card">{images.length>0&&<div className="merch-gallery" role="group" aria-roledescription="carousel" aria-label={`${product.name} photos`}
-    onKeyDown={event=>{if(images.length>1&&['ArrowLeft','ArrowRight'].includes(event.key)){event.preventDefault();movePhoto(event.key==='ArrowLeft'?-1:1);}}}>
-    <img src={images[currentPhoto].src} alt={`${product.name}${photoOption?` — ${photoOption}`:''}`} loading="lazy"/>
-    {images.length>1&&<>
-      <div className="merch-gallery-dots" role="group" aria-label="Choose a photo">{images.map((image,index)=><button key={`${image.src}:${index}`} type="button" aria-label={`Show photo ${index+1} of ${images.length} of ${product.name}`} aria-current={index===currentPhoto?'true':undefined} onClick={()=>setPhoto(index)}/>)}</div>
-      <span className="merch-gallery-announcement" aria-live="polite" aria-atomic="true">Photo {currentPhoto+1} of {images.length}</span>
-    </>}
-  </div>}<h2>{product.name}</h2><div className="merch-description"><ProductDescription description={product.description}/></div>
+  return <article className="merch-card"><MerchandisePhotoGallery key={photoVariant?.id || 'all'} images={images}
+    name={`${product.name}${photoOption?` — ${photoOption}`:''}`} />
+    <h2>{product.name}</h2><div className="merch-description"><ProductDescription description={product.description}/></div>
     {variants.length?<>
       {groups.length>0 ? <div className="merch-variant-controls">
         {groups.filter(group=>group.values.length>1).map(({type,values})=><label key={type}>
