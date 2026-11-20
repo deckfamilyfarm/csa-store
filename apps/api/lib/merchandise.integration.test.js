@@ -10,6 +10,7 @@ import Stripe from 'stripe';
 import {createStorefrontStripeWebhook} from '../routes/storefront.js';
 import {storefrontWebhookEvent} from './storefrontStripe.js';
 import {dispatchStorefrontStripeEvent} from './storefrontStripeDispatch.js';
+import {merchandiseQuickApproval,merchandiseSaveInput} from '../../../design/template/vite-app/src/components/merchandiseAdminView.js';
 const socket=process.env.PRODUCT_SYNC_TEST_SOCKET;
 test('native merchandise catalog, Stripe payments and independent supplier fulfillment on disposable MySQL',{skip:!socket},async t=>{
   assert.match(socket,/^\/(?:private\/)?tmp\/csa-product-sync-[^/]+\//);
@@ -345,5 +346,31 @@ test('native merchandise catalog, Stripe payments and independent supplier fulfi
     assert.equal((await service.catalog()).products[0].variants[0].retailCents,1800);
     await assert.rejects(service.checkout({quoteId:stale.quote.quoteId,token:stale.access},'http://localhost:5177'),/retail price changed/);
     assert.equal((await service.viewOrder(result.orderId,q.access)).items[0].retailCents,1400);
+  });
+  await t.test('table approval uses defaults, confirms artwork and USD, disables unavailable selections and rejects stale retries',async()=>{
+    let p=(await service.catalog(true)).products[0];
+    p=await service.saveProduct(p.id,merchandiseSaveInput({...p,active:false,artworkReviewed:false,currency:null,
+      variants:p.variants.map(v=>({...v,enabled:false}))},{[localVariant]:''}),1);
+    assert.equal((await service.catalog()).products.length,0);
+    const body=merchandiseQuickApproval(p);
+    const saved=await service.saveProduct(p.id,body,1);
+    assert.equal(saved.active,true);assert.equal(saved.artworkReviewed,true);assert.equal(saved.currency,'USD');
+    assert.equal(saved.variants.find(v=>v.id===localVariant).retailCents,null);
+    assert.equal(saved.variants.find(v=>v.id!==localVariant).enabled,false);
+    assert.equal((await service.catalog()).products[0].variants[0].retailCents,1400);
+    await assert.rejects(service.saveProduct(p.id,body,1),/changed/);
+
+    await pool.query('UPDATE merch_variants SET available=0 WHERE product_id=?',[p.id]);
+    try {
+      assert.equal((await service.catalog()).products.length,0);
+      const unavailable=(await service.catalog(true)).products.find(row=>row.id===p.id);
+      assert.ok(unavailable.variants.every(v=>!v.canSell));
+      assert.throws(()=>merchandiseQuickApproval(unavailable),/No available/);
+      await assert.rejects(service.saveProduct(p.id,{...merchandiseSaveInput(saved),active:true},1),/not currently available/);
+      const disabled=await service.saveProduct(p.id,merchandiseSaveInput({...saved,active:false}),1);
+      assert.equal(disabled.active,false);
+    } finally {
+      for(const variant of saved.variants)await pool.query('UPDATE merch_variants SET available=? WHERE id=?',[variant.available?1:0,variant.id]);
+    }
   });
 });

@@ -69,7 +69,7 @@ export function createMerchandiseService({ pool, stripeClients = {}, provider, c
       shipsNationwide,shippingRegions:[...new Set([...configuredRegions,...(shipsNationwide?US_SHIPPING_REGIONS:[])])].sort(),
       checkoutEnabled:Boolean(config.checkoutEnabled && (config.mode!=='live' || config.liveEnabled)), mode:config.mode || 'test',
       ...(admin ? { vendors,controls:{ liveCheckout:Boolean(config.liveEnabled), supplierOrders:Boolean(config.ordersEnabled), production:Boolean(config.productionEnabled) } } : {}),
-      products:admin ? products : products.filter(p=>p.active).map(p=>({ id:p.id,name:p.name,description:p.description,
+      products:admin ? products : products.filter(p=>p.active && p.artworkReviewed && p.currency==='USD' && p.variants.some(v=>v.enabled && v.canSell && v.sellingPriceCents!==null)).map(p=>({ id:p.id,name:p.name,description:p.description,
         category:p.category,images:p.images.map(image=>({src:image.src,variantIds:p.variants.filter(v=>image.variant_ids?.includes(v.externalId)).map(v=>v.id)})),currency:p.currency,variants:p.variants.filter(v=>v.enabled && v.canSell && v.sellingPriceCents!==null)
           .map(v=>({id:v.id,title:v.title,options:v.options,retailCents:v.sellingPriceCents})) })) };
   }

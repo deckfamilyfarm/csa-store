@@ -1,60 +1,8 @@
 import React,{useEffect,useState} from 'react';
-import {adminGet,adminPut,adminPost} from '../adminApi.js';
+import {adminGet,adminPost} from '../adminApi.js';
+import { MerchandiseProductTable } from './MerchandiseProductTable.jsx';
 import './merchandise.css';
 const money=value=>value==null?'Not recorded':new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(value/100);
-function Editor({product,vendors,token,onSaved,onAction}) {
-  const [draft,setDraft]=useState(product),[showAll,setShowAll]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState('');
-  const [priceInputs,setPriceInputs]=useState({});
-  const [dirty,setDirty]=useState(false);
-  useEffect(()=>{setDraft(product);setDirty(false);},[product]);
-  const change=(key,value)=>{setDraft(d=>({...d,[key]:value}));setDirty(true);};
-  const variant=(id,values)=>{setDraft(d=>({...d,variants:d.variants.map(v=>v.id===id?{...v,...values}:v)}));setDirty(true);};
-  const availableVariants = draft.variants.filter(v=>v.canSell);
-  const allAvailableSelected = availableVariants.length>0 && availableVariants.every(v=>v.enabled);
-  const someAvailableSelected = availableVariants.some(v=>v.enabled);
-  function sellAllVariants(enabled) {
-    setDraft(d=>({...d,variants:d.variants.map(v=>({...v,enabled:enabled && v.canSell}))}));
-    setDirty(true);
-  }
-  async function save(){setBusy(true);setError('');try{
-    const prices=Object.fromEntries(Object.entries(priceInputs).map(([id,value])=>{
-      if(value!==''&&!/^\d+(?:\.\d{1,2})?$/.test(value))throw new Error('Enter retail prices with at most two decimal places.');
-      return [id,value===''?null:Math.round(Number(value)*100)];
-    }));
-    const saved=await adminPut(`merchandise/products/${product.id}`,token,{version:draft.version,vendorId:draft.vendorId,active:draft.active,artworkReviewed:draft.artworkReviewed,currency:draft.currency,
-      variants:draft.variants.map(v=>({id:v.id,enabled:v.enabled,retailCents:Object.hasOwn(prices,v.id)?prices[v.id]:v.retailCents}))});onSaved(saved);
-  }catch(e){setError(e.message);}finally{setBusy(false);}}
-  return <details className="merch-editor"><summary>{product.name} · {product.active?'Listed':'Draft'} · {product.variants.filter(v=>v.sourceEnabled).length} supplier-enabled variants</summary>
-    {error&&<p role="alert">{error}</p>}
-    <div className="merch-product-heading">{product.images[0]&&<img src={product.images[0].src} alt={product.name} loading="lazy"/>}
-      <div><p>{product.provider || 'Supplier catalog unavailable'} · Shop {product.shopId} · {product.externalId}</p><p>{product.holds.join(' ')}</p>
-      <label>Local vendor<select value={draft.vendorId || ''} onChange={e=>change('vendorId',Number(e.target.value))}><option value="">Choose an existing vendor</option>{vendors.map(v=><option key={v.id} value={v.id}>{v.name}</option>)}</select></label>
-      <p>Supplier visibility: {product.sourceVisible?'Visible':'Hidden'}. Default prices add 40% to Printify production cost, with a $10.00 minimum.</p>
-      <label><input type="checkbox" checked={draft.artworkReviewed} onChange={e=>change('artworkReviewed',e.target.checked)}/> I reviewed the artwork, placements and any generated layers for these existing supplier products.</label>
-      <label><input type="checkbox" checked={draft.currency==='USD'} onChange={e=>change('currency',e.target.checked?'USD':null)}/> I confirmed the supplier money values are USD.</label>
-      <label><input type="checkbox" checked={draft.active} onChange={e=>change('active',e.target.checked)}/> Show this product in the CSA Store</label></div></div>
-    <div className="merch-actions">
-      <label><input type="checkbox" checked={allAvailableSelected} disabled={!availableVariants.length || busy}
-        ref={input=>{if(input)input.indeterminate=someAvailableSelected && !allAvailableSelected;}}
-        onChange={e=>sellAllVariants(e.target.checked)}/> Sell all available variants ({availableVariants.length})</label>
-      <label><input type="checkbox" checked={showAll} onChange={e=>setShowAll(e.target.checked)}/> Show all source variants, including disabled options</label>
-    </div>
-    <p>Leave Modified Price blank to use the Default price.</p>
-    <div className="merch-table-scroll"><table><thead><tr><th>Variant</th><th>Supplier</th><th>Cost</th><th>Saved channel price</th><th>Default</th><th>Modified Price</th><th>Sell this variant</th></tr></thead>
-      <tbody>{draft.variants.filter(v=>showAll||v.sourceEnabled||v.enabled).map(v=><tr key={v.id}>
-        <td>{v.title}<small>{v.sku}</small></td>
-        <td>{!v.sourceEnabled?'Not enabled':!v.available?'Unavailable':v.canSell?'Available':'Needs supplier review'}</td>
-        <td>{money(v.costCents)}</td><td>{money(v.channelPriceCents)}</td><td>{money(v.proposedRetailCents)}</td>
-        <td><input aria-label={`${v.title} modified price in dollars`} type="text" inputMode="decimal"
-          value={priceInputs[v.id]??(v.retailCents==null?'':(v.retailCents/100).toFixed(2))}
-          onChange={e=>{setPriceInputs(inputs=>({...inputs,[v.id]:e.target.value}));setDirty(true);}}/></td>
-        <td><input aria-label={`Sell ${v.title} in the CSA Store`} type="checkbox" disabled={(!v.canSell && !v.enabled) || busy}
-          checked={v.enabled} onChange={e=>variant(v.id,{enabled:e.target.checked})}/></td>
-      </tr>)}</tbody></table></div>
-    <div className="merch-actions"><button type="button" disabled={busy} onClick={save}>{busy?'Saving…':'Save merchandise settings'}</button>
-      <button type="button" disabled={busy||dirty} onClick={()=>onAction(()=>adminPost(`merchandise/products/${product.id}/refresh`,token,{}))}>Refresh supplier information</button><span>{dirty?'Save local edits before refreshing.':'A supplier change disables the product for review and preserves modified prices.'}</span></div>
-  </details>;
-}
 export function AdminMerchandise({token}) {
   const [catalog,setCatalog]=useState(null),[data,setData]=useState({orders:[],report:[]}),[error,setError]=useState(''),[busy,setBusy]=useState(false),[review,setReview]=useState(null),[notice,setNotice]=useState('');
   async function load(){const [c,o]=await Promise.all([adminGet('merchandise/catalog',token),adminGet('merchandise/orders',token)]);setCatalog(c);setData(o);}
@@ -66,7 +14,9 @@ export function AdminMerchandise({token}) {
     {!catalog?<p>Merchandise setup is loading. If a migration is required, run the explicit merchandise migration documented in the repository.</p>:<>
       <p className="merch-status">Stripe mode: {catalog.mode}. Checkout: {catalog.checkoutEnabled?'Enabled':'Disabled'}. Live checkout: {catalog.controls.liveCheckout?'Enabled':'Disabled'}. Printify orders: {catalog.controls.supplierOrders?'Enabled':'Disabled'}. Production: {catalog.controls.production?'Enabled':'Disabled'}.</p>
       <p><a href="/#/merchandise?preview=1" target="_blank" rel="noreferrer">Preview merchandise catalog</a></p>
-      {catalog.products.map(product=><Editor key={`${product.id}:${product.version}`} product={product} vendors={catalog.vendors} token={token} onSaved={saved=>setCatalog(c=>({...c,products:c.products.map(p=>p.id===saved.id?saved:p)}))} onAction={action}/>)}
+      <MerchandiseProductTable products={catalog.products} vendors={catalog.vendors} token={token}
+        onSaved={saved=>setCatalog(c=>({...c,products:c.products.map(p=>p.id===saved.id?saved:p)}))}
+        onReloaded={next=>setCatalog(c=>({...c,...next}))} />
       <h3>Financial reporting</h3><p>Test and live orders are reported separately. Profit is estimated until supplier costs and Stripe fees are confirmed.</p>
       <div className="merch-table-scroll"><table><thead><tr><th>Mode</th><th>Paid orders</th><th>Gross sales</th><th>Shipping charged</th><th>Tax collected</th><th>Production cost</th><th>Shipping cost</th><th>Supplier tax</th><th>Known Stripe fees</th><th>Refunds</th><th>Estimated gross profit</th></tr></thead><tbody>{data.report.map(r=><tr key={r.mode}><td>{r.mode}</td><td>{r.paidOrders}</td><td>{money(r.grossSalesCents)}</td><td>{money(r.shippingChargedCents)}</td><td>{money(r.taxCollectedCents)}</td><td>{money(r.productionCostCents)}</td><td>{money(r.shippingCostCents)}</td><td>{money(r.supplierTaxCents)}</td><td>{money(r.knownStripeFeesCents)} ({r.missingStripeFees} missing)</td><td>{money(r.refundsCents)}</td><td>{money(r.estimatedGrossProfitCents)} ({r.estimatedCostOrders} estimated costs)</td></tr>)}</tbody></table></div>
       <h3>Merchandise orders</h3>{!data.orders.length&&<p>No merchandise orders yet.</p>}

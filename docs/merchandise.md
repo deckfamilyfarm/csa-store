@@ -19,6 +19,26 @@ the importer never creates a vendor or assumes IDs are interchangeable.
 Supplier refresh preserves approved retail values but disables changed products
 and resets artwork review. Versions reject stale edits and refreshes.
 
+Store → Merchandise shows a product table with available/total variant counts,
+selling/default price ranges, artwork and USD review, and listing status. Search
+or choose **No available variants** to find disabled products. Products without
+an available, selected, validly priced variant are excluded from the public
+catalog even when an older listing flag remains saved; they stay visible to
+staff, and cannot be enabled through the save API without available variants.
+
+**Approve & sell all** is a single explicit approval: clicking it confirms artwork,
+placements/generated layers and USD, selects all currently available variants,
+disables unavailable selections, and lists the product using the displayed
+version. It uses default prices unless an intentional modified price is already
+saved; existing overrides are preserved. Supplier/provider holds and invalid
+prices cannot be bypassed by this shortcut. No supplier orders are submitted.
+
+Click a product or **Settings & prices** for the settings popup. Review photos,
+choose the existing local vendor, edit individual variant selections and prices,
+or use **Use default prices for every variant** to clear overrides explicitly.
+Blank modified prices use the default. Save before refreshing supplier data;
+closing with unsaved changes asks whether to discard them.
+
 All supplier variants, options, images, descriptions and production records are
 preserved, including disabled and unavailable variants. Do not enable unavailable
 hoodies, substitute their missing provider, or discard generated neck layers.
@@ -284,7 +304,7 @@ represented as confirmed profit.
 ## Validation and launch gates
 
 ```sh
-node --test apps/api/lib/merchandise.test.js design/template/vite-app/src/components/merchandiseCart.test.js
+node --test apps/api/lib/merchandise.test.js design/template/vite-app/src/components/merchandiseCart.test.js design/template/vite-app/src/components/merchandiseAdminView.test.js
 python3 scripts/test-stabilization.py --docker
 npm --prefix design/template/vite-app run build
 ```

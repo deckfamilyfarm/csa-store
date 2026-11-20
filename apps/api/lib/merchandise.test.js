@@ -7,6 +7,8 @@ import {merchandiseConfig,merchandiseStripeEvent} from './merchandiseRuntime.js'
 import Stripe from 'stripe';
 import {hasAdminPermission} from './adminRoles.js';
 import {dispatchStorefrontStripeEvent} from './storefrontStripeDispatch.js';
+import {createMerchandiseService} from './merchandiseService.js';
+import {MERCHANDISE_TABLES} from './merchandiseSchema.js';
 test('merchandise administration requires its own grant or full admin',()=>{
   assert.equal(hasAdminPermission(['merchandise_admin'],'merchandise_admin'),true);
   assert.equal(hasAdminPermission(['admin'],'merchandise_admin'),true);
@@ -96,4 +98,40 @@ test('default retail applies a 40% markup with a $10 floor',()=>{
   assert.equal(proposedRetail(715),1001);
   assert.equal(proposedRetail(1001),1401);
   assert.equal(proposedRetail(null),null);
+});
+
+test('public merchandise excludes empty, unavailable and unreviewed listings while admin keeps every product visible without writes', async () => {
+  const source = JSON.stringify({ product: { visible: true }, catalog: { shipping: {}, provider: { id: 20 }, variants: { variants: [{ id: 101 }, { id: 102 }] } } });
+  const products = [1, 2].map(id => ({ id, name: `Product ${id}`, vendor_id: 3153, source_json: source,
+    images_json: '[]', holds_json: '[]', active: 1, artwork_reviewed: 1, currency: 'USD', version: 4 }));
+  const variants = [1, 2].map(id => ({ id, product_id: id, external_id: 100 + id, options_json: '[]',
+    source_enabled: 1, available: 1, enabled: 1, cost_cents: 1000, retail_cents: null }));
+  const pool = { query: async sql => {
+    if (sql.includes('information_schema.TABLES')) return [Object.keys(MERCHANDISE_TABLES).map(name => ({ name }))];
+    if (sql.startsWith('SHOW COLUMNS')) return [[{ Field: 'vendor_id' }]];
+    if (sql.startsWith('SELECT * FROM merch_products')) return [structuredClone(products)];
+    if (sql.startsWith('SELECT * FROM merch_variants')) return [structuredClone(variants)];
+    if (sql.startsWith('SELECT id,name FROM vendors')) return [[{ id: 3153, name: 'Deck Family Farm' }]];
+    throw new Error(`Unexpected write or query: ${sql}`);
+  } };
+  const service = createMerchandiseService({ pool, config: { catalogEnabled: true } });
+  assert.equal((await service.catalog()).products.length, 2);
+  for (const change of [
+    () => { variants[1].available = 0; },
+    () => { variants[1].source_enabled = 0; },
+    () => { variants[1].enabled = 0; },
+    () => { variants[1].cost_cents = null; },
+    () => { products[1].artwork_reviewed = 0; },
+    () => { products[1].currency = null; },
+    () => { products[1].source_json = JSON.stringify({ product: {}, catalog: {} }); }
+  ]) {
+    const originalProduct = structuredClone(products[1]), originalVariant = structuredClone(variants[1]);
+    change();
+    const publicCatalog = await service.catalog();
+    assert.deepEqual(publicCatalog.products.map(product => product.id), [1]);
+    assert.equal(publicCatalog.products[0].variants[0].retailCents, 1400);
+    const adminCatalog = await service.catalog(true);
+    assert.equal(adminCatalog.products.length, 2);
+    Object.assign(products[1], originalProduct); Object.assign(variants[1], originalVariant);
+  }
 });
